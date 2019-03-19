@@ -59,6 +59,7 @@ import {
 import { toggleDraftSavedNotification } from 'src/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
+import * as Sentry from '@sentry/browser'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -208,6 +209,11 @@ export const messages = defineMessages({
     id: 'modal.title.submitConfirmation',
     defaultMessage: 'Are you ready to submit?',
     description: 'Title for submit confirmation modal'
+  },
+  queryError: {
+    id: 'register.registerForm.queryError',
+    defaultMessage: `{error, select, regError {The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.}}`,
+    description: 'The error message shown when a search query fails'
   }
 })
 
@@ -253,6 +259,12 @@ const ConfirmBtn = styled(PrimaryButton)`
   }
 `
 
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
 function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
   return viewParams.tabId || form.sections[0].id
 }
@@ -317,6 +329,10 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   selectedTabId: string
+  errorSection: {
+    showError: boolean
+    errorEvent: string
+  }
 }
 const VIEW_TYPE = {
   REVIEW: 'review',
@@ -362,7 +378,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
       selectedTabId: '',
       isDataAltered: false,
       rejectFormOpen: false,
-      showRegisterModal: false
+      showRegisterModal: false,
+      errorSection: {
+        showError: false,
+        errorEvent: 'error'
+      }
     }
   }
 
@@ -485,6 +505,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.deleteDraft(draft)
   }
 
+  registrationOnError = (error: Error) => {
+    Sentry.captureException(error)
+    this.setState({
+      showRegisterModal: false,
+      errorSection: {
+        showError: true,
+        errorEvent: 'regError'
+      }
+    })
+  }
+
   submitForm = () => {
     this.setState({ showSubmitModal: true })
   }
@@ -592,163 +623,180 @@ class RegisterFormView extends React.Component<FullProps, State> {
           registerForm.sections
         )
       : registerForm.sections
+    const isErrorOccured =
+      this.state.errorSection && this.state.errorSection.showError
+
     return (
       <FormViewContainer>
-        <ViewHeaderWithTabs
-          id="informant_parent_view"
-          title={intl.formatMessage(title, { event: draft.event })}
-        >
-          <StickyFormTabs
-            sections={sectionForReview}
-            activeTabId={activeSection.id}
-            onTabClick={(tabId: string) =>
-              goToTab(
-                this.props.tabRoute,
-                draft.id,
-                tabId,
-                draft.event.toLowerCase()
-              )
-            }
-          />
-        </ViewHeaderWithTabs>
-        <FormContainer>
-          <HeaderContent>
-            <Swipeable
-              disabled={isReviewSection || !isMobileDevice()}
-              id="swipeable_block"
-              trackMouse
-              onSwipedLeft={() =>
-                this.onSwiped(
-                  draft.id,
-                  nextSection,
-                  this.props.tabRoute,
-                  draft.event.toLowerCase(),
-                  goToTab
-                )
-              }
-              onSwipedRight={() =>
-                this.onSwiped(
-                  draft.id,
-                  getPreviousSection(registerForm.sections, activeSection),
-                  this.props.tabRoute,
-                  draft.event.toLowerCase(),
-                  goToTab
-                )
-              }
+        {isErrorOccured && (
+          <ErrorText id="error_message_section">
+            {intl.formatMessage(messages.queryError, {
+              error: this.state.errorSection.errorEvent
+            })}
+          </ErrorText>
+        )}
+
+        {!isErrorOccured && (
+          <>
+            <ViewHeaderWithTabs
+              id="informant_parent_view"
+              title={intl.formatMessage(title, { event: draft.event })}
             >
-              {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-                <ReviewSection
-                  tabRoute={this.props.tabRoute}
-                  draft={draft}
-                  submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                  deleteApplicationClickEvent={() => {
-                    this.props.deleteDraft(draft)
-                    history.push('/')
-                  }}
-                />
-              )}
-              {activeSection.viewType === VIEW_TYPE.REVIEW && (
-                <ReviewSection
-                  tabRoute={this.props.tabRoute}
-                  draft={draft}
-                  rejectApplicationClickEvent={() => {
-                    this.toggleRejectForm()
-                  }}
-                  registerClickEvent={this.registerApplication}
-                />
-              )}
-              {activeSection.viewType === 'form' && (
-                <Box>
-                  <FormSectionTitle
-                    id={`form_section_title_${activeSection.id}`}
-                  >
-                    {intl.formatMessage(activeSection.title)}
-                    {activeSection.optional && (
-                      <Optional
-                        id={`form_section_optional_label_${activeSection.id}`}
-                        disabled={activeSection.disabled}
-                      >
-                        &nbsp;&nbsp;•&nbsp;
-                        {intl.formatMessage(messages.optionalLabel)}
-                      </Optional>
-                    )}
-                  </FormSectionTitle>
-                  {activeSection.notice && (
-                    <Notice id={`form_section_notice_${activeSection.id}`}>
-                      {intl.formatMessage(activeSection.notice)}
-                    </Notice>
-                  )}
-                  <form
-                    id={`form_section_id_${activeSection.id}`}
-                    onSubmit={handleSubmit}
-                  >
-                    <FormFieldGenerator
-                      id={activeSection.id}
-                      onChange={this.modifyDraft}
-                      setAllFieldsDirty={setAllFieldsDirty}
-                      fields={activeSection.fields}
-                      offlineResources={offlineResources}
-                      draftData={draft.data}
+              <StickyFormTabs
+                sections={sectionForReview}
+                activeTabId={activeSection.id}
+                onTabClick={(tabId: string) =>
+                  goToTab(
+                    this.props.tabRoute,
+                    draft.id,
+                    tabId,
+                    draft.event.toLowerCase()
+                  )
+                }
+              />
+            </ViewHeaderWithTabs>
+            <FormContainer>
+              <HeaderContent>
+                <Swipeable
+                  disabled={isReviewSection || !isMobileDevice()}
+                  id="swipeable_block"
+                  trackMouse
+                  onSwipedLeft={() =>
+                    this.onSwiped(
+                      draft.id,
+                      nextSection,
+                      this.props.tabRoute,
+                      draft.event.toLowerCase(),
+                      goToTab
+                    )
+                  }
+                  onSwipedRight={() =>
+                    this.onSwiped(
+                      draft.id,
+                      getPreviousSection(registerForm.sections, activeSection),
+                      this.props.tabRoute,
+                      draft.event.toLowerCase(),
+                      goToTab
+                    )
+                  }
+                >
+                  {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+                    <ReviewSection
+                      tabRoute={this.props.tabRoute}
+                      draft={draft}
+                      submitClickEvent={this.submitForm}
+                      saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
+                      deleteApplicationClickEvent={() => {
+                        this.props.deleteDraft(draft)
+                        history.push('/')
+                      }}
                     />
-                  </form>
-                  <FormActionSection>
-                    <FormAction>
-                      {
-                        <BackButtonContainer onClick={goBack}>
-                          <BackButton icon={() => <ArrowBack />} />
-                          <BackButtonText>
-                            {intl.formatMessage(messages.back)}
-                          </BackButtonText>
-                        </BackButtonContainer>
-                      }
-                      {nextSection && (
-                        <FormPrimaryButton
-                          onClick={() =>
-                            goToTab(
-                              this.props.tabRoute,
-                              draft.id,
-                              nextSection.id,
-                              draft.event.toLowerCase()
-                            )
-                          }
-                          id="next_section"
-                          icon={() => <ArrowForward />}
-                        >
-                          {intl.formatMessage(messages.next)}
-                        </FormPrimaryButton>
+                  )}
+                  {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                    <ReviewSection
+                      tabRoute={this.props.tabRoute}
+                      draft={draft}
+                      rejectApplicationClickEvent={() => {
+                        this.toggleRejectForm()
+                      }}
+                      registerClickEvent={this.registerApplication}
+                    />
+                  )}
+                  {activeSection.viewType === 'form' && (
+                    <Box>
+                      <FormSectionTitle
+                        id={`form_section_title_${activeSection.id}`}
+                      >
+                        {intl.formatMessage(activeSection.title)}
+                        {activeSection.optional && (
+                          <Optional
+                            id={`form_section_optional_label_${
+                              activeSection.id
+                            }`}
+                            disabled={activeSection.disabled}
+                          >
+                            &nbsp;&nbsp;•&nbsp;
+                            {intl.formatMessage(messages.optionalLabel)}
+                          </Optional>
+                        )}
+                      </FormSectionTitle>
+                      {activeSection.notice && (
+                        <Notice id={`form_section_notice_${activeSection.id}`}>
+                          {intl.formatMessage(activeSection.notice)}
+                        </Notice>
                       )}
-                    </FormAction>
-                    <FormActionDivider />
-                    <FormAction>
-                      {
-                        <DraftButtonContainer
-                          id="save_as_draft"
-                          onClick={() => this.onSaveAsDraftClicked()}
-                        >
-                          <DraftSimple />
-                          <DraftButtonText>
-                            {intl.formatMessage(messages.valueSaveAsDraft)}
-                          </DraftButtonText>
-                        </DraftButtonContainer>
-                      }
-                    </FormAction>
-                  </FormActionSection>
-                </Box>
-              )}
-            </Swipeable>
-          </HeaderContent>
-        </FormContainer>
-        <ViewFooter>
-          <FooterAction>
-            <FooterPrimaryButton
-              id="save_draft"
-              onClick={() => history.push(CONFIRMATION_SCREEN)}
-            >
-              {intl.formatMessage(messages.saveDraft)}
-            </FooterPrimaryButton>
-          </FooterAction>
-        </ViewFooter>
+                      <form
+                        id={`form_section_id_${activeSection.id}`}
+                        onSubmit={handleSubmit}
+                      >
+                        <FormFieldGenerator
+                          id={activeSection.id}
+                          onChange={this.modifyDraft}
+                          setAllFieldsDirty={setAllFieldsDirty}
+                          fields={activeSection.fields}
+                          offlineResources={offlineResources}
+                          draftData={draft.data}
+                        />
+                      </form>
+                      <FormActionSection>
+                        <FormAction>
+                          {
+                            <BackButtonContainer onClick={goBack}>
+                              <BackButton icon={() => <ArrowBack />} />
+                              <BackButtonText>
+                                {intl.formatMessage(messages.back)}
+                              </BackButtonText>
+                            </BackButtonContainer>
+                          }
+                          {nextSection && (
+                            <FormPrimaryButton
+                              onClick={() =>
+                                goToTab(
+                                  this.props.tabRoute,
+                                  draft.id,
+                                  nextSection.id,
+                                  draft.event.toLowerCase()
+                                )
+                              }
+                              id="next_section"
+                              icon={() => <ArrowForward />}
+                            >
+                              {intl.formatMessage(messages.next)}
+                            </FormPrimaryButton>
+                          )}
+                        </FormAction>
+                        <FormActionDivider />
+                        <FormAction>
+                          {
+                            <DraftButtonContainer
+                              id="save_as_draft"
+                              onClick={() => this.onSaveAsDraftClicked()}
+                            >
+                              <DraftSimple />
+                              <DraftButtonText>
+                                {intl.formatMessage(messages.valueSaveAsDraft)}
+                              </DraftButtonText>
+                            </DraftButtonContainer>
+                          }
+                        </FormAction>
+                      </FormActionSection>
+                    </Box>
+                  )}
+                </Swipeable>
+              </HeaderContent>
+            </FormContainer>
+            <ViewFooter>
+              <FooterAction>
+                <FooterPrimaryButton
+                  id="save_draft"
+                  onClick={() => history.push(CONFIRMATION_SCREEN)}
+                >
+                  {intl.formatMessage(messages.saveDraft)}
+                </FooterPrimaryButton>
+              </FooterAction>
+            </ViewFooter>
+          </>
+        )}
 
         {this.state.showSubmitModal && (
           <MutationProvider
@@ -808,6 +856,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             form={registerForm}
             draft={draft}
             onCompleted={this.successfullyRegistered}
+            onError={this.registrationOnError}
           >
             <MutationContext.Consumer>
               {({ mutation, loading, data }) => (
