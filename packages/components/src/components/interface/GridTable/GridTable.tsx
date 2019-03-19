@@ -1,10 +1,10 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpnasionContentInfo'
-import { IAction, IDynamicValues } from './types'
+import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -21,7 +21,7 @@ const TableHeader = styled.div`
 
 const StyledBox = styled(Box)`
   margin-top: 15px;
-  padding: 12px 0px;
+  padding: 12px 0px 0px 0px;
   color: ${({ theme }) => theme.colors.placeholder};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
@@ -52,10 +52,18 @@ const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
 `
-
-const ExpendedSectionContainer = styled.div`
-  border-top: ${({ theme }) => `2px solid ${theme.colors.greyBorder}`};
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+const ExpendedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
+  border-top: ${({ theme, expanded }) =>
+    expanded ? `2px solid ${theme.colors.greyBorder}` : 'none'};
   margin-top: 5px;
+  overflow: hidden;
+  transition: max-height 600ms;
+  max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
+  animation: ${fadeIn} 600ms;
 `
 
 export enum ColumnContentAlignment {
@@ -75,6 +83,7 @@ interface IGridPreference {
 interface IGridTableProps {
   content: IDynamicValues[]
   columns: IGridPreference[]
+  expandedContentRows?: IExpandedContentPreference[]
   noResultText: string
   onPageChange?: (currentPage: number) => void
   pageSize?: number
@@ -212,6 +221,7 @@ export class GridTable extends React.Component<
         )}
         {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
+            const expanded = this.showExpandedSection(item.id as string)
             return (
               <StyledBox key={index}>
                 <RowWrapper
@@ -240,11 +250,15 @@ export class GridTable extends React.Component<
                     }
                   })}
                 </RowWrapper>
-                {this.showExpandedSection(item.id as string) && (
-                  <ExpendedSectionContainer>
-                    {<ExpansionContentInfo data={item} />}
-                  </ExpendedSectionContainer>
-                )}
+
+                <ExpendedSectionContainer expanded={expanded}>
+                  {expanded && (
+                    <ExpansionContentInfo
+                      data={item}
+                      preference={this.props.expandedContentRows}
+                    />
+                  )}
+                </ExpendedSectionContainer>
               </StyledBox>
             )
           }
