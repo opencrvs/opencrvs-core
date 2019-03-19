@@ -172,10 +172,6 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         onClick: this.goToHome
       },
       {
-        title: intl.formatMessage(messages.settings),
-        key: 'settings'
-      },
-      {
         title: intl.formatMessage(messages.logout),
         key: 'logout',
         onClick: this.toggleLogoutModal
