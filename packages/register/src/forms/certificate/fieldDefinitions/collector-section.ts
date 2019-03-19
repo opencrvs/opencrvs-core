@@ -219,10 +219,12 @@ export const collectBirthCertificateFormSection: IFormSection = {
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
+          kind: 'dynamic',
           dependency: 'otherPersonIDType',
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'otherPersonIDType',
           typeMapper: identityTypeMapper
         },
@@ -357,10 +359,12 @@ export const collectDeathCertificateFormSection: IFormSection = {
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
+          kind: 'dynamic',
           dependency: 'otherPersonIDType',
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'otherPersonIDType',
           typeMapper: identityTypeMapper
         },

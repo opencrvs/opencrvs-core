@@ -11,7 +11,6 @@ import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   range,
-  isValidBirthDate,
   greaterThanZero
 } from 'src/utils/validate'
 import { conditionals } from '../../../utils'
@@ -308,7 +307,7 @@ export const childSection: IFormSection = {
       label: messages.childDateOfBirth,
       required: true,
       initialValue: '',
-      validate: [isValidBirthDate],
+      validate: [],
       mapping: {
         mutation: fieldNameTransformer('birthDate'),
         query: fieldValueTransformer('birthDate')

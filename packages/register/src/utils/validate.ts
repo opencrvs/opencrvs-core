@@ -271,11 +271,47 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(new Date())
 }
 
-export const isValidBirthDate: Validation = (value: string) => {
-  return value && isDateNotInFuture(value) && isAValidDateFormat(value)
+export const checkBirthDate: ValidationInitializer = (
+  marriageDate: string
+): Validation => (value: string) => {
+  if (!marriageDate || !isAValidDateFormat(value)) {
+    return undefined
+  }
+
+  const mDate = new Date(marriageDate)
+  // didn't use the `isDateNotInFuture` function, because no need to call `new Date(marriageDate)` twice
+  if (mDate > new Date()) {
+    return {
+      message: messages.isValidBirthDate
+    }
+  }
+
+  return mDate > new Date(value)
     ? undefined
     : {
         message: messages.isValidBirthDate
+      }
+}
+
+export const checkMarriageDate: ValidationInitializer = (
+  birthDate: string
+): Validation => (value: string) => {
+  if (!birthDate || !isAValidDateFormat(value)) {
+    return undefined
+  }
+
+  const bDate = new Date(birthDate)
+  // didn't use the `isDateNotInFuture` function, because no need to call `new Date(birthDate)` twice
+  if (bDate > new Date()) {
+    return {
+      message: messages.isValidBirthDate
+    }
+  }
+
+  return bDate < new Date(value)
+    ? undefined
+    : {
+        message: messages.isValidMarriageDate
       }
 }
 /*
@@ -443,5 +479,13 @@ export const greaterThanZero: Validation = (value: string) => {
     ? undefined
     : {
         message: messages.greaterThanZero
+      }
+}
+
+export const isValidBirthDate: Validation = (value: string) => {
+  return value && isDateNotInFuture(value) && isAValidDateFormat(value)
+    ? undefined
+    : {
+        message: messages.isValidBirthDate
       }
 }

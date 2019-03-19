@@ -114,9 +114,15 @@ export const getFieldType = (
     return field.type
   }
 
-  return field.dynamicDefinitions.type.typeMapper(values[
-    field.dynamicDefinitions.type.dependency
-  ] as string)
+  switch (field.dynamicDefinitions.type.kind) {
+    case 'static':
+    default:
+      return field.dynamicDefinitions.type.staticType
+    case 'dynamic':
+      return field.dynamicDefinitions.type.typeMapper(values[
+        field.dynamicDefinitions.type.dependency
+      ] as string)
+  }
 }
 
 export const getFieldLabel = (
@@ -126,9 +132,20 @@ export const getFieldLabel = (
   if (!field.dynamicDefinitions.label) {
     return undefined
   }
-  return field.dynamicDefinitions.label.labelMapper(values[
-    field.dynamicDefinitions.label.dependency
-  ] as string)
+
+  switch (field.dynamicDefinitions.label.kind) {
+    case 'static':
+    default:
+      return {
+        id: 'string',
+        description: 'string',
+        defaultMessage: field.dynamicDefinitions.label.staticLabel
+      }
+    case 'dynamic':
+      return field.dynamicDefinitions.label.labelMapper(values[
+        field.dynamicDefinitions.label.dependency
+      ] as string)
+  }
 }
 
 export const getFieldValidation = (

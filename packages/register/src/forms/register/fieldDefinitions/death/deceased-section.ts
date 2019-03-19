@@ -15,7 +15,6 @@ import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate,
   validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
@@ -226,10 +225,12 @@ export const deceasedSection: IFormSection = {
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
+          kind: 'dynamic',
           dependency: 'iDType',
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'iDType',
           typeMapper: identityTypeMapper
         },
@@ -394,7 +395,7 @@ export const deceasedSection: IFormSection = {
       label: messages.deceasedDateOfBirth,
       required: true,
       initialValue: '',
-      validate: [isValidBirthDate]
+      validate: []
     },
     {
       name: 'permanentAddress',
