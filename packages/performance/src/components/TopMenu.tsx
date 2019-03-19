@@ -159,18 +159,9 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         ]
       },
       {
-        title: intl.formatMessage(messages.homepage),
-        key: 'homepage',
-        onClick: this.goToHome
-      },
-      {
         title: intl.formatMessage(messages.register),
         key: 'register',
         onClick: this.goToRegister
-      },
-      {
-        title: intl.formatMessage(messages.settings),
-        key: 'settings'
       },
       {
         title: intl.formatMessage(messages.logout),
