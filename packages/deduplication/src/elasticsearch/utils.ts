@@ -2,7 +2,7 @@ import { searchComposition } from 'src/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
 import { MATCH_SCORE_THRESHOLD } from 'src/constants'
 
-interface ICompositionBody {
+export interface ICompositionBody {
   compositionId?: string
   contactNumber?: string
   dateOfApplication?: string
@@ -34,6 +34,14 @@ export interface IBirthCompositionBody extends ICompositionBody {
   fatherFamilyNameLocal?: string
   fatherDoB?: string
   fatherIdentifier?: string
+}
+
+export interface IDeathCompositionBody extends ICompositionBody {
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedFirstNamesLocal?: string
+  deceasedFamilyNameLocal?: string
+  deathDate?: string
 }
 
 export async function detectDuplicates(
