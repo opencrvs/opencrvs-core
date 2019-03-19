@@ -505,20 +505,40 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  makeSwipe(deltaX: number, deltaY: number) {
+    if (Math.abs(deltaX) > Math.abs(deltaY * 4)) {
+      if (deltaX > 0) {
+        this.onSwiped(
+          this.props.draft.id,
+          getNextSection(
+            this.props.registerForm.sections,
+            this.props.activeSection
+          ),
+          this.props.tabRoute,
+          this.props.draft.event.toLowerCase()
+        )
+      } else {
+        this.onSwiped(
+          this.props.draft.id,
+          getPreviousSection(
+            this.props.registerForm.sections,
+            this.props.activeSection
+          ),
+          this.props.tabRoute,
+          this.props.draft.event.toLowerCase()
+        )
+      }
+    }
+  }
+
   onSwiped = (
     draftId: string,
     selectedSection: IFormSection | null,
     tabRoute: string,
-    event: string,
-    goToTab: (
-      tabRoute: string,
-      draftId: string,
-      tabId: string,
-      event: string
-    ) => void
+    event: string
   ): void => {
     if (selectedSection) {
-      goToTab(tabRoute, draftId, selectedSection.id, event)
+      this.props.goToTab(tabRoute, draftId, selectedSection.id, event)
     }
   }
 
@@ -617,23 +637,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
               disabled={isReviewSection || !isMobileDevice()}
               id="swipeable_block"
               trackMouse
-              onSwipedLeft={() =>
-                this.onSwiped(
-                  draft.id,
-                  nextSection,
-                  this.props.tabRoute,
-                  draft.event.toLowerCase(),
-                  goToTab
-                )
-              }
-              onSwipedRight={() =>
-                this.onSwiped(
-                  draft.id,
-                  getPreviousSection(registerForm.sections, activeSection),
-                  this.props.tabRoute,
-                  draft.event.toLowerCase(),
-                  goToTab
-                )
+              delta={50}
+              onSwiped={(e: any, deltaX: number, deltaY: number) =>
+                this.makeSwipe(deltaX, deltaY)
               }
             >
               {activeSection.viewType === VIEW_TYPE.PREVIEW && (
