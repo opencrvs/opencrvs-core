@@ -2,6 +2,7 @@ import {
   newBirthDeclarationHandler,
   updatedBirthDeclarationHandler
 } from 'src/features/registration/birth/handler'
+import { newDeathDeclarationHandler } from 'src/features/registration/death/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -48,6 +49,17 @@ export const getRoutes = () => {
             }
           }
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-declaration',
+      handler: newDeathDeclarationHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Handles indexing a new declaration and searching for duplicates'
       }
     }
   ]
