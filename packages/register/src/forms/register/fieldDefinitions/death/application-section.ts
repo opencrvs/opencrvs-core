@@ -15,7 +15,6 @@ import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  isValidBirthDate,
   validIDNumber
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
@@ -225,10 +224,12 @@ export const applicantsSection: IFormSection = {
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
+          kind: 'dynamic',
           dependency: 'iDType',
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'iDType',
           typeMapper: identityTypeMapper
         },
@@ -356,7 +357,7 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [isValidBirthDate],
+      validate: [],
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,

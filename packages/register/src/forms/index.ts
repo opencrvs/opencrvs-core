@@ -95,15 +95,31 @@ export type IDynamicValueMapper = (key: string) => string
 export type IDynamicFieldTypeMapper = (key: string) => string
 
 export interface IDynamicFormFieldDefinitions {
-  label?: {
-    dependency: string
-    labelMapper: IDynamicFormFieldLabelMapper
-  }
-  type?: {
-    dependency: string
-    typeMapper: IDynamicFieldTypeMapper
-  }
+  label?: IDynamicFieldLabel | IStaticFieldLabel
+  type?: IDynamicFieldType | IStaticFieldType
   validate?: IDynamicFormFieldValidators[]
+}
+
+export interface IDynamicFieldLabel {
+  kind: 'dynamic'
+  dependency: string
+  labelMapper: IDynamicFormFieldLabelMapper
+}
+
+export interface IStaticFieldLabel {
+  kind: 'static'
+  staticLabel: string
+}
+
+export interface IDynamicFieldType {
+  kind: 'dynamic'
+  dependency: string
+  typeMapper: IDynamicFieldTypeMapper
+}
+
+export interface IStaticFieldType {
+  kind: 'static'
+  staticType: string
 }
 
 export interface IFieldInput {
