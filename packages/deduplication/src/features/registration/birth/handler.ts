@@ -3,7 +3,7 @@ import { internal } from 'boom'
 import {
   insertNewDeclaration,
   insertUpdatedDeclaration
-} from 'src/features/registration/service'
+} from 'src/features/registration/birth/service'
 import { logger } from 'src/logger'
 
 export async function newBirthDeclarationHandler(

@@ -1,7 +1,7 @@
 import {
   newBirthDeclarationHandler,
   updatedBirthDeclarationHandler
-} from 'src/features/registration/handler'
+} from 'src/features/registration/birth/handler'
 
 export const getRoutes = () => {
   const routes = [
