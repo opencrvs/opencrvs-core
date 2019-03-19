@@ -9,7 +9,7 @@ import {
   StatusRejected,
   Duplicate
 } from '../../icons'
-import { IDynamicValues } from './types'
+import { IDynamicValues, IExpandedContentPreference } from './types'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -75,28 +75,15 @@ const BorderedPaddedContent = styled(PaddedContent)`
 `
 const HistoryWrapper = styled.div`
   padding: 10px 25px;
+  margin: 20px 0px;
 `
 
 type IProps = InjectedIntlProps & {
   data: IDynamicValues
+} & {
+  preference: IExpandedContentPreference[] | undefined
 }
-const viewableField = ['name', 'dob', 'dod']
 const messages = defineMessages({
-  name: {
-    id: 'register.workQueue.labels.results.name',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  dob: {
-    id: 'register.workQueue.labels.results.dob',
-    defaultMessage: 'D.o.B',
-    description: 'Label for DoB in work queue list item'
-  },
-  dod: {
-    id: 'register.workQueue.labels.results.dod',
-    defaultMessage: 'D.o.D',
-    description: 'Label for DoD in work queue list item'
-  },
   workflowStatusDateRegistered: {
     id: 'register.workQueue.listItem.status.dateLabel.registered',
     defaultMessage: 'Registrated on',
@@ -269,27 +256,44 @@ export class ExpansionContentComp extends React.Component<IProps> {
   }
 
   renderExpansionContent = (item: IDynamicValues) => {
-    const { intl } = this.props
-    return viewableField.map((itemElem, index) => {
-      return (
-        itemElem in item &&
-        item[itemElem] && (
-          <ExpansionContainer key={index}>
-            <label>{intl.formatMessage(messages[itemElem])}:</label>
-            <BoldSpan>{item[itemElem]}</BoldSpan>
-          </ExpansionContainer>
-        )
+    const { preference } = this.props
+    return (
+      preference && (
+        <BorderedPaddedContent>
+          {preference.map((elem, index) => {
+            if (elem.allowedEvents) {
+              if (
+                elem.allowedEvents.find(
+                  event =>
+                    event.toLowerCase() === (item.event as string).toLowerCase()
+                )
+              ) {
+                return (
+                  <ExpansionContainer key={index}>
+                    <label>{elem.label}:</label>
+                    <BoldSpan>{item[elem.key]}</BoldSpan>
+                  </ExpansionContainer>
+                )
+              }
+              return null
+            }
+            return (
+              <ExpansionContainer key={index}>
+                <label>{elem.label}:</label>
+                <BoldSpan>{item[elem.key]}</BoldSpan>
+              </ExpansionContainer>
+            )
+          })}
+        </BorderedPaddedContent>
       )
-    })
+    )
   }
 
   render() {
     const { data } = this.props
     return (
       <ExpansionContent>
-        <BorderedPaddedContent>
-          {this.renderExpansionContent(data)}
-        </BorderedPaddedContent>
+        {this.renderExpansionContent(data)}
         {this.history(data)}
       </ExpansionContent>
     )

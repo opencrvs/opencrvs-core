@@ -4,7 +4,7 @@ import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpnasionContentInfo'
-import { IAction, IDynamicValues } from './types'
+import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -83,6 +83,7 @@ interface IGridPreference {
 interface IGridTableProps {
   content: IDynamicValues[]
   columns: IGridPreference[]
+  expandedContentRows?: IExpandedContentPreference[]
   noResultText: string
   onPageChange?: (currentPage: number) => void
   pageSize?: number
@@ -251,7 +252,12 @@ export class GridTable extends React.Component<
                 </RowWrapper>
 
                 <ExpendedSectionContainer expanded={expanded}>
-                  {expanded && <ExpansionContentInfo data={item} />}
+                  {expanded && (
+                    <ExpansionContentInfo
+                      data={item}
+                      preference={this.props.expandedContentRows}
+                    />
+                  )}
                 </ExpendedSectionContainer>
               </StyledBox>
             )

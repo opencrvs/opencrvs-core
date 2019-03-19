@@ -18,3 +18,9 @@ export interface IDynamicValues {
     | IStatus[]
     | undefined
 }
+
+export interface IExpandedContentPreference {
+  label: string
+  allowedEvents?: string[]
+  key: string
+}

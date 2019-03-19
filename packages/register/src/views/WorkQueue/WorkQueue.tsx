@@ -62,6 +62,7 @@ import * as moment from 'moment'
 import { IDraft } from 'src/drafts'
 import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
 import { formatLongDate } from 'src/utils/date-formatting'
+import { Event } from 'src/forms'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -95,6 +96,21 @@ export const IconTab = styled(Button).attrs<IProps>({})`
 `
 
 const messages = defineMessages({
+  name: {
+    id: 'register.workQueue.labels.results.name',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  dob: {
+    id: 'register.workQueue.labels.results.dob',
+    defaultMessage: 'D.o.B',
+    description: 'Label for DoB in work queue list item'
+  },
+  dod: {
+    id: 'register.workQueue.labels.results.dod',
+    defaultMessage: 'D.o.D',
+    description: 'Label for DoD in work queue list item'
+  },
   hello: {
     id: 'register.home.header.hello',
     defaultMessage: 'Hello {fullName}',
@@ -891,6 +907,23 @@ export class WorkQueueView extends React.Component<
                           key: 'actions',
                           isActionColumn: true,
                           alignment: ColumnContentAlignment.CENTER
+                        }
+                      ]}
+                      expandedContentRows={[
+                        {
+                          label: intl.formatMessage(messages.name),
+                          key: 'name'
+                        },
+                        {
+                          label: intl.formatMessage(messages.dob),
+                          // @ts-ignore
+                          allowedEvents: [Event.BIRTH],
+                          key: 'date_of_event'
+                        },
+                        {
+                          label: intl.formatMessage(messages.dod),
+                          allowedEvents: [Event.DEATH],
+                          key: 'date_of_event'
                         }
                       ]}
                       noResultText={intl.formatMessage(
