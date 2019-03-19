@@ -53,7 +53,7 @@ const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 const Separator = styled.div`
-  height: 1.3em;
+  height: 20px;
   width: 1px;
   margin: 1px 8px;
   background: ${({ theme }) => theme.colors.copyAlpha80};
