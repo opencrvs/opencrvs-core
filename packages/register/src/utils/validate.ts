@@ -306,7 +306,7 @@ export const checkBirthDate: ValidationInitializer = (
     }
   }
 
-  if (!marriageDate) {
+  if (!marriageDate || !isAValidDateFormat(marriageDate)) {
     return undefined
   }
 
@@ -334,7 +334,7 @@ export const checkMarriageDate: ValidationInitializer = (
     }
   }
 
-  if (!birthDate) {
+  if (!birthDate || !isAValidDateFormat(birthDate)) {
     return undefined
   }
 
