@@ -66,6 +66,24 @@ export const messages = defineMessages({
     description:
       'The error message appears when the given birth date is not valid'
   },
+  isValidMarriageDate: {
+    id: 'validations.isValidMarriageDate',
+    defaultMessage: 'Must be a valid marriage date',
+    description:
+      'The error message appears when the given marriage date is not valid'
+  },
+  dobEarlierThanDom: {
+    id: 'validations.dobEarlierThanDom',
+    defaultMessage: 'Must be earlier than marriage date',
+    description:
+      'The error message appears when the given birth date is later than the given marriage date'
+  },
+  domLaterThanDob: {
+    id: 'validations.domLaterThanDob',
+    defaultMessage: 'Must be later than birth date',
+    description:
+      'The error message appears when the given marriage date is earlier than the given birth date'
+  },
   emailAddressFormat: {
     id: 'validations.emailAddressFormat',
     defaultMessage: 'Must be a valid email address',
@@ -278,18 +296,18 @@ export const checkBirthDate: ValidationInitializer = (
     return undefined
   }
 
-  const mDate = new Date(marriageDate)
-  // didn't use the `isDateNotInFuture` function, because no need to call `new Date(marriageDate)` twice
-  if (mDate > new Date()) {
+  const bDate = new Date(value)
+  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+  if (bDate > new Date()) {
     return {
-      message: messages.isValidBirthDate
+      message: messages.dateFormat
     }
   }
 
-  return mDate > new Date(value)
+  return bDate < new Date(marriageDate)
     ? undefined
     : {
-        message: messages.isValidBirthDate
+        message: messages.dobEarlierThanDom
       }
 }
 
@@ -300,18 +318,18 @@ export const checkMarriageDate: ValidationInitializer = (
     return undefined
   }
 
-  const bDate = new Date(birthDate)
-  // didn't use the `isDateNotInFuture` function, because no need to call `new Date(birthDate)` twice
-  if (bDate > new Date()) {
+  const mDate = new Date(value)
+  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+  if (mDate > new Date()) {
     return {
-      message: messages.isValidBirthDate
+      message: messages.dateFormat
     }
   }
 
-  return bDate < new Date(value)
+  return mDate > new Date(birthDate)
     ? undefined
     : {
-        message: messages.isValidMarriageDate
+        message: messages.domLaterThanDob
       }
 }
 /*
