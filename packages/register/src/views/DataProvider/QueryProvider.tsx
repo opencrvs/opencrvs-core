@@ -20,8 +20,8 @@ const QueryMapper = {
 
 export const QueryContext = React.createContext({
   loading: false,
-  error: undefined,
-  data: undefined,
+  error: {},
+  data: {},
   dataKey: ''
 })
 class QueryProviderComponent extends React.Component<IProps> {

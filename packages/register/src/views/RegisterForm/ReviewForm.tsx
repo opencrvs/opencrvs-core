@@ -113,16 +113,22 @@ export class ReviewFormView extends React.Component<IProps> {
                 )
               }
 
+              const eventData = data && data[dataKey]
               const transData: IFormData = gqlToDraftTransformer(
                 this.props.registerForm,
-                // @ts-ignore
-                data && data[dataKey]
+                eventData
               )
+              const status: string =
+                (eventData &&
+                  eventData.registration &&
+                  eventData.registration.status &&
+                  eventData.registration.status[0].type) ||
+                ''
               const reviewDraft = createReviewDraft(
                 draftId,
-                // @ts-ignore
                 transData,
-                this.props.event
+                this.props.event,
+                status
               )
               dispatch(storeDraft(reviewDraft))
 
