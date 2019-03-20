@@ -56,20 +56,19 @@ export function findEntry(
     return undefined
   }
   const reference = patientSection.entry[0].reference
-  const entry = findEntryByUrl(reference, bundleEntries)
-  return entry && entry.resource
+  return findEntryResourceByUrl(reference, bundleEntries)
 }
 
-export function findEntryByUrl(
+export function findEntryResourceByUrl(
   url?: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  return (
+  const bundleEntry =
     bundleEntries &&
     bundleEntries.find(
       (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === url
     )
-  )
+  return bundleEntry && bundleEntry.resource
 }
 
 export function findName(code: string, patient: fhir.Patient) {

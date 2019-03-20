@@ -6,7 +6,7 @@ import {
 } from 'src/elasticsearch/utils'
 import {
   findEntry,
-  findEntryByUrl,
+  findEntryResourceByUrl,
   findName,
   findTask,
   findTaskExtension
@@ -87,8 +87,9 @@ function createApplicationIndex(
     composition,
     bundleEntries
   ) as fhir.RelatedPerson
-  const informant = findEntryByUrl(
-    relatedPerson && relatedPerson.patient && relatedPerson.patient.reference
+  const informant = findEntryResourceByUrl(
+    relatedPerson && relatedPerson.patient && relatedPerson.patient.reference,
+    bundleEntries
   ) as fhir.Patient
   const informantTelecom =
     informant &&
