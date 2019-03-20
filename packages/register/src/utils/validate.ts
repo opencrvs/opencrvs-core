@@ -292,8 +292,10 @@ export const isDateNotInFuture = (date: string) => {
 export const checkBirthDate: ValidationInitializer = (
   marriageDate: string
 ): Validation => (value: string) => {
-  if (!marriageDate || !isAValidDateFormat(value)) {
-    return undefined
+  if (!isAValidDateFormat(value)) {
+    return {
+      message: messages.dateFormat
+    }
   }
 
   const bDate = new Date(value)
@@ -302,6 +304,10 @@ export const checkBirthDate: ValidationInitializer = (
     return {
       message: messages.dateFormat
     }
+  }
+
+  if (!marriageDate) {
+    return undefined
   }
 
   return bDate < new Date(marriageDate)
@@ -314,8 +320,10 @@ export const checkBirthDate: ValidationInitializer = (
 export const checkMarriageDate: ValidationInitializer = (
   birthDate: string
 ): Validation => (value: string) => {
-  if (!birthDate || !isAValidDateFormat(value)) {
-    return undefined
+  if (!isAValidDateFormat(value)) {
+    return {
+      message: messages.dateFormat
+    }
   }
 
   const mDate = new Date(value)
@@ -324,6 +332,10 @@ export const checkMarriageDate: ValidationInitializer = (
     return {
       message: messages.dateFormat
     }
+  }
+
+  if (!birthDate) {
+    return undefined
   }
 
   return mDate > new Date(birthDate)
