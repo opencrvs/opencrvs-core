@@ -29,6 +29,21 @@ describe('validate', () => {
       const response = true
       expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
     })
+    it('should pass when supplied a good value for a United Kingdom of Great Britain and Northern Ireland number', () => {
+      const goodValue = '07123456789'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
+    })
+    it('should pass when supplied a good value for a United Kingdom of Great Britain and Northern Ireland number', () => {
+      const goodValue = '071234567890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(response)
+    })
+    it('should pass when supplied a good value for a United Kingdom of Great Britain and Northern Ireland number', () => {
+      const badValue = '01720067890'
+      const response = true
+      expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(response)
+    })
     it('should pass when supplied a good value and country is not added to the lookup table', () => {
       const goodValue = '01720067890'
       const response = true
