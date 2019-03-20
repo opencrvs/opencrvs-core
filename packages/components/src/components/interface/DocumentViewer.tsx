@@ -7,11 +7,14 @@ import { DocumentImage } from './components/DocumentImage'
 import { isEqual } from 'lodash'
 
 const Header = styled.div`
-  padding: 14px 18px;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
   margin-bottom: 15px;
   display: flex;
   align-items: center;
+`
+
+const Box = styled.div`
+  padding: 14px 18px;
 `
 const Icon = styled.div`
   margin-right: 15px;
@@ -41,7 +44,6 @@ const Image = styled.img`
   transform: translate(-50%, -50%);
 `
 const SelectContainer = styled.div`
-  padding-left: 14px;
   width: 70%;
 `
 const WhiteBackground = styled.div`
@@ -90,32 +92,34 @@ export class DocumentViewer extends React.Component<IProps, IState> {
     return (
       <Sticky enabled={true} top="#form_tabs_container">
         <WhiteBackground>
-          <Header>
-            <Icon>{icon || <SupportingDocument />}</Icon>
-            <TitleContainer>
-              <Title>{title}</Title>
-              {tagline}
-            </TitleContainer>
-          </Header>
+          <Box>
+            <Header>
+              <Icon>{icon || <SupportingDocument />}</Icon>
+              <TitleContainer>
+                <Title>{title}</Title>
+                {tagline}
+              </TitleContainer>
+            </Header>
 
-          <SelectContainer>
-            <Select
-              id="selectDocument"
-              options={options.selectOptions}
-              value={this.state.selectedOption as string}
-              onChange={(val: string) => {
-                const imgArray = options.documentOptions.filter(doc => {
-                  return doc.label === val
-                })
-                if (imgArray[0]) {
-                  this.setState({
-                    selectedOption: val,
-                    selectedDocument: imgArray[0].value
+            <SelectContainer>
+              <Select
+                id="selectDocument"
+                options={options.selectOptions}
+                value={this.state.selectedOption as string}
+                onChange={(val: string) => {
+                  const imgArray = options.documentOptions.filter(doc => {
+                    return doc.label === val
                   })
-                }
-              }}
-            />
-          </SelectContainer>
+                  if (imgArray[0]) {
+                    this.setState({
+                      selectedOption: val,
+                      selectedDocument: imgArray[0].value
+                    })
+                  }
+                }}
+              />
+            </SelectContainer>
+          </Box>
 
           {this.state.selectedDocument && (
             <DocumentImage image={this.state.selectedDocument} />

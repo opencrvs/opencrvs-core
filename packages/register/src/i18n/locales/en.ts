@@ -519,6 +519,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
     'register.form.modal.preview': 'Preview',
+    'modal.title.submitConfirmation': 'Are you ready to submit?',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
