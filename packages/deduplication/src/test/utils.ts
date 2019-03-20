@@ -1,4 +1,4 @@
-export const mockFhirBundle = {
+export const mockBirthFhirBundle = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
@@ -219,6 +219,397 @@ export const mockFhirBundle = {
   ],
   meta: {
     lastUpdated: '2019-01-07T12:27:38.918Z'
+  }
+}
+
+export const mockDeathFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1',
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'DH86EY1'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'death-declaration'
+            }
+          ],
+          text: 'Death Declaration'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Death Declaration',
+        section: [
+          {
+            title: 'Deceased details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'deceased-details'
+                }
+              ],
+              text: 'Deceased details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd'
+              }
+            ]
+          },
+          {
+            title: "Informant's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'informant-details'
+                }
+              ],
+              text: "Informant's details"
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:d9dc4e44-987a-4313-89b1-0a71780c6bea'
+              }
+            ]
+          },
+          {
+            title: 'Death encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'death-encounter'
+                }
+              ],
+              text: 'Death encounter'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df'
+              }
+            ]
+          }
+        ],
+        subject: {},
+        date: '2019-03-19T13:05:13.524Z',
+        author: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:6167c7ac-ddde-4c84-ae9f-af3850b9f2bd',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '1234567890123',
+            type: 'NATIONAL_ID'
+          }
+        ],
+        name: [
+          {
+            use: 'bn',
+            family: ['এলাস্তিচ']
+          },
+          {
+            use: 'en',
+            family: ['elastic']
+          }
+        ],
+        gender: 'male',
+        birthDate: '1940-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        address: [
+          {
+            type: 'PERMANENT',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          },
+          {
+            type: 'CURRENT',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          }
+        ],
+        deceasedBoolean: true,
+        deceasedDateTime: '2019-02-01',
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d9dc4e44-987a-4313-89b1-0a71780c6bea',
+      resource: {
+        resourceType: 'RelatedPerson',
+        relationship: {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: 'EXTENDED_FAMILY'
+            }
+          ]
+        },
+        patient: {
+          reference: 'urn:uuid:16d007fa-e516-4f71-8c4e-671c39274d1d'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:16d007fa-e516-4f71-8c4e-671c39274d1d',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '123123123',
+            type: 'PASSPORT'
+          }
+        ],
+        name: [
+          {
+            use: 'bn',
+            family: ['এলাস্তিচ']
+          },
+          {
+            use: 'en',
+            family: ['elastic']
+          }
+        ],
+        telecom: [
+          {
+            system: 'phone',
+            value: '01711111115'
+          }
+        ],
+        address: [
+          {
+            type: 'CURRENT',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          },
+          {
+            type: 'PERMANENT',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
+          }
+        ],
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df',
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: {
+              reference: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9'
+            }
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:b11350af-826d-4573-a256-6ecede0d8fd9',
+      resource: {
+        resourceType: 'Location',
+        mode: 'instance',
+        partOf: {
+          reference: 'Location/ee72f497-343f-4f0f-9062-d618fafc175c'
+        },
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'PERMANENT'
+            }
+          ]
+        },
+        address: {
+          type: 'PERMANENT',
+          line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+          country: 'BGD'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:3cf94b36-1bba-4914-89ed-1e57230aba47',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:db0f9b0b-1cc8-48bb-b4fc-23584937d5df'
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'vital-signs',
+                display: 'Vital Signs'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'uncertified-manner-of-death',
+              display: 'Uncertified manner of death'
+            }
+          ]
+        },
+        valueCodeableConcept: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/ValueSet/icd-10',
+              code: 'NATURAL_CAUSES'
+            }
+          ]
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:cd9330bb-f406-464b-9508-253c727feb31',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'DEATH'
+            }
+          ]
+        },
+        focus: {
+          reference: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'DH86EY1'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-19T13:05:19.260Z'
+      }
+    }
+  ],
+  meta: {
+    lastUpdated: '2019-03-19T13:05:13.524Z'
   }
 }
 

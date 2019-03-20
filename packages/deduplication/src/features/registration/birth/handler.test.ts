@@ -1,14 +1,14 @@
 import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import { indexComposition, searchComposition } from 'src/elasticsearch/dbhelper'
 import { createServer } from 'src/index'
 import {
-  mockFhirBundle,
-  mockTaskBundle,
+  mockBirthFhirBundle,
+  mockCompositionEntry,
   mockSearchResponse,
-  mockCompositionEntry
+  mockTaskBundle
 } from 'src/test/utils'
-import { indexComposition, searchComposition } from 'src/elasticsearch/dbhelper'
 
 jest.mock('src/elasticsearch/dbhelper.ts')
 
@@ -57,7 +57,7 @@ describe('Verify handlers', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/events/birth/new-declaration',
-        payload: mockFhirBundle,
+        payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -131,7 +131,7 @@ describe('Verify handlers', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/events/birth/update-declaration',
-        payload: mockFhirBundle,
+        payload: mockBirthFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
