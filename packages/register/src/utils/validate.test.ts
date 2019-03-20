@@ -28,6 +28,18 @@ describe('validate', () => {
       const goodValue = '01720067890'
       expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(true)
     })
+    it('should pass when supplied a good value for a British number', () => {
+      const goodValue = '07123456789'
+      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(true)
+    })
+    it('should pass when supplied a good value for a British number', () => {
+      const goodValue = '071234567890'
+      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(true)
+    })
+    it('should error when supplied a bad value for a British number', () => {
+      const badValue = '01720067890'
+      expect(isAValidPhoneNumberFormat(badValue, 'gbr')).toEqual(false)
+    })
     it('should pass when supplied a good value and country is not added to the lookup table', () => {
       const goodValue = '01720067890'
       expect(isAValidPhoneNumberFormat(goodValue, 'th')).toEqual(true)
@@ -288,12 +300,13 @@ describe('validate', () => {
         message: {
           id: 'validations.phoneNumberFormat',
           defaultMessage:
-            'Must be 11 digit valid mobile phone number that stars with 01',
+            'Must be {num} digit valid mobile phone number that stars with {start}',
           description:
             'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
         },
         props: {
-          example: '01741234567'
+          num: '11',
+          start: '01'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)
