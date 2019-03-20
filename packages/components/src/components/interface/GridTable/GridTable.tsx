@@ -147,7 +147,7 @@ export class GridTable extends React.Component<
     if (!this.props.expandable) {
       return
     }
-    const toggledExpandedList = []
+    const toggledExpandedList = [] as string[]
     const { expanded } = this.state
     const index = expanded.findIndex(id => id === itemId)
     if (index < 0) {
