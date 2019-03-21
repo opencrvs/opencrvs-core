@@ -868,17 +868,20 @@ export const ENGLISH_STATE: ILanguage = {
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
 
-    'formFields.fetchDeceasedModalTitle': 'Checking',
-    'formFields.fetchDeceasedModalSuccessTitle': 'ID valid',
-    'formFields.fetchDeceasedModalErrorTitle': 'Invalid Id',
-    'formFields.fetchDeceasedModalErrorText':
+    'formFields.fetchIdentifierModalTitle': 'Checking',
+    'formFields.fetchIdentifierModalSuccessTitle': 'ID valid',
+    'formFields.fetchIdentifierModalErrorTitle': 'Invalid Id',
+    'formFields.fetchRegistrationModalErrorText':
       'No registration found for provided BRN',
     'formFields.fetchButton.cancel': 'Cancel',
     'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
-    'formFields.fetchDeceasedModalInfo': 'Birth Registration Number',
+    'formFields.fetchInformantDetails': "Retrieve Informant's Details",
+    'formFields.fetchRegistrationModalInfo': 'Birth Registration Number',
     'formFields.fetchPersonByNIDModalInfo': 'National ID',
     'formFields.fetchPersonByNIDModalErrorText':
       'No person found for provided NID',
+    'formFields.fetchMotherDetails': "Retrieve Mother's Details",
+    'formFields.fetchFatherDetails': "Retrieve Father's Details",
     'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
     certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
     submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,

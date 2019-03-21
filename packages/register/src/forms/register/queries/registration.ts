@@ -2,9 +2,7 @@ import gql from 'graphql-tag'
 import { ApolloQueryResult } from 'apollo-client'
 import {
   GQLQuery,
-  GQLBirthRegistration,
-  GQLHumanName,
-  GQLPerson
+  GQLBirthRegistration
 } from '@opencrvs/gateway/src/graphql/schema.d'
 
 export const FETCH_REGISTRATION = gql`
@@ -29,24 +27,5 @@ export const transformRegistrationData = (
 ) => {
   const responseData = response.data
     .queryRegistrationByIdentifier as GQLBirthRegistration
-  const { birthDate, gender, name } = responseData.child as GQLPerson
-
-  const localName =
-    name &&
-    name.find((humanName: GQLHumanName) => {
-      return humanName && humanName.use === 'bn'
-    })
-  const engName =
-    name &&
-    name.find((humanName: GQLHumanName) => {
-      return humanName && humanName.use === 'en'
-    })
-  return {
-    birthDate,
-    gender,
-    familyName: localName && localName.familyName,
-    familyNameEng: engName && engName.familyName,
-    firstNames: localName && localName.firstNames,
-    firstNamesEng: engName && engName.firstNames
-  }
+  return responseData.child
 }

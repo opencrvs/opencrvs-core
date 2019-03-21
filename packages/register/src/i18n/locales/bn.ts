@@ -857,14 +857,17 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
-    'formFields.fetchDeceasedModalTitle': 'পরীক্ষা করা হচ্ছে',
-    'formFields.fetchDeceasedModalSuccessTitle': 'আইডি বৈধ',
-    'formFields.fetchDeceasedModalErrorTitle': 'অকার্যকর আইডি',
-    'formFields.fetchDeceasedModalErrorText':
+    'formFields.fetchIdentifierModalTitle': 'পরীক্ষা করা হচ্ছে',
+    'formFields.fetchIdentifierModalSuccessTitle': 'আইডি বৈধ',
+    'formFields.fetchIdentifierModalErrorTitle': 'অকার্যকর আইডি',
+    'formFields.fetchRegistrationModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
     'formFields.fetchButton.cancel': 'বাতিল',
     'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
-    'formFields.fetchDeceasedModalInfo': 'জন্ম নিবন্ধন নম্বর',
+    'formFields.fetchInformantDetails': 'সংবাদদাতার তথ্য উত্তোলন করুন',
+    'formFields.fetchRegistrationModalInfo': 'জন্ম নিবন্ধন নম্বর',
+    'formFields.fetchMotherDetails': 'মায়ের তথ্য উত্তোলন করুন',
+    'formFields.fetchFatherDetails': 'পিতার তথ্য উত্তোলন করুন',
     'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}
       certificate {সনদপত্র} offlineEvent {আবেদন }} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
       rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {সংযুক্তি স্থগিত}}`,
