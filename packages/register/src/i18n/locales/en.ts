@@ -518,7 +518,7 @@ export const ENGLISH_STATE: ILanguage = {
       '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Registration Review',
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
-    'register.form.modal.preview': 'Preview',
+    'register.form.modal.cancel': 'Cancel',
     'modal.title.submitConfirmation': 'Are you ready to submit?',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
