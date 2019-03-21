@@ -9,7 +9,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol, validations.isNumber],
     disabled: false,
-    type: 'text',
+    type: 'tel',
     focusInput: false
   },
   code2: {
@@ -18,7 +18,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol, validations.isNumber],
     disabled: false,
-    type: 'text',
+    type: 'tel',
     focusInput: false
   },
   code3: {
@@ -27,7 +27,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol, validations.isNumber],
     disabled: false,
-    type: 'text',
+    type: 'tel',
     focusInput: false
   },
   code4: {
@@ -36,7 +36,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol, validations.isNumber],
     disabled: false,
-    type: 'text',
+    type: 'tel',
     focusInput: false
   },
   code5: {
@@ -45,7 +45,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol, validations.isNumber],
     disabled: false,
-    type: 'text',
+    type: 'tel',
     focusInput: false
   },
   code6: {
@@ -54,7 +54,7 @@ export const stepTwoFields: IFieldGroup = {
     maxLength: 1,
     validate: [validations.requiredSymbol, validations.isNumber],
     disabled: false,
-    type: 'text',
+    type: 'tel',
     focusInput: false
   }
 }
