@@ -20,7 +20,6 @@ import {
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat,
   validIDNumber,
   checkBirthDate,
   checkMarriageDate
