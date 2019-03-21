@@ -917,12 +917,12 @@ export class WorkQueueView extends React.Component<
                         {
                           label: intl.formatMessage(messages.dob),
                           // @ts-ignore
-                          allowedEvents: [Event.BIRTH],
+                          displayForEvents: [Event.BIRTH],
                           key: 'date_of_event'
                         },
                         {
                           label: intl.formatMessage(messages.dod),
-                          allowedEvents: [Event.DEATH],
+                          displayForEvents: [Event.DEATH],
                           key: 'date_of_event'
                         }
                       ]}

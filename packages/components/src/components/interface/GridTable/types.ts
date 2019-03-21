@@ -21,6 +21,6 @@ export interface IDynamicValues {
 
 export interface IExpandedContentPreference {
   label: string
-  allowedEvents?: string[]
+  displayForEvents?: string[]
   key: string
 }

@@ -10,6 +10,7 @@ import {
   Duplicate
 } from '../../icons'
 import { IDynamicValues, IExpandedContentPreference } from './types'
+import { IStatus } from '../ListItem'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -71,7 +72,7 @@ const PaddedContent = styled.div`
   padding: 25px;
 `
 const BorderedPaddedContent = styled(PaddedContent)`
-  border-bottom: ${({ theme }) => `2px solid ${theme.colors.greyBorder}`};
+  border-bottom: ${({ theme }) => `2px solid ${theme.colors.seperatorBorder}`};
 `
 const HistoryWrapper = styled.div`
   padding: 10px 25px;
@@ -80,9 +81,9 @@ const HistoryWrapper = styled.div`
 
 type IProps = InjectedIntlProps & {
   data: IDynamicValues
-} & {
   preference: IExpandedContentPreference[] | undefined
 }
+
 const messages = defineMessages({
   workflowStatusDateRegistered: {
     id: 'register.workQueue.listItem.status.dateLabel.registered',
@@ -261,9 +262,9 @@ export class ExpansionContentComp extends React.Component<IProps> {
       preference && (
         <BorderedPaddedContent>
           {preference.map((elem, index) => {
-            if (elem.allowedEvents) {
+            if (elem.displayForEvents) {
               if (
-                elem.allowedEvents.find(
+                elem.displayForEvents.find(
                   event =>
                     event.toLowerCase() === (item.event as string).toLowerCase()
                 )
@@ -300,7 +301,4 @@ export class ExpansionContentComp extends React.Component<IProps> {
   }
 }
 
-export const ExpansionContentInfo = connect(
-  null,
-  null
-)(injectIntl(ExpansionContentComp))
+export const ExpansionContentInfo = injectIntl(ExpansionContentComp)

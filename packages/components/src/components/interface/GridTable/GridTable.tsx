@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import { ExpansionContentInfo } from './ExpnasionContentInfo'
+import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
 export { IAction } from './types'
 
@@ -56,9 +56,9 @@ const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
 `
-const ExpendedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
+const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   border-top: ${({ theme, expanded }) =>
-    expanded ? `2px solid ${theme.colors.greyBorder}` : 'none'};
+    expanded ? `2px solid ${theme.colors.seperatorBorder}` : 'none'};
   margin-top: 5px;
   overflow: hidden;
   transition: max-height 600ms;
@@ -251,14 +251,14 @@ export class GridTable extends React.Component<
                   })}
                 </RowWrapper>
 
-                <ExpendedSectionContainer expanded={expanded}>
+                <ExpandedSectionContainer expanded={expanded}>
                   {expanded && (
                     <ExpansionContentInfo
                       data={item}
                       preference={this.props.expandedContentRows}
                     />
                   )}
-                </ExpendedSectionContainer>
+                </ExpandedSectionContainer>
               </StyledBox>
             )
           }
