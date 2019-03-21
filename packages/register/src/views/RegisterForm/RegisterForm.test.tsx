@@ -691,13 +691,13 @@ describe('when user is in the register form preview section', () => {
         .simulate('click')
       component.update()
 
-      const previewBtn = component.find('#preview-btn').hostNodes()
+      const previewBtn = component.find('#cancel-btn').hostNodes()
       expect(previewBtn.length).toEqual(1)
 
       previewBtn.simulate('click')
       component.update()
 
-      expect(component.find('#preview-btn').hostNodes().length).toEqual(0)
+      expect(component.find('#cancel-btn').hostNodes().length).toEqual(0)
     })
   })
 })
