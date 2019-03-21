@@ -2,21 +2,16 @@ import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
 import { IAction } from '../ListItem'
 export { IAction } from '../ListItem'
 
-interface IStatus {
-  type: GQLRegStatus | null | undefined
+export interface IStatus {
+  type: GQLRegStatus | null
   practitionerName: string
   timestamp: string | null
   practitionerRole: string
-  officeName: string | Array<string | null> | null | undefined
+  officeName: string | Array<string | null> | null
 }
 
 export interface IDynamicValues {
-  [key: string]:
-    | string
-    | IAction[]
-    | Array<string | null>
-    | IStatus[]
-    | undefined
+  [key: string]: string | IAction[] | Array<string | null> | IStatus[] | null
 }
 
 export interface IExpandedContentPreference {

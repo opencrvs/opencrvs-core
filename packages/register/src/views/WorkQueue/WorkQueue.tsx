@@ -437,40 +437,43 @@ export class WorkQueueView extends React.Component<
           duplicates: (reg.registration && reg.registration.duplicates) || [],
           actions,
           status:
-            reg.registration &&
-            reg.registration.status &&
-            reg.registration.status
-              .map(status => {
-                return {
-                  type: status && status.type,
-                  practitionerName:
-                    (status &&
-                      status.user &&
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        this.props.language
-                      ] as string)) ||
-                    (status &&
-                      status.user &&
-                      /* tslint:disable:no-string-literal */
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        'default'
-                      ] as string)) ||
-                    /* tslint:enable:no-string-literal */
-                    '',
-                  timestamp: status && formatLongDate(status.timestamp, locale),
-                  practitionerRole:
-                    status && status.user && status.user.role
-                      ? this.props.intl.formatMessage(
-                          messages[status.user.role as string]
-                        )
-                      : '',
-                  officeName:
-                    locale === 'en'
-                      ? status && status.office && status.office.name
-                      : status && status.office && status.office.alias
-                }
-              })
-              .reverse()
+            (reg.registration &&
+              reg.registration.status &&
+              reg.registration.status
+                .map(status => {
+                  return {
+                    type: (status && status.type) || null,
+                    practitionerName:
+                      (status &&
+                        status.user &&
+                        (createNamesMap(status.user.name as GQLHumanName[])[
+                          this.props.language
+                        ] as string)) ||
+                      (status &&
+                        status.user &&
+                        /* tslint:disable:no-string-literal */
+                        (createNamesMap(status.user.name as GQLHumanName[])[
+                          'default'
+                        ] as string)) ||
+                      /* tslint:enable:no-string-literal */
+                      '',
+                    timestamp:
+                      (status && formatLongDate(status.timestamp, locale)) ||
+                      null,
+                    practitionerRole:
+                      status && status.user && status.user.role
+                        ? this.props.intl.formatMessage(
+                            messages[status.user.role as string]
+                          )
+                        : '',
+                    officeName:
+                      locale === 'en'
+                        ? (status && status.office && status.office.name) || ''
+                        : (status && status.office && status.office.alias) || ''
+                  }
+                })
+                .reverse()) ||
+            null
         }
       }
     )
@@ -570,40 +573,43 @@ export class WorkQueueView extends React.Component<
           duplicates: (reg.registration && reg.registration.duplicates) || [],
           actions,
           status:
-            reg.registration &&
-            reg.registration.status &&
-            reg.registration.status
-              .map(status => {
-                return {
-                  type: status && status.type,
-                  practitionerName:
-                    (status &&
-                      status.user &&
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        this.props.language
-                      ] as string)) ||
-                    (status &&
-                      status.user &&
-                      /* tslint:disable:no-string-literal */
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        'default'
-                      ] as string)) ||
-                    /* tslint:enable:no-string-literal */
-                    '',
-                  timestamp: status && formatLongDate(status.timestamp, locale),
-                  practitionerRole:
-                    status && status.user && status.user.role
-                      ? this.props.intl.formatMessage(
-                          messages[status.user.role as string]
-                        )
-                      : '',
-                  officeName:
-                    locale === 'en'
-                      ? status && status.office && status.office.name
-                      : status && status.office && status.office.alias
-                }
-              })
-              .reverse()
+            (reg.registration &&
+              reg.registration.status &&
+              reg.registration.status
+                .map(status => {
+                  return {
+                    type: (status && status.type) || null,
+                    practitionerName:
+                      (status &&
+                        status.user &&
+                        (createNamesMap(status.user.name as GQLHumanName[])[
+                          this.props.language
+                        ] as string)) ||
+                      (status &&
+                        status.user &&
+                        /* tslint:disable:no-string-literal */
+                        (createNamesMap(status.user.name as GQLHumanName[])[
+                          'default'
+                        ] as string)) ||
+                      /* tslint:enable:no-string-literal */
+                      '',
+                    timestamp:
+                      (status && formatLongDate(status.timestamp, locale)) ||
+                      null,
+                    practitionerRole:
+                      status && status.user && status.user.role
+                        ? this.props.intl.formatMessage(
+                            messages[status.user.role as string]
+                          )
+                        : '',
+                    officeName:
+                      locale === 'en'
+                        ? (status && status.office && status.office.name) || ''
+                        : (status && status.office && status.office.alias) || ''
+                  }
+                })
+                .reverse()) ||
+            null
         }
       }
     )
@@ -916,7 +922,6 @@ export class WorkQueueView extends React.Component<
                         },
                         {
                           label: intl.formatMessage(messages.dob),
-                          // @ts-ignore
                           displayForEvents: [Event.BIRTH],
                           key: 'date_of_event'
                         },

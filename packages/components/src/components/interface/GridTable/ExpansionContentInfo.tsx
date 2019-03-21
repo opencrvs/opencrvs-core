@@ -9,8 +9,7 @@ import {
   StatusRejected,
   Duplicate
 } from '../../icons'
-import { IDynamicValues, IExpandedContentPreference } from './types'
-import { IStatus } from '../ListItem'
+import { IDynamicValues, IExpandedContentPreference, IStatus } from './types'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -205,54 +204,54 @@ export class ExpansionContentComp extends React.Component<IProps> {
         return messages.workflowStatusDateApplication
     }
   }
-  history = (item: IDynamicValues): JSX.Element[] => {
+  history = (item: IDynamicValues): JSX.Element[] | null => {
     return (
-      item.status &&
-      // @ts-ignore
-      item.status.map((status, i) => {
-        const { practitionerName, practitionerRole, officeName } = status
-        return (
-          <HistoryWrapper key={i}>
-            <ExpansionContainer>
-              {this.getDeclarationStatusIcon(status.type)}
-              <ExpansionContentContainer>
-                <LabelValue
-                  label={this.props.intl.formatMessage(
-                    this.getWorkflowDateLabel(status.type)
-                  )}
-                  value={status.timestamp}
-                />
-                <ValueContainer>
-                  <StyledLabel>
-                    {this.props.intl.formatMessage(
-                      messages.workflowPractitionerLabel
+      (item.status &&
+        (item.status as IStatus[]).map((status, i) => {
+          const { practitionerName, practitionerRole, officeName } = status
+          return (
+            <HistoryWrapper key={i}>
+              <ExpansionContainer>
+                {this.getDeclarationStatusIcon(status.type as string)}
+                <ExpansionContentContainer>
+                  <LabelValue
+                    label={this.props.intl.formatMessage(
+                      this.getWorkflowDateLabel(status.type as string)
                     )}
-                    :
-                  </StyledLabel>
-                  <ValuesWithSeparator
-                    strings={[
-                      practitionerName,
-                      formatRoleCode(practitionerRole),
-                      officeName
-                    ]}
-                    separator={<Separator />}
+                    value={status.timestamp || ''}
                   />
-                </ValueContainer>
-                {item.duplicates && item.duplicates.length > 0 && (
-                  <DuplicateIndicatorContainer>
-                    <Duplicate />
-                    <span>
+                  <ValueContainer>
+                    <StyledLabel>
                       {this.props.intl.formatMessage(
-                        messages.listItemDuplicateLabel
+                        messages.workflowPractitionerLabel
                       )}
-                    </span>
-                  </DuplicateIndicatorContainer>
-                )}
-              </ExpansionContentContainer>
-            </ExpansionContainer>
-          </HistoryWrapper>
-        )
-      })
+                      :
+                    </StyledLabel>
+                    <ValuesWithSeparator
+                      strings={[
+                        practitionerName,
+                        formatRoleCode(practitionerRole),
+                        (officeName && (officeName as string)) || ''
+                      ]}
+                      separator={<Separator />}
+                    />
+                  </ValueContainer>
+                  {item.duplicates && item.duplicates.length > 0 && (
+                    <DuplicateIndicatorContainer>
+                      <Duplicate />
+                      <span>
+                        {this.props.intl.formatMessage(
+                          messages.listItemDuplicateLabel
+                        )}
+                      </span>
+                    </DuplicateIndicatorContainer>
+                  )}
+                </ExpansionContentContainer>
+              </ExpansionContainer>
+            </HistoryWrapper>
+          )
+        })) ||
+      null
     )
   }
 
