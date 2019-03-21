@@ -81,7 +81,7 @@ export class ActionPage extends React.Component<
           <HeaderContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
               <BackButton icon={icon || (() => <ArrowBack />)} />
-              <BackButtonText>{backLabel ? backLabel : 'BACK'}</BackButtonText>
+              <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
           </HeaderContent>
