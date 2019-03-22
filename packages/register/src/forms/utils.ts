@@ -472,7 +472,7 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
   },
-  deceasedIDSelected: {
+  identifierIDSelected: {
     action: 'hide',
     expression:
       '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'

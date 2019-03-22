@@ -63,7 +63,9 @@ import {
   IListFormField,
   IFormData,
   FETCH_BUTTON,
-  ILoaderButton
+  ILoaderButton,
+  IForm,
+  IFormSection
 } from 'src/forms'
 
 import { IValidationResult } from 'src/utils/validate'
@@ -77,6 +79,7 @@ import { ImageUploadField } from './ImageUploadField'
 import { FetchButtonField } from './FetchButton'
 
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
+import { gqlToDraftTransformer } from 'src/transformer'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -472,7 +475,27 @@ class FormSectionComponent extends React.Component<Props> {
                   queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
-                    const updatedValues = Object.assign({}, values, response)
+                    const section = {
+                      id: this.props.id,
+                      fields: fieldsWithValuesDefined
+                    } as IFormSection
+
+                    const form = {
+                      sections: [section]
+                    } as IForm
+
+                    const queryData = {}
+                    queryData[this.props.id] = response
+
+                    const transformedData = gqlToDraftTransformer(
+                      form,
+                      queryData
+                    )
+                    const updatedValues = Object.assign(
+                      {},
+                      values,
+                      transformedData[this.props.id]
+                    )
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)

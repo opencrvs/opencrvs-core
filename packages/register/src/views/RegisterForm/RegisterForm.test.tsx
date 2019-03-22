@@ -418,6 +418,124 @@ describe('when user is in the register form for death event', async () => {
       )
     })
 
+    it('fetches informant information by entered NID', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_PERSON,
+            variables: {
+              identifier: '1234567898765'
+            }
+          },
+          result: {
+            data: {
+              queryPersonByIdentifier: {
+                id: '26499e5c-72a2-42f6-b8e6-1ffc99b5311e',
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  }
+                ],
+                birthDate: '2018-08-01',
+                gender: 'female',
+                address: [
+                  {
+                    line: [
+                      '40',
+                      '',
+                      'My street',
+                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
+                      '',
+                      '3f65c407-e249-4096-9291-404f9e682897'
+                    ],
+                    type: 'PERMANENT',
+                    city: null,
+                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
+                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
+                    postalCode: '10024',
+                    country: 'BGD'
+                  },
+                  {
+                    line: [
+                      '40',
+                      '',
+                      'My street',
+                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
+                      '',
+                      '3f65c407-e249-4096-9291-404f9e682897'
+                    ],
+                    type: 'CURRENT',
+                    city: null,
+                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
+                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
+                    postalCode: '10024',
+                    country: 'BGD'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          draft={draft}
+          tabRoute={DRAFT_DEATH_FORM_TAB}
+          match={{
+            params: { draftId: draft.id, tabId: 'informant' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+      selectOption(component, '#iDType', 'National ID')
+
+      component.find('input#applicantID').simulate('change', {
+        target: { id: 'applicantID', value: '1234567898765' }
+      })
+
+      component.update()
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+      component
+        .find('#fetchButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+      component.update()
+
+      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
+        1
+      )
+    })
+
     it('displays error message if no registration found by BRN', async () => {
       const graphqlMock = [
         {

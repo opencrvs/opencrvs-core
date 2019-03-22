@@ -328,7 +328,7 @@ export interface IConditionals {
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
-  deceasedIDSelected: IConditional
+  identifierIDSelected: IConditional
   otherRelationship: IConditional
 }
 
