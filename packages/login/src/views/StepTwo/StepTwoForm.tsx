@@ -227,10 +227,15 @@ export class StepTwoForm extends React.Component<
             <SecondaryButtonStyled
               onClick={this.props.onResendSMS}
               id="login-mobile-resend"
+              type="button"
             >
               {intl.formatMessage(messages.resend)}
             </SecondaryButtonStyled>
-            <PrimaryButton id="login-mobile-submit" disabled={submitting}>
+            <PrimaryButton
+              id="login-mobile-submit"
+              disabled={submitting}
+              type="submit"
+            >
               {intl.formatMessage(messages.submit)}
             </PrimaryButton>
           </ActionWrapper>

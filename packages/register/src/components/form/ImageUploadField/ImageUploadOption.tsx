@@ -54,10 +54,11 @@ export class ImageUploadOption extends React.Component<IProps, State> {
   }
 
   storeData = (documentData: IFormSectionData) => {
-    this.setState({ data: documentData })
-    if (this.shouldShowUploadButton(documentData)) {
-      this.setState({ showUploadButton: true })
-    }
+    const showUploadButton = this.shouldShowUploadButton(documentData)
+    this.setState({
+      data: documentData,
+      showUploadButton
+    })
   }
 
   shouldShowUploadButton = (documentData: IFormSectionData) => {
