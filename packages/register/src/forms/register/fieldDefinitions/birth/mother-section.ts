@@ -248,7 +248,7 @@ export const motherSection: IFormSection = {
       }
     },
     {
-      name: 'motherBirthDate',
+      name: 'motherDateOfBirth',
       type: FIELD_WITH_DYNAMIC_DEFINITIONS,
       dynamicDefinitions: {
         label: {
@@ -311,7 +311,7 @@ export const motherSection: IFormSection = {
         validate: [
           {
             validator: checkMarriageDate,
-            dependencies: ['motherBirthDate']
+            dependencies: ['motherDateOfBirth']
           }
         ]
       },

@@ -375,7 +375,6 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.motherFirstNamesEng': 'নামের প্রথমাংশ (ইংরেজিতে)',
     'formFields.motherFamilyNameEng': 'পারিবারিক নাম (ইংরেজিতে)',
     'formFields.motherDateOfBirth': 'জন্ম তারিখ',
-    'formFields.motherBirthDate': 'জন্ম তারিখ',
     'formFields.motherEducationAttainment': 'মায়ের আনুষ্ঠানিক শিক্ষা',
     'formFields.optionalLabel': 'ঐচ্ছিক',
     'formFields.hospital': 'হাসপাতাল',
