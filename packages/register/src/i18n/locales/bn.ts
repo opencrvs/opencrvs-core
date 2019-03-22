@@ -375,6 +375,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.motherFirstNamesEng': 'নামের প্রথমাংশ (ইংরেজিতে)',
     'formFields.motherFamilyNameEng': 'পারিবারিক নাম (ইংরেজিতে)',
     'formFields.motherDateOfBirth': 'জন্ম তারিখ',
+    'formFields.motherBirthDate': 'জন্ম তারিখ',
     'formFields.motherEducationAttainment': 'মায়ের আনুষ্ঠানিক শিক্ষা',
     'formFields.optionalLabel': 'ঐচ্ছিক',
     'formFields.hospital': 'হাসপাতাল',
@@ -502,6 +503,10 @@ export const BENGALI_STATE: ILanguage = {
       'রেজিস্টারড মোবাইল নম্বর হতে হবে এবং শূন্য দিয় শুরু করতে হবে।',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
+    'validations.dobEarlierThanDom':
+      'জন্মের তারিখ বিয়ের তারিখের পূর্বে হওয়া আবশ্যক।',
+    'validations.domLaterThanDob':
+      'বিয়ের তারিখ জন্মের তারিখের পরে হওয়া আবশ্যক।',
     'validations.isValidBirthDate': 'একটি বৈধ জন্ম তারিখ হতে হবে',
     'validations.requiredSymbol': '',
     'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
