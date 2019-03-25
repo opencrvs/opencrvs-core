@@ -212,7 +212,8 @@ export const messages = defineMessages({
   },
   queryError: {
     id: 'register.registerForm.queryError',
-    defaultMessage: `{error, select, regError {The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.}}`,
+    defaultMessage:
+      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
     description: 'The error message shown when a search query fails'
   }
 })
@@ -329,10 +330,7 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   selectedTabId: string
-  errorSection: {
-    showError: boolean
-    errorEvent: string
-  }
+  hasError: boolean
 }
 const VIEW_TYPE = {
   REVIEW: 'review',
@@ -379,10 +377,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isDataAltered: false,
       rejectFormOpen: false,
       showRegisterModal: false,
-      errorSection: {
-        showError: false,
-        errorEvent: 'error'
-      }
+      hasError: false
     }
   }
 
@@ -509,10 +504,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     Sentry.captureException(error)
     this.setState({
       showRegisterModal: false,
-      errorSection: {
-        showError: true,
-        errorEvent: 'regError'
-      }
+      hasError: true
     })
   }
 
@@ -643,16 +635,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
           registerForm.sections
         )
       : registerForm.sections
-    const isErrorOccured =
-      this.state.errorSection && this.state.errorSection.showError
+    const isErrorOccured = this.state.hasError
 
     return (
       <FormViewContainer>
         {isErrorOccured && (
           <ErrorText id="error_message_section">
-            {intl.formatMessage(messages.queryError, {
-              error: this.state.errorSection.errorEvent
-            })}
+            {intl.formatMessage(messages.queryError)}
           </ErrorText>
         )}
 

@@ -920,6 +920,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.event.birth': 'Birth',
     'validations.isValidDateOfDeath': 'Must be a valid date of death',
     'validations.greaterThanZero': 'Must be a greater than zero',
-    'register.registerForm.queryError': `{error, select, regError {The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.}}`
+    'register.registerForm.queryError':
+      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.'
   }
 }
