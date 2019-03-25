@@ -114,9 +114,15 @@ export const getFieldType = (
     return field.type
   }
 
-  return field.dynamicDefinitions.type.typeMapper(values[
-    field.dynamicDefinitions.type.dependency
-  ] as string)
+  switch (field.dynamicDefinitions.type.kind) {
+    case 'dynamic':
+      return field.dynamicDefinitions.type.typeMapper(values[
+        field.dynamicDefinitions.type.dependency
+      ] as string)
+    case 'static':
+    default:
+      return field.dynamicDefinitions.type.staticType
+  }
 }
 
 export const getFieldLabel = (

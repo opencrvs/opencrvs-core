@@ -24,9 +24,9 @@ import {
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat,
   validIDNumber,
-  isValidBirthDate
+  checkBirthDate,
+  checkMarriageDate
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -62,6 +62,10 @@ import {
   FETCH_REGISTRATION
 } from '../../queries/registration'
 import { FETCH_PERSON, transformPersonData } from '../../queries/person'
+import {
+  getFatherDateOfBirthLabel,
+  getDateOfMarriageLabel
+} from './staticLabel'
 
 export const messages = defineMessages({
   fatherTab: {
@@ -248,6 +252,7 @@ export const fatherSection: IFormSection = {
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'iDType',
           typeMapper: identityTypeMapper
         },
@@ -378,11 +383,27 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'fatherBirthDate',
-      type: DATE,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'fatherBirthDate',
+          labelMapper: getFatherDateOfBirthLabel
+        },
+        type: {
+          kind: 'static',
+          staticType: DATE
+        },
+        validate: [
+          {
+            validator: checkBirthDate,
+            dependencies: ['dateOfMarriage']
+          }
+        ]
+      },
       label: messages.fatherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [isValidBirthDate],
+      validate: [],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
         mutation: fieldNameTransformer('birthDate'),
@@ -413,11 +434,27 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'dateOfMarriage',
-      type: DATE,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'dateOfMarriage',
+          labelMapper: getDateOfMarriageLabel
+        },
+        type: {
+          kind: 'static',
+          staticType: DATE
+        },
+        validate: [
+          {
+            validator: checkMarriageDate,
+            dependencies: ['fatherBirthDate']
+          }
+        ]
+      },
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
+      validate: [],
       conditionals: [conditionals.fathersDetailsExist, conditionals.isMarried]
     },
     {
