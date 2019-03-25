@@ -503,6 +503,8 @@ export const BENGALI_STATE: ILanguage = {
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'একটি বৈধ তারিখ হওয়া আবশ্যক',
     'validations.isValidBirthDate': 'একটি বৈধ জন্ম তারিখ হতে হবে',
+    'validations.dobEarlierThanDom': 'জন্ম তারিখ বিয়ের তারিখের পূর্বে হতে হবে।',
+    'validations.domLaterThanDob': 'বিয়ের তারিখ জন্ম তারিখের পরে হতে হবে।',
     'validations.requiredSymbol': '',
     'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
     'register.form.saveAsDraft': 'Save as draft',
