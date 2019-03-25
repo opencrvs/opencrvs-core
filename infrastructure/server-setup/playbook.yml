@@ -1,7 +1,6 @@
 ---
 
 - hosts: all
-  remote_user: root
   become: yes
   become_method: sudo
   tasks:
@@ -50,7 +49,6 @@
       job: "/usr/bin/docker system prune -f >> /var/log/docker-prune.log"
 
 - hosts: docker-manager-first
-  remote_user: root
   become: yes
   become_method: sudo
   tasks:
@@ -102,7 +100,6 @@
       mode: '600'
 
 - hosts: docker-workers
-  remote_user: root
   become: yes
   become_method: sudo
   tasks:
