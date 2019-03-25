@@ -14,10 +14,10 @@ describe('validate', () => {
       const response = false
       expect(isAValidPhoneNumberFormat(badValue, 'bgd')).toEqual(response)
     })
-    it('should error when given an invalid phone number', () => {
-      const badNumber = '01200345678'
+    it('should error when supplied a bad value for a British number', () => {
+      const badValue = '01720067890'
       const response = false
-      expect(isAValidPhoneNumberFormat(badNumber, 'bgd')).toEqual(response)
+      expect(isAValidPhoneNumberFormat(badValue, 'gbr')).toEqual(response)
     })
     it('should pass when supplied a good value for a British number', () => {
       const goodValue = '07111111111'

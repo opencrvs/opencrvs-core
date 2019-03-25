@@ -135,8 +135,9 @@ const Notice = styled.div`
   line-height: 24px;
   margin: 30px -25px;
 `
-const PreviewButton = styled.a`
+const CancelButton = styled.a`
   text-decoration: underline;
+  cursor: pointer;
   color: ${({ theme }) => theme.colors.primary};
 `
 
@@ -174,10 +175,10 @@ export const messages = defineMessages({
     defaultMessage: 'Next',
     description: 'Next button'
   },
-  preview: {
-    id: 'register.form.modal.preview',
-    defaultMessage: 'Preview',
-    description: 'Preview button on submit modal'
+  cancel: {
+    id: 'register.form.modal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'Cancel button on submit modal'
   },
   submitDescription: {
     id: 'register.form.modal.submitDescription',
@@ -822,9 +823,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       )}
                       {loading && <ButtonSpinner id="submit_confirm_spinner" />}
                     </ConfirmBtn>,
-                    <PreviewButton
-                      id="preview-btn"
-                      key="preview"
+                    <CancelButton
+                      id="cancel-btn"
+                      key="cancel"
                       onClick={() => {
                         this.toggleSubmitModalOpen()
                         if (document.documentElement) {
@@ -832,8 +833,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         }
                       }}
                     >
-                      {intl.formatMessage(messages.preview)}
-                    </PreviewButton>
+                      {intl.formatMessage(messages.cancel)}
+                    </CancelButton>
                   ]}
                   show={this.state.showSubmitModal}
                   handleClose={this.toggleSubmitModalOpen}
@@ -875,9 +876,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         <ButtonSpinner id="register_confirm_spinner" />
                       )}
                     </ConfirmBtn>,
-                    <PreviewButton
-                      key="review"
-                      id="register_review"
+                    <CancelButton
+                      key="register_cancel"
+                      id="register_cancel"
                       onClick={() => {
                         this.toggleRegisterModalOpen()
                         if (document.documentElement) {
@@ -885,8 +886,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         }
                       }}
                     >
-                      {intl.formatMessage(messages.preview)}
-                    </PreviewButton>
+                      {intl.formatMessage(messages.cancel)}
+                    </CancelButton>
                   ]}
                   show={this.state.showRegisterModal}
                   handleClose={this.toggleRegisterModalOpen}

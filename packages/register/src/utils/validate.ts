@@ -51,7 +51,7 @@ export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage:
-      'Must be 11 digit valid mobile phone number that stars with 01',
+      'Must be {num} digit valid mobile phone number that stars with {start}',
     description:
       'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
   },
@@ -143,11 +143,15 @@ const fallbackCountry = window.config.COUNTRY
 const mobilePhonePatternTable = {
   gbr: {
     pattern: /^07[0-9]{9,10}$/,
-    example: '07123456789'
+    example: '07123456789',
+    start: '07',
+    num: '10 or 11'
   },
   bgd: {
     pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567'
+    example: '01741234567',
+    start: '01',
+    num: '11'
   }
 }
 
@@ -160,6 +164,7 @@ export const isAValidPhoneNumberFormat = (
   const { pattern } = countryMobileTable
   return pattern.test(value)
 }
+
 export const isAValidEmailAddressFormat = (value: string): boolean => {
   return validateEmail(value)
 }
@@ -232,10 +237,11 @@ export const numeric: Validation = (value: string) =>
 
 export const phoneNumberFormat: Validation = (value: string) => {
   const country = window.config.COUNTRY
+  console.log(window.config, value)
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
-  const { example } = countryMobileTable
-  const validationProps = { example }
+  const { start, num } = countryMobileTable
+  const validationProps = { start, num }
 
   const trimmedValue = value === undefined || value === null ? '' : value.trim()
 

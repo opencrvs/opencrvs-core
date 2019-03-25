@@ -499,7 +499,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.blockAlphaNumericDot':
       'Can contain only block character, number and dot (e.g. C91.5)',
     'validations.phoneNumberFormat':
-      'Must be 11 digit valid mobile phone number that stars with 01',
+      'Must be {num} digit valid mobile phone number that stars with {start}',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.isValidBirthDate': 'Must be a valid birth date',
@@ -518,7 +518,7 @@ export const ENGLISH_STATE: ILanguage = {
       '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Registration Review',
     'register.form.saveDraft': 'Save as draft',
     'register.form.next': 'Next',
-    'register.form.modal.preview': 'Preview',
+    'register.form.modal.cancel': 'Cancel',
     'modal.title.submitConfirmation': 'Are you ready to submit?',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
