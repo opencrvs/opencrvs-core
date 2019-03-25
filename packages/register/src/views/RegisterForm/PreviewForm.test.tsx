@@ -439,14 +439,14 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
 
       app
-        .find('#register_review')
+        .find('#register_cancel')
         .hostNodes()
         .simulate('click')
 
       await flushPromises()
       app.update()
 
-      expect(app.find('#register_review').hostNodes()).toHaveLength(0)
+      expect(app.find('#register_cancel').hostNodes()).toHaveLength(0)
     })
     it('rejecting application redirects to reject confirmation screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })

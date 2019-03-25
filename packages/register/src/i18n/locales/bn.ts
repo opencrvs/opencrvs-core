@@ -519,7 +519,7 @@ export const BENGALI_STATE: ILanguage = {
       ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} আবেদনপত্র পর্যালোচনা',
     'register.form.saveDraft': 'খসড়া সংরক্ষণ',
     'register.form.next': 'পরবর্তী',
-    'register.form.modal.preview': 'প্রিভিউ',
+    'register.form.modal.cancel': 'বাতিল করুন',
     'modal.title.submitConfirmation': 'আপনি জমা দিতে প্রস্তুত?',
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
@@ -857,14 +857,17 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.applicantsCurrentAddressSameAsPermanent':
       'আবেদনকারীর স্থায়ী ঠিকানা এবং বর্তমান ঠিকানা কি একই?',
     'formFields.applicant.phone': 'ফোন নম্বর',
-    'formFields.fetchDeceasedModalTitle': 'পরীক্ষা করা হচ্ছে',
-    'formFields.fetchDeceasedModalSuccessTitle': 'আইডি বৈধ',
-    'formFields.fetchDeceasedModalErrorTitle': 'অকার্যকর আইডি',
-    'formFields.fetchDeceasedModalErrorText':
+    'formFields.fetchIdentifierModalTitle': 'পরীক্ষা করা হচ্ছে',
+    'formFields.fetchIdentifierModalSuccessTitle': 'আইডি বৈধ',
+    'formFields.fetchIdentifierModalErrorTitle': 'অকার্যকর আইডি',
+    'formFields.fetchRegistrationModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
     'formFields.fetchButton.cancel': 'বাতিল',
     'formFields.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
-    'formFields.fetchDeceasedModalInfo': 'জন্ম নিবন্ধন নম্বর',
+    'formFields.fetchInformantDetails': 'সংবাদদাতার তথ্য উত্তোলন করুন',
+    'formFields.fetchRegistrationModalInfo': 'জন্ম নিবন্ধন নম্বর',
+    'formFields.fetchMotherDetails': 'মায়ের তথ্য উত্তোলন করুন',
+    'formFields.fetchFatherDetails': 'পিতার তথ্য উত্তোলন করুন',
     'register.confirmationScreen.title': `{event, select, declaration {তথ্য বিবরনী} registration {আবেদন} duplication {নকল আবেদন}
       certificate {সনদপত্র} offlineEvent {আবেদন }} {action, select, completed {সম্পন্ন} submitted {জমাদান} registered {নিবন্ধভুক্তকরন}
       rejected {প্রত্যাখ্যাত} approved {অনুমোদিত} offlineAction {সংযুক্তি স্থগিত}}`,
@@ -917,6 +920,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.event.birth': 'জন্ম',
     'validations.isValidDateOfDeath': 'মৃত্যু ঘটনার তারিখ বৈধ হতে হবে',
     'validations.greaterThanZero': '0 (শূন্য) থেকে বড় হতে হবে',
-    'register.SearchResult.title': 'অনুসন্ধান'
+    'register.SearchResult.title': 'অনুসন্ধান',
+    'register.registerForm.queryError':
+      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি  এই মুহূর্তে  লোড করা সম্ভব হচ্ছে  না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ  করুন, অথবা পুনরায়  চেষ্টা করুন।'
   }
 }
