@@ -10,9 +10,8 @@ import {
 
 const Wrapper = styled.div`
   width: 100%;
-  flex: 1 0 auto;
   display: flex;
-  flex-direction: row;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin-top: 15px;
 `
@@ -24,7 +23,6 @@ const LabelText = styled.div`
 `
 const ComponentWrapper = styled.span`
   flex-direction: column;
-  margin: 0 auto;
 `
 export interface IInputLabel {
   label: string

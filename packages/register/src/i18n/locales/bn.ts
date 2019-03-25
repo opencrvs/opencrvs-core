@@ -920,6 +920,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.event.birth': 'জন্ম',
     'validations.isValidDateOfDeath': 'মৃত্যু ঘটনার তারিখ বৈধ হতে হবে',
     'validations.greaterThanZero': '0 (শূন্য) থেকে বড় হতে হবে',
+    'register.SearchResult.title': 'অনুসন্ধান',
     'register.registerForm.queryError':
       'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি  এই মুহূর্তে  লোড করা সম্ভব হচ্ছে  না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ  করুন, অথবা পুনরায়  চেষ্টা করুন।'
   }
