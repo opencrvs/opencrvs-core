@@ -352,6 +352,58 @@ export const checkMarriageDate: ValidationInitializer = (
         message: messages.domLaterThanDob
       }
 }
+
+export const dateGreaterThan: ValidationInitializer = (
+  previousDate: string
+): Validation => (value: string) => {
+  if (!previousDate || !isAValidDateFormat(previousDate)) {
+    return undefined
+  }
+
+  return new Date(value) > new Date(previousDate)
+    ? undefined
+    : {
+        message: messages.domLaterThanDob
+      }
+}
+
+export const dateLessThan: ValidationInitializer = (
+  laterDate: string
+): Validation => (value: string) => {
+  if (!laterDate || !isAValidDateFormat(laterDate)) {
+    return undefined
+  }
+
+  return new Date(value) < new Date(laterDate)
+    ? undefined
+    : {
+        message: messages.dobEarlierThanDom
+      }
+}
+
+export const dateNotInFuture: ValidationInitializer = (): Validation => (
+  value: string
+) => {
+  if (isDateNotInFuture(value)) {
+    return undefined
+  } else {
+    return { message: messages.dateFormat }
+    // return { message: { id: 'dateNotInFuture', defaultMessage: 'dateNotInFuture' } }
+  }
+}
+
+export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
+  value: string
+) => {
+  // isAValidDateFormat(value)
+  if (isAValidDateFormat(value)) {
+    return undefined
+  } else {
+    return { message: messages.dateFormat }
+    // return { message: { id: 'dateFormatIsCorrect', defaultMessage: 'dateFormatIsCorrect' } }
+  }
+}
+
 /*
  * TODO: The name validation functions should be refactored out.
  *

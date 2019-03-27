@@ -25,8 +25,10 @@ import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   validIDNumber,
-  checkBirthDate,
-  checkMarriageDate
+  dateGreaterThan,
+  dateLessThan,
+  dateNotInFuture,
+  dateFormatIsCorrect
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -395,7 +397,15 @@ export const fatherSection: IFormSection = {
         },
         validate: [
           {
-            validator: checkBirthDate,
+            validator: dateFormatIsCorrect,
+            dependencies: []
+          },
+          {
+            validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateLessThan,
             dependencies: ['dateOfMarriage']
           }
         ]
@@ -446,7 +456,15 @@ export const fatherSection: IFormSection = {
         },
         validate: [
           {
-            validator: checkMarriageDate,
+            validator: dateFormatIsCorrect,
+            dependencies: []
+          },
+          {
+            validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateGreaterThan,
             dependencies: ['fatherBirthDate']
           }
         ]
