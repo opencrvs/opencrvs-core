@@ -144,17 +144,6 @@ function ValuesWithSeparator(props: {
     </ValueContainer>
   )
 }
-function formatRoleCode(str: string) {
-  const sections = str.split('_')
-  const formattedString: string[] = []
-  sections.map(section => {
-    section = section.charAt(0) + section.slice(1).toLowerCase()
-    formattedString.push(section)
-  })
-
-  return formattedString.join(' ')
-}
-
 export class ExpansionContentComp extends React.Component<IProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
@@ -230,7 +219,7 @@ export class ExpansionContentComp extends React.Component<IProps> {
                     <ValuesWithSeparator
                       strings={[
                         practitionerName,
-                        formatRoleCode(practitionerRole),
+                        practitionerRole,
                         (officeName && (officeName as string)) || ''
                       ]}
                       separator={<Separator />}
