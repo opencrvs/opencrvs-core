@@ -1,8 +1,5 @@
-import {
-  newBirthDeclarationHandler,
-  updatedBirthDeclarationHandler
-} from 'src/features/registration/birth/handler'
-import { newDeathDeclarationHandler } from 'src/features/registration/death/handler'
+import { birthEventHandler } from 'src/features/registration/birth/handler'
+import { deathEventHandler } from 'src/features/registration/death/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -20,7 +17,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-declaration',
-      handler: newBirthDeclarationHandler,
+      handler: birthEventHandler,
       config: {
         tags: ['api'],
         auth: false,
@@ -30,36 +27,97 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/birth/update-declaration',
-      handler: updatedBirthDeclarationHandler,
+      path: '/events/birth/new-registration',
+      handler: birthEventHandler,
       config: {
         tags: ['api'],
         auth: false,
         description:
-          'Handles indexing an updated declaration and searching for duplicates',
-        plugins: {
-          'hapi-swagger': {
-            responses: {
-              200: {
-                description: 'Successful'
-              },
-              400: {
-                description: 'Bad request'
-              }
-            }
-          }
-        }
+          'Handles indexing an updated declaration and searching for duplicates'
       }
     },
+    {
+      method: 'POST',
+      path: '/events/birth/registration',
+      handler: birthEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Handles indexing an updated declaration and searching for duplicates'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-certified',
+      handler: birthEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Handles indexing an updated declaration and searching for duplicates'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-voided',
+      handler: birthEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Handles indexing an updated declaration and searching for duplicates'
+      }
+    },
+
     {
       method: 'POST',
       path: '/events/death/new-declaration',
-      handler: newDeathDeclarationHandler,
+      handler: deathEventHandler,
       config: {
         tags: ['api'],
         auth: false,
-        description:
-          'Handles indexing a new declaration and searching for duplicates'
+        description: 'Handles indexing a new declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-registration',
+      handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Handles updating a existing declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/registration',
+      handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Handles updating a existing declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-certified',
+      handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Handles updating a existing declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-voided',
+      handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Handles updating a existing declaration'
       }
     }
   ]
