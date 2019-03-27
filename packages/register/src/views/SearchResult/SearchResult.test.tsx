@@ -721,7 +721,7 @@ describe('SearchResult tests', async () => {
                               state: 'iuyiuy'
                             }
                           },
-                          type: 'COLLECTED',
+                          type: 'CERTIFIED',
                           comments: [
                             {
                               comment: ''
@@ -954,7 +954,7 @@ describe('SearchResult tests', async () => {
                               state: 'iuyiuy'
                             }
                           },
-                          type: 'COLLECTED',
+                          type: 'CERTIFIED',
                           comments: [
                             {
                               comment: ''
