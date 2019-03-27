@@ -394,15 +394,7 @@ export const dateNotInFuture: ValidationInitializer = (): Validation => (
 
 export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
   value: string
-) => {
-  // isAValidDateFormat(value)
-  if (isAValidDateFormat(value)) {
-    return undefined
-  } else {
-    return { message: messages.dateFormat }
-    // return { message: { id: 'dateFormatIsCorrect', defaultMessage: 'dateFormatIsCorrect' } }
-  }
-}
+) => dateFormat(value)
 
 /*
  * TODO: The name validation functions should be refactored out.
