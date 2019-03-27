@@ -2,17 +2,23 @@ import { searchComposition } from 'src/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
 import { MATCH_SCORE_THRESHOLD } from 'src/constants'
 
+export const enum EVENT {
+  BIRTH = 'Birth',
+  DEATH = 'Death'
+}
+
 export interface ICompositionBody {
   compositionId?: string
+  event?: EVENT
+  type?: string
   contactNumber?: string
   dateOfApplication?: string
   trackingId?: string
-  placeOfApplication?: IPlaceOfApplication
-}
-
-interface IPlaceOfApplication {
-  placeOfDeclaration?: string
-  placeOfRegistration?: string
+  registrationNumber?: string
+  eventLocationId?: string
+  applicationLocationId?: string
+  rejectReason?: string
+  rejectComment?: string
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {
