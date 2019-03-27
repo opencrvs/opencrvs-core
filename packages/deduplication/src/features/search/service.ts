@@ -1,5 +1,6 @@
 import { client } from 'src/elasticsearch/client'
 import { ISearchQuery } from './types'
+import { queryBuilder } from './utils'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
@@ -8,9 +9,14 @@ const SEARCHABLE_FIELDS = [
   'childFamilyName',
   'childFirstNamesLocal',
   'childFamilyNameLocal',
+  'deceasedFirstNames',
+  'deceasedFamilyName',
+  'deceasedFirstNamesLocal',
+  'deceasedFamilyNameLocal',
   'trackingid',
   'registrationNumber',
-  'contactNumber'
+  'contactNumber',
+  'motherIdentifier'
 ]
 
 export async function searchComposition(params: ISearchQuery) {
@@ -20,13 +26,7 @@ export async function searchComposition(params: ISearchQuery) {
     from: from,
     size: size,
     body: {
-      query: {
-        multi_match: {
-          query: `${query}`,
-          fields: SEARCHABLE_FIELDS,
-          fuzziness: 'AUTO'
-        }
-      }
+      query: queryBuilder(query, SEARCHABLE_FIELDS)
     }
   })
 }
