@@ -17,7 +17,11 @@ import {
   checkBirthDate,
   checkMarriageDate,
   isValidDeathOccurrenceDate,
-  greaterThanZero
+  greaterThanZero,
+  dateGreaterThan,
+  dateLessThan,
+  dateNotInFuture,
+  dateFormatIsCorrect
 } from './validate'
 
 describe('validate', () => {
@@ -620,6 +624,92 @@ describe('validate', () => {
       const birthDate = '1801-02-23'
       const validDate = '2003-02-23'
       expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
+    })
+  })
+
+  // TODO: dateGreaterThan
+
+  describe('dateGreaterThan. Checks if a given date is greater than another given date', () => {
+    it('should give error message when the second date is greater than the first date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateGreaterThan(laterDate)(previousDate)).toEqual({
+        message: messages.domLaterThanDob
+      })
+    })
+    it('should be okay when the first date is greater than the second date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateGreaterThan(previousDate)(laterDate)).toEqual(undefined)
+    })
+  })
+
+  // TODO: dateLessThan
+
+  describe('dateLessThan. Checks if a given date is less than another given date', () => {
+    it('should be okay when the first date is less than the second date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateLessThan(laterDate)(previousDate)).toEqual(undefined)
+    })
+    it('should give error message when the second date is less than the first date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateLessThan(previousDate)(laterDate)).toEqual({
+        message: messages.dobEarlierThanDom
+      })
+    })
+  })
+
+  // TODO: dateNotInFuture
+
+  describe('dateNotInFuture. Checks if a given date is in the future', () => {
+    it('should be okay with date not in future', () => {
+      const pastDate = '2003-02-23'
+      expect(dateNotInFuture()(pastDate)).toEqual(undefined)
+    })
+    it('should give error message with date in future', () => {
+      const futureDate = '2053-02-23'
+      expect(dateNotInFuture()(futureDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+  })
+
+  // TODO: dateFormatIsCorrect
+
+  describe('dateFormatIsCorrect. Checks if a given date is in correct format', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(dateFormatIsCorrect()(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(dateFormatIsCorrect()(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(dateFormatIsCorrect()(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+
+    it('should pass when supplied a valid date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(dateFormatIsCorrect()(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(dateFormatIsCorrect()(validDate)).toEqual(response)
     })
   })
 
