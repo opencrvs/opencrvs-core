@@ -46,6 +46,14 @@ export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
   )
 }
 
+export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
+  return (
+    task &&
+    task.identifier &&
+    task.identifier.find(identifier => identifier.system === identiferSystem)
+  )
+}
+
 export function findEntry(
   code: string,
   composition: fhir.Composition,
