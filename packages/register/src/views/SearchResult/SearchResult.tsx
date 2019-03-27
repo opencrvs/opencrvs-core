@@ -1075,9 +1075,6 @@ export class SearchResultView extends React.Component<
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
-  userHasDeclareScope() {
-    return this.props.scope && this.props.scope.includes('declare')
-  }
 
   userHasCertifyScope() {
     return this.props.scope && this.props.scope.includes('certify')
@@ -1101,17 +1098,6 @@ export class SearchResultView extends React.Component<
 
     return identifier && identifier.id
   }
-
-  getNewEventButtonText() {
-    if (this.userHasRegisterScope()) {
-      return messages.newRegistration
-    } else if (this.userHasDeclareScope()) {
-      return messages.newApplication
-    } else {
-      return messages.newApplication
-    }
-  }
-
   onPageChange = async (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }

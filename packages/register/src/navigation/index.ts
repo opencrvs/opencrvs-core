@@ -10,7 +10,7 @@ import {
   MY_DRAFTS,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
-  WORK_QUEUE
+  WORK_QUEUE_TAB
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -153,7 +153,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
       const { tabId: workQueueTabId } = action.payload
       return loop(
         state,
-        Cmd.action(push(formatUrl(WORK_QUEUE, { tabId: workQueueTabId })))
+        Cmd.action(push(formatUrl(WORK_QUEUE_TAB, { tabId: workQueueTabId })))
       )
   }
 }

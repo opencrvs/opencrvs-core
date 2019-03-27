@@ -106,6 +106,12 @@ export class App extends React.Component<IAppProps> {
                           />
 
                           <ProtectedRoute
+                            exact
+                            path={routes.WORK_QUEUE_TAB}
+                            component={WorkQueue}
+                          />
+
+                          <ProtectedRoute
                             path={routes.CONFIRMATION_SCREEN}
                             component={ConfirmationScreen}
                           />

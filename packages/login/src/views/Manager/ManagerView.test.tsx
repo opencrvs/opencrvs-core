@@ -23,7 +23,7 @@ describe('Manager view', () => {
         .simulate('click')
       await wait()
       expect(window.location.assign).toBeCalledWith(
-        `${window.config.REGISTER_APP_URL}search-result?token=`
+        `${window.config.REGISTER_APP_URL}work-queue?token=`
       )
     })
     it('Should redirect the user to the performance app', async () => {
