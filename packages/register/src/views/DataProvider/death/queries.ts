@@ -74,6 +74,9 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
+        status {
+          type
+        }
         type
         trackingId
         registrationNumber

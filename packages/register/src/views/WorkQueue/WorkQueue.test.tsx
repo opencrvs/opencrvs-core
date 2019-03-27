@@ -12,6 +12,7 @@ import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { checkAuth } from 'src/profile/profileActions'
 import { storeDraft, createReviewDraft } from 'src/drafts'
 import { Event } from 'src/forms'
+import moment = require('moment')
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -236,7 +237,57 @@ describe('WorkQueue tests', async () => {
         .text()
     ).toContain('In progress (1)')
   })
+  it('renders review and register button for user with register scope', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['123456789']
+          }
+        },
+        result: {
+          data: {
+            countEventRegistrations: {
+              declared: 10,
+              rejected: 5
+            }
+          }
+        }
+      }
+    ]
 
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue
+        match={{
+          params: {
+            tabId: 'review'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftCount={1}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    const app = testComponent.component
+    expect(
+      app
+        .find('#new_registration')
+        .hostNodes()
+        .text()
+    ).toContain('New registration')
+  })
   it('check rejected applications count', async () => {
     const graphqlMock = [
       {
@@ -462,6 +513,7 @@ describe('WorkQueue tests', async () => {
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in rejected tab', async () => {
+    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const graphqlMock = [
       {
         request: {
@@ -486,7 +538,7 @@ describe('WorkQueue tests', async () => {
                     type: 'BIRTH',
                     status: [
                       {
-                        timestamp: '2018-12-07T13:11:49.380Z',
+                        timestamp: TIME_STAMP,
                         user: {
                           id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
                           name: [
@@ -623,23 +675,27 @@ describe('WorkQueue tests', async () => {
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
+    const EXPECTED_DATE_OF_REJECTION = moment(
+      TIME_STAMP,
+      'YYYY-MM-DD'
+    ).fromNow()
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('cc66d69c-7f0a-4047-9283-f066571830f1')
     expect(data[1].contact_number).toBe('01622688231')
-    expect(data[1].date_of_rejection).toBe('3 months ago')
+    expect(data[1].date_of_rejection).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('DEATH')
     expect(data[1].actions).toBeDefined()
 
     testComponent.component.unmount()
   })
-
   it('renders all items returned from graphql query in inProgress tab', async () => {
+    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const drafts = [
       {
         id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
         event: 'birth',
-        modifiedOn: '2018-12-07T13:11:49.380Z',
+        modifiedOn: TIME_STAMP,
         data: {
           child: {
             familyNameEng: 'Anik',
@@ -650,7 +706,7 @@ describe('WorkQueue tests', async () => {
       {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         event: 'death',
-        modifiedOn: '2018-12-07T13:11:49.380Z',
+        modifiedOn: TIME_STAMP,
         data: {
           deceased: {
             familyNameEng: 'Anik',
@@ -676,10 +732,14 @@ describe('WorkQueue tests', async () => {
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
+    const EXPECTED_DATE_OF_REJECTION = moment(
+      TIME_STAMP,
+      'YYYY-MM-DD'
+    ).fromNow()
 
     expect(data[1].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[1].name).toBe('Anik')
-    expect(data[1].date_of_modification).toBe('3 months ago')
+    expect(data[1].date_of_modification).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('BIRTH')
     expect(data[1].actions).toBeDefined()
 

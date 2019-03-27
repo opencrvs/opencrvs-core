@@ -29,6 +29,13 @@ printf "<infobip-api-key>" | docker secret create infobip-api-key -
 
 After creating the secrets make sure the commands are removed from the shell history
 
+Also, if you can't ssh into the manager as root you will need to add your ssh user to be able to run docker commands:
+
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+
 Now, from the root folder of the repository run the deployment as follows:
 
 ```

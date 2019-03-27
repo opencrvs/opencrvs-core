@@ -324,7 +324,7 @@ describe('SearchResult tests', async () => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
     })
-    it('renders review and register button for user with register scope', async () => {
+    it('renders search section', async () => {
       const graphqlMock = [
         {
           request: {
@@ -452,11 +452,8 @@ describe('SearchResult tests', async () => {
         .simulate('click')
 
       expect(
-        testComponent.component
-          .find('#new_registration')
-          .hostNodes()
-          .text()
-      ).toContain('New registration')
+        testComponent.component.find('#search-input-text').hostNodes().length
+      ).toEqual(1)
 
       testComponent.component.unmount()
     })
@@ -1152,144 +1149,6 @@ describe('SearchResult tests', async () => {
         .simulate('click')
 
       expect(history.location.pathname).toContain('duplicates')
-    })
-  })
-
-  describe('SearchResult tests for declare scope', () => {
-    beforeAll(() => {
-      getItem.mockReturnValue(declareScope)
-      store.dispatch(checkAuth({ '?token': declareScope }))
-    })
-    it('does not render review and register button for user with declare scope', async () => {
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_REGISTRATION_QUERY,
-            variables: {
-              locationIds: ['123456789'],
-              skip: 0,
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              listEventRegistrations: {
-                totalItems: 1,
-                results: [
-                  {
-                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                    registration: {
-                      id: '123',
-                      registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'CERTIFIED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-
-      const testComponent = createTestComponent(
-        // @ts-ignore
-        <SearchResult />,
-        store,
-        graphqlMock
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.component.update()
-
-      const instance = testComponent.component
-        .find(DataTable)
-        .find(ListItem)
-        .instance() as any
-
-      instance.toggleExpanded()
-      testComponent.component.update()
-
-      expect(
-        testComponent.component
-          .find(DataTable)
-          .find('#reviewAndRegisterBtn_B111111')
-          .hostNodes().length
-      ).toBe(0)
-
-      testComponent.component
-        .find(DataTable)
-        .find('button')
-        .at(0)
-        .simulate('click')
-
-      expect(
-        testComponent.component
-          .find('#new_registration')
-          .hostNodes()
-          .text()
-      ).toContain('New application')
-
-      testComponent.component.unmount()
     })
   })
 })
