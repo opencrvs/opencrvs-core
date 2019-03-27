@@ -15,6 +15,19 @@ export const indexComposition = async (
   return response
 }
 
+export const updateComposition = async (id: string, body: ICompositionBody) => {
+  const response = await client.update({
+    index: 'ocrvs',
+    type: 'compositions',
+    id,
+    body: {
+      doc: body
+    }
+  })
+
+  return response
+}
+
 export const searchComposition = async (body: ICompositionBody) => {
   const response = client.search({
     index: 'ocrvs',
