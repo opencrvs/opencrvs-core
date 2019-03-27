@@ -1,36 +1,17 @@
 import * as Hapi from 'hapi'
 import { internal } from 'boom'
-import {
-  insertNewDeclaration,
-  insertUpdatedDeclaration
-} from 'src/features/registration/birth/service'
+import { upsertEvent } from 'src/features/registration/birth/service'
 import { logger } from 'src/logger'
 
-export async function newBirthDeclarationHandler(
+export async function birthEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as fhir.Bundle
   try {
-    await insertNewDeclaration(payload)
+    await upsertEvent(payload)
   } catch (error) {
-    logger.error(`Deduplication/newDeclarationHandler: error: ${error}`)
-    return internal(error)
-  }
-
-  return h.response().code(200)
-}
-
-export async function updatedBirthDeclarationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const payload = request.payload as fhir.Bundle
-
-  try {
-    await insertUpdatedDeclaration(payload)
-  } catch (error) {
-    logger.error(`Deduplication/updatedDeclarationHandler: error: ${error}`)
+    logger.error(`Deduplication/birthEventHandler: error: ${error}`)
     return internal(error)
   }
 

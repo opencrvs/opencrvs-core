@@ -2,17 +2,17 @@ import * as Hapi from 'hapi'
 import { internal } from 'boom'
 
 import { logger } from 'src/logger'
-import { insertNewDeclaration } from './service'
+import { upsertEvent } from './service'
 
-export async function newDeathDeclarationHandler(
+export async function deathEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as fhir.Bundle
   try {
-    await insertNewDeclaration(payload)
+    await upsertEvent(payload)
   } catch (error) {
-    logger.error(`Deduplication/newDeclarationHandler: error: ${error}`)
+    logger.error(`Deduplication/deathEventHandler: error: ${error}`)
     return internal(error)
   }
 

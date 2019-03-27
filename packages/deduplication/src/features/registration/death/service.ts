@@ -1,6 +1,6 @@
-import { indexComposition } from 'src/elasticsearch/dbhelper'
+import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
 import {
-  IBirthCompositionBody,
+  EVENT,
   ICompositionBody,
   IDeathCompositionBody
 } from 'src/elasticsearch/utils'
@@ -9,7 +9,8 @@ import {
   findEntryResourceByUrl,
   findName,
   findTask,
-  findTaskExtension
+  findTaskExtension,
+  findTaskIdentifier
 } from 'src/features/fhir/fhir-utils'
 
 const DECEASED_CODE = 'deceased-details'
@@ -17,12 +18,30 @@ const INFORMANT_CODE = 'informant-details'
 const NAME_EN = 'en'
 const NAME_BN = 'bn'
 
-export async function insertNewDeclaration(bundle: fhir.Bundle) {
+export async function upsertEvent(bundle: fhir.Bundle) {
   const bundleEntries = bundle.entry
+
+  if (bundleEntries && bundleEntries.length === 1) {
+    const resource = bundleEntries[0].resource
+    if (resource && resource.resourceType === 'Task') {
+      updateEvent(resource as fhir.Task)
+      return
+    }
+  }
+
   const composition = (bundleEntries &&
     bundleEntries[0].resource) as fhir.Composition
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  const task = findTask(bundleEntries)
+  const trackingIdIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/death-tracking-id'
+  )
   const compositionIdentifier =
-    composition.identifier && composition.identifier.value
+    trackingIdIdentifier && trackingIdIdentifier.value
 
   if (!compositionIdentifier) {
     throw new Error(`Composition Identifier not found`)
@@ -31,12 +50,38 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
   indexDeclaration(compositionIdentifier, composition, bundleEntries)
 }
 
+async function updateEvent(task: fhir.Task) {
+  const trackingIdIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/death-tracking-id'
+  )
+  const trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+
+  if (!trackingId) {
+    throw new Error('Tracking ID not found')
+  }
+
+  const body: ICompositionBody = {}
+  body.type =
+    task &&
+    task.businessStatus &&
+    task.businessStatus.coding &&
+    task.businessStatus.coding[0].code
+  const nodeText =
+    task && task.note && task.note[0].text && task.note[0].text.split('&')
+  body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
+  body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
+
+  await updateComposition(trackingId, body)
+}
+
 async function indexDeclaration(
   compositionIdentifier: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const body: ICompositionBody = {}
+  const body: ICompositionBody = { event: EVENT.DEATH }
+
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
 }
@@ -78,7 +123,7 @@ function createDeceasedIndex(
 }
 
 function createApplicationIndex(
-  body: IBirthCompositionBody,
+  body: IDeathCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -101,13 +146,27 @@ function createApplicationIndex(
     'http://opencrvs.org/specs/extension/regLastLocation'
   )
 
+  const trackingIdIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/death-tracking-id'
+  )
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/death-registration-number'
+  )
+
   body.contactNumber = informantTelecom && informantTelecom.value
+  body.type =
+    task &&
+    task.businessStatus &&
+    task.businessStatus.coding &&
+    task.businessStatus.coding[0].code
   body.dateOfApplication = task && task.lastModified
-  body.trackingId = task && task.identifier && task.identifier[0].value
-  body.placeOfApplication = {
-    placeOfDeclaration:
-      placeOfApplicationExtension &&
-      placeOfApplicationExtension.valueReference &&
-      placeOfApplicationExtension.valueReference.reference
-  }
+  body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
+  body.applicationLocationId =
+    placeOfApplicationExtension &&
+    placeOfApplicationExtension.valueReference &&
+    placeOfApplicationExtension.valueReference.reference
 }
