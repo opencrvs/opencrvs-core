@@ -13,11 +13,11 @@ const SEARCHABLE_FIELDS = [
   'contactNumber',
   'motherIdentifier'
 ]
+export const EMPTY_STRING = ''
 
 export function queryBuilder(query: string, filters: IFilter) {
   const must: any[] = []
   const should: any[] = []
-  const EMPTY_STRING = ''
 
   if (query !== EMPTY_STRING) {
     must.push({
