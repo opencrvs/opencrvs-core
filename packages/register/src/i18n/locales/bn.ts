@@ -347,7 +347,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.birthTypeHigherMultipleDelivery': 'একাধিক ডেলিভারি',
     'formFields.multipleBirth': 'জন্মের ক্রম',
     'formFields.weightAtBirth': 'জন্মের সময় ওজন',
-    'formFields.placeOfBirth': 'জন্মস্থান',
+    'formFields.placeOfBirth': 'জন্মের স্থান',
     'formFields.birthLocation': 'হাসপাতাল',
     'formFields.deliveryInstitution': 'প্রতিষ্ঠান নির্বাচন করুন',
     'formFields.deliveryAddress': 'জন্মস্থান',
