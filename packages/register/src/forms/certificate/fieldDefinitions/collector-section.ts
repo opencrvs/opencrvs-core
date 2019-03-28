@@ -223,6 +223,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'otherPersonIDType',
           typeMapper: identityTypeMapper
         },
@@ -361,6 +362,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'otherPersonIDType',
           typeMapper: identityTypeMapper
         },

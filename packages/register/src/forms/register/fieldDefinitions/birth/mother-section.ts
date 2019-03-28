@@ -4,6 +4,10 @@ import {
   birthIdentityOptions,
   identityTypeMapper
 } from '../../../identity'
+import {
+  getMotherDateOfBirthLabel,
+  getDateOfMarriageLabel
+} from './staticLabel'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
 import {
@@ -21,9 +25,11 @@ import {
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat,
   validIDNumber,
-  isValidBirthDate
+  dateGreaterThan,
+  dateLessThan,
+  dateNotInFuture,
+  dateFormatIsCorrect
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -211,6 +217,7 @@ export const motherSection: IFormSection = {
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'iDType',
           typeMapper: identityTypeMapper
         },
@@ -335,11 +342,35 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'motherBirthDate',
-      type: DATE,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'motherBirthDate',
+          labelMapper: getMotherDateOfBirthLabel
+        },
+        type: {
+          kind: 'static',
+          staticType: DATE
+        },
+        validate: [
+          {
+            validator: dateFormatIsCorrect,
+            dependencies: []
+          },
+          {
+            validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateLessThan,
+            dependencies: ['dateOfMarriage']
+          }
+        ]
+      },
       label: messages.motherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [isValidBirthDate],
+      validate: [],
       mapping: {
         mutation: fieldNameTransformer('birthDate'),
         query: fieldValueTransformer('birthDate')
@@ -368,11 +399,35 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'dateOfMarriage',
-      type: DATE,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'dateOfMarriage',
+          labelMapper: getDateOfMarriageLabel
+        },
+        type: {
+          kind: 'static',
+          staticType: DATE
+        },
+        validate: [
+          {
+            validator: dateFormatIsCorrect,
+            dependencies: []
+          },
+          {
+            validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateGreaterThan,
+            dependencies: ['motherBirthDate']
+          }
+        ]
+      },
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
+      validate: [],
       conditionals: [conditionals.isMarried]
     },
     {
