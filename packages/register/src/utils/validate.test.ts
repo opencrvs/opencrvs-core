@@ -627,8 +627,6 @@ describe('validate', () => {
     })
   })
 
-  // TODO: dateGreaterThan
-
   describe('dateGreaterThan. Checks if a given date is greater than another given date', () => {
     it('should give error message when the second date is greater than the first date', () => {
       const previousDate = '1971-03-26'
@@ -643,8 +641,6 @@ describe('validate', () => {
       expect(dateGreaterThan(previousDate)(laterDate)).toEqual(undefined)
     })
   })
-
-  // TODO: dateLessThan
 
   describe('dateLessThan. Checks if a given date is less than another given date', () => {
     it('should be okay when the first date is less than the second date', () => {
@@ -661,8 +657,6 @@ describe('validate', () => {
     })
   })
 
-  // TODO: dateNotInFuture
-
   describe('dateNotInFuture. Checks if a given date is in the future', () => {
     it('should be okay with date not in future', () => {
       const pastDate = '2003-02-23'
@@ -675,8 +669,6 @@ describe('validate', () => {
       })
     })
   })
-
-  // TODO: dateFormatIsCorrect
 
   describe('dateFormatIsCorrect. Checks if a given date is in correct format', () => {
     it('should error when input invalid chararcters', () => {

@@ -388,7 +388,6 @@ export const dateNotInFuture: ValidationInitializer = (): Validation => (
     return undefined
   } else {
     return { message: messages.dateFormat }
-    // return { message: { id: 'dateNotInFuture', defaultMessage: 'dateNotInFuture' } }
   }
 }
 
