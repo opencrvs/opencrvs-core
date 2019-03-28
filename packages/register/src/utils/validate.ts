@@ -237,7 +237,6 @@ export const numeric: Validation = (value: string) =>
 
 export const phoneNumberFormat: Validation = (value: string) => {
   const country = window.config.COUNTRY
-  console.log(window.config, value)
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
   const { start, num } = countryMobileTable
