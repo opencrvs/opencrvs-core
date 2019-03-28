@@ -291,6 +291,11 @@ enum EducationType {
   NOT_STATED
 }
 
+type EventRegResultSet {
+  results: [EventRegistration]
+  totalItems: Int
+}
+
 type HumanName {
   use: String
   firstNames: String
@@ -517,7 +522,7 @@ type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
-  listBirthRegistrations(
+  listEventRegistrations(
     locationIds: [String]
     status: String
     userId: String
@@ -525,17 +530,8 @@ type Query {
     to: Date
     count: Int
     skip: Int
-  ): BirthRegResultSet
+  ): EventRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): DeathRegResultSet
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   getUser(userId: String): User
@@ -648,4 +644,10 @@ input UserInput {
   primaryOffice: LocationInput
   currentLocation: LocationInput
   catchmentArea: [LocationInput]
+}
+
+type EventRegistration {
+  id: ID! # long uuid
+  registration: Registration
+  createdAt: Date
 }

@@ -461,16 +461,15 @@ const StyledLabel = styled.label`
 const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
 `
-const Separator = styled.div`
-  height: 1.3em;
-  width: 1px;
-  margin: 1px 8px;
-  background: ${({ theme }) => theme.colors.copyAlpha80};
-`
 const ValueContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
   line-height: 1.3em;
+  & span:not(:last-child) {
+    border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
+    margin-right: 10px;
+    padding-right: 10px;
+  }
 `
 const DuplicateIndicatorContainer = styled.div`
   display: flex;
@@ -502,22 +501,12 @@ function LabelValue({ label, value }: { label: string; value: string }) {
   )
 }
 
-function ValuesWithSeparator(props: {
-  strings: string[]
-  separator: React.ReactNode
-}): JSX.Element {
+function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
   return (
     <ValueContainer>
-      {props.strings.map((value, index) => {
-        return (
-          <React.Fragment key={index}>
-            {value}
-            {index < props.strings.length - 1 && value.length > 0
-              ? props.separator
-              : null}
-          </React.Fragment>
-        )
-      })}
+      {props.strings.map((value, index) => (
+        <span key={index}>{value}</span>
+      ))}
     </ValueContainer>
   )
 }
@@ -855,7 +844,6 @@ export class SearchResultView extends React.Component<
                   formatRoleCode(practitionerRole),
                   officeName
                 ]}
-                separator={<Separator />}
               />
             </ValueContainer>
             {item.duplicates && item.duplicates.length > 0 && (
@@ -1075,9 +1063,6 @@ export class SearchResultView extends React.Component<
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
-  userHasDeclareScope() {
-    return this.props.scope && this.props.scope.includes('declare')
-  }
 
   userHasCertifyScope() {
     return this.props.scope && this.props.scope.includes('certify')
@@ -1101,17 +1086,6 @@ export class SearchResultView extends React.Component<
 
     return identifier && identifier.id
   }
-
-  getNewEventButtonText() {
-    if (this.userHasRegisterScope()) {
-      return messages.newRegistration
-    } else if (this.userHasDeclareScope()) {
-      return messages.newApplication
-    } else {
-      return messages.newApplication
-    }
-  }
-
   onPageChange = async (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }
