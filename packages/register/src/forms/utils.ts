@@ -166,7 +166,7 @@ export const getFieldOptions = (
     return []
   }
   if (resources && field.dynamicOptions.resource === OFFLINE_LOCATIONS_KEY) {
-    const locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+    const locations = resources[OFFLINE_LOCATIONS_KEY]
     let partOf: string
     if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
@@ -174,7 +174,7 @@ export const getFieldOptions = (
       partOf = `Location/${dependencyVal}`
     }
     return generateOptions(
-      locations.filter((location: ILocation) => {
+      Object.values(locations).filter((location: ILocation) => {
         return location.partOf === partOf
       }),
       'location'
@@ -183,8 +183,8 @@ export const getFieldOptions = (
     resources &&
     field.dynamicOptions.resource === OFFLINE_FACILITIES_KEY
   ) {
-    const facilities = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
-    return generateOptions(facilities, 'facility')
+    const facilities = resources[OFFLINE_FACILITIES_KEY]
+    return generateOptions(Object.values(facilities), 'facility')
   } else {
     let options
     if (!field.dynamicOptions.options) {
@@ -248,12 +248,10 @@ export const diffDoB = (doB: string) => {
 }
 
 export function isCityLocation(
-  locations: ILocation[],
+  locations: { [key: string]: ILocation },
   locationId: string
 ): boolean {
-  const selectedLocation = locations.filter((location: ILocation) => {
-    return location.id === locationId
-  })[0]
+  const selectedLocation = locations[locationId]
   if (selectedLocation) {
     if (selectedLocation.jurisdictionType === 'CITYCORPORATION') {
       return true

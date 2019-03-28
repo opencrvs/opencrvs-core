@@ -801,9 +801,9 @@ class PrintCertificateActionComponent extends React.Component<
         data.eventLocation.type === 'HEALTH_FACILITY' &&
         data._fhirIDMap.eventLocation
       ) {
-        const selectedLocation = offlineResources[
-          OFFLINE_FACILITIES_KEY
-        ].filter((location: ILocation) => {
+        const selectedLocation = Object.values(
+          offlineResources[OFFLINE_FACILITIES_KEY]
+        ).filter((location: ILocation) => {
           return location.id === data._fhirIDMap.eventLocation
         })[0]
         const partOfID = selectedLocation.partOf.split('/')[1]
