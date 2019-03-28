@@ -10,6 +10,7 @@ export async function searchComposition(params: ISearchQuery) {
     query = EMPTY_STRING,
     event = EMPTY_STRING,
     status = EMPTY_STRING,
+    applicationLocationId = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE
   } = params
@@ -19,7 +20,7 @@ export async function searchComposition(params: ISearchQuery) {
     from: from,
     size: size,
     body: {
-      query: queryBuilder(query, { event, status })
+      query: queryBuilder(query, applicationLocationId, { event, status })
     }
   })
 }

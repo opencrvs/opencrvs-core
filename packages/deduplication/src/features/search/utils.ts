@@ -15,7 +15,11 @@ const SEARCHABLE_FIELDS = [
 ]
 export const EMPTY_STRING = ''
 
-export function queryBuilder(query: string, filters: IFilter) {
+export function queryBuilder(
+  query: string,
+  applicationLocationId: string,
+  filters: IFilter
+) {
   const must: any[] = []
   const should: any[] = []
 
@@ -25,6 +29,14 @@ export function queryBuilder(query: string, filters: IFilter) {
         query: `${query}`,
         fields: SEARCHABLE_FIELDS,
         fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (applicationLocationId !== EMPTY_STRING) {
+    must.push({
+      match: {
+        applicationLocationId
       }
     })
   }
