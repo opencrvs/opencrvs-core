@@ -33,7 +33,7 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: false,
         description:
-          'Handles indexing an updated declaration and searching for duplicates'
+          'Handles indexing a new registration and searching for duplicates'
       }
     },
     {
@@ -44,7 +44,7 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: false,
         description:
-          'Handles indexing an updated declaration and searching for duplicates'
+          'Handles updating an existing declaration and searching for duplicates'
       }
     },
     {
@@ -55,7 +55,7 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: false,
         description:
-          'Handles indexing an updated declaration and searching for duplicates'
+          'Handles updating an existing declaration and searching for duplicates'
       }
     },
     {
@@ -65,8 +65,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: false,
-        description:
-          'Handles indexing an updated declaration and searching for duplicates'
+        description: 'Handles updating an existing declaration'
       }
     },
 
@@ -87,7 +86,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: false,
-        description: 'Handles updating a existing declaration'
+        description: 'Handles indexing a new registration'
       }
     },
     {
