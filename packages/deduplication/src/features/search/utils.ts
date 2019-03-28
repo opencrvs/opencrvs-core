@@ -1,4 +1,20 @@
-export function queryBuilder(query: string, searchableFields: string[]) {
+import { IFilter } from './types'
+const SEARCHABLE_FIELDS = [
+  'childFirstNames',
+  'childFamilyName',
+  'childFirstNamesLocal',
+  'childFamilyNameLocal',
+  'deceasedFirstNames',
+  'deceasedFamilyName',
+  'deceasedFirstNamesLocal',
+  'deceasedFamilyNameLocal',
+  'trackingid',
+  'registrationNumber',
+  'contactNumber',
+  'motherIdentifier'
+]
+
+export function queryBuilder(query: string, filters: IFilter) {
   const must: any[] = []
   const should: any[] = []
   const EMPTY_STRING = ''
@@ -7,8 +23,24 @@ export function queryBuilder(query: string, searchableFields: string[]) {
     must.push({
       multi_match: {
         query: `${query}`,
-        fields: searchableFields,
+        fields: SEARCHABLE_FIELDS,
         fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (filters.event !== EMPTY_STRING) {
+    must.push({
+      match: {
+        event: filters.event
+      }
+    })
+  }
+
+  if (filters.status !== EMPTY_STRING) {
+    must.push({
+      match: {
+        type: filters.status
       }
     })
   }
