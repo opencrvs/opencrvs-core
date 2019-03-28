@@ -364,11 +364,13 @@ class FormSectionComponent extends React.Component<Props> {
       }
     }
   }
+
   async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
     }
   }
+
   showValidationErrors(fields: IFormField[]) {
     const touched = fields.reduce(
       (memo, { name }) => ({ ...memo, [name]: true }),
@@ -377,9 +379,11 @@ class FormSectionComponent extends React.Component<Props> {
 
     this.props.setTouched(touched)
   }
+
   handleBlur = (e: React.FocusEvent<any>) => {
     this.props.setFieldTouched(e.target.name)
   }
+
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
     const fieldToReset = fields.find(
@@ -391,6 +395,7 @@ class FormSectionComponent extends React.Component<Props> {
       this.props.setFieldValue(fieldToReset.name, '')
     }
   }
+
   render() {
     const {
       values,

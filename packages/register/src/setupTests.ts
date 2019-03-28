@@ -1,6 +1,7 @@
 import * as fetch from 'jest-fetch-mock'
 
 jest.setMock('node-fetch', { default: fetch })
+jest.mock('lodash/debounce', () => jest.fn(fn => fn))
 
 const localStorageMock = {
   getItem: jest.fn(),
