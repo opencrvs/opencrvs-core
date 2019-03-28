@@ -3,11 +3,11 @@ export const mockBirthFhirBundle = {
   type: 'document',
   entry: [
     {
-      fullUrl: 'urn:uuid:c79e8d62-335e-458d-9fcc-45ec5836c404',
+      fullUrl: 'urn:uuid:a2cb0db6-3526-4c2e-aa22-2f8fef9eef46',
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
-          value: 'c79e8d62-335e-458d-9fcc-45ec5836c404'
+          value: 'BLNMDOZ'
         },
         resourceType: 'Composition',
         status: 'preliminary',
@@ -32,23 +32,6 @@ export const mockBirthFhirBundle = {
         title: 'Birth Declaration',
         section: [
           {
-            title: 'Supporting documents',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: 'supporting-documents'
-                }
-              ],
-              text: 'Supporting documents'
-            },
-            entry: [
-              {
-                reference: 'urn:uuid:5e63d942-b948-4274-9219-65b501074220'
-              }
-            ]
-          },
-          {
             title: 'Child details',
             code: {
               coding: [
@@ -61,7 +44,7 @@ export const mockBirthFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:847f0c22-0327-4b9c-94f5-b7eae5df124f'
+                reference: 'urn:uuid:d449b644-5c1a-4355-bc82-7473d6a235b8'
               }
             ]
           },
@@ -78,30 +61,12 @@ export const mockBirthFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:d49fb3c1-4585-484f-9083-04088bfcdafb'
+                reference: 'urn:uuid:afb2ecf4-76d8-46fa-854d-3651130a28db'
               }
             ]
           },
           {
-            title: "Father's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/specs/sections',
-                  code: 'father-details'
-                }
-              ],
-              text: "Father's details"
-            },
-            text: '',
-            entry: [
-              {
-                reference: 'urn:uuid:d59fb3c1-4585-484f-9083-04088bfcdafb'
-              }
-            ]
-          },
-          {
-            title: 'Birth Encounter',
+            title: 'Birth encounter',
             code: {
               coding: [
                 {
@@ -113,112 +78,212 @@ export const mockBirthFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:74fa59b6-ee75-41f1-af30-4edb73b73a00'
+                reference: 'urn:uuid:f5858402-c61a-48a2-876d-93cf06f876cb'
               }
             ]
           }
         ],
         subject: {},
-        date: '2019-01-07T12:27:38.918Z',
+        date: '2019-03-27T11:34:46.928Z',
         author: []
       }
     },
     {
-      fullUrl: 'urn:uuid:847f0c22-0327-4b9c-94f5-b7eae5df124f',
+      fullUrl: 'urn:uuid:412e286c-8839-4f1d-b7c0-4d069b2ec58c',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        focus: {
+          reference: 'urn:uuid:a2cb0db6-3526-4c2e-aa22-2f8fef9eef46'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01722222222'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-27T11:34:48.804Z',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'BLNMDOZ'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:d449b644-5c1a-4355-bc82-7473d6a235b8',
       resource: {
         resourceType: 'Patient',
         active: true,
         name: [
           {
             use: 'bn',
-            given: ['asdd'],
-            family: ['সরর']
+            family: ['ম দুই']
           },
           {
             use: 'en',
-            given: ['আনিস'],
-            family: ['asd']
+            family: ['m two']
           }
         ],
         gender: 'male',
-        birthDate: '1990-02-01'
+        birthDate: '2007-01-01'
       }
     },
     {
-      fullUrl: 'urn:uuid:d49fb3c1-4585-484f-9083-04088bfcdafb',
+      fullUrl: 'urn:uuid:afb2ecf4-76d8-46fa-854d-3651130a28db',
       resource: {
         resourceType: 'Patient',
         active: true,
         identifier: [
           {
-            id: '22123123123123123',
-            type: 'PASSPORT'
+            value: '12341234123412341',
+            type: 'BIRTH_REGISTRATION_NUMBER'
           }
         ],
         name: [
           {
             use: 'bn',
-            given: ['চট্টগ্রাম'],
-            family: ['সরকার']
+            family: ['ম ম দুই']
           },
           {
             use: 'en',
-            given: ['test'],
-            family: ['asd']
+            family: ['m m two']
           }
         ],
-        telecom: [
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        multipleBirthInteger: 1,
+        address: [
           {
-            system: 'phone',
-            value: '01710278466'
+            type: 'PERMANENT',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
           },
           {
-            system: 'email',
-            value: 'tofael.ahmed@dsinnovators.com'
+            type: 'CURRENT',
+            line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
+            district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
+            state: '9a236522-0c3d-40eb-83ad-e8567518c763',
+            country: 'BGD'
           }
         ],
-        birthDate: '1960-02-01'
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          }
+        ]
       }
     },
     {
-      fullUrl: 'urn:uuid:d59fb3c1-4585-484f-9083-04088bfcdafb',
+      fullUrl: 'urn:uuid:f5858402-c61a-48a2-876d-93cf06f876cb',
       resource: {
-        resourceType: 'Patient',
-        active: true,
-        identifier: [
+        resourceType: 'Encounter',
+        status: 'finished'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:4a093653-085d-4064-98b8-4d7508493207',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:f5858402-c61a-48a2-876d-93cf06f876cb'
+        },
+        category: [
           {
-            id: '22123123123123123',
-            type: 'PASSPORT'
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
           }
         ],
-        name: [
-          {
-            use: 'bn',
-            given: ['চট্টগ্রাম'],
-            family: ['সরকার']
-          },
-          {
-            use: 'en',
-            given: ['test'],
-            family: ['asd']
-          }
-        ],
-        telecom: [
-          {
-            system: 'phone',
-            value: '01710278466'
-          },
-          {
-            system: 'email',
-            value: 'tofael.ahmed@dsinnovators.com'
-          }
-        ],
-        birthDate: '1960-02-01'
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'present-at-birth-reg',
+              display: 'Present at birth registration'
+            }
+          ]
+        },
+        valueString: 'MOTHER_ONLY'
       }
     }
   ],
   meta: {
-    lastUpdated: '2019-01-07T12:27:38.918Z'
+    lastUpdated: '2019-03-27T11:34:46.928Z'
   }
 }
 
@@ -880,6 +945,169 @@ export const mockTaskBundle = {
           ]
         },
         id: 'e849ceb4-0adc-4be2-8fc8-8a4c41781bb5'
+      }
+    }
+  ]
+}
+
+export const mockBirthRejectionTaskBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/16b3a085-0cf8-40db-8213-58ecc8f72790/_history/99c8a143-675e-4a5c-a6d7-aaa5f10e8b9e',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        focus: {
+          reference: 'Composition/d6667198-3581-4beb-b9a6-52b93aee3159'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01722222222'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-27T11:40:09.493Z',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'BLNMDOZ'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'REJECTED'
+            }
+          ]
+        },
+        meta: {
+          lastUpdated: '2019-03-27T11:34:48.970+00:00',
+          versionId: '99c8a143-675e-4a5c-a6d7-aaa5f10e8b9e'
+        },
+        id: '16b3a085-0cf8-40db-8213-58ecc8f72790',
+        note: [
+          {
+            text: 'reason=duplicate&comment=Possible Duplicate found!',
+            time: 'Wed, 27 Mar 2019 11:40:09 GMT',
+            authorString: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
+          }
+        ]
+      },
+      request: {
+        method: 'POST',
+        url: 'Task'
+      }
+    }
+  ]
+}
+
+export const mockDeathRejectionTaskBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a/_history/57a41663-6f07-42b7-9cce-c2945ddd3a0c',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'DEATH'
+            }
+          ]
+        },
+        focus: {
+          reference: 'Composition/37df1f45-0b27-43da-aebb-8041a73cb103'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'DKCGBVI'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'REJECTED'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-03-27T11:44:41.407Z',
+        meta: {
+          lastUpdated: '2019-03-27T11:38:44.701+00:00',
+          versionId: '57a41663-6f07-42b7-9cce-c2945ddd3a0c'
+        },
+        id: 'be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a',
+        note: [
+          {
+            text: 'reason=missing_supporting_doc&comment=No documents found!',
+            time: 'Wed, 27 Mar 2019 11:44:41 GMT',
+            authorString: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
+          }
+        ]
+      },
+      request: {
+        method: 'POST',
+        url: 'Task'
       }
     }
   ]

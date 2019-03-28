@@ -1,13 +1,17 @@
 import { readFileSync } from 'fs'
 import * as fetch from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import { indexComposition, searchComposition } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  searchComposition,
+  updateComposition
+} from 'src/elasticsearch/dbhelper'
 import { createServer } from 'src/index'
 import {
   mockBirthFhirBundle,
+  mockBirthRejectionTaskBundle,
   mockCompositionEntry,
-  mockSearchResponse,
-  mockTaskBundle
+  mockSearchResponse
 } from 'src/test/utils'
 
 jest.mock('src/elasticsearch/dbhelper.ts')
@@ -15,7 +19,7 @@ jest.mock('src/elasticsearch/dbhelper.ts')
 describe('Verify handlers', () => {
   let server: any
 
-  describe('insertNewDeclarationHandler:', () => {
+  describe('birthEventHandler', () => {
     beforeEach(async () => {
       server = await createServer()
     })
@@ -66,17 +70,9 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    afterAll(async () => {
-      jest.clearAllMocks()
-    })
-  })
+    it('should return status code 200 if the event data is updated with task', async () => {
+      updateComposition.mockReturnValue({})
 
-  describe('updatedDeclarationHandler:', () => {
-    beforeEach(async () => {
-      server = await createServer()
-    })
-
-    it('should return status code 500 if composition identifier not available in payload', async () => {
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -85,53 +81,8 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/events/birth/update-declaration',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(500)
-    })
-
-    it('should skip indexing if composition not updated', async () => {
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:deduplication-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/birth/update-declaration',
-        payload: mockTaskBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(indexComposition.mock.calls.length).toBe(0)
-    })
-
-    it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchComposition.mockReturnValue(mockSearchResponse)
-      fetch.mockResponses(
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify({})]
-      )
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:deduplication-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/birth/update-declaration',
-        payload: mockBirthFhirBundle,
+        url: '/events/birth/mark-voided',
+        payload: mockBirthRejectionTaskBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -139,7 +90,6 @@ describe('Verify handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
-
     afterAll(async () => {
       jest.clearAllMocks()
     })
