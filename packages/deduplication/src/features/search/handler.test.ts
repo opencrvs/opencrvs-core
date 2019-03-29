@@ -1,9 +1,11 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-// import * as fetch from 'jest-fetch-mock'
+import * as fetch from 'jest-fetch-mock'
 import { createServer } from 'src/index'
+import { searchComposition } from './service'
+import { mockSearchResult } from 'src/test/utils'
 
-jest.mock('src/elasticsearch/dbhelper.ts')
+jest.mock('./service.ts')
 
 describe('Verify handlers', () => {
   let server: any
@@ -62,8 +64,9 @@ describe('Verify handlers', () => {
   })
 
   describe('When the request is made', async () => {
-    let token: string, server: any
+    let token: string
     beforeEach(async () => {
+      searchComposition.mockReturnValue(mockSearchResult)
       server = await createServer()
       token = jwt.sign(
         {

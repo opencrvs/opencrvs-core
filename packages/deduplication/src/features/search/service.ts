@@ -5,7 +5,7 @@ import { queryBuilder, EMPTY_STRING } from './utils'
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
-export async function searchComposition(params: ISearchQuery) {
+export const searchComposition = async (params: ISearchQuery) => {
   const {
     query = EMPTY_STRING,
     event = EMPTY_STRING,
