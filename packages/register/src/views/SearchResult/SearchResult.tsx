@@ -135,6 +135,49 @@ export const FETCH_REGISTRATION_QUERY = gql`
     }
   }
 `
+export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
+  query data($id: ID!) {
+    fetchRegistration(id: $id) {
+      registration {
+        id
+        trackingId
+        registrationNumber
+        type
+        status {
+          id
+          user {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role
+          }
+          location {
+            id
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+          type
+          timestamp
+          comments {
+            comment
+          }
+        }
+        duplicates
+      }
+    }
+  }
+`
 
 const messages = defineMessages({
   hello: {
@@ -439,7 +482,17 @@ const messages = defineMessages({
 const StyledSpinner = styled(Spinner)`
   margin: 50% auto;
 `
-
+const ListItemExpansionSpinner = styled(Spinner)`
+  width: 70px;
+  height: 70px;
+  top: 0px !important;
+`
+const ExpansionSpinnerContainer = styled.div`
+  min-height: 70px;
+  min-width: 70px;
+  display: flex;
+  justify-content: center;
+`
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -816,50 +869,128 @@ export class SearchResultView extends React.Component<
     )
   }
 
-  renderExpansionContent = (item: {
-    [key: string]: string & Array<{ [key: string]: string }>
-  }): JSX.Element[] => {
-    return item.status.map((status, i) => {
-      const { practitionerName, practitionerRole, officeName } = status
-      return (
-        <ExpansionContainer key={i}>
-          {this.getDeclarationStatusIcon(status.type)}
-          <ExpansionContentContainer>
-            <LabelValue
-              label={this.props.intl.formatMessage(
-                this.getWorkflowDateLabel(status.type)
-              )}
-              value={status.timestamp}
-            />
-            <ValueContainer>
-              <StyledLabel>
-                {this.props.intl.formatMessage(
-                  messages.workflowPractitionerLabel
-                )}
-                :
-              </StyledLabel>
-              <ValuesWithSeparator
-                strings={[
-                  practitionerName,
-                  formatRoleCode(practitionerRole),
-                  officeName
-                ]}
-              />
-            </ValueContainer>
-            {item.duplicates && item.duplicates.length > 0 && (
-              <DuplicateIndicatorContainer>
-                <Duplicate />
-                <span>
-                  {this.props.intl.formatMessage(
-                    messages.listItemDuplicateLabel
-                  )}
-                </span>
-              </DuplicateIndicatorContainer>
-            )}
-          </ExpansionContentContainer>
-        </ExpansionContainer>
-      )
+  transformDataToTaskHistory = (data: GQLQuery) => {
+    const { locale } = this.props.intl
+    if (
+      !data ||
+      !data.fetchRegistration ||
+      !data.fetchRegistration.registration ||
+      !data.fetchRegistration.registration.status
+    ) {
+      return []
+    }
+
+    return data.fetchRegistration.registration.status.map(status => {
+      return {
+        type: status && status.type,
+        practitionerName:
+          (status &&
+            status.user &&
+            (createNamesMap(status.user.name as GQLHumanName[])[
+              this.props.language
+            ] as string)) ||
+          (status &&
+            status.user &&
+            (createNamesMap(status.user.name as GQLHumanName[])[
+              ''
+            ] as string)) ||
+          '',
+        timestamp: status && formatLongDate(status.timestamp, locale),
+        practitionerRole:
+          status && status.user && status.user.role
+            ? this.props.intl.formatMessage(
+                messages[status.user.role as string]
+              )
+            : '',
+        officeName:
+          locale === 'en'
+            ? status && status.office && status.office.name
+            : status && status.office && status.office.alias
+      }
     })
+  }
+
+  renderExpansionContent = (id: string): JSX.Element => {
+    return (
+      <>
+        <Query
+          query={FETCH_REGISTRATION_BY_COMPOSITION}
+          variables={{
+            id
+          }}
+        >
+          {({ loading, error, data }) => {
+            if (error) {
+              Sentry.captureException(error)
+            }
+            if (loading) {
+              return (
+                <ExpansionSpinnerContainer>
+                  <ListItemExpansionSpinner
+                    id="list-expansion-spinner"
+                    baseColor={this.props.theme.colors.background}
+                  />
+                </ExpansionSpinnerContainer>
+              )
+            }
+
+            const statusData = this.transformDataToTaskHistory(data)
+            const duplicates =
+              data &&
+              data.fetchRegistration &&
+              data.fetchRegistration.registration &&
+              data.fetchRegistration.registration.duplicates
+
+            return statusData.map((status, index) => {
+              const { practitionerName, practitionerRole } = status
+
+              const type = status.type as string
+              const timestamp = status.timestamp as string
+              const officeName = status.officeName as string
+
+              return (
+                <ExpansionContainer key={index} id="expid">
+                  {this.getDeclarationStatusIcon(type)}
+                  <ExpansionContentContainer>
+                    <LabelValue
+                      label={this.props.intl.formatMessage(
+                        this.getWorkflowDateLabel(type)
+                      )}
+                      value={timestamp}
+                    />
+                    <ValueContainer>
+                      <StyledLabel>
+                        {this.props.intl.formatMessage(
+                          messages.workflowPractitionerLabel
+                        )}
+                        :
+                      </StyledLabel>
+                      <ValuesWithSeparator
+                        strings={[
+                          practitionerName,
+                          formatRoleCode(practitionerRole),
+                          officeName
+                        ]}
+                      />
+                    </ValueContainer>
+                    {duplicates && statusData.length - 1 === index && (
+                      <DuplicateIndicatorContainer>
+                        <Duplicate />
+                        <span>
+                          {this.props.intl.formatMessage(
+                            messages.listItemDuplicateLabel
+                          )}
+                        </span>
+                      </DuplicateIndicatorContainer>
+                    )}
+                  </ExpansionContentContainer>
+                </ExpansionContainer>
+              )
+            })
+          }}
+        </Query>
+      </>
+    )
   }
 
   renderCell = (
@@ -1053,8 +1184,8 @@ export class SearchResultView extends React.Component<
         itemData={{}}
         actions={listItemActions}
         expandedCellRenderer={() => (
-          <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item)}
+          <ListItemExpansion>
+            {this.renderExpansionContent(item.id)}
           </ListItemExpansion>
         )}
       />

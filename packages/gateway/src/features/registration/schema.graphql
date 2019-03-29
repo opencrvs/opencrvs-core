@@ -342,6 +342,7 @@ type RegistrationCount {
 
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
+  fetchRegistration(id: ID!): EventRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(

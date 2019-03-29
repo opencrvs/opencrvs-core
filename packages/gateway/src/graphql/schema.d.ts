@@ -13,6 +13,7 @@ import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
 export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
   fetchBirthRegistration?: GQLBirthRegistration
+  fetchRegistration?: GQLEventRegistration
   queryRegistrationByIdentifier?: GQLBirthRegistration
   queryPersonByIdentifier?: GQLPerson
   listBirthRegistrations?: GQLBirthRegResultSet
@@ -714,6 +715,7 @@ export interface GQLResolver {
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
+  fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
   queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<
     TParent
   >
@@ -758,6 +760,21 @@ export interface QueryToFetchBirthRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchBirthRegistrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRegistrationArgs {
+  id: string
+}
+export interface QueryToFetchRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRegistrationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
