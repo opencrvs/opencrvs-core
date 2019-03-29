@@ -13,7 +13,7 @@ export type ITextInputProps = ICustomProps &
 
 const StyledInput = styled.input.attrs<ITextInputProps>({})`
   width: 100%;
-  padding: 10px;
+  padding: 8px 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
   border: solid 2px
