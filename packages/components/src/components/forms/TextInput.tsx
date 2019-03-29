@@ -16,7 +16,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   padding: 8px 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
-  border: solid 2px
+  border: solid 1px
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.error : theme.colors.secondary};
   box-sizing: border-box;
@@ -26,8 +26,8 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   background: ${({ theme }) => theme.colors.inputBackground};
 
   &:focus {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.creamCan};
-    border: solid 2px ${({ theme }) => theme.colors.secondary};
+    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
+    border: solid 1px ${({ theme }) => theme.colors.secondary};
   }
 
   &::-webkit-input-placeholder {
