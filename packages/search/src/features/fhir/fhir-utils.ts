@@ -92,7 +92,7 @@ export async function getCompositionByIdentifier(identifier: string) {
     return response.entry[0].resource
   } catch (error) {
     logger.error(
-      `Deduplication/fhir-utils: getting composition by identifer failed with error: ${error}`
+      `Search/fhir-utils: getting composition by identifer failed with error: ${error}`
     )
     throw new Error(error)
   }
@@ -107,7 +107,7 @@ export function addDuplicatesToComposition(
       composition.identifier && composition.identifier.value
 
     logger.info(
-      `Deduplication/fhir-utils: updating composition(identifier: ${compositionIdentifier}) with duplicates ${duplicates}`
+      `Search/fhir-utils: updating composition(identifier: ${compositionIdentifier}) with duplicates ${duplicates}`
     )
 
     if (!composition.relatesTo) {
@@ -117,7 +117,7 @@ export function addDuplicatesToComposition(
     createDuplicatesTemplate(duplicates, composition)
   } catch (error) {
     logger.error(
-      `Deduplication/fhir-utils: updating composition failed with error: ${error}`
+      `Search/fhir-utils: updating composition failed with error: ${error}`
     )
     throw new Error(error)
   }

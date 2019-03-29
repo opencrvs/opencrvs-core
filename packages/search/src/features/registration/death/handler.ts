@@ -12,7 +12,7 @@ export async function deathEventHandler(
   try {
     await upsertEvent(payload)
   } catch (error) {
-    logger.error(`Deduplication/deathEventHandler: error: ${error}`)
+    logger.error(`Search/deathEventHandler: error: ${error}`)
     return internal(error)
   }
 

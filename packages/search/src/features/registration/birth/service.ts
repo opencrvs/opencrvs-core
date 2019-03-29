@@ -234,7 +234,7 @@ async function detectAndUpdateDuplicates(
     return
   }
   logger.info(
-    `Deduplication/service: ${duplicates.length} duplicate composition(s) found`
+    `Search/service: ${duplicates.length} duplicate composition(s) found`
   )
 
   if (composition.id) {

@@ -29,7 +29,7 @@ describe('Route authorization', () => {
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+      audience: 'opencrvs:search-user'
     })
     const res = await server.server.inject({
       method: 'GET',
@@ -46,7 +46,7 @@ describe('Route authorization', () => {
     const token = jwt.sign({}, readFileSync('../auth/test/cert-invalid.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+      audience: 'opencrvs:search-user'
     })
     const res = await server.server.inject({
       method: 'GET',
@@ -63,7 +63,7 @@ describe('Route authorization', () => {
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user',
+      audience: 'opencrvs:search-user',
       expiresIn: '1ms'
     })
 
@@ -86,7 +86,7 @@ describe('Route authorization', () => {
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'HS512',
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+      audience: 'opencrvs:search-user'
     })
     const res = await server.server.inject({
       method: 'GET',
@@ -122,7 +122,7 @@ describe('Route authorization', () => {
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:NOT_VALID',
-      audience: 'opencrvs:deduplication-user'
+      audience: 'opencrvs:search-user'
     })
     const res = await server.server.inject({
       method: 'GET',

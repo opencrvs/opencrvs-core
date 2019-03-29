@@ -11,7 +11,7 @@ export async function birthEventHandler(
   try {
     await upsertEvent(payload)
   } catch (error) {
-    logger.error(`Deduplication/birthEventHandler: error: ${error}`)
+    logger.error(`Search/birthEventHandler: error: ${error}`)
     return internal(error)
   }
 
