@@ -10,8 +10,7 @@ const SEARCHABLE_FIELDS = [
   'deceasedFamilyNameLocal',
   'trackingid',
   'registrationNumber',
-  'contactNumber',
-  'motherIdentifier'
+  'contactNumber'
 ]
 export const EMPTY_STRING = ''
 
