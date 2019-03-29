@@ -57,6 +57,8 @@ import { formatLongDate } from 'src/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
 import { extractCommentFragmentValue } from 'src/utils/data-formatting'
 import { ActionPage } from '@opencrvs/components/lib/interface'
+import * as moment from 'moment'
+import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
@@ -399,12 +401,12 @@ const messages = defineMessages({
   },
   workflowStatusDateRejected: {
     id: 'register.workQueue.listItem.status.dateLabel.rejected',
-    defaultMessage: 'Rejected on',
+    defaultMessage: 'Application rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
   },
   workflowStatusDateCollected: {
     id: 'register.workQueue.listItem.status.dateLabel.collected',
-    defaultMessage: 'Printed on',
+    defaultMessage: 'Certificate collected on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
   workflowPractitionerLabel: {
@@ -920,6 +922,8 @@ export class SearchResultView extends React.Component<
           }}
         >
           {({ loading, error, data }) => {
+            const { intl, language } = this.props
+            moment.locale(language)
             if (error) {
               Sentry.captureException(error)
             }
@@ -941,52 +945,59 @@ export class SearchResultView extends React.Component<
               data.fetchRegistration.registration &&
               data.fetchRegistration.registration.duplicates
 
-            return statusData.map((status, index) => {
-              const { practitionerName, practitionerRole } = status
+            return statusData
+              .map((status, index) => {
+                const { practitionerName, practitionerRole } = status
+                const type = status.type as string
+                const officeName = status.officeName as string
+                const timestamp = moment(
+                  status.timestamp as string,
+                  'DD-MM-YYYY'
+                ).format(CERTIFICATE_DATE_FORMAT)
 
-              const type = status.type as string
-              const timestamp = status.timestamp as string
-              const officeName = status.officeName as string
-
-              return (
-                <ExpansionContainer key={index} id="expid">
-                  {this.getDeclarationStatusIcon(type)}
-                  <ExpansionContentContainer>
-                    <LabelValue
-                      label={this.props.intl.formatMessage(
-                        this.getWorkflowDateLabel(type)
-                      )}
-                      value={timestamp}
-                    />
-                    <ValueContainer>
-                      <StyledLabel>
-                        {this.props.intl.formatMessage(
-                          messages.workflowPractitionerLabel
+                return (
+                  <ExpansionContainer
+                    key={index}
+                    id={'expanded_section_' + index}
+                  >
+                    {this.getDeclarationStatusIcon(type)}
+                    <ExpansionContentContainer>
+                      <LabelValue
+                        label={intl.formatMessage(
+                          this.getWorkflowDateLabel(type)
                         )}
-                        :
-                      </StyledLabel>
-                      <ValuesWithSeparator
-                        strings={[
-                          practitionerName,
-                          formatRoleCode(practitionerRole),
-                          officeName
-                        ]}
+                        value={timestamp}
                       />
-                    </ValueContainer>
-                    {duplicates && statusData.length - 1 === index && (
-                      <DuplicateIndicatorContainer>
-                        <Duplicate />
-                        <span>
+                      <ValueContainer>
+                        <StyledLabel>
                           {this.props.intl.formatMessage(
-                            messages.listItemDuplicateLabel
+                            messages.workflowPractitionerLabel
                           )}
-                        </span>
-                      </DuplicateIndicatorContainer>
-                    )}
-                  </ExpansionContentContainer>
-                </ExpansionContainer>
-              )
-            })
+                          :
+                        </StyledLabel>
+                        <ValuesWithSeparator
+                          strings={[
+                            practitionerName,
+                            formatRoleCode(practitionerRole),
+                            officeName
+                          ]}
+                        />
+                      </ValueContainer>
+                      {duplicates && index === 0 && (
+                        <DuplicateIndicatorContainer>
+                          <Duplicate />
+                          <span>
+                            {this.props.intl.formatMessage(
+                              messages.listItemDuplicateLabel
+                            )}
+                          </span>
+                        </DuplicateIndicatorContainer>
+                      )}
+                    </ExpansionContentContainer>
+                  </ExpansionContainer>
+                )
+              })
+              .reverse()
           }}
         </Query>
       </>
