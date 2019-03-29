@@ -161,6 +161,7 @@ export interface IFormFieldBase {
   postfix?: string
   disabled?: boolean
   initialValue?: IFormFieldValue
+  withNoBorder?: boolean
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
@@ -392,6 +393,7 @@ export interface Ii18nFormFieldBase {
   initialValue?: IFormFieldValue
   postfix?: string
   disabled?: boolean
+  withNoBorder?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
 }

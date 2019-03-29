@@ -102,6 +102,7 @@ type GeneratedInputFieldProps = {
   resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
+  withNoBorder: boolean
   error: string
 }
 
@@ -113,6 +114,7 @@ function GeneratedInputField({
   resetDependentSelectValues,
   error,
   touched,
+  withNoBorder,
   value
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
@@ -125,7 +127,8 @@ function GeneratedInputField({
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,
     error,
-    touched
+    touched,
+    withNoBorder: fieldDefinition.withNoBorder
   }
 
   const inputProps = {
@@ -135,7 +138,8 @@ function GeneratedInputField({
     value,
     disabled: fieldDefinition.disabled,
     error: Boolean(error),
-    touched: Boolean(touched)
+    touched: Boolean(touched),
+    withNoBorder: Boolean(withNoBorder)
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
@@ -150,6 +154,7 @@ function GeneratedInputField({
             onSetFieldValue(fieldDefinition.name, val)
           }}
           options={fieldDefinition.options}
+          withNoBorder={withNoBorder}
         />
       </InputField>
     )
@@ -402,6 +407,7 @@ class FormSectionComponent extends React.Component<Props> {
       draftData,
       setValues
     } = this.props
+
     const language = this.props.intl.locale
 
     const errors = (this.props.errors as any) as {
@@ -524,6 +530,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      withNoBorder={field.withNoBorder || false}
                     />
                   )}
                 </Field>
@@ -546,6 +553,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      withNoBorder={field.withNoBorder || false}
                     />
                   )}
                 </FastField>

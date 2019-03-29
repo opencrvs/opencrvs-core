@@ -281,6 +281,7 @@ export const childSection: IFormSection = {
       type: TEXT,
       label: messages.childFamilyNameEng,
       required: true,
+      withNoBorder: true,
       initialValue: '',
       validate: [englishOnlyNameFormat],
       mapping: {
@@ -293,6 +294,7 @@ export const childSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: messages.childSex,
       required: true,
+      withNoBorder: true,
       initialValue: '',
       validate: [],
       options: [
@@ -320,6 +322,7 @@ export const childSection: IFormSection = {
       label: messages.attendantAtBirth,
       required: false,
       initialValue: '',
+      withNoBorder: true,
       validate: [],
       options: [
         { value: 'PHYSICIAN', label: messages.attendantAtBirthPhysician },
@@ -343,6 +346,7 @@ export const childSection: IFormSection = {
       type: SELECT_WITH_OPTIONS,
       label: messages.birthType,
       required: false,
+      withNoBorder: true,
       initialValue: '',
       validate: [],
       options: [
