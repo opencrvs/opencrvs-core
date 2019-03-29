@@ -275,6 +275,7 @@ export const applicantsSection: IFormSection = {
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'iDType',
           typeMapper: identityTypeMapper
         },

@@ -66,6 +66,18 @@ export const messages = defineMessages({
     description:
       'The error message appears when the given birth date is not valid'
   },
+  dobEarlierThanDom: {
+    id: 'validations.dobEarlierThanDom',
+    defaultMessage: 'Must be earlier than marriage date',
+    description:
+      'The error message appears when the given birth date is later than the given marriage date'
+  },
+  domLaterThanDob: {
+    id: 'validations.domLaterThanDob',
+    defaultMessage: 'Must be later than birth date',
+    description:
+      'The error message appears when the given marriage date is earlier than the given birth date'
+  },
   emailAddressFormat: {
     id: 'validations.emailAddressFormat',
     defaultMessage: 'Must be a valid email address',
@@ -284,6 +296,105 @@ export const isValidBirthDate: Validation = (value: string) => {
         message: messages.isValidBirthDate
       }
 }
+
+export const checkBirthDate: ValidationInitializer = (
+  marriageDate: string
+): Validation => (value: string) => {
+  if (!isAValidDateFormat(value)) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  const bDate = new Date(value)
+  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+  if (bDate > new Date()) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  if (!marriageDate || !isAValidDateFormat(marriageDate)) {
+    return undefined
+  }
+
+  return bDate < new Date(marriageDate)
+    ? undefined
+    : {
+        message: messages.dobEarlierThanDom
+      }
+}
+
+export const checkMarriageDate: ValidationInitializer = (
+  birthDate: string
+): Validation => (value: string) => {
+  if (!isAValidDateFormat(value)) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  const mDate = new Date(value)
+  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+  if (mDate > new Date()) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  if (!birthDate || !isAValidDateFormat(birthDate)) {
+    return undefined
+  }
+
+  return mDate > new Date(birthDate)
+    ? undefined
+    : {
+        message: messages.domLaterThanDob
+      }
+}
+
+export const dateGreaterThan: ValidationInitializer = (
+  previousDate: string
+): Validation => (value: string) => {
+  if (!previousDate || !isAValidDateFormat(previousDate)) {
+    return undefined
+  }
+
+  return new Date(value) > new Date(previousDate)
+    ? undefined
+    : {
+        message: messages.domLaterThanDob
+      }
+}
+
+export const dateLessThan: ValidationInitializer = (
+  laterDate: string
+): Validation => (value: string) => {
+  if (!laterDate || !isAValidDateFormat(laterDate)) {
+    return undefined
+  }
+
+  return new Date(value) < new Date(laterDate)
+    ? undefined
+    : {
+        message: messages.dobEarlierThanDom
+      }
+}
+
+export const dateNotInFuture: ValidationInitializer = (): Validation => (
+  value: string
+) => {
+  if (isDateNotInFuture(value)) {
+    return undefined
+  } else {
+    return { message: messages.dateFormat }
+  }
+}
+
+export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
+  value: string
+) => dateFormat(value)
+
 /*
  * TODO: The name validation functions should be refactored out.
  *
