@@ -26,6 +26,7 @@
     "deploy": "bash deploy.sh",
     "deploy:staging": "bash deploy.sh --clear-data=no --restore-metadata=yes opencrvs-staging.jembi.org latest",
     "deploy:qa": "bash deploy.sh --clear-data=yes --restore-metadata=yes opencrvs.qa1.jembi.org",
+    "deploy:bn-prod": "SSH_USER=mishealth SSH_HOST=172.16.17.54 LOG_LOCATION=/home/mishealth bash deploy.sh --clear-data=no --restore-metadata=yes opencrvsbd.org",
     "db:backup:create": "./infrastructure/backup-metadata.sh",
     "db:backup:restore": "./infrastructure/restore-metadata.sh",
     "db:clear:all": "./infrastructure/clear-all-data.sh"

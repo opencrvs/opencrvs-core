@@ -6,9 +6,8 @@ import { IAction } from '../interface/ListItem'
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin-left: 1px;
-  width: 120px;
 `
 const ListItemSingleAction = styled(Button)`
   display: flex;
@@ -19,6 +18,7 @@ const ListItemSingleAction = styled(Button)`
   ${({ theme }) => theme.fonts.capsFontStyle};
   font-weight: 600;
   margin-bottom: 1px;
+  padding: 15px 25px;
   &:last-child {
     margin-bottom: 0;
   }

@@ -18,14 +18,17 @@ import {
   SUBSECTION,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  FIELD_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  FETCH_BUTTON
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  dateFormat,
   validIDNumber,
-  isValidBirthDate
+  dateGreaterThan,
+  dateLessThan,
+  dateNotInFuture,
+  dateFormatIsCorrect
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -56,6 +59,15 @@ import {
   sameAddressFieldTransformer
 } from 'src/forms/mappings/query/field-mappings'
 import { emptyFatherSectionTransformer } from './mappings/query/father-mappings'
+import {
+  transformRegistrationData,
+  FETCH_REGISTRATION
+} from '../../queries/registration'
+import { FETCH_PERSON, transformPersonData } from '../../queries/person'
+import {
+  getFatherDateOfBirthLabel,
+  getDateOfMarriageLabel
+} from './staticLabel'
 
 export const messages = defineMessages({
   fatherTab: {
@@ -142,6 +154,46 @@ export const messages = defineMessages({
     id: 'formFields.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
+  },
+  fetchFatherDetails: {
+    id: 'formFields.fetchFatherDetails',
+    defaultMessage: "Retrieve Father's Details",
+    description: 'Label for loader button'
+  },
+  fetchIdentifierModalTitle: {
+    id: 'formFields.fetchIdentifierModalTitle',
+    defaultMessage: 'Checking',
+    description: 'Label for fetch modal title'
+  },
+  fetchIdentifierModalSuccessTitle: {
+    id: 'formFields.fetchIdentifierModalSuccessTitle',
+    defaultMessage: 'ID valid',
+    description: 'Label for fetch modal success title'
+  },
+  fetchIdentifierModalErrorTitle: {
+    id: 'formFields.fetchIdentifierModalErrorTitle',
+    defaultMessage: 'Invalid Id',
+    description: 'Label for fetch modal error title'
+  },
+  fetchRegistrationModalErrorText: {
+    id: 'formFields.fetchRegistrationModalErrorText',
+    defaultMessage: 'No registration found for provided BRN',
+    description: 'Label for fetch modal error title'
+  },
+  fetchPersonByNIDModalErrorText: {
+    id: 'formFields.fetchPersonByNIDModalErrorText',
+    defaultMessage: 'No person found for provided NID',
+    description: 'Label for fetch modal error title'
+  },
+  fetchRegistrationModalInfo: {
+    id: 'formFields.fetchRegistrationModalInfo',
+    defaultMessage: 'Birth Registration Number',
+    description: 'Label for loader button'
+  },
+  fetchPersonByNIDModalInfo: {
+    id: 'formFields.fetchPersonByNIDModalInfo',
+    defaultMessage: 'National ID',
+    description: 'Label for loader button'
   }
 })
 
@@ -202,6 +254,7 @@ export const fatherSection: IFormSection = {
           labelMapper: identityNameMapper
         },
         type: {
+          kind: 'dynamic',
           dependency: 'iDType',
           typeMapper: identityTypeMapper
         },
@@ -221,6 +274,48 @@ export const fatherSection: IFormSection = {
         mutation: fieldToIdentifierTransformer('id'),
         query: identifierToFieldTransformer('id')
       }
+    },
+    {
+      name: 'fetchButton',
+      type: FETCH_BUTTON,
+      label: messages.fetchFatherDetails,
+      required: false,
+      initialValue: '',
+      queryMap: {
+        BIRTH_REGISTRATION_NUMBER: {
+          query: FETCH_REGISTRATION,
+          inputs: [
+            {
+              name: 'identifier',
+              valueField: 'iD'
+            }
+          ],
+          responseTransformer: transformRegistrationData,
+          modalInfoText: messages.fetchRegistrationModalInfo,
+          errorText: messages.fetchRegistrationModalErrorText
+        },
+        NATIONAL_ID: {
+          query: FETCH_PERSON,
+          inputs: [
+            {
+              name: 'identifier',
+              valueField: 'iD'
+            }
+          ],
+          responseTransformer: transformPersonData,
+          modalInfoText: messages.fetchPersonByNIDModalInfo,
+          errorText: messages.fetchPersonByNIDModalErrorText
+        }
+      },
+      querySelectorInput: {
+        name: 'identifierType',
+        valueField: 'iDType'
+      },
+      validate: [],
+      conditionals: [conditionals.identifierIDSelected],
+      modalTitle: messages.fetchIdentifierModalTitle,
+      successTitle: messages.fetchIdentifierModalSuccessTitle,
+      errorTitle: messages.fetchIdentifierModalErrorTitle
     },
     {
       name: 'nationality',
@@ -290,11 +385,35 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'fatherBirthDate',
-      type: DATE,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'fatherBirthDate',
+          labelMapper: getFatherDateOfBirthLabel
+        },
+        type: {
+          kind: 'static',
+          staticType: DATE
+        },
+        validate: [
+          {
+            validator: dateFormatIsCorrect,
+            dependencies: []
+          },
+          {
+            validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateLessThan,
+            dependencies: ['dateOfMarriage']
+          }
+        ]
+      },
       label: messages.fatherDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [isValidBirthDate],
+      validate: [],
       conditionals: [conditionals.fathersDetailsExist],
       mapping: {
         mutation: fieldNameTransformer('birthDate'),
@@ -325,11 +444,35 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'dateOfMarriage',
-      type: DATE,
+      type: FIELD_WITH_DYNAMIC_DEFINITIONS,
+      dynamicDefinitions: {
+        label: {
+          dependency: 'dateOfMarriage',
+          labelMapper: getDateOfMarriageLabel
+        },
+        type: {
+          kind: 'static',
+          staticType: DATE
+        },
+        validate: [
+          {
+            validator: dateFormatIsCorrect,
+            dependencies: []
+          },
+          {
+            validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateGreaterThan,
+            dependencies: ['fatherBirthDate']
+          }
+        ]
+      },
       label: maritalStatusMessages.dateOfMarriage,
       required: false,
       initialValue: '',
-      validate: [dateFormat],
+      validate: [],
       conditionals: [conditionals.fathersDetailsExist, conditionals.isMarried]
     },
     {

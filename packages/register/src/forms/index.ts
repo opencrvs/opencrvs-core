@@ -94,15 +94,25 @@ export type IDynamicValueMapper = (key: string) => string
 export type IDynamicFieldTypeMapper = (key: string) => string
 
 export interface IDynamicFormFieldDefinitions {
-  label?: {
-    dependency: string
-    labelMapper: IDynamicFormFieldLabelMapper
-  }
-  type?: {
-    dependency: string
-    typeMapper: IDynamicFieldTypeMapper
-  }
+  label?: IDynamicFieldLabel
+  type?: IDynamicFieldType | IStaticFieldType
   validate?: IDynamicFormFieldValidators[]
+}
+
+export interface IDynamicFieldLabel {
+  dependency: string
+  labelMapper: IDynamicFormFieldLabelMapper
+}
+
+export interface IDynamicFieldType {
+  kind: 'dynamic'
+  dependency: string
+  typeMapper: IDynamicFieldTypeMapper
+}
+
+export interface IStaticFieldType {
+  kind: 'static'
+  staticType: string
 }
 
 export interface IFieldInput {
@@ -328,7 +338,7 @@ export interface IConditionals {
   deathPlaceOther: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
-  deceasedIDSelected: IConditional
+  identifierIDSelected: IConditional
   otherRelationship: IConditional
 }
 

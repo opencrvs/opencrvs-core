@@ -35,5 +35,6 @@ export const colors = {
   saveDraftBtn: '#5391E8',
   disabledTab: '#C4C9D4',
   offlineBoxText: '#747987',
-  offlineBoxTitle: '#41485F'
+  offlineBoxTitle: '#41485F',
+  seperatorBorder: '#f7f7f7'
 }

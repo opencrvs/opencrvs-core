@@ -669,6 +669,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.labels.locations.all': 'All locations',
     'register.workQueue.labels.selects.sort': 'Sort by:',
     'register.workQueue.labels.selects.filter': 'Filter by:',
+    'register.workQueue.labels.results.type': 'Type',
+    'register.workQueue.labels.results.applicationDate': 'Application sent',
+    'register.workQueue.labels.results.updateDate': 'Sent on',
+    'register.workQueue.labels.results.applicantNumber': 'Applicant No.',
+    'register.workQueue.labels.results.modificationDate': 'Last edited',
+    'register.workQueue.labels.results.eventDate': 'Date of event',
     'register.workQueue.labels.results.name': 'Name',
     'register.workQueue.labels.results.dob': 'D.o.B.',
     'register.workQueue.labels.results.dod': 'D.o.D.',
@@ -695,6 +701,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
     'register.workQueue.list.buttons.review': 'Review',
+    'register.workQueue.list.buttons.update': 'Update',
     'register.workQueue.list.buttons.print': 'Print',
     'register.workQueue.title.certificateCollection': 'Certificate Collection',
     'register.workQueue.list.buttons.printCertificate': 'Print certificate',
@@ -868,17 +875,20 @@ export const ENGLISH_STATE: ILanguage = {
       'Is applicant’s permanent address the same as their current address?',
     'formFields.applicant.phone': 'Phone number',
 
-    'formFields.fetchDeceasedModalTitle': 'Checking',
-    'formFields.fetchDeceasedModalSuccessTitle': 'ID valid',
-    'formFields.fetchDeceasedModalErrorTitle': 'Invalid Id',
-    'formFields.fetchDeceasedModalErrorText':
+    'formFields.fetchIdentifierModalTitle': 'Checking',
+    'formFields.fetchIdentifierModalSuccessTitle': 'ID valid',
+    'formFields.fetchIdentifierModalErrorTitle': 'Invalid Id',
+    'formFields.fetchRegistrationModalErrorText':
       'No registration found for provided BRN',
     'formFields.fetchButton.cancel': 'Cancel',
     'formFields.fetchDeceasedDetails': "Retrieve Deceased's Details",
-    'formFields.fetchDeceasedModalInfo': 'Birth Registration Number',
+    'formFields.fetchInformantDetails': "Retrieve Informant's Details",
+    'formFields.fetchRegistrationModalInfo': 'Birth Registration Number',
     'formFields.fetchPersonByNIDModalInfo': 'National ID',
     'formFields.fetchPersonByNIDModalErrorText':
       'No person found for provided NID',
+    'formFields.fetchMotherDetails': "Retrieve Mother's Details",
+    'formFields.fetchFatherDetails': "Retrieve Father's Details",
     'register.confirmationScreen.title': `{event, select, declaration {Application} registration {Application} duplication {Application}
     certificate {Certificate} offlineEvent {Application}} {action, select, completed {completed}
     submitted {submitted} rejected {rejected} approved {Approved} registered {registered} offlineAction {pending connectivity}}`,
@@ -919,6 +929,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.event.death': 'Death',
     'register.event.birth': 'Birth',
     'validations.isValidDateOfDeath': 'Must be a valid date of death',
-    'validations.greaterThanZero': 'Must be a greater than zero'
+    'validations.greaterThanZero': 'Must be a greater than zero',
+    'register.SearchResult.title': 'Search',
+    'register.registerForm.queryError':
+      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.'
   }
 }
