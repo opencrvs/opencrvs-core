@@ -61,6 +61,32 @@ describe('Verify handlers', () => {
       })
       expect(res.statusCode).toBe(200)
     })
+    it('should return status code 500', async () => {
+      searchComposition.mockImplementation(() => {
+        throw 'dead'
+      })
+      const token = jwt.sign(
+        {
+          scope: ['register']
+        },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:deduplication-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/search',
+        payload: {},
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(500)
+    })
   })
 
   describe('When the request is made', async () => {
