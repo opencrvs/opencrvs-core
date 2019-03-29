@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { SearchResult, FETCH_REGISTRATION_QUERY } from './SearchResult'
+import {
+  SearchResult,
+  FETCH_REGISTRATION_QUERY,
+  FETCH_REGISTRATION_BY_COMPOSITION
+} from './SearchResult'
 import { createTestComponent, mockUserResponse } from 'src/tests/util'
 import { createStore } from 'src/store'
 import {
@@ -41,7 +45,7 @@ mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', async () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -324,7 +328,7 @@ describe('SearchResult tests', async () => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
     })
-    it('renders search section', async () => {
+    it('renders expanded section', async () => {
       const graphqlMock = [
         {
           request: {
@@ -408,6 +412,69 @@ describe('SearchResult tests', async () => {
               }
             }
           }
+        },
+        {
+          request: {
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            variables: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+            }
+          },
+          result: {
+            data: {
+              fetchRegistration: {
+                registration: {
+                  id: '123',
+                  registrationNumber: null,
+                  trackingId: 'B111111',
+                  type: 'BIRTH',
+                  duplicates: null,
+                  status: [
+                    {
+                      id: '123',
+                      timestamp: null,
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
+                      },
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'DECLARED',
+                      comments: [
+                        {
+                          comment: ''
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
         }
       ]
 
@@ -430,35 +497,22 @@ describe('SearchResult tests', async () => {
         .instance() as any
 
       instance.toggleExpanded()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
       testComponent.component.update()
 
       expect(
-        testComponent.component
-          .find(DataTable)
-          .find('#reviewAndRegisterBtn_B111111')
-          .hostNodes().length
+        testComponent.component.find('#expanded_section_0').hostNodes().length
       ).toBe(1)
-      testComponent.component
-        .find(DataTable)
-        .find('#reviewAndRegisterBtn_B111111')
-        .hostNodes()
-        .simulate('click')
-
-      testComponent.component
-        .find(DataTable)
-        .find('button')
-        .at(1)
-        .hostNodes()
-        .simulate('click')
-
-      expect(
-        testComponent.component.find('#search-input-text').hostNodes().length
-      ).toEqual(1)
 
       testComponent.component.unmount()
     })
 
-    it('Should Render Print Certificate & Edit button', async () => {
+    it('renders error while expanded section can not load data', async () => {
       const graphqlMock = [
         {
           request: {
@@ -516,7 +570,7 @@ describe('SearchResult tests', async () => {
                               state: 'iuyiuy'
                             }
                           },
-                          type: 'REGISTERED',
+                          type: 'DECLARED',
                           comments: [
                             {
                               comment: ''
@@ -542,441 +596,18 @@ describe('SearchResult tests', async () => {
               }
             }
           }
-        }
-      ]
-
-      const testComponent = createTestComponent(
-        // @ts-ignore
-        <SearchResult />,
-        store,
-        graphqlMock
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 0)
-      })
-
-      testComponent.component.update()
-      const instance = testComponent.component
-        .find(DataTable)
-        .find(ListItem)
-        .instance() as any
-
-      instance.toggleExpanded()
-      testComponent.component.update()
-
-      expect(
-        testComponent.component
-          .find(DataTable)
-          .find('#editBtn_B111111')
-          .hostNodes().length
-      ).toBe(1)
-
-      expect(
-        testComponent.component
-          .find(DataTable)
-          .find('#printCertificate_B111111')
-          .hostNodes().length
-      ).toBe(1)
-
-      testComponent.component.unmount()
-    })
-
-    it('Should Render Certificate Collection Screen', async () => {
-      const graphqlMock = [
+        },
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
-              locationIds: ['123456789'],
-              skip: 0,
-              count: 10
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
-                totalItems: 4,
-                results: [
-                  {
-                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                    registration: {
-                      id: '123',
-                      registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'REGISTERED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        },
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'APPLICATION',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        },
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'CERTIFIED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        },
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'REJECTED',
-                          comments: [
-                            {
-                              comment: 'reason=duplicate,other&comment=lol'
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  {
-                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be815',
-                    registration: {
-                      id: '123',
-                      registrationNumber: null,
-                      trackingId: 'B2222',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'APPLICATION',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  {
-                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be816',
-                    registration: {
-                      id: '123',
-                      registrationNumber: null,
-                      trackingId: 'B33333',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'REJECTED',
-                          comments: [
-                            {
-                              comment:
-                                'reason=misspelling,missing_supporting_doc,duplicate,other&comment=lol'
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  {
-                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be817',
-                    registration: {
-                      id: '123',
-                      registrationNumber: null,
-                      trackingId: 'B444444',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'CERTIFIED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
-                  }
-                ]
+              fetchRegistration: {
+                registration: undefined
               }
             }
           }
@@ -999,23 +630,19 @@ describe('SearchResult tests', async () => {
       const instance = testComponent.component
         .find(DataTable)
         .find(ListItem)
-        .at(0)
         .instance() as any
 
       instance.toggleExpanded()
-      testComponent.component.update()
 
-      const PrintBtn = testComponent.component
-        .find(DataTable)
-        .find('#printCertificate_B111111')
-      expect(PrintBtn.hostNodes().length).toBe(1)
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
 
-      PrintBtn.hostNodes().simulate('click')
       testComponent.component.update()
 
       expect(
-        testComponent.component.find('#personCollectingCertificate_label')
-          .length
+        testComponent.component.find('#expanded_section_0').hostNodes().length
       ).toBe(0)
 
       testComponent.component.unmount()
@@ -1027,7 +654,7 @@ describe('SearchResult tests', async () => {
       getItem.mockReturnValue(registerScopeToken)
       store.dispatch(checkAuth({ '?token': registerScopeToken }))
     })
-    it('renders review duplicates button for user with register scope', async () => {
+    it('renders possible duplicates found', async () => {
       const graphqlMock = [
         {
           request: {
@@ -1111,6 +738,69 @@ describe('SearchResult tests', async () => {
               }
             }
           }
+        },
+        {
+          request: {
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            variables: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+            }
+          },
+          result: {
+            data: {
+              fetchRegistration: {
+                registration: {
+                  id: '123',
+                  registrationNumber: null,
+                  trackingId: 'B111111',
+                  type: 'BIRTH',
+                  duplicates: 1,
+                  status: [
+                    {
+                      id: '123',
+                      timestamp: null,
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
+                      },
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'DECLARED',
+                      comments: [
+                        {
+                          comment: ''
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
         }
       ]
 
@@ -1133,22 +823,20 @@ describe('SearchResult tests', async () => {
         .instance() as any
 
       instance.toggleExpanded()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
       testComponent.component.update()
 
       expect(
         testComponent.component
           .find(DataTable)
-          .find('#reviewDuplicatesBtn_B111111')
+          .find('#duplicate_found_section')
           .hostNodes().length
       ).toBe(1)
-
-      testComponent.component
-        .find(DataTable)
-        .find('#reviewDuplicatesBtn_B111111')
-        .hostNodes()
-        .simulate('click')
-
-      expect(history.location.pathname).toContain('duplicates')
     })
   })
 })

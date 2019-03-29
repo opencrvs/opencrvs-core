@@ -40,6 +40,23 @@ describe('Registration root resolvers', () => {
       expect(result.totalItems).toBe(1)
     })
 
+    describe('fetchRegistration()', () => {
+      it('returns object of composition result', async () => {
+        fetch.mockResponseOnce(
+          JSON.stringify({
+            id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+          })
+        )
+        // @ts-ignore
+        const composition = await resolvers.Query.fetchRegistration(
+          {},
+          { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+        )
+        expect(composition).toBeDefined()
+        expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+      })
+    })
+
     it('returns an array of composition results when location ids provided', async () => {
       fetch.mockResponse(
         JSON.stringify({

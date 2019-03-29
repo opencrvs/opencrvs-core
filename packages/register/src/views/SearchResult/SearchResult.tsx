@@ -984,7 +984,7 @@ export class SearchResultView extends React.Component<
                         />
                       </ValueContainer>
                       {duplicates && index === 0 && (
-                        <DuplicateIndicatorContainer>
+                        <DuplicateIndicatorContainer id="duplicate_found_section">
                           <Duplicate />
                           <span>
                             {this.props.intl.formatMessage(
