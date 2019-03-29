@@ -91,6 +91,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           comments {
             comment
           }
+          type
         }
         type
         trackingId
@@ -236,14 +237,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
       }
       presentAtBirthRegistration
-    }
-  }
-`
-export const COUNT_REGISTRATION_QUERY = gql`
-  query data($locationIds: [String]) {
-    countEventRegistrations(locationIds: $locationIds) {
-      declared
-      rejected
     }
   }
 `

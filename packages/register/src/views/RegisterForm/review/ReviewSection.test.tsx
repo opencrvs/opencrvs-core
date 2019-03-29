@@ -3,13 +3,18 @@ import { ReviewSection, renderSelectDynamicLabel } from './ReviewSection'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from 'src/store'
 import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
-import { createDraft } from 'src/drafts'
+import { createDraft, createReviewDraft } from 'src/drafts'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { Event } from 'src/forms'
+import { v4 as uuid } from 'uuid'
+import { REJECTED } from 'src/utils/constants'
 
 const { store } = createStore()
 const mockHandler = jest.fn()
 const draft = createDraft(Event.BIRTH)
+const rejectedDraftBirth = createReviewDraft(uuid(), {}, Event.BIRTH, REJECTED)
+const rejectedDraftDeath = createReviewDraft(uuid(), {}, Event.DEATH, REJECTED)
+
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: { fathersDetailsExist: true, addressSameAsMother: false },
@@ -105,5 +110,75 @@ describe('return the correct label on dynamic fields', () => {
         'en'
       )
     ).toBe('Chittagong')
+  })
+})
+
+describe('when user is in the review page for rejected birth application', () => {
+  let reviewSectionComponent: ReactWrapper<{}, {}>
+  beforeEach(async () => {
+    const testComponent = createTestComponent(
+      <ReviewSection
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        draft={rejectedDraftBirth}
+        registerClickEvent={mockHandler}
+        rejectApplicationClickEvent={mockHandler}
+        submitClickEvent={mockHandler}
+      />,
+      store
+    )
+    reviewSectionComponent = testComponent.component
+    reviewSectionComponent
+      .find(`button#next_button_child`)
+      .hostNodes()
+      .simulate('click')
+    reviewSectionComponent
+      .find(`button#next_button_mother`)
+      .hostNodes()
+      .simulate('click')
+    reviewSectionComponent
+      .find(`button#next_button_father`)
+      .hostNodes()
+      .simulate('click')
+  })
+
+  it('Should not click the Reject Application', async () => {
+    const rejectButton = reviewSectionComponent.find('#rejectApplicationBtn')
+      .length
+    expect(rejectButton).toEqual(0)
+  })
+})
+
+describe('when user is in the review page for rejected death application', () => {
+  let reviewSectionComponent: ReactWrapper<{}, {}>
+  beforeEach(async () => {
+    const testComponent = createTestComponent(
+      <ReviewSection
+        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        draft={rejectedDraftDeath}
+        registerClickEvent={mockHandler}
+        rejectApplicationClickEvent={mockHandler}
+        submitClickEvent={mockHandler}
+      />,
+      store
+    )
+    reviewSectionComponent = testComponent.component
+    reviewSectionComponent
+      .find(`button#next_button_deceased`)
+      .hostNodes()
+      .simulate('click')
+    reviewSectionComponent
+      .find(`button#next_button_informant`)
+      .hostNodes()
+      .simulate('click')
+    reviewSectionComponent
+      .find(`button#next_button_deathEvent`)
+      .hostNodes()
+      .simulate('click')
+  })
+
+  it('Should not click the Reject Application', async () => {
+    const rejectButton = reviewSectionComponent.find('#rejectApplicationBtn')
+      .length
+    expect(rejectButton).toEqual(0)
   })
 })

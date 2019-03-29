@@ -58,11 +58,15 @@ const fallbackCountry = window.config.COUNTRY
 const mobilePhonePatternTable = {
   gbr: {
     pattern: /^07[0-9]{9,10}$/,
-    example: '07123456789'
+    example: '07123456789',
+    start: '07',
+    num: '10 or 11'
   },
   bgd: {
-    pattern: /^01[156789][0-9]{8}$/,
-    example: '01741234567'
+    pattern: /^01[1-9][0-9]{8}$/,
+    example: '01741234567',
+    start: '01',
+    num: '11'
   }
 }
 

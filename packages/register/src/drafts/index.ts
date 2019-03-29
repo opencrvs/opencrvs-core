@@ -16,9 +16,11 @@ export interface IDraft {
   id: string
   data: IFormData
   savedOn?: number
+  modifiedOn?: number
   eventType?: string
   review?: boolean
   event: Event
+  status?: string
 }
 
 interface IStoreDraftAction {
@@ -86,9 +88,10 @@ export function createDraft(event: Event) {
 export function createReviewDraft(
   draftId: string,
   formData: IFormData,
-  event: Event
+  event: Event,
+  status?: string
 ): IDraft {
-  return { id: draftId, data: formData, review: true, event }
+  return { id: draftId, data: formData, review: true, event, status }
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {
@@ -97,6 +100,7 @@ export function storeDraft(draft: IDraft): IStoreDraftAction {
 }
 
 export function modifyDraft(draft: IDraft): IModifyDraftAction {
+  draft.modifiedOn = Date.now()
   return { type: MODIFY_DRAFT, payload: { draft } }
 }
 export function setInitialDrafts() {

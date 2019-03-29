@@ -14,8 +14,14 @@ import {
   validIDNumber,
   maxLength,
   isValidBirthDate,
+  checkBirthDate,
+  checkMarriageDate,
   isValidDeathOccurrenceDate,
-  greaterThanZero
+  greaterThanZero,
+  dateGreaterThan,
+  dateLessThan,
+  dateNotInFuture,
+  dateFormatIsCorrect
 } from './validate'
 
 describe('validate', () => {
@@ -27,6 +33,18 @@ describe('validate', () => {
     it('should pass when supplied a good value for a Bangladeshi number', () => {
       const goodValue = '01720067890'
       expect(isAValidPhoneNumberFormat(goodValue, 'bgd')).toEqual(true)
+    })
+    it('should pass when supplied a good value for a British number', () => {
+      const goodValue = '07123456789'
+      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(true)
+    })
+    it('should pass when supplied a good value for a British number', () => {
+      const goodValue = '071234567890'
+      expect(isAValidPhoneNumberFormat(goodValue, 'gbr')).toEqual(true)
+    })
+    it('should error when supplied a bad value for a British number', () => {
+      const badValue = '01720067890'
+      expect(isAValidPhoneNumberFormat(badValue, 'gbr')).toEqual(false)
     })
     it('should pass when supplied a good value and country is not added to the lookup table', () => {
       const goodValue = '01720067890'
@@ -288,12 +306,13 @@ describe('validate', () => {
         message: {
           id: 'validations.phoneNumberFormat',
           defaultMessage:
-            'Must be 11 digit valid mobile phone number that stars with 01',
+            'Must be {num} digit valid mobile phone number that stars with {start}',
           description:
             'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
         },
         props: {
-          example: '01741234567'
+          num: '11',
+          start: '01'
         }
       }
       expect(phoneNumberFormat(badValue)).toEqual(response)
@@ -483,6 +502,206 @@ describe('validate', () => {
     it('should pass when a hyphenated English name is given', () => {
       const goodValue = 'Anne-Marie'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+  })
+
+  describe('checkBirthDate. Used for validation of date of birth.', () => {
+    // When marriageDate = 'falsy'
+
+    it('should fail for invalid format', () => {
+      const marriageDate = ''
+      const invalidDate = '1901-+2-2e'
+      expect(checkBirthDate(marriageDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should fail for invalid number input', () => {
+      const marriageDate = ''
+      const invalidDate = '190-2-21'
+      expect(checkBirthDate(marriageDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should fail for invalid date', () => {
+      const marriageDate = ''
+      const invalidDate = '2015-2-29'
+      expect(checkBirthDate(marriageDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should fail for dates in the future', () => {
+      const marriageDate = ''
+      const invalidDate = '2125-2-27'
+      expect(checkBirthDate(marriageDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should pass for one-digit figures for day and month', () => {
+      const marriageDate = ''
+      const validDate = '2012-2-2'
+      expect(checkBirthDate(marriageDate)(validDate)).toEqual(undefined)
+    })
+    it('should pass for valid dates', () => {
+      const marriageDate = ''
+      const validDate = '2003-02-23'
+      expect(checkBirthDate(marriageDate)(validDate)).toEqual(undefined)
+    })
+
+    // When the marriage date is before the birth date
+
+    it('should fail for marriage dates before the birth date', () => {
+      const marriageDate = '1801-02-23'
+      const birthDate = '2003-02-23'
+      expect(checkBirthDate(marriageDate)(birthDate)).toEqual({
+        message: messages.dobEarlierThanDom
+      })
+    })
+
+    // When the marriage date is after the birth date
+
+    it('should fail for marriage dates after the birth date', () => {
+      const marriageDate = '2101-02-23'
+      const validDate = '2003-02-23'
+      expect(checkBirthDate(marriageDate)(validDate)).toEqual(undefined)
+    })
+  })
+
+  describe('checkMarriageDate. Used for validation of date of birth.', () => {
+    // When birthDate = 'falsy'
+
+    it('should fail for invalid format', () => {
+      const birthDate = ''
+      const invalidDate = '1901-+2-2e'
+      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should fail for invalid number input', () => {
+      const birthDate = ''
+      const invalidDate = '190-2-21'
+      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should fail for invalid date', () => {
+      const birthDate = ''
+      const invalidDate = '2015-2-29'
+      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should fail for dates in the future', () => {
+      const birthDate = ''
+      const invalidDate = '2125-2-27'
+      expect(checkMarriageDate(birthDate)(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+    it('should pass for one-digit figures for day and month', () => {
+      const birthDate = ''
+      const validDate = '2012-2-2'
+      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
+    })
+    it('should pass for valid dates', () => {
+      const birthDate = ''
+      const validDate = '2003-02-23'
+      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
+    })
+
+    // When the marriage date is before the birth date
+
+    it('should fail for marriage dates before the birth date', () => {
+      const birthDate = '2101-02-23'
+      const validDate = '2003-02-23'
+      expect(checkMarriageDate(birthDate)(validDate)).toEqual({
+        message: messages.domLaterThanDob
+      })
+    })
+
+    // When the marriage date is after the birth date
+
+    it('should pass for marriage dates after the birth date', () => {
+      const birthDate = '1801-02-23'
+      const validDate = '2003-02-23'
+      expect(checkMarriageDate(birthDate)(validDate)).toEqual(undefined)
+    })
+  })
+
+  describe('dateGreaterThan. Checks if a given date is greater than another given date', () => {
+    it('should give error message when the second date is greater than the first date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateGreaterThan(laterDate)(previousDate)).toEqual({
+        message: messages.domLaterThanDob
+      })
+    })
+    it('should be okay when the first date is greater than the second date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateGreaterThan(previousDate)(laterDate)).toEqual(undefined)
+    })
+  })
+
+  describe('dateLessThan. Checks if a given date is less than another given date', () => {
+    it('should be okay when the first date is less than the second date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateLessThan(laterDate)(previousDate)).toEqual(undefined)
+    })
+    it('should give error message when the second date is less than the first date', () => {
+      const previousDate = '1971-03-26'
+      const laterDate = '1971-12-16'
+      expect(dateLessThan(previousDate)(laterDate)).toEqual({
+        message: messages.dobEarlierThanDom
+      })
+    })
+  })
+
+  describe('dateNotInFuture. Checks if a given date is in the future', () => {
+    it('should be okay with date not in future', () => {
+      const pastDate = '2003-02-23'
+      expect(dateNotInFuture()(pastDate)).toEqual(undefined)
+    })
+    it('should give error message with date in future', () => {
+      const futureDate = '2053-02-23'
+      expect(dateNotInFuture()(futureDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+  })
+
+  describe('dateFormatIsCorrect. Checks if a given date is in correct format', () => {
+    it('should error when input invalid chararcters', () => {
+      const invalidDate = '1901-+2-2e'
+      expect(dateFormatIsCorrect()(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+
+    it('should error when input invalid format', () => {
+      const invalidDate = '190-2-21'
+      expect(dateFormatIsCorrect()(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+
+    it('should error when input invalid date', () => {
+      const invalidDate = '2017-2-29'
+      expect(dateFormatIsCorrect()(invalidDate)).toEqual({
+        message: messages.dateFormat
+      })
+    })
+
+    it('should pass when supplied a valid date with single digit', () => {
+      const validDate = '2011-8-12'
+      const response = undefined
+      expect(dateFormatIsCorrect()(validDate)).toEqual(response)
+    })
+
+    it('should pass when supplied a valid date', () => {
+      const validDate = '2011-08-12'
+      const response = undefined
+      expect(dateFormatIsCorrect()(validDate)).toEqual(response)
     })
   })
 

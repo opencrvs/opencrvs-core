@@ -51,7 +51,7 @@ export const messages = defineMessages({
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
     defaultMessage:
-      'Must be 11 digit valid mobile phone number that stars with 01',
+      'Must be {num} digit valid mobile phone number that stars with {start}',
     description:
       'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
   },
@@ -65,6 +65,18 @@ export const messages = defineMessages({
     defaultMessage: 'Must be a valid birth date',
     description:
       'The error message appears when the given birth date is not valid'
+  },
+  dobEarlierThanDom: {
+    id: 'validations.dobEarlierThanDom',
+    defaultMessage: 'Must be earlier than marriage date',
+    description:
+      'The error message appears when the given birth date is later than the given marriage date'
+  },
+  domLaterThanDob: {
+    id: 'validations.domLaterThanDob',
+    defaultMessage: 'Must be later than birth date',
+    description:
+      'The error message appears when the given marriage date is earlier than the given birth date'
   },
   emailAddressFormat: {
     id: 'validations.emailAddressFormat',
@@ -143,11 +155,15 @@ const fallbackCountry = window.config.COUNTRY
 const mobilePhonePatternTable = {
   gbr: {
     pattern: /^07[0-9]{9,10}$/,
-    example: '07123456789'
+    example: '07123456789',
+    start: '07',
+    num: '10 or 11'
   },
   bgd: {
     pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567'
+    example: '01741234567',
+    start: '01',
+    num: '11'
   }
 }
 
@@ -160,6 +176,7 @@ export const isAValidPhoneNumberFormat = (
   const { pattern } = countryMobileTable
   return pattern.test(value)
 }
+
 export const isAValidEmailAddressFormat = (value: string): boolean => {
   return validateEmail(value)
 }
@@ -232,10 +249,11 @@ export const numeric: Validation = (value: string) =>
 
 export const phoneNumberFormat: Validation = (value: string) => {
   const country = window.config.COUNTRY
+  console.log(window.config, value)
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
-  const { example } = countryMobileTable
-  const validationProps = { example }
+  const { start, num } = countryMobileTable
+  const validationProps = { start, num }
 
   const trimmedValue = value === undefined || value === null ? '' : value.trim()
 
@@ -278,6 +296,105 @@ export const isValidBirthDate: Validation = (value: string) => {
         message: messages.isValidBirthDate
       }
 }
+
+export const checkBirthDate: ValidationInitializer = (
+  marriageDate: string
+): Validation => (value: string) => {
+  if (!isAValidDateFormat(value)) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  const bDate = new Date(value)
+  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+  if (bDate > new Date()) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  if (!marriageDate || !isAValidDateFormat(marriageDate)) {
+    return undefined
+  }
+
+  return bDate < new Date(marriageDate)
+    ? undefined
+    : {
+        message: messages.dobEarlierThanDom
+      }
+}
+
+export const checkMarriageDate: ValidationInitializer = (
+  birthDate: string
+): Validation => (value: string) => {
+  if (!isAValidDateFormat(value)) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  const mDate = new Date(value)
+  // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
+  if (mDate > new Date()) {
+    return {
+      message: messages.dateFormat
+    }
+  }
+
+  if (!birthDate || !isAValidDateFormat(birthDate)) {
+    return undefined
+  }
+
+  return mDate > new Date(birthDate)
+    ? undefined
+    : {
+        message: messages.domLaterThanDob
+      }
+}
+
+export const dateGreaterThan: ValidationInitializer = (
+  previousDate: string
+): Validation => (value: string) => {
+  if (!previousDate || !isAValidDateFormat(previousDate)) {
+    return undefined
+  }
+
+  return new Date(value) > new Date(previousDate)
+    ? undefined
+    : {
+        message: messages.domLaterThanDob
+      }
+}
+
+export const dateLessThan: ValidationInitializer = (
+  laterDate: string
+): Validation => (value: string) => {
+  if (!laterDate || !isAValidDateFormat(laterDate)) {
+    return undefined
+  }
+
+  return new Date(value) < new Date(laterDate)
+    ? undefined
+    : {
+        message: messages.dobEarlierThanDom
+      }
+}
+
+export const dateNotInFuture: ValidationInitializer = (): Validation => (
+  value: string
+) => {
+  if (isDateNotInFuture(value)) {
+    return undefined
+  } else {
+    return { message: messages.dateFormat }
+  }
+}
+
+export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
+  value: string
+) => dateFormat(value)
+
 /*
  * TODO: The name validation functions should be refactored out.
  *

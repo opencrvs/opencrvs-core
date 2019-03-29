@@ -438,6 +438,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         goBack={() => {
           window.location.assign(SEARCH_RESULT)
         }}
+        backLabel={intl.formatMessage(messages.back)}
         title={intl.formatMessage(messages.pageTitle)}
       >
         <Query

@@ -114,9 +114,15 @@ export const getFieldType = (
     return field.type
   }
 
-  return field.dynamicDefinitions.type.typeMapper(values[
-    field.dynamicDefinitions.type.dependency
-  ] as string)
+  switch (field.dynamicDefinitions.type.kind) {
+    case 'dynamic':
+      return field.dynamicDefinitions.type.typeMapper(values[
+        field.dynamicDefinitions.type.dependency
+      ] as string)
+    case 'static':
+    default:
+      return field.dynamicDefinitions.type.staticType
+  }
 }
 
 export const getFieldLabel = (
@@ -472,7 +478,7 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
   },
-  deceasedIDSelected: {
+  identifierIDSelected: {
     action: 'hide',
     expression:
       '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
