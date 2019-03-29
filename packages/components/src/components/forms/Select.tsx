@@ -39,11 +39,11 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
     box-shadow: none;
     font-size: 16px;
     padding: 0 5px;
-    border: solid 2px
+    border: solid 1px
       ${({ error, touched, theme }) =>
         error && touched ? theme.colors.error : theme.colors.secondary};
     &:hover {
-      border: solid 2px
+      border: solid 1px
         ${({ error, touched, theme }) =>
           error && touched ? theme.colors.error : theme.colors.secondary};
     }
@@ -59,8 +59,8 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.creamCan};
-    border: solid 2px ${({ theme }) => theme.colors.secondary};
+    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
+    border: solid 1px ${({ theme }) => theme.colors.secondary};
   }
 
   ${({ ignoreMediaQuery, theme }) => {
