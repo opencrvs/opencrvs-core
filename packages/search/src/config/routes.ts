@@ -1,5 +1,12 @@
 import { birthEventHandler } from 'src/features/registration/birth/handler'
 import { deathEventHandler } from 'src/features/registration/death/handler'
+import { searchDeclaration } from 'src/features/search/handler'
+
+const enum RouteScope {
+  DECLARE = 'declare',
+  REGISTER = 'register',
+  CERTIFY = 'certify'
+}
 
 export const getRoutes = () => {
   const routes = [
@@ -12,6 +19,19 @@ export const getRoutes = () => {
       },
       config: {
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search',
+      handler: searchDeclaration,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        description:
+          'Handles indexing a new declaration and searching for duplicates'
       }
     },
     {

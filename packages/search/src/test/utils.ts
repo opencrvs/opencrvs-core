@@ -1112,3 +1112,35 @@ export const mockDeathRejectionTaskBundle = {
     }
   ]
 }
+
+export const mockSearchResult = {
+  took: 1,
+  timed_out: false,
+  _shards: {
+    total: 10,
+    successful: 10,
+    skipped: 0,
+    failed: 0
+  },
+  hits: {
+    total: 6,
+    max_score: 1,
+    hits: [
+      {
+        _index: 'ocrvs',
+        _type: 'compositions',
+        _id: 'BGM9CA2',
+        _score: 1,
+        _source: {
+          childFamilyName: 'Moajjem',
+          childFamilyNameLocal: 'মোয়াজ্জেম',
+          childDoB: '2011-11-11',
+          gender: 'male',
+          motherFamilyName: 'Moajjem',
+          motherFamilyNameLocal: 'মোয়াজ্জেম',
+          motherIdentifier: '11111111111111111'
+        }
+      }
+    ]
+  }
+}
