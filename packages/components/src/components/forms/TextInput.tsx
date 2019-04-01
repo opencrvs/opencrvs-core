@@ -77,7 +77,9 @@ export class TextInput extends React.Component<ITextInputProps> {
      * if the focusInput prop is called right after keydown
      */
     setTimeout(() => {
-      this.$element.current!.focus()
+      if (this.$element.current) {
+        this.$element.current!.focus()
+      }
     })
   }
   componentWillReceiveProps(nextProps: ITextInputProps) {

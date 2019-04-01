@@ -354,16 +354,14 @@ export function renderSelectDynamicLabel(
     return selectedOption ? intl.formatMessage(selectedOption.label) : value
   } else {
     if (options.resource) {
-      let locations: ILocation[]
+      let selectedLocation: ILocation
+      const locationId = value as string
       if (options.resource === 'locations') {
-        locations = resources[OFFLINE_LOCATIONS_KEY] as ILocation[]
+        selectedLocation = resources[OFFLINE_LOCATIONS_KEY][locationId]
       } else {
-        locations = resources[OFFLINE_FACILITIES_KEY] as ILocation[]
+        selectedLocation = resources[OFFLINE_FACILITIES_KEY][locationId]
       }
 
-      const selectedLocation = locations.filter((location: ILocation) => {
-        return location.id === value
-      })[0]
       if (selectedLocation) {
         if (language === 'en') {
           return selectedLocation.name

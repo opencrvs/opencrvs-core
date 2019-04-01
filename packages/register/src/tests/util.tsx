@@ -491,8 +491,8 @@ export const mockDeathApplicationData = {
 }
 
 export const mockOfflineData = {
-  facilities: [
-    {
+  facilities: {
+    '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
       name: 'Shaheed Taj Uddin Ahmad Medical College',
       nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
@@ -500,7 +500,7 @@ export const mockOfflineData = {
       type: 'HEALTH_FACILITY',
       partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
     },
-    {
+    'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
       id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
       name: 'Kaliganj Union Sub Center',
       nameBn: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
@@ -508,7 +508,7 @@ export const mockOfflineData = {
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     },
-    {
+    '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
       id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
       name: 'Kaliganj Upazila Health Complex',
       nameBn: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
@@ -516,7 +516,7 @@ export const mockOfflineData = {
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     },
-    {
+    '0d8474da-0361-4d32-979e-af91f020309e': {
       id: '0d8474da-0361-4d32-979e-af91f020309e',
       name: 'Dholashadhukhan Cc',
       nameBn: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
@@ -524,10 +524,10 @@ export const mockOfflineData = {
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     }
-  ],
+  },
   healthFacilityFilterLocation: '50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987',
-  locations: [
-    {
+  locations: {
+    '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
       name: 'Barisal',
       nameBn: 'বরিশাল',
@@ -536,7 +536,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '8cbc862a-b817-4c29-a490-4a8767ff023c': {
       id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
       name: 'Chittagong',
       nameBn: 'চট্টগ্রাম',
@@ -545,7 +545,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b': {
       id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
       name: 'Dhaka',
       nameBn: 'ঢাকা',
@@ -554,7 +554,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '7304b306-1b0d-4640-b668-5bf39bc78f48': {
       id: '7304b306-1b0d-4640-b668-5bf39bc78f48',
       name: 'Khulna',
       nameBn: 'খুলনা',
@@ -563,7 +563,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a': {
       id: '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a',
       name: 'Rajshahi',
       nameBn: 'রাজশাহী',
@@ -572,7 +572,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '2b55d13f-f700-4373-8255-c0febd4733b6': {
       id: '2b55d13f-f700-4373-8255-c0febd4733b6',
       name: 'Rangpur',
       nameBn: 'রংপুর',
@@ -581,7 +581,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '59f7f044-84b8-4a6c-955d-271aa3e5af46': {
       id: '59f7f044-84b8-4a6c-955d-271aa3e5af46',
       name: 'Sylhet',
       nameBn: 'সিলেট',
@@ -590,7 +590,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    '237f3404-d417-41fe-9130-3d049800a1e5': {
       id: '237f3404-d417-41fe-9130-3d049800a1e5',
       name: 'Mymensingh',
       nameBn: 'ময়মনসিংহ',
@@ -599,7 +599,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
-    {
+    'bc4b9f99-0db3-4815-926d-89fd56889407': {
       id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
       name: 'BARGUNA',
       nameBn: 'বরগুনা',
@@ -608,7 +608,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
-    {
+    'dabffdf7-c174-4450-b306-5a3c2c0e2c0e': {
       id: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
       name: 'BARISAL',
       nameBn: 'বরিশাল',
@@ -617,7 +617,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
-    {
+    'a5b61fc5-f0c9-4f54-a934-eba18f9110c2': {
       id: 'a5b61fc5-f0c9-4f54-a934-eba18f9110c2',
       name: 'BHOLA',
       nameBn: 'ভোলা',
@@ -626,7 +626,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
-    {
+    '5ffa5780-5ddf-4549-a391-7ad3ba2334d4': {
       id: '5ffa5780-5ddf-4549-a391-7ad3ba2334d4',
       name: 'JHALOKATI',
       nameBn: 'ঝালকাঠি',
@@ -635,7 +635,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
-    {
+    'c8dcf1fe-bf92-404b-81c0-31d6802a1a68': {
       id: 'c8dcf1fe-bf92-404b-81c0-31d6802a1a68',
       name: 'PATUAKHALI',
       nameBn: 'পটুয়াখালী ',
@@ -644,7 +644,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
-    {
+    '9c86160a-f704-464a-8b7d-9eae2b4cf1f9': {
       id: '9c86160a-f704-464a-8b7d-9eae2b4cf1f9',
       name: 'PIROJPUR',
       nameBn: 'পিরোজপুর ',
@@ -653,7 +653,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
     },
-    {
+    '1846f07e-6f5c-4507-b5d6-126716b0856b': {
       id: '1846f07e-6f5c-4507-b5d6-126716b0856b',
       name: 'BANDARBAN',
       nameBn: 'বান্দরবান',
@@ -662,7 +662,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
-    {
+    'cf141982-36a1-4308-9090-0445c311f5ae': {
       id: 'cf141982-36a1-4308-9090-0445c311f5ae',
       name: 'BRAHMANBARIA',
       nameBn: 'ব্রাহ্মণবাড়িয়া',
@@ -671,7 +671,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
-    {
+    '478f518e-8d86-439d-8618-5cfa8d3bf5dd': {
       id: '478f518e-8d86-439d-8618-5cfa8d3bf5dd',
       name: 'CHANDPUR',
       nameBn: 'চাঁদপুর',
@@ -680,7 +680,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
-    {
+    'db5faba3-8143-4924-a44a-8562ed5e0437': {
       id: 'db5faba3-8143-4924-a44a-8562ed5e0437',
       name: 'CHITTAGONG',
       nameBn: 'চট্টগ্রাম',
@@ -689,7 +689,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
-    {
+    '5926982b-845c-4463-80aa-cbfb86762e0a': {
       id: '5926982b-845c-4463-80aa-cbfb86762e0a',
       name: 'COMILLA',
       nameBn: 'কুমিল্লা',
@@ -698,7 +698,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
-    {
+    'a3455e64-164c-4bf4-b834-16640a85efd8': {
       id: 'a3455e64-164c-4bf4-b834-16640a85efd8',
       name: "COX'S BAZAR",
       nameBn: 'কক্সবাজার ',
@@ -707,7 +707,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     },
-    {
+    '1dfc716a-c5f7-4d39-ad71-71d2a359210c': {
       id: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
       name: 'FENI',
       nameBn: 'ফেনী',
@@ -716,7 +716,7 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     }
-  ]
+  }
 }
 
 export const mockDeathApplicationDataWithoutFirstNames = {
