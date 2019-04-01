@@ -165,7 +165,7 @@ export interface IFormFieldBase {
   description?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
-  withNoBorder?: boolean
+  hideBorder?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -395,7 +395,7 @@ export interface Ii18nFormFieldBase {
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
-  withNoBorder?: boolean
+  hideBorder?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
