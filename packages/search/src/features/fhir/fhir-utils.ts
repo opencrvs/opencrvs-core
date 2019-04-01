@@ -21,22 +21,62 @@ export function findCompositionSection(
   )
 }
 
+export function findTask(
+  bundleEntries?: fhir.BundleEntry[]
+): fhir.Task | undefined {
+  const taskEntry: fhir.BundleEntry | undefined =
+    bundleEntries &&
+    bundleEntries.find(entry => {
+      if (entry && entry.resource) {
+        return entry.resource.resourceType === 'Task'
+      } else {
+        return false
+      }
+    })
+  return taskEntry && (taskEntry.resource as fhir.Task)
+}
+
+export function findTaskExtension(task?: fhir.Task, extensionUrl?: string) {
+  return (
+    task &&
+    task.extension &&
+    task.extension.find(
+      extension => extension && extension.url === extensionUrl
+    )
+  )
+}
+
+export function findTaskIdentifier(task?: fhir.Task, identiferSystem?: string) {
+  return (
+    task &&
+    task.identifier &&
+    task.identifier.find(identifier => identifier.system === identiferSystem)
+  )
+}
+
 export function findEntry(
   code: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
-) {
+): fhir.Resource | undefined {
   const patientSection = findCompositionSection(code, composition)
   if (!patientSection || !patientSection.entry) {
-    return null
+    return undefined
   }
   const reference = patientSection.entry[0].reference
-  const entry =
+  return findEntryResourceByUrl(reference, bundleEntries)
+}
+
+export function findEntryResourceByUrl(
+  url?: string,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const bundleEntry =
     bundleEntries &&
     bundleEntries.find(
-      (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === reference
+      (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === url
     )
-  return entry && entry.resource
+  return bundleEntry && bundleEntry.resource
 }
 
 export function findName(code: string, patient: fhir.Patient) {
@@ -52,7 +92,7 @@ export async function getCompositionByIdentifier(identifier: string) {
     return response.entry[0].resource
   } catch (error) {
     logger.error(
-      `Deduplication/fhir-utils: getting composition by identifer failed with error: ${error}`
+      `Search/fhir-utils: getting composition by identifer failed with error: ${error}`
     )
     throw new Error(error)
   }
@@ -67,7 +107,7 @@ export function addDuplicatesToComposition(
       composition.identifier && composition.identifier.value
 
     logger.info(
-      `Deduplication/fhir-utils: updating composition(identifier: ${compositionIdentifier}) with duplicates ${duplicates}`
+      `Search/fhir-utils: updating composition(identifier: ${compositionIdentifier}) with duplicates ${duplicates}`
     )
 
     if (!composition.relatesTo) {
@@ -77,7 +117,7 @@ export function addDuplicatesToComposition(
     createDuplicatesTemplate(duplicates, composition)
   } catch (error) {
     logger.error(
-      `Deduplication/fhir-utils: updating composition failed with error: ${error}`
+      `Search/fhir-utils: updating composition failed with error: ${error}`
     )
     throw new Error(error)
   }
