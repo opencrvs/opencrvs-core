@@ -72,6 +72,7 @@ export interface IInputFieldProps {
   children: React.ReactNode
   ignoreMediaQuery?: boolean
   hideAsterisk?: boolean
+  hideBorder?: boolean
 }
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
@@ -84,7 +85,8 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       error,
       touched,
       ignoreMediaQuery,
-      hideAsterisk
+      hideAsterisk,
+      hideBorder
     } = this.props
 
     const postfix = this.props.postfix as React.ComponentClass<any> | string
@@ -99,6 +101,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
               id={`${id}_label`}
               disabled={this.props.disabled}
               ignoreMediaQuery={ignoreMediaQuery}
+              hideBorder={hideBorder}
             >
               {label}
               {required && !hideAsterisk && (
