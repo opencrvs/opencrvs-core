@@ -61,7 +61,7 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
 
   .react-select__control--is-focused {
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
-    border: solid ${({ withNoBorder }) => (withNoBorder ? '0px' : '2px')};
+    border: solid ${({ withNoBorder }) => (withNoBorder ? '0px' : '1px')};
     ${({ theme }) => theme.colors.secondary};
   }
 
