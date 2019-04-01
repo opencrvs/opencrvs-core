@@ -6,7 +6,7 @@ export interface ICustomProps {
   touched?: boolean
   focusInput?: boolean
   ignoreMediaQuery?: boolean
-  withNoBorder?: boolean
+  hideBorder?: boolean
 }
 
 export type ITextInputProps = ICustomProps &
@@ -17,7 +17,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   padding: 8px 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
-  border: solid ${({ withNoBorder }) => (withNoBorder ? '0px' : '1px')}
+  border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.error : theme.colors.secondary};
   box-sizing: border-box;
@@ -28,7 +28,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
 
   &:focus {
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
-    border: solid ${({ withNoBorder }) => (withNoBorder ? '0px' : '1px')}
+    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
       ${({ theme }) => theme.colors.secondary};
   }
 
