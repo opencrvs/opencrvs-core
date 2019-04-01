@@ -12,6 +12,7 @@ import { from } from 'apollo-link'
 import { IStoreState } from 'src/store'
 import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/browser'
+import TimeoutLink from './timeoutLink'
 
 export let client: any
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
@@ -42,6 +43,7 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
     }
   })
 
+  const timeoutLink = new TimeoutLink()
   /*
   Use IntrospectionFragmentMatcher to remove the warning of using inteface in GraphQL Query
   This change is suggested in the following link:
@@ -55,7 +57,7 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
     }
   })
   client = new ApolloClient({
-    link: from([errorLink, authLink, httpLink]),
+    link: from([errorLink, timeoutLink, authLink, httpLink]),
     cache: new InMemoryCache({ fragmentMatcher })
   })
   return client
