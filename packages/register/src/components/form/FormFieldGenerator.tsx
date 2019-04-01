@@ -87,7 +87,7 @@ const fadeIn = keyframes`
 `
 
 const FormItem = styled.div`
-  min-height: 6.6em;
+  min-height: 6.7em;
   animation: ${fadeIn} 500ms;
 `
 const LinkFormField = styled(Link)`
@@ -102,6 +102,7 @@ type GeneratedInputFieldProps = {
   resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
+  hideBorder: boolean
   error: string
 }
 
@@ -113,6 +114,7 @@ function GeneratedInputField({
   resetDependentSelectValues,
   error,
   touched,
+  hideBorder,
   value
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
@@ -125,7 +127,8 @@ function GeneratedInputField({
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,
     error,
-    touched
+    touched,
+    hideBorder: fieldDefinition.hideBorder
   }
 
   const inputProps = {
@@ -135,7 +138,8 @@ function GeneratedInputField({
     value,
     disabled: fieldDefinition.disabled,
     error: Boolean(error),
-    touched: Boolean(touched)
+    touched: Boolean(touched),
+    hideBorder: Boolean(hideBorder)
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
@@ -150,6 +154,7 @@ function GeneratedInputField({
             onSetFieldValue(fieldDefinition.name, val)
           }}
           options={fieldDefinition.options}
+          hideBorder={hideBorder}
         />
       </InputField>
     )
@@ -529,6 +534,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      hideBorder={field.hideBorder || false}
                     />
                   )}
                 </Field>
@@ -551,6 +557,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      hideBorder={field.hideBorder || false}
                     />
                   )}
                 </FastField>
