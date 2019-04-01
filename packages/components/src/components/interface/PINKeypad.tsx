@@ -23,7 +23,7 @@ const DotFilled = styled.span`
   background-color: ${({ theme }) => theme.colors.accentLight};
   border-radius: 50%;
   display: inline-block;
-  margin: 40px;
+  margin: 24px;
 `
 
 const DotUnfilled = styled.span`
@@ -32,7 +32,7 @@ const DotUnfilled = styled.span`
   border: 2px solid ${({ theme }) => theme.colors.accentLight};
   border-radius: 50%;
   display: inline-block;
-  margin: 40px;
+  margin: 24px;
 `
 
 const NumberContainer = styled.div`
