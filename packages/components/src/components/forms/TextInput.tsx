@@ -13,13 +13,12 @@ export type ITextInputProps = ICustomProps &
 
 const StyledInput = styled.input.attrs<ITextInputProps>({})`
   width: 100%;
-  padding: 10px;
+  padding: 8px 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
-  border: 0px solid;
-  border-bottom: solid 1px
+  border: solid 1px
     ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.error : theme.colors.disabled};
+      error && touched ? theme.colors.error : theme.colors.secondary};
   box-sizing: border-box;
   outline: none;
   ${({ theme }) => theme.fonts.defaultFontStyle};
@@ -27,7 +26,8 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   background: ${({ theme }) => theme.colors.inputBackground};
 
   &:focus {
-    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
+    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
+    border: solid 1px ${({ theme }) => theme.colors.secondary};
   }
 
   &::-webkit-input-placeholder {
