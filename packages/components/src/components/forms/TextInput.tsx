@@ -6,6 +6,7 @@ export interface ICustomProps {
   touched?: boolean
   focusInput?: boolean
   ignoreMediaQuery?: boolean
+  withNoBorder?: boolean
 }
 
 export type ITextInputProps = ICustomProps &
@@ -16,7 +17,7 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   padding: 8px 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
-  border: solid 1px
+  border: solid ${({ withNoBorder }) => (withNoBorder ? '0px' : '1px')}
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.error : theme.colors.secondary};
   box-sizing: border-box;
@@ -27,7 +28,8 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
 
   &:focus {
     box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
-    border: solid 1px ${({ theme }) => theme.colors.secondary};
+    border: solid ${({ withNoBorder }) => (withNoBorder ? '0px' : '1px')}
+      ${({ theme }) => theme.colors.secondary};
   }
 
   &::-webkit-input-placeholder {
