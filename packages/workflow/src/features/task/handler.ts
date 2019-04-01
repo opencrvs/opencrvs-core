@@ -38,7 +38,8 @@ export default async function updateTaskHandler(
         }] body: ${await res.text()}`
       )
     }
-    return res.json()
+
+    return payload.entry[0].resource
   } catch (error) {
     logger.error(`Workflow/updateTaskHandler: error: ${error}`)
     throw new Error(error)

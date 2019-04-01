@@ -22,13 +22,13 @@ export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 const DateSegment = styled(TextInput)`
   width: 4em;
   margin: 0 9px;
-  text-align: center;
 
   &:first-of-type {
     margin-left: 0;
   }
   &:last-of-type {
     margin-right: 0;
+    width: 5em;
   }
 `
 

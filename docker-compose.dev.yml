@@ -41,7 +41,7 @@ services:
     extra_hosts:
       - 'gateway:${LOCAL_IP-172.17.0.1}'
       - 'workflow:${LOCAL_IP-172.17.0.1}'
-      - 'deduplication:${LOCAL_IP-172.17.0.1}'
+      - 'search:${LOCAL_IP-172.17.0.1}'
       - 'auth:${LOCAL_IP-172.17.0.1}'
       - 'user-mgnt:${LOCAL_IP-172.17.0.1}'
       - 'notification:${LOCAL_IP-172.17.0.1}'

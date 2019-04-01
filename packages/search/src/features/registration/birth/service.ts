@@ -3,11 +3,19 @@ import {
   findName,
   updateInHearth,
   getCompositionByIdentifier,
-  addDuplicatesToComposition
+  addDuplicatesToComposition,
+  findTask,
+  findTaskExtension,
+  findTaskIdentifier
 } from 'src/features/fhir/fhir-utils'
 import { logger } from 'src/logger'
-import { ICompositionBody, detectDuplicates } from 'src/elasticsearch/utils'
-import { indexComposition } from 'src/elasticsearch/dbhelper'
+import {
+  IBirthCompositionBody,
+  detectDuplicates,
+  EVENT,
+  ICompositionBody
+} from 'src/elasticsearch/utils'
+import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -15,12 +23,30 @@ const CHILD_CODE = 'child-details'
 const NAME_EN = 'en'
 const NAME_BN = 'bn'
 
-export async function insertNewDeclaration(bundle: fhir.Bundle) {
+export async function upsertEvent(bundle: fhir.Bundle) {
   const bundleEntries = bundle.entry
+
+  if (bundleEntries && bundleEntries.length === 1) {
+    const resource = bundleEntries[0].resource
+    if (resource && resource.resourceType === 'Task') {
+      updateEvent(resource as fhir.Task)
+      return
+    }
+  }
+
   const composition = (bundleEntries &&
     bundleEntries[0].resource) as fhir.Composition
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  const task = findTask(bundleEntries)
+  const trackingIdIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-tracking-id'
+  )
   const compositionIdentifier =
-    composition.identifier && composition.identifier.value
+    trackingIdIdentifier && trackingIdIdentifier.value
 
   if (!compositionIdentifier) {
     throw new Error(`Composition Identifier not found`)
@@ -29,27 +55,29 @@ export async function insertNewDeclaration(bundle: fhir.Bundle) {
   indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
 }
 
-export async function insertUpdatedDeclaration(bundle: fhir.Bundle) {
-  const bundleEntries = bundle.entry
+async function updateEvent(task: fhir.Task) {
+  const trackingIdIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-tracking-id'
+  )
+  const trackingId = trackingIdIdentifier && trackingIdIdentifier.value
 
-  if (bundleEntries && bundleEntries.length === 1) {
-    const resource = bundleEntries[0].resource
-    if (resource && resource.resourceType === 'Task') {
-      logger.info(`Composition not updated, skipping`)
-      return
-    }
+  if (!trackingId) {
+    throw new Error('Tracking ID not found')
   }
 
-  const composition = (bundleEntries &&
-    bundleEntries[0].resource) as fhir.Composition
-  const compositionIdentifier =
-    composition.identifier && composition.identifier.value
+  const body: ICompositionBody = {}
+  body.type =
+    task &&
+    task.businessStatus &&
+    task.businessStatus.coding &&
+    task.businessStatus.coding[0].code
+  const nodeText =
+    task && task.note && task.note[0].text && task.note[0].text.split('&')
+  body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
+  body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
 
-  if (!compositionIdentifier) {
-    throw new Error(`Composition Identifier not found`)
-  }
-
-  indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
+  await updateComposition(trackingId, body)
 }
 
 async function indexAndSearchComposition(
@@ -57,23 +85,27 @@ async function indexAndSearchComposition(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const body: ICompositionBody = {}
+  const body: IBirthCompositionBody = { event: EVENT.BIRTH }
+
   createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionIdentifier, body)
+
   await detectAndUpdateDuplicates(compositionIdentifier, composition, body)
 }
 
 function createIndexBody(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
+  createApplicationIndex(body, bundleEntries)
 }
+
 function createChildIndex(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -98,7 +130,7 @@ function createChildIndex(
 }
 
 function createMotherIndex(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -124,7 +156,7 @@ function createMotherIndex(
 }
 
 function createFatherIndex(
-  body: ICompositionBody,
+  body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
@@ -152,17 +184,57 @@ function createFatherIndex(
   body.fatherIdentifier = father.identifier && father.identifier[0].value
 }
 
+function createApplicationIndex(
+  body: IBirthCompositionBody,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const task = findTask(bundleEntries)
+  const contactNumberExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
+  const placeOfApplicationExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastLocation'
+  )
+
+  const trackingIdIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-tracking-id'
+  )
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-registration-number'
+  )
+
+  body.contactNumber =
+    contactNumberExtension && contactNumberExtension.valueString
+  body.type =
+    task &&
+    task.businessStatus &&
+    task.businessStatus.coding &&
+    task.businessStatus.coding[0].code
+  body.dateOfApplication = task && task.lastModified
+  body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
+  body.applicationLocationId =
+    placeOfApplicationExtension &&
+    placeOfApplicationExtension.valueReference &&
+    placeOfApplicationExtension.valueReference.reference
+}
+
 async function detectAndUpdateDuplicates(
   compositionIdentifier: string,
   composition: fhir.Composition,
-  body: ICompositionBody
+  body: IBirthCompositionBody
 ) {
   const duplicates = await detectDuplicates(compositionIdentifier, body)
   if (!duplicates.length) {
     return
   }
   logger.info(
-    `Deduplication/service: ${duplicates.length} duplicate composition(s) found`
+    `Search/service: ${duplicates.length} duplicate composition(s) found`
   )
 
   if (composition.id) {

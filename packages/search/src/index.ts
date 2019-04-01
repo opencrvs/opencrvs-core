@@ -26,7 +26,7 @@ export async function createServer() {
     verifyOptions: {
       algorithms: ['RS256'],
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:deduplication-user'
+      audience: 'opencrvs:search-user'
     },
     validate: (payload: any, request: any) => ({
       isValid: true,

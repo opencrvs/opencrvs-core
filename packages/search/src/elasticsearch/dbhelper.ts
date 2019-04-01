@@ -1,5 +1,5 @@
 import { client } from 'src/elasticsearch/client'
-import { ICompositionBody, buildQuery } from 'src/elasticsearch/utils'
+import { buildQuery, ICompositionBody } from 'src/elasticsearch/utils'
 
 export const indexComposition = async (
   compositionIdentifier: string,
@@ -10,6 +10,19 @@ export const indexComposition = async (
     type: 'compositions',
     id: compositionIdentifier,
     body
+  })
+
+  return response
+}
+
+export const updateComposition = async (id: string, body: ICompositionBody) => {
+  const response = await client.update({
+    index: 'ocrvs',
+    type: 'compositions',
+    id,
+    body: {
+      doc: body
+    }
   })
 
   return response

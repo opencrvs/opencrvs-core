@@ -87,7 +87,7 @@ const fadeIn = keyframes`
 `
 
 const FormItem = styled.div`
-  margin-bottom: 2em;
+  min-height: 6.6em;
   animation: ${fadeIn} 500ms;
 `
 const LinkFormField = styled(Link)`

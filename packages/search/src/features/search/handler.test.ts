@@ -23,7 +23,7 @@ describe('Verify handlers', () => {
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:deduplication-user'
+          audience: 'opencrvs:search-user'
         }
       )
 
@@ -47,7 +47,7 @@ describe('Verify handlers', () => {
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:deduplication-user'
+          audience: 'opencrvs:search-user'
         }
       )
 
@@ -73,7 +73,7 @@ describe('Verify handlers', () => {
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:deduplication-user'
+          audience: 'opencrvs:search-user'
         }
       )
 
@@ -102,7 +102,7 @@ describe('Verify handlers', () => {
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:deduplication-user'
+          audience: 'opencrvs:search-user'
         }
       )
     })

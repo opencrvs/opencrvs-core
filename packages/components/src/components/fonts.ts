@@ -54,7 +54,7 @@ export const fonts = (country: string): IFonts => ({
     letter-spacing: 0.1px;`,
   infoFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 14px;
     }
