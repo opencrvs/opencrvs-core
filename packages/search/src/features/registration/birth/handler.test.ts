@@ -11,6 +11,7 @@ import {
   mockBirthFhirBundle,
   mockBirthRejectionTaskBundle,
   mockCompositionEntry,
+  mockCOmpositionResponse,
   mockSearchResponse
 } from 'src/test/utils'
 
@@ -43,11 +44,34 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(500)
     })
 
+    it('should return status code 200 if the event data is updated with task', async () => {
+      jest.clearAllMocks
+      updateComposition.mockReturnValue({})
+
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:search-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/mark-voided',
+        payload: mockBirthRejectionTaskBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
     it('should return status code 200 if the composition indexed correctly', async () => {
       indexComposition.mockReturnValue({})
       searchComposition.mockReturnValue(mockSearchResponse)
+      updateComposition.mockReturnValue({})
       fetch.mockResponses(
-        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify(mockCOmpositionResponse)],
         [JSON.stringify(mockCompositionEntry)],
         [JSON.stringify(mockCompositionEntry)],
         [JSON.stringify({})]
@@ -70,26 +94,6 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('should return status code 200 if the event data is updated with task', async () => {
-      updateComposition.mockReturnValue({})
-
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/birth/mark-voided',
-        payload: mockBirthRejectionTaskBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(200)
-    })
     afterAll(async () => {
       jest.clearAllMocks()
     })

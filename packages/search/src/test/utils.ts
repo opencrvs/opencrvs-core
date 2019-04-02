@@ -5,6 +5,7 @@ export const mockBirthFhirBundle = {
     {
       fullUrl: 'urn:uuid:a2cb0db6-3526-4c2e-aa22-2f8fef9eef46',
       resource: {
+        id: '00acd794-0484-483d-9a5d-4ce8e38d5192',
         identifier: {
           system: 'urn:ietf:rfc:3986',
           value: 'BLNMDOZ'
@@ -294,6 +295,7 @@ export const mockDeathFhirBundle = {
     {
       fullUrl: 'urn:uuid:a2e730c8-07c8-4943-b66b-4ef9e4bde7a1',
       resource: {
+        id: 'ff6a4fce-4e72-463c-a6aa-718054643983',
         identifier: {
           system: 'urn:ietf:rfc:3986',
           value: 'DH86EY1'
@@ -924,6 +926,82 @@ export const mockCompositionEntry = {
       }
     }
   ]
+}
+
+export const mockCompositionResponse = {
+  identifier: { system: 'urn:ietf:rfc:3986', value: 'BLURQJG' },
+  resourceType: 'Composition',
+  status: 'preliminary',
+  type: {
+    coding: [
+      { system: 'http://opencrvs.org/doc-types', code: 'birth-declaration' }
+    ],
+    text: 'Birth Declaration'
+  },
+  class: {
+    coding: [
+      { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+    ],
+    text: 'CRVS Document'
+  },
+  title: 'Birth Declaration',
+  section: [
+    {
+      title: 'Child details',
+      code: {
+        coding: [
+          { system: 'http://opencrvs.org/doc-sections', code: 'child-details' }
+        ],
+        text: 'Child details'
+      },
+      entry: [{ reference: 'urn:uuid:fc3fd2df-92cc-452d-855f-5277396f9cce' }]
+    },
+    {
+      title: "Mother's details",
+      code: {
+        coding: [
+          { system: 'http://opencrvs.org/doc-sections', code: 'mother-details' }
+        ],
+        text: "Mother's details"
+      },
+      entry: [{ reference: 'urn:uuid:feb86ab7-437a-43e7-8d10-7fad17cda5f9' }]
+    },
+    {
+      title: 'Birth encounter',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'birth-encounter'
+          }
+        ],
+        text: 'Birth encounter'
+      },
+      entry: [{ reference: 'urn:uuid:6077ab73-2e55-4aa8-8b85-f733c44c1b77' }]
+    }
+  ],
+  subject: {},
+  date: '2019-04-02T11:22:46.135Z',
+  author: [],
+  id: '9acd5bb1-696c-4fdf-ad3a-59c75634ea69',
+  relatesTo: [
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composi$ion/ff6a4fce-4e72-463c-a6aa-718054643983'
+      }
+    },
+    {
+      code: 'duplicate',
+      targetReference: {
+        reference: 'Composition/3a092303-6ecd-46db-b0b3-fa236964ba32'
+      }
+    }
+  ],
+  meta: {
+    lastUpdated: '201$-04-02T12:56:18.460+00:00',
+    versionId: '074c1544-7f3a-4825-816d-8d8fff90934f'
+  }
 }
 
 export const mockTaskBundle = {
