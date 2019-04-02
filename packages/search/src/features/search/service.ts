@@ -16,7 +16,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     sort = SortOrder.ASC
   } = params
 
-  const g = {
+  return client.search({
     type: DEFAULT_SEARCH_TYPE,
     from,
     size,
@@ -24,6 +24,5 @@ export const searchComposition = async (params: ISearchQuery) => {
       query: queryBuilder(query, applicationLocationId, { event, status }),
       sort: [{ dateOfApplication: sort }]
     }
-  }
-  return client.search(g)
+  })
 }

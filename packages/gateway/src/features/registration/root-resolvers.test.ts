@@ -24,6 +24,29 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
+  describe('searchEvents()', () => {
+    it('returns an array of composition results', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          eventType: 'Birth',
+          status: 'DECLARED',
+          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce'],
+          searchContent: 'xxx'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+  })
   describe('listEventRegistrations()', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponse(
