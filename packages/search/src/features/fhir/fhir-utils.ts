@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
-import { logger } from 'src/logger'
 import { HEARTH_URL } from 'src/constants'
+import { logger } from 'src/logger'
 
 export interface ITemplatedComposition extends fhir.Composition {
   section?: fhir.CompositionSection[]
@@ -86,10 +86,9 @@ export function findName(code: string, patient: fhir.Patient) {
   )
 }
 
-export async function getCompositionByIdentifier(identifier: string) {
+export async function getCompositionById(id: string) {
   try {
-    const response = await getFromFhir(`/Composition?identifier=${identifier}`)
-    return response.entry[0].resource
+    return await getFromFhir(`/Composition/${id}`)
   } catch (error) {
     logger.error(
       `Search/fhir-utils: getting composition by identifer failed with error: ${error}`

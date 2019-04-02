@@ -1,21 +1,21 @@
+import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
 import {
-  findEntry,
-  findName,
-  updateInHearth,
-  getCompositionByIdentifier,
-  addDuplicatesToComposition,
-  findTask,
-  findTaskExtension,
-  findTaskIdentifier
-} from 'src/features/fhir/fhir-utils'
-import { logger } from 'src/logger'
-import {
-  IBirthCompositionBody,
   detectDuplicates,
   EVENT,
+  IBirthCompositionBody,
   ICompositionBody
 } from 'src/elasticsearch/utils'
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
+import {
+  addDuplicatesToComposition,
+  findEntry,
+  findName,
+  findTask,
+  findTaskExtension,
+  findTaskIdentifier,
+  getCompositionById,
+  updateInHearth
+} from 'src/features/fhir/fhir-utils'
+import { logger } from 'src/logger'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -40,30 +40,24 @@ export async function upsertEvent(bundle: fhir.Bundle) {
     throw new Error('Composition not found')
   }
 
-  const task = findTask(bundleEntries)
-  const trackingIdIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/birth-tracking-id'
-  )
-  const compositionIdentifier =
-    trackingIdIdentifier && trackingIdIdentifier.value
+  const compositionId = composition.id
 
-  if (!compositionIdentifier) {
-    throw new Error(`Composition Identifier not found`)
+  if (!compositionId) {
+    throw new Error(`Composition ID not found`)
   }
 
-  indexAndSearchComposition(compositionIdentifier, composition, bundleEntries)
+  indexAndSearchComposition(compositionId, composition, bundleEntries)
 }
 
 async function updateEvent(task: fhir.Task) {
-  const trackingIdIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/birth-tracking-id'
-  )
-  const trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+  const compositionId =
+    task &&
+    task.focus &&
+    task.focus.reference &&
+    task.focus.reference.split('/')[1]
 
-  if (!trackingId) {
-    throw new Error('Tracking ID not found')
+  if (!compositionId) {
+    throw new Error('No Composition ID found')
   }
 
   const body: ICompositionBody = {}
@@ -77,20 +71,20 @@ async function updateEvent(task: fhir.Task) {
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
   body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
 
-  await updateComposition(trackingId, body)
+  await updateComposition(compositionId, body)
 }
 
 async function indexAndSearchComposition(
-  compositionIdentifier: string,
+  compositionId: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const body: IBirthCompositionBody = { event: EVENT.BIRTH }
 
   createIndexBody(body, composition, bundleEntries)
-  await indexComposition(compositionIdentifier, body)
+  await indexComposition(compositionId, body)
 
-  await detectAndUpdateDuplicates(compositionIdentifier, composition, body)
+  await detectAndUpdateDuplicates(compositionId, composition, body)
 }
 
 function createIndexBody(
@@ -226,11 +220,11 @@ function createApplicationIndex(
 }
 
 async function detectAndUpdateDuplicates(
-  compositionIdentifier: string,
+  compositionId: string,
   composition: fhir.Composition,
   body: IBirthCompositionBody
 ) {
-  const duplicates = await detectDuplicates(compositionIdentifier, body)
+  const duplicates = await detectDuplicates(compositionId, body)
   if (!duplicates.length) {
     return
   }
@@ -241,9 +235,7 @@ async function detectAndUpdateDuplicates(
   if (composition.id) {
     return await updateCompositionWithDuplicates(composition, duplicates)
   }
-  const compositionWithId = await getCompositionByIdentifier(
-    compositionIdentifier
-  )
+  const compositionWithId = await getCompositionById(compositionId)
   return await updateCompositionWithDuplicates(compositionWithId, duplicates)
 }
 
@@ -252,7 +244,7 @@ async function updateCompositionWithDuplicates(
   duplicates: string[]
 ) {
   const duplicateCompositions = await Promise.all(
-    duplicates.map(duplicate => getCompositionByIdentifier(duplicate))
+    duplicates.map(duplicate => getCompositionById(duplicate))
   )
 
   const duplicateCompositionIds = duplicateCompositions.map(
