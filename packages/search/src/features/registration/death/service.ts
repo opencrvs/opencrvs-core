@@ -168,5 +168,6 @@ function createApplicationIndex(
   body.applicationLocationId =
     placeOfApplicationExtension &&
     placeOfApplicationExtension.valueReference &&
-    placeOfApplicationExtension.valueReference.reference
+    placeOfApplicationExtension.valueReference.reference &&
+    placeOfApplicationExtension.valueReference.reference.split('/')[1]
 }
