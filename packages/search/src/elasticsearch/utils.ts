@@ -19,6 +19,7 @@ export interface ICompositionBody {
   applicationLocationId?: string
   rejectReason?: string
   rejectComment?: string
+  relatesTo?: string[]
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {

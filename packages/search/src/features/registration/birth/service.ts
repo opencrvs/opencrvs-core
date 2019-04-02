@@ -251,6 +251,12 @@ async function updateCompositionWithDuplicates(
     dupComposition => dupComposition.id
   )
 
+  if (composition && composition.id) {
+    const body: ICompositionBody = {}
+    body.relatesTo = duplicateCompositionIds
+    updateComposition(composition.id, body)
+  }
+
   addDuplicatesToComposition(duplicateCompositionIds, composition)
 
   return updateInHearth(composition, composition.id)
