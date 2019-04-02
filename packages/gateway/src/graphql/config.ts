@@ -6,6 +6,7 @@ import { resolvers as registrationRootResolvers } from 'src/features/registratio
 import { resolvers as locationRootResolvers } from 'src/features/location/root-resolvers'
 import { resolvers as userRootResolvers } from 'src/features/user/root-resolvers'
 import { typeResolvers } from 'src/features/registration/type-resovlers'
+import { searchTypeResolvers } from 'src/features/registration/search-type-resovlers'
 
 export const getExecutableSchema = (schemaPath: string) => {
   const typeDefs = importSchema(schemaPath)
@@ -18,7 +19,8 @@ export const getExecutableSchema = (schemaPath: string) => {
       registrationRootResolvers as IResolvers,
       locationRootResolvers as IResolvers,
       userRootResolvers as IResolvers,
-      typeResolvers as IResolvers
+      typeResolvers as IResolvers,
+      searchTypeResolvers as IResolvers
     ]
   })
 }

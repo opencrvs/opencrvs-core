@@ -1,3 +1,7 @@
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc'
+}
 export interface ISearchQuery {
   query?: string
   event?: string
@@ -5,6 +9,7 @@ export interface ISearchQuery {
   applicationLocationId?: string
   from?: number
   size?: number
+  sort?: SortOrder
 }
 
 export interface IFilter {

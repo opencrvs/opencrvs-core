@@ -8,7 +8,7 @@ const SEARCHABLE_FIELDS = [
   'deceasedFamilyName',
   'deceasedFirstNamesLocal',
   'deceasedFamilyNameLocal',
-  'trackingid',
+  'trackingId',
   'registrationNumber',
   'contactNumber'
 ]
@@ -34,24 +34,27 @@ export function queryBuilder(
 
   if (applicationLocationId !== EMPTY_STRING) {
     must.push({
-      match: {
-        applicationLocationId
+      term: {
+        'applicationLocationId.keyword': {
+          value: applicationLocationId,
+          boost: 2.0
+        }
       }
     })
   }
 
   if (filters.event !== EMPTY_STRING) {
     must.push({
-      match: {
-        event: filters.event
+      term: {
+        'event.keyword': filters.event
       }
     })
   }
 
   if (filters.status !== EMPTY_STRING) {
     must.push({
-      match: {
-        type: filters.status
+      term: {
+        'type.keyword': filters.status
       }
     })
   }
