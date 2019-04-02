@@ -932,6 +932,13 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.greaterThanZero': 'Must be a greater than zero',
     'register.SearchResult.title': 'Search',
     'register.registerForm.queryError':
-      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.'
+      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
+    'createPIN.createTitle': 'Create a PIN',
+    'createPIN.createDescription':
+      "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
+    'createPIN.pinMatchError': 'PIN code did not match. Please try again.',
+    'createPIN.reEnterTitle': 'Re-enter your new PIN',
+    'createPIN.reEnterDescription':
+      "Let's make sure we collected your PIN correctly."
   }
 }

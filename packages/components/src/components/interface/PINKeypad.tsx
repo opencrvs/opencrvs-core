@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import Backspace from '../icons/Backspace'
+import { Backspace } from '../icons/Backspace'
 
 interface IProps {
   onComplete: (pin: string) => void
