@@ -1,7 +1,7 @@
 {
   "name": "@opencrvs/search",
   "version": "1.0.0-alpha.1",
-  "description": "OpenCRVS de-duplication service",
+  "description": "OpenCRVS search service",
   "main": "src/index.js",
   "license": "NONE",
   "private": true,
