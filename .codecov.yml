@@ -41,6 +41,11 @@ coverage:
         paths:
           - packages/workflow
         threshold: 0.5
+      search:
+        paths:
+          - packages/search
+        threshold: 0.5
+
 ignore:
   - 'packages/register/src/extract-translations.ts'
   - 'packages/register/src/index.tsx'

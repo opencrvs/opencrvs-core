@@ -1,5 +1,5 @@
 import { client } from 'src/elasticsearch/client'
-import { ISearchQuery } from './types'
+import { ISearchQuery, SortOrder } from './types'
 import { queryBuilder, EMPTY_STRING } from './utils'
 
 const DEFAULT_SIZE = 10
@@ -12,15 +12,17 @@ export const searchComposition = async (params: ISearchQuery) => {
     status = EMPTY_STRING,
     applicationLocationId = EMPTY_STRING,
     from = 0,
-    size = DEFAULT_SIZE
+    size = DEFAULT_SIZE,
+    sort = SortOrder.ASC
   } = params
 
   return client.search({
     type: DEFAULT_SEARCH_TYPE,
-    from: from,
-    size: size,
+    from,
+    size,
     body: {
-      query: queryBuilder(query, applicationLocationId, { event, status })
+      query: queryBuilder(query, applicationLocationId, { event, status }),
+      sort: [{ dateOfApplication: sort }]
     }
   })
 }

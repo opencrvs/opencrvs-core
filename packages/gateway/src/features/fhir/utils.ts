@@ -24,7 +24,7 @@ import {
   ITemplatedComposition
 } from '../registration/fhir-builders'
 import fetch from 'node-fetch'
-import { FHIR_URL } from 'src/constants'
+import { FHIR_URL, SEARCH_URL } from 'src/constants'
 import { IAuthHeader } from 'src/common-types'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
@@ -33,6 +33,7 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO
 } from './constants'
+import { ISearchCriteria } from '../registration/search-type-resovlers'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -695,6 +696,28 @@ export const fetchFHIR = (
     })
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
+}
+
+export const postSearch = (
+  authHeader: IAuthHeader,
+  criteria: ISearchCriteria
+) => {
+  return fetch(`${SEARCH_URL}search`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
     })
 }
 
