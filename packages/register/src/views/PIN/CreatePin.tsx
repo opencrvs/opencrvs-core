@@ -76,7 +76,6 @@ class CreatePinComponent extends React.Component<IProps> {
   storePINForUser = async (pin: string) => {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(pin, salt)
-    console.log(hash)
 
     // TODO: this should be moved to the user object when the support for multiple user has been added
     await storage.setItem('pin', hash)
@@ -93,20 +92,26 @@ class CreatePinComponent extends React.Component<IProps> {
         <PIN />
         {pin === null && (
           <>
-            <TitleText>{intl.formatMessage(messages.createTitle)}</TitleText>
-            <DescriptionText>
+            <TitleText id="title-text">
+              {intl.formatMessage(messages.createTitle)}
+            </TitleText>
+            <DescriptionText id="description-text">
               {intl.formatMessage(messages.createDescription)}
             </DescriptionText>
             {pinMatchError && (
-              <ErrorBox>{intl.formatMessage(messages.pinMatchError)}</ErrorBox>
+              <ErrorBox id="error-text">
+                {intl.formatMessage(messages.pinMatchError)}
+              </ErrorBox>
             )}
             <PINKeypad onComplete={this.firstPINEntry} />
           </>
         )}
         {pin && (
           <>
-            <TitleText>{intl.formatMessage(messages.reEnterTitle)}</TitleText>
-            <DescriptionText>
+            <TitleText id="title-text">
+              {intl.formatMessage(messages.reEnterTitle)}
+            </TitleText>
+            <DescriptionText id="description-text">
               {intl.formatMessage(messages.reEnterDescription)}
             </DescriptionText>
             <PINKeypad onComplete={this.secondPINEntry} />
