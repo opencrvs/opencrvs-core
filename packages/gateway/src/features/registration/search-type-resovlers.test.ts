@@ -73,6 +73,27 @@ describe('Search type resolvers', () => {
       const name = searchTypeResolvers.BirthEventSearchSet.childName({})
       expect(name).toEqual(null)
     })
+    it('returns null as given and family name in-case of missing required data', () => {
+      const name = searchTypeResolvers.BirthEventSearchSet.childName({
+        _type: 'compositions',
+        _id: '123',
+        _source: {
+          event: 'Birth'
+        }
+      })
+      expect(name).toEqual([
+        {
+          use: 'en',
+          given: null,
+          family: null
+        },
+        {
+          use: 'bn',
+          given: null,
+          family: null
+        }
+      ])
+    })
     it('returns date of birth from birth event search set', () => {
       const dob = searchTypeResolvers.BirthEventSearchSet.dateOfBirth({
         _type: 'compositions',
@@ -87,6 +108,20 @@ describe('Search type resolvers', () => {
         }
       })
       expect(dob).toBe('01-01-2019')
+    })
+    it('returns null as date of birth in case of missing required data', () => {
+      const dob = searchTypeResolvers.BirthEventSearchSet.dateOfBirth({
+        _type: 'compositions',
+        _id: '123',
+        _source: {
+          event: 'Birth',
+          childFirstNames: 'Anik',
+          childFamilyName: 'Hoque',
+          childFirstNamesLocal: 'অনিক',
+          childFamilyNameLocal: 'হক'
+        }
+      })
+      expect(dob).toBe(null)
     })
     it('returns _source info as registration from birth event search set', () => {
       const registration = searchTypeResolvers.BirthEventSearchSet.registration(
@@ -160,6 +195,27 @@ describe('Search type resolvers', () => {
       const name = searchTypeResolvers.DeathEventSearchSet.deceasedName({})
       expect(name).toEqual(null)
     })
+    it('returns null as given and family name in-case of missing required data', () => {
+      const name = searchTypeResolvers.DeathEventSearchSet.deceasedName({
+        _type: 'compositions',
+        _id: '123',
+        _source: {
+          event: 'Death'
+        }
+      })
+      expect(name).toEqual([
+        {
+          use: 'en',
+          given: null,
+          family: null
+        },
+        {
+          use: 'bn',
+          given: null,
+          family: null
+        }
+      ])
+    })
     it('returns date of Death from Death event search set', () => {
       const dod = searchTypeResolvers.DeathEventSearchSet.dateOfDeath({
         _type: 'compositions',
@@ -174,6 +230,20 @@ describe('Search type resolvers', () => {
         }
       })
       expect(dod).toBe('01-01-2019')
+    })
+    it('returns null as date of death in case of missing required data', () => {
+      const dod = searchTypeResolvers.DeathEventSearchSet.dateOfDeath({
+        _type: 'compositions',
+        _id: '123',
+        _source: {
+          event: 'Death',
+          deceasedFirstNames: 'Anik',
+          deceasedFamilyName: 'Hoque',
+          deceasedFirstNamesLocal: 'অনিক',
+          deceasedFamilyNameLocal: 'হক'
+        }
+      })
+      expect(dod).toBe(null)
     })
     it('returns _source info as registration from Death event search set', () => {
       const registration = searchTypeResolvers.DeathEventSearchSet.registration(

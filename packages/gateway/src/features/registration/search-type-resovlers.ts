@@ -45,13 +45,29 @@ export const searchTypeResolvers: GQLResolver = {
       return [
         {
           use: 'en',
-          given: [resultSet._source.childFirstNames] || null,
-          family: [resultSet._source.childFamilyName] || null
+          given:
+            (resultSet._source.childFirstNames && [
+              resultSet._source.childFirstNames
+            ]) ||
+            null,
+          family:
+            (resultSet._source.childFamilyName && [
+              resultSet._source.childFamilyName
+            ]) ||
+            null
         },
         {
           use: 'bn',
-          given: [resultSet._source.childFirstNamesLocal] || null,
-          family: [resultSet._source.childFamilyNameLocal] || null
+          given:
+            (resultSet._source.childFirstNamesLocal && [
+              resultSet._source.childFirstNamesLocal
+            ]) ||
+            null,
+          family:
+            (resultSet._source.childFamilyNameLocal && [
+              resultSet._source.childFamilyNameLocal
+            ]) ||
+            null
         }
       ]
     },
@@ -76,13 +92,29 @@ export const searchTypeResolvers: GQLResolver = {
       return [
         {
           use: 'en',
-          given: [resultSet._source.deceasedFirstNames] || null,
-          family: [resultSet._source.deceasedFamilyName] || null
+          given:
+            (resultSet._source.deceasedFirstNames && [
+              resultSet._source.deceasedFirstNames
+            ]) ||
+            null,
+          family:
+            (resultSet._source.deceasedFamilyName && [
+              resultSet._source.deceasedFamilyName
+            ]) ||
+            null
         },
         {
           use: 'bn',
-          given: [resultSet._source.deceasedFirstNamesLocal] || null,
-          family: [resultSet._source.deceasedFamilyNameLocal] || null
+          given:
+            (resultSet._source.deceasedFirstNamesLocal && [
+              resultSet._source.deceasedFirstNamesLocal
+            ]) ||
+            null,
+          family:
+            (resultSet._source.deceasedFamilyNameLocal && [
+              resultSet._source.deceasedFamilyNameLocal
+            ]) ||
+            null
         }
       ]
     },
