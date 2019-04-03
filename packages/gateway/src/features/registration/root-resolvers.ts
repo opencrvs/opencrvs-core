@@ -39,8 +39,36 @@ export const resolvers: GQLResolver = {
 
       return await fetchFHIR(`/${task.focus.reference}`, authHeader)
     },
-    async fetchRegistration(_, { id }, authHeader) {
-      return await fetchFHIR(`/Composition/${id}`, authHeader)
+    async queryTaskHistory(_, { id }, authHeader) {
+      const taskBundle = await fetchFHIR(
+        `/Task?focus=Composition/${id}`,
+        authHeader
+      )
+
+      if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
+        return null
+      }
+      const taskId = taskBundle.entry[0].resource.id
+      const taskBundleHistory = await fetchFHIR(
+        `/Task/${taskId}/_history`,
+        authHeader
+      )
+
+      return (
+        taskBundleHistory.entry &&
+        taskBundleHistory.entry.map(
+          (taskEntry: fhir.BundleEntry, index: number) => {
+            const historicalTask = taskEntry.resource
+            // bind version and index to the id
+            if (historicalTask && historicalTask.meta) {
+              historicalTask.id = `${historicalTask.id}/_history/${
+                historicalTask.meta.versionId
+              }/_index/${index}`
+            }
+            return historicalTask
+          }
+        )
+      )
     },
     async queryPersonByIdentifier(_, { identifier }, authHeader) {
       const personBundle = await fetchFHIR(

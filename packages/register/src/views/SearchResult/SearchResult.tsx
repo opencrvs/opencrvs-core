@@ -7,7 +7,6 @@ import {
   PrimaryButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Edit } from '@opencrvs/components/lib/icons'
 import {
   SearchInput,
   ISearchInputProps,
@@ -33,9 +32,10 @@ import {
   StatusGray,
   StatusOrange,
   StatusGreen,
-  StatusCollected,
   StatusRejected,
-  Duplicate
+  Duplicate,
+  Edit,
+  StatusBlue
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
@@ -58,7 +58,12 @@ import * as Sentry from '@sentry/browser'
 import { extractCommentFragmentValue } from 'src/utils/data-formatting'
 import { ActionPage } from '@opencrvs/components/lib/interface'
 import * as moment from 'moment'
-import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
+import {
+  CERTIFICATE_DATE_FORMAT,
+  REJECTED,
+  REASON,
+  DECLARED
+} from 'src/utils/constants'
 
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
@@ -137,45 +142,55 @@ export const FETCH_REGISTRATION_QUERY = gql`
     }
   }
 `
-export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
-  query data($id: ID!) {
-    fetchRegistration(id: $id) {
-      registration {
+export const FETCH_TASK_HISTORY_BY_COMPOSITION = gql`
+  query list($id: ID!) {
+    queryTaskHistory(id: $id) {
+      user {
         id
-        trackingId
-        registrationNumber
-        type
-        status {
-          id
-          user {
-            id
+        name {
+          use
+          firstNames
+          familyName
+        }
+        role
+      }
+      location {
+        id
+        name
+        alias
+      }
+      office {
+        name
+        alias
+        address {
+          district
+          state
+        }
+      }
+      certificate {
+        collector {
+          individual {
             name {
               use
               firstNames
               familyName
             }
-            role
           }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
+
+          relationship
         }
-        duplicates
+      }
+      comments {
+        comment
+      }
+      type
+      timestamp
+      informant {
+        telecom {
+          use
+          system
+          value
+        }
       }
     }
   }
@@ -478,6 +493,26 @@ const messages = defineMessages({
     id: 'register.SearchResult.title',
     defaultMessage: 'Search',
     description: 'The title of the page'
+  },
+  collectedBy: {
+    id: 'register.SearchResult.collectedBy',
+    defaultMessage: 'Collected by',
+    description: 'The collected by sec text'
+  },
+  issuedBy: {
+    id: 'register.SearchResult.issuedBy',
+    defaultMessage: 'Issued by',
+    description: 'The issued by sec text'
+  },
+  rejectReason: {
+    id: 'register.SearchResult.rejectReason',
+    defaultMessage: 'Reason',
+    description: 'The rejected reason'
+  },
+  informantContact: {
+    id: 'register.SearchResult.informantContact',
+    defaultMessage: 'Informant contact number',
+    description: 'The rejected reason'
   }
 })
 
@@ -515,6 +550,7 @@ const StyledLabel = styled.label`
 `
 const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
+  text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
   display: inline-flex;
@@ -524,15 +560,6 @@ const ValueContainer = styled.div`
     border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
     margin-right: 10px;
     padding-right: 10px;
-  }
-`
-const DuplicateIndicatorContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  & span {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
-    margin-left: 10px;
   }
 `
 export const ActionPageWrapper = styled.div`
@@ -629,12 +656,6 @@ const StyledSecondaryButton = styled(SecondaryButton)`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
-
-const StatusIconCollected = styled.div`
-  padding-left: 6px;
-  margin-top: 3px;
-`
-
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
@@ -685,9 +706,9 @@ export class SearchResultView extends React.Component<
         )
       case 'CERTIFIED':
         return (
-          <StatusIconCollected>
-            <StatusCollected />
-          </StatusIconCollected>
+          <StatusIcon>
+            <StatusBlue />
+          </StatusIcon>
         )
       default:
         return (
@@ -873,16 +894,18 @@ export class SearchResultView extends React.Component<
 
   transformDataToTaskHistory = (data: GQLQuery) => {
     const { locale } = this.props.intl
-    if (
-      !data ||
-      !data.fetchRegistration ||
-      !data.fetchRegistration.registration ||
-      !data.fetchRegistration.registration.status
-    ) {
+    if (!data || !data.queryTaskHistory) {
       return []
     }
 
-    return data.fetchRegistration.registration.status.map(status => {
+    return data.queryTaskHistory.map(status => {
+      const collector =
+        status && status.certificate && status.certificate.collector
+      const contactInfo =
+        status &&
+        status.informant &&
+        status.informant.telecom &&
+        status.informant.telecom[0]
       return {
         type: status && status.type,
         practitionerName:
@@ -907,7 +930,29 @@ export class SearchResultView extends React.Component<
         officeName:
           locale === 'en'
             ? status && status.office && status.office.name
-            : status && status.office && status.office.alias
+            : status && status.office && status.office.alias,
+        collectorName:
+          (collector &&
+            collector.individual &&
+            (createNamesMap(collector.individual.name as GQLHumanName[])[
+              this.props.language
+            ] as string)) ||
+          (collector &&
+            collector.individual &&
+            (createNamesMap(collector.individual.name as GQLHumanName[])[
+              ''
+            ] as string)) ||
+          '',
+        collectorType: collector && collector.relationship,
+        rejectReasons:
+          (status &&
+            status.type === REJECTED &&
+            extractCommentFragmentValue(
+              status.comments as GQLComment[],
+              REASON
+            )) ||
+          '',
+        informantContactNumber: contactInfo && contactInfo.value
       }
     })
   }
@@ -916,7 +961,7 @@ export class SearchResultView extends React.Component<
     return (
       <>
         <Query
-          query={FETCH_REGISTRATION_BY_COMPOSITION}
+          query={FETCH_TASK_HISTORY_BY_COMPOSITION}
           variables={{
             id
           }}
@@ -939,21 +984,24 @@ export class SearchResultView extends React.Component<
             }
 
             const statusData = this.transformDataToTaskHistory(data)
-            const duplicates =
-              data &&
-              data.fetchRegistration &&
-              data.fetchRegistration.registration &&
-              data.fetchRegistration.registration.duplicates
 
             return statusData
               .map((status, index) => {
-                const { practitionerName, practitionerRole } = status
+                const {
+                  practitionerName,
+                  practitionerRole,
+                  collectorName,
+                  collectorType,
+                  rejectReasons,
+                  informantContactNumber
+                } = status
                 const type = status.type as string
                 const officeName = status.officeName as string
                 const timestamp = moment(
                   status.timestamp as string,
                   'DD-MM-YYYY'
                 ).format(CERTIFICATE_DATE_FORMAT)
+                const collectorInfo = collectorName + ' (' + collectorType + ')'
 
                 return (
                   <ExpansionContainer
@@ -968,10 +1016,24 @@ export class SearchResultView extends React.Component<
                         )}
                         value={timestamp}
                       />
-                      <ValueContainer>
-                        <StyledLabel>
+                      {type === DECLARED && informantContactNumber && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.informantContact)}
+                          value={informantContactNumber}
+                        />
+                      )}
+                      {collectorType && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.collectedBy)}
+                          value={collectorInfo}
+                        />
+                      )}
+                      <ValueContainer id="vc">
+                        <StyledLabel id="sb">
                           {this.props.intl.formatMessage(
-                            messages.workflowPractitionerLabel
+                            collectorType
+                              ? messages.issuedBy
+                              : messages.workflowPractitionerLabel
                           )}
                           :
                         </StyledLabel>
@@ -983,15 +1045,11 @@ export class SearchResultView extends React.Component<
                           ]}
                         />
                       </ValueContainer>
-                      {duplicates && index === 0 && (
-                        <DuplicateIndicatorContainer id="duplicate_found_section">
-                          <Duplicate />
-                          <span>
-                            {this.props.intl.formatMessage(
-                              messages.listItemDuplicateLabel
-                            )}
-                          </span>
-                        </DuplicateIndicatorContainer>
+                      {rejectReasons && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.rejectReason)}
+                          value={rejectReasons}
+                        />
                       )}
                     </ExpansionContentContainer>
                   </ExpansionContainer>

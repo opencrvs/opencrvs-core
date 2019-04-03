@@ -1,3 +1,5 @@
+import { from } from 'zen-observable'
+
 export * from './ArrowBack'
 export * from './ArrowForward'
 export * from './Hamburger'
@@ -42,3 +44,4 @@ export * from './Error'
 export * from './Success'
 export * from './MinusTransparent'
 export * from './PlusTransparent'
+export * from './StatusBlue'

@@ -22,7 +22,8 @@ import {
   DEATH_ENCOUNTER_CODE,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_METHOD_CODE
+  CAUSE_OF_DEATH_METHOD_CODE,
+  CERTIFICATE_DOCS_CODE
 } from 'src/features/fhir/templates'
 import { GQLResolver } from 'src/graphql/schema'
 import {
@@ -142,6 +143,12 @@ export const typeResolvers: GQLResolver = {
       )
     },
     individual: async (relatedPerson, _, authHeader) => {
+      if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
+        relatedPerson = await fetchFHIR(
+          `/${relatedPerson.patient.reference}`,
+          authHeader
+        )
+      }
       return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
     }
   },
@@ -445,7 +452,133 @@ export const typeResolvers: GQLResolver = {
       return docRef.created
     }
   },
+  TaskHistory: {
+    type: (task: fhir.Task) => {
+      const taskStatus = task.businessStatus
+      const taskStatusCoding = taskStatus && taskStatus.coding
+      const statusType =
+        taskStatusCoding &&
+        taskStatusCoding.find(
+          (coding: fhir.Coding) =>
+            coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+        )
 
+      return (statusType && statusType.code) || null
+    },
+    user: async (task, _, authHeader) => {
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension
+      )
+      if (!user || !user.valueReference) {
+        return null
+      }
+      return await fetchFHIR(`/${user.valueReference.reference}`, authHeader)
+    },
+    timestamp: task => task.lastModified,
+    comments: task => task.note,
+    location: async (task, _, authHeader) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
+        task.extension
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
+    },
+    office: async (task, _, authHeader) => {
+      const taskLocation = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension
+      )
+      if (!taskLocation || !taskLocation.valueReference) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${taskLocation.valueReference.reference}`,
+        authHeader
+      )
+    },
+    certificate: async (task, _, authHeader) => {
+      if (!task.focus) {
+        throw new Error(
+          'Task resource does not have a focus property necessary to lookup the composition'
+        )
+      }
+      const index = task.id.split(/[/ ]+/).pop()
+      const compositionBundle = await fetchFHIR(
+        `/${task.focus.reference}/_history`,
+        authHeader
+      )
+
+      if (!compositionBundle || index >= compositionBundle.total) {
+        return null
+      }
+
+      const composition =
+        compositionBundle.entry &&
+        compositionBundle.entry[index] &&
+        compositionBundle.entry[index].resource
+      const certSection = findCompositionSection(
+        CERTIFICATE_DOCS_CODE,
+        composition
+      )
+      if (
+        !certSection ||
+        !certSection.entry ||
+        !(certSection.entry.length > 0)
+      ) {
+        return null
+      }
+      const certReference = certSection.entry[0].reference
+      return await fetchFHIR(`/${certReference}`, authHeader)
+    },
+    informant: async (task, _, authHeader) => {
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
+      const informantSection = findCompositionSection(
+        INFORMANT_CODE,
+        composition
+      )
+      const relatedPersonRef =
+        informantSection &&
+        informantSection.entry &&
+        informantSection.entry[0] &&
+        informantSection.entry[0].reference
+
+      if (!relatedPersonRef) {
+        return null
+      }
+
+      const relatedPerson = await fetchFHIR(`/${relatedPersonRef}`, authHeader)
+
+      return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
+    }
+  },
+  Certificate: {
+    async collector(docRef: fhir.DocumentReference, _, authHeader) {
+      const relatedPersonRef =
+        docRef.extension &&
+        docRef.extension.find(
+          (extension: fhir.Extension) =>
+            extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
+        )
+      if (!relatedPersonRef) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${relatedPersonRef.valueReference &&
+          relatedPersonRef.valueReference.reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
+    }
+  },
   Identifier: {
     system: identifier => identifier.system,
     value: identifier => identifier.value

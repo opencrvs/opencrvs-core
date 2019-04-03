@@ -934,6 +934,10 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.greaterThanZero': 'Must be a greater than zero',
     'register.SearchResult.title': 'Search',
     'register.registerForm.queryError':
-      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.'
+      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
+    'register.SearchResult.issuedBy': 'Issued by',
+    'register.SearchResult.collectedBy': 'Collected by',
+    'register.SearchResult.rejectReason': 'Reason',
+    'register.SearchResult.informantContact': 'Informant contact number'
   }
 }

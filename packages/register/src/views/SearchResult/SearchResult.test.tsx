@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   SearchResult,
   FETCH_REGISTRATION_QUERY,
-  FETCH_REGISTRATION_BY_COMPOSITION
+  FETCH_TASK_HISTORY_BY_COMPOSITION
 } from './SearchResult'
 import { createTestComponent, mockUserResponse } from 'src/tests/util'
 import { createStore } from 'src/store'
@@ -415,7 +415,7 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
@@ -599,7 +599,7 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
@@ -741,7 +741,7 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }

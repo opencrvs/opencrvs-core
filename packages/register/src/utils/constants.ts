@@ -16,6 +16,8 @@ export const BIRTH = 'birth'
 export const DEATH = 'death'
 export const OFFLINE = 'offline'
 export const REJECTED = 'REJECTED'
+export const REASON = 'reason'
+export const DECLARED = 'DECLARED'
 
 export const REGEXP_ALPHA_NUMERIC = '^[0-9a-zA-Z]+$'
 export const REGEXP_BLOCK_ALPHA_NUMERIC = '^[0-9A-Z]+$'
