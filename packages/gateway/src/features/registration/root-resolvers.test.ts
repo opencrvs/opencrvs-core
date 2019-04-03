@@ -38,13 +38,34 @@ describe('Registration root resolvers', () => {
           eventType: 'Birth',
           status: 'DECLARED',
           locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce'],
-          searchContent: 'xxx'
+          searchContent: '01622688231'
         }
       )
 
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
+    })
+    it('returns total item as 0 and an empty array in-case of invalid result found from elastic', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: null
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          eventType: 'Birth',
+          status: 'DECLARED',
+          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce'],
+          searchContent: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toEqual([])
+      expect(result.totalItems).toBe(0)
     })
   })
   describe('listEventRegistrations()', () => {
