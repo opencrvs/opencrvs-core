@@ -52,18 +52,15 @@ export interface IDeathCompositionBody extends ICompositionBody {
 }
 
 export async function detectDuplicates(
-  compositionIdentifier: string,
+  compositionId: string,
   body: IBirthCompositionBody
 ) {
   const searchResponse = await searchComposition(body)
-  const duplicates = findDuplicateIdentifers(
-    compositionIdentifier,
-    searchResponse
-  )
+  const duplicates = findDuplicateIds(compositionId, searchResponse)
   return duplicates
 }
 
-function findDuplicateIdentifers(
+function findDuplicateIds(
   compositionIdentifier: string,
   results: SearchResponse<{}>
 ) {

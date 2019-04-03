@@ -29,7 +29,7 @@ export async function upsertEvent(bundle: fhir.Bundle) {
   if (bundleEntries && bundleEntries.length === 1) {
     const resource = bundleEntries[0].resource
     if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task)
+      await updateEvent(resource as fhir.Task)
       return
     }
   }
@@ -232,11 +232,7 @@ async function detectAndUpdateDuplicates(
     `Search/service: ${duplicates.length} duplicate composition(s) found`
   )
 
-  if (composition.id) {
-    return await updateCompositionWithDuplicates(composition, duplicates)
-  }
-  const compositionWithId = await getCompositionById(compositionId)
-  return await updateCompositionWithDuplicates(compositionWithId, duplicates)
+  return await updateCompositionWithDuplicates(composition, duplicates)
 }
 
 async function updateCompositionWithDuplicates(
