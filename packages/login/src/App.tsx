@@ -9,10 +9,12 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { IntlContainer } from './i18n/components/I18nContainer'
 import { createStore, history } from './store'
 import { PageContainer } from './common/PageContainer'
+import { SecurePageContainer } from './common/SecurePageContainer'
 import * as routes from './navigation/routes'
 import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from './views/StepOne/StepOneContainer'
 import { ManagerViewContainer } from './views/Manager/ManagerView'
+import { SecureAccount } from './views/SecureAccount/SecureAccountView'
 import { ErrorBoundary } from './ErrorBoundary'
 
 export const store = createStore()
@@ -29,25 +31,43 @@ export class App extends React.Component {
               )}
             >
               <ConnectedRouter history={history}>
-                <PageContainer>
-                  <Switch>
-                    <Route
-                      exact
-                      path={routes.STEP_ONE}
-                      component={StepOneContainer}
-                    />
-                    <Route
-                      exact
-                      path={routes.STEP_TWO}
-                      component={StepTwoContainer}
-                    />
-                    <Route
-                      exact
-                      path={routes.MANAGER}
-                      component={ManagerViewContainer}
-                    />
-                  </Switch>
-                </PageContainer>
+                <Switch>
+                  <Route
+                    exact
+                    path={routes.STEP_ONE}
+                    children={_ => (
+                      <PageContainer>
+                        <StepOneContainer />
+                      </PageContainer>
+                    )}
+                  />
+                  <Route
+                    exact
+                    path={routes.STEP_TWO}
+                    children={_ => (
+                      <PageContainer>
+                        <StepTwoContainer />
+                      </PageContainer>
+                    )}
+                  />
+                  <Route
+                    exact
+                    path={routes.MANAGER}
+                    children={_ => (
+                      <PageContainer>
+                        <ManagerViewContainer />
+                      </PageContainer>
+                    )}
+                  />
+                  <Route
+                    path={routes.SECURE_ACCOUNT}
+                    children={() => (
+                      <SecurePageContainer>
+                        <SecureAccount />
+                      </SecurePageContainer>
+                    )}
+                  />
+                </Switch>
               </ConnectedRouter>
             </ThemeProvider>
           </IntlContainer>
