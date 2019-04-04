@@ -1,13 +1,19 @@
-import { indexComposition, searchComposition } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  updateComposition,
+  searchComposition
+} from 'src/elasticsearch/dbhelper'
 import { mockCompositionBody } from 'src/test/utils'
 import { client } from 'src/elasticsearch/client'
 
 describe('elasticsearch db helper', async () => {
   let indexSpy
+  let updateSpy
   let searchSpy
 
   beforeAll(() => {
     indexSpy = jest.spyOn(client, 'index')
+    updateSpy = jest.spyOn(client, 'update')
     searchSpy = jest.spyOn(client, 'search')
   })
 
@@ -19,6 +25,22 @@ describe('elasticsearch db helper', async () => {
       id: 'testId',
       index: 'ocrvs',
       type: 'compositions'
+    })
+  })
+
+  it('should update a composition with proper configuration', async () => {
+    const body = {
+      testKey: 'testValue'
+    }
+    updateComposition('testId', body)
+    expect(updateSpy).toBeCalled()
+    expect(updateSpy).toBeCalledWith({
+      index: 'ocrvs',
+      type: 'compositions',
+      id: 'testId',
+      body: {
+        doc: body
+      }
     })
   })
 
