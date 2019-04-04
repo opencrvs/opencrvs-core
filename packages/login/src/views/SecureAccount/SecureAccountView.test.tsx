@@ -12,7 +12,6 @@ describe('Login app > Secure Account Page', () => {
 
   it('Renders the secure account page successfully', () => {
     const elem = component.find('#createPinBtn').hostNodes()
-    console.log(elem.debug())
     expect(elem).toHaveLength(1)
   })
 })
