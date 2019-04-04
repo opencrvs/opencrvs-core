@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
-
+import { colors } from '../../colors'
 const InputHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -72,7 +72,11 @@ export interface IInputFieldProps {
   children: React.ReactNode
   ignoreMediaQuery?: boolean
   hideAsterisk?: boolean
-  hideBorder?: boolean
+  mode?: THEME_MODE
+}
+
+export enum THEME_MODE {
+  DARK = 'dark'
 }
 
 export class InputField extends React.Component<IInputFieldProps, {}> {
@@ -86,13 +90,25 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       touched,
       ignoreMediaQuery,
       hideAsterisk,
-      hideBorder
+      mode
     } = this.props
 
     const postfix = this.props.postfix as React.ComponentClass<any> | string
 
-    const { children, prefix } = this.props
+    const { prefix } = this.props
 
+    let color: string | undefined
+    let hideBorder: boolean
+    if (mode && mode === THEME_MODE.DARK) {
+      color = colors.white
+      hideBorder = true
+    }
+    const children = React.Children.map(
+      this.props.children,
+      (node: React.ReactElement<any>) => {
+        return React.cloneElement(node, { hideBorder })
+      }
+    )
     return (
       <div>
         <InputHeader>
@@ -101,7 +117,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
               id={`${id}_label`}
               disabled={this.props.disabled}
               ignoreMediaQuery={ignoreMediaQuery}
-              hideBorder={hideBorder}
+              color={color}
             >
               {label}
               {required && !hideAsterisk && (
@@ -122,13 +138,14 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
             id={this.props.id + '_error'}
             centred={!this.props.maxLength}
             ignoreMediaQuery={ignoreMediaQuery}
+            color={color}
           >
             {error}
           </InputError>
         )}
 
         {description && (
-          <InputDescription ignoreMediaQuery={ignoreMediaQuery}>
+          <InputDescription ignoreMediaQuery={ignoreMediaQuery} color={color}>
             {description}
           </InputDescription>
         )}
