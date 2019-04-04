@@ -29,6 +29,7 @@ import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScree
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
+import { Unlock } from './views/Unlock/Unlock'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -136,6 +137,10 @@ export class App extends React.Component<IAppProps> {
                           <ProtectedRoute
                             path={routes.PRINT_CERTIFICATE}
                             component={PrintCertificateAction}
+                          />
+                          <ProtectedRoute
+                            path={routes.UNLOCK_SCREEN}
+                            component={Unlock}
                           />
                         </Switch>
                       </Page>
