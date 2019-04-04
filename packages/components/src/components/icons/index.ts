@@ -1,5 +1,3 @@
-import { from } from 'zen-observable'
-
 export * from './ArrowBack'
 export * from './ArrowForward'
 export * from './Hamburger'

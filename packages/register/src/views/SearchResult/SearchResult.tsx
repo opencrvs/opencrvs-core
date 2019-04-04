@@ -1004,10 +1004,7 @@ export class SearchResultView extends React.Component<
                 const collectorInfo = collectorName + ' (' + collectorType + ')'
 
                 return (
-                  <ExpansionContainer
-                    key={index}
-                    id={'expanded_section_' + index}
-                  >
+                  <ExpansionContainer key={index} id={type + '-' + index}>
                     {this.getDeclarationStatusIcon(type)}
                     <ExpansionContentContainer>
                       <LabelValue
