@@ -28,9 +28,6 @@ const PinButton = styled(PrimaryButton)`
 `
 
 export class SecureAccount extends React.Component {
-  createPin() {
-    console.log('take me to Pin entry screen')
-  }
   render() {
     return (
       <SecurePageContainer>
@@ -48,7 +45,7 @@ export class SecureAccount extends React.Component {
           </Item>
 
           <Item>
-            <PinButton onClick={this.createPin}>CREATE A PIN</PinButton>
+            <PinButton id="createPinBtn">CREATE A PIN</PinButton>
           </Item>
         </Wrapper>
       </SecurePageContainer>
