@@ -72,6 +72,12 @@ type Action =
   | IGetStorageDraftsSuccessAction
   | IGetStorageDraftsFailedAction
 
+interface IUserData {
+  userID: string
+  drafts: IDraft[]
+  userPIN: number
+}
+
 export interface IDraftsState {
   initialDraftsLoaded: boolean
   drafts: IDraft[]
@@ -130,6 +136,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
   action: Action
 ): IDraftsState | Loop<IDraftsState, Action> => {
+  console.log(action.type)
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -186,7 +193,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       )
     case WRITE_DRAFT:
       if (state.initialDraftsLoaded && state.drafts) {
-        storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
+        writeDraftByUser('userID', action.payload.draft.drafts)
       }
       return state
     case SET_INITIAL_DRAFTS:
@@ -195,11 +202,11 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
           ...state
         },
         Cmd.run<IGetStorageDraftsSuccessAction | IGetStorageDraftsFailedAction>(
-          storage.getItem,
+          getDraftsOfUser,
           {
             successActionCreator: getStorageDraftsSuccess,
             failActionCreator: getStorageDraftsFailed,
-            args: ['drafts']
+            args: ['userID']
           }
         )
       )
@@ -214,4 +221,45 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
     default:
       return state
   }
+}
+
+async function getDraftsOfUser(userID: string): Promise<string> {
+  console.log('getDraftsOfUser')
+  const AllUserData = JSON.parse(
+    await storage.getItem('USER_DATA')
+  ) as IUserData[]
+  if (!AllUserData) {
+    console.log('No userdata draft found!')
+    return ''
+  }
+  let drafts: IDraft[] = []
+  AllUserData.some(uData => {
+    if (uData.userID === userID) {
+      drafts = uData.drafts
+    }
+    return uData.userID === userID
+  })
+  return JSON.stringify(drafts)
+}
+
+async function writeDraftByUser(
+  userID: string,
+  newDrafts: IDraft[]
+): Promise<void> {
+  console.log('writeDraftByUser')
+  const AllUserData: IUserData[] =
+    (JSON.parse(await storage.getItem('USER_DATA')) as IUserData[]) || []
+  const currentUserData = AllUserData.find(user => user.userID === userID)
+  if (!currentUserData) {
+    AllUserData.concat({
+      userID: 'userID',
+      userPIN: 1212,
+      drafts: newDrafts
+    })
+  } else {
+    currentUserData.drafts = newDrafts
+  }
+  storage
+    .setItem('USER_DATA', JSON.stringify(AllUserData))
+    .then(() => AllUserData && console.log('New USER_DATA has been set'))
 }
