@@ -8,7 +8,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 import { IntlContainer } from './i18n/components/I18nContainer'
 import { createStore, history } from './store'
-import { PageContainer } from './common/PageContainer'
+import { PageContainer, DarkPageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
 import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from './views/StepOne/StepOneContainer'
@@ -29,25 +29,35 @@ export class App extends React.Component {
               )}
             >
               <ConnectedRouter history={history}>
-                <PageContainer>
-                  <Switch>
-                    <Route
-                      exact
-                      path={routes.STEP_ONE}
-                      component={StepOneContainer}
-                    />
-                    <Route
-                      exact
-                      path={routes.STEP_TWO}
-                      component={StepTwoContainer}
-                    />
-                    <Route
-                      exact
-                      path={routes.MANAGER}
-                      component={ManagerViewContainer}
-                    />
-                  </Switch>
-                </PageContainer>
+                <Switch>
+                  <Route
+                    exact
+                    path={routes.STEP_ONE}
+                    children={() => (
+                      <DarkPageContainer>
+                        <StepOneContainer />
+                      </DarkPageContainer>
+                    )}
+                  />
+                  <Route
+                    exact
+                    path={routes.STEP_TWO}
+                    children={() => (
+                      <PageContainer>
+                        <StepTwoContainer />
+                      </PageContainer>
+                    )}
+                  />
+                  <Route
+                    exact
+                    path={routes.MANAGER}
+                    children={() => (
+                      <PageContainer>
+                        <ManagerViewContainer />
+                      </PageContainer>
+                    )}
+                  />
+                </Switch>
               </ConnectedRouter>
             </ThemeProvider>
           </IntlContainer>

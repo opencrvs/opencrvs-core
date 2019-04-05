@@ -16,7 +16,6 @@ import { stepTwoFields } from './stepTwoFields'
 
 import { store } from '../../App'
 import {
-  StyledBox,
   ErrorText,
   Title,
   FormWrapper,
@@ -28,6 +27,7 @@ import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
 
 import { FORM_NAME } from './contants'
+import { Box } from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({
   stepTwoTitle: {
@@ -110,7 +110,19 @@ const ClearFormLink = styled(Link)`
   float: right;
   top: -20px;
 `
+const StyledBox = styled(Box)`
+  position: absolute;
+  height: auto;
+  top: 50%;
+  right: 50%;
+  padding: 0px;
+  margin: 0px;
+  transform: translate(50%, -50%);
 
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 90%;
+  }
+`
 export interface IProps {
   formId: string
   submissionError: boolean
