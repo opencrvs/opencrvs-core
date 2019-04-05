@@ -1311,4 +1311,66 @@ describe('Registration root resolvers', () => {
       )
     })
   })
+
+  describe('queryTaskHistory()', async () => {
+    it('returns Task History', async () => {
+      const mockComposition = {
+        resourceType: 'Composition',
+        id: '4c48ba8b-2fd6-4aa9-9b1a-b5a81ad9d537',
+        entry: [
+          {
+            resource: {
+              resourceType: 'Task',
+              id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5'
+            }
+          }
+        ]
+      }
+      const mockTaskHistory = {
+        resourceType: 'Bundle',
+        id: 'd6a66971-1a08-4d5c-abad-071692748b5d',
+        entry: [
+          {
+            resource: {
+              resourceType: 'Task',
+              id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
+              meta: {
+                versionId: '7ba5de26-5de7-415b-8e67-1655ed023881'
+              }
+            }
+          }
+        ]
+      }
+
+      fetch.mockResponses(
+        [JSON.stringify(mockComposition)],
+        [JSON.stringify(mockTaskHistory)]
+      )
+
+      const taskHistory = await resolvers.Query.queryTaskHistory(
+        {},
+        { id: '96d2f69a-2572-46b1-a390-9b722265d037' }
+      )
+      expect(taskHistory).toBeDefined()
+      expect(taskHistory.length).toBe(1)
+    })
+
+    it('returns errors while fetching fails', async () => {
+      const mockComposition = {
+        resourceType: 'Composition',
+        id: '4c48ba8b-2fd6-4aa9-9b1a-b5a81ad9d537',
+        entry: [
+          {
+            resource: null
+          }
+        ]
+      }
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      const taskHistory = await resolvers.Query.queryTaskHistory(
+        {},
+        { id: '96d2f69a-2572-46b1-a390-9b722265d037' }
+      )
+      expect(taskHistory).toBeNull()
+    })
+  })
 })

@@ -1255,6 +1255,7 @@ export const mockObservations = {
 
 export const mockRelatedPerson = {
   fullUrl: 'urn:uuid:<uuid>',
+  id: '9185c9f1-a491-41f0-b823-6cba987b550b',
   resource: {
     resourceType: 'RelatedPerson',
     relationship: {
@@ -1270,4 +1271,139 @@ export const mockRelatedPerson = {
       reference: 'Patient/123' // reference to deceased
     }
   }
+}
+
+export const mockTaskHistory = {
+  resourceType: 'Task',
+  status: 'requested',
+  id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5/_history/_index/0',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+      value: '123'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: '123'
+    },
+    { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-page', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-book', value: '123' }
+  ],
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/reg-status',
+        code: 'DECLARED | VERIFIED | REGISTERED | CERTIFIED'
+      }
+    ]
+  },
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'BIRTH'
+      }
+    ]
+  },
+  focus: {
+    reference: 'Composition/210e184a-fe81-4207-bfc8-b6259973093c'
+  },
+  authoredOn: '2016-10-31T08:25:05+10:00',
+  lastModified: '2016-10-31T09:45:05+10:00',
+  note: [
+    {
+      authorString: '<username>',
+      text: 'Comment',
+      time: '2016-10-31T09:45:05+10:00'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastUser',
+      valueReference: { reference: 'Practitioner/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+      valueString: '01733333333'
+    }
+  ],
+  meta: {
+    versionId: '123'
+  }
+}
+
+export const mockCertificate = {
+  resourceType: 'DocumentReference',
+  id: '5ebdd50a-6180-4aa2-abbe-941442e7cbe7',
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/collector',
+      valueReference: {
+        reference: 'RelatedPerson/9185c9f1-a491-41f0-b823-6cba987b550b'
+      }
+    }
+  ]
+}
+
+export const mockCertificateComposition = {
+  resourceType: 'Composition',
+  id: '210e184a-fe81-4207-bfc8-b6259973093c',
+  entry: [
+    {
+      resource: {
+        resourceType: 'Task',
+        id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
+        section: [
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference:
+                  'DocumentReference/5ebdd50a-6180-4aa2-abbe-941442e7cbe7'
+              }
+            ]
+          },
+          {
+            title: "Informant's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: "Informant's details"
+            },
+            entry: [
+              {
+                reference: 'RelatedPerson/9185c9f1-a491-41f0-b823-6cba987b550b'
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

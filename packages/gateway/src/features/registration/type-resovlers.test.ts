@@ -9,10 +9,14 @@ import {
   mockPatient,
   mockDocumentReference,
   mockTask,
+  mockTaskHistory,
   mockTaskForDeath,
   mockComposition,
   mockObservations,
-  mockLocation
+  mockLocation,
+  mockCertificate,
+  mockCertificateComposition,
+  mockRelatedPerson
 } from 'src/utils/testUtils'
 import { clone } from 'lodash'
 
@@ -1102,5 +1106,89 @@ describe('Registration type resolvers', () => {
     }
     const res = typeResolvers.EventRegistration.__resolveType(mock)
     expect(res).toEqual('DeathRegistration')
+  })
+
+  describe('TaskHistory type', () => {
+    it('returns type of the task', async () => {
+      const status = await typeResolvers.TaskHistory.type(mockTaskHistory)
+      expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
+    })
+
+    it('returns comments of the task', async () => {
+      const comments = await typeResolvers.TaskHistory.comments(mockTaskHistory)
+      const comment = await typeResolvers.Comment.comment(
+        mockTaskHistory.note[0]
+      )
+      const user = await typeResolvers.Comment.user(mockTaskHistory.note[0])
+      const time = await typeResolvers.Comment.createdAt(
+        mockTaskHistory.note[0]
+      )
+
+      expect(comments).toBeDefined()
+      expect(comments).toHaveLength(1)
+      expect(comment).toBe('Comment')
+      expect(user).toBe('<username>')
+      expect(time).toBe('2016-10-31T09:45:05+10:00')
+    })
+
+    it('returns timestamp of the task', async () => {
+      const time = await typeResolvers.TaskHistory.timestamp(mockTaskHistory)
+      expect(time).toBe('2016-10-31T09:45:05+10:00')
+    })
+
+    it('returns user of the task', async () => {
+      const mock = fetch.mockResponseOnce(
+        JSON.stringify({ resourceType: 'Practitioner' })
+      )
+      const user = await typeResolvers.TaskHistory.user(mockTaskHistory)
+
+      expect(mock).toBeCalledWith(
+        'http://localhost:5001/fhir/Practitioner/123',
+        {
+          body: undefined,
+          headers: { 'Content-Type': 'application/fhir+json' },
+          method: 'GET'
+        }
+      )
+      expect(user.resourceType).toBe('Practitioner')
+    })
+
+    it('returns certificate of the task', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockCertificateComposition)],
+        [JSON.stringify(mockCertificate)]
+      )
+
+      const certificate = await typeResolvers.TaskHistory.certificate(
+        mockTaskHistory
+      )
+      expect(certificate).toBeDefined()
+      expect(certificate.id).toBe('5ebdd50a-6180-4aa2-abbe-941442e7cbe7')
+    })
+
+    it('returns informant of the task', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockCertificateComposition)],
+        [JSON.stringify(mockRelatedPerson)]
+      )
+
+      const informant = await typeResolvers.TaskHistory.certificate(
+        mockTaskHistory
+      )
+      expect(informant).toBeDefined()
+      expect(informant.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
+    })
+  })
+
+  describe('Certificate type', () => {
+    it('returns collector of the certificate', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
+
+      const relatedPerson = await typeResolvers.Certificate.collector(
+        mockCertificate
+      )
+      expect(relatedPerson).toBeDefined()
+      expect(relatedPerson.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
+    })
   })
 })
