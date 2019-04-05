@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import Backspace from '../icons/Backspace'
+import { Backspace } from '../icons/Backspace'
 
 interface IProps {
   onComplete: (pin: string) => void
@@ -81,15 +81,16 @@ export class PINKeypad extends React.Component<IProps, IState> {
     return (
       <Container>
         <div>
-          {new Array(pin.length).fill('').map(() => (
-            <DotFilled key={Math.random()} />
+          {new Array(pin.length).fill('').map((e, i) => (
+            <DotFilled key={`dot-filled-${i}`} />
           ))}
-          {new Array(4 - pin.length).fill('').map(() => (
-            <DotUnfilled key={Math.random()} />
+          {new Array(4 - pin.length).fill('').map((e, i) => (
+            <DotUnfilled key={`dot-unfilled-${i}`} />
           ))}
         </div>
         <NumberContainer>
           <Key
+            id="keypad-1"
             onClick={() => {
               this.keyPress(1)
             }}
@@ -97,6 +98,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             1
           </Key>
           <Key
+            id="keypad-2"
             onClick={() => {
               this.keyPress(2)
             }}
@@ -104,6 +106,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             2
           </Key>
           <Key
+            id="keypad-3"
             onClick={() => {
               this.keyPress(3)
             }}
@@ -111,6 +114,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             3
           </Key>
           <Key
+            id="keypad-4"
             onClick={() => {
               this.keyPress(4)
             }}
@@ -118,6 +122,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             4
           </Key>
           <Key
+            id="keypad-5"
             onClick={() => {
               this.keyPress(5)
             }}
@@ -125,6 +130,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             5
           </Key>
           <Key
+            id="keypad-6"
             onClick={() => {
               this.keyPress(6)
             }}
@@ -132,6 +138,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             6
           </Key>
           <Key
+            id="keypad-7"
             onClick={() => {
               this.keyPress(7)
             }}
@@ -139,6 +146,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             7
           </Key>
           <Key
+            id="keypad-8"
             onClick={() => {
               this.keyPress(8)
             }}
@@ -146,14 +154,16 @@ export class PINKeypad extends React.Component<IProps, IState> {
             8
           </Key>
           <Key
+            id="keypad-9"
             onClick={() => {
               this.keyPress(9)
             }}
           >
             9
           </Key>
-          <Key>&nbsp;</Key>
+          <Key id="keypad-blank">&nbsp;</Key>
           <Key
+            id="keypad-0"
             onClick={() => {
               this.keyPress(0)
             }}
@@ -161,6 +171,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             0
           </Key>
           <Key
+            id="keypad-backspace"
             onClick={() => {
               this.keyPress(-1)
             }}

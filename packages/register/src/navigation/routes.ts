@@ -25,3 +25,4 @@ export const WORK_QUEUE = '/work-queue'
 export const WORK_QUEUE_TAB = '/work-queue/:tabId'
 
 export const UNLOCK_SCREEN = '/unlock'
+export const CREATE_PIN = '/create-pin'

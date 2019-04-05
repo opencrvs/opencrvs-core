@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-const Backspace = (props: React.HTMLAttributes<SVGElement>) => (
+export const Backspace = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={34} height={21} fill="none" {...props}>
     <path
       d="M1 11l8.707 8.707a1 1 0 0 0 .707.293H32.5V1H10.445a1 1 0 0 0-.743.331L1 11z"
@@ -19,5 +19,3 @@ const Backspace = (props: React.HTMLAttributes<SVGElement>) => (
     />
   </svg>
 )
-
-export default Backspace
