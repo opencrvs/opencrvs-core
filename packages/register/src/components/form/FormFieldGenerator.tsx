@@ -102,7 +102,7 @@ type GeneratedInputFieldProps = {
   resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
-  hideBorder: boolean
+
   error: string
 }
 
@@ -114,7 +114,6 @@ function GeneratedInputField({
   resetDependentSelectValues,
   error,
   touched,
-  hideBorder,
   value
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
@@ -128,7 +127,7 @@ function GeneratedInputField({
     hideAsterisk: fieldDefinition.hideAsterisk,
     error,
     touched,
-    hideBorder: fieldDefinition.hideBorder
+    mode: fieldDefinition.mode
   }
 
   const inputProps = {
@@ -138,8 +137,7 @@ function GeneratedInputField({
     value,
     disabled: fieldDefinition.disabled,
     error: Boolean(error),
-    touched: Boolean(touched),
-    hideBorder: Boolean(hideBorder)
+    touched: Boolean(touched)
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
@@ -154,7 +152,6 @@ function GeneratedInputField({
             onSetFieldValue(fieldDefinition.name, val)
           }}
           options={fieldDefinition.options}
-          hideBorder={hideBorder}
         />
       </InputField>
     )
@@ -534,7 +531,6 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
-                      hideBorder={field.hideBorder || false}
                     />
                   )}
                 </Field>
@@ -557,7 +553,6 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
-                      hideBorder={field.hideBorder || false}
                     />
                   )}
                 </FastField>

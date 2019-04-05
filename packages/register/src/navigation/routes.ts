@@ -23,3 +23,5 @@ export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
 
 export const WORK_QUEUE = '/work-queue'
 export const WORK_QUEUE_TAB = '/work-queue/:tabId'
+
+export const CREATE_PIN = '/create-pin'
