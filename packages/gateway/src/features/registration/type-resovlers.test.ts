@@ -16,7 +16,8 @@ import {
   mockLocation,
   mockCertificate,
   mockCertificateComposition,
-  mockRelatedPerson
+  mockRelatedPerson,
+  mockTaskHistoryForError
 } from 'src/utils/testUtils'
 import { clone } from 'lodash'
 
@@ -1153,6 +1154,11 @@ describe('Registration type resolvers', () => {
       expect(user.resourceType).toBe('Practitioner')
     })
 
+    it('returns null as user of the task', async () => {
+      const user = await typeResolvers.TaskHistory.user(mockTaskHistoryForError)
+      expect(user).toBeNull()
+    })
+
     it('returns certificate of the task', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockCertificateComposition)],
@@ -1166,17 +1172,22 @@ describe('Registration type resolvers', () => {
       expect(certificate.id).toBe('5ebdd50a-6180-4aa2-abbe-941442e7cbe7')
     })
 
-    it('returns informant of the task', async () => {
+    it('throws error as certificate of the task', async () => {
+      expect(typeResolvers.TaskHistory.certificate({})).rejects.toThrowError(
+        'Task resource does not have a focus property necessary to lookup the composition'
+      )
+    })
+
+    it('returns null as certificate of the task', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockCertificateComposition)],
-        [JSON.stringify(mockRelatedPerson)]
+        [JSON.stringify(mockCertificate)]
       )
 
-      const informant = await typeResolvers.TaskHistory.certificate(
-        mockTaskHistory
+      const certificate = await typeResolvers.TaskHistory.certificate(
+        mockTaskHistoryForError
       )
-      expect(informant).toBeDefined()
-      expect(informant.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
+      expect(certificate).toBeNull()
     })
 
     it('returns location of the task', async () => {
@@ -1187,6 +1198,13 @@ describe('Registration type resolvers', () => {
       expect(location.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
     })
 
+    it('returns null as location of the task', async () => {
+      const location = await typeResolvers.TaskHistory.location(
+        mockTaskHistoryForError
+      )
+      expect(location).toBeNull()
+    })
+
     it('returns office of the task', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockLocation))
 
@@ -1194,6 +1212,13 @@ describe('Registration type resolvers', () => {
       expect(office).toBeDefined()
       expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
     })
+  })
+
+  it('returns null as office of the task', async () => {
+    const office = await typeResolvers.TaskHistory.office(
+      mockTaskHistoryForError
+    )
+    expect(office).toBeNull()
   })
 
   describe('Certificate type', () => {
