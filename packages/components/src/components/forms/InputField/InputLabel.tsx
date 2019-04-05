@@ -4,6 +4,7 @@ import styled, { StyledFunction } from 'styled-components'
 export type IInputLabel = {
   disabled?: boolean
   ignoreMediaQuery?: boolean
+  color?: string
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const styledInputLabel = styled.label.attrs<IInputLabel>({})
@@ -11,9 +12,8 @@ const styledInputLabel = styled.label.attrs<IInputLabel>({})
 const StyledInputLabel = styledInputLabel`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.accent};
-
+  color: ${({ color, disabled, theme }) =>
+    disabled ? theme.colors.disabled : color ? color : theme.colors.accent} ;
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
