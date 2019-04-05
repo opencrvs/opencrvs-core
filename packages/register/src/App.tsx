@@ -30,6 +30,7 @@ import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScree
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
+import { CreatePin } from './views/PIN/CreatePin'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -76,48 +77,40 @@ export class App extends React.Component<IAppProps> {
                               path={routes.DRAFT_BIRTH_PARENT_FORM}
                               component={ApplicationForm}
                             />
-
                             <ProtectedRoute
                               exact
                               path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
                               component={ApplicationForm}
                             />
-
                             <ProtectedRoute
                               exact
                               path={routes.DRAFT_DEATH_FORM}
                               component={ApplicationForm}
                             />
-
                             <ProtectedRoute
                               exact
                               path={routes.DRAFT_DEATH_FORM_TAB}
                               component={ApplicationForm}
                             />
-
                             <ProtectedRoute
                               exact
                               path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
                               component={ReviewForm}
                             />
-
                             <ProtectedRoute
                               exact
                               path={routes.WORK_QUEUE}
                               component={WorkQueue}
                             />
-
                             <ProtectedRoute
                               exact
                               path={routes.WORK_QUEUE_TAB}
                               component={WorkQueue}
                             />
-
                             <ProtectedRoute
                               path={routes.CONFIRMATION_SCREEN}
                               component={ConfirmationScreen}
                             />
-
                             <ProtectedRoute
                               path={routes.SEARCH_RESULT}
                               component={SearchResult}
@@ -126,7 +119,6 @@ export class App extends React.Component<IAppProps> {
                               path={routes.MY_RECORDS}
                               component={MyRecords}
                             />
-
                             <ProtectedRoute
                               path={routes.MY_DRAFTS}
                               component={MyDrafts}
@@ -138,6 +130,10 @@ export class App extends React.Component<IAppProps> {
                             <ProtectedRoute
                               path={routes.PRINT_CERTIFICATE}
                               component={PrintCertificateAction}
+                            />
+                            <ProtectedRoute
+                              path={routes.CREATE_PIN}
+                              component={CreatePin}
                             />
                           </Switch>
                         </ProtectedPage>
