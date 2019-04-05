@@ -1038,7 +1038,7 @@ describe('SearchResult tests', async () => {
                               state: 'iuyiuy'
                             }
                           },
-                          type: 'COLLECTED',
+                          type: 'CERTIFIED',
                           comments: [
                             {
                               comment: ''
@@ -1107,7 +1107,7 @@ describe('SearchResult tests', async () => {
                       state: 'iuyiuy'
                     }
                   },
-                  type: 'COLLECTED',
+                  type: 'CERTIFIED',
                   certificate: {
                     collector: {
                       individual: {
@@ -1123,7 +1123,15 @@ describe('SearchResult tests', async () => {
                     }
                   },
                   comments: null,
-                  informant: null
+                  informant: {
+                    telecom: [
+                      {
+                        use: null,
+                        system: 'phone',
+                        value: '01686972106'
+                      }
+                    ]
+                  }
                 }
               ]
             }
@@ -1159,7 +1167,248 @@ describe('SearchResult tests', async () => {
       testComponent.component.update()
 
       expect(
-        testComponent.component.find('#COLLECTED-0').hostNodes().length
+        testComponent.component.find('#CERTIFIED-0').hostNodes().length
+      ).toBe(1)
+
+      testComponent.component.unmount()
+    })
+
+    it('renders collected section after expanding in collector english name not present', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_REGISTRATION_QUERY,
+            variables: {
+              locationIds: ['123456789'],
+              skip: 0,
+              count: 10
+            }
+          },
+          result: {
+            data: {
+              listEventRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    registration: {
+                      id: '123',
+                      registrationNumber: null,
+                      trackingId: 'B111111',
+                      type: '',
+                      duplicates: null,
+                      status: [
+                        {
+                          id: '123',
+                          timestamp: null,
+                          user: {
+                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                            name: [
+                              {
+                                use: 'en',
+                                firstNames: 'Mohammad',
+                                familyName: 'Ashraful'
+                              },
+                              {
+                                use: 'bn',
+                                firstNames: '',
+                                familyName: ''
+                              }
+                            ],
+                            role: 'LOCAL_REGISTRAR'
+                          },
+                          location: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: ['']
+                          },
+                          office: {
+                            id: '123',
+                            name: 'Kaliganj Union Sub Center',
+                            alias: [''],
+                            address: {
+                              district: '7876',
+                              state: 'iuyiuy'
+                            }
+                          },
+                          type: '',
+                          comments: [
+                            {
+                              comment: ''
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    child: {
+                      id: '123',
+                      name: [
+                        {
+                          use: null,
+                          firstNames: 'Baby',
+                          familyName: 'Doe'
+                        }
+                      ],
+                      birthDate: null
+                    },
+                    createdAt: '2018-05-23T14:44:58+02:00'
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          request: {
+            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            variables: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+            }
+          },
+          result: {
+            data: {
+              queryTaskHistory: [
+                {
+                  timestamp: '2019-04-03T07:08:24.936Z',
+                  user: {
+                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: 'মোহাম্মদ',
+                        familyName: 'আশরাফুল'
+                      }
+                    ],
+                    role: ''
+                  },
+                  location: {
+                    id: '123',
+                    name: 'Kaliganj Union Sub Center',
+                    alias: ['']
+                  },
+                  office: {
+                    id: '123',
+                    name: '',
+                    alias: ['Kaliganj Union Sub Center'],
+                    address: {
+                      district: '7876',
+                      state: 'iuyiuy'
+                    }
+                  },
+                  type: 'CERTIFIED',
+                  certificate: {
+                    collector: {
+                      individual: {
+                        name: [
+                          {
+                            use: 'bn',
+                            firstNames: 'তৌফিক',
+                            familyName: 'শাহরিয়ার'
+                          }
+                        ]
+                      },
+                      relationship: 'OTHER'
+                    }
+                  },
+                  comments: null,
+                  informant: {
+                    telecom: [
+                      {
+                        use: null,
+                        system: 'phone',
+                        value: '01686972106'
+                      }
+                    ]
+                  }
+                },
+                {
+                  timestamp: '2019-04-03T07:08:24.936Z',
+                  user: {
+                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: 'মোহাম্মদ',
+                        familyName: 'আশরাফুল'
+                      }
+                    ],
+                    role: ''
+                  },
+                  location: {
+                    id: '123',
+                    name: 'Kaliganj Union Sub Center',
+                    alias: ['']
+                  },
+                  office: {
+                    id: '123',
+                    name: '',
+                    alias: ['Kaliganj Union Sub Center'],
+                    address: {
+                      district: '7876',
+                      state: 'iuyiuy'
+                    }
+                  },
+                  type: '',
+                  certificate: {
+                    collector: {
+                      individual: {
+                        name: [
+                          {
+                            use: 'bn',
+                            firstNames: 'তৌফিক',
+                            familyName: 'শাহরিয়ার'
+                          }
+                        ]
+                      },
+                      relationship: 'OTHER'
+                    }
+                  },
+                  comments: null,
+                  informant: {
+                    telecom: [
+                      {
+                        use: null,
+                        system: 'phone',
+                        value: '01686972106'
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <SearchResult />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+      const instance = testComponent.component
+        .find(DataTable)
+        .find(ListItem)
+        .instance() as any
+
+      instance.toggleExpanded()
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+
+      expect(
+        testComponent.component.find('#CERTIFIED-0').hostNodes().length
       ).toBe(1)
 
       testComponent.component.unmount()

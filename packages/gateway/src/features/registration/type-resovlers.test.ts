@@ -1178,6 +1178,22 @@ describe('Registration type resolvers', () => {
       expect(informant).toBeDefined()
       expect(informant.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
     })
+
+    it('returns location of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+
+      const location = await typeResolvers.TaskHistory.location(mockTaskHistory)
+      expect(location).toBeDefined()
+      expect(location.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
+    })
+
+    it('returns office of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+
+      const office = await typeResolvers.TaskHistory.office(mockTaskHistory)
+      expect(office).toBeDefined()
+      expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
+    })
   })
 
   describe('Certificate type', () => {

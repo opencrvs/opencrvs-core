@@ -782,6 +782,7 @@ export const mockFhirBundle = {
 
 export const mockLocation = {
   fullUrl: 'urn:uuid:<uuid>',
+  id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
   resource: {
     resourceType: 'Location',
     status: 'active',
@@ -1325,11 +1326,15 @@ export const mockTaskHistory = {
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastLocation',
-      valueReference: { reference: 'Location/123' }
+      valueReference: {
+        reference: 'Location/43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+      }
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
-      valueReference: { reference: 'Location/123' }
+      valueReference: {
+        reference: 'Location/43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+      }
     },
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',

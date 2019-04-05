@@ -61,7 +61,8 @@ import {
   CERTIFICATE_DATE_FORMAT,
   REJECTED,
   REASON,
-  DECLARED
+  DECLARED,
+  EN
 } from 'src/utils/constants'
 import {
   FETCH_TASK_HISTORY_BY_COMPOSITION,
@@ -558,7 +559,7 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return (
           <StatusIcon>
             <StatusOrange />
@@ -593,7 +594,7 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return this.props.intl.formatMessage(messages.application)
       case 'REGISTERED':
         return this.props.intl.formatMessage(messages.registered)
@@ -608,7 +609,7 @@ export class SearchResultView extends React.Component<
 
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return messages.workflowStatusDateApplication
       case 'REGISTERED':
         return messages.workflowStatusDateRegistered
@@ -812,7 +813,7 @@ export class SearchResultView extends React.Component<
           (collector &&
             collector.individual &&
             (createNamesMap(collector.individual.name as GQLHumanName[])[
-              ''
+              EN
             ] as string)) ||
           '',
         collectorType: collector && collector.relationship,
@@ -843,8 +844,7 @@ export class SearchResultView extends React.Component<
             moment.locale(language)
             if (error) {
               Sentry.captureException(error)
-            }
-            if (loading) {
+            } else if (loading) {
               return (
                 <ExpansionSpinnerContainer>
                   <ListItemExpansionSpinner
