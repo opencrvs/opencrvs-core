@@ -934,6 +934,13 @@ export const BENGALI_STATE: ILanguage = {
     'validations.greaterThanZero': '0 (শূন্য) থেকে বড় হতে হবে',
     'register.SearchResult.title': 'অনুসন্ধান',
     'register.registerForm.queryError':
-      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি  এই মুহূর্তে  লোড করা সম্ভব হচ্ছে  না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ  করুন, অথবা পুনরায়  চেষ্টা করুন।'
+      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি  এই মুহূর্তে  লোড করা সম্ভব হচ্ছে  না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ  করুন, অথবা পুনরায়  চেষ্টা করুন।',
+    'createPIN.createTitle': 'Create a PIN',
+    'createPIN.createDescription':
+      "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
+    'createPIN.pinMatchError': 'PIN code did not match. Please try again.',
+    'createPIN.reEnterTitle': 'Re-enter your new PIN',
+    'createPIN.reEnterDescription':
+      "Let's make sure we collected your PIN correctly."
   }
 }
