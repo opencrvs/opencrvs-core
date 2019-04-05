@@ -82,10 +82,10 @@ export class PINKeypad extends React.Component<IProps, IState> {
       <Container>
         <div>
           {new Array(pin.length).fill('').map(() => (
-            <DotFilled />
+            <DotFilled key={Math.random()} />
           ))}
           {new Array(4 - pin.length).fill('').map(() => (
-            <DotUnfilled />
+            <DotUnfilled key={Math.random()} />
           ))}
         </div>
         <NumberContainer>
