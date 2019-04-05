@@ -4,4 +4,5 @@ export const USER_MANAGEMENT_URL =
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
+export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const COUNTRY = process.env.COUNTRY || 'bgd'

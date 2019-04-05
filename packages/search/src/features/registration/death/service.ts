@@ -35,33 +35,28 @@ export async function upsertEvent(bundle: fhir.Bundle) {
     throw new Error('Composition not found')
   }
 
-  const task = findTask(bundleEntries)
-  const trackingIdIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/death-tracking-id'
-  )
-  const compositionIdentifier =
-    trackingIdIdentifier && trackingIdIdentifier.value
+  const compositionId = composition.id
 
-  if (!compositionIdentifier) {
-    throw new Error(`Composition Identifier not found`)
+  if (!compositionId) {
+    throw new Error(`Composition ID not found`)
   }
 
-  indexDeclaration(compositionIdentifier, composition, bundleEntries)
+  indexDeclaration(compositionId, composition, bundleEntries)
 }
 
 async function updateEvent(task: fhir.Task) {
-  const trackingIdIdentifier = findTaskIdentifier(
-    task,
-    'http://opencrvs.org/specs/id/death-tracking-id'
-  )
-  const trackingId = trackingIdIdentifier && trackingIdIdentifier.value
+  const compositionId =
+    task &&
+    task.focus &&
+    task.focus.reference &&
+    task.focus.reference.split('/')[1]
 
-  if (!trackingId) {
-    throw new Error('Tracking ID not found')
+  if (!compositionId) {
+    throw new Error('No Composition ID found')
   }
 
   const body: ICompositionBody = {}
+
   body.type =
     task &&
     task.businessStatus &&
@@ -72,18 +67,18 @@ async function updateEvent(task: fhir.Task) {
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
   body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
 
-  await updateComposition(trackingId, body)
+  await updateComposition(compositionId, body)
 }
 
 async function indexDeclaration(
-  compositionIdentifier: string,
+  compositionId: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const body: ICompositionBody = { event: EVENT.DEATH }
 
   createIndexBody(body, composition, bundleEntries)
-  await indexComposition(compositionIdentifier, body)
+  await indexComposition(compositionId, body)
 }
 
 function createIndexBody(
@@ -168,5 +163,6 @@ function createApplicationIndex(
   body.applicationLocationId =
     placeOfApplicationExtension &&
     placeOfApplicationExtension.valueReference &&
-    placeOfApplicationExtension.valueReference.reference
+    placeOfApplicationExtension.valueReference.reference &&
+    placeOfApplicationExtension.valueReference.reference.split('/')[1]
 }

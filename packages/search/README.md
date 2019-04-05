@@ -1,4 +1,4 @@
-# OpenCRVS De-Duplication Service
+# OpenCRVS Search Service
 
 A microservice to perform the de duplication process
 
