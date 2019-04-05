@@ -15,12 +15,7 @@ import { TextInput, InputField } from '@opencrvs/components/lib/forms'
 import { stepTwoFields } from './stepTwoFields'
 
 import { store } from '../../App'
-import {
-  ErrorText,
-  Title,
-  FormWrapper,
-  ActionWrapper
-} from '../StepOne/StepOneForm'
+import { ErrorText, Title, FormWrapper } from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
@@ -85,6 +80,16 @@ const FieldWrapper = styled.div`
   &:last-child {
     margin-right: 0%;
   }
+`
+/**
+ * This ActionWrapper should be removed and replaced by imported ActionWrapper
+ * from StepOneForm when styling updates will take place in StepTwoFrom
+ */
+
+const ActionWrapper = styled.div`
+  position: relative;
+  margin-top: 10px;
+  display: flex;
 `
 
 const Separator = styled.div`

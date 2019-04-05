@@ -19,7 +19,7 @@ background: ${({ theme }) =>
   flex-direction: column; 
 
   ${({ submitting }) =>
-    submitting && `justify-content: center; align-items: center`};
+    submitting && `justify-content: center; align-items: center;`}
 
   * {
     box-sizing: border-box;
@@ -94,7 +94,7 @@ export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
             <Spinner
               id="login-submitting-spinner"
               baseColor={
-                getTheme(window.config.COUNTRY).colors.headerGradientLight
+                getTheme(window.config.COUNTRY).colors.headerGradientDark
               }
             />
           ) : (

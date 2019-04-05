@@ -6,7 +6,11 @@ import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
 
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
 
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import {
+  InputField,
+  TextInput,
+  THEME_MODE
+} from '@opencrvs/components/lib/forms'
 
 import { stepOneFields } from './stepOneFields'
 
@@ -166,6 +170,7 @@ const MobileInput = injectIntl((props: Props) => {
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
+      mode={THEME_MODE.DARK}
     >
       <TextInput
         {...mobileField}
@@ -191,6 +196,7 @@ const PasswordInput = injectIntl((props: Props) => {
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
+      mode={THEME_MODE.DARK}
     >
       <TextInput
         {...passwordField}
