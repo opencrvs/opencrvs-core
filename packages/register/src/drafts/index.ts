@@ -136,7 +136,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
   action: Action
 ): IDraftsState | Loop<IDraftsState, Action> => {
-  console.log(action.type)
+  console.log(action.type, state.drafts, action)
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -193,6 +193,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       )
     case WRITE_DRAFT:
       if (state.initialDraftsLoaded && state.drafts) {
+        console.log('action.payload.draft', action.payload.draft.drafts)
         writeDraftByUser('userID', action.payload.draft.drafts)
       }
       return state
@@ -242,24 +243,41 @@ async function getDraftsOfUser(userID: string): Promise<string> {
   return JSON.stringify(drafts)
 }
 
-async function writeDraftByUser(
-  userID: string,
-  newDrafts: IDraft[]
-): Promise<void> {
+async function writeDraftByUser(userID: string, newDrafts: IDraft[]) {
   console.log('writeDraftByUser')
+  console.log('NEW DRAFTS', newDrafts)
+  const str = await storage.getItem('USER_DATA')
+  console.log('str.length', str)
   const AllUserData: IUserData[] =
-    (JSON.parse(await storage.getItem('USER_DATA')) as IUserData[]) || []
-  const currentUserData = AllUserData.find(user => user.userID === userID)
-  if (!currentUserData) {
-    AllUserData.concat({
-      userID: 'userID',
+    str === '[]' ? [] : (JSON.parse(str) as IUserData[])
+  const max = AllUserData.length
+  let currentUserData: IUserData | null = null
+  for (let i = 0; i < max; i++) {
+    if (AllUserData[i].userID === userID) {
+      currentUserData = AllUserData[i]
+      break
+    }
+  }
+  if (currentUserData != null) {
+    currentUserData.drafts = newDrafts
+  } else {
+    AllUserData.push({
+      userID,
       userPIN: 1212,
       drafts: newDrafts
     })
-  } else {
-    currentUserData.drafts = newDrafts
   }
-  storage
-    .setItem('USER_DATA', JSON.stringify(AllUserData))
-    .then(() => AllUserData && console.log('New USER_DATA has been set'))
+
+  console.log(
+    'currentUserData.drafts',
+    currentUserData ? currentUserData.drafts : null
+  )
+
+  AllUserData.forEach(uDet => {
+    if (uDet.userID === userID) {
+      uDet = currentUserData as IUserData
+    }
+  })
+  console.log('AllUserData', AllUserData)
+  storage.setItem('USER_DATA', JSON.stringify(AllUserData))
 }
