@@ -79,7 +79,7 @@ describe('when user has starts a new application', () => {
 
     describe('when user enters childBirthDate and clicks to documents tab', () => {
       beforeEach(async () => {
-        Date.now = jest.fn(() => 1549607679507)
+        Date.now = jest.fn(() => 1549607679507) // 08-02-2019
         app
           .find('#childBirthDate-dd')
           .hostNodes()

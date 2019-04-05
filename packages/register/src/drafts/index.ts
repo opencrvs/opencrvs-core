@@ -174,6 +174,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       const stateAfterDraftModification = {
         ...state,
         drafts: state.drafts.map(draft => {
+          // TODO could improve this by saving drafts as a map
           if (draft.id === action.payload.draft.id) {
             return action.payload.draft
           }

@@ -3,11 +3,11 @@ import { resolve } from 'url'
 import { ILocation } from 'src/offline/reducer'
 
 export interface ILocationDataResponse {
-  data: ILocation[]
+  data: { [key: string]: ILocation }
 }
 
 export interface IFacilitiesDataResponse {
-  data: ILocation[]
+  data: { [key: string]: ILocation }
 }
 
 async function loadLocations(): Promise<any> {

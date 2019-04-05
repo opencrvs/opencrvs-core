@@ -5,6 +5,7 @@ export interface IInputError {
   id: string
   centred: boolean
   ignoreMediaQuery?: boolean
+  color?: string
 }
 
 const styledErrorWrapper = styled.div.attrs<IInputError>({})
@@ -14,7 +15,7 @@ const InputErrorWrapper = styledErrorWrapper`
   width: 100%;
   display: inline-block;
   ${({ theme }) => theme.fonts.infoFontStyle}
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme, color }) => (color ? color : theme.colors.error)};
   text-align: ${({ centred }) => (!centred ? 'center' : 'left')};
 
   ${({ ignoreMediaQuery, theme }) => {

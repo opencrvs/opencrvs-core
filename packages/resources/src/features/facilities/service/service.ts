@@ -1,15 +1,7 @@
 import fetch from 'node-fetch'
 import { generateLocationResource } from '../scripts/service'
 import { FHIR_URL } from 'src/constants'
-
-export interface ILocation {
-  id: string
-  name: string
-  nameBn: string
-  physicalType: string
-  type: string
-  partOf: string
-}
+import { ILocation } from 'src/features/utils/bn'
 
 export interface ILocationDataResponse {
   data: ILocation[]
@@ -26,16 +18,36 @@ export async function getFacilities(): Promise<ILocationDataResponse> {
   const locationBundleCRVSOffices = await resCRVSOffices.json()
   const locationBundleHealthFacilities = await resHealthFacilities.json()
 
+  const facilities = locationBundleCRVSOffices.entry.reduce(
+    (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
+      if (!entry.resource || !entry.resource.id) {
+        throw new Error('Resource in entry not valid')
+      }
+
+      accumulator[entry.resource.id] = generateLocationResource(
+        entry.resource as fhir.Location
+      )
+      return accumulator
+    },
+    {}
+  )
+
+  locationBundleHealthFacilities.entry.reduce(
+    (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
+      if (!entry.resource || !entry.resource.id) {
+        throw new Error('Resource in entry not valid')
+      }
+
+      accumulator[entry.resource.id] = generateLocationResource(
+        entry.resource as fhir.Location
+      )
+      return accumulator
+    },
+    facilities
+  )
+
   const locations = {
-    data: locationBundleCRVSOffices.entry
-      .map((entry: fhir.BundleEntry) =>
-        generateLocationResource(entry.resource as fhir.Location)
-      )
-      .concat(
-        locationBundleHealthFacilities.entry.map((entry: fhir.BundleEntry) =>
-          generateLocationResource(entry.resource as fhir.Location)
-        )
-      )
+    data: facilities
   }
 
   return locations

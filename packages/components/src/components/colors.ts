@@ -36,5 +36,6 @@ export const colors = {
   disabledTab: '#C4C9D4',
   offlineBoxText: '#747987',
   offlineBoxTitle: '#41485F',
-  seperatorBorder: '#f7f7f7'
+  seperatorBorder: '#f7f7f7',
+  creamCan: '#EDC55E'
 }

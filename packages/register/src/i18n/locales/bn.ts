@@ -940,6 +940,13 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.issuedBy': 'প্রদান',
     'register.SearchResult.collectedBy': 'সংগৃহীত',
     'register.SearchResult.rejectReason': 'কারণ',
-    'register.SearchResult.informantContact': 'তথ্যদাতার যোগাযোগ নম্বর'
+    'register.SearchResult.informantContact': 'তথ্যদাতার যোগাযোগ নম্বর',
+    'createPIN.createTitle': 'Create a PIN',
+    'createPIN.createDescription':
+      "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
+    'createPIN.pinMatchError': 'PIN code did not match. Please try again.',
+    'createPIN.reEnterTitle': 'Re-enter your new PIN',
+    'createPIN.reEnterDescription':
+      "Let's make sure we collected your PIN correctly."
   }
 }

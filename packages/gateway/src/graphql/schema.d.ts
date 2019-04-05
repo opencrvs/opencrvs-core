@@ -21,6 +21,7 @@ export interface GQLQuery {
   fetchEventRegistration?: GQLEventRegistration
   listEventRegistrations?: GQLEventRegResultSet
   countEventRegistrations?: GQLRegistrationCount
+  searchEvents?: GQLEventSearchResultSet
   queryTaskHistory?: Array<GQLTaskHistory | null>
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
@@ -456,6 +457,40 @@ export interface GQLRegistrationCount {
   rejected?: number
 }
 
+export interface GQLEventSearchResultSet {
+  results?: Array<GQLEventSearchSet | null>
+  totalItems?: number
+}
+
+export interface GQLEventSearchSet {
+  id: string
+  type?: string
+  registration?: GQLRegistrationSearchSet
+}
+
+/** Use this to resolve interface type EventSearchSet */
+export type GQLPossibleEventSearchSetTypeNames =
+  | 'BirthEventSearchSet'
+  | 'DeathEventSearchSet'
+
+export interface GQLEventSearchSetNameMap {
+  EventSearchSet: GQLEventSearchSet
+  BirthEventSearchSet: GQLBirthEventSearchSet
+  DeathEventSearchSet: GQLDeathEventSearchSet
+}
+
+export interface GQLRegistrationSearchSet {
+  status?: string
+  contactNumber?: string
+  dateOfApplication?: GQLDate
+  trackingId?: string
+  registrationNumber?: string
+  eventLocationId?: string
+  registeredLocationId?: string
+  reason?: string
+  comment?: string
+}
+
 export interface GQLTaskHistory {
   id: string
   type?: GQLRegStatus
@@ -680,6 +715,22 @@ export interface GQLDummy {
   dummy: string
 }
 
+export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
+  id: string
+  type?: string
+  childName?: Array<GQLHumanName | null>
+  dateOfBirth?: GQLDate
+  registration?: GQLRegistrationSearchSet
+}
+
+export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
+  id: string
+  type?: string
+  deceasedName?: Array<GQLHumanName | null>
+  dateOfDeath?: GQLDate
+  registration?: GQLRegistrationSearchSet
+}
+
 /*********************************
  *                               *
  *         TYPE RESOLVERS        *
@@ -721,9 +772,17 @@ export interface GQLResolver {
   DeathRegResultSet?: GQLDeathRegResultSetTypeResolver
   EventRegResultSet?: GQLEventRegResultSetTypeResolver
   RegistrationCount?: GQLRegistrationCountTypeResolver
+  EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
+  EventSearchSet?: {
+    __resolveType: GQLEventSearchSetTypeResolver
+  }
+
+  RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   TaskHistory?: GQLTaskHistoryTypeResolver
   Mutation?: GQLMutationTypeResolver
   Dummy?: GQLDummyTypeResolver
+  BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
+  DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -738,6 +797,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   listEventRegistrations?: QueryToListEventRegistrationsResolver<TParent>
   countEventRegistrations?: QueryToCountEventRegistrationsResolver<TParent>
+  searchEvents?: QueryToSearchEventsResolver<TParent>
   queryTaskHistory?: QueryToQueryTaskHistoryResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
@@ -883,7 +943,6 @@ export interface QueryToFetchEventRegistrationResolver<
 export interface QueryToListEventRegistrationsArgs {
   locationIds?: Array<string | null>
   status?: string
-  userId?: string
   from?: GQLDate
   to?: GQLDate
   count?: number
@@ -911,6 +970,24 @@ export interface QueryToCountEventRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToCountEventRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToSearchEventsArgs {
+  locationIds?: Array<string | null>
+  status?: string
+  searchContent?: string
+  eventType?: string
+  count?: number
+  skip?: number
+  sort?: string
+}
+export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToSearchEventsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2006,6 +2083,109 @@ export interface RegistrationCountToRejectedResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLEventSearchResultSetTypeResolver<TParent = any> {
+  results?: EventSearchResultSetToResultsResolver<TParent>
+  totalItems?: EventSearchResultSetToTotalItemsResolver<TParent>
+}
+
+export interface EventSearchResultSetToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventSearchResultSetToTotalItemsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventSearchSetTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'BirthEventSearchSet'
+    | 'DeathEventSearchSet'
+}
+export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
+  status?: RegistrationSearchSetToStatusResolver<TParent>
+  contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
+  dateOfApplication?: RegistrationSearchSetToDateOfApplicationResolver<TParent>
+  trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
+  registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<
+    TParent
+  >
+  eventLocationId?: RegistrationSearchSetToEventLocationIdResolver<TParent>
+  registeredLocationId?: RegistrationSearchSetToRegisteredLocationIdResolver<
+    TParent
+  >
+  reason?: RegistrationSearchSetToReasonResolver<TParent>
+  comment?: RegistrationSearchSetToCommentResolver<TParent>
+}
+
+export interface RegistrationSearchSetToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToDateOfApplicationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToRegistrationNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToEventLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToRegisteredLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToReasonResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToCommentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLTaskHistoryTypeResolver<TParent = any> {
   id?: TaskHistoryToIdResolver<TParent>
   type?: TaskHistoryToTypeResolver<TParent>
@@ -2297,5 +2477,85 @@ export interface GQLDummyTypeResolver<TParent = any> {
 }
 
 export interface DummyToDummyResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
+  id?: BirthEventSearchSetToIdResolver<TParent>
+  type?: BirthEventSearchSetToTypeResolver<TParent>
+  childName?: BirthEventSearchSetToChildNameResolver<TParent>
+  dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
+  registration?: BirthEventSearchSetToRegistrationResolver<TParent>
+}
+
+export interface BirthEventSearchSetToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthEventSearchSetToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthEventSearchSetToChildNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthEventSearchSetToDateOfBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLDeathEventSearchSetTypeResolver<TParent = any> {
+  id?: DeathEventSearchSetToIdResolver<TParent>
+  type?: DeathEventSearchSetToTypeResolver<TParent>
+  deceasedName?: DeathEventSearchSetToDeceasedNameResolver<TParent>
+  dateOfDeath?: DeathEventSearchSetToDateOfDeathResolver<TParent>
+  registration?: DeathEventSearchSetToRegistrationResolver<TParent>
+}
+
+export interface DeathEventSearchSetToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathEventSearchSetToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathEventSearchSetToDeceasedNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathEventSearchSetToDateOfDeathResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }

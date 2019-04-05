@@ -5,6 +5,7 @@ import {
 import { GQLResolver } from 'src/graphql/schema'
 import {
   fetchFHIR,
+  postSearch,
   getIDFromResponse,
   getTrackingIdFromResponse,
   getRegistrationNumberFromResponse,
@@ -13,6 +14,7 @@ import {
 import { IAuthHeader } from 'src/common-types'
 import { hasScope } from 'src/features/user/utils'
 import { EVENT_TYPE } from '../fhir/constants'
+import { ISearchCriteria } from './search-type-resovlers'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -108,6 +110,45 @@ export const resolvers: GQLResolver = {
       return {
         declared: declaredBundle.totalItems,
         rejected: rejectedBundle.totalItems
+      }
+    },
+    async searchEvents(
+      _,
+      {
+        eventType,
+        status,
+        locationIds,
+        searchContent,
+        count = 10,
+        skip = 0,
+        sort = 'desc'
+      },
+      authHeader
+    ) {
+      const searchCriteria: ISearchCriteria = {
+        from: skip,
+        size: count,
+        sort
+      }
+      if (eventType) {
+        searchCriteria.event = eventType
+      }
+      if (status) {
+        searchCriteria.status = status
+      }
+      if (locationIds) {
+        searchCriteria.applicationLocationId = locationIds.join(',')
+      }
+      if (searchContent) {
+        searchCriteria.query = searchContent
+      }
+
+      const searchResult = await postSearch(authHeader, searchCriteria)
+      return {
+        totalItems:
+          (searchResult && searchResult.hits && searchResult.hits.total) || 0,
+        results:
+          (searchResult && searchResult.hits && searchResult.hits.hits) || []
       }
     }
   },
