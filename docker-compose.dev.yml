@@ -36,8 +36,14 @@ services:
   openhim-console:
     volumes:
       - './infrastructure/openhim-console-config.json:/usr/share/nginx/html/config/default.json'
+    ports:
+      - '8888:80'
 
   openhim-core:
+    ports:
+      - '8080:8080'
+      - '5000:5000'
+      - '5001:5001'
     extra_hosts:
       - 'gateway:${LOCAL_IP-172.17.0.1}'
       - 'workflow:${LOCAL_IP-172.17.0.1}'
