@@ -6,7 +6,10 @@ import { createStore } from 'src/store'
 describe('Login app > Secure Account Page', () => {
   it('Renders the secure account page successfully', () => {
     const { store } = createStore()
-    const component = createTestComponent(<SecureAccount />, store)
+    const component = createTestComponent(
+      <SecureAccount onComplete={() => null} />,
+      store
+    )
     const elem = component.component.find('#createPinBtn').hostNodes()
     expect(elem).toHaveLength(1)
   })
