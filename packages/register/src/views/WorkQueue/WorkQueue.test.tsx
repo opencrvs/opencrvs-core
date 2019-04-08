@@ -340,6 +340,7 @@ describe('WorkQueue tests', async () => {
     ).toContain('Sent for updates (5)')
   })
   it('renders all items returned from graphql query in ready for reivew', async () => {
+    Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
