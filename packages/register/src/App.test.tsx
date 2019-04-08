@@ -1,7 +1,14 @@
-import { createTestApp, mockOfflineData } from 'src/tests/util'
+import * as React from 'react'
+import {
+  createTestApp,
+  mockOfflineData,
+  createTestComponent
+} from 'src/tests/util'
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import { createClient } from 'src/utils/apolloClient'
 import * as actions from 'src/notification/actions'
+import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { createStore } from './store'
 
 const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -82,5 +89,52 @@ describe('when user has a valid token in local storage', () => {
 
   it("doesn't redirect user to SSO", async () => {
     expect(assign.mock.calls).toHaveLength(0)
+  })
+})
+
+describe('it handles react errors', () => {
+  const { store } = createStore()
+  it('displays react error page', () => {
+    function Problem() {
+      throw new Error('Error thrown.')
+      return <div>Error</div>
+    }
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <StyledErrorBoundary>
+        <Problem />
+      </StyledErrorBoundary>,
+      store
+    )
+    // @ts-ignore
+    expect(
+      testComponent.component.find('#GoToHomepage').hostNodes()
+    ).toHaveLength(1)
+  })
+})
+
+describe('it handles react unauthorized errors', () => {
+  const { store } = createStore()
+  it('displays react error page', () => {
+    function Problem() {
+      throw new Error('401')
+      return <div>Error</div>
+    }
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <StyledErrorBoundary>
+        <Problem />
+      </StyledErrorBoundary>,
+      store
+    )
+    // @ts-ignore
+    expect(
+      testComponent.component.find('#GoToHomepage').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component
+      .find('#GoToHomepage')
+      .hostNodes()
+      .simulate('click')
   })
 })
