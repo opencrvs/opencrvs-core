@@ -153,7 +153,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   render() {
     return (
-      <PageWrapper>
+      <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.toggleLogoutModal}>
           <span>Logout</span>
           <Logout />
