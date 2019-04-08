@@ -6,6 +6,8 @@ export const ENGLISH_STATE = {
     'login.mobileLabel': 'Mobile number',
     'login.mobilePlaceholder': '07123456789',
     'login.passwordLabel': 'Password',
+    'login.verficationCodeLabel':
+      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 5 minutes.',
     'login.submit': 'Submit',
     'login.forgotPassword': 'Forgot password',
     'login.submissionError':
@@ -25,7 +27,7 @@ export const ENGLISH_STATE = {
       "Analyse the performance of a particular area of your country in it's Civil Registration.",
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
-    'validations.numberRequired': 'Must be a number',
+    'validations.numberRequired': 'Must be number',
     'validations.phoneNumberFormat':
       'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.mobilePhoneRegex': '0[0-9]{9,10}',
