@@ -175,12 +175,12 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 export const Unlock = connect(
   (store: IStoreState) => ({
     userPin: '0000',
-    userDetails: getUserDetails(store)
-  }),
-  {
+    userDetails: getUserDetails(store),
     onCorrectPinMatch: () => {
       console.log('Pin Matched')
-    },
+    }
+  }),
+  {
     redirectToAuthentication
   }
 )(injectIntl<IFullProps>(UnlockView))
