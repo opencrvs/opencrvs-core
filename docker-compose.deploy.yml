@@ -174,7 +174,26 @@ services:
       - source: hearth-queryparam-extensions-conf.{{ts}}
         target: /src/hearth/config/queryparam-extensions.json
 
+  openhim-core:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.openhim-api.frontend.rule=Host: openhim-api.{{hostname}}'
+        - 'traefik.openhim-api.protocol=https'
+        - 'traefik.openhim-api.port=8080'
+        - 'traefik.router.frontend.rule=Host: api.{{hostname}}'
+        - 'traefik.router.port=5001'
+      replicas: 2
+
   openhim-console:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: openhim.{{hostname}}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
     configs:
       - source: openhim-console-conf.{{ts}}
         target: /usr/share/nginx/html/config/default.json
@@ -197,7 +216,7 @@ secrets:
 
 configs:
   openhim-console-conf.{{ts}}:
-    file: ./infrastructure/openhim-console-config.staging.json
+    file: ./infrastructure/openhim-console-config.deploy.json
   traefik.{{ts}}:
     file: ./infrastructure/traefik.toml
   hearth-check-dupe-plugin.{{ts}}:
