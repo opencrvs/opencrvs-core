@@ -2,18 +2,24 @@ import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
 import { SecureAccount } from 'src/views/SecureAccount/SecureAccountView'
 import { storage } from 'src/storage'
+import { connect } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router'
+import { IStoreState } from '@opencrvs/register/src/store'
+import { IUserDetails } from '../utils/userUtils'
+import { getUserDetails } from 'src/profile/profileSelectors'
+
 const SCREEN_LOCK = 'screenLock'
 interface IProtectPageProps {
-  children: React.ReactElement
+  userDetails: IUserDetails
 }
 interface IProtectPageState {
   secured: boolean
 }
-export class ProtectedPage extends React.Component<
-  IProtectPageProps,
+class ProtectedPageComponent extends React.Component<
+  RouteComponentProps<{}> & IProtectPageProps,
   IProtectPageState
 > {
-  constructor(props: IProtectPageProps) {
+  constructor(props: RouteComponentProps<{}> & IProtectPageProps) {
     super(props)
     this.state = {
       secured: true
@@ -28,7 +34,11 @@ export class ProtectedPage extends React.Component<
   }
 
   async handleVisibilityChange(isVisible: boolean) {
-    if (!isVisible && !(await storage.getItem(SCREEN_LOCK))) {
+    if (
+      this.props.userDetails.role === 'FIELD_AGENT' &&
+      !isVisible &&
+      !(await storage.getItem(SCREEN_LOCK))
+    ) {
       this.setState({
         secured: false
       })
@@ -41,13 +51,21 @@ export class ProtectedPage extends React.Component<
   }
 
   render() {
+    const { secured } = this.state
     return (
       <PageVisibility onChange={this.handleVisibilityChange}>
-        {(this.state.secured && this.props.children) ||
-          (!this.state.secured && (
-            <SecureAccount onComplete={this.markAsSecured} />
-          ))}
+        {(secured && this.props.children) ||
+          (!secured && <SecureAccount onComplete={this.markAsSecured} />)}
       </PageVisibility>
     )
   }
 }
+
+const mapStateToProps = (store: IStoreState): IProtectPageProps => {
+  return {
+    userDetails: getUserDetails(store) || {}
+  }
+}
+export const ProtectedPage = withRouter(
+  connect<IProtectPageProps, {}>(mapStateToProps)(ProtectedPageComponent)
+)
