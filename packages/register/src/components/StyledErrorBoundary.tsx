@@ -72,7 +72,7 @@ const messages = defineMessages({
 
 type IFullProps = InjectedIntlProps
 
-class ReactErrorBoundaryComponent extends React.Component<IFullProps> {
+class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   state = { error: null, authError: false }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -125,9 +125,9 @@ class ReactErrorBoundaryComponent extends React.Component<IFullProps> {
   }
 }
 
-export const ReactErrorBoundary = connect(
+export const StyledErrorBoundary = connect(
   (state: IStoreState) => ({
     language: state.i18n.language
   }),
   {}
-)(injectIntl(ReactErrorBoundaryComponent))
+)(injectIntl(StyledErrorBoundaryComponent))

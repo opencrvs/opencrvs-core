@@ -7,7 +7,7 @@ import {
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import { createClient } from 'src/utils/apolloClient'
 import * as actions from 'src/notification/actions'
-import { ReactErrorBoundary } from './components/ReactErrorBoundary'
+import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { createStore } from './store'
 
 const validToken =
@@ -101,9 +101,9 @@ describe('it handles react errors', () => {
     }
     const testComponent = createTestComponent(
       // @ts-ignore
-      <ReactErrorBoundary>
+      <StyledErrorBoundary>
         <Problem />
-      </ReactErrorBoundary>,
+      </StyledErrorBoundary>,
       store
     )
     // @ts-ignore
@@ -122,9 +122,9 @@ describe('it handles react unauthorized errors', () => {
     }
     const testComponent = createTestComponent(
       // @ts-ignore
-      <ReactErrorBoundary>
+      <StyledErrorBoundary>
         <Problem />
-      </ReactErrorBoundary>,
+      </StyledErrorBoundary>,
       store
     )
     // @ts-ignore

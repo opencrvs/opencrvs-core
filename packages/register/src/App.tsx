@@ -30,7 +30,7 @@ import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificat
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { CreatePin } from './views/PIN/CreatePin'
-import { ReactErrorBoundary } from './components/ReactErrorBoundary'
+import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -50,7 +50,7 @@ export class App extends React.Component<IAppProps> {
           <Provider store={this.props.store}>
             <I18nContainer>
               <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
-                <ReactErrorBoundary>
+                <StyledErrorBoundary>
                   <ConnectedRouter history={this.props.history}>
                     <ScrollToTop>
                       <SessionExpireConfirmation />
@@ -140,7 +140,7 @@ export class App extends React.Component<IAppProps> {
                       </NotificationComponent>
                     </ScrollToTop>
                   </ConnectedRouter>
-                </ReactErrorBoundary>
+                </StyledErrorBoundary>
               </ThemeProvider>
             </I18nContainer>
           </Provider>
