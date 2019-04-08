@@ -25,10 +25,13 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', (userType, options = {}) => {
-  indexedDB.deleteDatabase('OpenCRVS')
   const users = {
     fieldWorker: {
       mobile: '+8801711111111',
+      password: 'test'
+    },
+    registrar: {
+      mobile: '+8801733333333',
       password: 'test'
     }
   }
