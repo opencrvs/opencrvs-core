@@ -32,7 +32,7 @@ const ListItemSingleAction = styled(Button)`
 
 interface IListItemActionProps {
   actions: IAction[]
-  id: string
+  id?: string
   expanded?: boolean
   onExpand?: () => void
 }
