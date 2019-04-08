@@ -30,6 +30,7 @@ import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificat
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { CreatePin } from './views/PIN/CreatePin'
+import { SecureAccount } from './views/SecureAccount/SecureAccountView'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -132,6 +133,10 @@ export class App extends React.Component<IAppProps> {
                           <ProtectedRoute
                             path={routes.CREATE_PIN}
                             component={CreatePin}
+                          />
+                          <ProtectedRoute
+                            path={routes.SECURE_ACCOUNT}
+                            component={SecureAccount}
                           />
                         </Switch>
                       </Page>
