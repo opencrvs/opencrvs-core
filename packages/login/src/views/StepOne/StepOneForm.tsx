@@ -67,7 +67,7 @@ export const messages = defineMessages({
   }
 })
 
-const Container = styled.div`
+export const Container = styled.div`
   position: absolute;
   height: auto;
   top: 50%;
@@ -99,7 +99,7 @@ export const ActionWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `
-const LogoContainer = styled.div`
+export const LogoContainer = styled.div`
   flex-direction: row;
   display: flex;
   justify-content: center;
@@ -108,6 +108,8 @@ const LogoContainer = styled.div`
 export const Title = styled.div`
   margin: auto;
   margin-top: 30px;
+  color: ${({ theme }) => theme.colors.white};
+  text-align: center;
   width: 80%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 85%;
