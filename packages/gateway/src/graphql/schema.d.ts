@@ -22,7 +22,7 @@ export interface GQLQuery {
   listEventRegistrations?: GQLEventRegResultSet
   countEventRegistrations?: GQLRegistrationCount
   searchEvents?: GQLEventSearchResultSet
-  queryTaskHistory?: Array<GQLTaskHistory | null>
+  fetchRegistration?: GQLEventRegistration
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -491,18 +491,6 @@ export interface GQLRegistrationSearchSet {
   comment?: string
 }
 
-export interface GQLTaskHistory {
-  id: string
-  type?: GQLRegStatus
-  user?: GQLUser
-  timestamp?: GQLDate
-  location?: GQLLocation
-  office?: GQLLocation
-  comments?: Array<GQLComment | null>
-  certificate?: GQLCertificate
-  informant?: GQLPerson
-}
-
 export interface GQLMutation {
   createNotification: GQLNotification
   voidNotification?: GQLNotification
@@ -778,7 +766,6 @@ export interface GQLResolver {
   }
 
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
-  TaskHistory?: GQLTaskHistoryTypeResolver
   Mutation?: GQLMutationTypeResolver
   Dummy?: GQLDummyTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -798,7 +785,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listEventRegistrations?: QueryToListEventRegistrationsResolver<TParent>
   countEventRegistrations?: QueryToCountEventRegistrationsResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
-  queryTaskHistory?: QueryToQueryTaskHistoryResolver<TParent>
+  fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
@@ -993,13 +980,16 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface QueryToQueryTaskHistoryArgs {
+export interface QueryToFetchRegistrationArgs {
   id: string
 }
-export interface QueryToQueryTaskHistoryResolver<TParent = any, TResult = any> {
+export interface QueryToFetchRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
-    args: QueryToQueryTaskHistoryArgs,
+    args: QueryToFetchRegistrationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2183,57 +2173,6 @@ export interface RegistrationSearchSetToCommentResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLTaskHistoryTypeResolver<TParent = any> {
-  id?: TaskHistoryToIdResolver<TParent>
-  type?: TaskHistoryToTypeResolver<TParent>
-  user?: TaskHistoryToUserResolver<TParent>
-  timestamp?: TaskHistoryToTimestampResolver<TParent>
-  location?: TaskHistoryToLocationResolver<TParent>
-  office?: TaskHistoryToOfficeResolver<TParent>
-  comments?: TaskHistoryToCommentsResolver<TParent>
-  certificate?: TaskHistoryToCertificateResolver<TParent>
-  informant?: TaskHistoryToInformantResolver<TParent>
-}
-
-export interface TaskHistoryToIdResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToTypeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToUserResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToTimestampResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToLocationResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToOfficeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToCommentsResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToCertificateResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface TaskHistoryToInformantResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

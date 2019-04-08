@@ -1,58 +1,70 @@
 import gql from 'graphql-tag'
 
-export const FETCH_TASK_HISTORY_BY_COMPOSITION = gql`
-  query list($id: ID!) {
-    queryTaskHistory(id: $id) {
-      user {
+export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
+  query data($id: ID!) {
+    fetchRegistration(id: $id) {
+      id
+      registration {
         id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        role
-      }
-      location {
-        id
-        name
-        alias
-      }
-      office {
-        name
-        alias
-        address {
-          district
-          state
-        }
-      }
-      certificate {
-        collector {
-          individual {
+        status {
+          id
+          user {
+            id
             name {
               use
               firstNames
               familyName
             }
+            role
           }
+          location {
+            id
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+          type
+          timestamp
+          comments {
+            comment
+          }
+        }
 
-          relationship
+        certificates {
+          collector {
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+            }
+            relationship
+          }
         }
       }
-      comments {
-        comment
-      }
-      type
-      timestamp
-      informant {
-        telecom {
-          use
-          system
-          value
+      ... on DeathRegistration {
+        informant {
+          individual {
+            telecom {
+              use
+              system
+              value
+            }
+          }
         }
       }
     }
   }
 `
+
 export const FETCH_REGISTRATION_QUERY = gql`
   query list($locationIds: [String], $count: Int, $skip: Int) {
     listEventRegistrations(

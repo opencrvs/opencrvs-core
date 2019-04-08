@@ -11,7 +11,7 @@ import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { queries } from 'src/profile/queries'
 import { merge } from 'lodash'
 import {
-  FETCH_TASK_HISTORY_BY_COMPOSITION,
+  FETCH_REGISTRATION_BY_COMPOSITION,
   FETCH_REGISTRATION_QUERY
 } from './queries'
 
@@ -415,52 +415,59 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              queryTaskHistory: [
-                {
-                  timestamp: '2019-04-03T07:08:24.936Z',
-                  user: {
-                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  certificates: null,
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-04-03T07:08:24.936Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
                       },
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: ''
-                      }
-                    ],
-                    role: 'LOCAL_REGISTRAR'
-                  },
-                  location: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: ['']
-                  },
-                  office: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: [''],
-                    address: {
-                      district: '7876',
-                      state: 'iuyiuy'
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'DECLARED',
+                      comments: null
                     }
-                  },
-                  type: 'DECLARED',
-                  certificate: null,
-                  comments: null,
-                  informant: null
+                  ]
                 }
-              ]
+              }
             }
           }
         }
@@ -587,14 +594,17 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              queryTaskHistory: null
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: null
+              }
             }
           }
         }
@@ -721,54 +731,64 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              queryTaskHistory: [
-                {
-                  timestamp: '2019-04-03T07:08:24.936Z',
-                  user: {
-                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  certificates: null,
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-04-03T07:08:24.936Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
                       },
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: ''
-                      }
-                    ],
-                    role: 'LOCAL_REGISTRAR'
-                  },
-                  location: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: ['']
-                  },
-                  office: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: [''],
-                    address: {
-                      district: '7876',
-                      state: 'iuyiuy'
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'REJECTED',
+                      comments: [
+                        {
+                          comment: 'reason=duplicate&comment=dup'
+                        }
+                      ]
                     }
-                  },
-                  type: 'REJECTED',
-                  certificate: null,
-                  comments: {
-                    comment: 'reason=duplicate&comment=dup'
-                  },
-                  informant: null
-                }
-              ]
+                  ]
+                },
+                __typename: 'BirthRegistration'
+              }
             }
           }
         }
@@ -895,52 +915,59 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              queryTaskHistory: [
-                {
-                  timestamp: '2019-04-03T07:08:24.936Z',
-                  user: {
-                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  certificates: null,
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-04-03T07:08:24.936Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
                       },
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: ''
-                      }
-                    ],
-                    role: 'LOCAL_REGISTRAR'
-                  },
-                  location: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: ['']
-                  },
-                  office: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: [''],
-                    address: {
-                      district: '7876',
-                      state: 'iuyiuy'
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'REGISTERED',
+                      comments: null
                     }
-                  },
-                  type: 'REGISTERED',
-                  certificate: null,
-                  comments: null,
-                  informant: null
+                  ]
                 }
-              ]
+              }
             }
           }
         }
@@ -1067,73 +1094,59 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              queryTaskHistory: [
-                {
-                  timestamp: '2019-04-03T07:08:24.936Z',
-                  user: {
-                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      },
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: ''
-                      }
-                    ],
-                    role: 'LOCAL_REGISTRAR'
-                  },
-                  location: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: ['']
-                  },
-                  office: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: [''],
-                    address: {
-                      district: '7876',
-                      state: 'iuyiuy'
-                    }
-                  },
-                  type: 'CERTIFIED',
-                  certificate: {
-                    collector: {
-                      individual: {
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  certificates: null,
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-04-03T07:08:24.936Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
                         name: [
                           {
                             use: 'en',
-                            firstNames: 'Rakib',
-                            familyName: 'Hasan'
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
                           }
-                        ]
+                        ],
+                        role: 'LOCAL_REGISTRAR'
                       },
-                      relationship: 'OTHER'
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'CERTIFIED',
+                      comments: null
                     }
-                  },
-                  comments: null,
-                  informant: {
-                    telecom: [
-                      {
-                        use: null,
-                        system: 'phone',
-                        value: '01686972106'
-                      }
-                    ]
-                  }
+                  ]
                 }
-              ]
+              }
             }
           }
         }
@@ -1260,121 +1273,72 @@ describe('SearchResult tests', async () => {
         },
         {
           request: {
-            query: FETCH_TASK_HISTORY_BY_COMPOSITION,
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
             variables: {
               id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
             }
           },
           result: {
             data: {
-              queryTaskHistory: [
-                {
-                  timestamp: '2019-04-03T07:08:24.936Z',
-                  user: {
-                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: 'মোহাম্মদ',
-                        familyName: 'আশরাফুল'
-                      }
-                    ],
-                    role: ''
-                  },
-                  location: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: ['']
-                  },
-                  office: {
-                    id: '123',
-                    name: '',
-                    alias: ['Kaliganj Union Sub Center'],
-                    address: {
-                      district: '7876',
-                      state: 'iuyiuy'
-                    }
-                  },
-                  type: 'CERTIFIED',
-                  certificate: {
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  certificates: {
                     collector: {
                       individual: {
                         name: [
                           {
                             use: 'bn',
-                            firstNames: 'তৌফিক',
-                            familyName: 'শাহরিয়ার'
+                            firstNames: 'গায়ত্রী',
+                            familyName: 'পিভক'
                           }
                         ]
                       },
-                      relationship: 'OTHER'
+                      relationship: 'MOTHER'
                     }
                   },
-                  comments: null,
-                  informant: {
-                    telecom: [
-                      {
-                        use: null,
-                        system: 'phone',
-                        value: '01686972106'
-                      }
-                    ]
-                  }
-                },
-                {
-                  timestamp: '2019-04-03T07:08:24.936Z',
-                  user: {
-                    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: 'মোহাম্মদ',
-                        familyName: 'আশরাফুল'
-                      }
-                    ],
-                    role: ''
-                  },
-                  location: {
-                    id: '123',
-                    name: 'Kaliganj Union Sub Center',
-                    alias: ['']
-                  },
-                  office: {
-                    id: '123',
-                    name: '',
-                    alias: ['Kaliganj Union Sub Center'],
-                    address: {
-                      district: '7876',
-                      state: 'iuyiuy'
-                    }
-                  },
-                  type: '',
-                  certificate: {
-                    collector: {
-                      individual: {
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-04-03T07:08:24.936Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
                         name: [
                           {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
                             use: 'bn',
-                            firstNames: 'তৌফিক',
-                            familyName: 'শাহরিয়ার'
+                            firstNames: '',
+                            familyName: ''
                           }
-                        ]
+                        ],
+                        role: 'LOCAL_REGISTRAR'
                       },
-                      relationship: 'OTHER'
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'CERTIFIED',
+                      comments: null
                     }
-                  },
-                  comments: null,
-                  informant: {
-                    telecom: [
-                      {
-                        use: null,
-                        system: 'phone',
-                        value: '01686972106'
-                      }
-                    ]
-                  }
+                  ]
                 }
-              ]
+              }
             }
           }
         }

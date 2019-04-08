@@ -320,18 +320,6 @@ type Attachment { # -> DocumentReference
   createdAt: Date # -> .created
 }
 
-type TaskHistory {
-  id: ID!
-  type: RegStatus # -> .businessStatus
-  user: User # -> extension(url='http://opencrvs.org/specs/extension/regLastUser').valueReference
-  timestamp: Date # -> lastModified
-  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
-  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
-  comments: [Comment] # -> .note
-  certificate: Certificate # -> Composition.section(code='certificates').entry.reference
-  informant: Person # -> Composition.section(code='informant-details').entry.reference.patient.reference
-}
-
 type BirthRegResultSet {
   results: [BirthRegistration]
   totalItems: Int
@@ -435,7 +423,7 @@ type Query {
     skip: Int
     sort: String
   ): EventSearchResultSet
-  queryTaskHistory(id: ID!): [TaskHistory]
+  fetchRegistration(id: ID!): EventRegistration
 }
 
 type Mutation {

@@ -9,15 +9,14 @@ import {
   mockPatient,
   mockDocumentReference,
   mockTask,
-  mockTaskHistory,
   mockTaskForDeath,
   mockComposition,
   mockObservations,
   mockLocation,
-  mockCertificate,
-  mockCertificateComposition,
   mockRelatedPerson,
-  mockTaskHistoryForError
+  mockTaskForError,
+  mockCertificateComposition,
+  mockCertificate
 } from 'src/utils/testUtils'
 import { clone } from 'lodash'
 
@@ -857,6 +856,19 @@ describe('Registration type resolvers', () => {
       expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
     })
 
+    it('returns office of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+
+      const office = await typeResolvers.RegWorkflow.office(mockTask)
+      expect(office).toBeDefined()
+      expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
+    })
+
+    it('returns null as office of the task', async () => {
+      const office = await typeResolvers.RegWorkflow.office(mockTaskForError)
+      expect(office).toBeNull()
+    })
+
     it('returns comments of the task', async () => {
       // @ts-ignore
       const comments = await typeResolvers.RegWorkflow.comments(mockTask)
@@ -1109,116 +1121,15 @@ describe('Registration type resolvers', () => {
     expect(res).toEqual('DeathRegistration')
   })
 
-  describe('TaskHistory type', () => {
-    it('returns type of the task', async () => {
-      const status = await typeResolvers.TaskHistory.type(mockTaskHistory)
-      expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
-    })
-
-    it('returns comments of the task', async () => {
-      const comments = await typeResolvers.TaskHistory.comments(mockTaskHistory)
-      const comment = await typeResolvers.Comment.comment(
-        mockTaskHistory.note[0]
-      )
-      const user = await typeResolvers.Comment.user(mockTaskHistory.note[0])
-      const time = await typeResolvers.Comment.createdAt(
-        mockTaskHistory.note[0]
-      )
-
-      expect(comments).toBeDefined()
-      expect(comments).toHaveLength(1)
-      expect(comment).toBe('Comment')
-      expect(user).toBe('<username>')
-      expect(time).toBe('2016-10-31T09:45:05+10:00')
-    })
-
-    it('returns timestamp of the task', async () => {
-      const time = await typeResolvers.TaskHistory.timestamp(mockTaskHistory)
-      expect(time).toBe('2016-10-31T09:45:05+10:00')
-    })
-
-    it('returns user of the task', async () => {
-      const mock = fetch.mockResponseOnce(
-        JSON.stringify({ resourceType: 'Practitioner' })
-      )
-      const user = await typeResolvers.TaskHistory.user(mockTaskHistory)
-
-      expect(mock).toBeCalledWith(
-        'http://localhost:5001/fhir/Practitioner/123',
-        {
-          body: undefined,
-          headers: { 'Content-Type': 'application/fhir+json' },
-          method: 'GET'
-        }
-      )
-      expect(user.resourceType).toBe('Practitioner')
-    })
-
-    it('returns null as user of the task', async () => {
-      const user = await typeResolvers.TaskHistory.user(mockTaskHistoryForError)
-      expect(user).toBeNull()
-    })
-
-    it('returns certificate of the task', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockCertificateComposition)],
-        [JSON.stringify(mockCertificate)]
-      )
-
-      const certificate = await typeResolvers.TaskHistory.certificate(
-        mockTaskHistory
-      )
-      expect(certificate).toBeDefined()
-      expect(certificate.id).toBe('5ebdd50a-6180-4aa2-abbe-941442e7cbe7')
-    })
-
-    it('throws error as certificate of the task', async () => {
-      expect(typeResolvers.TaskHistory.certificate({})).rejects.toThrowError(
-        'Task resource does not have a focus property necessary to lookup the composition'
-      )
-    })
-
-    it('returns null as certificate of the task', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockCertificateComposition)],
-        [JSON.stringify(mockCertificate)]
-      )
-
-      const certificate = await typeResolvers.TaskHistory.certificate(
-        mockTaskHistoryForError
-      )
-      expect(certificate).toBeNull()
-    })
-
-    it('returns location of the task', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
-
-      const location = await typeResolvers.TaskHistory.location(mockTaskHistory)
-      expect(location).toBeDefined()
-      expect(location.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
-    })
-
-    it('returns null as location of the task', async () => {
-      const location = await typeResolvers.TaskHistory.location(
-        mockTaskHistoryForError
-      )
-      expect(location).toBeNull()
-    })
-
-    it('returns office of the task', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockLocation))
-
-      const office = await typeResolvers.TaskHistory.office(mockTaskHistory)
-      expect(office).toBeDefined()
-      expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
-    })
-  })
-
-  it('returns null as office of the task', async () => {
-    const office = await typeResolvers.TaskHistory.office(
-      mockTaskHistoryForError
+  it('returns certificate of the task', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockCertificateComposition)],
+      [JSON.stringify(mockCertificate)]
     )
-    expect(office).toBeNull()
+
+    const certificate = await typeResolvers.Registration.certificates(mockTask)
+
+    expect(certificate).toBeDefined()
   })
 
   describe('Certificate type', () => {

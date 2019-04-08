@@ -65,7 +65,7 @@ import {
   EN
 } from 'src/utils/constants'
 import {
-  FETCH_TASK_HISTORY_BY_COMPOSITION,
+  FETCH_REGISTRATION_BY_COMPOSITION,
   FETCH_REGISTRATION_QUERY
 } from './queries'
 
@@ -767,18 +767,25 @@ export class SearchResultView extends React.Component<
 
   transformDataToTaskHistory = (data: GQLQuery) => {
     const { locale } = this.props.intl
-    if (!data || !data.queryTaskHistory) {
+    const registration =
+      data && data.fetchRegistration && data.fetchRegistration.registration
+    const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
+    const informant = deathReg && deathReg.informant
+    const contactInfo =
+      informant &&
+      informant.individual &&
+      informant.individual.telecom &&
+      informant.individual.telecom[0]
+
+    if (!registration || !registration.status) {
       return []
     }
 
-    return data.queryTaskHistory.map(status => {
-      const collector =
-        status && status.certificate && status.certificate.collector
-      const contactInfo =
-        status &&
-        status.informant &&
-        status.informant.telecom &&
-        status.informant.telecom[0]
+    return registration.status.map((status, index) => {
+      const certificate =
+        registration.certificates && registration.certificates[index]
+      const collector = certificate && certificate.collector
+
       return {
         type: status && status.type,
         practitionerName:
@@ -834,7 +841,7 @@ export class SearchResultView extends React.Component<
     return (
       <>
         <Query
-          query={FETCH_TASK_HISTORY_BY_COMPOSITION}
+          query={FETCH_REGISTRATION_BY_COMPOSITION}
           variables={{
             id
           }}
