@@ -1,15 +1,18 @@
 /// <reference types="Cypress" />
 
 context('Birth Registration Integration Test', () => {
-  it('Tests from application to print', () => {
+  beforeEach(() => {
+    indexedDB.deleteDatabase('OpenCRVS')
+  })
+  it('Tests from application to registration', () => {
     cy.login('fieldWorker')
-    // APPLICATION FORM
-    // CHILD DETAILS
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#select_parent_informant').click()
+    // APPLICATION FORM
+    // CHILD DETAILS
     cy.get('#firstNames').type('গায়ত্রী')
     cy.get('#familyName').type('স্পিভক')
     cy.get('#firstNamesEng').type('Gayatri')
@@ -23,6 +26,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#multipleBirth').type('1')
     cy.get('#weightAtBirth').type('1')
     cy.selectOption('#placeOfBirth', 'Hospital', 'Hospital')
+    cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')
@@ -52,6 +56,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('10024')
+    cy.wait(1000)
     cy.get('#next_section').click()
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_true').click()
@@ -92,6 +97,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('10024')
+    cy.wait(1000)
     cy.get('#next_section').click()
     // REGISTRATION
     cy.selectOption(
@@ -102,20 +108,46 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#whoseContactDetails', 'Father', 'Father')
     cy.get('#registrationPhone').type('01711111111')
     cy.get('#commentsOrNotes').type('note')
+    cy.wait(1000)
     cy.get('#next_section').click()
     // DOCUMENTS
+    cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
     cy.get('#next_button_child').click()
     cy.get('#next_button_mother').click()
     cy.get('#next_button_father').click()
-    // cy.get('#submit_form').click()
+    cy.get('#submit_form').click()
     // MODAL
-    /*cy.get('#submit_confirm').click()
-    // SUCCESS
+    cy.get('#submit_confirm').click()
+    // APPLICATION SUBMITTED
     cy.get('#tracking_id_viewer').then($track => {
-      let trackingIDText = $track.text()
+      cy.wait(1000)
+      const trackingIDText = $track.text()
       cy.log('trackingID: ', trackingIDText)
-    })*/
+      cy.logout()
+      cy.login('registrar')
+      cy.wait(1000)
+      // WORK QUEUE
+      cy.contains(`${trackingIDText}`)
+        .siblings('#ActionWrapper')
+        .children('#ListItemAction')
+        .children('#Review')
+        .click()
+      // REVIEW
+      cy.get('#next_button_child').click()
+      cy.get('#next_button_mother').click()
+      cy.get('#next_button_father').click()
+      cy.get('#registerApplicationBtn').click()
+      // MODAL
+      cy.get('#register_confirm').click()
+      // REGISTRATION SUBMITTED
+      cy.get('#tracking_id_viewer').then($track => {
+        cy.wait(1000)
+        const registrationNumberText = $track.text()
+        cy.log('registrationNumberText: ', registrationNumberText)
+        cy.get('#go_to_homepage_button').click()
+      })
+    })
   })
 })
