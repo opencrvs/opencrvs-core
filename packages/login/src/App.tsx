@@ -30,33 +30,21 @@ export class App extends React.Component {
             >
               <ConnectedRouter history={history}>
                 <Switch>
-                  <Route
-                    exact
-                    path={routes.STEP_ONE}
-                    children={() => (
-                      <DarkPageContainer>
-                        <StepOneContainer />
-                      </DarkPageContainer>
-                    )}
-                  />
-                  <Route
-                    exact
-                    path={routes.STEP_TWO}
-                    children={() => (
-                      <PageContainer>
-                        <StepTwoContainer />
-                      </PageContainer>
-                    )}
-                  />
-                  <Route
-                    exact
-                    path={routes.MANAGER}
-                    children={() => (
-                      <PageContainer>
-                        <ManagerViewContainer />
-                      </PageContainer>
-                    )}
-                  />
+                  <Route exact path={routes.STEP_ONE}>
+                    <DarkPageContainer>
+                      <StepOneContainer />
+                    </DarkPageContainer>
+                  </Route>
+                  <Route exact path={routes.STEP_TWO}>
+                    <PageContainer>
+                      <StepTwoContainer />
+                    </PageContainer>
+                  </Route>
+                  <Route exact path={routes.MANAGER}>
+                    <PageContainer>
+                      <ManagerViewContainer />
+                    </PageContainer>
+                  </Route>
                 </Switch>
               </ConnectedRouter>
             </ThemeProvider>
