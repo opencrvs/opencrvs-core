@@ -15,19 +15,14 @@ import { TextInput, InputField } from '@opencrvs/components/lib/forms'
 import { stepTwoFields } from './stepTwoFields'
 
 import { store } from '../../App'
-import {
-  StyledBox,
-  ErrorText,
-  Title,
-  FormWrapper,
-  ActionWrapper
-} from '../StepOne/StepOneForm'
+import { ErrorText, Title, FormWrapper } from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
 
 import { FORM_NAME } from './contants'
+import { Box } from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({
   stepTwoTitle: {
@@ -86,6 +81,16 @@ const FieldWrapper = styled.div`
     margin-right: 0%;
   }
 `
+/**
+ * This ActionWrapper should be removed and replaced by imported ActionWrapper
+ * from StepOneForm when styling updates will take place in StepTwoFrom
+ */
+
+const ActionWrapper = styled.div`
+  position: relative;
+  margin-top: 10px;
+  display: flex;
+`
 
 const Separator = styled.div`
   flex-grow: 1;
@@ -110,7 +115,19 @@ const ClearFormLink = styled(Link)`
   float: right;
   top: -20px;
 `
+const StyledBox = styled(Box)`
+  position: absolute;
+  height: auto;
+  top: 50%;
+  right: 50%;
+  padding: 0px;
+  margin: 0px;
+  transform: translate(50%, -50%);
 
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 90%;
+  }
+`
 export interface IProps {
   formId: string
   submissionError: boolean
