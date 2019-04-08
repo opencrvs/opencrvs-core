@@ -1,11 +1,9 @@
 /// <reference types="Cypress" />
 
-context('Register', () => {
-  beforeEach(() => {
+context('Birth Registration Integration Test', () => {
+  it('Tests from application to print', () => {
     cy.login('fieldWorker')
-  })
-
-  it('fills in all data into the register form', () => {
+    // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
@@ -111,10 +109,13 @@ context('Register', () => {
     cy.get('#next_button_child').click()
     cy.get('#next_button_mother').click()
     cy.get('#next_button_father').click()
-    cy.get('#submit_form').click()
+    // cy.get('#submit_form').click()
     // MODAL
-    // cy.get('#submit_confirm').click()
+    /*cy.get('#submit_confirm').click()
     // SUCCESS
-    // cy.get('#confirmation_screen_view').contains('Application submitted')
+    cy.get('#tracking_id_viewer').then($track => {
+      let trackingIDText = $track.text()
+      cy.log('trackingID: ', trackingIDText)
+    })*/
   })
 })
