@@ -105,7 +105,9 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   showErrorMessage() {
     return (
-      this.state.errorMessage && <ErrorMsg>{this.state.errorMessage}</ErrorMsg>
+      this.state.errorMessage && (
+        <ErrorMsg id="errorMsg">{this.state.errorMessage}</ErrorMsg>
+      )
     )
   }
 
@@ -154,7 +156,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   render() {
     return (
       <PageWrapper id="unlockPage">
-        <LogoutHeader onClick={this.toggleLogoutModal}>
+        <LogoutHeader onClick={this.toggleLogoutModal} id="logout">
           <span>Logout</span>
           <Logout />
         </LogoutHeader>
