@@ -1,21 +1,26 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
-import { LoginHeader } from './LoginHeader'
-
-export interface IPage {
-  submitting: boolean
-  language?: string
-}
+import { IPage } from './Page'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div.attrs<IPage>({})`
-  background: ${({ theme }) => theme.colors.background};
+background: ${({ theme }) =>
+  `linear-gradient(
+  180deg,
+   ${theme.colors.headerGradientLight} 0%,
+   ${theme.colors.headerGradientDark} 100%
+)`};
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  margin-top: -280px;
+  flex-direction: column; 
+
+  ${({ submitting }) =>
+    submitting && `justify-content: center; align-items: center;`}
+
   * {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
@@ -79,13 +84,23 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 `
 
-export class Page extends React.Component<IPage & RouteComponentProps<{}>> {
+export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
   render() {
-    const { children } = this.props
+    const { children, submitting } = this.props
     return (
       <div>
-        <LoginHeader />
-        <StyledPage {...this.props}>{children}</StyledPage>
+        <StyledPage {...this.props}>
+          {submitting ? (
+            <Spinner
+              id="login-submitting-spinner"
+              baseColor={
+                getTheme(window.config.COUNTRY).colors.headerGradientDark
+              }
+            />
+          ) : (
+            children
+          )}
+        </StyledPage>
       </div>
     )
   }
