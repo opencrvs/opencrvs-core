@@ -8,6 +8,7 @@ export const BENGALI_STATE = {
     'login.mobilePlaceholder': '01723456789',
     'login.passwordLabel': 'পাসওয়ার্ড',
     'login.submit': 'সাবমিট',
+    'login.forgotPassword': 'পাসওয়ার্ড ভুলে গেছেন',
     'login.submissionError': 'মোবাইল নম্বর/পাসওয়ার্ড সঠিক নয়',
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
     'login.resendMobile': 'এসএমএস পুনঃপ্রেরণ',
