@@ -26,6 +26,9 @@ const PinButton = styled(PrimaryButton)`
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.16);
   display: block;
 `
+const Bold = styled.b`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+`
 
 export class SecureAccount extends React.Component {
   render() {
@@ -37,7 +40,7 @@ export class SecureAccount extends React.Component {
           </Item>
 
           <Item margin="50px 0px">
-            <b>Secure your Account</b>
+            <Bold>Secure your Account</Bold>
             <p>
               A personal identification number protects your account. Your pin
               will be required before each use of the OpenCRVS app.
