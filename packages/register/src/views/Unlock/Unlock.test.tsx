@@ -3,6 +3,7 @@ import { ReactWrapper } from 'enzyme'
 import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
+import { storage } from 'src/storage'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -14,6 +15,10 @@ const clearPassword = (component: ReactWrapper) => {
 }
 
 describe('Unlock page loads Properly', () => {
+  storage.getItem = jest.fn(
+    () => '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82'
+  )
+
   const { store } = createStore()
   const testComponent = createTestComponent(<Unlock />, store)
 
