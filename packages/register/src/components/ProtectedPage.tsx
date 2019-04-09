@@ -9,11 +9,13 @@ import { IUserDetails } from '../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 
 const SCREEN_LOCK = 'screenLock'
+const PIN = 'pin'
 interface IProtectPageProps {
   userDetails: IUserDetails
 }
 interface IProtectPageState {
   secured: boolean
+  pinExists: boolean
 }
 class ProtectedPageComponent extends React.Component<
   RouteComponentProps<{}> & IProtectPageProps,
@@ -22,26 +24,39 @@ class ProtectedPageComponent extends React.Component<
   constructor(props: RouteComponentProps<{}> & IProtectPageProps) {
     super(props)
     this.state = {
-      secured: true
+      secured: true,
+      pinExists: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
   }
   async componentDidMount() {
+    const newState = { ...this.state }
     if (await storage.getItem(SCREEN_LOCK)) {
-      this.setState({ secured: false })
+      newState.secured = false
     }
+    if (await storage.getItem(PIN)) {
+      newState.pinExists = true
+    }
+    this.setState(newState)
   }
 
   async handleVisibilityChange(isVisible: boolean) {
     if (
+      this.props.userDetails.role &&
       this.props.userDetails.role === 'FIELD_AGENT' &&
       !isVisible &&
       !(await storage.getItem(SCREEN_LOCK))
     ) {
-      this.setState({
-        secured: false
-      })
+      const newState = { ...this.state }
+      newState.secured = false
+      /* eventually we will take this pin from current user-details */
+      if (await storage.getItem(PIN)) {
+        newState.pinExists = true
+      } else {
+        newState.pinExists = false
+      }
+      this.setState(newState)
       storage.setItem(SCREEN_LOCK, 'true')
     }
   }
@@ -51,11 +66,16 @@ class ProtectedPageComponent extends React.Component<
   }
 
   render() {
-    const { secured } = this.state
+    const { secured, pinExists } = this.state
     return (
       <PageVisibility onChange={this.handleVisibilityChange}>
         {(secured && this.props.children) ||
-          (!secured && <SecureAccount onComplete={this.markAsSecured} />)}
+          (!secured && !pinExists && (
+            <SecureAccount onComplete={this.markAsSecured} />
+          )) ||
+          (!secured && pinExists && (
+            <div onClick={() => this.markAsSecured()}> unlock screen </div>
+          ))}
       </PageVisibility>
     )
   }
