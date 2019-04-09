@@ -9,6 +9,6 @@ export const stepTwoFields: IFieldGroup = {
     validate: [validations.required, validations.isNumber],
     disabled: false,
     type: 'tel',
-    focusInput: false
+    focusInput: true
   }
 }

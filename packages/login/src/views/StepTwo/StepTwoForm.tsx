@@ -2,7 +2,7 @@ import { Field, WrappedFieldProps } from 'redux-form'
 import * as React from 'react'
 import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
-import { InjectedFormProps, reset } from 'redux-form'
+import { InjectedFormProps } from 'redux-form'
 
 import {
   TextInput,
@@ -12,7 +12,6 @@ import {
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from './stepTwoFields'
 
-import { store } from '../../App'
 import {
   Title,
   FormWrapper,
@@ -27,8 +26,6 @@ import {
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
-
-import { FORM_NAME } from './contants'
 
 export const messages = defineMessages({
   stepTwoTitle: {
@@ -129,9 +126,6 @@ export class StepTwoForm extends React.Component<
     InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
     IStepTwoForm
 > {
-  clearTheForm(e: React.MouseEvent<HTMLElement>) {
-    store.dispatch(reset(FORM_NAME))
-  }
   render() {
     const {
       intl,
