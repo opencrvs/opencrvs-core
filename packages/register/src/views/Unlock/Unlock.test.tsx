@@ -20,7 +20,10 @@ describe('Unlock page loads Properly', () => {
   )
 
   const { store } = createStore()
-  const testComponent = createTestComponent(<Unlock />, store)
+  const testComponent = createTestComponent(
+    <Unlock onCorrectPinMatch={() => null} />,
+    store
+  )
 
   it('Should load the Unlock page properly', () => {
     const elem = testComponent.component.find('#unlockPage').hostNodes().length

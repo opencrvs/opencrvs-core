@@ -73,14 +73,16 @@ type IFullState = IState & ErrorState
 type Props = {
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
-  onCorrectPinMatch: () => void
 }
-type IFullProps = Props & InjectedIntlProps
+type IFullProps = Props &
+  InjectedIntlProps & {
+    onCorrectPinMatch: () => void
+  }
 
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
-  constructor(props: IFullProps & IState) {
+  constructor(props: IFullProps) {
     super(props)
     this.state = {
       showLogoutModal: false,
@@ -186,10 +188,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
 export const Unlock = connect(
   (store: IStoreState) => ({
-    userDetails: getUserDetails(store),
-    onCorrectPinMatch: () => {
-      console.log('Pin Matched')
-    }
+    userDetails: getUserDetails(store)
   }),
   {
     redirectToAuthentication
