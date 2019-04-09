@@ -10,6 +10,8 @@ import { getUserDetails } from 'src/profile/profileSelectors'
 import { IUserDetails } from '../../utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { storage } from 'src/storage'
+import * as bcrypt from 'bcryptjs'
 
 const messages = defineMessages({
   incorrect: {
@@ -60,6 +62,7 @@ const ErrorMsg = styled.div`
 interface IState {
   showLogoutModal: boolean
   pin: string
+  userPin: string
 }
 type ErrorState = {
   attempt: number
@@ -68,7 +71,6 @@ type ErrorState = {
 type IFullState = IState & ErrorState
 
 type Props = {
-  userPin: string
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
   onCorrectPinMatch: () => void
@@ -84,8 +86,20 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       showLogoutModal: false,
       attempt: 0,
       errorMessage: '',
-      pin: ''
+      pin: '',
+      userPin: ''
     }
+  }
+
+  componentWillMount() {
+    this.loadUserPin()
+  }
+
+  async loadUserPin() {
+    const userPin = (await storage.getItem('pin')) || ''
+    this.setState(() => ({
+      userPin
+    }))
   }
 
   showName() {
@@ -119,33 +133,29 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   onPinProvided = (pin: string) => {
     const { intl } = this.props
+    const { userPin } = this.state
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT) {
       this.setState(() => ({
         errorMessage: intl.formatMessage(messages.locked)
       }))
     }
 
-    if (
-      this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 &&
-      pin !== this.props.userPin
-    ) {
+    if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && pin !== userPin) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.incorrect)
       }))
     }
 
-    if (
-      this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 &&
-      pin !== this.props.userPin
-    ) {
+    if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && pin !== userPin) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.lastTry)
       }))
     }
 
-    if (pin === this.props.userPin) {
+    const didPinMatch = bcrypt.compareSync(pin, userPin)
+    if (didPinMatch) {
       this.setState(() => ({
         errorMessage: ''
       }))
@@ -176,7 +186,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
 export const Unlock = connect(
   (store: IStoreState) => ({
-    userPin: '0000',
     userDetails: getUserDetails(store),
     onCorrectPinMatch: () => {
       console.log('Pin Matched')
