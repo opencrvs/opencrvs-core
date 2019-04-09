@@ -53,6 +53,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
 
   keyPress = (key: number) => {
     const { pin } = this.state
+    const { onComplete } = this.props
 
     if (key === -1) {
       this.setState({ pin: pin.slice(0, pin.length - 1) })
@@ -64,20 +65,14 @@ export class PINKeypad extends React.Component<IProps, IState> {
     }
 
     const newPIN = pin + key
+    if (newPIN.length === 4) {
+      onComplete(newPIN)
+    }
     this.setState({ pin: newPIN })
   }
 
   render() {
     const { pin } = this.state
-    const { onComplete } = this.props
-
-    if (pin.length === 4) {
-      // call onComplete after render so last dot shows as filled
-      setImmediate(() => {
-        onComplete(pin)
-      })
-    }
-
     return (
       <Container>
         <div>

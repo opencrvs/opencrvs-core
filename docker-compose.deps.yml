@@ -66,10 +66,6 @@ services:
       - mongo_url=mongodb://mongo/openhim-dev
       - mongo_atnaUrl=mongodb://mongo/openhim-dev
       - logger_level=error
-    ports:
-      - '8080:8080'
-      - '5000:5000'
-      - '5001:5001'
     depends_on:
       - mongo
     restart: unless-stopped
@@ -80,8 +76,6 @@ services:
 
   openhim-console:
     image: jembi/openhim-console:1.13
-    ports:
-      - '8888:80'
     restart: unless-stopped
     deploy:
       replicas: 2

@@ -123,7 +123,10 @@ export const StyledButton = styled(Button)`
   }
 `
 export const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.danger};
+  padding: 2px ${({ theme }) => theme.grid.margin}px;
+  text-align: center;
 `
 
 export const FieldWrapper = styled.div`
