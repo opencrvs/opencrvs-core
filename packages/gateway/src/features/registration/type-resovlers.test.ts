@@ -16,7 +16,8 @@ import {
   mockRelatedPerson,
   mockTaskForError,
   mockCertificateComposition,
-  mockCertificate
+  mockCertificate,
+  mockErrorComposition
 } from 'src/utils/testUtils'
 import { clone } from 'lodash'
 
@@ -1127,9 +1128,25 @@ describe('Registration type resolvers', () => {
       [JSON.stringify(mockCertificate)]
     )
 
-    const certificate = await typeResolvers.Registration.certificates(mockTask)
+    const certificates = await typeResolvers.Registration.certificates(mockTask)
 
-    expect(certificate).toBeDefined()
+    expect(certificates).toBeDefined()
+  })
+
+  it('throws error as certificate of the task', async () => {
+    expect(typeResolvers.Registration.certificates({})).rejects.toThrowError(
+      'Task resource does not have a focus property necessary to lookup the composition'
+    )
+  })
+
+  it('returns null as certificate of the task', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockErrorComposition)],
+      [JSON.stringify(mockCertificate)]
+    )
+
+    const certificates = await typeResolvers.Registration.certificates(mockTask)
+    expect(certificates).toBeNull()
   })
 
   describe('Certificate type', () => {

@@ -1322,10 +1322,17 @@ export const mockCertificateComposition = {
   ]
 }
 
+export const mockErrorComposition = {
+  resourceType: 'Composition',
+  id: '123',
+  total: 1,
+  entry: null
+}
+
 export const mockTaskForError = {
   resourceType: 'Task',
   status: 'requested',
-  id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5/_history/_index/4',
+  id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
   identifier: [
     {
       system: 'http://opencrvs.org/specs/id/birth-tracking-id',

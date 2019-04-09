@@ -386,7 +386,7 @@ describe('SearchResult tests', async () => {
                               state: 'iuyiuy'
                             }
                           },
-                          type: 'DECLARED',
+                          type: '',
                           comments: [
                             {
                               comment: ''
@@ -705,7 +705,7 @@ describe('SearchResult tests', async () => {
                           type: 'REJECTED',
                           comments: [
                             {
-                              comment: ''
+                              comment: 'reason=misspelling&comment=misspel'
                             }
                           ]
                         }
@@ -935,11 +935,6 @@ describe('SearchResult tests', async () => {
                       user: {
                         id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
                         name: [
-                          {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
                           {
                             use: 'bn',
                             firstNames: '',
@@ -1186,7 +1181,7 @@ describe('SearchResult tests', async () => {
       testComponent.component.unmount()
     })
 
-    it('renders collected section after expanding in collector english name not present', async () => {
+    it('check branches  using miscellaneous data', async () => {
       const graphqlMock = [
         {
           request: {
@@ -1218,11 +1213,6 @@ describe('SearchResult tests', async () => {
                             id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
                             name: [
                               {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
                                 use: 'bn',
                                 firstNames: '',
                                 familyName: ''
@@ -1232,7 +1222,7 @@ describe('SearchResult tests', async () => {
                           },
                           location: {
                             id: '123',
-                            name: 'Kaliganj Union Sub Center',
+                            name: '',
                             alias: ['']
                           },
                           office: {
@@ -1262,7 +1252,7 @@ describe('SearchResult tests', async () => {
                           familyName: 'Doe'
                         }
                       ],
-                      birthDate: null
+                      birthDate: '2011-05-23T14:44:58+02:00'
                     },
                     createdAt: '2018-05-23T14:44:58+02:00'
                   }
@@ -1284,20 +1274,22 @@ describe('SearchResult tests', async () => {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 registration: {
                   id: '345678',
-                  certificates: {
-                    collector: {
-                      individual: {
-                        name: [
-                          {
-                            use: 'bn',
-                            firstNames: 'গায়ত্রী',
-                            familyName: 'পিভক'
-                          }
-                        ]
-                      },
-                      relationship: 'MOTHER'
+                  certificates: [
+                    {
+                      collector: {
+                        individual: {
+                          name: [
+                            {
+                              use: 'bn',
+                              firstNames: 'গায়ত্রী',
+                              familyName: 'পিভক'
+                            }
+                          ]
+                        },
+                        relationship: 'MOTHER'
+                      }
                     }
-                  },
+                  ],
                   status: [
                     {
                       id:
@@ -1307,17 +1299,12 @@ describe('SearchResult tests', async () => {
                         id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
                         name: [
                           {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
-                          {
                             use: 'bn',
-                            firstNames: '',
-                            familyName: ''
+                            firstNames: 'গায়ত্রী',
+                            familyName: 'পিভক'
                           }
                         ],
-                        role: 'LOCAL_REGISTRAR'
+                        role: ''
                       },
                       location: {
                         id: '123',
@@ -1337,6 +1324,17 @@ describe('SearchResult tests', async () => {
                       comments: null
                     }
                   ]
+                },
+                informant: {
+                  individual: {
+                    telecom: [
+                      {
+                        use: null,
+                        system: 'phone',
+                        value: '01686972106'
+                      }
+                    ]
+                  }
                 }
               }
             }
