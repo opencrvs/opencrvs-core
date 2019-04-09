@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
 import { InjectedFormProps, reset } from 'redux-form'
 
-import { FlexGrid } from '@opencrvs/components/lib/grid'
 import {
   TextInput,
   InputField,
@@ -21,7 +20,8 @@ import {
   Container,
   LogoContainer,
   StyledPrimaryButton,
-  StyledButton
+  StyledButton,
+  FieldWrapper
 } from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
@@ -75,18 +75,6 @@ export const messages = defineMessages({
   }
 })
 
-const FieldWrapper = styled.div`
-  margin-bottom: 30px;
-  flex-grow: 1;
-  margin-right: 5%;
-  margin-left: 5%;
-  &:first-child {
-    margin-left: 0%;
-  }
-  &:last-child {
-    margin-right: 0%;
-  }
-`
 const ErrorMsg = styled.span`
   color: ${({ theme }) => theme.colors.white};
   font-size: 15px;
@@ -111,7 +99,6 @@ const CodeInput = injectIntl(
     } & InjectedIntlProps
   ) => {
     const { field, meta, intl, ...otherProps } = props
-    console.log(props)
     return (
       <InputField
         {...field}
@@ -174,23 +161,19 @@ export class StepTwoForm extends React.Component<
           </p>
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
-          <FlexGrid>
-            <React.Fragment>
-              <FieldWrapper>
-                <Field
-                  name={field.name}
-                  validate={field.validate}
-                  component={CodeInput}
-                  field={field}
-                />
-                {submissionError && (
-                  <ErrorMsg>
-                    {intl.formatMessage(messages.codeSubmissionError)}
-                  </ErrorMsg>
-                )}
-              </FieldWrapper>
-            </React.Fragment>
-          </FlexGrid>
+          <FieldWrapper>
+            <Field
+              name={field.name}
+              validate={field.validate}
+              component={CodeInput}
+              field={field}
+            />
+            {submissionError && (
+              <ErrorMsg>
+                {intl.formatMessage(messages.codeSubmissionError)}
+              </ErrorMsg>
+            )}
+          </FieldWrapper>
 
           <ActionWrapper>
             <StyledPrimaryButton

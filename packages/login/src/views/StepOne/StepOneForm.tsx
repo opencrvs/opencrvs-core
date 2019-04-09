@@ -68,29 +68,19 @@ export const messages = defineMessages({
 })
 
 export const Container = styled.div`
-  position: absolute;
+  position: relative;
   height: auto;
-  top: 50%;
-  right: 50%;
   padding: 0px;
-  margin: 0px;
-  transform: translate(50%, -50%);
-  width: 20vw;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 70%;
-  }
+  margin: 0px auto;
+  width: 300px;
 `
 
 export const FormWrapper = styled.form`
   position: relative;
   margin: auto;
-  width: 80%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 85%;
-  }
+  width: 100%;
   margin-bottom: 50px;
-  padding-top: 20px;
+  margin-top: 30px;
 `
 
 export const ActionWrapper = styled.div`
@@ -110,10 +100,6 @@ export const Title = styled.div`
   margin-top: 30px;
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
-  width: 80%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 85%;
-  }
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
   justify-content: center;
@@ -140,8 +126,8 @@ export const ErrorText = styled.p`
   color: ${({ theme }) => theme.colors.error};
 `
 
-const FieldWrapper = styled.div`
-  margin-bottom: 30px;
+export const FieldWrapper = styled.div`
+  min-height: 6.7em;
 `
 
 export interface IProps {

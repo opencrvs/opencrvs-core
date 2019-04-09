@@ -1,6 +1,6 @@
 import * as validations from '../../utils/validate'
-import { IFieldGroup, IFieldRefGroup } from '../../utils/fieldUtils'
-import * as React from 'react'
+import { IFieldGroup } from '../../utils/fieldUtils'
+
 export const stepTwoFields: IFieldGroup = {
   code: {
     id: 'code',
@@ -11,8 +11,4 @@ export const stepTwoFields: IFieldGroup = {
     type: 'tel',
     focusInput: false
   }
-}
-
-export const fieldRefs: IFieldRefGroup = {
-  code: React.createRef()
 }
