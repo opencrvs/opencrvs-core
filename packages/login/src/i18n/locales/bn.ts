@@ -14,7 +14,7 @@ export const BENGALI_STATE = {
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
     'login.resendMobile': 'এসএমএস পুনঃপ্রেরণ',
     'login.optionalLabel': 'ঐচ্ছিক',
-    'login.stepTwoTitle': 'আপনার মোবাইল নম্বর যাচাই করুন',
+    'login.stepTwoTitle': 'আপনার মোবাইল যাচাই করুন',
     'login.stepTwoInstruction':
       'অনুগ্রহপূর্বক আপনার মোবাইল নম্বর, {number} তে প্রেরিত বার্তা থেকে পিনকোডটি (ইংরেজিতে) টাইপ করুন। এটি ৫ মিনিট পর্যন্ত কার্যকর থাকবে।',
     'login.clearForm': 'বাতিল',
