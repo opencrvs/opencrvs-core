@@ -3,6 +3,7 @@ import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { IUserDetails } from 'src/utils/userUtils'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
@@ -138,6 +139,8 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
   action: Action
 ): IDraftsState | Loop<IDraftsState, Action> => {
+  console.log(action.type)
+  console.log(state.userID)
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -157,7 +160,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
     case STORE_DRAFT:
       const stateAfterDraftStore = {
         ...state,
-        drafts: state.drafts.concat(action.payload.draft)
+        drafts: state.drafts ? state.drafts.concat(action.payload.draft) : []
       }
       return loop(
         stateAfterDraftStore,
@@ -193,8 +196,9 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
+      console.log(action.type, state.userID)
       if (state.initialDraftsLoaded && state.drafts) {
-        writeDraftByUser(state.userID, action.payload.draft.drafts)
+        writeDraftByUser(action.payload.draft)
       }
       return state
     case SET_INITIAL_DRAFTS:
@@ -212,11 +216,17 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         )
       )
     case GET_DRAFTS_SUCCESS:
-      const idDrafts = JSON.parse(action.payload) as IUserWiseDrafts
+      if (action.payload) {
+        const idDrafts = JSON.parse(action.payload) as IUserData
+        return {
+          ...state,
+          userID: idDrafts.userID,
+          drafts: idDrafts.drafts,
+          initialDraftsLoaded: true
+        }
+      }
       return {
         ...state,
-        userID: idDrafts.userID,
-        drafts: idDrafts.drafts,
         initialDraftsLoaded: true
       }
     default:
@@ -224,19 +234,26 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   }
 }
 
-interface IUserWiseDrafts {
-  userID: string
-  drafts: IDraft[]
-}
-
 async function getDraftsOfCurrentUser(): Promise<string> {
-  const currentUserID = JSON.parse(await storage.getItem('USER_DETAILS'))
-    .userMgntUserID
+  const storageTable = await storage.getItem('USER_DATA')
+  // console.log('storageTable', storageTable)
+  if (!storageTable) {
+    storage.configStorage('OpenCRVS')
+    return '[]'
+  }
+
+  const currentUserID = await getCurrentUserID()
+  console.log(
+    'getDraftsOfCurrentUser :: currentUserID',
+    currentUserID || 'nada!'
+  )
+
   const allUserData = JSON.parse(
     await storage.getItem('USER_DATA')
   ) as IUserData[]
   if (!allUserData || !allUserData.length) {
     // No user-data at all
+    console.log('__FAILURE__')
     return `"userID": "${currentUserID}", "drafts":"[]"`
   }
 
@@ -244,29 +261,42 @@ async function getDraftsOfCurrentUser(): Promise<string> {
     uData => uData.userID === currentUserID
   )
   const currentUserDrafts = currentUserData ? currentUserData.drafts : []
-  return JSON.stringify({
+  const payload = {
     userID: currentUserID,
     drafts: currentUserDrafts
-  })
+  }
+  console.log('getDraftsOfCurrentUser :: payload', payload)
+  return JSON.stringify(payload)
 }
 
-async function writeDraftByUser(userID: string, newDrafts: IDraft[]) {
+async function writeDraftByUser(draftsState: IDraftsState) {
+  const uID = draftsState.userID || (await getCurrentUserID())
   const str = await storage.getItem('USER_DATA')
-  const allUserData: IUserData[] =
-    str === '[]' || str === '{}' || str === '' || str === 'null'
-      ? []
-      : (JSON.parse(str) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === userID)
+  if (!str) {
+    // No storage option found
+    storage.configStorage('OpenCRVS')
+  }
+  const allUserData: IUserData[] = !str ? [] : (JSON.parse(str) as IUserData[])
+  const currentUserData = allUserData.find(uData => uData.userID === uID)
 
   if (currentUserData) {
-    currentUserData.drafts = newDrafts
+    console.log('__FOUND RECORD__')
+    currentUserData.drafts = draftsState.drafts
   } else {
+    console.log('INSIDE writeDraftByUser', uID)
     allUserData.push({
-      userID,
+      userID: uID,
       userPIN: 1234,
-      drafts: newDrafts
+      drafts: draftsState.drafts
     })
   }
-
+  console.log('writeDraftByUser :: Setting USER_DATA', draftsState.drafts)
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
+}
+
+async function getCurrentUserID(): Promise<string> {
+  const currentUserDetails = JSON.parse(
+    await storage.getItem('USER_DETAILS')
+  ) as IUserDetails
+  return currentUserDetails.userMgntUserID || ''
 }
