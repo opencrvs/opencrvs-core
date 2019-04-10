@@ -20,7 +20,8 @@ import {
   LogoContainer,
   StyledPrimaryButton,
   StyledButton,
-  FieldWrapper
+  FieldWrapper,
+  ErrorText
 } from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
@@ -57,7 +58,7 @@ export const messages = defineMessages({
   },
   resentSMS: {
     id: 'login.resentSMS',
-    defaultMessage: 'We have delivered a new SMS to your mobile phone',
+    defaultMessage: 'We just resent you another code to {number}',
     description: 'The message that appears when the resend button is clicked.'
   },
   optionalLabel: {
@@ -72,9 +73,8 @@ export const messages = defineMessages({
   }
 })
 
-const ErrorMsg = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  font-size: 15px;
+const StyledMobile2FA = styled(Mobile2FA)`
+  transform: scale(0.8);
 `
 export interface IProps {
   formId: string
@@ -133,6 +133,7 @@ export class StepTwoForm extends React.Component<
       formId,
       submitAction,
       submitting,
+      resentSMS,
       stepOneDetails,
       submissionError
     } = this.props
@@ -145,14 +146,27 @@ export class StepTwoForm extends React.Component<
       <Container id="login-step-two-box">
         <Title>
           <LogoContainer>
-            <Mobile2FA />
+            <StyledMobile2FA />
           </LogoContainer>
           <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
-          <p>
-            {intl.formatMessage(messages.stepTwoInstruction, {
-              number: mobileNumber
-            })}
-          </p>
+          {resentSMS ? (
+            <p>
+              {intl.formatMessage(messages.resentSMS, {
+                number: mobileNumber
+              })}
+            </p>
+          ) : (
+            <p>
+              {intl.formatMessage(messages.stepTwoInstruction, {
+                number: mobileNumber
+              })}
+            </p>
+          )}
+          {submissionError && (
+            <ErrorText>
+              {intl.formatMessage(messages.codeSubmissionError)}
+            </ErrorText>
+          )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
@@ -162,11 +176,6 @@ export class StepTwoForm extends React.Component<
               component={CodeInput}
               field={field}
             />
-            {submissionError && (
-              <ErrorMsg>
-                {intl.formatMessage(messages.codeSubmissionError)}
-              </ErrorMsg>
-            )}
           </FieldWrapper>
 
           <ActionWrapper>
