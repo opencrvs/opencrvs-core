@@ -263,19 +263,10 @@ export class DataTable extends React.Component<
       filterValues &&
       getSortAndFilterByPropsWithValues(filterBy, filterValues)
 
-    let sortedAndFilteredData: IDynamicValues[] = []
-    sortedAndFilteredData =
-      (sortByItemsWithValues && this.sortData(data, sortByItemsWithValues)) ||
-      data
-    sortedAndFilteredData =
-      (filterByItemsWithValues &&
-        this.filterData(sortedAndFilteredData, filterByItemsWithValues)) ||
-      sortedAndFilteredData
-
     const totalPages = this.props.totalPages
       ? this.props.totalPages
       : getTotalPageNumber(
-          sortedAndFilteredData.length,
+          data.length,
           this.props.pageSize || defaultConfiguration.pageSize
         )
 
@@ -288,16 +279,14 @@ export class DataTable extends React.Component<
           onChangeFilter={this.onFilterChange}
         />
         <ResultsText>
-          {resultLabel}({sortedAndFilteredData.length})
+          {resultLabel}({data.length})
         </ResultsText>
         <StyledList>
-          {this.getDisplayItems(
-            currentPage,
-            pageSize,
-            sortedAndFilteredData
-          ).map((item, index) => this.props.cellRenderer(item, index))}
+          {this.getDisplayItems(currentPage, pageSize, data).map(
+            (item, index) => this.props.cellRenderer(item, index)
+          )}
         </StyledList>
-        {sortedAndFilteredData.length > 0 && (
+        {data.length > 0 && (
           <Pagination
             initialPage={initialPage}
             totalPages={totalPages}
