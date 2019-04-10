@@ -4,9 +4,9 @@ import { SecureAccount } from 'src/views/SecureAccount/SecureAccountView'
 import { Unlock } from 'src/views/Unlock/Unlock'
 import { storage } from 'src/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
+import { isMobile } from 'react-device-detect'
 
 const SCREEN_LOCK = 'screenLock'
-const PIN = 'pin'
 
 interface IProtectPageState {
   secured: boolean
@@ -20,28 +20,33 @@ class ProtectedPageComponent extends React.Component<
     super(props)
     this.state = {
       secured: true,
-      pinExists: false
+      pinExists: true
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
   }
+
   async componentDidMount() {
     const newState = { ...this.state }
     if (await storage.getItem(SCREEN_LOCK)) {
       newState.secured = false
+    } else {
+      newState.secured = true
     }
-    if (await storage.getItem(PIN)) {
+    if (await this.getPIN()) {
       newState.pinExists = true
+    } else {
+      newState.pinExists = false
     }
     this.setState(newState)
   }
 
   async handleVisibilityChange(isVisible: boolean) {
-    if (!isVisible && !(await storage.getItem(SCREEN_LOCK))) {
-      const newState = { ...this.state }
+    const newState = { ...this.state }
+
+    if (!isVisible && !(await storage.getItem(SCREEN_LOCK)) && isMobile) {
       newState.secured = false
-      /* eventually we will take this pin from current user-details */
-      if (await storage.getItem(PIN)) {
+      if (await this.getPIN()) {
         newState.pinExists = true
       } else {
         newState.pinExists = false
@@ -50,19 +55,22 @@ class ProtectedPageComponent extends React.Component<
       storage.setItem(SCREEN_LOCK, 'true')
     }
   }
+
   markAsSecured() {
-    this.setState({ secured: true })
+    this.setState({ secured: true, pinExists: true })
     storage.removeItem(SCREEN_LOCK)
+  }
+  /* eventually we will take this pin from current user-details */
+  async getPIN() {
+    return await storage.getItem('pin')
   }
 
   render() {
     const { secured, pinExists } = this.state
     return (
       <PageVisibility onChange={this.handleVisibilityChange}>
-        {(secured && this.props.children) ||
-          (!secured && !pinExists && (
-            <SecureAccount onComplete={this.markAsSecured} />
-          )) ||
+        {(secured && pinExists && this.props.children) ||
+          (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
           (!secured && pinExists && (
             <Unlock onCorrectPinMatch={this.markAsSecured} />
           ))}

@@ -50,12 +50,26 @@ describe('when user has starts a new application', () => {
 
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
-    beforeEach(() => {
+    beforeEach(async () => {
       draft = createDraft(Event.BIRTH)
       store.dispatch(storeDraft(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
       )
+      app.update()
+      app
+        .find('#createPinBtn')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 8 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      await flushPromises()
       app.update()
     })
 
