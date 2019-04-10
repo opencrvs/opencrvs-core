@@ -4,12 +4,13 @@ import { Search } from '../icons'
 import { PrimaryButton } from '../buttons'
 
 export interface ISerachInputCustomProps {
+  searchValue?: string
   error?: boolean
   touched?: boolean
   focusInput?: boolean
   buttonLabel: string
   onSearchTextChange?: (searchText: string) => void
-  onSubmit: (searchText: string) => void
+  onSubmit: (searchText: string) => any
 }
 
 export type ISearchInputProps = ISerachInputCustomProps &
@@ -136,6 +137,9 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
     if (!this.props.focusInput && nextProps.focusInput) {
       this.focusField()
     }
+  }
+  componentDidMount() {
+    this.setState({ searchText: this.props.searchValue || '' })
   }
 
   change = (event: React.ChangeEvent<HTMLInputElement>) => {
