@@ -1092,7 +1092,7 @@ export class SearchResultView extends React.Component<
                 label: intl.formatMessage(messages.filtersNewestToOldest)
               }
             ],
-            value: 'desc',
+            value: this.state.sortBy,
             type: SelectFieldType.Date
           }
         ]
@@ -1125,7 +1125,7 @@ export class SearchResultView extends React.Component<
                 label: intl.formatMessage(messages.filtersMarriage)
               }
             ],
-            value: ''
+            value: this.state.eventType || ''
           },
           {
             name: 'status',
@@ -1151,7 +1151,7 @@ export class SearchResultView extends React.Component<
                 label: intl.formatMessage(messages.filtersRejected)
               }
             ],
-            value: ''
+            value: this.state.status || ''
           }
         ]
       }
@@ -1198,7 +1198,6 @@ export class SearchResultView extends React.Component<
                       </ErrorText>
                     )
                   }
-                  console.log(`DATA: ${JSON.stringify(data)}`)
                   const transformedData = transformData(data, intl)
                   return (
                     <>
