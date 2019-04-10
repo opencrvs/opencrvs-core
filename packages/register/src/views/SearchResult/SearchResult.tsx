@@ -1,74 +1,73 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   PrimaryButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import {
-  SearchInput,
-  ISearchInputProps,
-  ListItem,
-  Spinner,
-  ListItemExpansion,
-  SelectFieldType
-} from '@opencrvs/components/lib/interface'
-import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
-import { Query } from 'react-apollo'
-import {
-  GQLBirthRegistration,
-  GQLRegWorkflow,
-  GQLLocation,
-  GQLHumanName,
-  GQLQuery,
-  GQLComment,
-  GQLEventRegistration,
-  GQLDeathRegistration
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import {
-  StatusGray,
-  StatusOrange,
-  StatusGreen,
-  StatusRejected,
   Duplicate,
   Edit,
-  StatusCertified
+  StatusCertified,
+  StatusGray,
+  StatusGreen,
+  StatusOrange,
+  StatusRejected
 } from '@opencrvs/components/lib/icons'
-import { IStoreState } from 'src/store'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
+import {
+  ActionPage,
+  ISearchInputProps,
+  ISelectGroupValue,
+  ListItem,
+  ListItemExpansion,
+  SearchInput,
+  SelectFieldType,
+  Spinner
+} from '@opencrvs/components/lib/interface'
+import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
-  goToEvents as goToEventsAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToPrintCertificate as goToPrintCertificateAction
-} from 'src/navigation'
-import { goToTab as goToTabAction } from '../../navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { messages as rejectionMessages } from 'src/review/reject-registration'
-import { formatLongDate } from 'src/utils/date-formatting'
+  GQLComment,
+  GQLDeathRegistration,
+  GQLHumanName,
+  GQLQuery
+} from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
-import { extractCommentFragmentValue } from 'src/utils/data-formatting'
-import { ActionPage } from '@opencrvs/components/lib/interface'
 import * as moment from 'moment'
+import * as React from 'react'
+import { Query } from 'react-apollo'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { IViewHeadingProps } from 'src/components/ViewHeading'
+import {
+  goToEvents as goToEventsAction,
+  goToPrintCertificate as goToPrintCertificateAction,
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToSearchResult
+} from 'src/navigation'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { getScope, getUserDetails } from 'src/profile/profileSelectors'
+import { messages as rejectionMessages } from 'src/review/reject-registration'
+import { SEARCH_EVENTS } from 'src/search/queries'
+import { transformData } from 'src/search/transformer'
+import { IStoreState } from 'src/store'
+import { Scope } from 'src/utils/authUtils'
 import {
   CERTIFICATE_DATE_FORMAT,
-  REJECTED,
-  REJECT_REASON,
   DECLARED,
   LANG_EN,
-  LOCAL_DATE_FORMAT
+  LOCAL_DATE_FORMAT,
+  REJECTED,
+  REJECT_REASON
 } from 'src/utils/constants'
 import {
-  FETCH_REGISTRATION_BY_COMPOSITION,
-  FETCH_REGISTRATION_QUERY
-} from './queries'
+  createNamesMap,
+  extractCommentFragmentValue
+} from 'src/utils/data-formatting'
+import { formatLongDate } from 'src/utils/date-formatting'
+import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
+import styled, { withTheme } from 'styled-components'
+import { goToTab as goToTabAction } from '../../navigation'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 
 const messages = defineMessages({
   hello: {
@@ -176,6 +175,11 @@ const messages = defineMessages({
     id: 'register.workQueue.labels.statuses.collected',
     defaultMessage: 'Collected',
     description: 'Label for the filter by collected option'
+  },
+  filtersRejected: {
+    id: 'register.workQueue.labels.statuses.rejected',
+    defaultMessage: 'Rejected',
+    description: 'Label for the filter by rejected option'
   },
   filtersAllLocations: {
     id: 'register.workQueue.labels.locations.all',
@@ -539,23 +543,41 @@ interface IBaseSearchResultProps {
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToSearchResult: typeof goToSearchResult
+}
+
+interface IMatchParams {
+  searchText: string
 }
 
 type ISearchResultProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseSearchResultProps
+  IBaseSearchResultProps &
+  RouteComponentProps<IMatchParams>
 
 interface ISearchResultState {
   printCertificateModalVisible: boolean
   regId: string | null
   currentPage: number
+  sortBy?: string
+  eventType?: string
+  status?: string
+  searchContent?: string
 }
 export class SearchResultView extends React.Component<
   ISearchResultProps,
   ISearchResultState
 > {
-  state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
+  state = {
+    printCertificateModalVisible: false,
+    regId: null,
+    currentPage: 1,
+    sortBy: 'asc',
+    eventType: '',
+    status: '',
+    searchContent: ''
+  }
   pageSize = 10
 
   getDeclarationStatusIcon = (status: string) => {
@@ -624,7 +646,7 @@ export class SearchResultView extends React.Component<
   }
 
   getEventLabel = (status: string) => {
-    switch (status) {
+    switch (status.toUpperCase()) {
       case 'BIRTH':
         return this.props.intl.formatMessage(messages.filtersBirth)
       case 'DEATH':
@@ -632,138 +654,6 @@ export class SearchResultView extends React.Component<
       default:
         return this.props.intl.formatMessage(messages.filtersBirth)
     }
-  }
-
-  transformData = (data: GQLQuery) => {
-    const { locale } = this.props.intl
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
-      return []
-    }
-
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
-        let birthReg
-        let deathReg
-        let names
-        if (reg.registration && reg.registration.type === 'BIRTH') {
-          birthReg = reg as GQLBirthRegistration
-          names =
-            (birthReg &&
-              birthReg.child &&
-              (birthReg.child.name as GQLHumanName[])) ||
-            []
-        } else {
-          deathReg = reg as GQLDeathRegistration
-          names =
-            (deathReg &&
-              deathReg.deceased &&
-              (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-        }
-        const lang = 'bn'
-        const type =
-          reg.registration &&
-          reg.registration.status &&
-          (reg.registration.status[0] as GQLRegWorkflow).type
-        return {
-          id: reg.id,
-          name:
-            (createNamesMap(names)[lang] as string) ||
-            /* tslint:disable:no-string-literal */
-            (createNamesMap(names)['default'] as string) ||
-            /* tslint:enable:no-string-literal */
-            '',
-          dob:
-            (birthReg &&
-              birthReg.child &&
-              birthReg.child.birthDate &&
-              formatLongDate(birthReg.child.birthDate, locale)) ||
-            '',
-          dod:
-            (deathReg &&
-              deathReg.deceased &&
-              deathReg.deceased.deceased &&
-              deathReg.deceased.deceased.deathDate &&
-              formatLongDate(deathReg.deceased.deceased.deathDate, locale)) ||
-            '',
-          date_of_application: formatLongDate(reg.createdAt, locale),
-          registrationNumber:
-            (reg.registration && reg.registration.registrationNumber) || '',
-          tracking_id: (reg.registration && reg.registration.trackingId) || '',
-          createdAt: reg.createdAt as string,
-          status:
-            reg.registration &&
-            reg.registration.status &&
-            reg.registration.status
-              .map(status => {
-                return {
-                  type: status && status.type,
-                  practitionerName:
-                    (status &&
-                      status.user &&
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        this.props.language
-                      ] as string)) ||
-                    (status &&
-                      status.user &&
-                      /* tslint:disable:no-string-literal */
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        'default'
-                      ] as string)) ||
-                    /* tslint:enable:no-string-literal */
-                    '',
-                  timestamp: status && formatLongDate(status.timestamp, locale),
-                  practitionerRole:
-                    status && status.user && status.user.role
-                      ? this.props.intl.formatMessage(
-                          messages[status.user.role as string]
-                        )
-                      : '',
-                  officeName:
-                    locale === 'en'
-                      ? status && status.office && status.office.name
-                      : status && status.office && status.office.alias
-                }
-              })
-              .reverse(),
-          declaration_status:
-            reg.registration &&
-            reg.registration.status &&
-            (reg.registration.status[0] as GQLRegWorkflow).type,
-          event: reg.registration && reg.registration.type,
-          rejection_reasons:
-            (type === 'REJECTED' &&
-              reg.registration &&
-              reg.registration.status &&
-              (reg.registration.status[0] as GQLRegWorkflow).comments &&
-              extractCommentFragmentValue(
-                (reg.registration.status[0] as GQLRegWorkflow)
-                  .comments as GQLComment[],
-                'reason'
-              )) ||
-            '',
-          rejection_comment:
-            (type === 'REJECTED' &&
-              reg.registration &&
-              reg.registration.status &&
-              (reg.registration.status[0] as GQLRegWorkflow).comments &&
-              extractCommentFragmentValue(
-                (reg.registration.status[0] as GQLRegWorkflow)
-                  .comments as GQLComment[],
-                'comment'
-              )) ||
-            '',
-          duplicates: reg.registration && reg.registration.duplicates,
-          location:
-            (reg.registration &&
-              reg.registration.status &&
-              (reg.registration.status[0] as GQLRegWorkflow).location &&
-              ((reg.registration.status[0] as GQLRegWorkflow)
-                .location as GQLLocation).name) ||
-            ''
-        }
-      }
-    )
   }
 
   transformDataToTaskHistory = (data: GQLQuery) => {
@@ -1166,9 +1056,23 @@ export class SearchResultView extends React.Component<
   onPageChange = async (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }
+  onSortChange = (sortBy: string) => {
+    this.setState({ sortBy })
+  }
+  onFilterChange = (
+    value: ISelectGroupValue,
+    changedValue: ISelectGroupValue
+  ) => {
+    this.setState({
+      eventType: this.state.eventType,
+      status: this.state.status,
+      ...changedValue
+    })
+  }
 
   render() {
-    const { intl, theme } = this.props
+    const { intl, match, theme } = this.props
+    const searchParam = match.params.searchText
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -1202,29 +1106,29 @@ export class SearchResultView extends React.Component<
         name: '',
         options: [
           {
-            name: 'event',
+            name: 'eventType',
             options: [
               {
                 value: '',
                 label: intl.formatMessage(messages.filtersAllEvents)
               },
               {
-                value: 'birth',
+                value: 'Birth',
                 label: intl.formatMessage(messages.filtersBirth)
               },
               {
-                value: 'death',
+                value: 'Death',
                 label: intl.formatMessage(messages.filtersDeath)
               },
               {
-                value: 'marriage',
+                value: 'Marriage',
                 label: intl.formatMessage(messages.filtersMarriage)
               }
             ],
             value: ''
           },
           {
-            name: 'declaration_status',
+            name: 'status',
             options: [
               {
                 value: '',
@@ -1241,6 +1145,10 @@ export class SearchResultView extends React.Component<
               {
                 value: 'CERTIFIED',
                 label: intl.formatMessage(messages.filtersCollected)
+              },
+              {
+                value: 'REJECTED',
+                label: intl.formatMessage(messages.filtersRejected)
               }
             ],
             value: ''
@@ -1260,11 +1168,15 @@ export class SearchResultView extends React.Component<
           <Container>
             <HeaderContent>
               <Query
-                query={FETCH_REGISTRATION_QUERY}
+                query={SEARCH_EVENTS}
                 variables={{
                   locationIds: [this.getLocalLocationId()],
                   count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize
+                  skip: (this.state.currentPage - 1) * this.pageSize,
+                  sort: this.state.sortBy,
+                  eventType: this.state.eventType,
+                  status: this.state.status,
+                  searchContent: searchParam
                 }}
               >
                 {({ loading, error, data }) => {
@@ -1277,6 +1189,7 @@ export class SearchResultView extends React.Component<
                     )
                   }
                   if (error) {
+                    console.log(`ERROR in QUERY ${JSON.stringify(error)}`)
                     Sentry.captureException(error)
 
                     return (
@@ -1285,17 +1198,20 @@ export class SearchResultView extends React.Component<
                       </ErrorText>
                     )
                   }
-                  const transformedData = this.transformData(data)
+                  console.log(`DATA: ${JSON.stringify(data)}`)
+                  const transformedData = transformData(data, intl)
                   return (
                     <>
                       <SearchInput
                         id="search-input-text"
+                        searchValue={searchParam}
                         placeholder={intl.formatMessage(
                           messages.searchInputPlaceholder
                         )}
                         buttonLabel={intl.formatMessage(
                           messages.searchInputButtonTitle
                         )}
+                        onSubmit={this.props.goToSearchResult}
                         {...this.props}
                       />
                       <DataTable
@@ -1311,6 +1227,15 @@ export class SearchResultView extends React.Component<
                         )}
                         onPageChange={(currentPage: number) => {
                           this.onPageChange(currentPage)
+                        }}
+                        onSortChange={(value: ISelectGroupValue) =>
+                          this.onSortChange(value.createdAt)
+                        }
+                        onFilterChange={(
+                          value: ISelectGroupValue,
+                          changedValue: ISelectGroupValue
+                        ) => {
+                          this.onFilterChange(value, changedValue)
                         }}
                         pageSize={this.pageSize}
                         totalPages={Math.ceil(
@@ -1339,6 +1264,7 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
+    goToSearchResult,
     gotoTab: goToTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
