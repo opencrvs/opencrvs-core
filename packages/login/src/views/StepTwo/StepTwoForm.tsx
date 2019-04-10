@@ -34,6 +34,12 @@ export const messages = defineMessages({
     defaultMessage: 'Verify your mobile',
     description: 'The title that appears in step two of the form'
   },
+  stepTwoResendTitle: {
+    id: 'login.stepTwoResendTitle',
+    defaultMessage: 'Verification code resent',
+    description:
+      'The title that appears in step two of the form after resend button click'
+  },
   resend: {
     id: 'login.resendMobile',
     defaultMessage: 'Resend SMS',
@@ -148,20 +154,26 @@ export class StepTwoForm extends React.Component<
           <LogoContainer>
             <StyledMobile2FA />
           </LogoContainer>
-          <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
           {resentSMS ? (
-            <p>
-              {intl.formatMessage(messages.resentSMS, {
-                number: mobileNumber
-              })}
-            </p>
+            <React.Fragment>
+              <h2>{intl.formatMessage(messages.stepTwoResendTitle)}</h2>
+              <p>
+                {intl.formatMessage(messages.resentSMS, {
+                  number: mobileNumber
+                })}
+              </p>
+            </React.Fragment>
           ) : (
-            <p>
-              {intl.formatMessage(messages.stepTwoInstruction, {
-                number: mobileNumber
-              })}
-            </p>
+            <React.Fragment>
+              <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
+              <p>
+                {intl.formatMessage(messages.stepTwoInstruction, {
+                  number: mobileNumber
+                })}
+              </p>
+            </React.Fragment>
           )}
+
           {submissionError && (
             <ErrorText>
               {intl.formatMessage(messages.codeSubmissionError)}

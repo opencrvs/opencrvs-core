@@ -14,6 +14,7 @@ export const BENGALI_STATE = {
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
     'login.resentSMS':
       'আমরা আপনার মোবাইল নম্বর, {number} তে একটি নতুন এসএমএস প্রেরণ করেছি',
+    'login.stepTwoResendTitle': 'ভেরিফিকেশন কোড পুনঃপ্রেরণ',
     'login.resendMobile': 'এসএমএস পুনঃপ্রেরণ',
     'login.optionalLabel': 'ঐচ্ছিক',
     'login.stepTwoTitle': 'আপনার মোবাইল যাচাই করুন',
