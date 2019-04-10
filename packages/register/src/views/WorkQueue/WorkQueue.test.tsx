@@ -505,8 +505,8 @@ describe('WorkQueue tests', async () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].event_time_elapsed).toBe('8 years ago')
-    expect(data[0].application_time_elapsed).toBe('10 months ago')
+    expect(data[0].event_time_elapsed).toBe('9 years ago')
+    expect(data[0].application_time_elapsed).toBe('a year ago')
     expect(data[0].tracking_id).toBe('B111111')
     expect(data[0].event).toBe('BIRTH')
     expect(data[0].actions).toBeDefined()
