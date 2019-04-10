@@ -33,6 +33,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:gateway-user',
   'opencrvs:notification-user',
   'opencrvs:workflow-user',
-  'opencrvs:search-user'
+  'opencrvs:search-user',
+  'opencrvs:resources-user'
 ]
 export const JWT_ISSUER = 'opencrvs:auth-service'
