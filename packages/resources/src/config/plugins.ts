@@ -1,7 +1,9 @@
 import * as Good from 'good'
+import * as JWT from 'hapi-auth-jwt2'
 
 export default function getPlugins() {
   const plugins: any[] = [
+    JWT,
     {
       plugin: Good,
       options: {

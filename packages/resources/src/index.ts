@@ -3,11 +3,18 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 // tslint:enable no-var-requires
 
 import * as Hapi from 'hapi'
+import { readFileSync } from 'fs'
 import getPlugins from './config/plugins'
-import { RESOURCES_HOST, RESOURCES_PORT } from './constants'
+import {
+  RESOURCES_HOST,
+  RESOURCES_PORT,
+  CERT_PUBLIC_KEY_PATH
+} from './constants'
 
 import locationsHandler from './features/administrative/handler'
 import facilitiesHandler from './features/facilities/handler'
+
+const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -17,6 +24,23 @@ export async function createServer() {
       cors: { origin: ['*'] }
     }
   })
+
+  await server.register(getPlugins())
+
+  server.auth.strategy('jwt', 'jwt', {
+    key: publicCert,
+    verifyOptions: {
+      algorithms: ['RS256'],
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:resources-user'
+    },
+    validate: (payload: any, request: any) => ({
+      isValid: true,
+      credentials: payload
+    })
+  })
+
+  server.auth.default('jwt')
 
   server.route({
     method: 'GET',
@@ -34,19 +58,9 @@ export async function createServer() {
     handler: facilitiesHandler,
     options: {
       tags: ['api'],
-      description: 'Returns facilities.json',
-      plugins: {
-        'hapi-swagger': {
-          responses: {
-            200: { description: 'facilities JSON returned' },
-            400: { description: 'facilities JSON error' }
-          }
-        }
-      }
+      description: 'Returns facilities.json'
     }
   })
-
-  await server.register(getPlugins())
 
   async function stop() {
     await server.stop()

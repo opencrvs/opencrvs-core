@@ -2,33 +2,43 @@ import { Field, WrappedFieldProps } from 'redux-form'
 import * as React from 'react'
 import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
-import { InjectedFormProps, reset } from 'redux-form'
+import { InjectedFormProps } from 'redux-form'
 
 import {
-  SecondaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Link } from '@opencrvs/components/lib/typography'
-import { FlexGrid } from '@opencrvs/components/lib/grid'
-import { TextInput, InputField } from '@opencrvs/components/lib/forms'
-
+  TextInput,
+  InputField,
+  THEME_MODE
+} from '@opencrvs/components/lib/forms'
+import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from './stepTwoFields'
 
-import { store } from '../../App'
-import { ErrorText, Title, FormWrapper } from '../StepOne/StepOneForm'
+import {
+  Title,
+  FormWrapper,
+  ActionWrapper,
+  Container,
+  LogoContainer,
+  StyledPrimaryButton,
+  StyledButton,
+  FieldWrapper,
+  ErrorText
+} from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
 
-import { FORM_NAME } from './contants'
-import { Box } from '@opencrvs/components/lib/interface'
-
-const messages = defineMessages({
+export const messages = defineMessages({
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
     defaultMessage: 'Verify your mobile',
     description: 'The title that appears in step two of the form'
+  },
+  stepTwoResendTitle: {
+    id: 'login.stepTwoResendTitle',
+    defaultMessage: 'Verification code resent',
+    description:
+      'The title that appears in step two of the form after resend button click'
   },
   resend: {
     id: 'login.resendMobile',
@@ -38,7 +48,7 @@ const messages = defineMessages({
   stepTwoInstruction: {
     id: 'login.stepTwoInstruction',
     defaultMessage:
-      'Please enter the sms code we have sent to your mobile phone.',
+      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 5 minutes.',
     description: 'The instruction that appears in step two of the form'
   },
   submit: {
@@ -54,7 +64,7 @@ const messages = defineMessages({
   },
   resentSMS: {
     id: 'login.resentSMS',
-    defaultMessage: 'We have delivered a new SMS to your mobile phone',
+    defaultMessage: 'We just resent you another code to {number}',
     description: 'The message that appears when the resend button is clicked.'
   },
   optionalLabel: {
@@ -62,78 +72,22 @@ const messages = defineMessages({
     defaultMessage: 'Optional',
     description: 'Optional label'
   },
-  clearForm: {
-    id: 'login.clearForm',
-    defaultMessage: 'Clear form',
-    description: 'Button to clear the SMS code from the form'
+  verficationCodeLabel: {
+    id: 'login.verficationCodeLabel',
+    defaultMessage: 'Verification code (6 digits)',
+    description: 'Verification code label'
   }
 })
 
-const FieldWrapper = styled.div`
-  margin-bottom: 30px;
-  flex-grow: 1;
-  margin-right: 5%;
-  margin-left: 5%;
-  &:first-child {
-    margin-left: 0%;
-  }
-  &:last-child {
-    margin-right: 0%;
-  }
-`
-/**
- * This ActionWrapper should be removed and replaced by imported ActionWrapper
- * from StepOneForm when styling updates will take place in StepTwoFrom
- */
-
-const ActionWrapper = styled.div`
-  position: relative;
-  margin-top: 10px;
-  display: flex;
-`
-
-const Separator = styled.div`
-  flex-grow: 1;
-  margin-left: auto;
-  margin-right: auto;
-`
-
-const Circle = styled.div`
-  height: 5px;
-  width: 1px;
-  position: relative;
-  top: 12px;
-  background-color: ${({ theme }) => theme.colors.disabled};
-`
-
-const SecondaryButtonStyled = styled(SecondaryButton)`
-  margin-right: 1em;
-`
-
-const ClearFormLink = styled(Link)`
-  position: relative;
-  float: right;
-  top: -20px;
-`
-const StyledBox = styled(Box)`
-  position: absolute;
-  height: auto;
-  top: 50%;
-  right: 50%;
-  padding: 0px;
-  margin: 0px;
-  transform: translate(50%, -50%);
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 90%;
-  }
+const StyledMobile2FA = styled(Mobile2FA)`
+  transform: scale(0.8);
 `
 export interface IProps {
   formId: string
   submissionError: boolean
   resentSMS: boolean
   submitting: boolean
-  fieldToFocus: string | null
+  stepOneDetails: { mobile: string }
 }
 export interface IDispatchProps {
   submitAction: (values: IVerifyCodeNumbers) => void
@@ -141,11 +95,10 @@ export interface IDispatchProps {
 }
 
 type IStepTwoForm = IProps & IDispatchProps
-
 const CodeInput = injectIntl(
   (
-    props: WrappedFieldProps & { field: Ii18nReduxFormFieldProps } & {
-      isFocused: boolean
+    props: WrappedFieldProps & {
+      field: Ii18nReduxFormFieldProps
     } & InjectedIntlProps
   ) => {
     const { field, meta, intl, ...otherProps } = props
@@ -155,17 +108,18 @@ const CodeInput = injectIntl(
         {...otherProps}
         touched={meta.touched}
         error={meta.error && localiseValidationError(intl, meta.error)}
+        label={intl.formatMessage(messages.verficationCodeLabel)}
         optionalLabel={intl.formatMessage(messages.optionalLabel)}
-        label=""
         ignoreMediaQuery
+        hideAsterisk
+        mode={THEME_MODE.DARK}
       >
         <TextInput
           {...field}
           {...props.input}
           touched={Boolean(meta.touched)}
           error={Boolean(meta.error)}
-          focusInput={props.isFocused}
-          placeholder="0"
+          placeholder="000000"
           ignoreMediaQuery
         />
       </InputField>
@@ -178,86 +132,83 @@ export class StepTwoForm extends React.Component<
     InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
     IStepTwoForm
 > {
-  clearTheForm(e: React.MouseEvent<HTMLElement>) {
-    store.dispatch(reset(FORM_NAME))
-  }
   render() {
     const {
       intl,
       handleSubmit,
       formId,
       submitAction,
-      submissionError,
       submitting,
       resentSMS,
-      fieldToFocus
+      stepOneDetails,
+      submissionError
     } = this.props
-
+    const mobileNumber = stepOneDetails.mobile.replace(
+      stepOneDetails.mobile.slice(5, 10),
+      '******'
+    )
+    const field = stepTwoFields.code
     return (
-      <StyledBox id="login-step-two-box">
+      <Container id="login-step-two-box">
         <Title>
-          <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
-          <p>{intl.formatMessage(messages.stepTwoInstruction)}</p>
+          <LogoContainer>
+            <StyledMobile2FA />
+          </LogoContainer>
+          {resentSMS ? (
+            <React.Fragment>
+              <h2>{intl.formatMessage(messages.stepTwoResendTitle)}</h2>
+              <p>
+                {intl.formatMessage(messages.resentSMS, {
+                  number: mobileNumber
+                })}
+              </p>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
+              <p>
+                {intl.formatMessage(messages.stepTwoInstruction, {
+                  number: mobileNumber
+                })}
+              </p>
+            </React.Fragment>
+          )}
+
           {submissionError && (
             <ErrorText>
               {intl.formatMessage(messages.codeSubmissionError)}
             </ErrorText>
           )}
-          {resentSMS && (
-            <ErrorText>{intl.formatMessage(messages.resentSMS)}</ErrorText>
-          )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
-          <FlexGrid>
-            {Array(6)
-              .fill(null)
-              .map((_, i) => {
-                const field = stepTwoFields[`code${i + 1}`]
+          <FieldWrapper>
+            <Field
+              name={field.name}
+              validate={field.validate}
+              component={CodeInput}
+              field={field}
+            />
+          </FieldWrapper>
 
-                return (
-                  <React.Fragment key={i}>
-                    <FieldWrapper>
-                      <Field
-                        name={field.name}
-                        validate={field.validate}
-                        component={CodeInput}
-                        field={field}
-                        isFocused={field.id === fieldToFocus}
-                      />
-                    </FieldWrapper>
-                    {i !== 5 && (
-                      <Separator>
-                        <Circle />
-                      </Separator>
-                    )}
-                  </React.Fragment>
-                )
-              })}
-          </FlexGrid>
-
-          {fieldToFocus && (
-            <ClearFormLink id="login-clear-form" onClick={this.clearTheForm}>
-              {intl.formatMessage(messages.clearForm)}
-            </ClearFormLink>
-          )}
           <ActionWrapper>
-            <SecondaryButtonStyled
-              onClick={this.props.onResendSMS}
-              id="login-mobile-resend"
-              type="button"
-            >
-              {intl.formatMessage(messages.resend)}
-            </SecondaryButtonStyled>
-            <PrimaryButton
+            <StyledPrimaryButton
               id="login-mobile-submit"
               disabled={submitting}
               type="submit"
             >
               {intl.formatMessage(messages.submit)}
-            </PrimaryButton>
+            </StyledPrimaryButton>{' '}
+            <br />
+            <StyledButton
+              onClick={this.props.onResendSMS}
+              id="login-mobile-resend"
+              type="button"
+            >
+              {intl.formatMessage(messages.resend)}
+            </StyledButton>
           </ActionWrapper>
         </FormWrapper>
-      </StyledBox>
+      </Container>
     )
   }
 }

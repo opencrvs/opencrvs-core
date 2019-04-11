@@ -16,7 +16,8 @@ background: ${({ theme }) =>
 )`};
   min-height: 100vh;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
+  justify-content: center;
 
   ${({ submitting }) =>
     submitting && `justify-content: center; align-items: center;`}
