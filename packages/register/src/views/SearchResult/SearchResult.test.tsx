@@ -39,7 +39,7 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-describe.only('SearchResult tests', async () => {
+describe('SearchResult tests', async () => {
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -71,23 +71,49 @@ describe.only('SearchResult tests', async () => {
             sort: 'asc',
             eventType: '',
             status: '',
-            searchContent: 'zahir'
+            searchContent: ''
           }
         },
         result: {
           data: {
             searchEvents: {
-              totalItems: 1,
+              totalItems: 4,
               results: [
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'DECLARED',
+                    dateOfApplication: '2019-04-10T07:51:35.698Z',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ]
+                },
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
                   type: 'Death',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REJECTED',
                     dateOfApplication: '2019-04-10T07:55:39.307Z',
                     trackingId: 'DXMJPYA',
                     registrationNumber: null,
-                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    reason:
+                      'duplicate,misspelling,missing_supporting_doc,other',
+                    comment: 'Rejected'
                   },
                   dateOfDeath: '2010-01-01',
                   deceasedName: [
@@ -98,6 +124,50 @@ describe.only('SearchResult tests', async () => {
                     {
                       firstNames: 'জহির',
                       familyName: 'রায়হান'
+                    }
+                  ]
+                },
+                {
+                  id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    dateOfApplication: '2019-04-11T09:39:20.845Z',
+                    trackingId: 'BQRZWDR',
+                    registrationNumber: '2019333494BQRZWDR2',
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfBirth: '2010-01-01',
+                  childName: [
+                    {
+                      firstNames: 'Fokrul',
+                      familyName: 'Islam'
+                    },
+                    {
+                      firstNames: 'ফকরুল',
+                      familyName: 'ইসলাম'
+                    }
+                  ]
+                },
+                {
+                  id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
+                  type: 'Birth',
+                  registration: {
+                    status: 'CERTIFIED',
+                    dateOfApplication: '2019-04-11T06:30:18.273Z',
+                    trackingId: 'B3DBJMP',
+                    registrationNumber: '2019333494B3DBJMP5',
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfBirth: '2008-01-01',
+                  childName: [
+                    {
+                      firstNames: 'Rafiq',
+                      familyName: 'Islam'
+                    },
+                    {
+                      firstNames: 'রফিক',
+                      familyName: 'ইসলাম'
                     }
                   ]
                 }
@@ -111,7 +181,7 @@ describe.only('SearchResult tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <SearchResult match={{ params: { searchText: 'zahir' } }} />,
+      <SearchResult match={{ params: { searchText: '' } }} />,
       store,
       graphqlMock
     )
@@ -124,6 +194,19 @@ describe.only('SearchResult tests', async () => {
     const data = testComponent.component.find(DataTable).prop('data')
     expect(data).toEqual([
       {
+        id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+        name: 'ইলিয়াস খান',
+        dob: '',
+        dod: '01-01-2007',
+        date_of_application: '10-04-2019',
+        registrationNumber: '',
+        tracking_id: 'DW0UTHR',
+        event: 'Death',
+        declaration_status: 'DECLARED',
+        rejection_reasons: '',
+        rejection_comment: ''
+      },
+      {
         id: 'c7e83060-4db9-4057-8b14-71841243b05f',
         name: 'জহির রায়হান',
         dob: '',
@@ -131,8 +214,34 @@ describe.only('SearchResult tests', async () => {
         date_of_application: '10-04-2019',
         registrationNumber: '',
         tracking_id: 'DXMJPYA',
-        declaration_status: 'DECLARED',
         event: 'Death',
+        declaration_status: 'REJECTED',
+        rejection_reasons: '',
+        rejection_comment: ''
+      },
+      {
+        id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
+        name: 'ফকরুল ইসলাম',
+        dob: '01-01-2010',
+        dod: '',
+        date_of_application: '11-04-2019',
+        registrationNumber: '2019333494BQRZWDR2',
+        tracking_id: 'BQRZWDR',
+        event: 'Birth',
+        declaration_status: 'REGISTERED',
+        rejection_reasons: '',
+        rejection_comment: ''
+      },
+      {
+        id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
+        name: 'রফিক ইসলাম',
+        dob: '01-01-2008',
+        dod: '',
+        date_of_application: '11-04-2019',
+        registrationNumber: '2019333494B3DBJMP5',
+        tracking_id: 'B3DBJMP',
+        event: 'Birth',
+        declaration_status: 'CERTIFIED',
         rejection_reasons: '',
         rejection_comment: ''
       }
@@ -180,7 +289,7 @@ describe.only('SearchResult tests', async () => {
     testComponent.component.unmount()
   })
 
-  describe.only('SearchResult tests for different application activity', () => {
+  describe('SearchResult tests for different application activity', () => {
     it('renders declare section after expanding', async () => {
       const graphqlMock = [
         {
@@ -435,7 +544,7 @@ describe.only('SearchResult tests', async () => {
       testComponent.component.unmount()
     })
 
-    it.only('renders rejected section after expanding', async () => {
+    it('renders rejected section after expanding', async () => {
       const graphqlMock = [
         {
           request: {
