@@ -34,7 +34,7 @@ import {
   StatusRejected,
   Duplicate,
   Edit,
-  StatusBlue
+  StatusCertified
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
@@ -60,9 +60,9 @@ import * as moment from 'moment'
 import {
   CERTIFICATE_DATE_FORMAT,
   REJECTED,
-  REASON,
+  REJECT_REASON,
   DECLARED,
-  EN
+  LANG_EN
 } from 'src/utils/constants'
 import {
   FETCH_REGISTRATION_BY_COMPOSITION,
@@ -580,7 +580,7 @@ export class SearchResultView extends React.Component<
       case 'CERTIFIED':
         return (
           <StatusIcon>
-            <StatusBlue />
+            <StatusCertified />
           </StatusIcon>
         )
       default:
@@ -820,7 +820,7 @@ export class SearchResultView extends React.Component<
           (collector &&
             collector.individual &&
             (createNamesMap(collector.individual.name as GQLHumanName[])[
-              EN
+              LANG_EN
             ] as string)) ||
           '',
         collectorType: collector && collector.relationship,
@@ -829,7 +829,7 @@ export class SearchResultView extends React.Component<
             status.type === REJECTED &&
             extractCommentFragmentValue(
               status.comments as GQLComment[],
-              REASON
+              REJECT_REASON
             )) ||
           '',
         informantContactNumber: contactInfo && contactInfo.value
