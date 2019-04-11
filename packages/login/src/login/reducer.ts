@@ -12,6 +12,7 @@ export type LoginState = {
   authenticationDetails: { nonce: string }
   submissionError: boolean
   resentSMS: boolean
+  stepOneDetails: { mobile: string }
 }
 
 export const initialState: LoginState = {
@@ -21,7 +22,8 @@ export const initialState: LoginState = {
     nonce: ''
   },
   submissionError: false,
-  resentSMS: false
+  resentSMS: false,
+  stepOneDetails: { mobile: '' }
 }
 
 export const loginReducer: LoopReducer<LoginState, actions.Action> = (

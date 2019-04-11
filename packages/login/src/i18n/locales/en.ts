@@ -11,11 +11,14 @@ export const ENGLISH_STATE = {
     'login.submissionError':
       'Sorry that mobile number and password did not work.',
     'login.codeSubmissionError': 'Sorry that code did not work.',
+    'login.resentSMS': 'We just resent you another code to {number}',
+    'login.stepTwoResendTitle': 'Verification code resent',
     'login.resendMobile': 'Resend SMS',
     'login.optionalLabel': 'Optional',
     'login.stepTwoTitle': 'Verify your mobile phone',
+    'login.verficationCodeLabel': 'Verification code (6 digits)',
     'login.stepTwoInstruction':
-      'Please enter the sms code we have sent to your mobile phone.',
+      'A verification code has been sent to your phone. ending in {number}. This code will be valid for 5 minutes.',
     'login.clearForm': 'Clear form',
     'login.manager.registerAppTitle': 'OpenCRVS Homepage',
     'login.manager.registerAppDescription':
@@ -25,7 +28,7 @@ export const ENGLISH_STATE = {
       "Analyse the performance of a particular area of your country in it's Civil Registration.",
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
-    'validations.numberRequired': 'Must be a number',
+    'validations.numberRequired': 'Must be number',
     'validations.phoneNumberFormat':
       'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.mobilePhoneRegex': '0[0-9]{9,10}',

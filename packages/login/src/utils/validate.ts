@@ -22,9 +22,9 @@ export const messages = defineMessages({
   },
   numberRequired: {
     id: 'validations.numberRequired',
-    defaultMessage: 'Must be a number',
+    defaultMessage: 'Must be number',
     description:
-      'The error message that appears on fields where the value must be a number'
+      'The error message that appears on fields where the value must be number'
   },
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
