@@ -6,6 +6,7 @@ context('Birth Registration Integration Test', () => {
   })
   it('Tests from application to registration', () => {
     cy.login('fieldWorker')
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn').click()
     for (let i = 0; i < 8; i++) {
       cy.get('#keypad-1').click()
