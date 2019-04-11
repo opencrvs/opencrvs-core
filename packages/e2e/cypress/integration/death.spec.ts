@@ -7,14 +7,9 @@ context('Death Registration Integration Test', () => {
   it('Tests from application to registration', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn').click()
-    cy.get('#keypad-1').click()
-    cy.get('#keypad-2').click()
-    cy.get('#keypad-3').click()
-    cy.get('#keypad-4').click()
-    cy.get('#keypad-1').click()
-    cy.get('#keypad-2').click()
-    cy.get('#keypad-3').click()
-    cy.get('#keypad-4').click()
+    for (let i = 0; i < 8; i++) {
+      cy.get('#keypad-1').click()
+    }
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
     cy.get('#select_vital_event_view').should('be.visible')
