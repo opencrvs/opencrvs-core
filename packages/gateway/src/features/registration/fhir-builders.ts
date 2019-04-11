@@ -1869,6 +1869,13 @@ const builders: IFieldBuilders = {
               fhirBundle,
               context
             )
+          } else if (fieldValue === 'INFORMANT') {
+            await setCertificateCollectorReference(
+              INFORMANT_CODE,
+              relatedPersonResource,
+              fhirBundle,
+              context
+            )
           }
         },
         /* expecting value for this only when other is selected as relationship */

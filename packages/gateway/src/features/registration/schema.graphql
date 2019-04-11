@@ -423,6 +423,7 @@ type Query {
     skip: Int
     sort: String
   ): EventSearchResultSet
+  fetchRegistration(id: ID!): EventRegistration
 }
 
 type Mutation {

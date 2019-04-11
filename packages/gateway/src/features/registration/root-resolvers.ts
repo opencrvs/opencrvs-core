@@ -41,6 +41,9 @@ export const resolvers: GQLResolver = {
 
       return await fetchFHIR(`/${task.focus.reference}`, authHeader)
     },
+    async fetchRegistration(_, { id }, authHeader) {
+      return await fetchFHIR(`/Composition/${id}`, authHeader)
+    },
     async queryPersonByIdentifier(_, { identifier }, authHeader) {
       const personBundle = await fetchFHIR(
         `/Patient?identifier=${identifier}`,

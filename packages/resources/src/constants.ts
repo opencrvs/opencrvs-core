@@ -10,3 +10,6 @@ export const ORG_URL = 'http://opencrvs.org'
 export const REGISTER_SOURCE = `${process.cwd()}/../register/public/assets/`
 export const RESOURCES_HOST = process.env.RESOURCES_HOST || '0.0.0.0'
 export const RESOURCES_PORT = process.env.RESOURCES_PORT || 3040
+export const CERT_PUBLIC_KEY_PATH =
+  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
+  '../../.secrets/public-key.pem'

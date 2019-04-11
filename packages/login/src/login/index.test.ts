@@ -23,25 +23,6 @@ describe('actions', () => {
       ).toEqual(action)
     })
   })
-  describe('verifyCode', () => {
-    it('creates a code string from received code object', () => {
-      expect(
-        actions.verifyCode({
-          code1: '1',
-          code2: '2',
-          code3: '3',
-          code4: '4',
-          code5: '5',
-          code6: '6'
-        })
-      ).toEqual({
-        type: actions.VERIFY_CODE,
-        payload: {
-          code: '123456'
-        }
-      })
-    })
-  })
 })
 
 describe('reducer', () => {

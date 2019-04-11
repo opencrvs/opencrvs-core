@@ -32,18 +32,20 @@ const ListItemSingleAction = styled(Button)`
 
 interface IListItemActionProps {
   actions: IAction[]
+  id?: string
   expanded?: boolean
   onExpand?: () => void
 }
 
 export function ListItemAction(props: IListItemActionProps) {
-  const { actions, expanded, onExpand } = props
+  const { actions, expanded, onExpand, id } = props
   return (
-    <Container>
+    <Container id={id}>
       {actions &&
         actions.map((action: IAction) => (
           <ListItemSingleAction
             key={action.label as string}
+            id={action.label as string}
             onClick={action.handler}
           >
             {action.label}
