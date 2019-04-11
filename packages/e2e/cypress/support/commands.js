@@ -25,10 +25,13 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', (userType, options = {}) => {
-  indexedDB.deleteDatabase('OpenCRVS')
   const users = {
     fieldWorker: {
       mobile: '+8801711111111',
+      password: 'test'
+    },
+    registrar: {
+      mobile: '+8801733333333',
       password: 'test'
     }
   }
@@ -69,4 +72,10 @@ Cypress.Commands.add('selectOption', (selector, text, option) => {
     .get(`${selector} .react-select__menu`)
     .contains(option)
     .click()
+})
+
+Cypress.Commands.add('logout', () => {
+  cy.get('#sub-menu').click()
+  cy.get('#Logout-menu-item').click()
+  cy.get('#logout_confirm').click()
 })
