@@ -4,9 +4,9 @@ import { SecureAccount } from 'src/views/SecureAccount/SecureAccountView'
 import { Unlock } from 'src/views/Unlock/Unlock'
 import { storage } from 'src/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
-import { isMobile } from 'react-device-detect'
+import { isMobileDevice } from 'src/utils/commonUtils'
 
-const SCREEN_LOCK = 'screenLock'
+export const SCREEN_LOCK = 'screenLock'
 
 interface IProtectPageState {
   secured: boolean
@@ -43,8 +43,7 @@ class ProtectedPageComponent extends React.Component<
 
   async handleVisibilityChange(isVisible: boolean) {
     const newState = { ...this.state }
-
-    if (!isVisible && !(await storage.getItem(SCREEN_LOCK)) && isMobile) {
+    if (!isVisible && !(await storage.getItem(SCREEN_LOCK))) {
       newState.secured = false
       if (await this.getPIN()) {
         newState.pinExists = true
@@ -68,13 +67,14 @@ class ProtectedPageComponent extends React.Component<
   render() {
     const { secured, pinExists } = this.state
     return (
-      <PageVisibility onChange={this.handleVisibilityChange}>
-        {(secured && pinExists && this.props.children) ||
-          (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
-          (!secured && pinExists && (
-            <Unlock onCorrectPinMatch={this.markAsSecured} />
-          ))}
-      </PageVisibility>
+      (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
+      (isMobileDevice() && (
+        <PageVisibility onChange={this.handleVisibilityChange}>
+          {(secured && this.props.children) ||
+            (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+        </PageVisibility>
+      )) ||
+      this.props.children
     )
   }
 }

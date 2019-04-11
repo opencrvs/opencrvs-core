@@ -12,6 +12,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
 import * as bcrypt from 'bcryptjs'
+import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 
 const messages = defineMessages({
   incorrect: {
@@ -164,7 +165,10 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       this.props.onCorrectPinMatch()
     }
   }
-
+  logout = () => {
+    storage.removeItem(SCREEN_LOCK)
+    this.props.redirectToAuthentication()
+  }
   render() {
     return (
       <PageWrapper id="unlockPage">
@@ -179,7 +183,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}
-          handleYes={this.props.redirectToAuthentication}
+          handleYes={this.logout}
         />
       </PageWrapper>
     )
