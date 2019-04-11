@@ -10,10 +10,7 @@ import { queries } from 'src/profile/queries'
 import { SEARCH_EVENTS } from 'src/search/queries'
 import { createStore } from 'src/store'
 import { createTestComponent, mockUserResponse } from 'src/tests/util'
-import {
-  FETCH_REGISTRATION_BY_COMPOSITION,
-  FETCH_REGISTRATION_QUERY
-} from './queries'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 import { SearchResult } from './SearchResult'
 
 const registerScopeToken =
@@ -193,83 +190,52 @@ describe('SearchResult tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            operationName: null,
+            query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
+              count: 10,
               skip: 0,
-              count: 10
+              sort: 'asc',
+              eventType: '',
+              status: '',
+              searchContent: 'rafiq'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
+              searchEvents: {
                 totalItems: 1,
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
                     registration: {
-                      id: '123',
+                      status: 'DECLARED',
+                      dateOfApplication: '2019-04-03T08:56:12.031Z',
+                      trackingId: 'BDQNYZH',
                       registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: '',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      __typename: 'RegistrationSearchSet'
                     },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
+                    dateOfBirth: '2010-01-01',
+                    childName: [
+                      {
+                        firstNames: 'Rafiq',
+                        familyName: 'Islam',
+                        __typename: 'HumanName'
+                      },
+                      {
+                        firstNames: 'রফিক',
+                        familyName: 'ইসলাম',
+                        __typename: 'HumanName'
+                      }
+                    ],
+                    __typename: 'BirthEventSearchSet'
                   }
-                ]
+                ],
+                __typename: 'EventSearchResultSet'
               }
             }
           }
@@ -336,7 +302,7 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult />,
+        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
         store,
         graphqlMock
       )
@@ -372,83 +338,52 @@ describe('SearchResult tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            operationName: null,
+            query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
+              count: 10,
               skip: 0,
-              count: 10
+              sort: 'asc',
+              eventType: '',
+              status: '',
+              searchContent: 'rafiq'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
+              searchEvents: {
                 totalItems: 1,
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
                     registration: {
-                      id: '123',
+                      status: 'DECLARED',
+                      dateOfApplication: '2019-04-03T08:56:12.031Z',
+                      trackingId: 'BDQNYZH',
                       registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'DECLARED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      __typename: 'RegistrationSearchSet'
                     },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
+                    dateOfBirth: '2010-01-01',
+                    childName: [
+                      {
+                        firstNames: 'Rafiq',
+                        familyName: 'Islam',
+                        __typename: 'HumanName'
+                      },
+                      {
+                        firstNames: 'রফিক',
+                        familyName: 'ইসলাম',
+                        __typename: 'HumanName'
+                      }
+                    ],
+                    __typename: 'BirthEventSearchSet'
                   }
-                ]
+                ],
+                __typename: 'EventSearchResultSet'
               }
             }
           }
@@ -473,7 +408,7 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult />,
+        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
         store,
         graphqlMock
       )
@@ -509,83 +444,52 @@ describe('SearchResult tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            operationName: null,
+            query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
+              count: 10,
               skip: 0,
-              count: 10
+              sort: 'asc',
+              eventType: '',
+              status: '',
+              searchContent: 'rafiq'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
+              searchEvents: {
                 totalItems: 1,
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
                     registration: {
-                      id: '123',
+                      status: 'DECLARED',
+                      dateOfApplication: '2019-04-03T08:56:12.031Z',
+                      trackingId: 'BDQNYZH',
                       registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'REJECTED',
-                          comments: [
-                            {
-                              comment: 'reason=misspelling&comment=misspel'
-                            }
-                          ]
-                        }
-                      ]
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      __typename: 'RegistrationSearchSet'
                     },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
+                    dateOfBirth: '2010-01-01',
+                    childName: [
+                      {
+                        firstNames: 'Rafiq',
+                        familyName: 'Islam',
+                        __typename: 'HumanName'
+                      },
+                      {
+                        firstNames: 'রফিক',
+                        familyName: 'ইসলাম',
+                        __typename: 'HumanName'
+                      }
+                    ],
+                    __typename: 'BirthEventSearchSet'
                   }
-                ]
+                ],
+                __typename: 'EventSearchResultSet'
               }
             }
           }
@@ -657,7 +561,7 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult />,
+        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
         store,
         graphqlMock
       )
@@ -693,83 +597,52 @@ describe('SearchResult tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            operationName: null,
+            query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
+              count: 10,
               skip: 0,
-              count: 10
+              sort: 'asc',
+              eventType: '',
+              status: '',
+              searchContent: 'rafiq'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
+              searchEvents: {
                 totalItems: 1,
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
                     registration: {
-                      id: '123',
+                      status: 'DECLARED',
+                      dateOfApplication: '2019-04-03T08:56:12.031Z',
+                      trackingId: 'BDQNYZH',
                       registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'REGISTERED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      __typename: 'RegistrationSearchSet'
                     },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
+                    dateOfBirth: '2010-01-01',
+                    childName: [
+                      {
+                        firstNames: 'Rafiq',
+                        familyName: 'Islam',
+                        __typename: 'HumanName'
+                      },
+                      {
+                        firstNames: 'রফিক',
+                        familyName: 'ইসলাম',
+                        __typename: 'HumanName'
+                      }
+                    ],
+                    __typename: 'BirthEventSearchSet'
                   }
-                ]
+                ],
+                __typename: 'EventSearchResultSet'
               }
             }
           }
@@ -831,7 +704,7 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult />,
+        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
         store,
         graphqlMock
       )
@@ -867,83 +740,52 @@ describe('SearchResult tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            operationName: null,
+            query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
+              count: 10,
               skip: 0,
-              count: 10
+              sort: 'asc',
+              eventType: '',
+              status: '',
+              searchContent: 'rafiq'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
+              searchEvents: {
                 totalItems: 1,
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
                     registration: {
-                      id: '123',
+                      status: 'DECLARED',
+                      dateOfApplication: '2019-04-03T08:56:12.031Z',
+                      trackingId: 'BDQNYZH',
                       registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: 'BIRTH',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'en',
-                                firstNames: 'Mohammad',
-                                familyName: 'Ashraful'
-                              },
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: 'CERTIFIED',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      __typename: 'RegistrationSearchSet'
                     },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: null
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
+                    dateOfBirth: '2010-01-01',
+                    childName: [
+                      {
+                        firstNames: 'Rafiq',
+                        familyName: 'Islam',
+                        __typename: 'HumanName'
+                      },
+                      {
+                        firstNames: 'রফিক',
+                        familyName: 'ইসলাম',
+                        __typename: 'HumanName'
+                      }
+                    ],
+                    __typename: 'BirthEventSearchSet'
                   }
-                ]
+                ],
+                __typename: 'EventSearchResultSet'
               }
             }
           }
@@ -1010,7 +852,7 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult />,
+        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
         store,
         graphqlMock
       )
@@ -1046,78 +888,52 @@ describe('SearchResult tests', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_REGISTRATION_QUERY,
+            operationName: null,
+            query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
+              count: 10,
               skip: 0,
-              count: 10
+              sort: 'asc',
+              eventType: '',
+              status: '',
+              searchContent: 'rafiq'
             }
           },
           result: {
             data: {
-              listEventRegistrations: {
+              searchEvents: {
                 totalItems: 1,
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
                     registration: {
-                      id: '123',
+                      status: 'DECLARED',
+                      dateOfApplication: '2019-04-03T08:56:12.031Z',
+                      trackingId: 'BDQNYZH',
                       registrationNumber: null,
-                      trackingId: 'B111111',
-                      type: '',
-                      duplicates: null,
-                      status: [
-                        {
-                          id: '123',
-                          timestamp: null,
-                          user: {
-                            id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                            name: [
-                              {
-                                use: 'bn',
-                                firstNames: '',
-                                familyName: ''
-                              }
-                            ],
-                            role: 'LOCAL_REGISTRAR'
-                          },
-                          location: {
-                            id: '123',
-                            name: '',
-                            alias: ['']
-                          },
-                          office: {
-                            id: '123',
-                            name: 'Kaliganj Union Sub Center',
-                            alias: [''],
-                            address: {
-                              district: '7876',
-                              state: 'iuyiuy'
-                            }
-                          },
-                          type: '',
-                          comments: [
-                            {
-                              comment: ''
-                            }
-                          ]
-                        }
-                      ]
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      __typename: 'RegistrationSearchSet'
                     },
-                    child: {
-                      id: '123',
-                      name: [
-                        {
-                          use: null,
-                          firstNames: 'Baby',
-                          familyName: 'Doe'
-                        }
-                      ],
-                      birthDate: '2011-05-23T14:44:58+02:00'
-                    },
-                    createdAt: '2018-05-23T14:44:58+02:00'
+                    dateOfBirth: '2010-01-01',
+                    childName: [
+                      {
+                        firstNames: 'Rafiq',
+                        familyName: 'Islam',
+                        __typename: 'HumanName'
+                      },
+                      {
+                        firstNames: 'রফিক',
+                        familyName: 'ইসলাম',
+                        __typename: 'HumanName'
+                      }
+                    ],
+                    __typename: 'BirthEventSearchSet'
                   }
-                ]
+                ],
+                __typename: 'EventSearchResultSet'
               }
             }
           }
@@ -1205,7 +1021,7 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult />,
+        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
         store,
         graphqlMock
       )
