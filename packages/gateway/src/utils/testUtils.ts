@@ -218,7 +218,9 @@ export const mockTask = {
     },
     {
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
-      valueReference: { reference: 'Location/123' }
+      valueReference: {
+        reference: 'Location/43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+      }
     },
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
@@ -782,6 +784,7 @@ export const mockFhirBundle = {
 
 export const mockLocation = {
   fullUrl: 'urn:uuid:<uuid>',
+  id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
   resource: {
     resourceType: 'Location',
     status: 'active',
@@ -1255,6 +1258,7 @@ export const mockObservations = {
 
 export const mockRelatedPerson = {
   fullUrl: 'urn:uuid:<uuid>',
+  id: '9185c9f1-a491-41f0-b823-6cba987b550b',
   resource: {
     resourceType: 'RelatedPerson',
     relationship: {
@@ -1269,5 +1273,118 @@ export const mockRelatedPerson = {
     patient: {
       reference: 'Patient/123' // reference to deceased
     }
+  }
+}
+
+export const mockCertificate = {
+  resourceType: 'DocumentReference',
+  total: 1,
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/collector',
+      valueReference: {
+        reference: 'RelatedPerson/3215'
+      }
+    }
+  ]
+}
+
+export const mockCertificateComposition = {
+  resourceType: 'Composition',
+  id: '123',
+  total: 1,
+  entry: [
+    {
+      resource: {
+        resourceType: 'Task',
+        id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
+        section: [
+          {
+            title: 'Certificates',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'certificates'
+                }
+              ],
+              text: 'Certificates'
+            },
+            entry: [
+              {
+                reference: 'DocumentReference/321'
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+
+export const mockErrorComposition = {
+  resourceType: 'Composition',
+  id: '123',
+  total: 1,
+  entry: null
+}
+
+export const mockTaskForError = {
+  resourceType: 'Task',
+  status: 'requested',
+  id: 'd7e3f7cd-f02d-47fd-922c-30e62b1157e5',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+      value: '123'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: '123'
+    },
+    { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-page', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-book', value: '123' }
+  ],
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/reg-status',
+        code: 'DECLARED | VERIFIED | REGISTERED | CERTIFIED'
+      }
+    ]
+  },
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'BIRTH'
+      }
+    ]
+  },
+  focus: {
+    reference: 'Composition/210e184a-fe81-4207-bfc8-b6259973093c'
+  },
+  authoredOn: '2016-10-31T08:25:05+10:00',
+  lastModified: '2016-10-31T09:45:05+10:00',
+  note: [
+    {
+      authorString: '<username>',
+      text: 'Comment',
+      time: '2016-10-31T09:45:05+10:00'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+      valueString: '01733333333'
+    }
+  ],
+  meta: {
+    versionId: '123'
   }
 }

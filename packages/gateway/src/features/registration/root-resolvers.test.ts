@@ -15,7 +15,6 @@ describe('Registration root resolvers', () => {
           id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
         })
       )
-      // @ts-ignore
       const composition = await resolvers.Query.fetchBirthRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
@@ -33,6 +32,21 @@ describe('Registration root resolvers', () => {
       )
       // @ts-ignore
       const composition = await resolvers.Query.fetchDeathRegistration(
+        {},
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+  describe('fetchRegistration()', () => {
+    it('returns object of composition result', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+        })
+      )
+      const composition = await resolvers.Query.fetchRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
       )
@@ -140,7 +154,6 @@ describe('Registration root resolvers', () => {
       fetch.mockResponse(
         JSON.stringify({ entry: [{ resource: { focus: {} } }], total: 1 })
       )
-      // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
         { status: 'DECLARED' }
@@ -159,7 +172,6 @@ describe('Registration root resolvers', () => {
         })
       )
 
-      // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
         {
@@ -228,7 +240,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createDeathRegistration(
         {},
         { details }
@@ -334,7 +345,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createDeathRegistration(
         {},
         { details },
@@ -386,7 +396,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
         { details }
@@ -497,7 +506,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
         { details },
@@ -534,7 +542,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError(
@@ -545,7 +552,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
@@ -645,7 +651,6 @@ describe('Registration root resolvers', () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
-      // @ts-ignore
       const result = await resolvers.Mutation.markEventAsVoided(
         {},
         { id, reason, comment }
@@ -1209,7 +1214,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.updateBirthRegistration(
         {},
         { details }
@@ -1226,7 +1230,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Mutation.updateBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
@@ -1264,7 +1267,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.markBirthAsCertified(
         {},
         { details }
@@ -1281,7 +1283,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Mutation.markBirthAsCertified({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
@@ -1321,7 +1322,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.markDeathAsCertified(
         {},
         { details }
@@ -1412,7 +1412,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const composition = await resolvers.Query.queryRegistrationByIdentifier(
         {},
         { identifier: '2019333494BAQFYEG6' }
@@ -1423,7 +1422,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Query.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' }
@@ -1447,7 +1445,6 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        // @ts-ignore
         resolvers.Query.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' }
@@ -1492,7 +1489,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const composition = await resolvers.Query.queryPersonByIdentifier(
         {},
         { identifier: '1234567898765' }
@@ -1503,7 +1499,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' }

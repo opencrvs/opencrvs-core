@@ -7,7 +7,6 @@ import {
   PrimaryButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Edit } from '@opencrvs/components/lib/icons'
 import {
   SearchInput,
   ISearchInputProps,
@@ -17,7 +16,6 @@ import {
   SelectFieldType
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
-import gql from 'graphql-tag'
 import { Query } from 'react-apollo'
 import {
   GQLBirthRegistration,
@@ -33,9 +31,10 @@ import {
   StatusGray,
   StatusOrange,
   StatusGreen,
-  StatusCollected,
   StatusRejected,
-  Duplicate
+  Duplicate,
+  Edit,
+  StatusCertified
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from 'src/store'
 import { getScope } from 'src/profile/profileSelectors'
@@ -57,84 +56,19 @@ import { formatLongDate } from 'src/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
 import { extractCommentFragmentValue } from 'src/utils/data-formatting'
 import { ActionPage } from '@opencrvs/components/lib/interface'
-
-export const FETCH_REGISTRATION_QUERY = gql`
-  query list($locationIds: [String], $count: Int, $skip: Int) {
-    listEventRegistrations(
-      locationIds: $locationIds
-      count: $count
-      skip: $skip
-    ) {
-      totalItems
-      results {
-        id
-        registration {
-          id
-          trackingId
-          registrationNumber
-          type
-          status {
-            id
-            user {
-              id
-              name {
-                use
-                firstNames
-                familyName
-              }
-              role
-            }
-            location {
-              id
-              name
-              alias
-            }
-            office {
-              name
-              alias
-              address {
-                district
-                state
-              }
-            }
-            type
-            timestamp
-            comments {
-              comment
-            }
-          }
-          duplicates
-        }
-        createdAt
-        ... on BirthRegistration {
-          child {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            birthDate
-          }
-        }
-        ... on DeathRegistration {
-          deceased {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            birthDate
-            deceased {
-              deathDate
-            }
-          }
-        }
-      }
-    }
-  }
-`
+import * as moment from 'moment'
+import {
+  CERTIFICATE_DATE_FORMAT,
+  REJECTED,
+  REJECT_REASON,
+  DECLARED,
+  LANG_EN,
+  LOCAL_DATE_FORMAT
+} from 'src/utils/constants'
+import {
+  FETCH_REGISTRATION_BY_COMPOSITION,
+  FETCH_REGISTRATION_QUERY
+} from './queries'
 
 const messages = defineMessages({
   hello: {
@@ -356,12 +290,12 @@ const messages = defineMessages({
   },
   workflowStatusDateRejected: {
     id: 'register.workQueue.listItem.status.dateLabel.rejected',
-    defaultMessage: 'Rejected on',
+    defaultMessage: 'Application rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
   },
   workflowStatusDateCollected: {
     id: 'register.workQueue.listItem.status.dateLabel.collected',
-    defaultMessage: 'Printed on',
+    defaultMessage: 'Certificate collected on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
   workflowPractitionerLabel: {
@@ -433,13 +367,43 @@ const messages = defineMessages({
     id: 'register.SearchResult.title',
     defaultMessage: 'Search',
     description: 'The title of the page'
+  },
+  collectedBy: {
+    id: 'register.SearchResult.collectedBy',
+    defaultMessage: 'Collected by',
+    description: 'The collected by sec text'
+  },
+  issuedBy: {
+    id: 'register.SearchResult.issuedBy',
+    defaultMessage: 'Issued by',
+    description: 'The issued by sec text'
+  },
+  rejectReason: {
+    id: 'register.SearchResult.rejectReason',
+    defaultMessage: 'Reason',
+    description: 'The rejected reason'
+  },
+  informantContact: {
+    id: 'register.SearchResult.informantContact',
+    defaultMessage: 'Informant contact number',
+    description: 'The rejected reason'
   }
 })
 
 const StyledSpinner = styled(Spinner)`
   margin: 50% auto;
 `
-
+const ListItemExpansionSpinner = styled(Spinner)`
+  width: 70px;
+  height: 70px;
+  top: 0px !important;
+`
+const ExpansionSpinnerContainer = styled.div`
+  min-height: 70px;
+  min-width: 70px;
+  display: flex;
+  justify-content: center;
+`
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -460,6 +424,7 @@ const StyledLabel = styled.label`
 `
 const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
+  text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
   display: inline-flex;
@@ -469,15 +434,6 @@ const ValueContainer = styled.div`
     border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
     margin-right: 10px;
     padding-right: 10px;
-  }
-`
-const DuplicateIndicatorContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  & span {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
-    margin-left: 10px;
   }
 `
 export const ActionPageWrapper = styled.div`
@@ -574,12 +530,6 @@ const StyledSecondaryButton = styled(SecondaryButton)`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
-
-const StatusIconCollected = styled.div`
-  padding-left: 6px;
-  margin-top: 3px;
-`
-
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
@@ -610,7 +560,7 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return (
           <StatusIcon>
             <StatusOrange />
@@ -630,9 +580,9 @@ export class SearchResultView extends React.Component<
         )
       case 'CERTIFIED':
         return (
-          <StatusIconCollected>
-            <StatusCollected />
-          </StatusIconCollected>
+          <StatusIcon>
+            <StatusCertified />
+          </StatusIcon>
         )
       default:
         return (
@@ -645,7 +595,7 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return this.props.intl.formatMessage(messages.application)
       case 'REGISTERED':
         return this.props.intl.formatMessage(messages.registered)
@@ -660,7 +610,7 @@ export class SearchResultView extends React.Component<
 
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return messages.workflowStatusDateApplication
       case 'REGISTERED':
         return messages.workflowStatusDateRegistered
@@ -816,50 +766,177 @@ export class SearchResultView extends React.Component<
     )
   }
 
-  renderExpansionContent = (item: {
-    [key: string]: string & Array<{ [key: string]: string }>
-  }): JSX.Element[] => {
-    return item.status.map((status, i) => {
-      const { practitionerName, practitionerRole, officeName } = status
-      return (
-        <ExpansionContainer key={i}>
-          {this.getDeclarationStatusIcon(status.type)}
-          <ExpansionContentContainer>
-            <LabelValue
-              label={this.props.intl.formatMessage(
-                this.getWorkflowDateLabel(status.type)
-              )}
-              value={status.timestamp}
-            />
-            <ValueContainer>
-              <StyledLabel>
-                {this.props.intl.formatMessage(
-                  messages.workflowPractitionerLabel
-                )}
-                :
-              </StyledLabel>
-              <ValuesWithSeparator
-                strings={[
-                  practitionerName,
-                  formatRoleCode(practitionerRole),
-                  officeName
-                ]}
-              />
-            </ValueContainer>
-            {item.duplicates && item.duplicates.length > 0 && (
-              <DuplicateIndicatorContainer>
-                <Duplicate />
-                <span>
-                  {this.props.intl.formatMessage(
-                    messages.listItemDuplicateLabel
-                  )}
-                </span>
-              </DuplicateIndicatorContainer>
-            )}
-          </ExpansionContentContainer>
-        </ExpansionContainer>
-      )
+  transformDataToTaskHistory = (data: GQLQuery) => {
+    const { locale } = this.props.intl
+    const registration =
+      data && data.fetchRegistration && data.fetchRegistration.registration
+    const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
+    const informant = deathReg && deathReg.informant
+    const contactInfo =
+      informant &&
+      informant.individual &&
+      informant.individual.telecom &&
+      informant.individual.telecom[0]
+
+    if (!registration || !registration.status) {
+      return []
+    }
+
+    return registration.status.map((status, index) => {
+      const certificate =
+        registration.certificates && registration.certificates[index]
+      const collector = certificate && certificate.collector
+
+      return {
+        type: status && status.type,
+        practitionerName:
+          (status &&
+            status.user &&
+            (createNamesMap(status.user.name as GQLHumanName[])[
+              this.props.language
+            ] as string)) ||
+          (status &&
+            status.user &&
+            (createNamesMap(status.user.name as GQLHumanName[])[
+              ''
+            ] as string)) ||
+          '',
+        timestamp: status && formatLongDate(status.timestamp, locale),
+        practitionerRole:
+          status && status.user && status.user.role
+            ? this.props.intl.formatMessage(
+                messages[status.user.role as string]
+              )
+            : '',
+        officeName:
+          locale === LANG_EN
+            ? status && status.office && status.office.name
+            : status && status.office && status.office.alias,
+        collectorName:
+          (collector &&
+            collector.individual &&
+            (createNamesMap(collector.individual.name as GQLHumanName[])[
+              this.props.language
+            ] as string)) ||
+          (collector &&
+            collector.individual &&
+            (createNamesMap(collector.individual.name as GQLHumanName[])[
+              LANG_EN
+            ] as string)) ||
+          '',
+        collectorType: collector && collector.relationship,
+        rejectReasons:
+          (status &&
+            status.type === REJECTED &&
+            extractCommentFragmentValue(
+              status.comments as GQLComment[],
+              REJECT_REASON
+            )) ||
+          '',
+        informantContactNumber: contactInfo && contactInfo.value
+      }
     })
+  }
+
+  renderExpansionContent = (id: string): JSX.Element => {
+    return (
+      <>
+        <Query
+          query={FETCH_REGISTRATION_BY_COMPOSITION}
+          variables={{
+            id
+          }}
+        >
+          {({ loading, error, data }) => {
+            const { intl, language } = this.props
+            moment.locale(language)
+            if (error) {
+              Sentry.captureException(error)
+            } else if (loading) {
+              return (
+                <ExpansionSpinnerContainer>
+                  <ListItemExpansionSpinner
+                    id="list-expansion-spinner"
+                    baseColor={this.props.theme.colors.background}
+                  />
+                </ExpansionSpinnerContainer>
+              )
+            }
+
+            const statusData = this.transformDataToTaskHistory(data)
+
+            return statusData
+              .map((status, index) => {
+                const {
+                  practitionerName,
+                  practitionerRole,
+                  collectorName,
+                  collectorType,
+                  rejectReasons,
+                  informantContactNumber
+                } = status
+                const type = status.type as string
+                const officeName = status.officeName as string
+                const timestamp = moment(
+                  status.timestamp as string,
+                  LOCAL_DATE_FORMAT
+                ).format(CERTIFICATE_DATE_FORMAT)
+                const collectorInfo = collectorName + ' (' + collectorType + ')'
+
+                return (
+                  <ExpansionContainer key={index} id={type + '-' + index}>
+                    {this.getDeclarationStatusIcon(type)}
+                    <ExpansionContentContainer>
+                      <LabelValue
+                        label={intl.formatMessage(
+                          this.getWorkflowDateLabel(type)
+                        )}
+                        value={timestamp}
+                      />
+                      {type === DECLARED && informantContactNumber && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.informantContact)}
+                          value={informantContactNumber}
+                        />
+                      )}
+                      {collectorType && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.collectedBy)}
+                          value={collectorInfo}
+                        />
+                      )}
+                      <ValueContainer>
+                        <StyledLabel>
+                          {this.props.intl.formatMessage(
+                            collectorType
+                              ? messages.issuedBy
+                              : messages.workflowPractitionerLabel
+                          )}
+                          :
+                        </StyledLabel>
+                        <ValuesWithSeparator
+                          strings={[
+                            practitionerName,
+                            formatRoleCode(practitionerRole),
+                            officeName
+                          ]}
+                        />
+                      </ValueContainer>
+                      {rejectReasons && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.rejectReason)}
+                          value={rejectReasons}
+                        />
+                      )}
+                    </ExpansionContentContainer>
+                  </ExpansionContainer>
+                )
+              })
+              .reverse()
+          }}
+        </Query>
+      </>
+    )
   }
 
   renderCell = (
@@ -1053,8 +1130,8 @@ export class SearchResultView extends React.Component<
         itemData={{}}
         actions={listItemActions}
         expandedCellRenderer={() => (
-          <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item)}
+          <ListItemExpansion>
+            {this.renderExpansionContent(item.id)}
           </ListItemExpansion>
         )}
       />

@@ -22,6 +22,7 @@ export interface GQLQuery {
   listEventRegistrations?: GQLEventRegResultSet
   countEventRegistrations?: GQLRegistrationCount
   searchEvents?: GQLEventSearchResultSet
+  fetchRegistration?: GQLEventRegistration
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -784,6 +785,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listEventRegistrations?: QueryToListEventRegistrationsResolver<TParent>
   countEventRegistrations?: QueryToCountEventRegistrationsResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
+  fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
@@ -973,6 +975,21 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToSearchEventsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRegistrationArgs {
+  id: string
+}
+export interface QueryToFetchRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRegistrationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

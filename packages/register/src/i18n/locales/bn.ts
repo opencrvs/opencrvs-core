@@ -704,8 +704,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.buttons.newApplication': 'নতুন আবেদন',
     'register.workQueue.listItem.status.dateLabel.application': 'আবেদন জমা',
     'register.workQueue.listItem.status.dateLabel.registered': 'নিবন্ধিত',
-    'register.workQueue.listItem.status.dateLabel.rejected': 'প্রত্যাখ্যাত',
-    'register.workQueue.listItem.status.dateLabel.collected': 'মুদ্রণ',
+    'register.workQueue.listItem.status.dateLabel.rejected':
+      'আবেদন প্রত্যাখ্যাত',
+    'register.workQueue.listItem.status.dateLabel.collected':
+      'সার্টিফিকেট মুদ্রণ',
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
     'register.workQueue.labels.results.rejectionReason': 'কারণ',
     'register.workQueue.labels.results.rejectionComment': 'মন্তব্য',
@@ -935,6 +937,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.title': 'অনুসন্ধান',
     'register.registerForm.queryError':
       'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি  এই মুহূর্তে  লোড করা সম্ভব হচ্ছে  না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ  করুন, অথবা পুনরায়  চেষ্টা করুন।',
+    'register.SearchResult.issuedBy': 'প্রদান',
+    'register.SearchResult.collectedBy': 'সংগৃহীত',
+    'register.SearchResult.rejectReason': 'কারণ',
+    'register.SearchResult.informantContact': 'তথ্যদাতার যোগাযোগ নম্বর',
     'createPIN.createTitle': 'Create a PIN',
     'createPIN.createDescription':
       "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
