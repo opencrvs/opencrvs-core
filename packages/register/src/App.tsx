@@ -29,6 +29,7 @@ import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScree
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
+import { Unlock } from './views/Unlock/Unlock'
 import { CreatePin } from './views/PIN/CreatePin'
 import { SecureAccount } from './views/SecureAccount/SecureAccountView'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
@@ -139,6 +140,10 @@ export class App extends React.Component<IAppProps> {
                             <ProtectedRoute
                               path={routes.SECURE_ACCOUNT}
                               component={SecureAccount}
+                            />
+                            <ProtectedRoute
+                              path={routes.UNLOCK_SCREEN}
+                              component={Unlock}
                             />
                           </Switch>
                         </Page>

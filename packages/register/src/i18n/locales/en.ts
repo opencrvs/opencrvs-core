@@ -945,6 +945,9 @@ export const ENGLISH_STATE: ILanguage = {
     'createPIN.pinMatchError': 'PIN code did not match. Please try again.',
     'createPIN.reEnterTitle': 'Re-enter your new PIN',
     'createPIN.reEnterDescription':
-      "Let's make sure we collected your PIN correctly."
+      "Let's make sure we collected your PIN correctly.",
+    'unlockApp.incorrectPin': 'Incorrect pin. Please try again',
+    'unlockApp.lastTry': 'Last Try',
+    'unlockApp.locked': 'Locked'
   }
 }
