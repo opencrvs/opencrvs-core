@@ -107,6 +107,11 @@ export const messages = defineMessages({
     defaultMessage: 'Collected',
     description: 'Label for the filter by collected option'
   },
+  filtersRejected: {
+    id: 'register.workQueue.labels.statuses.rejected',
+    defaultMessage: 'Rejected',
+    description: 'Label for the filter by rejected option'
+  },
   filtersAllLocations: {
     id: 'register.workQueue.labels.locations.all',
     defaultMessage: 'All locations',
@@ -220,12 +225,12 @@ export const messages = defineMessages({
   },
   workflowStatusDateRejected: {
     id: 'register.workQueue.listItem.status.dateLabel.rejected',
-    defaultMessage: 'Rejected on',
+    defaultMessage: 'Application rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
   },
   workflowStatusDateCollected: {
     id: 'register.workQueue.listItem.status.dateLabel.collected',
-    defaultMessage: 'Printed on',
+    defaultMessage: 'Certificate collected on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
   workflowPractitionerLabel: {
@@ -297,5 +302,25 @@ export const messages = defineMessages({
     id: 'register.SearchResult.title',
     defaultMessage: 'Search',
     description: 'The title of the page'
+  },
+  collectedBy: {
+    id: 'register.SearchResult.collectedBy',
+    defaultMessage: 'Collected by',
+    description: 'The collected by sec text'
+  },
+  issuedBy: {
+    id: 'register.SearchResult.issuedBy',
+    defaultMessage: 'Issued by',
+    description: 'The issued by sec text'
+  },
+  rejectReason: {
+    id: 'register.SearchResult.rejectReason',
+    defaultMessage: 'Reason',
+    description: 'The rejected reason'
+  },
+  informantContact: {
+    id: 'register.SearchResult.informantContact',
+    defaultMessage: 'Informant contact number',
+    description: 'The rejected reason'
   }
 })
