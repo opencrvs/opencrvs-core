@@ -136,7 +136,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
         {error && touched && (
           <InputError
             id={this.props.id + '_error'}
-            centred={!this.props.maxLength}
+            centred={false}
             ignoreMediaQuery={ignoreMediaQuery}
             color={color}
           >

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { StyledFunction } from 'styled-components'
+import styled from 'styled-components'
 
 export interface ICustomProps {
   error?: boolean
