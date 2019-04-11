@@ -64,6 +64,17 @@ const StyledSearchButton = styled(SearchButton)`
     max-width: 200px;
     flex: 1;
   }
+  &:disabled {
+    div:first-of-type {
+      background: ${({ theme }) => theme.colors.disabledButton};
+    }
+    g {
+      fill: ${({ theme }) => theme.colors.disabled};
+    }
+    h3 {
+      color: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `
 const StyledInput = styled.input.attrs<ISearchInputProps>({})`
   flex: 1;
@@ -168,7 +179,10 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
             {...this.props}
           />
         </SearchIconAndInput>
-        <StyledSearchButton onClick={this.submit}>
+        <StyledSearchButton
+          onClick={this.submit}
+          disabled={!value ? true : false}
+        >
           {' '}
           {buttonLabel}
         </StyledSearchButton>
