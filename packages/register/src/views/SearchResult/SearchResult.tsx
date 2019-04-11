@@ -62,7 +62,8 @@ import {
   REJECTED,
   REJECT_REASON,
   DECLARED,
-  LANG_EN
+  LANG_EN,
+  LOCAL_DATE_FORMAT
 } from 'src/utils/constants'
 import {
   FETCH_REGISTRATION_BY_COMPOSITION,
@@ -808,7 +809,7 @@ export class SearchResultView extends React.Component<
               )
             : '',
         officeName:
-          locale === 'en'
+          locale === LANG_EN
             ? status && status.office && status.office.name
             : status && status.office && status.office.alias,
         collectorName:
@@ -878,7 +879,7 @@ export class SearchResultView extends React.Component<
                 const officeName = status.officeName as string
                 const timestamp = moment(
                   status.timestamp as string,
-                  'DD-MM-YYYY'
+                  LOCAL_DATE_FORMAT
                 ).format(CERTIFICATE_DATE_FORMAT)
                 const collectorInfo = collectorName + ' (' + collectorType + ')'
 
@@ -904,8 +905,8 @@ export class SearchResultView extends React.Component<
                           value={collectorInfo}
                         />
                       )}
-                      <ValueContainer id="vc">
-                        <StyledLabel id="sb">
+                      <ValueContainer>
+                        <StyledLabel>
                           {this.props.intl.formatMessage(
                             collectorType
                               ? messages.issuedBy
