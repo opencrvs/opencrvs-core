@@ -145,34 +145,47 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   onPinProvided = async (pin: string) => {
     const { intl } = this.props
     const { userPin } = this.state
-    const didPinMatch = bcrypt.compareSync(pin, userPin)
+    const pinMatched = bcrypt.compareSync(pin, userPin)
 
-    if (this.state.attempt === MAX_ALLOWED_ATTEMPT) {
-      await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
-      this.screenLockTimer()
+    if (this.state.attempt > MAX_ALLOWED_ATTEMPT) {
+      return
     }
 
-    if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && !didPinMatch) {
+    if (this.state.attempt === MAX_ALLOWED_ATTEMPT && !pinMatched) {
+      await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
+      this.setState(prevState => {
+        return {
+          attempt: prevState.attempt + 1
+        }
+      })
+      this.screenLockTimer()
+      return
+    }
+
+    if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && !pinMatched) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.incorrect),
         resekKey: Date.now()
       }))
+      return
     }
 
-    if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && !didPinMatch) {
+    if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && !pinMatched) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.lastTry),
         resekKey: Date.now()
       }))
+      return
     }
 
-    if (didPinMatch) {
+    if (pinMatched) {
       this.setState(() => ({
         errorMessage: ''
       }))
       this.props.onCorrectPinMatch()
+      return
     }
   }
 
@@ -187,8 +200,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         'minutes'
       )
       if (lockedAt && timeDiff < MAX_LOCK_TIME) {
-        this.setState(() => ({
-          attempt: MAX_ALLOWED_ATTEMPT,
+        this.setState(prevState => ({
+          attempt: MAX_ALLOWED_ATTEMPT + 1,
           errorMessage: intl.formatMessage(messages.locked)
         }))
       } else {

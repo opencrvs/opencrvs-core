@@ -60,15 +60,14 @@ export class PINKeypad extends React.Component<IProps, IState> {
       return
     }
 
-    if (pin.length === 4) {
-      return
-    }
-
     const newPIN = pin + key
-    if (newPIN.length === 4) {
-      onComplete(newPIN)
-    }
-    this.setState({ pin: newPIN })
+    this.setState({ pin: newPIN }, () => {
+      if (newPIN.length === 4) {
+        setTimeout(() => {
+          onComplete(newPIN)
+        })
+      }
+    })
   }
 
   render() {

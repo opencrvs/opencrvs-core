@@ -4,7 +4,6 @@ import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
 import { storage } from 'src/storage'
-import { delay } from 'bluebird'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -43,7 +42,7 @@ describe('Unlock page loads Properly', () => {
     expect(errorElem).toBe(0)
   })
 
-  it('Should Display Incorrect error message', () => {
+  it('Should Display Incorrect error message', async () => {
     clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
@@ -52,14 +51,16 @@ describe('Unlock page loads Properly', () => {
     numberElem.simulate('click')
     testComponent.component.update()
 
-    const errorElem = testComponent.component
-      .find('#errorMsg')
-      .hostNodes()
-      .text()
-    expect(errorElem).toBe('Incorrect pin. Please try again')
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Incorrect pin. Please try again')
+    }, 100)
   })
 
-  it('Should display the Last try message', () => {
+  it('Should display the Last try message', async () => {
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     clearPassword(testComponent.component)
     numberElem.simulate('click')
@@ -75,14 +76,17 @@ describe('Unlock page loads Properly', () => {
     numberElem.simulate('click')
     testComponent.component.update()
 
-    const errorElem = testComponent.component
-      .find('#errorMsg')
-      .hostNodes()
-      .text()
-    expect(errorElem).toBe('Last Try')
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Last Try')
+    }, 100)
   })
 
   it('Should display Locked Message', async () => {
+    clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
