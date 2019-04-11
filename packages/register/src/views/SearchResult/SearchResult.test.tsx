@@ -39,7 +39,7 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-describe('SearchResult tests', async () => {
+describe.only('SearchResult tests', async () => {
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -71,7 +71,7 @@ describe('SearchResult tests', async () => {
             sort: 'asc',
             eventType: '',
             status: '',
-            searchContent: 'rafiq'
+            searchContent: 'zahir'
           }
         },
         result: {
@@ -80,31 +80,26 @@ describe('SearchResult tests', async () => {
               totalItems: 1,
               results: [
                 {
-                  id: 'b7a1743e-1431-41ed-87a8-3606ec7f6671',
-                  type: 'Birth',
+                  id: 'c7e83060-4db9-4057-8b14-71841243b05f',
+                  type: 'Death',
                   registration: {
                     status: 'DECLARED',
-                    dateOfApplication: '2019-04-03T08:56:12.031Z',
-                    trackingId: 'BDQNYZH',
+                    dateOfApplication: '2019-04-10T07:55:39.307Z',
+                    trackingId: 'DXMJPYA',
                     registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    __typename: 'RegistrationSearchSet'
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
                   },
-                  dateOfBirth: '2010-01-01',
-                  childName: [
+                  dateOfDeath: '2010-01-01',
+                  deceasedName: [
                     {
-                      firstNames: 'Rafiq',
-                      familyName: 'Islam',
-                      __typename: 'HumanName'
+                      firstNames: 'Zahir',
+                      familyName: 'Raihan'
                     },
                     {
-                      firstNames: 'রফিক',
-                      familyName: 'ইসলাম',
-                      __typename: 'HumanName'
+                      firstNames: 'জহির',
+                      familyName: 'রায়হান'
                     }
-                  ],
-                  __typename: 'BirthEventSearchSet'
+                  ]
                 }
               ],
               __typename: 'EventSearchResultSet'
@@ -116,7 +111,7 @@ describe('SearchResult tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+      <SearchResult match={{ params: { searchText: 'zahir' } }} />,
       store,
       graphqlMock
     )
@@ -129,15 +124,15 @@ describe('SearchResult tests', async () => {
     const data = testComponent.component.find(DataTable).prop('data')
     expect(data).toEqual([
       {
-        id: 'b7a1743e-1431-41ed-87a8-3606ec7f6671',
-        name: 'রফিক ইসলাম',
-        dob: '01-01-2010',
-        dod: '',
-        date_of_application: '03-04-2019',
+        id: 'c7e83060-4db9-4057-8b14-71841243b05f',
+        name: 'জহির রায়হান',
+        dob: '',
+        dod: '01-01-2010',
+        date_of_application: '10-04-2019',
         registrationNumber: '',
-        tracking_id: 'BDQNYZH',
+        tracking_id: 'DXMJPYA',
         declaration_status: 'DECLARED',
-        event: 'Birth',
+        event: 'Death',
         rejection_reasons: '',
         rejection_comment: ''
       }
@@ -185,7 +180,7 @@ describe('SearchResult tests', async () => {
     testComponent.component.unmount()
   })
 
-  describe('SearchResult tests for different application activity', () => {
+  describe.only('SearchResult tests for different application activity', () => {
     it('renders declare section after expanding', async () => {
       const graphqlMock = [
         {
@@ -211,10 +206,10 @@ describe('SearchResult tests', async () => {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     type: 'Birth',
                     registration: {
-                      status: 'DECLARED',
+                      status: 'REGISTERED',
                       dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
-                      registrationNumber: null,
+                      registrationNumber: '123456789098765432',
                       registeredLocationId:
                         '308c35b4-04f8-4664-83f5-9790e790cde1',
                       __typename: 'RegistrationSearchSet'
@@ -359,10 +354,10 @@ describe('SearchResult tests', async () => {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     type: 'Birth',
                     registration: {
-                      status: 'DECLARED',
+                      status: 'CERTIFIED',
                       dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
-                      registrationNumber: null,
+                      registrationNumber: '123456789098765432',
                       registeredLocationId:
                         '308c35b4-04f8-4664-83f5-9790e790cde1',
                       __typename: 'RegistrationSearchSet'
@@ -440,7 +435,7 @@ describe('SearchResult tests', async () => {
       testComponent.component.unmount()
     })
 
-    it('renders rejected section after expanding', async () => {
+    it.only('renders rejected section after expanding', async () => {
       const graphqlMock = [
         {
           request: {
@@ -465,12 +460,14 @@ describe('SearchResult tests', async () => {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     type: 'Birth',
                     registration: {
-                      status: 'DECLARED',
+                      status: 'REJECTED',
                       dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
                         '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      reason: 'duplicate',
+                      comment: 'Possible duplicate',
                       __typename: 'RegistrationSearchSet'
                     },
                     dateOfBirth: '2010-01-01',
@@ -759,7 +756,7 @@ describe('SearchResult tests', async () => {
                 results: [
                   {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                    type: 'Birth',
+                    type: '',
                     registration: {
                       status: 'DECLARED',
                       dateOfApplication: '2019-04-03T08:56:12.031Z',
