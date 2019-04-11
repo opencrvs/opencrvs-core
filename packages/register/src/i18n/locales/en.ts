@@ -709,8 +709,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.application':
       'Application submitted on',
     'register.workQueue.listItem.status.dateLabel.registered': 'Registered on',
-    'register.workQueue.listItem.status.dateLabel.rejected': 'Rejected on',
-    'register.workQueue.listItem.status.dateLabel.collected': 'Printed on',
+    'register.workQueue.listItem.status.dateLabel.rejected':
+      'Application rejected on',
+    'register.workQueue.listItem.status.dateLabel.collected':
+      'Certificate collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.rejectionReason': 'Reason',
     'register.workQueue.labels.results.rejectionComment': 'Comment',
@@ -933,6 +935,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SearchResult.title': 'Search',
     'register.registerForm.queryError':
       'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
+    'register.SearchResult.issuedBy': 'Issued by',
+    'register.SearchResult.collectedBy': 'Collected by',
+    'register.SearchResult.rejectReason': 'Reason',
+    'register.SearchResult.informantContact': 'Informant contact number',
     'createPIN.createTitle': 'Create a PIN',
     'createPIN.createDescription':
       "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",

@@ -12,7 +12,12 @@ import {
   mockTaskForDeath,
   mockComposition,
   mockObservations,
-  mockLocation
+  mockLocation,
+  mockRelatedPerson,
+  mockTaskForError,
+  mockCertificateComposition,
+  mockCertificate,
+  mockErrorComposition
 } from 'src/utils/testUtils'
 import { clone } from 'lodash'
 
@@ -852,6 +857,19 @@ describe('Registration type resolvers', () => {
       expect(status).toBe('DECLARED | VERIFIED | REGISTERED | CERTIFIED')
     })
 
+    it('returns office of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockLocation))
+
+      const office = await typeResolvers.RegWorkflow.office(mockTask)
+      expect(office).toBeDefined()
+      expect(office.id).toBe('43ac3486-7df1-4bd9-9b5e-728054ccd6ba')
+    })
+
+    it('returns null as office of the task', async () => {
+      const office = await typeResolvers.RegWorkflow.office(mockTaskForError)
+      expect(office).toBeNull()
+    })
+
     it('returns comments of the task', async () => {
       // @ts-ignore
       const comments = await typeResolvers.RegWorkflow.comments(mockTask)
@@ -1102,5 +1120,44 @@ describe('Registration type resolvers', () => {
     }
     const res = typeResolvers.EventRegistration.__resolveType(mock)
     expect(res).toEqual('DeathRegistration')
+  })
+
+  it('returns certificate of the task', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockCertificateComposition)],
+      [JSON.stringify(mockCertificate)]
+    )
+
+    const certificates = await typeResolvers.Registration.certificates(mockTask)
+
+    expect(certificates).toBeDefined()
+  })
+
+  it('throws error as certificate of the task', async () => {
+    expect(typeResolvers.Registration.certificates({})).rejects.toThrowError(
+      'Task resource does not have a focus property necessary to lookup the composition'
+    )
+  })
+
+  it('returns null as certificate of the task', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockErrorComposition)],
+      [JSON.stringify(mockCertificate)]
+    )
+
+    const certificates = await typeResolvers.Registration.certificates(mockTask)
+    expect(certificates).toBeNull()
+  })
+
+  describe('Certificate type', () => {
+    it('returns collector of the certificate', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
+
+      const relatedPerson = await typeResolvers.Certificate.collector(
+        mockCertificate
+      )
+      expect(relatedPerson).toBeDefined()
+      expect(relatedPerson.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
+    })
   })
 })

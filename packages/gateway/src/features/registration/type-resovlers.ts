@@ -22,7 +22,8 @@ import {
   DEATH_ENCOUNTER_CODE,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_METHOD_CODE
+  CAUSE_OF_DEATH_METHOD_CODE,
+  CERTIFICATE_DOCS_CODE
 } from 'src/features/fhir/templates'
 import { GQLResolver } from 'src/graphql/schema'
 import {
@@ -142,6 +143,12 @@ export const typeResolvers: GQLResolver = {
       )
     },
     individual: async (relatedPerson, _, authHeader) => {
+      if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
+        relatedPerson = await fetchFHIR(
+          `/${relatedPerson.patient.reference}`,
+          authHeader
+        )
+      }
       return await fetchFHIR(`/${relatedPerson.patient.reference}`, authHeader)
     }
   },
@@ -322,6 +329,42 @@ export const typeResolvers: GQLResolver = {
           return null
         })
       )
+    },
+    certificates: async (task, _, authHeader) => {
+      if (!task.focus) {
+        throw new Error(
+          'Task resource does not have a focus property necessary to lookup the composition'
+        )
+      }
+
+      const compositionBundle = await fetchFHIR(
+        `/${task.focus.reference}/_history`,
+        authHeader
+      )
+
+      if (!compositionBundle || !compositionBundle.entry) {
+        return null
+      }
+
+      return compositionBundle.entry.map(
+        async (compositionEntry: fhir.BundleEntry) => {
+          const certSection = findCompositionSection(
+            CERTIFICATE_DOCS_CODE,
+            compositionEntry.resource as ITemplatedComposition
+          )
+          if (
+            !certSection ||
+            !certSection.entry ||
+            !(certSection.entry.length > 0)
+          ) {
+            return null
+          }
+          return await fetchFHIR(
+            `/${certSection.entry[0].reference}`,
+            authHeader
+          )
+        }
+      )
     }
   },
   RegWorkflow: {
@@ -445,7 +488,24 @@ export const typeResolvers: GQLResolver = {
       return docRef.created
     }
   },
-
+  Certificate: {
+    async collector(docRef: fhir.DocumentReference, _, authHeader) {
+      const relatedPersonRef =
+        docRef.extension &&
+        docRef.extension.find(
+          (extension: fhir.Extension) =>
+            extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/collector`
+        )
+      if (!relatedPersonRef) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${relatedPersonRef.valueReference &&
+          relatedPersonRef.valueReference.reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
+    }
+  },
   Identifier: {
     system: identifier => identifier.system,
     value: identifier => identifier.value
