@@ -12,6 +12,11 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
 import * as bcrypt from 'bcryptjs'
+import {
+  SECURITY_PIN_INDEX,
+  SECURITY_PIN_EXPIRED_AT
+} from 'src/utils/constants'
+import * as moment from 'moment'
 
 const messages = defineMessages({
   incorrect: {
@@ -39,6 +44,7 @@ const PageWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 `
 const LogoutHeader = styled.a`
   float: right;
@@ -57,12 +63,14 @@ const Name = styled.p`
 const ErrorMsg = styled.div`
   background-color: ${({ theme }) => theme.colors.danger};
   color: ${({ theme }) => theme.colors.white};
-  padding: 5px 20px;
+  padding: 10px 20px;
+  text-align: center;
 `
 interface IState {
   showLogoutModal: boolean
   pin: string
   userPin: string
+  resekKey: number
 }
 type ErrorState = {
   attempt: number
@@ -77,6 +85,7 @@ type Props = {
 }
 type IFullProps = Props & InjectedIntlProps
 
+const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
@@ -87,16 +96,18 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       attempt: 0,
       errorMessage: '',
       pin: '',
-      userPin: ''
+      userPin: '',
+      resekKey: Date.now()
     }
   }
 
   componentWillMount() {
     this.loadUserPin()
+    this.screenLockTimer()
   }
 
   async loadUserPin() {
-    const userPin = (await storage.getItem('pin')) || ''
+    const userPin = (await storage.getItem(SECURITY_PIN_INDEX)) || ''
     this.setState(() => ({
       userPin
     }))
@@ -131,26 +142,31 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }))
   }
 
-  onPinProvided = (pin: string) => {
+  onPinProvided = async (pin: string) => {
     const { intl } = this.props
     const { userPin } = this.state
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT) {
-      this.setState(() => ({
-        errorMessage: intl.formatMessage(messages.locked)
-      }))
+      // this.setState(() => ({
+      //   errorMessage: intl.formatMessage(messages.locked),
+      //   resekKey: Date.now()
+      // }))
+      await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
+      this.screenLockTimer()
     }
 
     if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && pin !== userPin) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
-        errorMessage: intl.formatMessage(messages.incorrect)
+        errorMessage: intl.formatMessage(messages.incorrect),
+        resekKey: Date.now()
       }))
     }
 
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && pin !== userPin) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
-        errorMessage: intl.formatMessage(messages.lastTry)
+        errorMessage: intl.formatMessage(messages.lastTry),
+        resekKey: Date.now()
       }))
     }
 
@@ -163,6 +179,32 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     }
   }
 
+  screenLockTimer = async () => {
+    const { intl } = this.props
+    const lockedAt = await storage.getItem(SECURITY_PIN_EXPIRED_AT)
+
+    const intervalID = setInterval(() => {
+      const currentTime = moment.now()
+      const timeDiff = moment(currentTime).diff(
+        parseInt(lockedAt, 10),
+        'minutes'
+      )
+      if (lockedAt && timeDiff < MAX_LOCK_TIME) {
+        this.setState(() => ({
+          attempt: MAX_ALLOWED_ATTEMPT,
+          errorMessage: intl.formatMessage(messages.locked)
+        }))
+      } else {
+        clearInterval(intervalID)
+        this.setState(() => ({
+          attempt: 0,
+          errorMessage: '',
+          resekKey: Date.now()
+        }))
+      }
+    }, 500)
+  }
+
   render() {
     return (
       <PageWrapper id="unlockPage">
@@ -173,7 +215,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <Logo />
         {this.showName()}
         {this.showErrorMessage()}
-        <PINKeypad onComplete={this.onPinProvided} pin={this.state.pin} />
+        <PINKeypad
+          onComplete={this.onPinProvided}
+          pin={this.state.pin}
+          key={this.state.resekKey}
+        />
         <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}

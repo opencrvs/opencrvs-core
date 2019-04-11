@@ -942,6 +942,7 @@ export const ENGLISH_STATE: ILanguage = {
       "Let's make sure we collected your PIN correctly.",
     'unlockApp.incorrectPin': 'Incorrect pin. Please try again',
     'unlockApp.lastTry': 'Last Try',
-    'unlockApp.locked': 'Locked'
+    'unlockApp.locked':
+      'your account has been locked. Please try again in 1 minute.'
   }
 }
