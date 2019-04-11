@@ -6,7 +6,6 @@ import {
   IAuthenticationData,
   ITokenResponse
 } from '../utils/authApi'
-
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
@@ -116,12 +115,7 @@ export const resendSMS = (): ResendSMSAction => ({
 })
 
 export interface IVerifyCodeNumbers {
-  code1: string
-  code2: string
-  code3: string
-  code4: string
-  code5: string
-  code6: string
+  code: string
 }
 
 export const completeSMSResend = (
@@ -138,7 +132,6 @@ export const failSMSResend = (error: AxiosError): ResendSMSFailedAction => ({
 
 export const verifyCode = (values: IVerifyCodeNumbers): VerifyCodeAction => {
   const code = Object.values(values).join('')
-
   return {
     type: VERIFY_CODE,
     payload: { code }

@@ -36,9 +36,9 @@ export class App extends React.Component {
                     </DarkPageContainer>
                   </Route>
                   <Route exact path={routes.STEP_TWO}>
-                    <PageContainer>
+                    <DarkPageContainer>
                       <StepTwoContainer />
-                    </PageContainer>
+                    </DarkPageContainer>
                   </Route>
                   <Route exact path={routes.MANAGER}>
                     <PageContainer>

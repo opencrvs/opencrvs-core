@@ -67,30 +67,20 @@ export const messages = defineMessages({
   }
 })
 
-const Container = styled.div`
-  position: absolute;
+export const Container = styled.div`
+  position: relative;
   height: auto;
-  top: 50%;
-  right: 50%;
   padding: 0px;
-  margin: 0px;
-  transform: translate(50%, -50%);
-  width: 20vw;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 70%;
-  }
+  margin: 0px auto;
+  width: 300px;
 `
 
 export const FormWrapper = styled.form`
   position: relative;
   margin: auto;
-  width: 80%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 85%;
-  }
+  width: 100%;
   margin-bottom: 50px;
-  padding-top: 20px;
+  margin-top: 30px;
 `
 
 export const ActionWrapper = styled.div`
@@ -99,7 +89,7 @@ export const ActionWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `
-const LogoContainer = styled.div`
+export const LogoContainer = styled.div`
   flex-direction: row;
   display: flex;
   justify-content: center;
@@ -108,10 +98,8 @@ const LogoContainer = styled.div`
 export const Title = styled.div`
   margin: auto;
   margin-top: 30px;
-  width: 80%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 85%;
-  }
+  color: ${({ theme }) => theme.colors.white};
+  text-align: center;
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
   justify-content: center;
@@ -141,8 +129,8 @@ export const ErrorText = styled.p`
   text-align: center;
 `
 
-const FieldWrapper = styled.div`
-  margin-bottom: 30px;
+export const FieldWrapper = styled.div`
+  min-height: 6.7em;
 `
 
 export interface IProps {
