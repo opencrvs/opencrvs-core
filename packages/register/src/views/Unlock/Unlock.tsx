@@ -145,16 +145,14 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   onPinProvided = async (pin: string) => {
     const { intl } = this.props
     const { userPin } = this.state
+    const didPinMatch = bcrypt.compareSync(pin, userPin)
+
     if (this.state.attempt === MAX_ALLOWED_ATTEMPT) {
-      // this.setState(() => ({
-      //   errorMessage: intl.formatMessage(messages.locked),
-      //   resekKey: Date.now()
-      // }))
       await storage.setItem(SECURITY_PIN_EXPIRED_AT, moment.now().toString())
       this.screenLockTimer()
     }
 
-    if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && pin !== userPin) {
+    if (this.state.attempt < MAX_ALLOWED_ATTEMPT - 1 && !didPinMatch) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.incorrect),
@@ -162,7 +160,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       }))
     }
 
-    if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && pin !== userPin) {
+    if (this.state.attempt === MAX_ALLOWED_ATTEMPT - 1 && !didPinMatch) {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.lastTry),
@@ -170,7 +168,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       }))
     }
 
-    const didPinMatch = bcrypt.compareSync(pin, userPin)
     if (didPinMatch) {
       this.setState(() => ({
         errorMessage: ''
@@ -202,7 +199,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           resekKey: Date.now()
         }))
       }
-    }, 500)
+    }, 100)
   }
 
   render() {

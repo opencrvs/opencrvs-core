@@ -4,6 +4,7 @@ import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
 import { storage } from 'src/storage'
+import { delay } from 'bluebird'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -27,7 +28,23 @@ describe('Unlock page loads Properly', () => {
     expect(elem).toBe(1)
   })
 
+  it('There should be no error message after providing successfull Pin', () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
+
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    const errorElem = testComponent.component.find('#errorMsg').hostNodes()
+      .length
+    expect(errorElem).toBe(0)
+  })
+
   it('Should Display Incorrect error message', () => {
+    clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
@@ -65,34 +82,20 @@ describe('Unlock page loads Properly', () => {
     expect(errorElem).toBe('Last Try')
   })
 
-  it('Should display Locked Message', () => {
+  it('Should display Locked Message', async () => {
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    clearPassword(testComponent.component)
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     testComponent.component.update()
 
-    const errorElem = testComponent.component
-      .find('#errorMsg')
-      .hostNodes()
-      .text()
-    expect(errorElem).toBe('Locked')
-  })
-
-  it('There should be no error message after providing successfull Pin', () => {
-    clearPassword(testComponent.component)
-    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
-
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    testComponent.component.update()
-
-    const errorElem = testComponent.component.find('#errorMsg').hostNodes()
-      .length
-    expect(errorElem).toBe(0)
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
   })
 })
