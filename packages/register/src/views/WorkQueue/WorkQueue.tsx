@@ -1,68 +1,68 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
-  IconAction,
   ActionTitle,
-  IButtonProps,
   Button,
+  IButtonProps,
+  IconAction,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import {
-  SearchInput,
+  Plus,
+  StatusOrange,
+  StatusProgress,
+  StatusRejected
+} from '@opencrvs/components/lib/icons'
+import {
   ISearchInputProps,
+  SearchInput,
   Spinner
 } from '@opencrvs/components/lib/interface'
 import {
-  Plus,
-  StatusOrange,
-  StatusRejected,
-  StatusProgress
-} from '@opencrvs/components/lib/icons'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
-import { IStoreState } from 'src/store'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  goToEvents as goToEventsAction,
-  goToTab as goToTabAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToPrintCertificate as goToPrintCertificateAction
-} from 'src/navigation'
-import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
-import { IUserDetails, getUserLocation } from 'src/utils/userUtils'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { RouteComponentProps } from 'react-router'
-import { Query } from 'react-apollo'
-import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
-import * as Sentry from '@sentry/browser'
-import {
-  GQLBirthRegistration,
-  GQLHumanName,
-  GQLQuery,
-  GQLEventRegistration,
-  GQLDeathRegistration
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import { createNamesMap } from 'src/utils/data-formatting'
-import {
-  GridTable,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
-  REVIEW_EVENT_PARENT_FORM_TAB,
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_DEATH_FORM
-} from 'src/navigation/routes'
+  GQLBirthRegistration,
+  GQLDeathRegistration,
+  GQLEventRegistration,
+  GQLHumanName,
+  GQLQuery
+} from '@opencrvs/gateway/src/graphql/schema.d'
+import * as Sentry from '@sentry/browser'
 import * as moment from 'moment'
+import * as React from 'react'
+import { Query } from 'react-apollo'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { IViewHeadingProps } from 'src/components/ViewHeading'
 import { IDraft } from 'src/drafts'
-import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
-import { formatLongDate } from 'src/utils/date-formatting'
 import { Event } from 'src/forms'
+import {
+  goToEvents as goToEventsAction,
+  goToPrintCertificate as goToPrintCertificateAction,
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToTab as goToTabAction,
+  goToSearchResult
+} from 'src/navigation'
+import {
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM,
+  REVIEW_EVENT_PARENT_FORM_TAB
+} from 'src/navigation/routes'
+import { getScope, getUserDetails } from 'src/profile/profileSelectors'
+import { IStoreState } from 'src/store'
+import { Scope } from 'src/utils/authUtils'
+import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
+import { createNamesMap } from 'src/utils/data-formatting'
+import { formatLongDate } from 'src/utils/date-formatting'
+import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
+import styled, { withTheme } from 'styled-components'
+import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
+import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -310,6 +310,7 @@ interface IBaseWorkQueueProps {
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
   drafts: IDraft[]
+  goToSearchResult: typeof goToSearchResult
 }
 
 interface IWorkQueueState {
@@ -726,6 +727,7 @@ export class WorkQueueView extends React.Component<
             <SearchInput
               placeholder={intl.formatMessage(messages.searchInputPlaceholder)}
               buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
+              onSubmit={this.props.goToSearchResult}
               {...this.props}
             />
             <Query
@@ -1067,6 +1069,7 @@ export const WorkQueue = connect(
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
     goToWorkQueueTab: goToWorkQueueTabAction,
+    goToSearchResult,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
