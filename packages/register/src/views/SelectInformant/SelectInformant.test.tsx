@@ -45,8 +45,22 @@ describe('when user is selecting the informant', () => {
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     history.replace(SELECT_INFORMANT)
+    app.update()
+    app
+      .find('#createPinBtn')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    app.update()
+    Array.apply(null, { length: 8 }).map(() => {
+      app
+        .find('#keypad-1')
+        .hostNodes()
+        .simulate('click')
+    })
+    await flushPromises()
     app.update()
   })
   describe('when selects "Parent"', () => {

@@ -46,8 +46,22 @@ describe('when user is selecting the vital event', () => {
   })
 
   describe('when user is in vital event selection view', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       history.replace(SELECT_VITAL_EVENT)
+      app.update()
+      app
+        .find('#createPinBtn')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 8 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      await flushPromises()
       app.update()
     })
     it('lists the options', () => {
