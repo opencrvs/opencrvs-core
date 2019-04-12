@@ -67,8 +67,12 @@ export function goToPerformance() {
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
-export function goToSearchResult() {
-  return push(SEARCH_RESULT)
+export function goToSearchResult(searchText?: string) {
+  return push(
+    formatUrl(SEARCH_RESULT, {
+      searchText: (searchText && searchText.toString()) || ''
+    })
+  )
 }
 export function goToMyRecords() {
   return push(MY_RECORDS)

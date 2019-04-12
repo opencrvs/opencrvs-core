@@ -350,8 +350,8 @@ describe('admin service', () => {
       fetch.once(locationBundle)
       const locations = await getLocations()
       expect(locations.data).toBeDefined()
-      expect(locations.data).toEqual([
-        {
+      expect(locations.data).toEqual({
+        'f8bebc4c-1bd2-4b72-961b-379a78f347a2': {
           id: 'f8bebc4c-1bd2-4b72-961b-379a78f347a2',
           name: 'Barisal',
           nameBn: 'বরিশাল',
@@ -359,7 +359,7 @@ describe('admin service', () => {
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
-        {
+        '0adfddb7-f499-44fb-b640-2123c90b685b': {
           id: '0adfddb7-f499-44fb-b640-2123c90b685b',
           name: 'Chittagong',
           nameBn: 'চট্টগ্রাম',
@@ -367,7 +367,7 @@ describe('admin service', () => {
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
-        {
+        '9975af98-cefb-4025-8c0f-d3fa63a17eed': {
           id: '9975af98-cefb-4025-8c0f-d3fa63a17eed',
           name: 'Dhaka',
           nameBn: 'ঢাকা',
@@ -375,7 +375,7 @@ describe('admin service', () => {
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
-        {
+        'c05b71cc-800c-415f-8db7-a78f81a59aa8': {
           id: 'c05b71cc-800c-415f-8db7-a78f81a59aa8',
           name: 'Khulna',
           nameBn: 'খুলনা',
@@ -383,7 +383,7 @@ describe('admin service', () => {
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
-        {
+        '013c77b5-aa9f-40e5-9f7b-abb43d86724b': {
           id: '013c77b5-aa9f-40e5-9f7b-abb43d86724b',
           name: 'Rajshahi',
           nameBn: 'রাজশাহী',
@@ -391,7 +391,7 @@ describe('admin service', () => {
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         }
-      ])
+      })
     })
 
     it('throw an error when the fetch fails', async () => {

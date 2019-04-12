@@ -14,7 +14,7 @@ type GetLocations = {
 export const LOCATIONS_LOADED = 'OFFLINE/LOCATIONS_LOADED'
 export type LocationsLoadedAction = {
   type: typeof LOCATIONS_LOADED
-  payload: ILocation[]
+  payload: { [key: string]: ILocation }
 }
 
 export const LOCATIONS_FAILED = 'OFFLINE/LOCATIONS_FAILED'
@@ -26,7 +26,7 @@ export type LocationsFailedAction = {
 export const FACILITIES_LOADED = 'OFFLINE/FACILITIES_LOADED'
 export type FacilitiesLoadedAction = {
   type: typeof FACILITIES_LOADED
-  payload: ILocation[]
+  payload: { [key: string]: ILocation }
 }
 
 export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'

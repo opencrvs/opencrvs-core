@@ -60,6 +60,8 @@ import { toggleDraftSavedNotification } from 'src/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
 import * as Sentry from '@sentry/browser'
+// @ts-ignore - typescript doesn't like importing the individual lodash modules but I need this for mocking
+import * as debounce from 'lodash/debounce'
 
 const FormSectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -386,8 +388,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return this.props.scope && this.props.scope.includes('register')
   }
 
-  modifyDraft = (sectionData: IFormSectionData) => {
-    const { activeSection, draft } = this.props
+  modifyDraft = (
+    sectionData: IFormSectionData,
+    activeSection: IFormSection,
+    draft: IDraft
+  ) => {
     if (draft.review && !this.state.isDataAltered) {
       this.setState({ isDataAltered: true })
     }
@@ -637,6 +642,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         )
       : registerForm.sections
     const isErrorOccured = this.state.hasError
+    const debouncedModifyDraft = debounce(this.modifyDraft, 500)
 
     return (
       <FormViewContainer>
@@ -727,7 +733,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       >
                         <FormFieldGenerator
                           id={activeSection.id}
-                          onChange={this.modifyDraft}
+                          onChange={values => {
+                            debouncedModifyDraft(values, activeSection, draft)
+                          }}
                           setAllFieldsDirty={setAllFieldsDirty}
                           fields={activeSection.fields}
                           offlineResources={offlineResources}

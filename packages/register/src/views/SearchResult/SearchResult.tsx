@@ -1,445 +1,89 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   PrimaryButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Edit } from '@opencrvs/components/lib/icons'
 import {
-  SearchInput,
+  Duplicate,
+  Edit,
+  StatusCertified,
+  StatusGray,
+  StatusGreen,
+  StatusOrange,
+  StatusRejected
+} from '@opencrvs/components/lib/icons'
+import {
+  ActionPage,
   ISearchInputProps,
+  ISelectGroupValue,
   ListItem,
-  Spinner,
   ListItemExpansion,
-  SelectFieldType
+  SearchInput,
+  SelectFieldType,
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
-import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
-import {
-  GQLBirthRegistration,
-  GQLRegWorkflow,
-  GQLLocation,
-  GQLHumanName,
-  GQLQuery,
-  GQLComment,
-  GQLEventRegistration,
-  GQLDeathRegistration
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import {
-  StatusGray,
-  StatusOrange,
-  StatusGreen,
-  StatusCollected,
-  StatusRejected,
-  Duplicate
-} from '@opencrvs/components/lib/icons'
-import { IStoreState } from 'src/store'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
+import { HeaderContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
-  goToEvents as goToEventsAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToPrintCertificate as goToPrintCertificateAction
-} from 'src/navigation'
-import { goToTab as goToTabAction } from '../../navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { IUserDetails, IGQLLocation, IIdentifier } from 'src/utils/userUtils'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { messages as rejectionMessages } from 'src/review/reject-registration'
-import { formatLongDate } from 'src/utils/date-formatting'
+  GQLComment,
+  GQLDeathRegistration,
+  GQLHumanName,
+  GQLQuery
+} from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
-import { extractCommentFragmentValue } from 'src/utils/data-formatting'
-import { ActionPage } from '@opencrvs/components/lib/interface'
-
-export const FETCH_REGISTRATION_QUERY = gql`
-  query list($locationIds: [String], $count: Int, $skip: Int) {
-    listEventRegistrations(
-      locationIds: $locationIds
-      count: $count
-      skip: $skip
-    ) {
-      totalItems
-      results {
-        id
-        registration {
-          id
-          trackingId
-          registrationNumber
-          type
-          status {
-            id
-            user {
-              id
-              name {
-                use
-                firstNames
-                familyName
-              }
-              role
-            }
-            location {
-              id
-              name
-              alias
-            }
-            office {
-              name
-              alias
-              address {
-                district
-                state
-              }
-            }
-            type
-            timestamp
-            comments {
-              comment
-            }
-          }
-          duplicates
-        }
-        createdAt
-        ... on BirthRegistration {
-          child {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            birthDate
-          }
-        }
-        ... on DeathRegistration {
-          deceased {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            birthDate
-            deceased {
-              deathDate
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-const messages = defineMessages({
-  hello: {
-    id: 'register.home.header.hello',
-    defaultMessage: 'Hello {fullName}',
-    description: 'Title for the user'
-  },
-  searchInputPlaceholder: {
-    id: 'register.workQueue.searchInput.placeholder',
-    defaultMessage: 'Look for a record',
-    description: 'The placeholder of search input'
-  },
-  searchInputButtonTitle: {
-    id: 'register.workQueue.buttons.search',
-    defaultMessage: 'Search',
-    description: 'The title of search input submit button'
-  },
-  bannerTitle: {
-    id: 'register.workQueue.applications.banner',
-    defaultMessage: 'Applications to register in your area',
-    description: 'The title of the banner'
-  },
-  queryError: {
-    id: 'register.workQueue.queryError',
-    defaultMessage: 'An error occurred while searching',
-    description: 'The error message shown when a search query fails'
-  },
-  dataTableResults: {
-    id: 'register.workQueue.dataTable.results',
-    defaultMessage: 'Results',
-    description: 'Results label at the top of the data table component'
-  },
-  dataTableNoResults: {
-    id: 'register.workQueue.dataTable.noResults',
-    defaultMessage: 'No result to display',
-    description:
-      'Text to display if the search return no results for the current filters'
-  },
-  headerTitle: {
-    id: 'register.workQueue.header.title',
-    defaultMessage: 'Hello Registrar',
-    description: 'The displayed title in the Work Queue header'
-  },
-  headerDescription: {
-    id: 'register.workQueue.header.description',
-    defaultMessage: 'Review | Registration | Certification',
-    description: 'The displayed description in the Work Queue header'
-  },
-  filtersSortBy: {
-    id: 'register.workQueue.labels.selects.sort',
-    defaultMessage: 'Sort By',
-    description: 'Label for the sort by section of the filters'
-  },
-  filtersOldestToNewest: {
-    id: 'register.workQueue.selects.sort.item0',
-    defaultMessage: 'Oldest to newest',
-    description: 'Label for the sort by oldest to newest option'
-  },
-  filtersNewestToOldest: {
-    id: 'register.workQueue.selects.sort.item1',
-    defaultMessage: 'Newest to oldest',
-    description: 'Label for the sort by newest to oldest option'
-  },
-  filtersFilterBy: {
-    id: 'register.workQueue.labels.selects.filter',
-    defaultMessage: 'Sort By',
-    description: 'Label for the sort by section of the filters'
-  },
-  filtersAllEvents: {
-    id: 'register.workQueue.labels.events.all',
-    defaultMessage: 'All life events',
-    description: 'Label for the filter by all events option'
-  },
-  filtersBirth: {
-    id: 'register.workQueue.labels.events.birth',
-    defaultMessage: 'Birth',
-    description: 'Label for the filter by birth option'
-  },
-  filtersDeath: {
-    id: 'register.workQueue.labels.events.death',
-    defaultMessage: 'Death',
-    description: 'Label for the filter by death option'
-  },
-  filtersMarriage: {
-    id: 'register.workQueue.labels.events.marriage',
-    defaultMessage: 'Marriage',
-    description: 'Label for the filter by marriage option'
-  },
-  filtersAllStatuses: {
-    id: 'register.workQueue.labels.statuses.all',
-    defaultMessage: 'All statues',
-    description: 'Label for the filter by all statuses option'
-  },
-  filtersApplication: {
-    id: 'register.workQueue.labels.statuses.application',
-    defaultMessage: 'Application',
-    description: 'Label for the filter by application option'
-  },
-  filtersRegistered: {
-    id: 'register.workQueue.labels.statuses.registered',
-    defaultMessage: 'Registered',
-    description: 'Label for the filter by registered option'
-  },
-  filtersCollected: {
-    id: 'register.workQueue.labels.statuses.collected',
-    defaultMessage: 'Collected',
-    description: 'Label for the filter by collected option'
-  },
-  filtersAllLocations: {
-    id: 'register.workQueue.labels.locations.all',
-    defaultMessage: 'All locations',
-    description: 'Label for filtering by all locations'
-  },
-  listItemName: {
-    id: 'register.workQueue.labels.results.name',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  listItemDob: {
-    id: 'register.workQueue.labels.results.dob',
-    defaultMessage: 'D.o.B',
-    description: 'Label for DoB in work queue list item'
-  },
-  listItemDod: {
-    id: 'register.workQueue.labels.results.dod',
-    defaultMessage: 'D.o.D',
-    description: 'Label for DoD in work queue list item'
-  },
-  listItemDateOfApplication: {
-    id: 'register.workQueue.labels.results.dateOfApplication',
-    defaultMessage: 'Date of application',
-    description: 'Label for date of application in work queue list item'
-  },
-  listItemTrackingNumber: {
-    id: 'register.workQueue.labels.results.trackingID',
-    defaultMessage: 'Tracking ID',
-    description: 'Label for tracking ID in work queue list item'
-  },
-  listItemBirthRegistrationNumber: {
-    id: 'register.workQueue.labels.results.birthRegistrationNumber',
-    defaultMessage: 'BRN',
-    description: 'Label for BRN in work queue list item'
-  },
-  listItemDeathRegistrationNumber: {
-    id: 'register.workQueue.labels.results.deathRegistrationNumber',
-    defaultMessage: 'DRN',
-    description: 'Label for DRN in work queue list item'
-  },
-  listItemEventRegistrationNumber: {
-    id: 'register.workQueue.labels.results.eventRegistrationNumber',
-    defaultMessage:
-      '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
-    description: 'Label for event registration number in work queue list item'
-  },
-  listItemDuplicateLabel: {
-    id: 'register.workQueue.labels.results.duplicate',
-    defaultMessage: 'Possible duplicate found',
-    description: 'Label for duplicate indication in work queue'
-  },
-  listItemRejectionReasonLabel: {
-    id: 'register.workQueue.labels.results.rejectionReason',
-    defaultMessage: 'Reason',
-    description: 'Label for rejection reason'
-  },
-  listItemCommentLabel: {
-    id: 'register.workQueue.labels.results.rejectionComment',
-    defaultMessage: 'Comment',
-    description: 'Label for rejection comment'
-  },
-  newRegistration: {
-    id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New registration',
-    description: 'The title of new registration button'
-  },
-  newApplication: {
-    id: 'register.workQueue.buttons.newApplication',
-    defaultMessage: 'New Application',
-    description: 'The title of new application button'
-  },
-  reviewAndRegister: {
-    id: 'register.workQueue.buttons.reviewAndRegister',
-    defaultMessage: 'Review and Register',
-    description:
-      'The title of review and register button in expanded area of list item'
-  },
-  reviewDuplicates: {
-    id: 'register.workQueue.buttons.reviewDuplicates',
-    defaultMessage: 'Review Duplicates',
-    description:
-      'The title of review duplicates button in expanded area of list item'
-  },
-  review: {
-    id: 'register.workQueue.list.buttons.review',
-    defaultMessage: 'Review',
-    description: 'The title of review button in list item actions'
-  },
-  print: {
-    id: 'register.workQueue.list.buttons.print',
-    defaultMessage: 'Print',
-    description: 'The title of print button in list item actions'
-  },
-  printCertificate: {
-    id: 'register.workQueue.list.buttons.printCertificate',
-    defaultMessage: 'Print certificate',
-    description:
-      'The title of print certificate button in list expansion actions'
-  },
-  workflowStatusDateApplication: {
-    id: 'register.workQueue.listItem.status.dateLabel.application',
-    defaultMessage: 'Application submitted on',
-    description:
-      'Label for the workflow timestamp when the status is application'
-  },
-  workflowStatusDateRegistered: {
-    id: 'register.workQueue.listItem.status.dateLabel.registered',
-    defaultMessage: 'Registrated on',
-    description:
-      'Label for the workflow timestamp when the status is registered'
-  },
-  workflowStatusDateRejected: {
-    id: 'register.workQueue.listItem.status.dateLabel.rejected',
-    defaultMessage: 'Rejected on',
-    description: 'Label for the workflow timestamp when the status is rejected'
-  },
-  workflowStatusDateCollected: {
-    id: 'register.workQueue.listItem.status.dateLabel.collected',
-    defaultMessage: 'Printed on',
-    description: 'Label for the workflow timestamp when the status is collected'
-  },
-  workflowPractitionerLabel: {
-    id: 'register.workQueue.listItem.status.label.byPractitioner',
-    defaultMessage: 'By',
-    description: 'Label for the practitioner name in workflow'
-  },
-  EditBtnText: {
-    id: 'review.edit.modal.editButton',
-    defaultMessage: 'Edit',
-    description: 'Edit button text'
-  },
-  printCertificateBtnText: {
-    id: 'register.workQueue.buttons.printCertificate',
-    defaultMessage: 'Print Certificate',
-    description: 'Print Certificate Button text'
-  },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
-  },
-  application: {
-    id: 'register.workQueue.statusLabel.application',
-    defaultMessage: 'application',
-    description: 'The status label for application'
-  },
-  registered: {
-    id: 'register.workQueue.statusLabel.registered',
-    defaultMessage: 'registered',
-    description: 'The status label for registered'
-  },
-  rejected: {
-    id: 'register.workQueue.statusLabel.rejected',
-    defaultMessage: 'rejected',
-    description: 'The status label for rejected'
-  },
-  collected: {
-    id: 'register.workQueue.statusLabel.collected',
-    defaultMessage: 'collected',
-    description: 'The status label for collected'
-  },
-  title: {
-    id: 'register.SearchResult.title',
-    defaultMessage: 'Search',
-    description: 'The title of the page'
-  }
-})
+import * as moment from 'moment'
+import * as React from 'react'
+import { Query } from 'react-apollo'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { IViewHeadingProps } from 'src/components/ViewHeading'
+import {
+  goToEvents as goToEventsAction,
+  goToPrintCertificate as goToPrintCertificateAction,
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToSearchResult
+} from 'src/navigation'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { getScope, getUserDetails } from 'src/profile/profileSelectors'
+import { messages as rejectionMessages } from 'src/review/reject-registration'
+import { messages } from 'src/search/messages'
+import { SEARCH_EVENTS } from 'src/search/queries'
+import { transformData } from 'src/search/transformer'
+import { IStoreState } from 'src/store'
+import { Scope } from 'src/utils/authUtils'
+import {
+  CERTIFICATE_DATE_FORMAT,
+  DECLARED,
+  LANG_EN,
+  LOCAL_DATE_FORMAT,
+  REJECTED,
+  REJECT_REASON
+} from 'src/utils/constants'
+import {
+  createNamesMap,
+  extractCommentFragmentValue
+} from 'src/utils/data-formatting'
+import { formatLongDate } from 'src/utils/date-formatting'
+import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
+import styled, { withTheme } from 'styled-components'
+import { goToTab as goToTabAction } from '../../navigation'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 
 const StyledSpinner = styled(Spinner)`
   margin: 50% auto;
 `
-
+const ListItemExpansionSpinner = styled(Spinner)`
+  width: 70px;
+  height: 70px;
+  top: 0px !important;
+`
+const ExpansionSpinnerContainer = styled.div`
+  min-height: 70px;
+  min-width: 70px;
+  display: flex;
+  justify-content: center;
+`
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -460,6 +104,7 @@ const StyledLabel = styled.label`
 `
 const StyledValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.regularFont};
+  text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
   display: inline-flex;
@@ -469,15 +114,6 @@ const ValueContainer = styled.div`
     border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
     margin-right: 10px;
     padding-right: 10px;
-  }
-`
-const DuplicateIndicatorContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  & span {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
-    margin-left: 10px;
   }
 `
 export const ActionPageWrapper = styled.div`
@@ -574,12 +210,6 @@ const StyledSecondaryButton = styled(SecondaryButton)`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
-
-const StatusIconCollected = styled.div`
-  padding-left: 6px;
-  margin-top: 3px;
-`
-
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
@@ -589,28 +219,46 @@ interface IBaseSearchResultProps {
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToSearchResult: typeof goToSearchResult
+}
+
+interface IMatchParams {
+  searchText: string
 }
 
 type ISearchResultProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseSearchResultProps
+  IBaseSearchResultProps &
+  RouteComponentProps<IMatchParams>
 
 interface ISearchResultState {
   printCertificateModalVisible: boolean
   regId: string | null
   currentPage: number
+  sortBy?: string
+  eventType?: string
+  status?: string
+  searchContent?: string
 }
 export class SearchResultView extends React.Component<
   ISearchResultProps,
   ISearchResultState
 > {
-  state = { printCertificateModalVisible: false, regId: null, currentPage: 1 }
+  state = {
+    printCertificateModalVisible: false,
+    regId: null,
+    currentPage: 1,
+    sortBy: 'asc',
+    eventType: '',
+    status: '',
+    searchContent: ''
+  }
   pageSize = 10
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return (
           <StatusIcon>
             <StatusOrange />
@@ -630,9 +278,9 @@ export class SearchResultView extends React.Component<
         )
       case 'CERTIFIED':
         return (
-          <StatusIconCollected>
-            <StatusCollected />
-          </StatusIconCollected>
+          <StatusIcon>
+            <StatusCertified />
+          </StatusIcon>
         )
       default:
         return (
@@ -645,7 +293,7 @@ export class SearchResultView extends React.Component<
 
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return this.props.intl.formatMessage(messages.application)
       case 'REGISTERED':
         return this.props.intl.formatMessage(messages.registered)
@@ -660,7 +308,7 @@ export class SearchResultView extends React.Component<
 
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
-      case 'APPLICATION':
+      case 'DECLARED':
         return messages.workflowStatusDateApplication
       case 'REGISTERED':
         return messages.workflowStatusDateRegistered
@@ -674,7 +322,7 @@ export class SearchResultView extends React.Component<
   }
 
   getEventLabel = (status: string) => {
-    switch (status) {
+    switch (status.toUpperCase()) {
       case 'BIRTH':
         return this.props.intl.formatMessage(messages.filtersBirth)
       case 'DEATH':
@@ -684,182 +332,177 @@ export class SearchResultView extends React.Component<
     }
   }
 
-  transformData = (data: GQLQuery) => {
+  transformDataToTaskHistory = (data: GQLQuery) => {
     const { locale } = this.props.intl
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+    const registration =
+      data && data.fetchRegistration && data.fetchRegistration.registration
+    const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
+    const informant = deathReg && deathReg.informant
+    const contactInfo =
+      informant &&
+      informant.individual &&
+      informant.individual.telecom &&
+      informant.individual.telecom[0]
+
+    if (!registration || !registration.status) {
       return []
     }
 
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
-        let birthReg
-        let deathReg
-        let names
-        if (reg.registration && reg.registration.type === 'BIRTH') {
-          birthReg = reg as GQLBirthRegistration
-          names =
-            (birthReg &&
-              birthReg.child &&
-              (birthReg.child.name as GQLHumanName[])) ||
-            []
-        } else {
-          deathReg = reg as GQLDeathRegistration
-          names =
-            (deathReg &&
-              deathReg.deceased &&
-              (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-        }
-        const lang = 'bn'
-        const type =
-          reg.registration &&
-          reg.registration.status &&
-          (reg.registration.status[0] as GQLRegWorkflow).type
-        return {
-          id: reg.id,
-          name:
-            (createNamesMap(names)[lang] as string) ||
-            /* tslint:disable:no-string-literal */
-            (createNamesMap(names)['default'] as string) ||
-            /* tslint:enable:no-string-literal */
-            '',
-          dob:
-            (birthReg &&
-              birthReg.child &&
-              birthReg.child.birthDate &&
-              formatLongDate(birthReg.child.birthDate, locale)) ||
-            '',
-          dod:
-            (deathReg &&
-              deathReg.deceased &&
-              deathReg.deceased.deceased &&
-              deathReg.deceased.deceased.deathDate &&
-              formatLongDate(deathReg.deceased.deceased.deathDate, locale)) ||
-            '',
-          date_of_application: formatLongDate(reg.createdAt, locale),
-          registrationNumber:
-            (reg.registration && reg.registration.registrationNumber) || '',
-          tracking_id: (reg.registration && reg.registration.trackingId) || '',
-          createdAt: reg.createdAt as string,
-          status:
-            reg.registration &&
-            reg.registration.status &&
-            reg.registration.status
-              .map(status => {
-                return {
-                  type: status && status.type,
-                  practitionerName:
-                    (status &&
-                      status.user &&
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        this.props.language
-                      ] as string)) ||
-                    (status &&
-                      status.user &&
-                      /* tslint:disable:no-string-literal */
-                      (createNamesMap(status.user.name as GQLHumanName[])[
-                        'default'
-                      ] as string)) ||
-                    /* tslint:enable:no-string-literal */
-                    '',
-                  timestamp: status && formatLongDate(status.timestamp, locale),
-                  practitionerRole:
-                    status && status.user && status.user.role
-                      ? this.props.intl.formatMessage(
-                          messages[status.user.role as string]
-                        )
-                      : '',
-                  officeName:
-                    locale === 'en'
-                      ? status && status.office && status.office.name
-                      : status && status.office && status.office.alias
-                }
-              })
-              .reverse(),
-          declaration_status:
-            reg.registration &&
-            reg.registration.status &&
-            (reg.registration.status[0] as GQLRegWorkflow).type,
-          event: reg.registration && reg.registration.type,
-          rejection_reasons:
-            (type === 'REJECTED' &&
-              reg.registration &&
-              reg.registration.status &&
-              (reg.registration.status[0] as GQLRegWorkflow).comments &&
-              extractCommentFragmentValue(
-                (reg.registration.status[0] as GQLRegWorkflow)
-                  .comments as GQLComment[],
-                'reason'
-              )) ||
-            '',
-          rejection_comment:
-            (type === 'REJECTED' &&
-              reg.registration &&
-              reg.registration.status &&
-              (reg.registration.status[0] as GQLRegWorkflow).comments &&
-              extractCommentFragmentValue(
-                (reg.registration.status[0] as GQLRegWorkflow)
-                  .comments as GQLComment[],
-                'comment'
-              )) ||
-            '',
-          duplicates: reg.registration && reg.registration.duplicates,
-          location:
-            (reg.registration &&
-              reg.registration.status &&
-              (reg.registration.status[0] as GQLRegWorkflow).location &&
-              ((reg.registration.status[0] as GQLRegWorkflow)
-                .location as GQLLocation).name) ||
-            ''
-        }
+    return registration.status.map((status, index) => {
+      const certificate =
+        registration.certificates && registration.certificates[index]
+      const collector = certificate && certificate.collector
+
+      return {
+        type: status && status.type,
+        practitionerName:
+          (status &&
+            status.user &&
+            (createNamesMap(status.user.name as GQLHumanName[])[
+              this.props.language
+            ] as string)) ||
+          (status &&
+            status.user &&
+            (createNamesMap(status.user.name as GQLHumanName[])[
+              ''
+            ] as string)) ||
+          '',
+        timestamp: status && formatLongDate(status.timestamp, locale),
+        practitionerRole:
+          status && status.user && status.user.role
+            ? this.props.intl.formatMessage(
+                messages[status.user.role as string]
+              )
+            : '',
+        officeName:
+          locale === LANG_EN
+            ? status && status.office && status.office.name
+            : status && status.office && status.office.alias,
+        collectorName:
+          (collector &&
+            collector.individual &&
+            (createNamesMap(collector.individual.name as GQLHumanName[])[
+              this.props.language
+            ] as string)) ||
+          (collector &&
+            collector.individual &&
+            (createNamesMap(collector.individual.name as GQLHumanName[])[
+              LANG_EN
+            ] as string)) ||
+          '',
+        collectorType: collector && collector.relationship,
+        rejectReasons:
+          (status &&
+            status.type === REJECTED &&
+            extractCommentFragmentValue(
+              status.comments as GQLComment[],
+              REJECT_REASON
+            )) ||
+          '',
+        informantContactNumber: contactInfo && contactInfo.value
       }
-    )
+    })
   }
 
-  renderExpansionContent = (item: {
-    [key: string]: string & Array<{ [key: string]: string }>
-  }): JSX.Element[] => {
-    return item.status.map((status, i) => {
-      const { practitionerName, practitionerRole, officeName } = status
-      return (
-        <ExpansionContainer key={i}>
-          {this.getDeclarationStatusIcon(status.type)}
-          <ExpansionContentContainer>
-            <LabelValue
-              label={this.props.intl.formatMessage(
-                this.getWorkflowDateLabel(status.type)
-              )}
-              value={status.timestamp}
-            />
-            <ValueContainer>
-              <StyledLabel>
-                {this.props.intl.formatMessage(
-                  messages.workflowPractitionerLabel
-                )}
-                :
-              </StyledLabel>
-              <ValuesWithSeparator
-                strings={[
+  renderExpansionContent = (id: string): JSX.Element => {
+    return (
+      <>
+        <Query
+          query={FETCH_REGISTRATION_BY_COMPOSITION}
+          variables={{
+            id
+          }}
+        >
+          {({ loading, error, data }) => {
+            const { intl, language } = this.props
+            moment.locale(language)
+            if (error) {
+              Sentry.captureException(error)
+            } else if (loading) {
+              return (
+                <ExpansionSpinnerContainer>
+                  <ListItemExpansionSpinner
+                    id="list-expansion-spinner"
+                    baseColor={this.props.theme.colors.background}
+                  />
+                </ExpansionSpinnerContainer>
+              )
+            }
+
+            const statusData = this.transformDataToTaskHistory(data)
+
+            return statusData
+              .map((status, index) => {
+                const {
                   practitionerName,
-                  formatRoleCode(practitionerRole),
-                  officeName
-                ]}
-              />
-            </ValueContainer>
-            {item.duplicates && item.duplicates.length > 0 && (
-              <DuplicateIndicatorContainer>
-                <Duplicate />
-                <span>
-                  {this.props.intl.formatMessage(
-                    messages.listItemDuplicateLabel
-                  )}
-                </span>
-              </DuplicateIndicatorContainer>
-            )}
-          </ExpansionContentContainer>
-        </ExpansionContainer>
-      )
-    })
+                  practitionerRole,
+                  collectorName,
+                  collectorType,
+                  rejectReasons,
+                  informantContactNumber
+                } = status
+                const type = status.type as string
+                const officeName = status.officeName as string
+                const timestamp = moment(
+                  status.timestamp as string,
+                  LOCAL_DATE_FORMAT
+                ).format(CERTIFICATE_DATE_FORMAT)
+                const collectorInfo = collectorName + ' (' + collectorType + ')'
+
+                return (
+                  <ExpansionContainer key={index} id={type + '-' + index}>
+                    {this.getDeclarationStatusIcon(type)}
+                    <ExpansionContentContainer>
+                      <LabelValue
+                        label={intl.formatMessage(
+                          this.getWorkflowDateLabel(type)
+                        )}
+                        value={timestamp}
+                      />
+                      {type === DECLARED && informantContactNumber && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.informantContact)}
+                          value={informantContactNumber}
+                        />
+                      )}
+                      {collectorType && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.collectedBy)}
+                          value={collectorInfo}
+                        />
+                      )}
+                      <ValueContainer>
+                        <StyledLabel>
+                          {this.props.intl.formatMessage(
+                            collectorType
+                              ? messages.issuedBy
+                              : messages.workflowPractitionerLabel
+                          )}
+                          :
+                        </StyledLabel>
+                        <ValuesWithSeparator
+                          strings={[
+                            practitionerName,
+                            formatRoleCode(practitionerRole),
+                            officeName
+                          ]}
+                        />
+                      </ValueContainer>
+                      {rejectReasons && (
+                        <LabelValue
+                          label={intl.formatMessage(messages.rejectReason)}
+                          value={rejectReasons}
+                        />
+                      )}
+                    </ExpansionContentContainer>
+                  </ExpansionContainer>
+                )
+              })
+              .reverse()
+          }}
+        </Query>
+      </>
+    )
   }
 
   renderCell = (
@@ -1053,8 +696,8 @@ export class SearchResultView extends React.Component<
         itemData={{}}
         actions={listItemActions}
         expandedCellRenderer={() => (
-          <ListItemExpansion actions={expansionActions}>
-            {this.renderExpansionContent(item)}
+          <ListItemExpansion>
+            {this.renderExpansionContent(item.id)}
           </ListItemExpansion>
         )}
       />
@@ -1089,9 +732,23 @@ export class SearchResultView extends React.Component<
   onPageChange = async (newPageNumber: number) => {
     this.setState({ currentPage: newPageNumber })
   }
+  onSortChange = (sortBy: string) => {
+    this.setState({ sortBy })
+  }
+  onFilterChange = (
+    value: ISelectGroupValue,
+    changedValue: ISelectGroupValue
+  ) => {
+    this.setState({
+      eventType: this.state.eventType,
+      status: this.state.status,
+      ...changedValue
+    })
+  }
 
   render() {
-    const { intl, theme } = this.props
+    const { intl, match, theme } = this.props
+    const searchParam = match.params.searchText
     const sortBy = {
       input: {
         label: intl.formatMessage(messages.filtersSortBy)
@@ -1111,7 +768,7 @@ export class SearchResultView extends React.Component<
                 label: intl.formatMessage(messages.filtersNewestToOldest)
               }
             ],
-            value: 'desc',
+            value: this.state.sortBy,
             type: SelectFieldType.Date
           }
         ]
@@ -1125,29 +782,29 @@ export class SearchResultView extends React.Component<
         name: '',
         options: [
           {
-            name: 'event',
+            name: 'eventType',
             options: [
               {
                 value: '',
                 label: intl.formatMessage(messages.filtersAllEvents)
               },
               {
-                value: 'birth',
+                value: 'Birth',
                 label: intl.formatMessage(messages.filtersBirth)
               },
               {
-                value: 'death',
+                value: 'Death',
                 label: intl.formatMessage(messages.filtersDeath)
               },
               {
-                value: 'marriage',
+                value: 'Marriage',
                 label: intl.formatMessage(messages.filtersMarriage)
               }
             ],
-            value: ''
+            value: this.state.eventType || ''
           },
           {
-            name: 'declaration_status',
+            name: 'status',
             options: [
               {
                 value: '',
@@ -1164,9 +821,13 @@ export class SearchResultView extends React.Component<
               {
                 value: 'CERTIFIED',
                 label: intl.formatMessage(messages.filtersCollected)
+              },
+              {
+                value: 'REJECTED',
+                label: intl.formatMessage(messages.filtersRejected)
               }
             ],
-            value: ''
+            value: this.state.status || ''
           }
         ]
       }
@@ -1183,11 +844,15 @@ export class SearchResultView extends React.Component<
           <Container>
             <HeaderContent>
               <Query
-                query={FETCH_REGISTRATION_QUERY}
+                query={SEARCH_EVENTS}
                 variables={{
                   locationIds: [this.getLocalLocationId()],
                   count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize
+                  skip: (this.state.currentPage - 1) * this.pageSize,
+                  sort: this.state.sortBy,
+                  eventType: this.state.eventType,
+                  status: this.state.status,
+                  searchContent: searchParam
                 }}
               >
                 {({ loading, error, data }) => {
@@ -1200,6 +865,7 @@ export class SearchResultView extends React.Component<
                     )
                   }
                   if (error) {
+                    console.log(`ERROR in QUERY ${JSON.stringify(error)}`)
                     Sentry.captureException(error)
 
                     return (
@@ -1208,17 +874,19 @@ export class SearchResultView extends React.Component<
                       </ErrorText>
                     )
                   }
-                  const transformedData = this.transformData(data)
+                  const transformedData = transformData(data, intl)
                   return (
                     <>
                       <SearchInput
                         id="search-input-text"
+                        searchValue={searchParam}
                         placeholder={intl.formatMessage(
                           messages.searchInputPlaceholder
                         )}
                         buttonLabel={intl.formatMessage(
                           messages.searchInputButtonTitle
                         )}
+                        onSubmit={this.props.goToSearchResult}
                         {...this.props}
                       />
                       <DataTable
@@ -1234,6 +902,15 @@ export class SearchResultView extends React.Component<
                         )}
                         onPageChange={(currentPage: number) => {
                           this.onPageChange(currentPage)
+                        }}
+                        onSortChange={(value: ISelectGroupValue) =>
+                          this.onSortChange(value.createdAt)
+                        }
+                        onFilterChange={(
+                          value: ISelectGroupValue,
+                          changedValue: ISelectGroupValue
+                        ) => {
+                          this.onFilterChange(value, changedValue)
                         }}
                         pageSize={this.pageSize}
                         totalPages={Math.ceil(
@@ -1262,6 +939,7 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
+    goToSearchResult,
     gotoTab: goToTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction

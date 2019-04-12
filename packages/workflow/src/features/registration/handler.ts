@@ -38,6 +38,27 @@ async function sendBundleToHearth(
   return res.json()
 }
 
+function populateCompositionWithID(
+  payload: fhir.Bundle,
+  response: fhir.Bundle
+) {
+  if (
+    payload &&
+    payload.entry &&
+    payload.entry[0].resource &&
+    payload.entry[0].resource.resourceType === 'Composition'
+  ) {
+    if (!payload.entry[0].resource.id) {
+      payload.entry[0].resource.id =
+        response &&
+        response.entry &&
+        response.entry[0].response &&
+        response.entry[0].response.location &&
+        response.entry[0].response.location.split('/')[3]
+    }
+  }
+}
+
 export async function createRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit,
@@ -55,6 +76,7 @@ export async function createRegistrationHandler(
       )
     }
     const resBundle = await sendBundleToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
 
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */

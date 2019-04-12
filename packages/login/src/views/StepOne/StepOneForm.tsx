@@ -4,14 +4,19 @@ import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
 
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Box } from '@opencrvs/components/lib/interface'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
+
+import {
+  InputField,
+  TextInput,
+  THEME_MODE
+} from '@opencrvs/components/lib/forms'
 
 import { stepOneFields } from './stepOneFields'
 
 import { IAuthenticationData } from '../../utils/authApi'
 import { localiseValidationError } from '../../forms/i18n'
+import { Logo } from '@opencrvs/components/lib/icons'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -44,6 +49,11 @@ export const messages = defineMessages({
     defaultMessage: 'Submit',
     description: 'The label that appears on the submit button'
   },
+  forgotPassword: {
+    id: 'login.forgotPassword',
+    defaultMessage: 'Forgot password',
+    description: 'The label that appears on the Forgot password button'
+  },
   submissionError: {
     id: 'login.submissionError',
     defaultMessage: 'Sorry that mobile number and password did not work.',
@@ -57,52 +67,70 @@ export const messages = defineMessages({
   }
 })
 
-export const StyledBox = styled(Box)`
-  position: absolute;
+export const Container = styled.div`
+  position: relative;
   height: auto;
-  top: 50%;
-  right: 50%;
   padding: 0px;
-  margin: 0px;
-  transform: translate(50%, -50%);
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 90%;
-  }
+  margin: 0px auto;
+  width: 300px;
 `
 
 export const FormWrapper = styled.form`
   position: relative;
   margin: auto;
-  width: 80%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 90%;
-  }
+  width: 100%;
   margin-bottom: 50px;
-  padding-top: 20px;
+  margin-top: 30px;
 `
 
 export const ActionWrapper = styled.div`
   position: relative;
   margin-top: 10px;
   display: flex;
+  flex-direction: column;
+`
+export const LogoContainer = styled.div`
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
 `
 
 export const Title = styled.div`
   margin: auto;
   margin-top: 30px;
-  width: 80%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 90%;
+  color: ${({ theme }) => theme.colors.white};
+  text-align: center;
+`
+export const StyledPrimaryButton = styled(PrimaryButton)`
+  justify-content: center;
+  flex-direction: row;
+  display: flex;
+  flex: 1;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.16);
+  padding: 10px ${({ theme }) => theme.grid.margin}px;
+  margin-bottom: 10px;
+`
+
+export const StyledButton = styled(Button)`
+  color: ${({ theme }) => theme.colors.white};
+  flex-direction: row;
+  justify-content: center;
+  padding: 10px ${({ theme }) => theme.grid.margin}px;
+
+  :hover {
+    text-decoration: underline;
+    text-decoration-color: ${({ theme }) => theme.colors.accentLight};
   }
 `
-
 export const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.danger};
+  padding: 2px ${({ theme }) => theme.grid.margin}px;
+  text-align: center;
 `
 
-const FieldWrapper = styled.div`
-  margin-bottom: 30px;
+export const FieldWrapper = styled.div`
+  min-height: 6.7em;
 `
 
 export interface IProps {
@@ -133,6 +161,7 @@ const MobileInput = injectIntl((props: Props) => {
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
+      mode={THEME_MODE.DARK}
     >
       <TextInput
         {...mobileField}
@@ -158,6 +187,7 @@ const PasswordInput = injectIntl((props: Props) => {
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
+      mode={THEME_MODE.DARK}
     >
       <TextInput
         {...passwordField}
@@ -184,10 +214,11 @@ export class StepOneForm extends React.Component<
     } = this.props
 
     return (
-      <StyledBox id="login-step-one-box">
+      <Container id="login-step-one-box">
+        <LogoContainer>
+          <Logo />
+        </LogoContainer>
         <Title>
-          <h2>{intl.formatMessage(messages.stepOneTitle)}</h2>
-          <p>{intl.formatMessage(messages.stepOneInstruction)}</p>
           {submissionError && (
             <ErrorText>
               {intl.formatMessage(messages.submissionError)}
@@ -216,12 +247,15 @@ export class StepOneForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <PrimaryButton id="login-mobile-submit" type="submit">
+            <StyledPrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
-            </PrimaryButton>
+            </StyledPrimaryButton>
+            <StyledButton id="login-forgot-password" type="button">
+              {intl.formatMessage(messages.forgotPassword)}
+            </StyledButton>
           </ActionWrapper>
         </FormWrapper>
-      </StyledBox>
+      </Container>
     )
   }
 }

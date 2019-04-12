@@ -50,9 +50,23 @@ describe('when the home page loads for a field worker', () => {
   describe('when user is in home view', () => {
     const registerUserDetails = Object.assign({}, userDetails)
     registerUserDetails.role = 'LOCAL_REGISTRAR'
-    beforeEach(() => {
+    beforeEach(async () => {
       store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
       history.replace(HOME)
+      app.update()
+      app
+        .find('#createPinBtn')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 8 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      await flushPromises()
       app.update()
     })
     it('lists the actions', () => {

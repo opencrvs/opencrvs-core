@@ -44,9 +44,9 @@ services:
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=bgd
 
-  deduplication:
-    image: jembi/ocrvs-deduplication:${VERSION:-latest}
-    build: packages/deduplication
+  search:
+    image: jembi/ocrvs-search:${VERSION:-latest}
+    build: packages/search
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT

@@ -496,7 +496,7 @@ describe('when user wants to print certificate', async () => {
     expect(informativeRadioGroupComponent.component.exists()).toBe(true)
   })
 
-  describe('when user interacts', async () => {
+  describe('when user interacts', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
@@ -861,6 +861,7 @@ describe('when user wants to print certificate', async () => {
         certificatePreview.fields
       )
     })
+
     it('timeElapsedInWords function returns required time duration in words', () => {
       Date.now = jest.fn(() => new Date('2019-01-01'))
 

@@ -34,7 +34,6 @@ export default async function refreshHandler(
   if (isDemoUser) {
     verificationCode = '000000'
   } else {
-    console.log('Calling generateVerificationCode')
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
 
@@ -44,7 +43,6 @@ export default async function refreshHandler(
       verificationCode
     })
   } else {
-    console.log('Calling sendVerificationCode')
     await sendVerificationCode(mobile, verificationCode)
   }
 

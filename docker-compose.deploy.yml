@@ -1,0 +1,231 @@
+version: '3.3'
+
+services:
+  # configure reverse proxy for public endpoints
+  traefik:
+    image: traefik
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8090:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/traefik/acme.json:/acme.json
+    configs:
+      - source: traefik.{{ts}}
+        target: /etc/traefik/traefik.toml
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - overlay_net
+
+  register:
+    configs:
+      - source: register-config.{{ts}}
+        target: /usr/src/app/packages/register/build/config.js
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: register.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
+        - 'traefik.port=5000'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  performance:
+    configs:
+      - source: performance-config.{{ts}}
+        target: /usr/src/app/packages/performance/build/config.js
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: performance.{{hostname}}'
+        - 'traefik.port=5000'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  login:
+    configs:
+      - source: login-config.{{ts}}
+        target: /usr/src/app/packages/login/build/config.js
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: login.{{hostname}}'
+        - 'traefik.port=5000'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  auth:
+    secrets:
+      - jwt-public-key.{{ts}}
+      - jwt-private-key.{{ts}}
+    environment:
+      - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: auth.{{hostname}}'
+        - 'traefik.port=4040'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  user-mgnt:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
+
+  notification:
+    secrets:
+      - clickatell-user
+      - clickatell-password
+      - clickatell-api-id
+      - infobip-gateway-endpoint
+      - infobip-api-key
+      - jwt-public-key.{{ts}}
+    environment:
+      - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
+      - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
+      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
+      - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
+      - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - LANGUAGE=bn
+      - COUNTRY_ALPHA3=BGD
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
+
+  gateway:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
+        - 'traefik.port=7070'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  workflow:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
+
+  search:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      replicas: 2
+    networks:
+      - overlay_net
+
+  resources:
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
+        - 'traefik.port=3040'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    networks:
+      - overlay_net
+
+  hearth:
+    secrets:
+      - jwt-public-key.{{ts}}
+    configs:
+      - source: hearth-check-dupe-plugin.{{ts}}
+        target: /src/hearth/lib/plugins/checkDuplicateTask.js
+      - source: hearth-queryparam-extensions-conf.{{ts}}
+        target: /src/hearth/config/queryparam-extensions.json
+
+  openhim-core:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.openhim-api.frontend.rule=Host: openhim-api.{{hostname}}'
+        - 'traefik.openhim-api.protocol=https'
+        - 'traefik.openhim-api.port=8080'
+        - 'traefik.router.frontend.rule=Host: api.{{hostname}}'
+        - 'traefik.router.port=5001'
+      replicas: 2
+
+  openhim-console:
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: openhim.{{hostname}}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+      replicas: 2
+    configs:
+      - source: openhim-console-conf.{{ts}}
+        target: /usr/share/nginx/html/config/default.json
+
+secrets:
+  jwt-public-key.{{ts}}:
+    external: true
+  jwt-private-key.{{ts}}:
+    external: true
+  clickatell-user:
+    external: true
+  clickatell-password:
+    external: true
+  clickatell-api-id:
+    external: true
+  infobip-gateway-endpoint:
+    external: true
+  infobip-api-key:
+    external: true
+
+configs:
+  openhim-console-conf.{{ts}}:
+    file: ./infrastructure/openhim-console-config.deploy.json
+  traefik.{{ts}}:
+    file: ./infrastructure/traefik.toml
+  hearth-check-dupe-plugin.{{ts}}:
+    file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
+  hearth-queryparam-extensions-conf.{{ts}}:
+    file: ./infrastructure/hearth-queryparam-extensions.json
+  register-config.{{ts}}:
+    file: ./infrastructure/register-config.js
+  performance-config.{{ts}}:
+    file: ./infrastructure/performance-config.js
+  login-config.{{ts}}:
+    file: ./infrastructure/login-config.js

@@ -15,6 +15,7 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   id: string
   error?: boolean
   touched?: boolean
+  hideBorder?: boolean
   options: ISelectOption[]
   ignoreMediaQuery?: boolean
 }
@@ -36,13 +37,17 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   .react-select__control {
     background: ${({ theme }) => theme.colors.inputBackground};
     border-radius: 0;
-    border: 0;
     box-shadow: none;
     font-size: 16px;
     padding: 0 5px;
-    border-bottom: solid 1px
+    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
       ${({ error, touched, theme }) =>
-        error && touched ? theme.colors.error : theme.colors.disabled};
+        error && touched ? theme.colors.error : theme.colors.secondary};
+    &:hover {
+      border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
+        ${({ error, touched, theme }) =>
+          error && touched ? theme.colors.error : theme.colors.secondary};
+    }
   }
 
   .react-select__option {
@@ -55,8 +60,9 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   }
 
   .react-select__control--is-focused {
-    border: 0;
-    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
+    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
+    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
+      ${({ theme }) => theme.colors.secondary};
   }
 
   ${({ ignoreMediaQuery, theme }) => {

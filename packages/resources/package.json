@@ -39,6 +39,7 @@
     "eslint-config-prettier": "^3.1.0",
     "jest": "23.6.0",
     "json2csv": "^4.3.0",
+    "jsonwebtoken": "^8.3.0",
     "nodemon": "^1.18.5",
     "nyc": "^13.1.0",
     "opener": "^1.5.1",
@@ -54,6 +55,7 @@
   "dependencies": {
     "@types/chalk": "^2.2.0",
     "@types/hapi": "^17.8.2",
+    "@types/hapi-auth-jwt2": "^8.0.1",
     "@types/jest": "^24.0.6",
     "@types/joi": "^14.0.0",
     "@types/lodash": "^4.14.117",
@@ -66,6 +68,7 @@
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.8.1",
+    "hapi-auth-jwt2": "^8.1.0",
     "jest-fetch-mock": "^2.1.1",
     "joi": "^14.0.6",
     "lodash": "^4.17.11",

@@ -1,6 +1,12 @@
 logLevel = "INFO"
 defaultEntryPoints = ["http", "https"]
 
+# This is used so we can comunicate with OpenHIM's API while it uses
+# the default self-signed cert. This makes configuration easier and
+# is ok because all communication takes place on a private docker
+# swarm network.
+insecureSkipVerify = true
+
 [entryPoints]
   [entryPoints.http]
   address = ":80"
@@ -31,6 +37,16 @@ entryPoint = "http"
 
 [[acme.domains]]
   main = "{{hostname}}"
-  sans = ["register.{{hostname}}", "login.{{hostname}}", "auth.{{hostname}}", "gateway.{{hostname}}", "performance.{{hostname}}", "resources.{{hostname}}"]
+  sans = [
+    "register.{{hostname}}",
+    "login.{{hostname}}",
+    "auth.{{hostname}}",
+    "gateway.{{hostname}}",
+    "performance.{{hostname}}",
+    "resources.{{hostname}}",
+    "openhim-api.{{hostname}}",
+    "api.{{hostname}}",
+    "openhim.{{hostname}}"
+  ]
 
 [retry]

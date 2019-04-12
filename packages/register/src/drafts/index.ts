@@ -76,7 +76,7 @@ type Action =
 interface IUserData {
   userID: string
   drafts: IDraft[]
-  userPIN: number
+  userPIN: string
 }
 
 export interface IDraftsState {
@@ -280,17 +280,15 @@ async function writeDraftByUser(draftsState: IDraftsState) {
   const currentUserData = allUserData.find(uData => uData.userID === uID)
 
   if (currentUserData) {
-    // console.log('__FOUND RECORD__')
     currentUserData.drafts = draftsState.drafts
   } else {
-    // console.log('INSIDE writeDraftByUser', uID)
+    const pin = await storage.getItem('pin')
     allUserData.push({
       userID: uID,
-      userPIN: 1234,
+      userPIN: pin,
       drafts: draftsState.drafts
     })
   }
-  // console.log('writeDraftByUser :: Setting USER_DATA', draftsState.drafts)
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
 }
 

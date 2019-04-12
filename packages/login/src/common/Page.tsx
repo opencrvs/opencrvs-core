@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { LoginHeader } from './LoginHeader'
 
 export interface IPage {
+  submitting: boolean
   language?: string
 }
 

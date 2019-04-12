@@ -15,7 +15,6 @@ describe('Registration root resolvers', () => {
           id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
         })
       )
-      // @ts-ignore
       const composition = await resolvers.Query.fetchBirthRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
@@ -24,12 +23,137 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
+  describe('fetchDeathRegistration()', () => {
+    it('returns object of composition result', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+        })
+      )
+      // @ts-ignore
+      const composition = await resolvers.Query.fetchDeathRegistration(
+        {},
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+  describe('fetchRegistration()', () => {
+    it('returns object of composition result', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+        })
+      )
+      const composition = await resolvers.Query.fetchRegistration(
+        {},
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+      )
+      expect(composition).toBeDefined()
+      expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+  describe('searchEvents()', () => {
+    it('returns an array of composition results for eventType', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          eventType: 'Birth'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for status', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          status: 'DECLARED'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for locationIds', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce']
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for searchContent', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          searchContent: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns total item as 0 and an empty array in-case of invalid result found from elastic', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: null
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          eventType: 'Birth',
+          status: 'DECLARED',
+          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce'],
+          searchContent: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toEqual([])
+      expect(result.totalItems).toBe(0)
+    })
+  })
   describe('listEventRegistrations()', () => {
     it('returns an array of composition results', async () => {
       fetch.mockResponse(
         JSON.stringify({ entry: [{ resource: { focus: {} } }], total: 1 })
       )
-      // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
         { status: 'DECLARED' }
@@ -48,7 +172,6 @@ describe('Registration root resolvers', () => {
         })
       )
 
-      // @ts-ignore
       const result = await resolvers.Query.listEventRegistrations(
         {},
         {
@@ -60,6 +183,27 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(2)
+    })
+  })
+  describe('countEventRegistrations()', () => {
+    it('returns total number of declared and rejected compositions', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
+        })
+      )
+
+      // @ts-ignore
+      const result = await resolvers.Query.countEventRegistrations(
+        {},
+        {
+          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.declared).toBe(2)
+      expect(result.rejected).toBe(2)
     })
   })
   describe('createDeathRegistration()', () => {
@@ -96,7 +240,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createDeathRegistration(
         {},
         { details }
@@ -202,7 +345,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createDeathRegistration(
         {},
         { details },
@@ -254,7 +396,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
         { details }
@@ -365,7 +506,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
         { details },
@@ -402,7 +542,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError(
@@ -413,7 +552,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
@@ -513,7 +651,6 @@ describe('Registration root resolvers', () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
-      // @ts-ignore
       const result = await resolvers.Mutation.markEventAsVoided(
         {},
         { id, reason, comment }
@@ -1077,7 +1214,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.updateBirthRegistration(
         {},
         { details }
@@ -1094,7 +1230,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Mutation.updateBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
@@ -1132,7 +1267,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.markBirthAsCertified(
         {},
         { details }
@@ -1149,7 +1283,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Mutation.markBirthAsCertified({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
@@ -1189,7 +1322,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const result = await resolvers.Mutation.markDeathAsCertified(
         {},
         { details }
@@ -1201,6 +1333,56 @@ describe('Registration root resolvers', () => {
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
+    })
+  })
+  describe('notADuplicate()', () => {
+    it('returns composition id after removing duplicate id from it', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'DewpkiM'
+            },
+            relatesTo: [
+              {
+                code: 'duplicate',
+                targetReference: {
+                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: {
+                  status: '201',
+                  location:
+                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
+                }
+              }
+            ],
+            type: 'transaction-response'
+          })
+        ]
+      )
+      // @ts-ignore
+      const result = await resolvers.Mutation.notADuplicate(
+        {},
+        {
+          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+          duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toBe('1648b1fb-bad4-4b98-b8a3-bd7ceee496b6')
     })
   })
   describe('queryRegistrationByIdentifier()', async () => {
@@ -1230,7 +1412,6 @@ describe('Registration root resolvers', () => {
           })
         ]
       )
-      // @ts-ignore
       const composition = await resolvers.Query.queryRegistrationByIdentifier(
         {},
         { identifier: '2019333494BAQFYEG6' }
@@ -1241,7 +1422,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Query.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' }
@@ -1265,7 +1445,6 @@ describe('Registration root resolvers', () => {
         })
       )
       await expect(
-        // @ts-ignore
         resolvers.Query.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' }
@@ -1310,7 +1489,6 @@ describe('Registration root resolvers', () => {
           ]
         })
       )
-      // @ts-ignore
       const composition = await resolvers.Query.queryPersonByIdentifier(
         {},
         { identifier: '1234567898765' }
@@ -1321,7 +1499,6 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        // @ts-ignore
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' }

@@ -50,21 +50,21 @@ export const formatFacilitiesLanguageState = (
 }
 
 export interface IOfflineData {
-  locations: ILocation[]
-  facilities: ILocation[]
+  locations: { [key: string]: ILocation }
+  facilities: { [key: string]: ILocation }
 }
 
 export type IOfflineDataState = {
-  locations: ILocation[]
-  facilities: ILocation[]
+  locations: { [key: string]: ILocation }
+  facilities: { [key: string]: ILocation }
   healthFacilityFilterLocation: string
   offlineDataLoaded: boolean
   loadingError: boolean
 }
 
 export const initialState: IOfflineDataState = {
-  locations: [],
-  facilities: [],
+  locations: {},
+  facilities: {},
   // rejected: [],
   // records: [],
   offlineDataLoaded: false,
@@ -99,9 +99,11 @@ export const offlineDataReducer: LoopReducer<
         })
       )
     case actions.FACILITIES_FAILED:
-      locationLanguageState = formatLocationLanguageState(state.locations)
+      locationLanguageState = formatLocationLanguageState(
+        Object.values(state.locations)
+      )
       facilitesLanguageState = formatFacilitiesLanguageState(
-        tempData.facilities
+        Object.values(tempData.facilities)
       )
       return loop(
         {
@@ -141,9 +143,14 @@ export const offlineDataReducer: LoopReducer<
           facilities
         })
       )
-      locationLanguageState = formatLocationLanguageState(state.locations)
 
-      facilitesLanguageState = formatFacilitiesLanguageState(action.payload)
+      locationLanguageState = formatLocationLanguageState(
+        Object.values(state.locations)
+      )
+      facilitesLanguageState = formatFacilitiesLanguageState(
+        Object.values(action.payload)
+      )
+
       return loop(
         {
           ...state,
@@ -182,10 +189,10 @@ export const offlineDataReducer: LoopReducer<
 
       if (offlineData.locations && offlineData.facilities) {
         locationLanguageState = formatLocationLanguageState(
-          offlineData.locations
+          Object.values(offlineData.locations)
         )
         facilitesLanguageState = formatFacilitiesLanguageState(
-          offlineData.facilities
+          Object.values(offlineData.facilities)
         )
         return loop(
           {

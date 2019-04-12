@@ -3,7 +3,8 @@ import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
-  ICheckboxOption as CheckboxComponentOption
+  ICheckboxOption as CheckboxComponentOption,
+  THEME_MODE
 } from '@opencrvs/components/lib/forms'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
@@ -165,6 +166,7 @@ export interface IFormFieldBase {
   description?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
+  mode?: THEME_MODE
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -394,6 +396,7 @@ export interface Ii18nFormFieldBase {
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
+  mode?: THEME_MODE
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

@@ -1,20 +1,24 @@
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from 'src/offline/reducer'
+import { getToken } from './authUtils'
 
 export interface ILocationDataResponse {
-  data: ILocation[]
+  data: { [key: string]: ILocation }
 }
 
 export interface IFacilitiesDataResponse {
-  data: ILocation[]
+  data: { [key: string]: ILocation }
 }
 
 async function loadLocations(): Promise<any> {
   const url = resolve(window.config.RESOURCES_URL, 'locations')
 
   const res = await fetch(url, {
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
   })
 
   if (res && res.status !== 200) {
@@ -31,7 +35,10 @@ async function loadFacilities(): Promise<any> {
   const url = resolve(window.config.RESOURCES_URL, 'facilities')
 
   const res = await fetch(url, {
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
   })
 
   if (res && res.status !== 200) {

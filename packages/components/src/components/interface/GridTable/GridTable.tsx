@@ -124,12 +124,18 @@ export class GridTable extends React.Component<
   ) => {
     if (this.props.expandable) {
       return (
-        <ActionWrapper key={key} width={width} alignment={alignment}>
+        <ActionWrapper
+          key={key}
+          width={width}
+          alignment={alignment}
+          id="ActionWrapper"
+        >
           <ListItemAction
             actions={actions}
             expanded={
               this.state.expanded.findIndex(id => id === itemId) >= 0 || false
             }
+            id="ListItemAction"
             onExpand={() => this.toggleExpanded(itemId)}
           />
         </ActionWrapper>
