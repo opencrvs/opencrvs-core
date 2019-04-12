@@ -662,9 +662,9 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.update()
 
-    const data = testComponent.component
-      .find(RegisterForm)
-      .prop('draft') as IDraft
+    const checkData = testComponent.component.find(RegisterForm)
+    console.log('PROPS ::', checkData.props)
+    const data = checkData.prop('draft') as IDraft
 
     expect(data.data.registration).toEqual({
       _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
@@ -699,7 +699,15 @@ describe('ReviewForm tests', async () => {
         type: 'BIRTH'
       }
     }
-    store.dispatch(getStorageDraftsSuccess(JSON.stringify([draft])))
+    store.dispatch(
+      getStorageDraftsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          userPIN: 1212, // mock
+          drafts: [draft]
+        })
+      )
+    )
     store.dispatch(storeDraft(draft))
 
     const testComponent = createTestComponent(

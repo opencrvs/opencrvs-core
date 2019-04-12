@@ -139,8 +139,8 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
   action: Action
 ): IDraftsState | Loop<IDraftsState, Action> => {
-  console.log(action.type)
-  console.log(state.userID)
+  // console.log(action.type)
+  // console.log(state.userID)
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -182,21 +182,24 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftDeletion))
       )
     case MODIFY_DRAFT:
+      const newDrafts = state.drafts
+        ? state.drafts.map(draft => {
+            if (draft.id === action.payload.draft.id) {
+              return action.payload.draft
+            }
+            return draft
+          })
+        : [] // if the array is not initialized, it will be
       const stateAfterDraftModification = {
         ...state,
-        drafts: state.drafts.map(draft => {
-          if (draft.id === action.payload.draft.id) {
-            return action.payload.draft
-          }
-          return draft
-        })
+        drafts: newDrafts
       }
       return loop(
         stateAfterDraftModification,
         Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
-      console.log(action.type, state.userID)
+      // console.log(action.type, state.userID)
       if (state.initialDraftsLoaded && state.drafts) {
         writeDraftByUser(action.payload.draft)
       }
@@ -243,17 +246,14 @@ async function getDraftsOfCurrentUser(): Promise<string> {
   }
 
   const currentUserID = await getCurrentUserID()
-  console.log(
-    'getDraftsOfCurrentUser :: currentUserID',
-    currentUserID || 'nada!'
-  )
+  console.log('getDraftsOfCurrentUser :: currentUserID', currentUserID)
 
   const allUserData = JSON.parse(
     await storage.getItem('USER_DATA')
   ) as IUserData[]
   if (!allUserData || !allUserData.length) {
     // No user-data at all
-    console.log('__FAILURE__')
+    // console.log('getDraftsOfCurrentUser :: allUserData is null or empty')
     return `"userID": "${currentUserID}", "drafts":"[]"`
   }
 
@@ -265,7 +265,7 @@ async function getDraftsOfCurrentUser(): Promise<string> {
     userID: currentUserID,
     drafts: currentUserDrafts
   }
-  console.log('getDraftsOfCurrentUser :: payload', payload)
+  // console.log('getDraftsOfCurrentUser :: payload', payload)
   return JSON.stringify(payload)
 }
 
@@ -280,23 +280,25 @@ async function writeDraftByUser(draftsState: IDraftsState) {
   const currentUserData = allUserData.find(uData => uData.userID === uID)
 
   if (currentUserData) {
-    console.log('__FOUND RECORD__')
+    // console.log('__FOUND RECORD__')
     currentUserData.drafts = draftsState.drafts
   } else {
-    console.log('INSIDE writeDraftByUser', uID)
+    // console.log('INSIDE writeDraftByUser', uID)
     allUserData.push({
       userID: uID,
       userPIN: 1234,
       drafts: draftsState.drafts
     })
   }
-  console.log('writeDraftByUser :: Setting USER_DATA', draftsState.drafts)
+  // console.log('writeDraftByUser :: Setting USER_DATA', draftsState.drafts)
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
 }
 
 async function getCurrentUserID(): Promise<string> {
-  const currentUserDetails = JSON.parse(
-    await storage.getItem('USER_DETAILS')
-  ) as IUserDetails
+  const stringValue = await storage.getItem('USER_DETAILS')
+  if (!stringValue) {
+    return ''
+  }
+  const currentUserDetails = JSON.parse(stringValue) as IUserDetails
   return currentUserDetails.userMgntUserID || ''
 }

@@ -253,6 +253,7 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
+  store.drafts.drafts = store.drafts.drafts || []
   const draftCount = store.drafts.drafts.length.toString()
   return {
     draftCount,
