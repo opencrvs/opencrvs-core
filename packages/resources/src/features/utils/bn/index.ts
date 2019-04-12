@@ -14,6 +14,65 @@ export interface IOISFLocation {
   id: number
 }
 
+export interface IStatistic {
+  reference: string
+  male_population_2007: string
+  female_population_2007: string
+  population_2007: string
+  male_female_ratio_2007: string
+  crude_birth_rate_2007: string
+  male_population_2008: string
+  female_population_2008: string
+  population_2008: string
+  male_female_ratio_2008: string
+  crude_birth_rate_2008: string
+  male_population_2009: string
+  female_population_2009: string
+  population_2009: string
+  male_female_ratio_2009: string
+  crude_birth_rate_2009: string
+  male_population_2010: string
+  female_population_2010: string
+  population_2010: string
+  male_female_ratio_2010: string
+  crude_birth_rate_2010: string
+  male_population_2011: string
+  female_population_2011: string
+  population_2011: string
+  male_female_ratio_2011: string
+  crude_birth_rate_2011: string
+  male_population_2012: string
+  female_population_2012: string
+  population_2012: string
+  male_female_ratio_2012: string
+  crude_birth_rate_2012: string
+  male_population_2013: string
+  female_population_2013: string
+  population_2013: string
+  male_female_ratio_2013: string
+  crude_birth_rate_2013: string
+  male_population_2014: string
+  female_population_2014: string
+  population_2014: string
+  male_female_ratio_2014: string
+  crude_birth_rate_2014: string
+  male_population_2015: string
+  female_population_2015: string
+  population_2015: string
+  male_female_ratio_2015: string
+  crude_birth_rate_2015: string
+  male_population_2016: string
+  female_population_2016: string
+  population_2016: string
+  male_female_ratio_2016: string
+  crude_birth_rate_2016: string
+  male_population_2017: string
+  female_population_2017: string
+  population_2017: string
+  male_female_ratio_2017: string
+  crude_birth_rate_2017: string
+}
+
 export interface ILocation {
   id?: string
   name?: string
