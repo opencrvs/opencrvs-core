@@ -12,7 +12,10 @@ describe('Create PIN view', async () => {
 
   beforeEach(() => {
     const { store } = createStore()
-    const testComponent = createTestComponent(<CreatePin />, store)
+    const testComponent = createTestComponent(
+      <CreatePin onComplete={() => null} />,
+      store
+    )
 
     c = testComponent.component
   })
