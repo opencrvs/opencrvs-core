@@ -102,4 +102,16 @@ describe('Unlock page loads Properly', () => {
       expect(errorElem).toBe('Locked')
     }, 1000)
   })
+
+  it('Should Pop the Logout modal', () => {
+    testComponent.component
+      .find('#logout')
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.update()
+    const modalIsDisplayed = testComponent.component
+      .find('#logout_confirm')
+      .hostNodes().length
+    expect(modalIsDisplayed).toBe(1)
+  })
 })
