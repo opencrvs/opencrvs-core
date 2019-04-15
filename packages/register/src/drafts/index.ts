@@ -139,8 +139,6 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   state: IDraftsState = initialState,
   action: Action
 ): IDraftsState | Loop<IDraftsState, Action> => {
-  // console.log(action.type)
-  // console.log(state.userID)
   switch (action.type) {
     case GO_TO_TAB: {
       const draft = state.drafts.find(({ id }) => id === action.payload.draftId)
@@ -201,7 +199,6 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftModification))
       )
     case WRITE_DRAFT:
-      // console.log(action.type, state.userID)
       if (state.initialDraftsLoaded && state.drafts) {
         writeDraftByUser(action.payload.draft)
       }
@@ -241,33 +238,37 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
 
 async function getDraftsOfCurrentUser(): Promise<string> {
   const storageTable = await storage.getItem('USER_DATA')
-  // console.log('storageTable', storageTable)
   if (!storageTable) {
     storage.configStorage('OpenCRVS')
     return '[]'
   }
 
   const currentUserID = await getCurrentUserID()
-  console.log('getDraftsOfCurrentUser :: currentUserID', currentUserID)
-
+  const currentUserPIN = await storage.getItem('pin')
   const allUserData = JSON.parse(
     await storage.getItem('USER_DATA')
   ) as IUserData[]
   if (!allUserData || !allUserData.length) {
     // No user-data at all
-    // console.log('getDraftsOfCurrentUser :: allUserData is null or empty')
-    return `"userID": "${currentUserID}", "drafts":"[]"`
+    const payloadWithoutDrafts: IUserData = {
+      userID: currentUserID,
+      userPIN: currentUserPIN,
+      drafts: []
+    }
+    return JSON.stringify(payloadWithoutDrafts)
   }
 
   const currentUserData = allUserData.find(
     uData => uData.userID === currentUserID
   )
-  const currentUserDrafts = currentUserData ? currentUserData.drafts : []
-  const payload = {
+  const currentUserDrafts: IDraft[] = currentUserData
+    ? currentUserData.drafts || []
+    : []
+  const payload: IUserData = {
     userID: currentUserID,
+    userPIN: currentUserPIN,
     drafts: currentUserDrafts
   }
-  // console.log('getDraftsOfCurrentUser :: payload', payload)
   return JSON.stringify(payload)
 }
 
