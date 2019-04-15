@@ -9,6 +9,7 @@ import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   TextInput,
+  PasswordInput,
   THEME_MODE
 } from '@opencrvs/components/lib/forms'
 
@@ -174,7 +175,7 @@ const MobileInput = injectIntl((props: Props) => {
   )
 })
 
-const PasswordInput = injectIntl((props: Props) => {
+const Password = injectIntl((props: Props) => {
   const { intl, meta, input, ...otherProps } = props
 
   return (
@@ -189,12 +190,7 @@ const PasswordInput = injectIntl((props: Props) => {
       hideAsterisk
       mode={THEME_MODE.DARK}
     >
-      <TextInput
-        {...passwordField}
-        {...input}
-        type="password"
-        ignoreMediaQuery
-      />
+      <PasswordInput {...passwordField} {...input} ignoreMediaQuery />
     </InputField>
   )
 })
@@ -242,7 +238,7 @@ export class StepOneForm extends React.Component<
               validate={passwordField.validate}
               component={
                 // tslint:disable-next-line no-any
-                PasswordInput as React.ComponentClass<any>
+                Password as React.ComponentClass<any>
               }
             />
           </FieldWrapper>
