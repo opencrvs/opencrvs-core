@@ -3,7 +3,7 @@ import styled, { StyledFunction } from 'styled-components'
 
 export interface IInputError {
   id: string
-  centred: boolean
+  centred?: boolean
   ignoreMediaQuery?: boolean
   color?: string
 }
