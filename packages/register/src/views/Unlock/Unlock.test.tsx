@@ -106,6 +106,33 @@ describe('Unlock page loads Properly', () => {
     }, 1000)
   })
 
+  it('Should display Locked Message', async () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
+  })
+})
+
+describe('Logout Sequence', async () => {
+  const { store } = createStore()
+  const redirect = jest.fn()
+  const testComponent = createTestComponent(
+    <Unlock onCorrectPinMatch={() => redirect} />,
+    store
+  )
+
   it('Should Pop the Logout modal', () => {
     testComponent.component
       .find('#logout')
