@@ -5,6 +5,8 @@ import { Unlock } from 'src/views/Unlock/Unlock'
 import { storage } from 'src/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from 'src/utils/commonUtils'
+import IdleTimer from 'react-idle-timer'
+import { CONFIG_DESKTOP_TIME_OUT_MILLISECONDS } from 'src/constants'
 
 export const SCREEN_LOCK = 'screenLock'
 
@@ -24,6 +26,7 @@ class ProtectedPageComponent extends React.Component<
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
+    this.onIdle = this.onIdle.bind(this)
   }
 
   async componentDidMount() {
@@ -64,6 +67,10 @@ class ProtectedPageComponent extends React.Component<
     return await storage.getItem('pin')
   }
 
+  onIdle() {
+    this.setState({ secured: false })
+  }
+
   render() {
     const { secured, pinExists } = this.state
     return (
@@ -73,8 +80,18 @@ class ProtectedPageComponent extends React.Component<
           {(secured && this.props.children) ||
             (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
         </PageVisibility>
-      )) ||
-      this.props.children
+      )) || (
+        <>
+          <IdleTimer
+            element={document}
+            onIdle={this.onIdle}
+            debounce={250}
+            timeout={CONFIG_DESKTOP_TIME_OUT_MILLISECONDS}
+          />
+          {(secured && this.props.children) ||
+            (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+        </>
+      )
     )
   }
 }
