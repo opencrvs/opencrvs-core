@@ -133,3 +133,4 @@ All hotfixes that are done for that release should be submitted in a PR against 
 4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.4.1`
 5. Run `git push origin v<version_number>`
 6. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
+7. Dockerhub should automatically build the images when a new release tag is created in Git. Howver Dockerhub can sometimes timeout and you may need to compose and push the release tagged images locally. To do that, run `yarn compose:push:release`
