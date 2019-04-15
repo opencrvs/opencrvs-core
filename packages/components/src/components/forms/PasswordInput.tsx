@@ -8,6 +8,9 @@ interface ICustomProps {
   focusInput?: boolean
   ignoreMediaQuery?: boolean
   hideBorder?: boolean
+  ignoreVisibility?: boolean
+  showIcon?: React.ReactNode
+  hideIcon?: React.ReactNode
 }
 
 interface IPasswordInputState {
@@ -30,12 +33,6 @@ const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
   ${({ theme }) => theme.fonts.defaultFontStyle};
   color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.inputBackground};
-
-  &:focus {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
-      ${({ theme }) => theme.colors.secondary};
-  }
 
   &::-webkit-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholder};
@@ -116,6 +113,7 @@ export class PasswordInput extends React.Component<
   }
 
   render() {
+    const { showIcon, hideIcon, ignoreVisibility } = this.props
     return (
       <>
         <StyledInput
@@ -123,9 +121,21 @@ export class PasswordInput extends React.Component<
           {...this.props}
           type={this.state.isVisible ? 'text' : 'password'}
         />
-        <IconButton onClick={this.toggleVisibility}>
-          {this.state.isVisible ? <EyeOff /> : <EyeOn />}
-        </IconButton>
+        {!ignoreVisibility && (
+          <IconButton onClick={this.toggleVisibility}>
+            {this.state.isVisible ? (
+              hideIcon ? (
+                hideIcon
+              ) : (
+                <EyeOff />
+              )
+            ) : showIcon ? (
+              showIcon
+            ) : (
+              <EyeOn />
+            )}
+          </IconButton>
+        )}
       </>
     )
   }
