@@ -4,9 +4,7 @@ import { PIN } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
-import { goToHome as goToHomeAction } from 'src/navigation'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
-import { connect } from 'react-redux'
 import messages from './messages'
 
 const Container = styled.div`
@@ -54,7 +52,7 @@ const ErrorBox = styled.div`
   margin-bottom: -10px;
 `
 
-type IProps = InjectedIntlProps & { goToHome: typeof goToHomeAction }
+type IProps = InjectedIntlProps & { onComplete: () => void }
 
 class CreatePinComponent extends React.Component<IProps> {
   state = { pin: null, pinMatchError: false }
@@ -80,7 +78,7 @@ class CreatePinComponent extends React.Component<IProps> {
     // TODO: this should be moved to the user object when the support for multiple user has been added
     await storage.setItem('pin', hash)
 
-    this.props.goToHome()
+    this.props.onComplete()
   }
 
   render() {
@@ -122,7 +120,4 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 }
 
-export const CreatePin = connect(
-  null,
-  { goToHome: goToHomeAction }
-)(injectIntl(CreatePinComponent))
+export const CreatePin = injectIntl(CreatePinComponent)

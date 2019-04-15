@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Shield } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { CreatePin } from 'src/views/PIN/CreatePin'
 
 const SecurePageContainer = styled.div`
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -30,28 +31,38 @@ const Bold = styled.b`
   font-family: ${({ theme }) => theme.fonts.boldFont};
 `
 
-export class SecureAccount extends React.Component {
+export class SecureAccount extends React.Component<{ onComplete: () => void }> {
+  state = {
+    collectPin: false
+  }
   render() {
     return (
-      <SecurePageContainer>
-        <Wrapper>
-          <Item margin="50px 0px">
-            <Shield />
-          </Item>
+      (!this.state.collectPin && (
+        <SecurePageContainer>
+          <Wrapper>
+            <Item margin="50px 0px">
+              <Shield />
+            </Item>
 
-          <Item margin="50px 0px">
-            <Bold>Secure your Account</Bold>
-            <p>
-              A personal identification number protects your account. Your pin
-              will be required before each use of the OpenCRVS app.
-            </p>
-          </Item>
+            <Item margin="50px 0px">
+              <Bold>Secure your Account</Bold>
+              <p>
+                A personal identification number protects your account. Your pin
+                will be required before each use of the OpenCRVS app.
+              </p>
+            </Item>
 
-          <Item>
-            <PinButton id="createPinBtn">CREATE A PIN</PinButton>
-          </Item>
-        </Wrapper>
-      </SecurePageContainer>
+            <Item>
+              <PinButton
+                id="createPinBtn"
+                onClick={() => this.setState({ collectPin: true })}
+              >
+                CREATE A PIN
+              </PinButton>
+            </Item>
+          </Wrapper>
+        </SecurePageContainer>
+      )) || <CreatePin onComplete={this.props.onComplete} />
     )
   }
 }

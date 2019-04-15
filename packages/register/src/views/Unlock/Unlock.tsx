@@ -12,6 +12,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
 import * as bcrypt from 'bcryptjs'
+import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 
 const messages = defineMessages({
   incorrect: {
@@ -73,14 +74,16 @@ type IFullState = IState & ErrorState
 type Props = {
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
-  onCorrectPinMatch: () => void
 }
-type IFullProps = Props & InjectedIntlProps
+type IFullProps = Props &
+  InjectedIntlProps & {
+    onCorrectPinMatch: () => void
+  }
 
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
-  constructor(props: IFullProps & IState) {
+  constructor(props: IFullProps) {
     super(props)
     this.state = {
       showLogoutModal: false,
@@ -162,7 +165,10 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       this.props.onCorrectPinMatch()
     }
   }
-
+  logout = () => {
+    storage.removeItem(SCREEN_LOCK)
+    this.props.redirectToAuthentication()
+  }
   render() {
     return (
       <PageWrapper id="unlockPage">
@@ -177,7 +183,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}
-          handleYes={this.props.redirectToAuthentication}
+          handleYes={this.logout}
         />
       </PageWrapper>
     )
@@ -186,10 +192,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
 export const Unlock = connect(
   (store: IStoreState) => ({
-    userDetails: getUserDetails(store),
-    onCorrectPinMatch: () => {
-      console.log('Pin Matched')
-    }
+    userDetails: getUserDetails(store)
   }),
   {
     redirectToAuthentication

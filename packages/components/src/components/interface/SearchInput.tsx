@@ -4,12 +4,13 @@ import { Search } from '../icons'
 import { PrimaryButton } from '../buttons'
 
 export interface ISerachInputCustomProps {
+  searchValue?: string
   error?: boolean
   touched?: boolean
   focusInput?: boolean
   buttonLabel: string
   onSearchTextChange?: (searchText: string) => void
-  onSubmit: (searchText: string) => void
+  onSubmit: (searchText: string) => any
 }
 
 export type ISearchInputProps = ISerachInputCustomProps &
@@ -62,6 +63,17 @@ const StyledSearchButton = styled(SearchButton)`
     margin-bottom: 11px;
     max-width: 200px;
     flex: 1;
+  }
+  &:disabled {
+    div:first-of-type {
+      background: ${({ theme }) => theme.colors.disabledButton};
+    }
+    g {
+      fill: ${({ theme }) => theme.colors.disabled};
+    }
+    h3 {
+      color: ${({ theme }) => theme.colors.disabled};
+    }
   }
 `
 const StyledInput = styled.input.attrs<ISearchInputProps>({})`
@@ -137,6 +149,9 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
       this.focusField()
     }
   }
+  componentDidMount() {
+    this.setState({ searchText: this.props.searchValue || '' })
+  }
 
   change = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -164,7 +179,10 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
             {...this.props}
           />
         </SearchIconAndInput>
-        <StyledSearchButton onClick={this.submit}>
+        <StyledSearchButton
+          onClick={this.submit}
+          disabled={!value ? true : false}
+        >
           {' '}
           {buttonLabel}
         </StyledSearchButton>

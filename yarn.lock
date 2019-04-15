@@ -11138,6 +11138,11 @@ react-dev-utils@^5.0.1:
     strip-ansi "3.0.1"
     text-table "0.2.0"
 
+react-device-detect@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/react-device-detect/-/react-device-detect-1.6.2.tgz#2587e4d1dc15bdfce7a1bf5417624ecd2a2fc31f"
+  integrity sha512-XIBgwIfpGAknm7tXe/YNbx4ieIR7IyFI3KNfSQk4UjHVy97UHe/nB7iJj8R/dDsI+I/ZzPR4HJ39Gh5tI4nhxw==
+
 react-docgen-annotation-resolver@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-docgen-annotation-resolver/-/react-docgen-annotation-resolver-1.1.0.tgz#0a0f8d5d4d7ba924866d479ec7e709ed6cf33807"
@@ -11224,6 +11229,13 @@ react-lifecycles-compat@^3.0.0, react-lifecycles-compat@^3.0.4:
 react-moment@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/react-moment/-/react-moment-0.8.4.tgz#18eb59e1541c8b216353e23c21e9db50e42e2edb"
+
+react-page-visibility@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/react-page-visibility/-/react-page-visibility-3.2.1.tgz#4c7e4bad8e047ba8279fdee0c9ba1ce9a0db6212"
+  integrity sha512-yRebWe06QajxAqClm+5wUfFHMZcVgRHPR0jFt+FL3tSdc1c6NK5a1dPR4NhfleDerCg6Fr2KTZiOOkheu014EQ==
+  dependencies:
+    prop-types "^15.6.2"
 
 react-pdf@^4.0.2:
   version "4.0.5"

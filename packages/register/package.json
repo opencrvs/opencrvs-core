@@ -1,9 +1,9 @@
 {
   "name": "@opencrvs/register",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.4.1",
   "private": true,
   "dependencies": {
-    "@opencrvs/components": "^1.0.0-alpha.1",
+    "@opencrvs/components": "^1.0.0-alpha.4.1",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -31,9 +31,11 @@
     "query-string": "^6.1.0",
     "react": "^16.3.2",
     "react-apollo": "^2.1.4",
+    "react-device-detect": "^1.6.2",
     "react-dom": "^16.3.2",
     "react-intl": "^2.4.0",
     "react-moment": "^0.8.4",
+    "react-page-visibility": "^3.2.1",
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-redux": "next",
