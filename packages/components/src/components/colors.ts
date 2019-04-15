@@ -5,7 +5,7 @@ export const colors = {
   accentGradientLight: '#7DC1EA',
   background: '#F4F4F4',
   disabled: '#D2D2D2',
-  error: '#D77160',
+  error: '#D53F3F',
   headerGradientDark: '#42506B',
   headerGradientLight: '#485F88',
   placeholder: '#58727E',
