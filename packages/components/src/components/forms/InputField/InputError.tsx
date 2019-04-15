@@ -3,7 +3,7 @@ import styled, { StyledFunction } from 'styled-components'
 
 export interface IInputError {
   id: string
-  centred: boolean
+  centred?: boolean
   ignoreMediaQuery?: boolean
   color?: string
 }
@@ -16,7 +16,7 @@ const InputErrorWrapper = styledErrorWrapper`
   display: inline-block;
   ${({ theme }) => theme.fonts.infoFontStyle}
   color: ${({ theme, color }) => (color ? color : theme.colors.error)};
-  text-align: ${({ centred }) => (!centred ? 'center' : 'left')};
+  text-align: ${({ centred }) => (centred ? 'center' : 'left')};
 
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
