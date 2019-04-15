@@ -167,15 +167,17 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftStore))
       )
     case DELETE_DRAFT:
-      const deleteIndex = state.drafts.findIndex(draft => {
-        return draft.id === action.payload.draft.id
-      })
+      const deleteIndex = state.drafts
+        ? state.drafts.findIndex(draft => {
+            return draft.id === action.payload.draft.id
+          })
+        : -1
       if (deleteIndex >= 0) {
         state.drafts.splice(deleteIndex, 1)
       }
       const stateAfterDraftDeletion = {
         ...state,
-        drafts: state.drafts
+        drafts: state.drafts || []
       }
       return loop(
         stateAfterDraftDeletion,

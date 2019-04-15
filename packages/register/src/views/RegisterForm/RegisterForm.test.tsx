@@ -732,6 +732,7 @@ describe('when user is in the register form preview section', () => {
 
     const deleteBtn = component.find('#delete-application').hostNodes()
     deleteBtn.simulate('click')
+    deleteBtn.debug()
     component.update()
 
     // @ts-ignore
