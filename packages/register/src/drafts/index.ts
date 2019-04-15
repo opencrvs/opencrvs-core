@@ -166,9 +166,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       )
     case DELETE_DRAFT:
       const deleteIndex = state.drafts
-        ? state.drafts.findIndex(draft => {
-            return draft.id === action.payload.draft.id
-          })
+        ? state.drafts.findIndex(draft => draft.id === action.payload.draft.id)
         : -1
       if (deleteIndex >= 0) {
         state.drafts.splice(deleteIndex, 1)
@@ -182,14 +180,15 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         Cmd.action(writeDraft(stateAfterDraftDeletion))
       )
     case MODIFY_DRAFT:
-      const newDrafts = state.drafts
-        ? state.drafts.map(draft => {
-            if (draft.id === action.payload.draft.id) {
-              return action.payload.draft
-            }
-            return draft
-          })
-        : [] // if the array is not initialized, it will be
+      const newDrafts: IDraft[] = state.drafts || []
+      const currentDraftIndex = newDrafts.findIndex(
+        draft => draft.id === action.payload.draft.id
+      )
+      if (currentDraftIndex >= 0) {
+        newDrafts[currentDraftIndex] = action.payload.draft
+      } else {
+        newDrafts.push(action.payload.draft)
+      }
       const stateAfterDraftModification = {
         ...state,
         drafts: newDrafts
@@ -239,16 +238,14 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
 async function getDraftsOfCurrentUser(): Promise<string> {
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
-    storage.configStorage('OpenCRVS')
+    // storage.configStorage('OpenCRVS')
     return '[]'
   }
 
   const currentUserID = await getCurrentUserID()
   const currentUserPIN = await storage.getItem('pin')
-  const allUserData = JSON.parse(
-    await storage.getItem('USER_DATA')
-  ) as IUserData[]
-  if (!allUserData || !allUserData.length) {
+  const allUserData = JSON.parse(storageTable) as IUserData[]
+  if (!allUserData.length) {
     // No user-data at all
     const payloadWithoutDrafts: IUserData = {
       userID: currentUserID,
@@ -300,6 +297,5 @@ async function getCurrentUserID(): Promise<string> {
   if (!stringValue) {
     return ''
   }
-  const currentUserDetails = JSON.parse(stringValue) as IUserDetails
-  return currentUserDetails.userMgntUserID || ''
+  return (JSON.parse(stringValue) as IUserDetails).userMgntUserID || ''
 }
