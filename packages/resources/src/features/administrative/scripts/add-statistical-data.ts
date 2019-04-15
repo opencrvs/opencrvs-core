@@ -16,7 +16,7 @@ const districtsStatistics = JSON.parse(
     .toString()
 )
 
-function generateStatisticalIdentifiers(sourceStatistic: IStatistic) {
+function generateStatisticalExtensions(sourceStatistic: IStatistic) {
   const malePopulations = []
   const femalePopulations = []
   const totalPopulations = []
@@ -55,29 +55,29 @@ function generateStatisticalIdentifiers(sourceStatistic: IStatistic) {
       })
     }
   }
-  const identifiers: fhir.Identifier[] = [
+  const extensions: fhir.Extension[] = [
     {
-      system: 'http://opencrvs.org/specs/id/bbs-statistics-male-populations',
-      value: JSON.stringify(malePopulations)
+      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+      valueString: JSON.stringify(malePopulations)
     },
     {
-      system: 'http://opencrvs.org/specs/id/bbs-statistics-female-populations',
-      value: JSON.stringify(femalePopulations)
+      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+      valueString: JSON.stringify(femalePopulations)
     },
     {
-      system: 'http://opencrvs.org/specs/id/bbs-statistics-total-populations',
-      value: JSON.stringify(totalPopulations)
+      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+      valueString: JSON.stringify(totalPopulations)
     },
     {
-      system: 'http://opencrvs.org/specs/id/bbs-statistics-male-female-ratios',
-      value: JSON.stringify(maleFemaleRatios)
+      url: 'http://opencrvs.org/specs/id/statistics-male-female-ratios',
+      valueString: JSON.stringify(maleFemaleRatios)
     },
     {
-      system: 'http://opencrvs.org/specs/id/bbs-statistics-crude-birth-rates',
-      value: JSON.stringify(birthRates)
+      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+      valueString: JSON.stringify(birthRates)
     }
   ]
-  return identifiers
+  return extensions
 }
 
 async function matchAndAssignStatisticalData(
@@ -99,13 +99,13 @@ async function matchAndAssignStatisticalData(
         }`
       )
     } else {
-      const statisticalIdentifiers = generateStatisticalIdentifiers(
+      const statisticalExtensions = generateStatisticalExtensions(
         matchingStatistics
       )
-      if (!location.identifier) {
-        throw Error('Location contains no identifiers')
+      if (!location.extension) {
+        location.extension = []
       }
-      location.identifier = [...location.identifier, ...statisticalIdentifiers]
+      location.extension = [...location.extension, ...statisticalExtensions]
       locationsWithStatistics.push(location)
     }
   }
