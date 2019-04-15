@@ -166,6 +166,8 @@ const MobileInput = injectIntl((props: Props) => {
       <TextInput
         {...mobileField}
         {...input}
+        touched={Boolean(meta.touched)}
+        error={Boolean(meta.error)}
         type="tel"
         placeholder={intl.formatMessage(mobileField.placeholder)}
         ignoreMediaQuery
@@ -192,6 +194,8 @@ const PasswordInput = injectIntl((props: Props) => {
       <TextInput
         {...passwordField}
         {...input}
+        touched={Boolean(meta.touched)}
+        error={Boolean(meta.error)}
         type="password"
         ignoreMediaQuery
       />
