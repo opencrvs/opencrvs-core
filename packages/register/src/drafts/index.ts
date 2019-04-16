@@ -36,7 +36,7 @@ interface IModifyDraftAction {
   }
 }
 
-interface IWriteDraftAction {
+export interface IWriteDraftAction {
   type: typeof WRITE_DRAFT
   payload: {
     draft: IDraftsState
@@ -63,7 +63,7 @@ interface IGetStorageDraftsFailedAction {
   type: typeof GET_DRAFTS_FAILED
 }
 
-type Action =
+export type Action =
   | IStoreDraftAction
   | IModifyDraftAction
   | ISetInitialDraftsAction
@@ -73,7 +73,7 @@ type Action =
   | IGetStorageDraftsSuccessAction
   | IGetStorageDraftsFailedAction
 
-interface IUserData {
+export interface IUserData {
   userID: string
   drafts: IDraft[]
   userPIN: string
@@ -235,11 +235,12 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
   }
 }
 
-async function getDraftsOfCurrentUser(): Promise<string> {
+export async function getDraftsOfCurrentUser(): Promise<string> {
+  // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
     // storage.configStorage('OpenCRVS')
-    return '[]'
+    return '{}'
   }
 
   const currentUserID = await getCurrentUserID()
@@ -269,7 +270,7 @@ async function getDraftsOfCurrentUser(): Promise<string> {
   return JSON.stringify(payload)
 }
 
-async function writeDraftByUser(draftsState: IDraftsState) {
+export async function writeDraftByUser(draftsState: IDraftsState) {
   const uID = draftsState.userID || (await getCurrentUserID())
   const str = await storage.getItem('USER_DATA')
   if (!str) {
@@ -292,10 +293,10 @@ async function writeDraftByUser(draftsState: IDraftsState) {
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
 }
 
-async function getCurrentUserID(): Promise<string> {
-  const stringValue = await storage.getItem('USER_DETAILS')
-  if (!stringValue) {
+export async function getCurrentUserID(): Promise<string> {
+  const str = await storage.getItem('USER_DETAILS')
+  if (!str) {
     return ''
   }
-  return (JSON.parse(stringValue) as IUserDetails).userMgntUserID || ''
+  return (JSON.parse(str) as IUserDetails).userMgntUserID || ''
 }
