@@ -1,7 +1,9 @@
+import * as Joi from 'joi'
 import {
-  newBirthRegistrationHandler,
-  birthRegistrationHandler
+  birthRegistrationHandler,
+  newBirthRegistrationHandler
 } from 'src/features/registration/handler'
+import { metricsHandler } from 'src/features/registration/metrics/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -41,16 +43,16 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/metrics/birth',
-      handler: (request: any, h: any) => {
-        // TODO: generate all birth metrics, use a timePeriod search param to control whether the points in the series are month or years
-        return {
-          keyFigures: {},
-          regByAge: {},
-          regWithin$5d: {}
-        }
-      },
+      handler: metricsHandler,
       config: {
-        tags: ['api']
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required()
+          })
+        },
+        tags: ['api'],
+        auth: false
       }
     }
   ]
