@@ -71,7 +71,7 @@ interface IState {
   showLogoutModal: boolean
   pin: string
   userPin: string
-  resekKey: number
+  resetKey: number
 }
 type ErrorState = {
   attempt: number
@@ -100,7 +100,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       errorMessage: '',
       pin: '',
       userPin: '',
-      resekKey: Date.now()
+      resetKey: Date.now()
     }
   }
 
@@ -169,7 +169,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.incorrect),
-        resekKey: Date.now()
+        resetKey: Date.now()
       }))
       return
     }
@@ -178,7 +178,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       this.setState(preState => ({
         attempt: preState.attempt + 1,
         errorMessage: intl.formatMessage(messages.lastTry),
-        resekKey: Date.now()
+        resetKey: Date.now()
       }))
       return
     }
@@ -212,7 +212,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         this.setState(() => ({
           attempt: 0,
           errorMessage: '',
-          resekKey: Date.now()
+          resetKey: Date.now()
         }))
       }
     }, 100)
@@ -235,7 +235,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <PINKeypad
           onComplete={this.onPinProvided}
           pin={this.state.pin}
-          key={this.state.resekKey}
+          key={this.state.resetKey}
         />
         <LogoutConfirmation
           show={this.state.showLogoutModal}
