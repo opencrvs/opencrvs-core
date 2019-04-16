@@ -5,12 +5,20 @@ const data = [
   {
     value: 500,
     label: 'Live births registered within 45 days of actual birth',
-    description: '500 out of 3000 total'
+    description: '500 out of 3000 total',
+    categoricalData: [
+      { name: 'female', label: 'Female', value: 48000, icon: Female },
+      { name: 'male', label: 'Male', value: 56000, icon: Male }
+    ]
   },
   {
     value: 1000,
     label: 'Live births registered within 1 year of actual birth',
-    description: '1000 out of 3000 total'
+    description: '1000 out of 3000 total',
+    categoricalData: [
+      { name: 'female', label: 'Female', value: 48000, icon: Female },
+      { name: 'male', label: 'Male', value: 56000, icon: Male }
+    ]
   },
   {
     value: 3000,

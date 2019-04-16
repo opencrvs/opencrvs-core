@@ -39,6 +39,8 @@ export const ENGLISH_STATE = {
     'performance.graph.birthRegistrationRatePerMonthLabel': 'Calendar Month',
     'performance.graph.birthRegistrationPercentageOfEstimateLabel':
       'Birth Registration % of estimate',
+    'performance.graph.category.gender.female': 'Female',
+    'performance.graph.category.gender.male': 'Male',
     'register.home.header.hello': 'Hello {fullName}',
     'register.home.header.FIELD_AGENT': 'Field Agent',
     'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
