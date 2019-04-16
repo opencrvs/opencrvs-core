@@ -18,6 +18,8 @@ import { IStoreState } from '@opencrvs/performance/src/store'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 
 import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
+import { ICategoryDataPoint } from '@opencrvs/components/lib/charts/datapoint'
+import { Male, Female } from '@opencrvs/components/lib/icons'
 
 const messages = defineMessages({
   logoutActionTitle: {
@@ -142,6 +144,16 @@ const messages = defineMessages({
     defaultMessage: 'Birth Registration % of estimate',
     description:
       'The y-axis label for birth registration rate within 45 days per month line chart'
+  },
+  genderCategoryFemaleLabel: {
+    id: 'performance.graph.category.gender.female',
+    defaultMessage: 'Female',
+    description: 'Label for gender category Female'
+  },
+  genderCategoryMaleLabel: {
+    id: 'performance.graph.category.gender.male',
+    defaultMessage: 'Male',
+    description: 'Label for gender category Male'
   }
 })
 
@@ -151,6 +163,7 @@ interface IData {
   description?: string
   total?: boolean
   estimate?: boolean
+  categoricalData?: ICategoryDataPoint[]
 }
 
 const getData = (intl: InjectedIntl): IData[] => {
@@ -167,7 +180,21 @@ const getData = (intl: InjectedIntl): IData[] => {
       ),
       description: intl.formatMessage(
         messages.liveBirthsWithin45DaysDescription
-      )
+      ),
+      categoricalData: [
+        {
+          name: 'female',
+          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
+          value: 48000,
+          icon: () => <Female />
+        },
+        {
+          name: 'male',
+          label: intl.formatMessage(messages.genderCategoryMaleLabel),
+          value: 56000,
+          icon: () => <Male />
+        }
+      ]
     },
     {
       value: 61500,
@@ -179,7 +206,23 @@ const getData = (intl: InjectedIntl): IData[] => {
           )}
         />
       ),
-      description: intl.formatMessage(messages.liveBirthsWithin1yearDescription)
+      description: intl.formatMessage(
+        messages.liveBirthsWithin1yearDescription
+      ),
+      categoricalData: [
+        {
+          name: 'female',
+          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
+          value: 48000,
+          icon: () => <Female />
+        },
+        {
+          name: 'male',
+          label: intl.formatMessage(messages.genderCategoryMaleLabel),
+          value: 56000,
+          icon: () => <Male />
+        }
+      ]
     },
     {
       value: 204000,
@@ -189,7 +232,21 @@ const getData = (intl: InjectedIntl): IData[] => {
           defaultMessage={intl.formatHTMLMessage(messages.totalLiveBirthsLabel)}
         />
       ),
-      total: true
+      total: true,
+      categoricalData: [
+        {
+          name: 'female',
+          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
+          value: 92000,
+          icon: () => <Female />
+        },
+        {
+          name: 'male',
+          label: intl.formatMessage(messages.genderCategoryMaleLabel),
+          value: 112000,
+          icon: () => <Male />
+        }
+      ]
     }
   ]
 }
