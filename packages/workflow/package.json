@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/workflow",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.4.1",
   "description": "OpenCRVS workflow service",
   "main": "src/index.js",
   "license": "NONE",
