@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { IDataPoint } from './datapoint'
+import { IDataPoint, ICategoryDataPoint } from './datapoint'
 import { ITheme } from '../theme'
 
 export interface ILegendProps {
@@ -48,11 +48,12 @@ const DataLabel = styled.label`
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 1em;
+  margin-bottom: auto;
 `
 const DataTitle = styled.h3.attrs<{ description?: string }>({})`
   font-size: 20px;
   color: ${({ theme }) => theme.colors.accent};
-  margin: ${({ description }) => (description ? `0` : `-48px 0px 0px 0px`)};
+  margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
@@ -62,7 +63,29 @@ const DataTitle = styled.h3.attrs<{ description?: string }>({})`
 const DataDescription = styled.span`
   font-size: 12px;
 `
-
+const FooterContainer = styled.div`
+  display: flex;
+  border-top: 1px solid ${({ theme }) => theme.colors.background};
+  margin-top: 10px;
+  padding-top: 10px;
+`
+const FooterData = styled.div`
+  flex-direction: column;
+  flex: 1;
+  display: flex;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.copy};
+`
+const FooterDataLabel = styled.span`
+  font-size: 12px;
+`
+const FooterIconTitle = styled.div`
+  margin-top: 5px;
+  display: flex;
+`
+const FooterIcon = styled.div`
+  margin: 0 8px;
+`
 const calculateSum = (points: IDataPoint[]) =>
   points.reduce((sum, item) => sum + item.value, 0)
 
@@ -89,11 +112,7 @@ function LegendBody({
   total: number
   estimate: number
 }) {
-  let title = `${Math.round(dataPoint.value / total * 100)}%`
-
-  if (dataPoint.total) {
-    title = `${Math.round(dataPoint.value / estimate * 100)}%`
-  }
+  let title = `${Math.round((dataPoint.value / total) * 100)}%`
 
   if (dataPoint.total) {
     title = dataPoint.value.toString()
@@ -106,6 +125,37 @@ function LegendBody({
         <DataDescription>{dataPoint.description}</DataDescription>
       )}
     </DataLabel>
+  )
+}
+
+function LegendFooter({
+  dataPoints,
+  total,
+  isTotal
+}: {
+  dataPoints: ICategoryDataPoint[]
+  total: number
+  isTotal: boolean | undefined
+}) {
+  return (
+    <FooterContainer>
+      {dataPoints.map((dataPoint: ICategoryDataPoint, i) => {
+        let title = `${Math.round((dataPoint.value / total) * 100)}%`
+
+        if (isTotal) {
+          title = dataPoint.value.toString()
+        }
+        return (
+          <FooterData key={i}>
+            <FooterDataLabel>{dataPoint.label}</FooterDataLabel>
+            <FooterIconTitle>
+              <FooterIcon>{dataPoint.icon()}</FooterIcon>
+              {title}
+            </FooterIconTitle>
+          </FooterData>
+        )
+      })}
+    </FooterContainer>
   )
 }
 
@@ -142,6 +192,13 @@ export const Legend = withTheme(
                   total={calculateSum(allTotalPoints)}
                   estimate={calculateSum(allEstimatePoints)}
                 />
+                {dataPoint.categoricalData && (
+                  <LegendFooter
+                    dataPoints={dataPoint.categoricalData}
+                    total={dataPoint.value}
+                    isTotal={dataPoint.total}
+                  />
+                )}
               </Column>
             )
           })}
