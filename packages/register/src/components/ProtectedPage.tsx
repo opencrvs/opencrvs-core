@@ -81,16 +81,13 @@ class ProtectedPageComponent extends React.Component<
             (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
         </PageVisibility>
       )) || (
-        <>
-          <IdleTimer
-            element={document}
-            onIdle={this.onIdle}
-            debounce={250}
-            timeout={CONFIG_DESKTOP_TIME_OUT_MILLISECONDS}
-          />
+        <IdleTimer
+          onIdle={this.onIdle}
+          timeout={CONFIG_DESKTOP_TIME_OUT_MILLISECONDS}
+        >
           {(secured && this.props.children) ||
             (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
-        </>
+        </IdleTimer>
       )
     )
   }
