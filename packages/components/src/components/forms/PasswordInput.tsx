@@ -70,6 +70,7 @@ const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
 
 const IconButton = styled.button`
   border: none;
+  cursor: pointer;
   outline: none;
   color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.background};

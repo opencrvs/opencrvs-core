@@ -19,7 +19,7 @@ jobs:
         - wait-on http://localhost:3000 http://localhost:3020
         - yarn db:backup:restore
         - cd packages/resources && yarn save:testData && cd ../..
-        - cd packages/e2e && yarn start --record
+        - cd packages/e2e && yarn start --record false
       env:
         - CYPRESS_LOGIN_URL=http://localhost:3020/
         - CYPRESS_REGISTER_URL=http://localhost:3000/
@@ -48,7 +48,7 @@ jobs:
     - stage: integration tests on staging
       if: branch = master AND type = push
       install: skip
-      script: cd packages/e2e && yarn && yarn start --record
+      script: cd packages/e2e && yarn && yarn start --record false
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
