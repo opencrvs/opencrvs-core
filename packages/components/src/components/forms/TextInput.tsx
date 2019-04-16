@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { StyledFunction } from 'styled-components'
+import styled from 'styled-components'
 
 export interface ICustomProps {
   error?: boolean
@@ -17,20 +17,35 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   padding: 8px 10px;
   min-height: 30px;
   transition: border-color 500ms ease-out;
-  border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
-    ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.error : theme.colors.secondary};
   box-sizing: border-box;
   outline: none;
   ${({ theme }) => theme.fonts.defaultFontStyle};
   color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.inputBackground};
 
-  &:focus {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
-      ${({ theme }) => theme.colors.secondary};
-  }
+  ${({ hideBorder, error, touched, theme }) =>
+    hideBorder
+      ? `
+      border:none;
+      ${
+        error && touched
+          ? `box-shadow: 0 0 0px 1px ${theme.colors.error};`
+          : 'box-shadow: none;'
+      }
+      &:focus {
+        box-shadow: 0 0 0px 1px ${
+          error && touched ? theme.colors.error : theme.colors.creamCan
+        };
+      }
+        `
+      : `
+      border: 1px solid ${
+        error && touched ? theme.colors.error : theme.colors.secondary
+      };
+      &:focus {
+        box-shadow: 0 0 0px 1px ${theme.colors.creamCan};
+      }
+      `}
 
   &::-webkit-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholder};
