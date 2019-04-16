@@ -11235,13 +11235,6 @@ react-moment@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/react-moment/-/react-moment-0.8.4.tgz#18eb59e1541c8b216353e23c21e9db50e42e2edb"
 
-react-page-visibility@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/react-page-visibility/-/react-page-visibility-3.2.1.tgz#4c7e4bad8e047ba8279fdee0c9ba1ce9a0db6212"
-  integrity sha512-yRebWe06QajxAqClm+5wUfFHMZcVgRHPR0jFt+FL3tSdc1c6NK5a1dPR4NhfleDerCg6Fr2KTZiOOkheu014EQ==
-  dependencies:
-    prop-types "^15.6.2"
-
 react-pdf@^4.0.2:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/react-pdf/-/react-pdf-4.0.5.tgz#4f5584005a504cb7941b01670b40355f4706b726"
