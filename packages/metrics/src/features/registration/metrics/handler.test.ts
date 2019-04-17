@@ -1,10 +1,22 @@
 import { createServer } from '../../..'
 import { readPoints } from '../../../influxdb/client'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
 
 jest.mock('../../../influxdb/client.ts')
 
 describe('verify metrics handler', () => {
   let server: any
+
+  const token = jwt.sign(
+    { scope: ['declare'] },
+    readFileSync('../auth/test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:metrics-user'
+    }
+  )
 
   beforeEach(async () => {
     server = await createServer()
@@ -14,7 +26,10 @@ describe('verify metrics handler', () => {
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468'
+        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
 
     expect(res.statusCode).toBe(200)
@@ -23,7 +38,10 @@ describe('verify metrics handler', () => {
   it('returns 400 for required params', async () => {
     const res = await server.server.inject({
       method: 'GET',
-      url: '/metrics/birth'
+      url: '/metrics/birth',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
 
     expect(res.statusCode).toBe(400)
@@ -37,7 +55,10 @@ describe('verify metrics handler', () => {
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468'
+        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
 
     expect(res.statusCode).toBe(500)
