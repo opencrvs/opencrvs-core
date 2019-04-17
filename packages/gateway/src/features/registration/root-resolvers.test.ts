@@ -6,6 +6,15 @@ import { readFileSync } from 'fs'
 beforeEach(() => {
   fetch.resetMocks()
 })
+const authHeaderRegCert = {
+  Authorization:
+    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTU1NDA2ODM4LCJleHAiOjE1NTYwMTE2MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1Yzc1MzVkN2I0YTI0MDE1NTJjM2EwOTkifQ.ofELKQxo8_zwM-p-Dy67uhlrQR04YHHZgy5Sqg-eRgczHQYvUnIOUkdgdgS2-mvwNOJLtKBi_CtMqW94RRP8VMaoNRTqJn0XC6xzjCEYU9kuJNW7JMgM_sPmNQYyeOC1lsiV6jkWUEyV2SlerWjU4NZF3QdFGM2-GL11fBrTSGqSvU56v1d3A3fGdHNUxcbUgt78415vguTOu-c7MCroejrrYfKb_DAYAOqrUV_XqjYLIHrUJt2nPX-PEcxKELCsd0sXk-RvINqVciDHz1aThPOiBWSR0aTilgDcFCIWN1JRxnFjFyDCslO9okZGtrNlHf4Y0WhpCEXjXec9EUWVog'
+}
+
+const authHeaderNotRegCert = {
+  Authorization:
+    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NTU0MTY3NTksImV4cCI6MTU1NjAyMTU1OSwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVjNzUzNWQ3YjRhMjQwMTU1MmMzYTA5NyJ9.AQWnbq0cfX26ZnYQyjuJDNtx2DaheCcd-ZBmH9-zfcmR_s9lE9PJw07FrD33ofXhQM4zi_MQJJ8KQlq4a7mWfNHCXvWxYeY7Q3FFlYX4R9Rhkw38dU4kxPQtoE6u7_xHBp1w-82GARemPyyUKzLfSIWs_lJzsuAp0S1VYJLqaQOLxkQtRVOingf-apv8T7sIUmWZnzrKhZpvBUTBd5q7y4yKMu9eqWu7HzMYfPwAWgUj_LLFBkabSHcqJmfGEKgY0RKSoB1CgNqQQv8UEWUJvJq7o5apDL2PweNMto4dWjKoqCDGyDse7qEb6g1FJ_-n9zfc4ZaLIK7gfX0Cr6jgtw'
+}
 
 describe('Registration root resolvers', () => {
   describe('fetchBirthRegistration()', () => {
@@ -17,10 +26,21 @@ describe('Registration root resolvers', () => {
       )
       const composition = await resolvers.Query.fetchBirthRegistration(
         {},
-        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
+        authHeaderRegCert
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+
+    it('throws error if user does not have register scope', async () => {
+      await expect(
+        resolvers.Query.fetchBirthRegistration(
+          {},
+          { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('fetchDeathRegistration()', () => {
@@ -33,10 +53,21 @@ describe('Registration root resolvers', () => {
       // @ts-ignore
       const composition = await resolvers.Query.fetchDeathRegistration(
         {},
-        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' }
+        { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
+        authHeaderRegCert
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+
+    it('throws error if user does not have register scope', async () => {
+      await expect(
+        resolvers.Query.fetchDeathRegistration(
+          {},
+          { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('fetchRegistration()', () => {
@@ -156,7 +187,8 @@ describe('Registration root resolvers', () => {
       )
       const result = await resolvers.Query.listEventRegistrations(
         {},
-        { status: 'DECLARED' }
+        { status: 'DECLARED' },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
@@ -177,12 +209,26 @@ describe('Registration root resolvers', () => {
         {
           locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
           status: 'DECLARED'
-        }
+        },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(2)
+    })
+
+    it('throws error if user does not have register scope', async () => {
+      await expect(
+        resolvers.Query.listEventRegistrations(
+          {},
+          {
+            locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
+            status: 'DECLARED'
+          },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('countEventRegistrations()', () => {
@@ -653,13 +699,27 @@ describe('Registration root resolvers', () => {
       const comment = 'Family name misspelled'
       const result = await resolvers.Mutation.markEventAsVoided(
         {},
-        { id, reason, comment }
+        { id, reason, comment },
+        authHeaderRegCert
       )
       const postData = JSON.parse(fetch.mock.calls[1][1].body)
       expect(postData.entry[0].resource.note[1].text).toBe(
         'reason=Misspelling&comment=Family name misspelled'
       )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+    })
+
+    it('throws error if user does not have register scope', async () => {
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      const reason = 'Misspelling'
+      const comment = 'Family name misspelled'
+      await expect(
+        resolvers.Mutation.markEventAsVoided(
+          {},
+          { id, reason, comment },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('markBirthAsRegistered()', () => {
@@ -857,7 +917,8 @@ describe('Registration root resolvers', () => {
       )
       const result = await resolvers.Mutation.markBirthAsRegistered(
         {},
-        { id: compositionID }
+        { id: compositionID },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
@@ -889,7 +950,11 @@ describe('Registration root resolvers', () => {
         })
       )
       expect(
-        resolvers.Mutation.markBirthAsRegistered({}, { id: compositionID })
+        resolvers.Mutation.markBirthAsRegistered(
+          {},
+          { id: compositionID },
+          authHeaderRegCert
+        )
       ).rejects.toThrowError('Task does not exist')
     })
     it('throws error if workflow doesnot send BirthRegistrationNumber as response', async () => {
@@ -998,8 +1063,23 @@ describe('Registration root resolvers', () => {
         [JSON.stringify({ SomethingDifferent: '2018333417123456786' })]
       )
       expect(
-        resolvers.Mutation.markBirthAsRegistered({}, { id: compositionID })
+        resolvers.Mutation.markBirthAsRegistered(
+          {},
+          { id: compositionID },
+          authHeaderRegCert
+        )
       ).rejects.toThrowError('FHIR did not send a valid response')
+    })
+
+    it("throws an error when the user doesn't have register scope", async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      await expect(
+        resolvers.Mutation.markBirthAsRegistered(
+          {},
+          { id: compositionID },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('markDeathAsRegistered', () => {
@@ -1181,7 +1261,8 @@ describe('Registration root resolvers', () => {
       )
       const result = await resolvers.Mutation.markDeathAsRegistered(
         {},
-        { id: compositionID }
+        { id: compositionID },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
@@ -1190,6 +1271,17 @@ describe('Registration root resolvers', () => {
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
+    })
+
+    it("throws an error when the user doesn't have register scope", async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      await expect(
+        resolvers.Mutation.markDeathAsRegistered(
+          {},
+          { id: compositionID },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('updateBirthRegistration()', () => {
@@ -1216,7 +1308,8 @@ describe('Registration root resolvers', () => {
       )
       const result = await resolvers.Mutation.updateBirthRegistration(
         {},
-        { details }
+        { details },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
@@ -1227,10 +1320,25 @@ describe('Registration root resolvers', () => {
       )
     })
 
+    it("throws error when user doesn't have a register scope", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        resolvers.Mutation.updateBirthRegistration(
+          {},
+          { details },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
+    })
+
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.updateBirthRegistration({}, { details })
+        resolvers.Mutation.updateBirthRegistration(
+          {},
+          { details },
+          authHeaderRegCert
+        )
       ).rejects.toThrowError('FHIR did not send a valid response')
     })
   })
@@ -1269,7 +1377,8 @@ describe('Registration root resolvers', () => {
       )
       const result = await resolvers.Mutation.markBirthAsCertified(
         {},
-        { details }
+        { details },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
@@ -1283,8 +1392,22 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.markBirthAsCertified({}, { details })
+        resolvers.Mutation.markBirthAsCertified(
+          {},
+          { details },
+          authHeaderRegCert
+        )
       ).rejects.toThrowError('FHIR did not send a valid response')
+    })
+
+    it("throws an error when the user doesn't have a certify scope", async () => {
+      await expect(
+        resolvers.Mutation.markBirthAsCertified(
+          {},
+          { details },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a certify scope')
     })
   })
   describe('markDeathAsCertified()', () => {
@@ -1324,7 +1447,8 @@ describe('Registration root resolvers', () => {
       )
       const result = await resolvers.Mutation.markDeathAsCertified(
         {},
-        { details }
+        { details },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
@@ -1333,6 +1457,16 @@ describe('Registration root resolvers', () => {
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
       )
+    })
+
+    it("throws an error when the user doesn't have a certify scope", async () => {
+      await expect(
+        resolvers.Mutation.markDeathAsCertified(
+          {},
+          { details },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a certify scope')
     })
   })
   describe('notADuplicate()', () => {
@@ -1378,11 +1512,26 @@ describe('Registration root resolvers', () => {
         {
           id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
           duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
-        }
+        },
+        authHeaderRegCert
       )
 
       expect(result).toBeDefined()
       expect(result).toBe('1648b1fb-bad4-4b98-b8a3-bd7ceee496b6')
+    })
+
+    it("throws an error when the user doesn't have register scope", async () => {
+      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      await expect(
+        resolvers.Mutation.notADuplicate(
+          {},
+          {
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+          },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
   describe('queryRegistrationByIdentifier()', async () => {
@@ -1414,7 +1563,8 @@ describe('Registration root resolvers', () => {
       )
       const composition = await resolvers.Query.queryRegistrationByIdentifier(
         {},
-        { identifier: '2019333494BAQFYEG6' }
+        { identifier: '2019333494BAQFYEG6' },
+        authHeaderRegCert
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('80b90ac3-1032-4f98-af64-627d2b7443f3')
@@ -1424,7 +1574,8 @@ describe('Registration root resolvers', () => {
       await expect(
         resolvers.Query.queryRegistrationByIdentifier(
           {},
-          { identifier: '2019333494BAQFYEG6' }
+          { identifier: '2019333494BAQFYEG6' },
+          authHeaderRegCert
         )
       ).rejects.toThrowError(
         'Task does not exist for identifer 2019333494BAQFYEG6'
@@ -1447,9 +1598,20 @@ describe('Registration root resolvers', () => {
       await expect(
         resolvers.Query.queryRegistrationByIdentifier(
           {},
-          { identifier: '2019333494BAQFYEG6' }
+          { identifier: '2019333494BAQFYEG6' },
+          authHeaderRegCert
         )
       ).rejects.toThrowError('Composition reference not found')
+    })
+
+    it("throws an error when the user doesn't have register scope", async () => {
+      await expect(
+        resolvers.Query.queryRegistrationByIdentifier(
+          {},
+          { identifier: '2019333494BAQFYEG6' },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
 
@@ -1491,7 +1653,8 @@ describe('Registration root resolvers', () => {
       )
       const composition = await resolvers.Query.queryPersonByIdentifier(
         {},
-        { identifier: '1234567898765' }
+        { identifier: '1234567898765' },
+        authHeaderRegCert
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('96d2f69a-2572-46b1-a390-9b722265d037')
@@ -1501,11 +1664,22 @@ describe('Registration root resolvers', () => {
       await expect(
         resolvers.Query.queryPersonByIdentifier(
           {},
-          { identifier: '1234567898765' }
+          { identifier: '1234567898765' },
+          authHeaderRegCert
         )
       ).rejects.toThrowError(
         'Person does not exist for identifer 1234567898765'
       )
+    })
+
+    it("throws an error when the user doesn't have register scope", async () => {
+      await expect(
+        resolvers.Query.queryPersonByIdentifier(
+          {},
+          { identifier: '1234567898765' },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
     })
   })
 })
