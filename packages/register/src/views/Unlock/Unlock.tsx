@@ -203,8 +203,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         'minutes'
       )
       if (lockedAt && timeDiff < MAX_LOCK_TIME) {
+        if (this.state.attempt === MAX_ALLOWED_ATTEMPT + 2) {
+          return
+        }
         this.setState(prevState => ({
-          attempt: MAX_ALLOWED_ATTEMPT + 1,
+          attempt: MAX_ALLOWED_ATTEMPT + 2,
           errorMessage: intl.formatMessage(messages.locked)
         }))
       } else {
