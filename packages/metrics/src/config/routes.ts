@@ -51,8 +51,7 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required()
           })
         },
-        tags: ['api'],
-        auth: false
+        tags: ['api']
       }
     }
   ]
