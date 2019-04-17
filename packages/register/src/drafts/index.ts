@@ -4,6 +4,7 @@ import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { IUserDetails } from 'src/utils/userUtils'
+import { AES, enc } from 'crypto-js'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
@@ -12,6 +13,8 @@ const WRITE_DRAFT = 'DRAFTS/WRITE_DRAFT'
 const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
 const GET_DRAFTS_SUCCESS = 'DRAFTS/GET_DRAFTS_SUCCESS'
 const GET_DRAFTS_FAILED = 'DRAFTS/GET_DRAFTS_FAILED'
+
+const encryptionKey = '1q@w3E4r%t6Y7u*i9O0p_' // saved the secret key here for now
 
 export interface IDraft {
   id: string
@@ -77,6 +80,12 @@ export interface IUserData {
   userID: string
   drafts: IDraft[]
   userPIN: string
+}
+
+export interface IUserDataEncrypted {
+  userID: string
+  userPIN: string
+  draftsEncrypted: string
 }
 
 export interface IDraftsState {
@@ -239,14 +248,13 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
-    // storage.configStorage('OpenCRVS')
     return '{}'
   }
 
   const currentUserID = await getCurrentUserID()
   const currentUserPIN = await storage.getItem('pin')
-  const allUserData = JSON.parse(storageTable) as IUserData[]
-  if (!allUserData.length) {
+  const allUserDataEncrypted = JSON.parse(storageTable) as IUserDataEncrypted[]
+  if (!allUserDataEncrypted.length) {
     // No user-data at all
     const payloadWithoutDrafts: IUserData = {
       userID: currentUserID,
@@ -256,12 +264,25 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
     return JSON.stringify(payloadWithoutDrafts)
   }
 
-  const currentUserData = allUserData.find(
+  const currentUserDataEncrypted = allUserDataEncrypted.find(
     uData => uData.userID === currentUserID
   )
-  const currentUserDrafts: IDraft[] = currentUserData
-    ? currentUserData.drafts || []
-    : []
+
+  if (!currentUserDataEncrypted || !currentUserDataEncrypted.draftsEncrypted) {
+    return JSON.stringify({
+      userID: currentUserID,
+      userPIN: currentUserPIN,
+      drafts: []
+    })
+  }
+
+  const decryption = AES.decrypt(
+    currentUserDataEncrypted.draftsEncrypted,
+    encryptionKey
+  )
+  const currentUserDrafts = JSON.parse(
+    enc.Utf8.stringify(decryption)
+  ) as IDraft[]
   const payload: IUserData = {
     userID: currentUserID,
     userPIN: currentUserPIN,
@@ -277,20 +298,26 @@ export async function writeDraftByUser(draftsState: IDraftsState) {
     // No storage option found
     storage.configStorage('OpenCRVS')
   }
-  const allUserData: IUserData[] = !str ? [] : (JSON.parse(str) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === uID)
+  const allUserDataEncrypted: IUserDataEncrypted[] = !str ? [] : JSON.parse(str)
+  const currentUserDataEncrypted = allUserDataEncrypted.find(
+    uData => uData.userID === uID
+  )
+  const drafts = JSON.stringify(draftsState.drafts)
 
-  if (currentUserData) {
-    currentUserData.drafts = draftsState.drafts
+  if (currentUserDataEncrypted) {
+    currentUserDataEncrypted.draftsEncrypted = AES.encrypt(
+      drafts,
+      encryptionKey
+    ).toString()
   } else {
     const pin = await storage.getItem('pin')
-    allUserData.push({
+    allUserDataEncrypted.push({
       userID: uID,
       userPIN: pin,
-      drafts: draftsState.drafts
+      draftsEncrypted: AES.encrypt(drafts, encryptionKey).toString()
     })
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  storage.setItem('USER_DATA', JSON.stringify(allUserDataEncrypted))
 }
 
 export async function getCurrentUserID(): Promise<string> {
