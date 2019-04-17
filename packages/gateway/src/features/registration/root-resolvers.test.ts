@@ -6,14 +6,33 @@ import { readFileSync } from 'fs'
 beforeEach(() => {
   fetch.resetMocks()
 })
+
+const registerCertifyToken = jwt.sign(
+  { scope: ['register', 'certify'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
+const declareToken = jwt.sign(
+  { scope: ['declare'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
-  Authorization:
-    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTU1NDA2ODM4LCJleHAiOjE1NTYwMTE2MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1Yzc1MzVkN2I0YTI0MDE1NTJjM2EwOTkifQ.ofELKQxo8_zwM-p-Dy67uhlrQR04YHHZgy5Sqg-eRgczHQYvUnIOUkdgdgS2-mvwNOJLtKBi_CtMqW94RRP8VMaoNRTqJn0XC6xzjCEYU9kuJNW7JMgM_sPmNQYyeOC1lsiV6jkWUEyV2SlerWjU4NZF3QdFGM2-GL11fBrTSGqSvU56v1d3A3fGdHNUxcbUgt78415vguTOu-c7MCroejrrYfKb_DAYAOqrUV_XqjYLIHrUJt2nPX-PEcxKELCsd0sXk-RvINqVciDHz1aThPOiBWSR0aTilgDcFCIWN1JRxnFjFyDCslO9okZGtrNlHf4Y0WhpCEXjXec9EUWVog'
+  Authorization: `Bearer ${registerCertifyToken}`
 }
 
 const authHeaderNotRegCert = {
-  Authorization:
-    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NTU0MTY3NTksImV4cCI6MTU1NjAyMTU1OSwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVjNzUzNWQ3YjRhMjQwMTU1MmMzYTA5NyJ9.AQWnbq0cfX26ZnYQyjuJDNtx2DaheCcd-ZBmH9-zfcmR_s9lE9PJw07FrD33ofXhQM4zi_MQJJ8KQlq4a7mWfNHCXvWxYeY7Q3FFlYX4R9Rhkw38dU4kxPQtoE6u7_xHBp1w-82GARemPyyUKzLfSIWs_lJzsuAp0S1VYJLqaQOLxkQtRVOingf-apv8T7sIUmWZnzrKhZpvBUTBd5q7y4yKMu9eqWu7HzMYfPwAWgUj_LLFBkabSHcqJmfGEKgY0RKSoB1CgNqQQv8UEWUJvJq7o5apDL2PweNMto4dWjKoqCDGyDse7qEb6g1FJ_-n9zfc4ZaLIK7gfX0Cr6jgtw'
+  Authorization: `Bearer ${declareToken}`
 }
 
 describe('Registration root resolvers', () => {
