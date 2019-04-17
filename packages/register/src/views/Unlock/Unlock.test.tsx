@@ -30,60 +30,6 @@ describe('Unlock page loads Properly', () => {
     expect(elem).toBe(1)
   })
 
-  it('Should Display Incorrect error message', () => {
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    testComponent.component.update()
-
-    const errorElem = testComponent.component
-      .find('#errorMsg')
-      .hostNodes()
-      .text()
-    expect(errorElem).toBe('Incorrect pin. Please try again')
-  })
-
-  it('Should display the Last try message', () => {
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    clearPassword(testComponent.component)
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    testComponent.component.update()
-
-    clearPassword(testComponent.component)
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    testComponent.component.update()
-
-    const errorElem = testComponent.component
-      .find('#errorMsg')
-      .hostNodes()
-      .text()
-    expect(errorElem).toBe('Last Try')
-  })
-
-  it('Should display Locked Message', () => {
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    clearPassword(testComponent.component)
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    testComponent.component.update()
-
-    const errorElem = testComponent.component
-      .find('#errorMsg')
-      .hostNodes()
-      .text()
-    expect(errorElem).toBe('Locked')
-  })
-
   it('There should be no error message after providing successfull Pin', () => {
     clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-0').hostNodes()
@@ -97,5 +43,105 @@ describe('Unlock page loads Properly', () => {
     const errorElem = testComponent.component.find('#errorMsg').hostNodes()
       .length
     expect(errorElem).toBe(0)
+  })
+
+  it('Should Display Incorrect error message', async () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Incorrect pin. Please try again')
+    }, 100)
+  })
+
+  it('Should display the Last try message', async () => {
+    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    clearPassword(testComponent.component)
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    clearPassword(testComponent.component)
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Last Try')
+    }, 100)
+  })
+
+  it('Should display Locked Message', async () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
+  })
+
+  it('Should display Locked Message', async () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
+  })
+})
+
+describe('Logout Sequence', async () => {
+  const { store } = createStore()
+  const redirect = jest.fn()
+  const testComponent = createTestComponent(
+    <Unlock onCorrectPinMatch={() => redirect} />,
+    store
+  )
+
+  it('Should Pop the Logout modal', () => {
+    testComponent.component
+      .find('#logout')
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.update()
+    const modalIsDisplayed = testComponent.component
+      .find('#logout_confirm')
+      .hostNodes().length
+    expect(modalIsDisplayed).toBe(1)
   })
 })
