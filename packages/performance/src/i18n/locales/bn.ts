@@ -39,6 +39,8 @@ export const BENGALI_STATE = {
     'performance.graph.birthRegistrationRatePerMonthLabel': 'পঞ্জিকা মাস',
     'performance.graph.birthRegistrationPercentageOfEstimateLabel':
       'আনুমানিক জন্ম নিবন্ধন%',
+    'performance.graph.category.gender.female': 'মহিলা',
+    'performance.graph.category.gender.male': 'পুরুষ',
     'register.home.header.hello': 'হ্যালো {fullName}',
     'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
     'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
