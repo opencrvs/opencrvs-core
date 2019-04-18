@@ -21,6 +21,7 @@ import * as CommonUtils from 'src/utils/commonUtils'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
+jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
   history.replaceState({}, '', '/')
@@ -61,7 +62,6 @@ describe('when user has starts a new application', () => {
     beforeEach(async () => {
       draft = createDraft(Event.BIRTH)
       store.dispatch(storeDraft(draft))
-      jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
       )

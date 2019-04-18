@@ -14,6 +14,7 @@ import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
+import * as CommonUtils from 'src/utils/commonUtils'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -44,6 +45,7 @@ describe('when app notifies the user', () => {
   })
 
   describe('when appliation has new update', () => {
+    jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
     beforeEach(() => {
       // @ts-ignore
       const action = actions.showNewContentAvailableNotification()

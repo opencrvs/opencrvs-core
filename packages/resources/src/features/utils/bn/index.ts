@@ -14,6 +14,10 @@ export interface IOISFLocation {
   id: number
 }
 
+export interface IStatistic {
+  [key: string]: string
+}
+
 export interface ILocation {
   id?: string
   name?: string

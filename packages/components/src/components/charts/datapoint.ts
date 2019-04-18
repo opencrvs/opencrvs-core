@@ -5,4 +5,12 @@ export interface IDataPoint {
   estimate?: boolean
   total?: boolean
   description?: string
+  categoricalData?: ICategoryDataPoint[]
+}
+
+export interface ICategoryDataPoint {
+  name: string
+  label: string
+  icon: () => React.ReactNode
+  value: number
 }

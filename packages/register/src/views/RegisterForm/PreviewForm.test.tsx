@@ -22,6 +22,7 @@ import { Event } from 'src/forms'
 import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
+import * as CommonUtils from 'src/utils/commonUtils'
 
 interface IPersonDetails {
   [key: string]: any
@@ -29,6 +30,7 @@ interface IPersonDetails {
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
+jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
   history.replaceState({}, '', '/')

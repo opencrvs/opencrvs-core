@@ -947,6 +947,10 @@ export const BENGALI_STATE: ILanguage = {
     'createPIN.pinMatchError': 'PIN code did not match. Please try again.',
     'createPIN.reEnterTitle': 'Re-enter your new PIN',
     'createPIN.reEnterDescription':
-      "Let's make sure we collected your PIN correctly."
+      "Let's make sure we collected your PIN correctly.",
+    'unlockApp.incorrectPin': 'ভুল পিন। অনুগ্রহপূর্বক আবার চেষ্টা করুন',
+    'unlockApp.lastTry': 'শেষ চেষ্টা',
+    'unlockApp.locked':
+      'আপনার অ্যাকাউন্ট লক করা হয়েছে. 1 মিনিটের মধ্যে আবার চেষ্টা করুন।'
   }
 }
