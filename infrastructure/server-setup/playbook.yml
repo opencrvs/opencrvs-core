@@ -64,9 +64,19 @@
     shell: docker swarm join-token -q worker
     register: worker_token
 
-  - name: "Create mongo data directory"
+  - name: "Create mongo1 data directory"
     file:
-      path: /data/mongo
+      path: /data/mongo1
+      state: directory
+
+  - name: "Create mongo2 data directory"
+    file:
+      path: /data/mongo2
+      state: directory
+
+  - name: "Create mongo3 data directory"
+    file:
+      path: /data/mongo3
       state: directory
 
   - name: "Create traefik data directory"

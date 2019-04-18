@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-  # configure reverse proxy for public endpoints
+  # Configure reverse proxy for public endpoints
   traefik:
     image: traefik
     ports:
@@ -22,6 +22,76 @@ services:
     networks:
       - overlay_net
 
+  # Configure mongo nodes to for a replica set
+  mongo1:
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo1:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data1 == true
+
+  mongo2:
+    image: mongo:3.6
+    restart: unless-stopped
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo2:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data2 == true
+    networks:
+      - overlay_net
+
+  mongo3:
+    image: mongo:3.6
+    restart: unless-stopped
+    command: --replSet rs0
+    volumes:
+      - '/data/mongo3:/data/db'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data3 == true
+    networks:
+      - overlay_net
+
+  mongo-rs-init:
+    image: mongo:3.6
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    command: 'mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27017\"},{_id:2,host:\"mongo3:27017\"}]})"'
+    networks:
+      - overlay_net
+
+  # Configure elasticsearch
+  elasticsearch:
+    volumes:
+      - '/data/elasticsearch:/usr/share/elasticsearch/data'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data1 == true
+
+  # Configure influxdb
+  influxdb:
+    volumes:
+      - '/data/influxdb:/var/lib/influxdb'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.data1 == true
+
+  # Configure webapps and add traefik config
   register:
     configs:
       - source: register-config.{{ts}}
@@ -66,6 +136,7 @@ services:
     networks:
       - overlay_net
 
+  # Configure other service with deployment specifc details
   auth:
     secrets:
       - jwt-public-key.{{ts}}
@@ -88,6 +159,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MONGO_URL=mongodb://mongo1,mongo2,mogno3/user-mgnt?replicaSet=rs0
     deploy:
       replicas: 2
     networks:
@@ -165,7 +237,16 @@ services:
     networks:
       - overlay_net
 
+  # Configure other dependencies with deployment specifc details
   hearth:
+    environment:
+      - mongodb__url=mongodb://mongo1,mongo2,mogno3/hearth-dev?replicaSet=rs0
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    deploy:
+      replicas: 2
     secrets:
       - jwt-public-key.{{ts}}
     configs:
@@ -175,6 +256,13 @@ services:
         target: /src/hearth/config/queryparam-extensions.json
 
   openhim-core:
+    environment:
+      - mongo_url=mongodb://mongo1,mongo2,mogno3/openhim-dev?replicaSet=rs0
+      - mongo_atnaUrl=mongodb://mongo1,mongo2,mogno3/openhim-dev?replicaSet=rs0
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
     deploy:
       labels:
         - 'traefik.enable=true'

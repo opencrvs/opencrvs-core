@@ -27,7 +27,9 @@ docker node ls
 docker login
 
 # on manger, create required directories
-mkdir -p /data/mongo
+mkdir -p /data/mongo1
+mkdir -p /data/mongo2
+mkdir -p /data/mongo3
 mkdir -p /data/traefik
 mkdir -p /data/elasticsearch
 chmod g+rwx /data/elasticsearch

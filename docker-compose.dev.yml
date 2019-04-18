@@ -2,11 +2,12 @@ version: '3.3'
 
 services:
   # For dependencies, expose ports locally for dev
-  mongo:
+  mongo1:
     ports:
       - '27017:27017'
     volumes:
-      - './data/mongo:/data/db'
+      - './data/mongo1:/data/db'
+
   redis:
     ports:
       - '6379:6379'
