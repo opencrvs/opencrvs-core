@@ -11,6 +11,7 @@ export type LoginState = {
   token: string
   authenticationDetails: { nonce: string }
   submissionError: boolean
+  errorCode?: number
   resentSMS: boolean
   stepOneDetails: { mobile: string }
 }
@@ -50,7 +51,12 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.AUTHENTICATION_FAILED:
-      return { ...state, submitting: false, submissionError: true }
+      return {
+        ...state,
+        submitting: false,
+        submissionError: true,
+        errorCode: action.payload.response && action.payload.response.status
+      }
     case actions.AUTHENTICATION_COMPLETED:
       return loop(
         {
@@ -110,7 +116,12 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.VERIFY_CODE_FAILED:
-      return { ...state, submitting: false, submissionError: true }
+      return {
+        ...state,
+        submitting: false,
+        submissionError: true,
+        errorCode: action.payload.response && action.payload.response.status
+      }
     case actions.VERIFY_CODE_COMPLETED:
       const decoded: ITokenPayload = getTokenPayload(
         action.payload.token
