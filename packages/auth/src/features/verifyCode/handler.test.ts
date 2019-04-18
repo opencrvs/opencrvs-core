@@ -32,7 +32,8 @@ describe('authenticate handler receives a request', () => {
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: smsCode
+          code: smsCode,
+          mobile: '+345345349'
         }
       })
 
@@ -65,7 +66,8 @@ describe('authenticate handler receives a request', () => {
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: badCode
+          code: badCode,
+          mobile: '+345345349'
         }
       })
       expect(res.statusCode).toBe(401)

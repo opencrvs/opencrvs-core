@@ -127,7 +127,7 @@ export async function createServer() {
   server.ext('onPostAuth', (request, h) => {
     const payload = request.payload as IAuthPayload
     const credentials = {
-      mobile: payload.mobile
+      id: payload && payload.mobile + request.url.pathname
     } as Hapi.AuthCredentials
 
     h.request.auth.credentials = credentials
