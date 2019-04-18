@@ -239,7 +239,6 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
-    // storage.configStorage('OpenCRVS')
     return '{}'
   }
 

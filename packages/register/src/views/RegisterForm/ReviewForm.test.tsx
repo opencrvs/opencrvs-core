@@ -663,7 +663,6 @@ describe('ReviewForm tests', async () => {
     testComponent.component.update()
 
     const checkData = testComponent.component.find(RegisterForm)
-    console.log('PROPS ::', checkData.props)
     const data = checkData.prop('draft') as IDraft
 
     expect(data.data.registration).toEqual({
