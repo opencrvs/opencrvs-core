@@ -14,13 +14,13 @@ import {
   ViewType,
   SELECT_WITH_OPTIONS,
   TEXT,
-  NUMBER,
   DATE,
   SUBSECTION,
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  FETCH_BUTTON
+  FETCH_BUTTON,
+  TEL
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -29,7 +29,9 @@ import {
   dateGreaterThan,
   dateLessThan,
   dateNotInFuture,
-  dateFormatIsCorrect
+  dateFormatIsCorrect,
+  numeric,
+  maxLength
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -633,11 +635,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCodeCityOptionPermanent',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -671,11 +673,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -886,11 +888,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCodeCityOption',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -926,11 +928,11 @@ export const motherSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.country,
         conditionals.state,

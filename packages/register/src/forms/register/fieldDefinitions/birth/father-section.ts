@@ -13,13 +13,13 @@ import {
   ViewType,
   RADIO_GROUP,
   TEXT,
-  NUMBER,
   DATE,
   SUBSECTION,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  FETCH_BUTTON
+  FETCH_BUTTON,
+  TEL
 } from 'src/forms'
 import {
   bengaliOnlyNameFormat,
@@ -28,7 +28,9 @@ import {
   dateGreaterThan,
   dateLessThan,
   dateNotInFuture,
-  dateFormatIsCorrect
+  dateFormatIsCorrect,
+  maxLength,
+  numeric
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -716,11 +718,11 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'postCodeCityOption',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -756,11 +758,11 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -978,11 +980,11 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'postCodeCityOptionPermanent',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,
@@ -1018,11 +1020,11 @@ export const fatherSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.permanentAddressSameAsMother,
         conditionals.countryPermanent,

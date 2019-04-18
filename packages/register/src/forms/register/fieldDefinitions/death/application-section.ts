@@ -6,7 +6,6 @@ import {
   DATE,
   SUBSECTION,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  NUMBER,
   RADIO_GROUP,
   TEL,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
@@ -17,7 +16,9 @@ import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   isValidBirthDate,
-  validIDNumber
+  validIDNumber,
+  numeric,
+  maxLength
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 import {
@@ -743,11 +744,11 @@ export const applicantsSection: IFormSection = {
     },
     {
       name: 'postCodeCityOption',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -796,11 +797,11 @@ export const applicantsSection: IFormSection = {
     },
     {
       name: 'postCode',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.country,
         conditionals.state,
@@ -1083,11 +1084,11 @@ export const applicantsSection: IFormSection = {
     },
     {
       name: 'postCodeCityOptionPermanent',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,
@@ -1136,11 +1137,11 @@ export const applicantsSection: IFormSection = {
     },
     {
       name: 'postCodePermanent',
-      type: NUMBER,
+      type: TEL,
       label: addressMessages.postCode,
       required: false,
       initialValue: '',
-      validate: [],
+      validate: [numeric, maxLength(4)],
       conditionals: [
         conditionals.countryPermanent,
         conditionals.statePermanent,
