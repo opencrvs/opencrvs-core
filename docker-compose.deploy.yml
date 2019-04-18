@@ -22,7 +22,7 @@ services:
     networks:
       - overlay_net
 
-  # Configure mongo nodes to for a replica set
+  # Configure mongo nodes as a replica set
   mongo1:
     command: --replSet rs0
     volumes:
