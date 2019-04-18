@@ -115,10 +115,6 @@ describe('when user logs in', async () => {
     // Now, let's check if the new draft is added
     const details = await getDraftsOfCurrentUser()
     const currentUserDrafts = (JSON.parse(details) as IUserData).drafts
-    console.log(
-      'CURRENT USER DRAFTS',
-      JSON.stringify(currentUserDrafts, null, 2)
-    )
     expect(currentUserDrafts.length).toBe(3)
     expect(currentUserDrafts.find(draft => draft.id === draft4.id)).toBeTruthy()
   })
