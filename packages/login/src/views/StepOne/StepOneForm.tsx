@@ -20,8 +20,10 @@ import { Logo } from '@opencrvs/components/lib/icons'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_INVALID_CREDENTIALS,
-  ERROR_CODE_PHONE_NUMBER_VALIDATE
+  ERROR_CODE_PHONE_NUMBER_VALIDATE,
+  ERROR_CODE_TOO_MANY_ATTEMPTS
 } from '../../utils/authUtils'
+
 export const messages = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
@@ -63,6 +65,13 @@ export const messages = defineMessages({
     defaultMessage: 'Sorry that mobile number and password did not work.',
     description:
       'The error that appears when the user entered details are unauthorised'
+  },
+  tooManyAttemptError: {
+    id: 'login.tooManyAttemptError',
+    defaultMessage:
+      'Sorry you have reached your attempt up to 10 times. Please try again after 1 minute',
+    description:
+      'The error that appears when the user attempts more than 10 times in a minute'
   },
   optionalLabel: {
     id: 'login.optionalLabel',
@@ -247,6 +256,9 @@ export class StepOneForm extends React.Component<
                 intl.formatMessage(messages.submissionError)}
               {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
                 intl.formatMessage(messages.phoneNumberFormat)}
+              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
+                ? intl.formatMessage(messages.tooManyAttemptError)
+                : intl.formatMessage(messages.submissionError)}
             </ErrorMessage>
           )}
         </Title>

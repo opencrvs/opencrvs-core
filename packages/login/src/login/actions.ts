@@ -66,7 +66,7 @@ export type VerifyCodeCompleteAction = {
 
 export type VerifyCodeFailedAction = {
   type: typeof VERIFY_CODE_FAILED
-  payload: Error
+  payload: AxiosError
 }
 
 export type GoToAppAction = {
