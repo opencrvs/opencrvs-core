@@ -14,9 +14,11 @@ import { Store } from 'redux'
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
+import * as CommonUtils from 'src/utils/commonUtils'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
+jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
   history.replaceState({}, '', '/')

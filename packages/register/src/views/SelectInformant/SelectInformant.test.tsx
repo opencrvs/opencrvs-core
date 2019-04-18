@@ -14,9 +14,11 @@ import { Store } from 'redux'
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
+import * as CommonUtils from 'src/utils/commonUtils'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
+jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
   history.replaceState({}, '', '/')
@@ -64,13 +66,12 @@ describe('when user is selecting the informant', () => {
     app.update()
   })
   describe('when selects "Parent"', () => {
-    beforeEach(() => {
+    it('takes user to the birth registration by parent informant view', () => {
       app
         .find('#select_parent_informant')
         .hostNodes()
         .simulate('click')
-    })
-    it('takes user to the birth registration by parent informant view', () => {
+
       expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
     })
   })
