@@ -15,14 +15,14 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         scope: ['admin'],
-        mobile: '+345345343'
+        mobile: '+345345346'
       })
 
       const authRes = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          mobile: '+345345346',
           password: '2r23432'
         }
       })
@@ -60,14 +60,14 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         scope: ['admin'],
-        mobile: '+345345343'
+        mobile: '+345345347'
       })
 
       const authRes = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          mobile: '+345345347',
           password: '2r23432'
         }
       })
