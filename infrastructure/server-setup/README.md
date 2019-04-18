@@ -10,7 +10,7 @@ Run the configuration script with:
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password"
 ```
 
-Replace <inventory_file> with the correct inventory file. These files contain the list of servers which are to be configured. If you are setting up a new set of servers, you will need to create a new file. Some files have been provide for the QA and staging environments.
+Replace <inventory_file> with the correct inventory file and use `-k` option if you need supply an ssh password. These files contain the list of servers which are to be configured. If you are setting up a new set of servers, you will need to create a new file. Some files have been provide for the QA and staging environments.
 
 Once this command is finished the servers are now prepared for an OpenCRVS deployment.
 
