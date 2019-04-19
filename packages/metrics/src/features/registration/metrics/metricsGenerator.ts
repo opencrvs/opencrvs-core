@@ -28,7 +28,7 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
   const interval = calculateInterval(timeStart, timeEnd)
   const points = await readPoints(
     `
-      SELECT COUNT(age_in_days) AS COUNT
+      SELECT COUNT(age_in_days) AS count
         FROM birth_reg 
       WHERE time >= ${timeStart} AND time <= ${timeEnd} 
         GROUP BY time(${interval})
