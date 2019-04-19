@@ -60,7 +60,7 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
-    cy.get('#postCodePermanent').type('10024')
+    cy.get('#postCodePermanent').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // FATHER DETAILS
@@ -92,7 +92,7 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
-    cy.get('#postCode').type('10024')
+    cy.get('#postCode').type('1024')
     cy.get('#permanentAddressSameAsMother_false').click()
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
@@ -101,7 +101,7 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
-    cy.get('#postCodePermanent').type('10024')
+    cy.get('#postCodePermanent').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // REGISTRATION

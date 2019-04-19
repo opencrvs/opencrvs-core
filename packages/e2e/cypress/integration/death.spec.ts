@@ -34,7 +34,7 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
-    cy.get('#postCodePermanent').type('10024')
+    cy.get('#postCodePermanent').type('1024')
     cy.get('#currentAddressSameAsPermanent_false').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
@@ -43,7 +43,7 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
-    cy.get('#postCode').type('10024')
+    cy.get('#postCode').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
@@ -64,7 +64,7 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('48')
-    cy.get('#postCode').type('10024')
+    cy.get('#postCode').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // EVENT DETAILS
