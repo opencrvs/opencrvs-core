@@ -28,21 +28,6 @@ const TitleContainer = styled.div`
 const Title = styled.div`
   font-weight: bold;
 `
-const ImageContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.imageContainerBackground};
-  margin-top: 16px;
-  text-align: center;
-  min-height: calc(100vh - 200px);
-  position: relative;
-`
-const Image = styled.img`
-  max-width: 100%;
-  max-height: 100%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-`
 const SelectContainer = styled.div`
   width: 70%;
 `
