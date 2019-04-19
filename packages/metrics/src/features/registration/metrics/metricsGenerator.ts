@@ -28,22 +28,27 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
   const interval = calculateInterval(timeStart, timeEnd)
   const points = await readPoints(
     `
-      SELECT count(age_in_days) as count 
+      SELECT COUNT(age_in_days) AS COUNT
         FROM birth_reg 
       WHERE time >= ${timeStart} AND time <= ${timeEnd} 
-        group by time(${interval})
+        GROUP BY time(${interval})
     `
-  ).catch((err: Error) =>
-    console.log(`Error pulling data from InfluxDB! ${err.stack}`)
   )
 
-  const total = points.reduce((total: IPoint, point: IPoint) => ({
-    count: total.count + point.count
-  }))
+  const total =
+    (points &&
+      points.reduce((total: IPoint, point: IPoint) => ({
+        count: total.count + point.count
+      }))) ||
+    0
 
-  return points.map((point: IPoint) => ({
-    label: moment(point.time).format('MMMM'),
-    value: point.count,
-    total: total.count
-  }))
+  return (
+    (points &&
+      points.map((point: IPoint) => ({
+        label: moment(point.time).format('MMMM'),
+        value: point.count,
+        total: total.count
+      }))) ||
+    []
+  )
 }
