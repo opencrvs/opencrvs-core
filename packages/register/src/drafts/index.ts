@@ -76,7 +76,6 @@ export type Action =
 export interface IUserData {
   userID: string
   drafts: IDraft[]
-  userPIN: string
 }
 
 export interface IDraftsState {
@@ -186,11 +185,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       const currentDraftIndex = newDrafts.findIndex(
         draft => draft.id === action.payload.draft.id
       )
-      if (currentDraftIndex >= 0) {
-        newDrafts[currentDraftIndex] = action.payload.draft
-      } else {
-        newDrafts.push(action.payload.draft)
-      }
+      newDrafts[currentDraftIndex] = action.payload.draft
       const stateAfterDraftModification = {
         ...state,
         drafts: newDrafts
@@ -245,13 +240,11 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   }
 
   const currentUserID = await getCurrentUserID()
-  const currentUserPIN = await storage.getItem('pin')
   const allUserData = JSON.parse(storageTable) as IUserData[]
   if (!allUserData.length) {
     // No user-data at all
     const payloadWithoutDrafts: IUserData = {
       userID: currentUserID,
-      userPIN: currentUserPIN,
       drafts: []
     }
     return JSON.stringify(payloadWithoutDrafts)
@@ -264,7 +257,6 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
     (currentUserData && currentUserData.drafts) || []
   const payload: IUserData = {
     userID: currentUserID,
-    userPIN: currentUserPIN,
     drafts: currentUserDrafts
   }
   return JSON.stringify(payload)
@@ -283,10 +275,8 @@ export async function writeDraftByUser(draftsState: IDraftsState) {
   if (currentUserData) {
     currentUserData.drafts = draftsState.drafts
   } else {
-    const pin = await storage.getItem('pin')
     allUserData.push({
       userID: uID,
-      userPIN: pin,
       drafts: draftsState.drafts
     })
   }

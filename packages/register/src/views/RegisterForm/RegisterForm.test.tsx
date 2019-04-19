@@ -47,13 +47,11 @@ describe('when user logs in', async () => {
 
   const currentUserData: IUserData = {
     userID: 'shakib75',
-    userPIN: 'allrounderNumber1',
     drafts: [draft1, draft2]
   }
 
   const anotherUserData: IUserData = {
     userID: 'mortaza',
-    userPIN: 'tiger',
     drafts: [draft3]
   }
 
@@ -125,8 +123,6 @@ describe('when there is no user-data saved', () => {
     storage.getItem = jest.fn(
       (key: string): string => {
         switch (key) {
-          case 'pin':
-            return 'opener'
           case 'USER_DATA':
             return '[]'
           case 'USER_DETAILS':

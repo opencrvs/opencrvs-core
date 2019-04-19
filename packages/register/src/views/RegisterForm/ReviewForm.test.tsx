@@ -662,8 +662,9 @@ describe('ReviewForm tests', async () => {
 
     testComponent.component.update()
 
-    const checkData = testComponent.component.find(RegisterForm)
-    const data = checkData.prop('draft') as IDraft
+    const data = testComponent.component
+      .find(RegisterForm)
+      .prop('draft') as IDraft
 
     expect(data.data.registration).toEqual({
       _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
