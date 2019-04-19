@@ -7,6 +7,9 @@ import { FormFieldGenerator } from 'src/components/form'
 import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
+import * as Jimp from 'jimp'
+import { ALLOWED_IMAGE_TYPE } from 'src/utils/constants'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -30,10 +33,25 @@ const FormAction = styled.div`
 const FormImageUploader = styled(ImageUploader)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
+const UploadErrorSec = styled.div`
+  display: flex;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.error};
+  margin-top: 10px;
+`
+
+const messages = defineMessages({
+  uploadError: {
+    id: 'imageUploadOption.upload.error',
+    defaultMessage: 'Must be JPEG or PNG format',
+    description: 'Show error messages while uploading'
+  }
+})
 
 type State = {
   data: IFormSectionData
   showUploadButton: boolean
+  errorOnUpload: boolean
 }
 
 type IProps = {
@@ -44,12 +62,14 @@ type IProps = {
   toggleNestedSection: () => void
 }
 
-export class ImageUploadOption extends React.Component<IProps, State> {
-  constructor(props: IProps) {
+type IFullProps = InjectedIntlProps & IProps
+export class ImageUploadOptionClass extends React.Component<IFullProps, State> {
+  constructor(props: IFullProps) {
     super(props)
     this.state = {
       data: {},
-      showUploadButton: false
+      showUploadButton: false,
+      errorOnUpload: false
     }
   }
 
@@ -69,18 +89,37 @@ export class ImageUploadOption extends React.Component<IProps, State> {
     const reader = new FileReader()
     reader.onloadend = () => {
       if (reader.result) {
-        this.props.onComplete({
-          optionValues: Object.values(this.state.data),
-          type: uploadedImage.type,
-          data: reader.result.toString()
-        })
+        Jimp.read(reader.result as string)
+          .then(buffer => {
+            if (!ALLOWED_IMAGE_TYPE.includes(buffer.getMIME())) {
+              throw new Error('File type not supported')
+            } else if (uploadedImage.size > 2097152) {
+              return buffer
+                .resize(2000, Jimp.AUTO)
+                .quality(70)
+                .getBase64Async(buffer.getMIME())
+            }
+            return reader.result as string
+          })
+          .then(buffer => {
+            this.props.onComplete({
+              optionValues: Object.values(this.state.data),
+              type: uploadedImage.type,
+              data: buffer
+            })
+          })
+          .catch(() => {
+            this.setState({
+              errorOnUpload: true
+            })
+          })
       }
     }
     reader.readAsDataURL(uploadedImage)
   }
 
   render = () => {
-    const { option, title, backLabel } = this.props
+    const { option, title, backLabel, intl } = this.props
     return (
       <OverlayContainer>
         <ActionPage
@@ -107,6 +146,11 @@ export class ImageUploadOption extends React.Component<IProps, State> {
                     />
                   </FormAction>
                 )}
+                {this.state.showUploadButton && this.state.errorOnUpload && (
+                  <UploadErrorSec>
+                    {intl.formatMessage(messages.uploadError)}
+                  </UploadErrorSec>
+                )}
               </Box>
             </FormContainer>
           </HeaderContent>
@@ -115,3 +159,5 @@ export class ImageUploadOption extends React.Component<IProps, State> {
     )
   }
 }
+
+export const ImageUploadOption = injectIntl<IFullProps>(ImageUploadOptionClass)

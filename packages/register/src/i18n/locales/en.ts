@@ -949,6 +949,7 @@ export const ENGLISH_STATE: ILanguage = {
     'unlockApp.incorrectPin': 'Incorrect pin. Please try again',
     'unlockApp.lastTry': 'Last Try',
     'unlockApp.locked':
-      'your account has been locked. Please try again in 1 minute.'
+      'your account has been locked. Please try again in 1 minute.',
+    'imageUploadOption.upload.error': 'Must be JPEG or PNG format'
   }
 }
