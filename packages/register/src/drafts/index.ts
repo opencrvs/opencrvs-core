@@ -158,7 +158,9 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
     case STORE_DRAFT:
       const stateAfterDraftStore = {
         ...state,
-        drafts: state.drafts ? state.drafts.concat(action.payload.draft) : []
+        drafts: state.drafts
+          ? state.drafts.concat(action.payload.draft)
+          : [action.payload.draft]
       }
       return loop(
         stateAfterDraftStore,
@@ -258,9 +260,8 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     uData => uData.userID === currentUserID
   )
-  const currentUserDrafts: IDraft[] = currentUserData
-    ? currentUserData.drafts || []
-    : []
+  const currentUserDrafts: IDraft[] =
+    (currentUserData && currentUserData.drafts) || []
   const payload: IUserData = {
     userID: currentUserID,
     userPIN: currentUserPIN,
