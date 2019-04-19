@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 export const RotateLeft = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={24} height={24} fill="none">
+  <svg width={24} height={24} fill="none" {...props}>
     <path
       d="M14 15l-5 5-5-5"
       stroke="#4C68C1"
