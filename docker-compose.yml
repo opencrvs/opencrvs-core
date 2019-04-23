@@ -31,6 +31,7 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
+      - METRICS_URL=http://metrics:1050
       - COUNTRY=bgd
 
   workflow:
