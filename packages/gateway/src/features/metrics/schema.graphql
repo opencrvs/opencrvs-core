@@ -1,0 +1,15 @@
+type BirthRegistrationMetrics {
+  regByAge: [BirthRegistrationByAgeMetrics]
+}
+
+type BirthRegistrationByAgeMetrics {
+  label: String
+  value: Int
+}
+
+type Query {
+  fetchBirthRegistrationMetrics(
+    timeStart: String
+    timeEnd: String
+  ): BirthRegistrationMetrics
+}
