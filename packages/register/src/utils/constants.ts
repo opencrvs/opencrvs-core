@@ -28,4 +28,4 @@ export const REGEXP_BLOCK_ALPHA_NUMERIC_DOT = '^[0-9A-Z.]+$'
 export const SECURITY_PIN_INDEX = 'pin'
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 
-export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/png']
+export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
