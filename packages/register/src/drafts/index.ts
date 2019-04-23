@@ -75,6 +75,7 @@ export type Action =
 
 export interface IUserData {
   userID: string
+  userPIN?: string
   drafts: IDraft[]
 }
 
