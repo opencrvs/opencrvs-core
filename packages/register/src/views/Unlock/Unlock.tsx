@@ -12,12 +12,10 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
 import * as bcrypt from 'bcryptjs'
-import {
-  SECURITY_PIN_INDEX,
-  SECURITY_PIN_EXPIRED_AT
-} from 'src/utils/constants'
+import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { getCurrentUserID, IUserData } from 'src/drafts'
 
 const messages = defineMessages({
   incorrect: {
@@ -110,7 +108,14 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   }
 
   async loadUserPin() {
-    const userPin = (await storage.getItem(SECURITY_PIN_INDEX)) || ''
+    const currentUserID = await getCurrentUserID()
+    const allUserData = JSON.parse(
+      await storage.getItem('USER_DATA')
+    ) as IUserData[]
+    const currentUserData = allUserData.find(
+      user => user.userID === currentUserID
+    ) || { userPIN: '' }
+    const userPin = currentUserData.userPIN || ''
     this.setState(() => ({
       userPin
     }))
