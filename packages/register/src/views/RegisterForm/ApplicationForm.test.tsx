@@ -6,7 +6,10 @@ import {
   getItem,
   flushPromises,
   setItem,
-  selectOption
+  selectOption,
+  getFileFromBase64String,
+  validImageB64String,
+  inValidImageB64String
 } from 'src/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
 import { storeDraft, createDraft, IDraft } from 'src/drafts'
@@ -399,18 +402,29 @@ describe('when user has starts a new application', () => {
                   .hostNodes()
                   .simulate('change', {
                     target: {
-                      files: [new Blob(['junkvalues'], { type: 'image/png' })]
+                      files: [
+                        getFileFromBase64String(
+                          validImageB64String,
+                          'index.png',
+                          'image/png'
+                        )
+                      ]
                     }
                   })
                 await flushPromises()
+
                 app.update()
 
                 app
                   .find('#action_page_back_button')
                   .hostNodes()
                   .simulate('click')
+                await new Promise(resolve => {
+                  setTimeout(() => {
+                    resolve()
+                  }, 100)
+                })
 
-                await flushPromises()
                 app.update()
               })
               it('uploaded section should appear now', () => {
@@ -446,6 +460,45 @@ describe('when user has starts a new application', () => {
                 it('uploaded image should not be available anymore', () => {
                   expect(app.find('#file_item_0').hostNodes()).toHaveLength(0)
                 })
+              })
+            })
+
+            describe('when invalid image is uploaded/captured', () => {
+              beforeEach(async () => {
+                app
+                  .find('#image_file_uploader_field')
+                  .hostNodes()
+                  .simulate('change', {
+                    target: {
+                      files: [
+                        getFileFromBase64String(
+                          inValidImageB64String,
+                          'index.png',
+                          'image/png'
+                        )
+                      ]
+                    }
+                  })
+                await flushPromises()
+
+                app.update()
+
+                app
+                  .find('#action_page_back_button')
+                  .hostNodes()
+                  .simulate('click')
+                await new Promise(resolve => {
+                  setTimeout(() => {
+                    resolve()
+                  }, 100)
+                })
+
+                app.update()
+              })
+              it('uploaded section should not appear now', () => {
+                expect(app.find('#file_list_viewer').hostNodes()).toHaveLength(
+                  0
+                )
               })
             })
           })
