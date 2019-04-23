@@ -40,7 +40,6 @@ export const getRoutes = () => {
       handler: birthEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description:
           'Handles indexing a new declaration and searching for duplicates'
       }
@@ -51,7 +50,6 @@ export const getRoutes = () => {
       handler: birthEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description:
           'Handles indexing a new registration and searching for duplicates'
       }
@@ -62,7 +60,6 @@ export const getRoutes = () => {
       handler: birthEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description:
           'Handles updating an existing declaration and searching for duplicates'
       }
@@ -73,7 +70,6 @@ export const getRoutes = () => {
       handler: birthEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description:
           'Handles updating an existing declaration and searching for duplicates'
       }
@@ -84,7 +80,6 @@ export const getRoutes = () => {
       handler: birthEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description: 'Handles updating an existing declaration'
       }
     },
@@ -95,7 +90,6 @@ export const getRoutes = () => {
       handler: deathEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description: 'Handles indexing a new declaration'
       }
     },
@@ -105,7 +99,6 @@ export const getRoutes = () => {
       handler: deathEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description: 'Handles indexing a new registration'
       }
     },
@@ -115,7 +108,6 @@ export const getRoutes = () => {
       handler: deathEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description: 'Handles updating a existing declaration'
       }
     },
@@ -125,7 +117,6 @@ export const getRoutes = () => {
       handler: deathEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description: 'Handles updating a existing declaration'
       }
     },
@@ -135,7 +126,6 @@ export const getRoutes = () => {
       handler: deathEventHandler,
       config: {
         tags: ['api'],
-        auth: false,
         description: 'Handles updating a existing declaration'
       }
     }
