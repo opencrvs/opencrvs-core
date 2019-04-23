@@ -494,11 +494,18 @@ export interface GQLRegistrationSearchSet {
 
 export interface GQLBirthRegistrationMetrics {
   regByAge?: Array<GQLBirthRegistrationByAgeMetrics | null>
+  regWithin45d?: Array<GQLBirthRegistrationWithIn45D | null>
 }
 
 export interface GQLBirthRegistrationByAgeMetrics {
   label?: string
   value?: number
+}
+
+export interface GQLBirthRegistrationWithIn45D {
+  label?: string
+  value?: number
+  total?: number
 }
 
 export interface GQLMutation {
@@ -778,6 +785,7 @@ export interface GQLResolver {
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
   BirthRegistrationByAgeMetrics?: GQLBirthRegistrationByAgeMetricsTypeResolver
+  BirthRegistrationWithIn45D?: GQLBirthRegistrationWithIn45DTypeResolver
   Mutation?: GQLMutationTypeResolver
   Dummy?: GQLDummyTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -2209,9 +2217,17 @@ export interface RegistrationSearchSetToCommentResolver<
 
 export interface GQLBirthRegistrationMetricsTypeResolver<TParent = any> {
   regByAge?: BirthRegistrationMetricsToRegByAgeResolver<TParent>
+  regWithin45d?: BirthRegistrationMetricsToRegWithin45dResolver<TParent>
 }
 
 export interface BirthRegistrationMetricsToRegByAgeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationMetricsToRegWithin45dResolver<
   TParent = any,
   TResult = any
 > {
@@ -2231,6 +2247,33 @@ export interface BirthRegistrationByAgeMetricsToLabelResolver<
 }
 
 export interface BirthRegistrationByAgeMetricsToValueResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthRegistrationWithIn45DTypeResolver<TParent = any> {
+  label?: BirthRegistrationWithIn45DToLabelResolver<TParent>
+  value?: BirthRegistrationWithIn45DToValueResolver<TParent>
+  total?: BirthRegistrationWithIn45DToTotalResolver<TParent>
+}
+
+export interface BirthRegistrationWithIn45DToLabelResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationWithIn45DToValueResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationWithIn45DToTotalResolver<
   TParent = any,
   TResult = any
 > {
