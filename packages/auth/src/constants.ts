@@ -34,7 +34,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:notification-user',
   'opencrvs:workflow-user',
   'opencrvs:search-user',
-  'opencrvs:resources-user',
-  'opencrvs:metrics-user'
+  'opencrvs:metrics-user',
+  'opencrvs:resources-user'
 ]
 export const JWT_ISSUER = 'opencrvs:auth-service'

@@ -25,8 +25,7 @@ describe('verify metrics handler', () => {
   it('returns ok for valid request', async () => {
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468',
+      url: '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419',
       headers: {
         Authorization: `Bearer ${token}`
       }

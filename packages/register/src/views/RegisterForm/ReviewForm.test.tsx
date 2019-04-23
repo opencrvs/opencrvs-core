@@ -699,7 +699,14 @@ describe('ReviewForm tests', async () => {
         type: 'BIRTH'
       }
     }
-    store.dispatch(getStorageDraftsSuccess(JSON.stringify([draft])))
+    store.dispatch(
+      getStorageDraftsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [draft]
+        })
+      )
+    )
     store.dispatch(storeDraft(draft))
 
     const testComponent = createTestComponent(
