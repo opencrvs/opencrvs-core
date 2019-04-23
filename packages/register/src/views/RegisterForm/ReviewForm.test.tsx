@@ -703,7 +703,6 @@ describe('ReviewForm tests', async () => {
       getStorageDraftsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          userPIN: 1212, // mock
           drafts: [draft]
         })
       )
