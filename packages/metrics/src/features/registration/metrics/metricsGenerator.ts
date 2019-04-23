@@ -1,11 +1,13 @@
 import { readPoints } from 'src/influxdb/client'
-import { ageIntervals } from 'src/features/registration/metrics/utils'
-import { RequestQuery } from 'hapi'
+import {
+  ageIntervals,
+  calculateInterval,
+  IPoint,
+  LABEL_FOMRAT
+} from 'src/features/registration/metrics/utils'
+import * as moment from 'moment'
 
-export async function regByAge(params: RequestQuery) {
-  const timeStart = params && params['timeStart']
-  const timeEnd = params && params['timeEnd']
-
+export async function regByAge(timeStart: string, timeEnd: string) {
   let metricsData: any[] = []
   for (let i = 0; i < ageIntervals.length; i++) {
     const points = await readPoints(
@@ -21,4 +23,34 @@ export async function regByAge(params: RequestQuery) {
   }
 
   return metricsData
+}
+
+export const regWithin45d = async (timeStart: string, timeEnd: string) => {
+  const interval = calculateInterval(timeStart, timeEnd)
+  const points = await readPoints(
+    `
+      SELECT COUNT(age_in_days) AS count
+        FROM birth_reg 
+      WHERE time >= ${timeStart} AND time <= ${timeEnd} 
+        GROUP BY time(${interval})
+    `
+  )
+
+  const total =
+    (points &&
+      points.reduce((total: IPoint, point: IPoint) => ({
+        count: total.count + point.count
+      }))) ||
+    0
+  const label = LABEL_FOMRAT[interval]
+
+  return (
+    (points &&
+      points.map((point: IPoint) => ({
+        label: moment(point.time).format(label),
+        value: point.count,
+        total: total.count
+      }))) ||
+    []
+  )
 }

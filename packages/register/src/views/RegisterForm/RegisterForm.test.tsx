@@ -13,7 +13,11 @@ import {
   createDraft,
   createReviewDraft,
   storeDraft,
-  setInitialDrafts
+  setInitialDrafts,
+  IUserData,
+  getCurrentUserID,
+  getDraftsOfCurrentUser,
+  writeDraftByUser
 } from 'src/drafts'
 import { v4 as uuid } from 'uuid'
 
@@ -31,6 +35,108 @@ import { IForm } from 'src/forms'
 import { clone } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
+import { storage } from 'src/storage'
+import { IUserDetails } from 'src/utils/userUtils'
+
+describe('when user logs in', async () => {
+  // Some mock data
+
+  const draft1 = createDraft(Event.BIRTH)
+  const draft2 = createDraft(Event.DEATH)
+  const draft3 = createDraft(Event.BIRTH)
+
+  const currentUserData: IUserData = {
+    userID: 'shakib75',
+    drafts: [draft1, draft2]
+  }
+
+  const anotherUserData: IUserData = {
+    userID: 'mortaza',
+    drafts: [draft3]
+  }
+
+  const currentUserDetails: IUserDetails = {
+    userMgntUserID: 'shakib75'
+  }
+
+  const indexedDB = {
+    USER_DATA: JSON.stringify([currentUserData, anotherUserData]),
+    USER_DETAILS: JSON.stringify(currentUserDetails)
+  }
+
+  // Mocking storage reading
+  storage.getItem = jest.fn(
+    (key: string): string => {
+      switch (key) {
+        case 'USER_DATA':
+        case 'USER_DETAILS':
+          return indexedDB[key]
+        default:
+          return 'undefined'
+      }
+    }
+  )
+
+  // Mocking storage writing
+  storage.setItem = jest.fn((key: string, value: string) => {
+    switch (key) {
+      case 'USER_DATA':
+      case 'USER_DETAILS':
+        indexedDB[key] = value
+      default:
+        break
+    }
+  })
+
+  it('should read userID correctly', async () => {
+    const uID = await getCurrentUserID() // reads from USER_DETAILS and returns the userMgntUserID, if exists
+    expect(uID).toEqual('shakib75')
+  })
+
+  it('should read only the drafts of the currently logged-in user', async () => {
+    const details = await getDraftsOfCurrentUser()
+    const currentUserDrafts = (JSON.parse(details) as IUserData).drafts
+    expect(currentUserDrafts.length).toBe(2)
+    expect(currentUserDrafts[0]).toEqual(draft1)
+    expect(currentUserDrafts[1]).toEqual(draft2)
+    expect(currentUserDrafts.find(draft => draft.id === draft3.id)).toBeFalsy()
+  })
+
+  it("should save the draft inside the current user's array of drafts", async () => {
+    const draft4 = createDraft(Event.DEATH)
+    await writeDraftByUser({
+      userID: currentUserData.userID,
+      initialDraftsLoaded: true,
+      drafts: [...currentUserData.drafts, draft4]
+    })
+
+    // Now, let's check if the new draft is added
+    const details = await getDraftsOfCurrentUser()
+    const currentUserDrafts = (JSON.parse(details) as IUserData).drafts
+    expect(currentUserDrafts.length).toBe(3)
+    expect(currentUserDrafts.find(draft => draft.id === draft4.id)).toBeTruthy()
+  })
+})
+
+describe('when there is no user-data saved', () => {
+  it('should return an empty array', async () => {
+    storage.getItem = jest.fn(
+      (key: string): string => {
+        switch (key) {
+          case 'USER_DATA':
+            return '[]'
+          case 'USER_DETAILS':
+            return '{ "userMgntUserID": "tamimIq" }'
+          default:
+            return ''
+        }
+      }
+    )
+    const str = await getDraftsOfCurrentUser()
+    const drafts = (JSON.parse(str) as IUserData).drafts
+    expect(drafts.length).toBe(0)
+  })
+})
 
 describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
@@ -67,6 +173,7 @@ describe('when user is in the register form before initial draft load', () => {
 describe('when user is in the register form for birth event', async () => {
   const { store, history } = createStore()
   const draft = createDraft(Event.BIRTH)
+  store.dispatch(storeDraft(draft))
   store.dispatch(setInitialDrafts())
   store.dispatch(storeDraft(draft))
   let component: ReactWrapper<{}, {}>
