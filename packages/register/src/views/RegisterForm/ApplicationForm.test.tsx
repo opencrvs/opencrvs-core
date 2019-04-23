@@ -100,19 +100,20 @@ describe('when user has starts a new application', () => {
     })
 
     describe('when user types in something', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#firstNames')
           .hostNodes()
           .simulate('change', {
             target: { id: 'firstNames', value: 'hello' }
           })
+        await flushPromises()
+        app.update()
       })
       it('stores the value to a new draft', () => {
-        const [, data] = (storage.setItem as jest.Mock).mock.calls[
-          (storage.setItem as jest.Mock).mock.calls.length - 1
-        ]
-        const storedDrafts = JSON.parse(data)
+        const mockCalls = (storage.setItem as jest.Mock).mock.calls
+        const userData = mockCalls[mockCalls.length - 1]
+        const storedDrafts = JSON.parse(userData[userData.length - 1])[0].drafts
         expect(storedDrafts[0].data.child.firstNames).toEqual('hello')
       })
     })

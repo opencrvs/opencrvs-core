@@ -3,6 +3,7 @@ import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { IUserDetails } from 'src/utils/userUtils'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
@@ -35,7 +36,7 @@ interface IModifyDraftAction {
   }
 }
 
-interface IWriteDraftAction {
+export interface IWriteDraftAction {
   type: typeof WRITE_DRAFT
   payload: {
     draft: IDraftsState
@@ -62,7 +63,7 @@ interface IGetStorageDraftsFailedAction {
   type: typeof GET_DRAFTS_FAILED
 }
 
-type Action =
+export type Action =
   | IStoreDraftAction
   | IModifyDraftAction
   | ISetInitialDraftsAction
@@ -72,12 +73,19 @@ type Action =
   | IGetStorageDraftsSuccessAction
   | IGetStorageDraftsFailedAction
 
+export interface IUserData {
+  userID: string
+  drafts: IDraft[]
+}
+
 export interface IDraftsState {
+  userID: string
   initialDraftsLoaded: boolean
   drafts: IDraft[]
 }
 
 const initialState = {
+  userID: '',
   initialDraftsLoaded: false,
   drafts: []
 }
@@ -149,37 +157,38 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
     case STORE_DRAFT:
       const stateAfterDraftStore = {
         ...state,
-        drafts: state.drafts.concat(action.payload.draft)
+        drafts: state.drafts
+          ? state.drafts.concat(action.payload.draft)
+          : [action.payload.draft]
       }
       return loop(
         stateAfterDraftStore,
         Cmd.action(writeDraft(stateAfterDraftStore))
       )
     case DELETE_DRAFT:
-      const deleteIndex = state.drafts.findIndex(draft => {
-        return draft.id === action.payload.draft.id
-      })
+      const deleteIndex = state.drafts
+        ? state.drafts.findIndex(draft => draft.id === action.payload.draft.id)
+        : -1
       if (deleteIndex >= 0) {
         state.drafts.splice(deleteIndex, 1)
       }
       const stateAfterDraftDeletion = {
         ...state,
-        drafts: state.drafts
+        drafts: state.drafts || []
       }
       return loop(
         stateAfterDraftDeletion,
         Cmd.action(writeDraft(stateAfterDraftDeletion))
       )
     case MODIFY_DRAFT:
+      const newDrafts: IDraft[] = state.drafts || []
+      const currentDraftIndex = newDrafts.findIndex(
+        draft => draft.id === action.payload.draft.id
+      )
+      newDrafts[currentDraftIndex] = action.payload.draft
       const stateAfterDraftModification = {
         ...state,
-        drafts: state.drafts.map(draft => {
-          // TODO could improve this by saving drafts as a map
-          if (draft.id === action.payload.draft.id) {
-            return action.payload.draft
-          }
-          return draft
-        })
+        drafts: newDrafts
       }
       return loop(
         stateAfterDraftModification,
@@ -187,7 +196,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       )
     case WRITE_DRAFT:
       if (state.initialDraftsLoaded && state.drafts) {
-        storage.setItem('drafts', JSON.stringify(action.payload.draft.drafts))
+        writeDraftByUser(action.payload.draft)
       }
       return state
     case SET_INITIAL_DRAFTS:
@@ -196,23 +205,88 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
           ...state
         },
         Cmd.run<IGetStorageDraftsSuccessAction | IGetStorageDraftsFailedAction>(
-          storage.getItem,
+          getDraftsOfCurrentUser,
           {
             successActionCreator: getStorageDraftsSuccess,
             failActionCreator: getStorageDraftsFailed,
-            args: ['drafts']
+            args: []
           }
         )
       )
     case GET_DRAFTS_SUCCESS:
-      const draftsString = action.payload
-      const drafts = JSON.parse(draftsString ? draftsString : '[]')
+      if (action.payload) {
+        const idDrafts = JSON.parse(action.payload) as IUserData
+        return {
+          ...state,
+          userID: idDrafts.userID,
+          drafts: idDrafts.drafts,
+          initialDraftsLoaded: true
+        }
+      }
       return {
         ...state,
-        drafts,
         initialDraftsLoaded: true
       }
     default:
       return state
   }
+}
+
+export async function getDraftsOfCurrentUser(): Promise<string> {
+  // returns a 'stringified' IUserData
+  const storageTable = await storage.getItem('USER_DATA')
+  if (!storageTable) {
+    return '{}'
+  }
+
+  const currentUserID = await getCurrentUserID()
+  const allUserData = JSON.parse(storageTable) as IUserData[]
+  if (!allUserData.length) {
+    // No user-data at all
+    const payloadWithoutDrafts: IUserData = {
+      userID: currentUserID,
+      drafts: []
+    }
+    return JSON.stringify(payloadWithoutDrafts)
+  }
+
+  const currentUserData = allUserData.find(
+    uData => uData.userID === currentUserID
+  )
+  const currentUserDrafts: IDraft[] =
+    (currentUserData && currentUserData.drafts) || []
+  const payload: IUserData = {
+    userID: currentUserID,
+    drafts: currentUserDrafts
+  }
+  return JSON.stringify(payload)
+}
+
+export async function writeDraftByUser(draftsState: IDraftsState) {
+  const uID = draftsState.userID || (await getCurrentUserID())
+  const str = await storage.getItem('USER_DATA')
+  if (!str) {
+    // No storage option found
+    storage.configStorage('OpenCRVS')
+  }
+  const allUserData: IUserData[] = !str ? [] : (JSON.parse(str) as IUserData[])
+  const currentUserData = allUserData.find(uData => uData.userID === uID)
+
+  if (currentUserData) {
+    currentUserData.drafts = draftsState.drafts
+  } else {
+    allUserData.push({
+      userID: uID,
+      drafts: draftsState.drafts
+    })
+  }
+  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+}
+
+export async function getCurrentUserID(): Promise<string> {
+  const str = await storage.getItem('USER_DETAILS')
+  if (!str) {
+    return ''
+  }
+  return (JSON.parse(str) as IUserDetails).userMgntUserID || ''
 }
