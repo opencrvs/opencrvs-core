@@ -2,7 +2,8 @@ import { readPoints } from 'src/influxdb/client'
 import {
   ageIntervals,
   calculateInterval,
-  IPoint
+  IPoint,
+  LABEL_FOMRAT
 } from 'src/features/registration/metrics/utils'
 import * as moment from 'moment'
 
@@ -41,11 +42,12 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
         count: total.count + point.count
       }))) ||
     0
+  const label = LABEL_FOMRAT[interval]
 
   return (
     (points &&
       points.map((point: IPoint) => ({
-        label: moment(point.time).format('MMMM'),
+        label: moment(point.time).format(label),
         value: point.count,
         total: total.count
       }))) ||
