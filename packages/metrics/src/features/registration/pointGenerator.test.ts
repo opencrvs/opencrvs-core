@@ -1,7 +1,8 @@
 import { generateBirthRegPoint } from './pointGenerator'
+import * as fetch from 'jest-fetch-mock'
 
 describe('Verify point generation', () => {
-  it('Return valid birth registration point to insert in influx', () => {
+  it('Return valid birth registration point to insert in influx', async () => {
     const payload = {
       resourceType: 'Bundle',
       type: 'document',
@@ -245,14 +246,45 @@ describe('Verify point generation', () => {
     }
 
     Date.now = jest.fn(() => 1552380296600) // 12-03-2019
-    const point = generateBirthRegPoint(payload, 'update-reg')
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          id: '1',
+          partOf: {
+            reference: 'Location/4'
+          }
+        })
+      ],
+      [
+        JSON.stringify({
+          id: '2',
+          partOf: {
+            reference: 'Location/3'
+          }
+        })
+      ],
+      [
+        JSON.stringify({
+          id: '3',
+          partOf: {
+            reference: 'Location/2'
+          }
+        })
+      ]
+    )
+    const point = await generateBirthRegPoint(payload, 'update-reg', {
+      Authorization: 'Bearer mock-token'
+    })
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: { reg_status: 'update-reg' },
       fields: {
         current_status: 'registered',
         gender: 'male',
-        location: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
+        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
         age_in_days: 435
       }
     })
@@ -484,8 +516,12 @@ describe('Verify point generation', () => {
       }
     }
 
-    expect(() => {
-      generateBirthRegPoint(payload, 'update-reg')
-    }).toThrow()
+    expect(
+      generateBirthRegPoint(payload, 'update-reg', {
+        Authorization: 'Bearer mock-token'
+      })
+    ).rejects.toThrowError(
+      'Patient referenced from composition section not found in FHIR bundle'
+    )
   })
 })
