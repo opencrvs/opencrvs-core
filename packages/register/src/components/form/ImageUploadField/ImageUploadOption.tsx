@@ -62,7 +62,7 @@ type IProps = {
   toggleNestedSection: () => void
 }
 
-function getBase64String(file: File) {
+const getBase64String = (file: File) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
