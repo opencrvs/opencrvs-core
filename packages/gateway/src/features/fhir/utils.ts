@@ -736,7 +736,7 @@ export const getMetrics = (authHeader: IAuthHeader, timeRange: ITimeRange) => {
     })
     .catch(error => {
       return Promise.reject(
-        new Error(`Metric request failed: ${error.message}`)
+        new Error(`Metrics request failed: ${error.message}`)
       )
     })
 }
