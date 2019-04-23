@@ -48,19 +48,9 @@
       hour: "0"
       job: "/usr/bin/docker system prune -f >> /var/log/docker-prune.log"
 
-  - name: "Create mongo1 data directory"
+  - name: "Create mongo data directory"
     file:
-      path: /data/mongo1
-      state: directory
-
-  - name: "Create mongo2 data directory"
-    file:
-      path: /data/mongo2
-      state: directory
-
-  - name: "Create mongo3 data directory"
-    file:
-      path: /data/mongo3
+      path: /data/mongo
       state: directory
 
   - name: "Create traefik data directory"

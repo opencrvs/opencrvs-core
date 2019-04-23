@@ -26,7 +26,7 @@ services:
   mongo1:
     command: --replSet rs0
     volumes:
-      - '/data/mongo1:/data/db'
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
     command: --replSet rs0
     volumes:
-      - '/data/mongo2:/data/db'
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
     command: --replSet rs0
     volumes:
-      - '/data/mongo3:/data/db'
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
