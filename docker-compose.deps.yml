@@ -1,16 +1,9 @@
 version: '3.3'
 
 services:
-  mongo:
+  mongo1:
     image: mongo:3.6
     restart: unless-stopped
-    volumes:
-      - '/data/mongo:/data/db'
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       - overlay_net
 
@@ -23,62 +16,44 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
     restart: unless-stopped
-    volumes:
-      - '/data/elasticsearch:/usr/share/elasticsearch/data'
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       - overlay_net
 
   influxdb:
     image: influxdb:1.7
     restart: unless-stopped
-    volumes:
-      - '/data/influxdb:/var/lib/influxdb'
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       - overlay_net
 
   hearth:
     image: jembi/hearth:v1.0.0-beta.1
     environment:
-      - mongodb__url=mongodb://mongo/hearth-dev
+      - mongodb__url=mongodb://mongo1/hearth-dev
       - logger__level=error
       - authentication__type=disabled
       - idGenerator=uuidv4
       - server__fhirVersion=stu3
+    depends_on:
+      - mongo1
     restart: unless-stopped
-    deploy:
-      replicas: 2
     networks:
       - overlay_net
 
   openhim-core:
     image: jembi/openhim-core:5
     environment:
-      - mongo_url=mongodb://mongo/openhim-dev
-      - mongo_atnaUrl=mongodb://mongo/openhim-dev
+      - mongo_url=mongodb://mongo1/openhim-dev
+      - mongo_atnaUrl=mongodb://mongo1/openhim-dev
       - logger_level=error
     depends_on:
-      - mongo
+      - mongo1
     restart: unless-stopped
-    deploy:
-      replicas: 2
     networks:
       - overlay_net
 
   openhim-console:
     image: jembi/openhim-console:1.13
     restart: unless-stopped
-    deploy:
-      replicas: 2
     networks:
       - overlay_net
 

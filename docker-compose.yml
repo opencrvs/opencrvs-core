@@ -81,7 +81,7 @@ services:
     build: packages/user-mgnt
     restart: unless-stopped
     environment:
-      - MONGO_URL=mongodb://mongo/user-mgnt
+      - MONGO_URL=mongodb://mongo1/user-mgnt
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
