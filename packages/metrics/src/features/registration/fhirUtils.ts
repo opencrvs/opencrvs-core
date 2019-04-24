@@ -1,3 +1,7 @@
+import fetch from 'node-fetch'
+import { IAuthHeader } from '.'
+import { fhirUrl } from 'src/constants'
+
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
   sectionCode: string
@@ -54,6 +58,14 @@ export function getRegLastLocation(bundle: fhir.Bundle) {
   )
 }
 
+export async function fetchParentLocationByLocationID(
+  locationID: string,
+  authHeader: IAuthHeader
+) {
+  const location = await fetchFHIR(locationID, authHeader)
+  return location && location.partOf && location.partOf.reference
+}
+
 export function getResourceByType(
   bundle: fhir.Bundle,
   type: string
@@ -74,4 +86,26 @@ export function getResourceByType(
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
   TASK = 'Task'
+}
+
+export const fetchFHIR = (
+  suffix: string,
+  authHeader: IAuthHeader,
+  method: string = 'GET',
+  body: string | undefined = undefined
+) => {
+  return fetch(`${fhirUrl}${suffix}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      ...authHeader
+    },
+    body
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
 }

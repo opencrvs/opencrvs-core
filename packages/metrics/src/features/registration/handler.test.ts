@@ -1,10 +1,48 @@
 import { createServer } from '../../index'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
+import * as fetch from 'jest-fetch-mock'
 
 describe('Verify handler', () => {
   let server: any
+  const token = jwt.sign(
+    { scope: ['declare'] },
+    readFileSync('../auth/test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:metrics-user'
+    }
+  )
 
   beforeEach(async () => {
     server = await createServer()
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          id: '1',
+          partOf: {
+            reference: 'Location/4'
+          }
+        })
+      ],
+      [
+        JSON.stringify({
+          id: '2',
+          partOf: {
+            reference: 'Location/3'
+          }
+        })
+      ],
+      [
+        JSON.stringify({
+          id: '3',
+          partOf: {
+            reference: 'Location/2'
+          }
+        })
+      ]
+    )
   })
 
   it('returns ok for valid new birth registration', async () => {
@@ -252,6 +290,9 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/new-registration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       payload
     })
 
@@ -502,6 +543,9 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/registration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       payload
     })
 
@@ -736,6 +780,9 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/new-registration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       payload
     })
 
@@ -970,6 +1017,9 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/events/birth/registration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       payload
     })
 

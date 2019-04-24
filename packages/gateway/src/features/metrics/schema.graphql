@@ -1,10 +1,17 @@
 type BirthRegistrationMetrics {
   regByAge: [BirthRegistrationByAgeMetrics]
+  regWithin45d: [BirthRegistrationWithIn45D]
 }
 
 type BirthRegistrationByAgeMetrics {
   label: String
   value: Int
+}
+
+type BirthRegistrationWithIn45D {
+  label: String
+  value: Int
+  total: Int
 }
 
 type Query {

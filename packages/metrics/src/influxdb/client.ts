@@ -9,7 +9,10 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'birth_reg',
       fields: {
-        location: Influx.FieldType.STRING,
+        locationLevel5: Influx.FieldType.STRING,
+        locationLevel4: Influx.FieldType.STRING,
+        locationLevel3: Influx.FieldType.STRING,
+        locationLevel2: Influx.FieldType.STRING,
         current_status: Influx.FieldType.STRING,
         gender: Influx.FieldType.STRING,
         age_in_days: Influx.FieldType.INTEGER
