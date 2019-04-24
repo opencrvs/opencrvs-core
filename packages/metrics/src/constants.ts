@@ -1,6 +1,6 @@
 export const HOST = process.env.METRICS_HOST || '0.0.0.0'
 export const PORT = process.env.METRICS_PORT || 1050
-export const fhirUrl = process.env.FHIR_URL || 'http://localhost:5001/fhir'
+export const fhirUrl = process.env.FHIR_URL || 'http://localhost:5001/fhir/'
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 export const CERT_PUBLIC_KEY_PATH =

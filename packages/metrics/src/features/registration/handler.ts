@@ -10,7 +10,9 @@ export async function newBirthRegistrationHandler(
   const points = []
   try {
     points.push(
-      generateBirthRegPoint(request.payload as fhir.Bundle, 'new-reg')
+      await generateBirthRegPoint(request.payload as fhir.Bundle, 'new-reg', {
+        Authorization: request.headers.authorization
+      })
     )
     writePoints(points)
   } catch (err) {
@@ -27,7 +29,13 @@ export async function birthRegistrationHandler(
   const points = []
   try {
     points.push(
-      generateBirthRegPoint(request.payload as fhir.Bundle, 'update-reg')
+      await generateBirthRegPoint(
+        request.payload as fhir.Bundle,
+        'update-reg',
+        {
+          Authorization: request.headers.authorization
+        }
+      )
     )
     writePoints(points)
   } catch (err) {
