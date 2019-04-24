@@ -7,7 +7,7 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { getUserDetails } from 'src/profile/profileSelectors'
-import { IUserDetails } from '../../utils/userUtils'
+import { IUserDetails, getCurrentUserID } from '../../utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
@@ -15,7 +15,7 @@ import * as bcrypt from 'bcryptjs'
 import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
-import { getCurrentUserID, IUserData } from 'src/drafts'
+import { IUserData } from 'src/drafts'
 
 const messages = defineMessages({
   incorrect: {

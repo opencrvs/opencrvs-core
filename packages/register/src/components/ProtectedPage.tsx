@@ -6,7 +6,8 @@ import { storage } from 'src/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from 'src/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-import { IUserData, getCurrentUserID } from 'src/drafts'
+import { IUserData } from 'src/drafts'
+import { getCurrentUserID } from 'src/utils/userUtils'
 
 export const SCREEN_LOCK = 'screenLock'
 
@@ -68,6 +69,9 @@ class ProtectedPageComponent extends React.Component<
     const allUserData = JSON.parse(
       await storage.getItem('USER_DATA')
     ) as IUserData[]
+    if (!allUserData) {
+      return ''
+    }
     const currentUserData = allUserData.find(
       user => user.userID === currentUserID
     ) || { userPIN: '' }
