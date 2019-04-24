@@ -30,16 +30,19 @@ export default function getPlugins() {
           ]
         }
       }
-    },
-    {
+    }
+  ]
+
+  if (process.env.RATE_LIMIT !== 'false') {
+    plugins.push({
       plugin: Rate,
       options: {
         userAttribute: 'id',
         max: 2,
         duration: 60 * 1000 // per minute (the value is in milliseconds)
       }
-    }
-  ]
+    })
+  }
 
   return plugins
 }
