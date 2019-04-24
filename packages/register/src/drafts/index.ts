@@ -3,7 +3,7 @@ import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
-import { IUserDetails } from 'src/utils/userUtils'
+import { getCurrentUserID } from 'src/utils/userUtils'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
@@ -226,9 +226,10 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       }
       return {
         ...state,
-        initialDraftsLoaded: true
+        initialDraftsLoaded: false
       }
     default:
+      console.log('ACTION.TYPE', action.type)
       return state
   }
 }
@@ -282,12 +283,4 @@ export async function writeDraftByUser(draftsState: IDraftsState) {
     })
   }
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
-}
-
-export async function getCurrentUserID(): Promise<string> {
-  const str = await storage.getItem('USER_DETAILS')
-  if (!str) {
-    return ''
-  }
-  return (JSON.parse(str) as IUserDetails).userMgntUserID || ''
 }
