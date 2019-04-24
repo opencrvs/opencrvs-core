@@ -15,7 +15,6 @@ import {
   storeDraft,
   setInitialDrafts,
   IUserData,
-  getCurrentUserID,
   getDraftsOfCurrentUser,
   writeDraftByUser
 } from 'src/drafts'
@@ -36,7 +35,7 @@ import { clone } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from 'src/storage'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails, getCurrentUserID } from 'src/utils/userUtils'
 
 describe('when user logs in', async () => {
   // Some mock data
