@@ -9,6 +9,7 @@ import {
 } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
+import { withTheme } from 'styled-components'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { getUserDetails } from 'src/profile/selectors'
 import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
@@ -20,6 +21,12 @@ import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
 import { ICategoryDataPoint } from '@opencrvs/components/lib/charts/datapoint'
 import { Male, Female } from '@opencrvs/components/lib/icons'
+
+import { Query } from 'react-apollo'
+import * as Sentry from '@sentry/browser'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { FETCH_METRIC } from './queries'
 
 const messages = defineMessages({
   logoutActionTitle: {
@@ -154,6 +161,11 @@ const messages = defineMessages({
     id: 'performance.graph.category.gender.male',
     defaultMessage: 'Male',
     description: 'Label for gender category Male'
+  },
+  queryError: {
+    id: 'register.workQueue.queryError',
+    defaultMessage: 'An error occurred while searching',
+    description: 'The error message shown when a search query fails'
   }
 })
 
@@ -266,21 +278,6 @@ const birthRegistrationData = [
   { label: '10', value: 2570 }
 ]
 
-const birthRegistrationDataPerMonth = [
-  { label: 'Jan', value: 2100, totalEstimate: 10000 },
-  { label: 'Feb', value: 2400, totalEstimate: 10000 },
-  { label: 'Mar', value: 1398, totalEstimate: 10000 },
-  { label: 'Apr', value: 6800, totalEstimate: 10000 },
-  { label: 'May', value: 3908, totalEstimate: 10000 },
-  { label: 'Jun', value: 4800, totalEstimate: 10000 },
-  { label: 'Jul', value: 3800, totalEstimate: 10000 },
-  { label: 'Aug', value: 4300, totalEstimate: 10000 },
-  { label: 'Sep', value: 2500, totalEstimate: 10000 },
-  { label: 'Oct', value: 5680, totalEstimate: 10000 },
-  { label: 'Nov', value: 4980, totalEstimate: 10000 },
-  { label: 'Dec', value: 8570, totalEstimate: 10000 }
-]
-
 const BoxTitle = styled.div`
   line-height: 25px;
   text-transform: capitalize !important;
@@ -337,15 +334,26 @@ const Label = styled.div`
   }
 `
 interface IHomeProps {
+  theme: ITheme
   language: string
   userDetails: IUserDetails
 }
 
 type FullProps = IHomeProps & InjectedIntlProps
 
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
+`
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
+
 class HomeView extends React.Component<FullProps> {
   render() {
-    const { intl, language, userDetails } = this.props
+    const { intl, language, userDetails, theme } = this.props
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName) => storedName.use === language
@@ -365,48 +373,83 @@ class HomeView extends React.Component<FullProps> {
             id="home_view"
           />
           <Container>
-            <ChartContainer>
-              <BoxTitle id="box_title">
-                {intl.formatMessage(messages.birthRegistrationBoxTitle)}
-              </BoxTitle>
-              <Legend data={getData(intl)} smallestToLargest={false} />
-              <FooterText id="footer_text">
-                {intl.formatMessage(messages.birthRegistrationBoxFooter)}
-              </FooterText>
-            </ChartContainer>
-            <ChartContainer>
-              <BoxTitle id="bar_chart_box_title">
-                {intl.formatMessage(messages.birthRegistrationBarChartBoxTitle)}
-              </BoxTitle>
-              <VerticalBar
-                data={birthRegistrationData}
-                xAxisLabel={intl.formatMessage(
-                  messages.birthRegistrationBarChartInAgesLabel
-                )}
-                yAxisLabel={intl.formatMessage(
-                  messages.birthRegistrationPercentageLabel
-                )}
-              />
-            </ChartContainer>
-            <ChartContainer>
-              <BoxTitle id="line_chart_box_title">
-                {intl.formatMessage(
-                  messages.birthRegistrationRateWithin45DaysBoxTitle
-                )}
-              </BoxTitle>
-              <LabelContainer>
-                <Label>2018 estimate = 10000</Label>
-              </LabelContainer>
-              <Line
-                data={birthRegistrationDataPerMonth}
-                xAxisLabel={intl.formatMessage(
-                  messages.birthRegistrationRatePerMonthLabel
-                )}
-                yAxisLabel={intl.formatMessage(
-                  messages.birthRegistrationPercentageOfEstimateLabel
-                )}
-              />
-            </ChartContainer>
+            <Query
+              query={FETCH_METRIC}
+              variables={{
+                timeStart: '1524592800000',
+                timeEnd: '1556128800000'
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return (
+                    <StyledSpinner
+                      id="search-result-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
+                }
+                if (error) {
+                  Sentry.captureException(error)
+                  return (
+                    <ErrorText id="search-result-error-text-review">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+
+                return (
+                  <>
+                    <ChartContainer>
+                      <BoxTitle id="box_title">
+                        {intl.formatMessage(messages.birthRegistrationBoxTitle)}
+                      </BoxTitle>
+                      <Legend data={getData(intl)} smallestToLargest={false} />
+                      <FooterText id="footer_text">
+                        {intl.formatMessage(
+                          messages.birthRegistrationBoxFooter
+                        )}
+                      </FooterText>
+                    </ChartContainer>
+                    <ChartContainer>
+                      <BoxTitle id="bar_chart_box_title">
+                        {intl.formatMessage(
+                          messages.birthRegistrationBarChartBoxTitle
+                        )}
+                      </BoxTitle>
+                      <VerticalBar
+                        data={birthRegistrationData}
+                        xAxisLabel={intl.formatMessage(
+                          messages.birthRegistrationBarChartInAgesLabel
+                        )}
+                        yAxisLabel={intl.formatMessage(
+                          messages.birthRegistrationPercentageLabel
+                        )}
+                      />
+                    </ChartContainer>
+                    <ChartContainer>
+                      <BoxTitle id="line_chart_box_title">
+                        {intl.formatMessage(
+                          messages.birthRegistrationRateWithin45DaysBoxTitle
+                        )}
+                      </BoxTitle>
+                      <LabelContainer>
+                        <Label>2018 estimate = 10000</Label>
+                      </LabelContainer>
+                      <Line
+                        data={data.fetchBirthRegistrationMetrics.regWithin45d}
+                        xAxisLabel={intl.formatMessage(
+                          messages.birthRegistrationRatePerMonthLabel
+                        )}
+                        yAxisLabel={intl.formatMessage(
+                          messages.birthRegistrationPercentageOfEstimateLabel
+                        )}
+                      />
+                    </ChartContainer>
+                  </>
+                )
+              }}
+            </Query>
           </Container>
         </Page>
       )
@@ -424,4 +467,4 @@ const mapStateToProps = (store: IStoreState) => {
 export const Home = connect(
   mapStateToProps,
   null
-)(injectIntl(HomeView))
+)(injectIntl(withTheme(HomeView)))
