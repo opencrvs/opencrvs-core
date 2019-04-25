@@ -48,7 +48,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-light-webfont-en.ttf')
+    url('/fonts/notosans-regular-webfont-en.ttf')
       format('truetype');
     font-style: normal;
   }
@@ -73,7 +73,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   @font-face {
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
+      url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
       format('truetype');
     font-style: normal;
   }
