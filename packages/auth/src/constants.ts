@@ -38,3 +38,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:resources-user'
 ]
 export const JWT_ISSUER = 'opencrvs:auth-service'
+
+export const MAX_RATE_LIMIT = process.env.MAX_RATE_LIMIT || 10
+export const MAX_RATE_LIMIT_DURATION =
+  process.env.MAX_RATE_LIMIT_DURATION || 60 * 1000 // per minute (the value is in milliseconds)

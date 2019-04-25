@@ -63,12 +63,12 @@ export const messages = defineMessages({
     description:
       'The error that appears when the user entered sms code is unauthorised'
   },
-  tooManyAttemptError: {
-    id: 'login.tooManyAttemptError',
+  tooManyCodeAttemptError: {
+    id: 'login.tooManyCodeAttemptError',
     defaultMessage:
-      'Sorry you have reached your attempt up to 10 times. Please try again after 1 minute',
+      'Too many code entry attempts. You can try again after one minute.',
     description:
-      'The error that appears when the user attempts more than 10 times in a minute'
+      'The error that appears when the user PIN attempts more than 10 times in a minute'
   },
   resentSMS: {
     id: 'login.resentSMS',
@@ -185,7 +185,7 @@ export class StepTwoForm extends React.Component<
           {submissionError && (
             <ErrorMessage>
               {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
-                ? intl.formatMessage(messages.tooManyAttemptError)
+                ? intl.formatMessage(messages.tooManyCodeAttemptError)
                 : intl.formatMessage(messages.codeSubmissionError)}
             </ErrorMessage>
           )}
