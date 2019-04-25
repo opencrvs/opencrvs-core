@@ -1,5 +1,6 @@
 import * as Good from 'good'
 import * as Rate from 'hapi-rate-limitor'
+import { MAX_RATE_LIMIT, MAX_RATE_LIMIT_DURATION } from 'src/constants'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -38,8 +39,8 @@ export default function getPlugins() {
       plugin: Rate,
       options: {
         userAttribute: 'id',
-        max: 2,
-        duration: 60 * 1000 // per minute (the value is in milliseconds)
+        max: MAX_RATE_LIMIT,
+        duration: MAX_RATE_LIMIT_DURATION
       }
     })
   }
