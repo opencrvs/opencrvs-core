@@ -18,6 +18,7 @@ import { ENGLISH_STATE } from '@opencrvs/performance/src/i18n/locales/en'
 import { IntlProvider, intlShape } from 'react-intl'
 import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
 import { App } from '../App'
+import { MockedProvider } from 'react-apollo/test-utils'
 
 configure({ adapter: new Adapter() })
 
@@ -51,16 +52,19 @@ export function createShallowRenderedComponent(
 
 export function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore
+  store: AppStore,
+  graphqlMocks: any = null
 ) {
   const component = mount(
-    <Provider store={store}>
-      <I18nContainer>
-        <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
-          {nodeWithIntlProp(node)}
-        </ThemeProvider>
-      </I18nContainer>
-    </Provider>,
+    <MockedProvider mocks={graphqlMocks} addTypename={false}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
+            {nodeWithIntlProp(node)}
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    </MockedProvider>,
     {
       context: { intl },
       childContextTypes: { intl: intlShape }
