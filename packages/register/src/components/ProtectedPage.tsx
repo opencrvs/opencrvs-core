@@ -63,13 +63,15 @@ class ProtectedPageComponent extends React.Component<
     this.setState({ secured: true, pinExists: true })
     storage.removeItem(SCREEN_LOCK)
   }
-  /* eventually we will take this pin from current user-details */
+
   async getPIN() {
     const currentUserID = await getCurrentUserID()
-    const allUserData = JSON.parse(
-      await storage.getItem('USER_DATA')
-    ) as IUserData[]
-    if (!allUserData) {
+    const userData = await storage.getItem('USER_DATA')
+    if (!userData) {
+      return ''
+    }
+    const allUserData = JSON.parse(userData) as IUserData[]
+    if (!allUserData || !allUserData.length) {
       return ''
     }
     const currentUserData = allUserData.find(
