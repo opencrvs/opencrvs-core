@@ -229,7 +229,6 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
         initialDraftsLoaded: false
       }
     default:
-      console.log('ACTION.TYPE', action.type)
       return state
   }
 }
@@ -241,7 +240,13 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
     return '{}'
   }
 
-  const currentUserID = await getCurrentUserID()
+  let currentUserID = await storage.getItem('USER_ID')
+  if (!currentUserID) {
+    currentUserID = await getCurrentUserID() // get user-id the old-fashioned way
+  } else {
+    await storage.removeItem('USER_ID') // delete the temporary storage
+  }
+
   const allUserData = JSON.parse(storageTable) as IUserData[]
   if (!allUserData.length) {
     // No user-data at all
