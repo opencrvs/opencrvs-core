@@ -38,13 +38,14 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
     background: ${({ theme }) => theme.colors.inputBackground};
     border-radius: 0;
     box-shadow: none;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 400px;
     padding: 0 5px;
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
+    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
       ${({ error, touched, theme }) =>
         error && touched ? theme.colors.error : theme.colors.secondary};
     &:hover {
-      border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
+      border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
         ${({ error, touched, theme }) =>
           error && touched ? theme.colors.error : theme.colors.secondary};
     }
@@ -60,8 +61,8 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
-    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.creamCan};
+    border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
       ${({ theme }) => theme.colors.secondary};
   }
 
