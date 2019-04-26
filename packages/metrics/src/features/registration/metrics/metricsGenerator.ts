@@ -49,7 +49,7 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
       points.map((point: IPoint) => ({
         label: moment(point.time).format(label),
         value: point.count,
-        total: total.count
+        totalEstimate: total.count
       }))) ||
     []
   )
