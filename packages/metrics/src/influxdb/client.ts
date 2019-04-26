@@ -14,10 +14,9 @@ export const influx = new Influx.InfluxDB({
         locationLevel3: Influx.FieldType.STRING,
         locationLevel2: Influx.FieldType.STRING,
         current_status: Influx.FieldType.STRING,
-        gender: Influx.FieldType.STRING,
         age_in_days: Influx.FieldType.INTEGER
       },
-      tags: ['reg_status']
+      tags: ['reg_status', 'gender']
     }
   ]
 })
