@@ -29,8 +29,7 @@ export const stepOneFields = {
     disabled: false,
     type: 'tel',
     focusInput: false,
-    label: messages.mobileLabel,
-    placeholder: messages.mobilePlaceholder
+    label: messages.mobileLabel
   },
   password: {
     id: 'password',
