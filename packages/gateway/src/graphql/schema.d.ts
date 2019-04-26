@@ -493,8 +493,21 @@ export interface GQLRegistrationSearchSet {
 }
 
 export interface GQLBirthRegistrationMetrics {
+  keyFigures?: Array<GQLBirthKeyFigures | null>
   regByAge?: Array<GQLBirthRegistrationByAgeMetrics | null>
   regWithin45d?: Array<GQLBirthRegistrationWithIn45D | null>
+}
+
+export interface GQLBirthKeyFigures {
+  label?: string
+  value?: number
+  total?: number
+  categoricalData?: Array<GQLBirthKeyFiguresData | null>
+}
+
+export interface GQLBirthKeyFiguresData {
+  name?: string
+  value?: number
 }
 
 export interface GQLBirthRegistrationByAgeMetrics {
@@ -784,6 +797,8 @@ export interface GQLResolver {
 
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
+  BirthKeyFigures?: GQLBirthKeyFiguresTypeResolver
+  BirthKeyFiguresData?: GQLBirthKeyFiguresDataTypeResolver
   BirthRegistrationByAgeMetrics?: GQLBirthRegistrationByAgeMetricsTypeResolver
   BirthRegistrationWithIn45D?: GQLBirthRegistrationWithIn45DTypeResolver
   Mutation?: GQLMutationTypeResolver
@@ -1059,8 +1074,9 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToFetchBirthRegistrationMetricsArgs {
-  timeStart?: string
-  timeEnd?: string
+  timeStart: string
+  timeEnd: string
+  locationId: string
 }
 export interface QueryToFetchBirthRegistrationMetricsResolver<
   TParent = any,
@@ -2216,8 +2232,16 @@ export interface RegistrationSearchSetToCommentResolver<
 }
 
 export interface GQLBirthRegistrationMetricsTypeResolver<TParent = any> {
+  keyFigures?: BirthRegistrationMetricsToKeyFiguresResolver<TParent>
   regByAge?: BirthRegistrationMetricsToRegByAgeResolver<TParent>
   regWithin45d?: BirthRegistrationMetricsToRegWithin45dResolver<TParent>
+}
+
+export interface BirthRegistrationMetricsToKeyFiguresResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface BirthRegistrationMetricsToRegByAgeResolver<
@@ -2228,6 +2252,51 @@ export interface BirthRegistrationMetricsToRegByAgeResolver<
 }
 
 export interface BirthRegistrationMetricsToRegWithin45dResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthKeyFiguresTypeResolver<TParent = any> {
+  label?: BirthKeyFiguresToLabelResolver<TParent>
+  value?: BirthKeyFiguresToValueResolver<TParent>
+  total?: BirthKeyFiguresToTotalResolver<TParent>
+  categoricalData?: BirthKeyFiguresToCategoricalDataResolver<TParent>
+}
+
+export interface BirthKeyFiguresToLabelResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthKeyFiguresToValueResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthKeyFiguresToTotalResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthKeyFiguresToCategoricalDataResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthKeyFiguresDataTypeResolver<TParent = any> {
+  name?: BirthKeyFiguresDataToNameResolver<TParent>
+  value?: BirthKeyFiguresDataToValueResolver<TParent>
+}
+
+export interface BirthKeyFiguresDataToNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthKeyFiguresDataToValueResolver<
   TParent = any,
   TResult = any
 > {
