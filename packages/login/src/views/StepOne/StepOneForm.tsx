@@ -179,7 +179,6 @@ const MobileInput = injectIntl((props: Props) => {
         touched={Boolean(meta.touched)}
         error={Boolean(meta.error)}
         type="tel"
-        placeholder={intl.formatMessage(mobileField.placeholder)}
         ignoreMediaQuery
       />
     </InputField>
