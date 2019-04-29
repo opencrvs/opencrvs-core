@@ -15,6 +15,7 @@ export const ENGLISH_STATE = {
       'Too many login attempts. You can try again after one minute.',
     'login.tooManyCodeAttemptError':
       'Too many code entry attempts. You can try again after one minute.',
+    'login.fieldMissing': 'Mobile No/Password required',
     'login.resentSMS': 'We just resent you another code to {number}',
     'login.stepTwoResendTitle': 'Verification code resent',
     'login.resendMobile': 'Resend SMS',

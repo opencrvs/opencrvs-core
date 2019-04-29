@@ -16,6 +16,7 @@ export const BENGALI_STATE = {
     'login.tooManyCodeAttemptError':
       'আপনি অধিক সংখ্যক ভুল কোড দিয়েছেন। ১ মিনিট পর আবার চেষ্টা করুন।',
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
+    'login.fieldMissing': 'মোবাইল নম্বর/পাসওয়ার্ড দিতে হবে',
     'login.resentSMS':
       'আমরা আপনার মোবাইল নম্বর, {number} তে একটি নতুন এসএমএস প্রেরণ করেছি',
     'login.stepTwoResendTitle': 'ভেরিফিকেশন কোড পুনঃপ্রেরণ',
