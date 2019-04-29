@@ -50,6 +50,12 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           args: [action.payload]
         })
       )
+    case actions.AUTHENTICATE_VALIDATE:
+      return {
+        ...state,
+        submissionError: true,
+        errorCode: action.payload
+      }
     case actions.AUTHENTICATION_FAILED:
       return {
         ...state,

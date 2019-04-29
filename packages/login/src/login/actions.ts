@@ -6,6 +6,7 @@ import {
   IAuthenticationData,
   ITokenResponse
 } from '../utils/authApi'
+import { phoneNumberFormat } from 'src/utils/validate'
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
@@ -17,12 +18,16 @@ export const VERIFY_CODE_FAILED = 'login/VERIFY_CODE_FAILED'
 export const RESEND_SMS = 'login/RESEND_SMS'
 export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
 export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
-
+export const AUTHENTICATE_VALIDATE = 'login/AUTHENTICATE_VALIDATE'
 export const GOTO_APP = 'login/GOTO_APP'
 
 export type AuthenticationDataAction = {
   type: typeof AUTHENTICATE
   payload: IAuthenticationData
+}
+export type AuthenticationFieldValidationAction = {
+  type: typeof AUTHENTICATE_VALIDATE
+  payload: number
 }
 
 export type AuthenticateResponseAction = {
@@ -81,10 +86,24 @@ export type Action =
   | VerifyCodeCompleteAction
   | VerifyCodeFailedAction
   | GoToAppAction
+  | AuthenticationFieldValidationAction
 
 export const authenticate = (
   values: IAuthenticationData
-): AuthenticationDataAction => {
+): AuthenticationDataAction | AuthenticationFieldValidationAction => {
+  if (!values.mobile || !values.password) {
+    return {
+      type: AUTHENTICATE_VALIDATE,
+      payload: 500
+    }
+  }
+  const validate = phoneNumberFormat(values.mobile)
+  if (validate) {
+    return {
+      type: AUTHENTICATE_VALIDATE,
+      payload: 503
+    }
+  }
   const cleanedData = {
     mobile: convertToMSISDN(values.mobile, window.config.COUNTRY),
     password: values.password
