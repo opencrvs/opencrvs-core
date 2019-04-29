@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
@@ -17,7 +17,7 @@ export const OverlayContainer = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: ${({ theme }: any) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.background};
   z-index: 4;
   width: 100%;
   height: 100%;

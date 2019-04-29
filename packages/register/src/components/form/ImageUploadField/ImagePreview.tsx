@@ -1,11 +1,11 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { IFileValue } from 'forms'
 import { ActionPage } from '@opencrvs/components/lib/interface'
 import { OverlayContainer } from './ImageUploadOption'
 
 const PreviewContainer = styled(OverlayContainer)`
-  background: ${({ theme }: any) => theme.colors.black};
+  background: ${({ theme }) => theme.colors.black};
 `
 const ImageHolder = styled.div`
   position: relative;

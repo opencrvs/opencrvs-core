@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import {
   OffLineCircled,
   Rejected,
@@ -79,8 +79,8 @@ const Container = styled.div`
   max-width: 940px;
 `
 const StyledP = styled.p`
-  color: ${({ theme }: any) => theme.colors.copy};
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
@@ -88,14 +88,14 @@ const StyledP = styled.p`
 
 const SubmissionName = styled(StyledP)`
   margin-right: 4px;
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-right: 0px;
     text-align: center;
   }
 `
 
 const SubmissionText = styled(StyledP)`
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: -15px;
     text-align: center;
   }
@@ -139,25 +139,25 @@ const BoxIconDiv = styled.div`
   display: flex;
   justify-content: center;
   width: 100px;
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
 `
 const BoxTextDiv = styled.div`
   display: flex;
   justify-content: center;
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
 `
 
 const TrackingHeader = styled.h3`
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
 `
 
 const TrackingNumber = styled.h1`
-  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 30px;
   margin-top: -15px;
 `

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '../../styled-components'
+import styled from 'styledComponents'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { countries } from 'forms/countries'
 import { identityNameMapper } from 'forms/identity'
@@ -56,14 +56,14 @@ const Wrapper = styled.div`
 const Label = styled.span`
   line-height: 29px;
   font-size: 16px;
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 
 const Text = styled.strong`
   line-height: 29px;
   font-size: 16px;
   margin-left: 10px;
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 
 const Divider = styled.div`

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { LogoutConfirmation } from 'components/LogoutConfirmation'
 import { redirectToAuthentication } from 'profile/profileActions'
 import { connect } from 'react-redux'
@@ -32,8 +32,8 @@ const messages = defineMessages({
 })
 
 const PageWrapper = styled.div`
-  font-family: ${({ theme }: any) => theme.fonts.boldFont};
-  background: ${({ theme }: any) =>
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  background: ${({ theme }) =>
     `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
       theme.colors.headerGradientLight
     } 100%);`};
@@ -46,7 +46,7 @@ const PageWrapper = styled.div`
 `
 const LogoutHeader = styled.a`
   float: right;
-  color: ${({ theme }: any) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.white};
   display: flex;
   position: absolute;
   top: 30px;
@@ -56,11 +56,11 @@ const LogoutHeader = styled.a`
   }
 `
 const Name = styled.p`
-  color: ${({ theme }: any) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.white};
 `
 const ErrorMsg = styled.div`
-  background-color: ${({ theme }: any) => theme.colors.danger};
-  color: ${({ theme }: any) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.white};
   padding: 10px 20px;
   text-align: center;
 `

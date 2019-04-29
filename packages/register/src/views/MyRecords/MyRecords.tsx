@@ -9,7 +9,7 @@ import {
   DataTable
 } from '@opencrvs/components/lib/interface'
 // import { Spinner } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 // import { Query } from 'react-apollo'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -23,17 +23,17 @@ import { IStoreState } from 'store'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const Container = styled.div`
-  margin: 0 ${({ theme }: any) => theme.grid.margin}px;
+  margin: 0 ${({ theme }) => theme.grid.margin}px;
 `
 // const StyledSpinner = styled(Spinner)`
 //   margin: 50% auto;
 // `
 const StyledPrimaryButton = styled(PrimaryButton)`
-  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  font-family: ${({ theme }) => theme.fonts.boldFont};
 `
 // const ErrorText = styled.div`
-//   color: ${({ theme }: any) => theme.colors.error};
-//   font-family: ${({ theme }: any) => theme.fonts.lightFont};
+//   color: ${({ theme }) => theme.colors.error};
+//   font-family: ${({ theme }) => theme.fonts.lightFont};
 //   text-align: center;
 //   margin-top: 100px;
 // `

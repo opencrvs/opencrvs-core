@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { IconAction } from '@opencrvs/components/lib/buttons'
 import { Camera } from '@opencrvs/components/lib/icons'
 import { IActionProps } from '@opencrvs/components/lib/buttons/Action'
@@ -12,7 +12,7 @@ import { ImagePreview } from './ImagePreview'
 
 const Container = styled.div`
   width: 100%;
-  border-bottom: 1px solid ${({ theme }: any) => theme.colors.background};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.background};
   padding-bottom: 35px;
 `
 const StyledIcon = styled(Camera)`
@@ -20,11 +20,11 @@ const StyledIcon = styled(Camera)`
   box-shadow: 0 0 4px 3px rgba(0, 0, 0, 0.1);
   height: 50px;
   width: 50px;
-  background-color: ${({ theme }: any) => theme.colors.accentLight};
+  background-color: ${({ theme }) => theme.colors.accentLight};
 `
 const PhotoIconAction = styled(IconAction)`
   outline-style: dashed;
-  outline-color: ${({ theme }: any) => theme.colors.accentLight};
+  outline-color: ${({ theme }) => theme.colors.accentLight};
   outline-width: 1px;
   min-height: 90px;
   /* stylelint-disable */
@@ -39,8 +39,8 @@ const FileViewer = styled.div`
   margin-top: 15px;
 `
 const FileViewerLabel = styled.label`
-  color: ${({ theme }: any) => theme.colors.primary};
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 const FileItemContainer = styled.div`
   margin-top: 12px;

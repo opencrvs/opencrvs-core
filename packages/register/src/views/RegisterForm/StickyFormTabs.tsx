@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as Sticky from 'react-stickynode'
 import { IFormSection } from '../../forms'
-import styled from '../../styled-components'
+import styled from 'styledComponents'
 import { FormTabs } from '../../components/form'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 
@@ -9,8 +9,8 @@ const StickyFormTabsContainer = styled.div`
   div.sticky-inner-wrapper {
     background: linear-gradient(
       270deg,
-      ${({ theme }: any) => theme.colors.headerGradientLight} 0%,
-      ${({ theme }: any) => theme.colors.headerGradientDark} 100%
+      ${({ theme }) => theme.colors.headerGradientLight} 0%,
+      ${({ theme }) => theme.colors.headerGradientDark} 100%
     );
   }
 `

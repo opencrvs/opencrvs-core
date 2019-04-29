@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const ConfirmButton = styled.a`
   text-decoration: underline;
-  color: ${({ theme }: any) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
 `
 const StyledModal = styled(Modal)`

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
@@ -65,28 +65,28 @@ const Backdrop = styled.div`
 const ModalContent = styled.div`
   width: 30vw;
   border-radius: 2px;
-  background-color: ${({ theme }: any) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.white};
   padding: 30px 30px 60px 30px;
-  color: ${({ theme }: any) => theme.colors.copy};
+  color: ${({ theme }) => theme.colors.copy};
   text-align: center;
   font-size: 14px;
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   position: relative;
 `
 
 const Heading = styled.div`
-  color: ${({ theme }: any) => theme.colors.copy};
+  color: ${({ theme }) => theme.colors.copy};
   text-align: center;
   font-size: 15px;
   font-weight: bold;
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 
 const Info = styled.div`
-  color: ${({ theme }: any) => theme.colors.copy};
+  color: ${({ theme }) => theme.colors.copy};
   text-align: center;
   font-size: 15px;
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -102,12 +102,12 @@ const ConfirmButton = styled.a`
   margin: 10px;
   display: block;
   text-decoration: underline;
-  color: ${({ theme }: any) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
 `
 const StyledPrimaryButton = styled(PrimaryButton)`
   display: block;
-  ${({ theme }: any) => {
+  ${({ theme }) => {
     return `@media (min-width: ${theme.grid.breakpoints.md}px) {
       width: 515px;
     }`

@@ -28,7 +28,7 @@ import {
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { Plus } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { IUserDetails } from '../../utils/userUtils'
 import { getUserDetails } from 'profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'

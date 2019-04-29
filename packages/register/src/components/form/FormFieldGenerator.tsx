@@ -29,7 +29,7 @@ import {
   getQueryData
 } from 'forms/utils'
 
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes } from 'styledComponents'
 
 import {
   IFormField,

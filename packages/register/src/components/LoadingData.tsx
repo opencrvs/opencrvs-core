@@ -5,7 +5,7 @@ import {
   defineMessages,
   FormattedMessage
 } from 'react-intl'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { IStoreState } from 'store'
 import { connect } from 'react-redux'

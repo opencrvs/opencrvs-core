@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { injectGlobal } from 'styled-components'
+import { injectGlobal } from 'styledComponents'
 import { App } from './App'
 import registerServiceWorker from './registerServiceWorker'
 import { createStore } from './store'

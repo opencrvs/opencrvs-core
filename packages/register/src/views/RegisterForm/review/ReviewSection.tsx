@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { SectionDrawer } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import { IDraft } from 'drafts'
 import { connect } from 'react-redux'
 import { IStoreState } from 'store'
@@ -132,7 +132,7 @@ const messages = defineMessages({
 
 const DrawerContainer = styled.div`
   margin-bottom: 11px;
-  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  font-family: ${({ theme }) => theme.fonts.boldFont};
 `
 const SectionRow = styled.p`
   padding: 0 24px;
@@ -141,7 +141,7 @@ const SectionRow = styled.p`
   }
 `
 const SectionLabel = styled.label`
-  color: ${({ theme }: any) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.placeholder};
   margin-right: 5px;
   &::after {
     content: ':';
@@ -149,14 +149,14 @@ const SectionLabel = styled.label`
 `
 const SectionValue = styled.span`
   font-weight: bold;
-  color: ${({ theme }: any) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.secondary};
 `
 const NextButton = styled(PrimaryButton)`
   margin: 15px 25px 30px;
   font-weight: bold;
 `
 const ButtonContainer = styled.div`
-  background-color: ${({ theme }: any) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.inputBackground};
   padding: 25px;
   margin-bottom: 2px;
 `
@@ -167,26 +167,26 @@ const RejectApplication = styled(IconAction)`
   padding: 0px;
   width: auto;
   div:first-of-type {
-    background: ${({ theme }: any) => theme.colors.rejectionIconColor};
+    background: ${({ theme }) => theme.colors.rejectionIconColor};
     padding: 15px 15px 10px;
     border-radius: 2px;
   }
   h3 {
-    font-family: ${({ theme }: any) => theme.fonts.boldFont};
+    font-family: ${({ theme }) => theme.fonts.boldFont};
     margin-left: 70px;
-    color: ${({ theme }: any) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
     font-size: 16px;
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }: any) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabledButton};
     }
     g {
-      fill: ${({ theme }: any) => theme.colors.disabled};
+      fill: ${({ theme }) => theme.colors.disabled};
     }
     h3 {
-      color: ${({ theme }: any) => theme.colors.disabled};
+      color: ${({ theme }) => theme.colors.disabled};
     }
   }
 `
@@ -199,15 +199,15 @@ const RegisterApplication = styled(PrimaryButton)`
     top: 2px;
   }
   &:disabled {
-    background: ${({ theme }: any) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.disabledButton};
     path {
-      stroke: ${({ theme }: any) => theme.colors.disabled};
+      stroke: ${({ theme }) => theme.colors.disabled};
     }
   }
 `
 const RequiredFieldLink = styled(Button)`
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
-  color: ${({ theme }: any) => theme.colors.danger};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
   text-decoration: underline;
   padding: 0;
   text-align: left;
@@ -215,7 +215,7 @@ const RequiredFieldLink = styled(Button)`
 const Row = styled.div`
   display: flex;
   flex: 1;
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column;
   }
 `
@@ -230,7 +230,7 @@ const Column = styled.div`
     margin-right: 0px;
   }
 
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 0px;
     width: 100%;
   }
@@ -238,7 +238,7 @@ const Column = styled.div`
 const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
   {}
 )`
-  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
   }
@@ -247,8 +247,8 @@ const DButtonContainer = styled(ButtonContainer)`
   background: transparent;
 `
 const DeleteApplication = styled.a`
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
-  color: ${({ theme }: any) => theme.colors.danger};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.danger};
   text-decoration: underline;
   cursor: pointer;
   svg {
@@ -256,8 +256,8 @@ const DeleteApplication = styled.a`
   }
 `
 const SaveDraftText = styled.span`
-  font-family: ${({ theme }: any) => theme.fonts.boldFont};
-  color: ${({ theme }: any) => theme.colors.secondary};
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }) => theme.colors.secondary};
   font-size: 14px;
   text-decoration: underline;
   letter-spacing: 0px;
@@ -265,7 +265,7 @@ const SaveDraftText = styled.span`
 `
 
 const DraftButtonContainer = styled.div`
-  background-color: ${({ theme }: any) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.inputBackground};
   min-height: 83px;
   display: flex;
   justify-content: flex-start;

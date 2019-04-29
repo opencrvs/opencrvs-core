@@ -7,7 +7,7 @@
  *
  * we import it from this module
  *
- * import styled from '../styled-components';
+ * import styled from 'styledComponents';
  */
 
 import * as styledComponents from 'styled-components'

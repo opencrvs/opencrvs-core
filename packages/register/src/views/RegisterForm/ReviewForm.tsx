@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { RegisterForm, IFormProps } from 'views/RegisterForm/RegisterForm'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -57,8 +57,8 @@ const StyledSpinner = styled(Spinner)`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }: any) => theme.colors.error};
-  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `

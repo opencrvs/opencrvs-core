@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { PIN } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
+import styled from 'styledComponents'
 import * as bcrypt from 'bcryptjs'
 import { storage } from 'storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
@@ -12,7 +12,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({ theme }: any) =>
+  background: ${({ theme }) =>
     `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
       theme.colors.headerGradientLight
     } 100%)`};
@@ -22,8 +22,8 @@ const Container = styled.div`
 `
 
 const TitleText = styled.span`
-  color: ${({ theme }: any) => theme.colors.white};
-  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.boldFont};
   text-align: center;
   font-size: 24px;
   margin-top: 24px;
@@ -31,8 +31,8 @@ const TitleText = styled.span`
 `
 
 const DescriptionText = styled.span`
-  color: ${({ theme }: any) => theme.colors.white};
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   text-align: center;
   font-size: 18px;
   max-width: 360px;
@@ -43,9 +43,9 @@ const ErrorBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }: any) => theme.colors.white};
-  font-family: ${({ theme }: any) => theme.fonts.regularFont};
-  background: ${({ theme }: any) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  background: ${({ theme }) => theme.colors.danger};
   height: 40px;
   width: 360px;
   margin-top: -30px;
