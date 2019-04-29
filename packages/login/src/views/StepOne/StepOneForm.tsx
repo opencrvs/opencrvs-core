@@ -18,8 +18,12 @@ import { stepOneFields } from './stepOneFields'
 import { IAuthenticationData } from '../../utils/authApi'
 import { localiseValidationError } from '../../forms/i18n'
 import { Logo } from '@opencrvs/components/lib/icons'
-import { ERROR_CODE_TOO_MANY_ATTEMPTS } from '../../utils/authUtils'
-
+import {
+  ERROR_CODE_TOO_MANY_ATTEMPTS,
+  ERROR_CODE_FIELD_MISSING,
+  ERROR_CODE_INVALID_CREDENTIALS,
+  ERROR_CODE_PHONE_NUMBER_VALIDATE
+} from '../../utils/authUtils'
 export const messages = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
@@ -73,6 +77,18 @@ export const messages = defineMessages({
     id: 'login.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
+  },
+  fieldMissing: {
+    id: 'login.fieldMissing',
+    defaultMessage: 'Mobile number and password must be provided',
+    description: "The error if user doesn't fill all the field"
+  },
+  phoneNumberFormat: {
+    id: 'validations.phoneNumberFormat',
+    defaultMessage:
+      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+    description:
+      'The error message that appears on phone numbers where the first character must be a 0'
   }
 })
 
@@ -234,11 +250,17 @@ export class StepOneForm extends React.Component<
           <Logo />
         </LogoContainer>
         <Title>
+          {console.log(errorCode)}
           {submissionError && (
             <ErrorText>
-              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
-                ? intl.formatMessage(messages.tooManyLoginAttemptError)
-                : intl.formatMessage(messages.submissionError)}
+              {errorCode === ERROR_CODE_FIELD_MISSING &&
+                intl.formatMessage(messages.fieldMissing)}
+              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS &&
+                intl.formatMessage(messages.tooManyLoginAttemptError)}
+              {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
+                intl.formatMessage(messages.submissionError)}
+              {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
+                intl.formatMessage(messages.phoneNumberFormat)}
             </ErrorText>
           )}
         </Title>
