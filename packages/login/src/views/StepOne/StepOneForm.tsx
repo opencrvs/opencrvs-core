@@ -251,9 +251,9 @@ export class StepOneForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <StyledPrimaryButton id="login-mobile-submit" type="submit">
+            <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
-            </StyledPrimaryButton>
+            </PrimaryButton>
             <StyledButton id="login-forgot-password" type="button">
               {intl.formatMessage(messages.forgotPassword)}
             </StyledButton>

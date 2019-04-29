@@ -18,7 +18,6 @@ import {
   ActionWrapper,
   Container,
   LogoContainer,
-  StyledPrimaryButton,
   StyledButton,
   FieldWrapper,
   ErrorText
@@ -27,6 +26,7 @@ import {
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 
 export const messages = defineMessages({
   stepTwoTitle: {
@@ -191,13 +191,13 @@ export class StepTwoForm extends React.Component<
           </FieldWrapper>
 
           <ActionWrapper>
-            <StyledPrimaryButton
+            <PrimaryButton
               id="login-mobile-submit"
               disabled={submitting}
               type="submit"
             >
               {intl.formatMessage(messages.submit)}
-            </StyledPrimaryButton>{' '}
+            </PrimaryButton>{' '}
             <br />
             <StyledButton
               onClick={this.props.onResendSMS}
