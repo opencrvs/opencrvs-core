@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import * as glob from 'glob'
+import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
 import { ENGLISH_STATE } from './i18n/locales/en'

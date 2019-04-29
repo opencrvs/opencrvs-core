@@ -32,7 +32,7 @@ import {
   ILocation
 } from 'offline/reducer'
 import { Validation } from 'utils/validate'
-import * as moment from 'moment'
+import moment from 'moment'
 import { IDynamicValues } from 'navigation'
 
 interface IRange {

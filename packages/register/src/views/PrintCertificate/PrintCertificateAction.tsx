@@ -31,7 +31,7 @@ import { IStoreState } from 'store'
 import { hasFormError } from 'forms/utils'
 import { calculatePrice } from './calculatePrice'
 import { Print } from '@opencrvs/components/lib/icons'
-import * as moment from 'moment'
+import moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import {

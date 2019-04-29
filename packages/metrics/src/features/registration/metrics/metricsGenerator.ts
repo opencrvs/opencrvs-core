@@ -5,7 +5,7 @@ import {
   IPoint,
   LABEL_FOMRAT
 } from 'src/features/registration/metrics/utils'
-import * as moment from 'moment'
+import * as moment  from 'moment'
 
 export async function regByAge(timeStart: string, timeEnd: string) {
   let metricsData: any[] = []

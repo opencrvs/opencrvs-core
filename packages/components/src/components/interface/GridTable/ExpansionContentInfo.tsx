@@ -71,7 +71,8 @@ const PaddedContent = styled.div`
   padding: 25px;
 `
 const BorderedPaddedContent = styled(PaddedContent)`
-  border-bottom: ${({ theme }: any) => `2px solid ${theme.colors.seperatorBorder}`};
+  border-bottom: ${({ theme }: any) =>
+    `2px solid ${theme.colors.seperatorBorder}`};
 `
 const HistoryWrapper = styled.div`
   padding: 10px 25px;

@@ -447,7 +447,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId
           }}
         >
-          {({ loading, error, data }) => {
+          {({ loading, error, data }: any) => {
             if (loading) {
               return <StyledSpinner id="review-duplicates-spinner" />
             }
@@ -494,7 +494,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   loading: loadingDetails,
                   error: errorDetails,
                   data: dataDetails
-                }) => {
+                }: any) => {
                   if (loadingDetails) {
                     return <StyledSpinner id="review-duplicates-spinner" />
                   }
@@ -556,9 +556,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: this.state.selectedCompositionID,
             reason: 'duplicate'
           }}
-          onCompleted={data => this.successfulRejection(data.markEventAsVoided)}
+          onCompleted={(data: any) =>
+            this.successfulRejection(data.markEventAsVoided)
+          }
         >
-          {submitEventAsRejected => {
+          {(submitEventAsRejected: any) => {
             return (
               <Modal
                 title={intl.formatMessage(messages.rejectDescription)}
@@ -595,11 +597,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId,
             duplicateId: this.state.selectedCompositionID
           }}
-          onCompleted={data =>
+          onCompleted={(data: any) =>
             this.successfulDuplicateRemoval(data.notADuplicate)
           }
         >
-          {(submitNotADuplicateMutation, { data }) => {
+          {({ submitNotADuplicateMutation }: any, { data }: any) => {
             return (
               <NotDuplicateConfirmation
                 handleYes={() => submitNotADuplicateMutation()}

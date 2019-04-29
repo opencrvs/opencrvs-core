@@ -104,14 +104,14 @@ const SubmissionText = styled(StyledP)`
 const TrackingBox = styled(Box)<StyleProps>`
   background: linear-gradient(
     137.89deg,
-    ${({ theme, offline }) =>
+    ${({ theme, offline }: any) =>
         offline ? theme.colors.disabled : theme.colors.primary}
       0%,
-    ${({ theme, offline }) =>
+    ${({ theme, offline }: any) =>
         offline ? theme.colors.white : theme.colors.accentLight}
       100%
   );
-  color: ${({ theme, offline }) =>
+  color: ${({ theme, offline }: any) =>
     offline ? theme.colors.offlineBoxTitle : theme.colors.white};
 
   text-align: center;
@@ -120,7 +120,7 @@ const TrackingBox = styled(Box)<StyleProps>`
   /* stylelint-disable */
   ${StyledP} {
     /* stylelint-enable */
-    color: ${({ theme, offline }) =>
+    color: ${({ theme, offline }: any) =>
       offline ? theme.colors.offlineBoxText : theme.colors.white};
   }
 `

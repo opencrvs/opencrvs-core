@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import * as moment  from 'moment'
 
 export function getAgeInDays(dob: string) {
   const todaysDate = moment(Date.now())

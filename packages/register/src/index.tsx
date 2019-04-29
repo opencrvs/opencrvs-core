@@ -20,9 +20,21 @@ injectGlobal`
   }
 `
 
+interface IConfig {
+  API_GATEWAY_URL: string
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  COUNTRY: string
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  LANGUAGE: string
+  LOGIN_URL: string
+  PERFORMANCE_URL: string
+  RESOURCES_URL: string
+  HEALTH_FACILITY_FILTER: string
+}
+
 declare global {
   interface Window {
-    config: any
+    config: IConfig
   }
 }
 

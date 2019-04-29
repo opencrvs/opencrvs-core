@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import * as moment  from 'moment'
 
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'

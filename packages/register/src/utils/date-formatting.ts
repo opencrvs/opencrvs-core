@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import moment from 'moment'
 
 const config: { [key: string]: moment.LocaleSpecification } = {
   en: {

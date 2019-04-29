@@ -16,7 +16,7 @@ import {
 } from 'navigation'
 import { IStoreState } from 'store'
 import { IDraft } from 'drafts'
-import * as moment from 'moment'
+import moment from 'moment'
 
 const Container = styled.div`
   margin: 0 ${({ theme }: any) => theme.grid.margin}px;

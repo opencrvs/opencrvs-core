@@ -33,7 +33,8 @@
     "webpack",
     "jest",
     "coverage",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "src/src-sw.js"
   ],
-  "include": ["src"]
+  "include": ["src", "typings"]
 }

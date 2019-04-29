@@ -175,7 +175,8 @@ const messages = defineMessages({
 })
 
 const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
-  border-top: ${({ theme }: any) => ` 4px solid ${theme.colors.expandedIndicator}`};
+  border-top: ${({ theme }: any) =>
+    ` 4px solid ${theme.colors.expandedIndicator}`};
   ${({ currentStatus }: any) =>
     currentStatus === 'rejected' ? `box-shadow: none` : ''}
 `
