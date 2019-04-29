@@ -5,7 +5,8 @@ import { Button, IButtonProps } from './Button'
 export const PrimaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
-  border: ${({ theme }) => theme.colors.white};
+  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  justify-content: center;
   border-radius: 2px;
   ${({ theme }) => theme.fonts.capsFontStyle};
 
@@ -15,12 +16,15 @@ export const PrimaryButton = styled(Button)`
       ${({ theme }) => theme.colors.primary}
     );
     color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => theme.colors.white};
+  }
+  &:focus {
+    outline: none;
   }
 
   &:active {
-    color: ${({ theme }) => theme.colors.accentGradientDark};
-    outline: none;
+    background: ${({ theme }) => theme.colors.primary};
+    padding: 0 32px;
+    border: 3px solid ${({ theme }) => theme.colors.creamCan};
   }
 
   &:disabled {
