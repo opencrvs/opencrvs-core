@@ -60,11 +60,7 @@ export const fonts = (country: string): IFonts => ({
     }
     letter-spacing: 0.1px;`,
   capsFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
-    font-weight: 300;
-    font-size: 14px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 16px;
-    }
+    font-size: 16px;
     letter-spacing: 2.5px;
     text-transform: uppercase;`,
   heavyFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
