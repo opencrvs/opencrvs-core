@@ -6,7 +6,7 @@ import {
   IAuthenticationData,
   ITokenResponse
 } from '../utils/authApi'
-import { phoneNumberFormat } from 'src/utils/validate'
+import { phoneNumberFormat } from '../utils/validate'
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
