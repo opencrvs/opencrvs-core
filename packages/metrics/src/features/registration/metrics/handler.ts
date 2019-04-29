@@ -12,7 +12,7 @@ export async function metricsHandler(
   try {
     const timeStart = request.query[TIME_FROM] + '000000'
     const timeEnd = request.query[TIME_TO] + '000000'
-    const locationId = 'Location/' + request.query[LOCATION_ID]
+    const locationId = request.query[LOCATION_ID]
     const authHeader: IAuthHeader = {
       Authorization: request.headers.authorization
     }

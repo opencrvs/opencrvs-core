@@ -24,5 +24,5 @@ export interface IAuthHeader {
 
 export interface IBirthRegistrationTags {
   reg_status: string
-  gender: string
+  gender: string | undefined
 }

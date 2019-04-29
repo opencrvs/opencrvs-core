@@ -15,7 +15,8 @@ import {
   MALE,
   FEMALE,
   WITHIN_45_DAYS,
-  WITHIN_1_YEAR
+  WITHIN_1_YEAR,
+  TIME_TO
 } from './constants'
 
 interface IGroupedByGender {
@@ -89,7 +90,7 @@ export async function fetchKeyFigures(
   locationId: string,
   authHeader: IAuthHeader
 ) {
-  const year = new Date(Number(timeEnd) / 100000).getFullYear().toString()
+  const year = new Date(Number(TIME_TO) / 100000).getFullYear().toString()
   const locationData: fhir.Location = await fetchFHIR(locationId, authHeader)
   const extensions = locationData.extension
   let crudBirthRate: number = 1
@@ -97,7 +98,7 @@ export async function fetchKeyFigures(
   let valueArray: any[]
 
   if (!extensions) {
-    return null
+    return []
   }
 
   extensions.forEach(extension => {
@@ -168,14 +169,15 @@ export async function fetchKeyFigures(
   })
 
   total45 = total45Female + total45Male
-
   total45Male = Math.ceil(
     (total45Male / ((crudBirthRate * midYearPoulation) / 1000)) * 100
   )
   total45Female = Math.ceil(
     (total45Female / ((crudBirthRate * midYearPoulation) / 1000)) * 100
   )
-  total45 = total45Female + total45Male
+  total45 = Math.ceil(
+    (total45 / ((crudBirthRate * midYearPoulation) / 1000)) * 100
+  )
 
   total1Year = total1YearMale + total1YearFemale
   total1YearMale = Math.ceil(
@@ -184,7 +186,9 @@ export async function fetchKeyFigures(
   total1YearFemale = Math.ceil(
     (total1YearFemale / ((crudBirthRate * midYearPoulation) / 1000)) * 100
   )
-  total1Year = total1YearFemale + total1YearMale
+  total1Year = Math.ceil(
+    (total1Year / ((crudBirthRate * midYearPoulation) / 1000)) * 100
+  )
 
   const total = total45 + total1Year
 
