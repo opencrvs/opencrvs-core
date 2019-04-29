@@ -1,4 +1,4 @@
-import { searchTypeResolvers } from 'src/features/registration/search-type-resovlers'
+import { searchTypeResolvers } from './type-resovlers'
 import * as fetch from 'jest-fetch-mock'
 
 beforeEach(() => {

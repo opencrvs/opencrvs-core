@@ -1,0 +1,104 @@
+import { resolvers } from './root-resolvers'
+import * as fetch from 'jest-fetch-mock'
+
+beforeEach(() => {
+  fetch.resetMocks()
+})
+
+describe('Search root resolvers', () => {
+  describe('searchEvents()', () => {
+    it('returns an array of composition results for eventType', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          eventType: 'Birth'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for status', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          status: 'DECLARED'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for locationIds', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce']
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for searchContent', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          searchContent: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns total item as 0 and an empty array in-case of invalid result found from elastic', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: null
+        })
+      )
+      // @ts-ignore
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          eventType: 'Birth',
+          status: 'DECLARED',
+          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce'],
+          searchContent: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toEqual([])
+      expect(result.totalItems).toBe(0)
+    })
+  })
+})
