@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { Action } from 'src/forms'
+import { Action } from 'forms'
 
 export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
   query data($id: ID!) {

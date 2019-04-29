@@ -1,5 +1,5 @@
-import { IStoreState } from '@opencrvs/register/src/store'
-import { IRejectState } from '@opencrvs/register/src/review/reducer'
+import { IStoreState } from '/store'
+import { IRejectState } from '/review/reducer'
 
 const getPartialState = (store: IStoreState): IRejectState => store.reject
 

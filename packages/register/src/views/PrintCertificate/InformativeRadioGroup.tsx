@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { RadioGroup } from '@opencrvs/components/lib/forms'
-import { InputField } from 'src/components/form/InputField'
+import { InputField } from 'components/form/InputField'
 import {
   Ii18nFormField,
   IFormFieldValue,
   Ii18nRadioGroupFormField,
   Ii18nInformativeRadioGroupFormField
-} from 'src/forms'
+} from 'forms'
 import { injectIntl } from 'react-intl'
 import { ParentDetails } from './ParentDetails'
 import styled from '../../styled-components'

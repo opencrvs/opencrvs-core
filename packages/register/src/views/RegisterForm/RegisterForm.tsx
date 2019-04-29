@@ -24,20 +24,20 @@ import {
   Action
 } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
-import { IStoreState } from 'src/store'
-import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
+import { IStoreState } from 'store'
+import { IDraft, modifyDraft, deleteDraft } from 'drafts'
 import {
   FooterAction,
   FooterPrimaryButton,
   ViewFooter
-} from 'src/components/interface/footer'
+} from 'components/interface/footer'
 import { StickyFormTabs } from './StickyFormTabs'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
 import { merge, isUndefined, isNull } from 'lodash'
-import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
-import { getOfflineState } from 'src/offline/selectors'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
+import { RejectRegistrationForm } from 'components/review/RejectRegistrationForm'
+import { getOfflineState } from 'offline/selectors'
+import { IOfflineDataState } from 'offline/reducer'
+import { CONFIRMATION_SCREEN } from 'navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 import {
@@ -47,16 +47,16 @@ import {
   REGISTERED,
   DUPLICATION,
   OFFLINE
-} from 'src/utils/constants'
+} from 'utils/constants'
 
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
-import { isMobileDevice } from 'src/utils/commonUtils'
+import { getScope } from 'profile/profileSelectors'
+import { Scope } from 'utils/authUtils'
+import { isMobileDevice } from 'utils/commonUtils'
 import {
   MutationProvider,
   MutationContext
 } from '../DataProvider/MutationProvider'
-import { toggleDraftSavedNotification } from 'src/notification/actions'
+import { toggleDraftSavedNotification } from 'notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
 import * as Sentry from '@sentry/browser'

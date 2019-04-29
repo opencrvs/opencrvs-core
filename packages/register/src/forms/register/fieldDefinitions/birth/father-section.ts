@@ -8,7 +8,7 @@ import {
 } from '../../../identity'
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as educationMessages } from '../../../education'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+import { OFFLINE_LOCATIONS_KEY } from 'offline/reducer'
 import {
   ViewType,
   RADIO_GROUP,
@@ -20,7 +20,7 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   FETCH_BUTTON,
   TEL
-} from 'src/forms'
+} from 'forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
@@ -31,7 +31,7 @@ import {
   dateFormatIsCorrect,
   maxLength,
   numeric
-} from 'src/utils/validate'
+} from 'utils/validate'
 
 export interface IFatherSectionFormData {
   firstName: string
@@ -39,7 +39,7 @@ export interface IFatherSectionFormData {
   bar: string
   baz: string
 }
-import { identityNameMapper } from 'src/forms/identity'
+import { identityNameMapper } from 'forms/identity'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
 import {
@@ -50,7 +50,7 @@ import {
   copyAddressTransformer,
   sectionRemoveTransformer,
   fieldNameTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from 'forms/mappings/mutation/field-mappings'
 
 import {
   nameToFieldTransformer,
@@ -59,7 +59,7 @@ import {
   identifierToFieldTransformer,
   addressToFieldTransformer,
   sameAddressFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from 'forms/mappings/query/field-mappings'
 import { emptyFatherSectionTransformer } from './mappings/query/father-mappings'
 import {
   transformRegistrationData,

@@ -21,7 +21,7 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   FETCH_BUTTON,
   TEL
-} from 'src/forms'
+} from 'forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
@@ -32,7 +32,7 @@ import {
   dateFormatIsCorrect,
   numeric,
   maxLength
-} from 'src/utils/validate'
+} from 'utils/validate'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -41,8 +41,8 @@ import { IFormSection } from '../../../index'
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import { conditionals } from '../../../utils'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { identityNameMapper } from 'src/forms/identity'
+import { OFFLINE_LOCATIONS_KEY } from 'offline/reducer'
+import { identityNameMapper } from 'forms/identity'
 import {
   fieldToNameTransformer,
   fieldToArrayTransformer,
@@ -50,7 +50,7 @@ import {
   fieldToAddressTransformer,
   fieldNameTransformer,
   copyAddressTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from 'forms/mappings/mutation/field-mappings'
 import {
   nameToFieldTransformer,
   fieldValueTransformer,
@@ -58,7 +58,7 @@ import {
   identifierToFieldTransformer,
   addressToFieldTransformer,
   sameAddressFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from 'forms/mappings/query/field-mappings'
 import { transformPersonData, FETCH_PERSON } from '../../queries/person'
 import {
   transformRegistrationData,

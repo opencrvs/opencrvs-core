@@ -1,9 +1,9 @@
 import * as React from 'react'
 import styled from '../../styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { countries } from 'src/forms/countries'
-import { identityNameMapper } from 'src/forms/identity'
-import { formatLongDate } from 'src/utils/date-formatting'
+import { countries } from 'forms/countries'
+import { identityNameMapper } from 'forms/identity'
+import { formatLongDate } from 'utils/date-formatting'
 
 const messages = defineMessages({
   firstName: {

@@ -11,9 +11,9 @@ import {
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
   WORK_QUEUE_TAB
-} from 'src/navigation/routes'
+} from 'navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken } from 'src/utils/authUtils'
+import { getToken } from 'utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any

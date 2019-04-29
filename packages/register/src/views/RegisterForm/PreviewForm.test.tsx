@@ -6,23 +6,23 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
+} from 'tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB
-} from 'src/navigation/routes'
-import { storeDraft, IDraft } from 'src/drafts'
+} from 'navigation/routes'
+import { storeDraft, IDraft } from 'drafts'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
+import { getOfflineDataSuccess } from 'offline/actions'
 import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
-import { Event } from 'src/forms'
+import { storage } from 'storage'
+import { Event } from 'forms'
 import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
-import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
-import * as CommonUtils from 'src/utils/commonUtils'
+import { checkAuth } from '/profile/profileActions'
+import * as CommonUtils from 'utils/commonUtils'
 
 interface IPersonDetails {
   [key: string]: any

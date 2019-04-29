@@ -5,18 +5,18 @@ import {
   TEL,
   TEXTAREA,
   WARNING
-} from 'src/forms'
-import { phoneNumberFormat } from 'src/utils/validate'
+} from 'forms'
+import { phoneNumberFormat } from 'utils/validate'
 import {
   fieldNameTransformer,
   fieldToCommentTransformer,
   sectionFieldToBundleFieldTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from 'forms/mappings/mutation/field-mappings'
 import {
   fieldValueTransformer,
   bundleFieldToSectionFieldTransformer,
   commentToFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from 'forms/mappings/query/field-mappings'
 import { setRegistrationSectionTransformer } from './mappings/mutation/registration-mappings'
 import { getRegistrationSectionTransformer } from './mappings/query/registration-mappings'
 

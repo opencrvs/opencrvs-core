@@ -3,8 +3,8 @@ import { IFormField, IFormSectionData, IDynamicFormField } from './'
 import {
   getConditionalActionsForField,
   getFieldValidation
-} from '@opencrvs/register/src/forms/utils'
-import { IOfflineDataState } from 'src/offline/reducer'
+} from '/forms/utils'
+import { IOfflineDataState } from 'offline/reducer'
 
 export function getValidationErrorsForField(
   field: IFormField,

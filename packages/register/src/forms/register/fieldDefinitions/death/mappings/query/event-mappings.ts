@@ -1,4 +1,4 @@
-import { IFormField, IFormData, Event } from 'src/forms'
+import { IFormField, IFormData, Event } from 'forms'
 import { REGISTRATION_SECTION } from './documents-mappings'
 
 export const deceasedDateToFieldTransformation = (

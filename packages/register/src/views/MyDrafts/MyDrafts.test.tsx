@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent } from 'tests/util'
 import { MyDrafts } from './MyDrafts'
 import { v4 as uuid } from 'uuid'
-import { IDraft, storeDraft } from 'src/drafts'
-import { createStore } from 'src/store'
+import { IDraft, storeDraft } from 'drafts'
+import { createStore } from 'store'
 import { DataTable } from '@opencrvs/components/lib/interface'
-import { Event } from 'src/forms'
+import { Event } from 'forms'
 
 describe('MyRecords tests', () => {
   const { store } = createStore()

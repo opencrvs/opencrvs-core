@@ -24,16 +24,16 @@ import {
   IQuery
 } from './'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
-import { getValidationErrorsForForm } from 'src/forms/validation'
+import { getValidationErrorsForForm } from 'forms/validation'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { Validation } from 'src/utils/validate'
+} from 'offline/reducer'
+import { Validation } from 'utils/validate'
 import * as moment from 'moment'
-import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { IDynamicValues } from '/navigation'
 
 interface IRange {
   start: number

@@ -4,7 +4,7 @@ import {
   IStoreState,
   createStore,
   AppStore
-} from '@opencrvs/performance/src/store'
+} from '/store'
 import { mount, configure, shallow } from 'enzyme'
 import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
@@ -14,9 +14,9 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { ENGLISH_STATE } from '@opencrvs/performance/src/i18n/locales/en'
+import { ENGLISH_STATE } from '/i18n/locales/en'
 import { IntlProvider, intlShape } from 'react-intl'
-import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
+import { I18nContainer } from '/i18n/components/I18nContainer'
 import { App } from '../App'
 import { MockedProvider } from 'react-apollo/test-utils'
 

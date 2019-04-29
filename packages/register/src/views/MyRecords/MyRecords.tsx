@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { IFormSection, IFormSectionData } from 'src/forms'
+import { IFormSection, IFormSectionData } from 'forms'
 import {
   ActionPage,
   ListItem,
@@ -18,8 +18,8 @@ import {
   StatusGreen,
   StatusCollected
 } from '@opencrvs/components/lib/icons'
-import { goToHome as goToHomeAction } from 'src/navigation'
-import { IStoreState } from 'src/store'
+import { goToHome as goToHomeAction } from 'navigation'
+import { IStoreState } from 'store'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const Container = styled.div`

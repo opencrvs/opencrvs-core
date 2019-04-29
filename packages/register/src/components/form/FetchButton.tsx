@@ -10,7 +10,7 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
-import { IQuery } from '@opencrvs/register/src/forms'
+import { IQuery } from '/forms'
 
 const messages = defineMessages({
   back: {

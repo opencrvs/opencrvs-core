@@ -3,13 +3,13 @@ import {
   ListItem,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
+import { checkAuth } from '/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { queries } from 'src/profile/queries'
-import { SEARCH_EVENTS } from 'src/search/queries'
-import { createStore } from 'src/store'
-import { createTestComponent, mockUserResponse } from 'src/tests/util'
+import { queries } from 'profile/queries'
+import { SEARCH_EVENTS } from 'search/queries'
+import { createStore } from 'store'
+import { createTestComponent, mockUserResponse } from 'tests/util'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 import { SearchResult } from './SearchResult'
 

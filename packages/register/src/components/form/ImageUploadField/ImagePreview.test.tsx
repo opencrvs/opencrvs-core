@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createShallowRenderedComponent } from 'src/tests/util'
+import { createShallowRenderedComponent } from 'tests/util'
 import { ImagePreview } from './ImagePreview'
 
 describe('image upload component', () => {

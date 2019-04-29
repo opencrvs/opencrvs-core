@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from 'src/forms'
+import { IFormField, IFormData } from 'forms'
 
 export const fieldToDeceasedDateTransformation = (
   alternativeSectionId?: string

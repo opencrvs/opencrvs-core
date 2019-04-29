@@ -17,24 +17,24 @@ import {
 import { profileReducer, ProfileState } from './profile/profileReducer'
 import { offlineDataReducer, IOfflineDataState } from './offline/reducer'
 import { intlReducer, IntlState } from './i18n/reducer'
-import { draftsReducer, IDraftsState } from 'src/drafts'
+import { draftsReducer, IDraftsState } from 'drafts'
 import {
   reviewReducer,
   IReviewFormState
-} from '@opencrvs/register/src/forms/register/reviewReducer'
+} from '/forms/register/reviewReducer'
 import {
   registerFormReducer,
   IRegisterFormState
 } from './forms/register/reducer'
-import { navigationReducer, INavigationState } from 'src/navigation'
+import { navigationReducer, INavigationState } from 'navigation'
 import {
   notificationReducer,
   NotificationState
-} from 'src/notification/reducer'
+} from 'notification/reducer'
 import {
   IRejectState,
   rejectReducer
-} from '@opencrvs/register/src/review/reducer'
+} from '/review/reducer'
 import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
 import * as Sentry from '@sentry/browser'
 import * as createSentryMiddleware from 'redux-sentry-middleware'

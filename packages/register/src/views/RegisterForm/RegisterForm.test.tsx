@@ -6,7 +6,7 @@ import {
   mockDeathApplicationData,
   mockDeathApplicationDataWithoutFirstNames,
   wait
-} from 'src/tests/util'
+} from 'tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import {
@@ -18,7 +18,7 @@ import {
   getCurrentUserID,
   getDraftsOfCurrentUser,
   writeDraftByUser
-} from 'src/drafts'
+} from 'drafts'
 import { v4 as uuid } from 'uuid'
 
 import { createStore } from '../../store'
@@ -26,17 +26,17 @@ import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   REVIEW_EVENT_PARENT_FORM_TAB,
   DRAFT_DEATH_FORM_TAB
-} from '@opencrvs/register/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { Event, IFormData } from '@opencrvs/register/src/forms'
-import { draftToGqlTransformer } from 'src/transformer'
-import { IForm } from 'src/forms'
+} from '/navigation/routes'
+import { getRegisterForm } from '/forms/register/application-selectors'
+import { getReviewForm } from '/forms/register/review-selectors'
+import { Event, IFormData } from '/forms'
+import { draftToGqlTransformer } from 'transformer'
+import { IForm } from 'forms'
 import { clone } from 'lodash'
-import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
-import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
-import { storage } from 'src/storage'
-import { IUserDetails } from 'src/utils/userUtils'
+import { FETCH_REGISTRATION } from '/forms/register/queries/registration'
+import { FETCH_PERSON } from '/forms/register/queries/person'
+import { storage } from 'storage'
+import { IUserDetails } from 'utils/userUtils'
 
 describe('when user logs in', async () => {
   // Some mock data

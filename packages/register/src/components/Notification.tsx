@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
-import { IStoreState } from '@opencrvs/register/src/store'
+import { getLanguage } from '/i18n/selectors'
+import { IStoreState } from '/store'
 import {
   Notification,
   NOTIFICATION_TYPE
@@ -15,7 +15,7 @@ import {
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification
-} from 'src/notification/actions'
+} from 'notification/actions'
 
 type NotificationProps = {
   language?: string

@@ -14,6 +14,13 @@ injectGlobal`
     padding: 0;
   }
 `
+
+declare global {
+  interface Window {
+    MyNamespace: any
+  }
+}
+
 const { store, history } = createStore()
 
 if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {

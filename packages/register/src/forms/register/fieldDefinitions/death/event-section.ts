@@ -8,20 +8,20 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEXT,
   NUMBER
-} from 'src/forms'
+} from 'forms'
 import { defineMessages } from 'react-intl'
-import { isValidDeathOccurrenceDate } from 'src/utils/validate'
+import { isValidDeathOccurrenceDate } from 'utils/validate'
 import { messages as addressMessages } from '../../../address'
-import { countries } from 'src/forms/countries'
-import { conditionals } from 'src/forms/utils'
+import { countries } from 'forms/countries'
+import { conditionals } from 'forms/utils'
 import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
-} from 'src/offline/reducer'
+} from 'offline/reducer'
 import {
   sectionFieldToBundleFieldTransformer,
   copyEventAddressTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from 'forms/mappings/mutation/field-mappings'
 import {
   fieldToDeceasedDateTransformation,
   eventLocationMutationTransformer
@@ -30,7 +30,7 @@ import {
   eventLocationIDQueryTransformer,
   bundleFieldToSectionFieldTransformer,
   eventLocationQueryTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from 'forms/mappings/query/field-mappings'
 import {
   deceasedDateToFieldTransformation,
   deathPlaceToFieldTransformer

@@ -7,8 +7,8 @@ import {
 } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '../store'
-import { getAuthenticated } from 'src/profile/selectors'
-import { checkAuth } from 'src/profile/actions'
+import { getAuthenticated } from 'profile/selectors'
+import { checkAuth } from 'profile/actions'
 import { IURLParams } from '../utils/authUtils'
 import { parse } from 'querystring'
 

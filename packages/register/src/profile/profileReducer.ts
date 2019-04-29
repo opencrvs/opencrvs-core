@@ -1,7 +1,7 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from './profileActions'
-import { storage } from 'src/storage'
-import { USER_DETAILS } from 'src/utils/userUtils'
+import { storage } from 'storage'
+import { USER_DETAILS } from 'utils/userUtils'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -15,11 +15,11 @@ import {
   getUserDetails,
   storeUserDetails,
   removeUserDetails
-} from 'src/utils/userUtils'
+} from 'utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
-import { queries } from 'src/profile/queries'
-import * as offlineActions from 'src/offline/actions'
+import { queries } from 'profile/queries'
+import * as offlineActions from 'offline/actions'
 
 export type ProfileState = {
   authenticated: boolean

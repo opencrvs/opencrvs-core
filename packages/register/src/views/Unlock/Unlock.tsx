@@ -2,22 +2,22 @@ import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import { LogoutConfirmation } from 'components/LogoutConfirmation'
+import { redirectToAuthentication } from 'profile/profileActions'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { getUserDetails } from 'src/profile/profileSelectors'
+import { IStoreState } from 'store'
+import { getUserDetails } from 'profile/profileSelectors'
 import { IUserDetails } from '../../utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { storage } from 'src/storage'
+import { storage } from 'storage'
 import * as bcrypt from 'bcryptjs'
 import {
   SECURITY_PIN_INDEX,
   SECURITY_PIN_EXPIRED_AT
-} from 'src/utils/constants'
+} from 'utils/constants'
 import * as moment from 'moment'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { SCREEN_LOCK } from 'components/ProtectedPage'
 
 const messages = defineMessages({
   incorrect: {

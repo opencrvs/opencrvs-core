@@ -7,10 +7,10 @@ import {
 } from 'react-intl'
 import styled from 'styled-components'
 import { Modal } from '@opencrvs/components/lib/interface'
-import { IStoreState } from 'src/store'
+import { IStoreState } from 'store'
 import { connect } from 'react-redux'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { getOfflineDataLoaded } from 'src/offline/selectors'
+import { getOfflineDataLoaded } from 'offline/selectors'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const StyledModal = styled(Modal)`

@@ -37,21 +37,21 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
+import { IViewHeadingProps } from 'components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToSearchResult
-} from 'src/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { getScope, getUserDetails } from 'src/profile/profileSelectors'
-import { messages as rejectionMessages } from 'src/review/reject-registration'
-import { messages } from 'src/search/messages'
-import { SEARCH_EVENTS } from 'src/search/queries'
-import { transformData } from 'src/search/transformer'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
+} from 'navigation'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'navigation/routes'
+import { getScope, getUserDetails } from 'profile/profileSelectors'
+import { messages as rejectionMessages } from 'review/reject-registration'
+import { messages } from 'search/messages'
+import { SEARCH_EVENTS } from 'search/queries'
+import { transformData } from 'search/transformer'
+import { IStoreState } from 'store'
+import { Scope } from 'utils/authUtils'
 import {
   CERTIFICATE_DATE_FORMAT,
   DECLARED,
@@ -59,13 +59,13 @@ import {
   LOCAL_DATE_FORMAT,
   REJECTED,
   REJECT_REASON
-} from 'src/utils/constants'
+} from 'utils/constants'
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
+} from 'utils/data-formatting'
+import { formatLongDate } from 'utils/date-formatting'
+import { IGQLLocation, IIdentifier, IUserDetails } from 'utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'

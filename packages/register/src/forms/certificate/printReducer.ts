@@ -4,7 +4,7 @@ import {
   collectDeathCertificateFormSection
 } from './fieldDefinitions/collector-section'
 import { Action } from 'redux'
-import { IFormSection } from 'src/forms'
+import { IFormSection } from 'forms'
 import { paymentFormSection } from './fieldDefinitions/payment-section'
 import { certificatePreview } from './fieldDefinitions/preview-section'
 

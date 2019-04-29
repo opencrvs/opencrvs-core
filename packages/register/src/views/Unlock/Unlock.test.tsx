@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent } from 'src/tests/util'
-import { createStore } from 'src/store'
+import { createTestComponent } from 'tests/util'
+import { createStore } from 'store'
 import { Unlock } from './Unlock'
-import { storage } from 'src/storage'
+import { storage } from 'storage'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()

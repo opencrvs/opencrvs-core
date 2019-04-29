@@ -2,7 +2,7 @@ import {
   GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
   getDeathQueryMappings
 } from './queries'
-import { Action } from 'src/forms'
+import { Action } from 'forms'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {

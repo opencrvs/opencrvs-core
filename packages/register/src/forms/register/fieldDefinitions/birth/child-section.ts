@@ -6,19 +6,19 @@ import {
   DATE,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS
-} from 'src/forms'
+} from 'forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   range,
   isValidBirthDate,
   greaterThanZero
-} from 'src/utils/validate'
+} from 'utils/validate'
 import { conditionals } from '../../../utils'
 import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
-} from 'src/offline/reducer'
+} from 'offline/reducer'
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
@@ -26,7 +26,7 @@ import {
   sectionFieldToBundleFieldTransformer,
   fieldNameTransformer,
   fieldValueSectionExchangeTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from 'forms/mappings/mutation/field-mappings'
 import { eventLocationMutationTransformer } from './mappings/mutation/child-mappings'
 import {
   nameToFieldTransformer,
@@ -36,7 +36,7 @@ import {
   eventLocationTypeQueryTransformer,
   eventLocationIDQueryTransformer,
   eventLocationQueryTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from 'forms/mappings/query/field-mappings'
 
 export interface IChildSectionFormData {
   firstName: string

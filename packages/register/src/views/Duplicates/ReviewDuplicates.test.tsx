@@ -7,11 +7,11 @@ import {
   FETCH_DUPLICATES,
   createDuplicateDetailsQuery
 } from './ReviewDuplicates'
-import { createStore } from 'src/store'
+import { createStore } from 'store'
 import { ReactWrapper } from 'enzyme'
-import { DuplicateDetails } from 'src/components/DuplicateDetails'
+import { DuplicateDetails } from 'components/DuplicateDetails'
 import { clone } from 'lodash'
-import { SEARCH_RESULT } from 'src/navigation/routes'
+import { SEARCH_RESULT } from 'navigation/routes'
 
 const assign = window.location.assign as jest.Mock
 

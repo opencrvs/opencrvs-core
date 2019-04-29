@@ -15,6 +15,12 @@ injectGlobal`
   }
 `
 
+declare global {
+  interface Window {
+    MyNamespace: any
+  }
+}
+
 if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
   // setup error reporting using sentry
   Sentry.init({

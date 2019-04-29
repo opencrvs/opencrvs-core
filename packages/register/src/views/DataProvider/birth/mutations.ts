@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
-import { IForm, Action } from 'src/forms'
-import { IDraft } from 'src/drafts'
-import { draftToGqlTransformer } from 'src/transformer'
+import { IForm, Action } from 'forms'
+import { IDraft } from 'drafts'
+import { draftToGqlTransformer } from 'transformer'
 
 const SUBMIT_BIRTH_APPLICATION = gql`
   mutation submitMutation($details: BirthRegistrationInput!) {

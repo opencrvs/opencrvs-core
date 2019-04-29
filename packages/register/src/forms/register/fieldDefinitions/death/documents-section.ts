@@ -6,7 +6,7 @@ import {
   PARAGRAPH,
   LIST,
   SELECT_WITH_DYNAMIC_OPTIONS
-} from 'src/forms'
+} from 'forms'
 import { deathFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
 import { deathAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
 import { defineMessages } from 'react-intl'

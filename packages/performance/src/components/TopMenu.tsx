@@ -8,12 +8,12 @@ import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
   goToRegister as goToRegisterAction
-} from 'src/navigation'
-import { redirectToAuthentication } from 'src/profile/actions'
-import { getLanguages } from 'src/i18n/selectors'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
+} from 'navigation'
+import { redirectToAuthentication } from 'profile/actions'
+import { getLanguages } from 'i18n/selectors'
+import { IStoreState } from 'store'
+import { IntlState } from 'i18n/reducer'
+import { changeLanguage as changeLanguageAction } from 'i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 import { LogoutConfirmation } from './LogoutConfirmation'
 

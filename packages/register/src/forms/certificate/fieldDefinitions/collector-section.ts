@@ -8,15 +8,15 @@ import {
   WARNING,
   PARAGRAPH,
   FIELD_WITH_DYNAMIC_DEFINITIONS
-} from 'src/forms'
+} from 'forms'
 import { defineMessages } from 'react-intl'
-import { conditionals } from 'src/forms/utils'
+import { conditionals } from 'forms/utils'
 import {
   messages as identityMessages,
   identityTypeMapper,
   identityNameMapper
-} from 'src/forms/identity'
-import { validIDNumber } from 'src/utils/validate'
+} from 'forms/identity'
+import { validIDNumber } from 'utils/validate'
 
 const messages = defineMessages({
   certificateCollectionTitle: {

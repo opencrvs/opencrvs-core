@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
-import { FormFieldGenerator } from 'src/components/form'
-import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
-import { hasFormError } from 'src/forms/utils'
+import { FormFieldGenerator } from 'components/form'
+import { IFormSection, IFormSectionData, IFileValue } from 'forms'
+import { hasFormError } from 'forms/utils'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 const FormContainer = styled.div`

@@ -3,7 +3,7 @@ import {
   GQLUser,
   GQLHumanName
 } from '@opencrvs/gateway/src/graphql/schema'
-import { storage } from '@opencrvs/register/src/storage'
+import { storage } from '/storage'
 
 export const USER_DETAILS = 'USER_DETAILS'
 

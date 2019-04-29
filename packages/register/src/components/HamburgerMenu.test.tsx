@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent } from 'tests/util'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '../store'

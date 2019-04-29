@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Shield } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { CreatePin } from 'src/views/PIN/CreatePin'
+import { CreatePin } from 'views/PIN/CreatePin'
 
 const SecurePageContainer = styled.div`
   font-family: ${({ theme }) => theme.fonts.lightFont};

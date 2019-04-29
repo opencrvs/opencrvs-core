@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { EditConfirmation } from './EditConfirmation'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
+import { createStore } from 'store'
+import { createTestComponent } from 'tests/util'
 
 const { store } = createStore()
 const mockHandleEdit = jest.fn()

@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { ReviewSection, renderSelectDynamicLabel } from './ReviewSection'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
-import { createDraft, createReviewDraft } from 'src/drafts'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { Event } from 'src/forms'
+import { createStore } from 'store'
+import { createTestComponent, mockOfflineData, intl } from 'tests/util'
+import { createDraft, createReviewDraft } from 'drafts'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'navigation/routes'
+import { Event } from 'forms'
 import { v4 as uuid } from 'uuid'
-import { REJECTED } from 'src/utils/constants'
+import { REJECTED } from 'utils/constants'
 
 const { store } = createStore()
 const mockHandler = jest.fn()

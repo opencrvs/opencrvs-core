@@ -1,23 +1,23 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Scope } from 'src/utils/authUtils'
+import { Scope } from 'utils/authUtils'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { getScope } from 'src/profile/profileSelectors'
+import { getScope } from 'profile/profileSelectors'
 import styled from '../styled-components'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
   goToPerformance as goToPerformanceAction
-} from 'src/navigation'
-import { redirectToAuthentication } from 'src/profile/profileActions'
-import { getLanguages } from 'src/i18n/selectors'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
+} from 'navigation'
+import { redirectToAuthentication } from 'profile/profileActions'
+import { getLanguages } from 'i18n/selectors'
+import { IStoreState } from 'store'
+import { IntlState } from 'i18n/reducer'
+import { changeLanguage as changeLanguageAction } from 'i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
+import { LogoutConfirmation } from 'components/LogoutConfirmation'
 
 const messages = defineMessages({
   back: {

@@ -4,16 +4,16 @@ import { InjectedIntlProps } from 'react-intl'
 import {
   RegisterForm,
   IFormProps
-} from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
+} from '/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   DRAFT_DEATH_FORM_TAB
-} from '@opencrvs/register/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-import { IStoreState } from '@opencrvs/register/src/store'
+} from '/navigation/routes'
+import { getRegisterForm } from '/forms/register/application-selectors'
+import { IStoreState } from '/store'
 import { connect } from 'react-redux'
-import { Event } from 'src/forms'
-import { Scope } from 'src/utils/authUtils'
+import { Event } from 'forms'
+import { Scope } from 'utils/authUtils'
 
 type IProps = IFormProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>

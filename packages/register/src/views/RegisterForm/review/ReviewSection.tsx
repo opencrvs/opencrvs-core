@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { SectionDrawer } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
-import { IDraft } from 'src/drafts'
+import { IDraft } from 'drafts'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { getRegisterForm } from 'src/forms/register/application-selectors'
+import { IStoreState } from 'store'
+import { getRegisterForm } from 'forms/register/application-selectors'
 import { EditConfirmation } from './EditConfirmation'
-import { getConditionalActionsForField } from 'src/forms/utils'
+import { getConditionalActionsForField } from 'forms/utils'
 import {
   TickLarge,
   CrossLarge,
@@ -14,24 +14,24 @@ import {
   DraftSimple
 } from '@opencrvs/components/lib/icons'
 import { findIndex, filter, flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from 'src/forms/validation'
-import { goToTab } from 'src/navigation'
+import { getValidationErrorsForForm } from 'forms/validation'
+import { goToTab } from 'navigation'
 import {
   DocumentViewer,
   IDocumentViewerOptions
 } from '@opencrvs/components/lib/interface'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
-import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
-import { getOfflineState } from 'src/offline/selectors'
+import { documentsSection } from 'forms/register/fieldDefinitions/birth/documents-section'
+import { getScope } from 'profile/profileSelectors'
+import { Scope } from 'utils/authUtils'
+import { getOfflineState } from 'offline/selectors'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { getLanguage } from 'src/i18n/selectors'
+} from 'offline/reducer'
+import { getLanguage } from 'i18n/selectors'
 import {
   defineMessages,
   InjectedIntlProps,
@@ -62,10 +62,10 @@ import {
   DATE,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField
-} from 'src/forms'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { getFieldLabel } from 'src/forms/utils'
-import { REJECTED } from 'src/utils/constants'
+} from 'forms'
+import { formatLongDate } from 'utils/date-formatting'
+import { getFieldLabel } from 'forms/utils'
+import { REJECTED } from 'utils/constants'
 
 const messages = defineMessages({
   valueYes: {

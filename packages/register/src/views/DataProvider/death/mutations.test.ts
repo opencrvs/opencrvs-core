@@ -1,5 +1,5 @@
 import { getDeathMutationMappings } from './mutations'
-import { Action } from 'src/forms'
+import { Action } from 'forms'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {

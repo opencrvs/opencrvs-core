@@ -6,10 +6,10 @@ import {
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
   DYNAMIC_LIST
-} from 'src/forms'
+} from 'forms'
 import { birthFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
 import { birthAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
-import { diffDoB } from 'src/forms/utils'
+import { diffDoB } from 'forms/utils'
 
 const messages = defineMessages({
   documentsTab: {

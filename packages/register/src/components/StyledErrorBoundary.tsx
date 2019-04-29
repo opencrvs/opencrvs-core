@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from 'src/store'
+import { IStoreState } from 'store'
 
 const ErrorContainer = styled.div`
   display: flex;

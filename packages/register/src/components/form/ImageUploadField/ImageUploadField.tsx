@@ -6,7 +6,7 @@ import { Camera } from '@opencrvs/components/lib/icons'
 import { IActionProps } from '@opencrvs/components/lib/buttons/Action'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { FileItem } from '@opencrvs/components/lib/files'
-import { IFormSection, IFileValue } from 'src/forms'
+import { IFormSection, IFileValue } from 'forms'
 import { ImageUploadOption } from './ImageUploadOption'
 import { ImagePreview } from './ImagePreview'
 

@@ -12,12 +12,12 @@ import {
   ViewFooter,
   FooterAction,
   FooterPrimaryButton
-} from '@opencrvs/register/src/components/interface/footer'
+} from '/components/interface/footer'
 import { RouteComponentProps } from 'react-router'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { DECLARATION, REJECTION, BIRTH, OFFLINE } from 'src/utils/constants'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { IStoreState } from 'store'
+import { IntlState } from 'i18n/reducer'
+import { DECLARATION, REJECTION, BIRTH, OFFLINE } from 'utils/constants'
+import { HomeViewHeader } from 'components/HomeViewHeader'
 
 const messages = defineMessages({
   backButton: {

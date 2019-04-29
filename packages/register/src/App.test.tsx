@@ -3,10 +3,10 @@ import {
   createTestApp,
   mockOfflineData,
   createTestComponent
-} from 'src/tests/util'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import { createClient } from 'src/utils/apolloClient'
-import * as actions from 'src/notification/actions'
+} from 'tests/util'
+import { getOfflineDataSuccess } from 'offline/actions'
+import { createClient } from 'utils/apolloClient'
+import * as actions from 'notification/actions'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { createStore } from './store'
 

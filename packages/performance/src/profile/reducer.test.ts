@@ -1,7 +1,7 @@
 import * as actions from './actions'
 import { initialState } from './reducer'
 import { createStore, AppStore } from '../store'
-import { mockUserResponse } from 'src/tests/util'
+import { mockUserResponse } from 'tests/util'
 
 describe('profileReducer tests', () => {
   let store: AppStore

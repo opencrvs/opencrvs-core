@@ -1,23 +1,23 @@
 import { PrintCertificateAction, getFullName } from './PrintCertificateAction'
-import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'src/views/DataProvider/birth/queries'
-import { createTestComponent } from 'src/tests/util'
-import { createStore } from 'src/store'
+import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from 'views/DataProvider/birth/queries'
+import { createTestComponent } from 'tests/util'
+import { createStore } from 'store'
 import * as React from 'react'
 
-import { FormFieldGenerator } from 'src/components/form'
-import { collectBirthCertificateFormSection } from 'src/forms/certificate/fieldDefinitions/collector-section'
+import { FormFieldGenerator } from 'components/form'
+import { collectBirthCertificateFormSection } from 'forms/certificate/fieldDefinitions/collector-section'
 import {
   IInformativeRadioGroupFormField,
   INFORMATIVE_RADIO_GROUP
-} from 'src/forms'
+} from 'forms'
 import { ReactWrapper } from 'enzyme'
 import { ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'
-import { conditionals } from 'src/forms/utils'
-import { paymentFormSection } from 'src/forms/certificate/fieldDefinitions/payment-section'
-import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/preview-section'
+import { conditionals } from 'forms/utils'
+import { paymentFormSection } from 'forms/certificate/fieldDefinitions/payment-section'
+import { certificatePreview } from 'forms/certificate/fieldDefinitions/preview-section'
 import { calculateDays, timeElapsed } from './calculatePrice'
-import { identityNameMapper } from 'src/forms/identity'
+import { identityNameMapper } from 'forms/identity'
 
 describe('when user wants to print certificate', async () => {
   const { store, history } = createStore()

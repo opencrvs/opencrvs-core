@@ -4,8 +4,8 @@ import { injectGlobal } from 'styled-components'
 import { App } from './App'
 import registerServiceWorker from './registerServiceWorker'
 import { createStore } from './store'
-import * as actions from 'src/notification/actions'
-import { storage } from 'src/storage'
+import * as actions from 'notification/actions'
+import { storage } from 'storage'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 
@@ -19,6 +19,12 @@ injectGlobal`
     padding: 0;
   }
 `
+
+declare global {
+  interface Window {
+    MyNamespace: any
+  }
+}
 
 const { store, history } = createStore()
 

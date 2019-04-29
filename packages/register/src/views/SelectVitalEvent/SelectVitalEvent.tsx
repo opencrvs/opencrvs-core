@@ -3,11 +3,11 @@ import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
-import { ViewHeader } from 'src/components/ViewHeader'
-import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
+import { ViewHeader } from 'components/ViewHeader'
+import { goToBirthRegistration, goToDeathRegistration } from 'navigation'
 import { Dispatch } from 'redux'
-import { createDraft, storeDraft } from 'src/drafts'
-import { Event } from 'src/forms'
+import { createDraft, storeDraft } from 'drafts'
+import { Event } from 'forms'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 export const messages = defineMessages({

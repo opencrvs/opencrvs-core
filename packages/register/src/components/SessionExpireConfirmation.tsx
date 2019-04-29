@@ -4,8 +4,8 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from 'src/store'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import { IStoreState } from 'store'
+import { redirectToAuthentication } from 'profile/profileActions'
 
 const StyledModal = styled(Modal)`
   z-index: 4;

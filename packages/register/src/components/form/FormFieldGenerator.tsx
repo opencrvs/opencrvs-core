@@ -27,9 +27,9 @@ import {
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData
-} from 'src/forms/utils'
+} from 'forms/utils'
 
-import styled, { keyframes } from 'src/styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import {
   IFormField,
@@ -66,20 +66,20 @@ import {
   ILoaderButton,
   IForm,
   IFormSection
-} from 'src/forms'
+} from 'forms'
 
-import { IValidationResult } from 'src/utils/validate'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { getValidationErrorsForForm } from 'src/forms/validation'
-import { InputField } from 'src/components/form/InputField'
-import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
+import { IValidationResult } from 'utils/validate'
+import { IOfflineDataState } from 'offline/reducer'
+import { getValidationErrorsForForm } from 'forms/validation'
+import { InputField } from 'components/form/InputField'
+import { SubSectionDivider } from 'components/form/SubSectionDivider'
 
 import { FormList } from './FormList'
 import { ImageUploadField } from './ImageUploadField'
 import { FetchButtonField } from './FetchButton'
 
 import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
-import { gqlToDraftTransformer } from 'src/transformer'
+import { gqlToDraftTransformer } from 'transformer'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

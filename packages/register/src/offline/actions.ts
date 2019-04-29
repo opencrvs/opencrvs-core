@@ -2,8 +2,8 @@ import { ILocation } from './reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse
-} from 'src/utils/referenceApi'
-import { IUserDetails } from 'src/utils/userUtils'
+} from 'utils/referenceApi'
+import { IUserDetails } from 'utils/userUtils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {

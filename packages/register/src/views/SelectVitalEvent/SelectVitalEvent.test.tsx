@@ -6,15 +6,15 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
-import { SELECT_VITAL_EVENT } from 'src/navigation/routes'
+} from 'tests/util'
+import { SELECT_VITAL_EVENT } from 'navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
+import { getOfflineDataSuccess } from 'offline/actions'
 import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
-import * as CommonUtils from 'src/utils/commonUtils'
+import { storage } from 'storage'
+import * as CommonUtils from 'utils/commonUtils'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()

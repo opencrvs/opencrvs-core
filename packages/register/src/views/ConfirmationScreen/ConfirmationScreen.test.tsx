@@ -12,7 +12,7 @@ import {
   DUPLICATION,
   BIRTH,
   DEATH
-} from 'src/utils/constants'
+} from 'utils/constants'
 
 const fullNameInBn = 'টম ব্র্যাডি'
 const fullNameInEng = 'Tom Brady'

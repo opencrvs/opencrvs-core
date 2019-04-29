@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { Event, Action, IForm } from 'src/forms'
+import { Event, Action, IForm } from 'forms'
 import { getBirthMutationMappings } from './birth/mutations'
 import { getDeathMutationMappings } from './death/mutations'
 import { Mutation } from 'react-apollo'
-import { IDraft } from 'src/drafts'
+import { IDraft } from 'drafts'
 
 interface IMutationProviderProps {
   event: Event

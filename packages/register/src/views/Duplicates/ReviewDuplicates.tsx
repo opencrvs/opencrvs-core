@@ -8,18 +8,18 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { Mutation } from 'react-apollo'
-import styled from 'src/styled-components'
+import styled from 'styled-components'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { SEARCH_RESULT } from 'src/navigation/routes'
-import { DuplicateDetails, Action } from 'src/components/DuplicateDetails'
-import { Event } from 'src/forms'
-import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfirmation'
+import { SEARCH_RESULT } from 'navigation/routes'
+import { DuplicateDetails, Action } from 'components/DuplicateDetails'
+import { Event } from 'forms'
+import { NotDuplicateConfirmation } from 'views/Duplicates/NotDuplicateConfirmation'
 import { RouteComponentProps } from 'react-router'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
-import { createNamesMap } from 'src/utils/data-formatting'
+import { createNamesMap } from 'utils/data-formatting'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+import { IStoreState } from 'store'
 import {
   GQLBirthRegistration,
   GQLHumanName,
@@ -30,9 +30,9 @@ import {
   GQLRegStatus,
   GQLComment
 } from '@opencrvs/gateway/src/graphql/schema'
-import { formatLongDate } from 'src/utils/date-formatting'
+import { formatLongDate } from 'utils/date-formatting'
 import * as Sentry from '@sentry/browser'
-import { extractCommentFragmentValue } from 'src/utils/data-formatting'
+import { extractCommentFragmentValue } from 'utils/data-formatting'
 
 interface IMatchParams {
   applicationId: string

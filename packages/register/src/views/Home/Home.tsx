@@ -2,14 +2,14 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { RouteComponentProps } from 'react-router'
-import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
-import { IStoreState } from '@opencrvs/register/src/store'
+import { getLanguage } from '/i18n/selectors'
+import { IStoreState } from '/store'
 import {
   goToEvents as goToEventsAction,
   goToMyRecords as goToMyRecordsAction,
   goToMyDrafts as goToMyDraftsAction
-} from 'src/navigation'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+} from 'navigation'
+import { HomeViewHeader } from 'components/HomeViewHeader'
 import {
   Banner,
   SearchInput,
@@ -19,7 +19,7 @@ import {
   FooterAction,
   FooterPrimaryButton,
   ViewFooter
-} from 'src/components/interface/footer'
+} from 'components/interface/footer'
 import {
   ActionList,
   IconAction,
@@ -27,13 +27,13 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { Plus } from '@opencrvs/components/lib/icons'
-import styled from 'src/styled-components'
+import styled from 'styled-components'
 import { IUserDetails } from '../../utils/userUtils'
-import { getUserDetails } from 'src/profile/profileSelectors'
+import { getUserDetails } from 'profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'src/utils/constants'
+import { NOTIFICATION_STATUS, REJECTED_STATUS } from 'utils/constants'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
-import { WORK_QUEUE } from 'src/navigation/routes'
+import { WORK_QUEUE } from 'navigation/routes'
 
 const messages = defineMessages({
   declareNewEventActionTitle: {

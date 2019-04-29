@@ -10,7 +10,7 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   FETCH_BUTTON,
   TEL
-} from 'src/forms'
+} from 'forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
@@ -19,8 +19,8 @@ import {
   validIDNumber,
   numeric,
   maxLength
-} from 'src/utils/validate'
-import { countries } from 'src/forms/countries'
+} from 'utils/validate'
+import { countries } from 'forms/countries'
 
 import {
   messages as identityMessages,
@@ -31,30 +31,30 @@ import {
 import { messages as maritalStatusMessages } from '../../../maritalStatus'
 import { messages as addressMessages } from '../../../address'
 
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { conditionals } from 'src/forms/utils'
+import { OFFLINE_LOCATIONS_KEY } from 'offline/reducer'
+import { conditionals } from 'forms/utils'
 import {
   fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
   copyAddressTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from 'forms/mappings/mutation/field-mappings'
 import {
   nameToFieldTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
   addressToFieldTransformer,
   sameAddressFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from 'forms/mappings/query/field-mappings'
 import {
   FETCH_REGISTRATION,
   transformRegistrationData
-} from '@opencrvs/register/src/forms/register/queries/registration'
+} from '/forms/register/queries/registration'
 import {
   FETCH_PERSON,
   transformPersonData
-} from '@opencrvs/register/src/forms/register/queries/person'
+} from '/forms/register/queries/person'
 
 const messages = defineMessages({
   deceasedTab: {

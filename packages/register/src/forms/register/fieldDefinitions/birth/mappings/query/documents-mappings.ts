@@ -1,5 +1,5 @@
-import { IFormField, IFormData } from 'src/forms'
-import { attachmentToFieldTransformer } from 'src/forms/mappings/query/field-mappings'
+import { IFormField, IFormData } from 'forms'
+import { attachmentToFieldTransformer } from 'forms/mappings/query/field-mappings'
 import {
   documentForWhomFhirMapping,
   documentTypeFhirMapping

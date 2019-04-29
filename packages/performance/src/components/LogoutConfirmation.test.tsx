@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
+import { LogoutConfirmation } from 'components/LogoutConfirmation'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
+import { createStore } from 'store'
+import { createTestComponent } from 'tests/util'
 
 const { store } = createStore()
 const mockHandleYes = jest.fn()

@@ -1,4 +1,4 @@
-import { ILocation } from 'src/offline/reducer'
+import { ILocation } from 'offline/reducer'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },

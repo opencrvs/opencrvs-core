@@ -6,27 +6,27 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   RegisterForm,
   IFormProps
-} from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
+} from '/views/RegisterForm/RegisterForm'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { IStoreState } from '@opencrvs/register/src/store'
+import { IStoreState } from '/store'
 import { connect } from 'react-redux'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { getReviewForm } from '/forms/register/review-selectors'
 import {
   storeDraft,
   IDraft,
   createReviewDraft
-} from '@opencrvs/register/src/drafts'
+} from '/drafts'
 import { Dispatch } from 'redux'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from '@opencrvs/register/src/utils/authUtils'
-import { gqlToDraftTransformer } from 'src/transformer'
-import { IFormData, Event, Action } from 'src/forms'
+import { getScope } from 'profile/profileSelectors'
+import { Scope } from '/utils/authUtils'
+import { gqlToDraftTransformer } from 'transformer'
+import { IFormData, Event, Action } from 'forms'
 import {
   QueryProvider,
   QueryContext
-} from 'src/views/DataProvider/QueryProvider'
+} from 'views/DataProvider/QueryProvider'
 import * as Sentry from '@sentry/browser'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'navigation/routes'
 
 const messages = defineMessages({
   queryError: {

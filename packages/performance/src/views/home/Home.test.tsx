@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { Home } from './Home'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
+import { createStore } from 'store'
 import {
   createTestComponent,
   mockUserResponse,
   userDetails
-} from 'src/tests/util'
-import { queries } from 'src/profile/queries'
-import { setInitialUserDetails } from '@opencrvs/performance/src/profile/actions'
+} from 'tests/util'
+import { queries } from 'profile/queries'
+import { setInitialUserDetails } from '/profile/actions'
 import { FETCH_METRIC } from './queries'
 
 const mockFetchUserDetails = jest.fn()

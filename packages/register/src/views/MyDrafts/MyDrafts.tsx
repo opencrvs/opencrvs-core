@@ -13,9 +13,9 @@ import { StatusGray, Edit } from '@opencrvs/components/lib/icons'
 import {
   goToHome as goToHomeAction,
   goToBirthRegistrationAsParent
-} from 'src/navigation'
-import { IStoreState } from 'src/store'
-import { IDraft } from 'src/drafts'
+} from 'navigation'
+import { IStoreState } from 'store'
+import { IDraft } from 'drafts'
 import * as moment from 'moment'
 
 const Container = styled.div`

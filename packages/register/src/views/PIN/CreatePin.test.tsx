@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { createTestComponent } from '../../tests/util'
 import { CreatePin } from './CreatePin'
-import { createStore } from 'src/store'
-import { storage } from '@opencrvs/register/src/storage'
+import { createStore } from 'store'
+import { storage } from '/storage'
 import { ReactWrapper } from 'enzyme'
 
 storage.setItem = jest.fn()

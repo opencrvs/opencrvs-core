@@ -6,19 +6,19 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
-import { storeDraft, IDraft } from 'src/drafts'
+} from 'tests/util'
+import { DRAFT_BIRTH_PARENT_FORM } from 'navigation/routes'
+import { storeDraft, IDraft } from 'drafts'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
+import { storage } from 'storage'
 import { v4 as uuid } from 'uuid'
-import { draftToGqlTransformer } from 'src/transformer'
-import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import { Event, IForm } from '@opencrvs/register/src/forms'
+import { draftToGqlTransformer } from 'transformer'
+import { getRegisterForm } from '/forms/register/application-selectors'
+import { getOfflineDataSuccess } from 'offline/actions'
+import { Event, IForm } from '/forms'
 import { clone } from 'lodash'
 
 interface IPersonDetails {

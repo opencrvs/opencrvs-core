@@ -3,19 +3,19 @@ import {
   createTestComponent,
   selectOption,
   mockOfflineData
-} from 'src/tests/util'
+} from 'tests/util'
 import { FormFieldGenerator } from './FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
-import { createDraft, storeDraft } from 'src/drafts'
+import { createDraft, storeDraft } from 'drafts'
 import { createStore } from '../../store'
 import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL,
   Event
-} from 'src/forms'
-import { countries } from 'src/forms/countries'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+} from 'forms'
+import { countries } from 'forms/countries'
+import { OFFLINE_LOCATIONS_KEY } from 'offline/reducer'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -29,7 +29,7 @@ const offlineResources = {
   loadingError: false
 }
 
-import { messages as addressMessages } from 'src/forms/address'
+import { messages as addressMessages } from 'forms/address'
 
 describe('form component', () => {
   const { store } = createStore()

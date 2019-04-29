@@ -1,4 +1,4 @@
-import { IFormData } from 'src/forms'
+import { IFormData } from 'forms'
 
 export function setRegistrationSectionTransformer(
   transformedData: any,

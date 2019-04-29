@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import { resolve } from 'url'
-import { ILocation } from 'src/offline/reducer'
+import { ILocation } from 'offline/reducer'
 import { getToken } from './authUtils'
 
 export interface ILocationDataResponse {

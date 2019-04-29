@@ -1,4 +1,4 @@
-import { isMobileDevice } from 'src/utils/commonUtils'
+import { isMobileDevice } from 'utils/commonUtils'
 describe('Common Utils Test', () => {
   it('Should simulate Mobile Devise', () => {
     const mobileDevise = isMobileDevice()

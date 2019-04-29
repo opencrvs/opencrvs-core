@@ -1,5 +1,5 @@
-import { IFormField, IFormData } from 'src/forms'
-import { fieldToAttachmentTransformer } from 'src/forms/mappings/mutation/field-mappings'
+import { IFormField, IFormData } from 'forms'
+import { fieldToAttachmentTransformer } from 'forms/mappings/mutation/field-mappings'
 
 export const documentForWhomFhirMapping = {
   "Proof of Deceased's ID": 'DECEASED_ID_PROOF',

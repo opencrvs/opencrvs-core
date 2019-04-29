@@ -37,29 +37,29 @@ import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IDraft } from 'src/drafts'
-import { Event } from 'src/forms'
+import { HomeViewHeader } from 'components/HomeViewHeader'
+import { IViewHeadingProps } from 'components/ViewHeading'
+import { IDraft } from 'drafts'
+import { Event } from 'forms'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToTab as goToTabAction,
   goToSearchResult
-} from 'src/navigation'
+} from 'navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB
-} from 'src/navigation/routes'
-import { getScope, getUserDetails } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
-import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
+} from 'navigation/routes'
+import { getScope, getUserDetails } from 'profile/profileSelectors'
+import { IStoreState } from 'store'
+import { Scope } from 'utils/authUtils'
+import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'utils/constants'
+import { createNamesMap } from 'utils/data-formatting'
+import { formatLongDate } from 'utils/date-formatting'
+import { getUserLocation, IUserDetails } from 'utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'

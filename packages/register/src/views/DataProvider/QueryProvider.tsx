@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { Event, Action } from 'src/forms'
+import { Event, Action } from 'forms'
 import { getBirthQueryMappings } from './birth/queries'
 import { getDeathQueryMappings } from './death/queries'
 import { Query } from 'react-apollo'

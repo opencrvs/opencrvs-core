@@ -1,4 +1,4 @@
-import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from 'src/forms'
+import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from 'forms'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({

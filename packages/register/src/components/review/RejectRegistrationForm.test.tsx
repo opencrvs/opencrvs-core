@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
-import { RejectRegistrationForm } from '@opencrvs/register/src/components/review/RejectRegistrationForm'
-import { Event } from 'src/forms'
+import { createStore } from 'store'
+import { createTestComponent } from 'tests/util'
+import { RejectRegistrationForm } from '/components/review/RejectRegistrationForm'
+import { Event } from 'forms'
 
 const { store } = createStore()
 const mockHandler = jest.fn()

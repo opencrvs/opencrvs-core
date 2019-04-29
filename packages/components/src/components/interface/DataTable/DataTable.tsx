@@ -11,7 +11,7 @@ import {
 } from '../SelectGroup'
 
 import { ISortAndFilterItem, IInputLabel } from './SortAndFilter'
-import { IDynamicValues } from 'src/components/common-types'
+import { IDynamicValues } from 'components/common-types'
 
 const Wrapper = styled.div`
   width: 100%;

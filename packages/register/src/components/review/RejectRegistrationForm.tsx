@@ -1,21 +1,21 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-import { FormFieldGenerator } from 'src/components/form'
-import { IFormSectionData, Event, Action } from 'src/forms'
-import { hasFormError } from 'src/forms/utils'
-import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
-import { IStoreState } from '@opencrvs/register/src/store'
+import { FormFieldGenerator } from 'components/form'
+import { IFormSectionData, Event, Action } from 'forms'
+import { hasFormError } from 'forms/utils'
+import { IRejectRegistrationForm } from '/review/reject-registration'
+import { IStoreState } from '/store'
 import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { getRejectForm } from '@opencrvs/register/src/review/selectors'
+import { getRejectForm } from '/review/selectors'
 import { Dispatch } from 'redux'
-import { goToSearchResult } from 'src/navigation'
+import { goToSearchResult } from 'navigation'
 import {
   MutationProvider,
   MutationContext
-} from 'src/views/DataProvider/MutationProvider'
+} from 'views/DataProvider/MutationProvider'
 
 const messages = defineMessages({
   back: {

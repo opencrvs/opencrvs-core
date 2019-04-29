@@ -32,7 +32,7 @@ export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 
 import { defineMessages } from 'react-intl'
-import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { IDynamicValues } from '/navigation'
 
 export const messages = defineMessages({
   otherOption: {

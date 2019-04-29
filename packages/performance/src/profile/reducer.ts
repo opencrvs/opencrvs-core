@@ -12,7 +12,7 @@ import {
   IUserDetails,
   getUserDetails,
   storeUserDetails
-} from 'src/utils/userUtils'
+} from 'utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from './queries'

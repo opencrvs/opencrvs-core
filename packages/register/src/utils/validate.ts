@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { FormattedMessage, MessageValue } from 'react-intl'
-import { IFormFieldValue } from '@opencrvs/register/src/forms'
+import { IFormFieldValue } from '/forms'
 
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
@@ -10,7 +10,7 @@ import {
   BIRTH_REGISTRATION_NUMBER,
   DEATH_REGISTRATION_NUMBER,
   PASSPORT
-} from 'src/forms/identity'
+} from 'forms/identity'
 import { REGEXP_ALPHA_NUMERIC, REGEXP_BLOCK_ALPHA_NUMERIC } from './constants'
 
 export interface IValidationResult {

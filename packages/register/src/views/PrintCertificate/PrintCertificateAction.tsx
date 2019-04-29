@@ -8,7 +8,7 @@ import {
   defineMessages,
   InjectedIntl
 } from 'react-intl'
-import { FormFieldGenerator } from 'src/components/form'
+import { FormFieldGenerator } from 'components/form'
 import {
   IFormSection,
   IFormSectionData,
@@ -20,15 +20,15 @@ import {
   IForm,
   Event,
   Action
-} from 'src/forms'
+} from 'forms'
 import {
   PrimaryButton,
   SecondaryButton,
   IconAction
 } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { hasFormError } from 'src/forms/utils'
+import { IStoreState } from 'store'
+import { hasFormError } from 'forms/utils'
 import { calculatePrice } from './calculatePrice'
 import { Print } from '@opencrvs/components/lib/icons'
 import * as moment from 'moment'
@@ -41,45 +41,45 @@ import {
   CertificateDetails,
   generateAndPrintCertificate
 } from './generatePDF'
-import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
+import { CERTIFICATE_DATE_FORMAT } from 'utils/constants'
 import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
 import {
   storeDraft,
   createReviewDraft,
   IDraftsState,
   IDraft
-} from '@opencrvs/register/src/drafts'
+} from '/drafts'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import {
   fatherDataDoesNotExist,
   fatherDataExists
-} from 'src/forms/certificate/fieldDefinitions/collector-section'
-import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
-import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+} from 'forms/certificate/fieldDefinitions/collector-section'
+import { gqlToDraftTransformer, draftToGqlTransformer } from 'transformer'
+import { documentForWhomFhirMapping } from 'forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import {
   MutationProvider,
   MutationContext
-} from 'src/views/DataProvider/MutationProvider'
+} from 'views/DataProvider/MutationProvider'
 import {
   QueryProvider,
   QueryContext
-} from 'src/views/DataProvider/QueryProvider'
-import { getUserDetails } from 'src/profile/profileSelectors'
+} from 'views/DataProvider/QueryProvider'
+import { getUserDetails } from 'profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails } from 'utils/userUtils'
 import { RouteComponentProps } from 'react-router'
-import { goToHome } from 'src/navigation'
-import { CERTIFICATION, COMPLETION } from 'src/utils/constants'
-import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
+import { goToHome } from 'navigation'
+import { CERTIFICATION, COMPLETION } from 'utils/constants'
+import { CONFIRMATION_SCREEN } from 'navigation/routes'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { getOfflineState } from 'src/offline/selectors'
-import { renderSelectDynamicLabel } from 'src/views/RegisterForm/review/ReviewSection'
+} from 'offline/reducer'
+import { getOfflineState } from 'offline/selectors'
+import { renderSelectDynamicLabel } from 'views/RegisterForm/review/ReviewSection'
 import * as Sentry from '@sentry/browser'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'

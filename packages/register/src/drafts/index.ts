@@ -1,9 +1,9 @@
 import { IFormData, Event } from '../forms'
-import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
-import { storage } from 'src/storage'
+import { GO_TO_TAB, Action as NavigationAction } from 'navigation'
+import { storage } from 'storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails } from 'utils/userUtils'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'

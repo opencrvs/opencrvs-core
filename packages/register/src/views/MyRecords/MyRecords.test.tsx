@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent } from 'tests/util'
 import { MyRecords } from './MyRecords'
-import { createStore } from 'src/store'
+import { createStore } from 'store'
 
 describe('MyRecords tests', async () => {
   it('sets loading state while waiting for data', () => {

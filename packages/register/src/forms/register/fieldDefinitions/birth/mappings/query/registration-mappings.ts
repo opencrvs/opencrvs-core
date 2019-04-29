@@ -1,4 +1,4 @@
-import { IFormData, Event } from 'src/forms'
+import { IFormData, Event } from 'forms'
 
 export function getRegistrationSectionTransformer(
   transformedData: IFormData,

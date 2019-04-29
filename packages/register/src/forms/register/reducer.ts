@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm } from 'src/forms'
+import { IForm } from 'forms'
 import { defineMessages } from 'react-intl'
 import { childSection } from './fieldDefinitions/birth/child-section'
 import { motherSection } from './fieldDefinitions/birth/mother-section'
