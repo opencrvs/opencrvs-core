@@ -13,6 +13,7 @@ const styledErrorWrapper = styled.div.attrs<IInputError>({})
 const InputErrorWrapper = styledErrorWrapper`
   min-height: 18px;
   width: 100%;
+  padding-top:4px;
   display: inline-block;
   ${({ theme }) => theme.fonts.infoFontStyle}
   color: ${({ theme, color }) => (color ? color : theme.colors.error)};

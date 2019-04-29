@@ -1,7 +1,14 @@
-docker run --rm --network=opencrvs_overlay_net mongo:3.6 mongo hearth-dev --host mongo --eval "db.dropDatabase()"
+if [ "$DEV" = "true" ]; then
+  HOST=mongo1
+  echo "Working in DEV mode"
+else
+  HOST=rs0/mongo1,mongo2,mongo3
+fi
 
-docker run --rm --network=opencrvs_overlay_net mongo:3.6 mongo openhim-dev --host mongo --eval "db.dropDatabase()"
+docker run --rm --network=opencrvs_overlay_net mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
 
-docker run --rm --network=opencrvs_overlay_net mongo:3.6 mongo user-mgnt --host mongo --eval "db.dropDatabase()"
+docker run --rm --network=opencrvs_overlay_net mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
+
+docker run --rm --network=opencrvs_overlay_net mongo:3.6 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
 
 docker run --rm --network=opencrvs_overlay_net appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v

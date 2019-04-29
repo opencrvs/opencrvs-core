@@ -9,12 +9,12 @@ const fontFaces = [
     fontFamily: styleGuideCountryFonts[country].lightFontFamily,
     fontStyle: 'normal',
     fontWeight: '300',
-    src: `url('notosans-extra-light-webfont-en.ttf') format('truetype')`
+    src: `url('notosans-light-webfont-en.ttf') format('truetype')`
   },
   {
     fontFamily: styleGuideCountryFonts[country].regularFontFamily,
     fontStyle: 'normal',
-    src: `url('notosans-light-webfont-en.ttf') format('truetype')`
+    src: `url('notosans-regular-webfont-en.ttf') format('truetype')`
   },
   {
     fontFamily: styleGuideCountryFonts[country].boldFontFamily,

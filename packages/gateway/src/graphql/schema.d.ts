@@ -505,7 +505,7 @@ export interface GQLBirthRegistrationByAgeMetrics {
 export interface GQLBirthRegistrationWithIn45D {
   label?: string
   value?: number
-  total?: number
+  totalEstimate?: number
 }
 
 export interface GQLMutation {
@@ -2256,7 +2256,7 @@ export interface BirthRegistrationByAgeMetricsToValueResolver<
 export interface GQLBirthRegistrationWithIn45DTypeResolver<TParent = any> {
   label?: BirthRegistrationWithIn45DToLabelResolver<TParent>
   value?: BirthRegistrationWithIn45DToValueResolver<TParent>
-  total?: BirthRegistrationWithIn45DToTotalResolver<TParent>
+  totalEstimate?: BirthRegistrationWithIn45DToTotalEstimateResolver<TParent>
 }
 
 export interface BirthRegistrationWithIn45DToLabelResolver<
@@ -2273,7 +2273,7 @@ export interface BirthRegistrationWithIn45DToValueResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationWithIn45DToTotalResolver<
+export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
   TParent = any,
   TResult = any
 > {
