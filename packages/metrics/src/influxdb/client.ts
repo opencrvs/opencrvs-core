@@ -1,5 +1,6 @@
 import * as Influx from 'influx'
 import { INFLUX_DB, INFLUX_HOST, INFLUX_PORT } from './constants'
+import { logger } from 'src/logger'
 
 export const influx = new Influx.InfluxDB({
   host: INFLUX_HOST,
@@ -25,7 +26,7 @@ export const writePoints = (points: any[]) => {
   influx
     .writePoints(points)
     .catch((err: Error) =>
-      console.log(`Error saving data to InfluxDB! ${err.stack}`)
+      logger.error(`Error saving data to InfluxDB! ${err.stack}`)
     )
 }
 
@@ -33,7 +34,7 @@ export const readPoints = (query: string) => {
   try {
     return influx.query(query)
   } catch (err) {
-    console.log(`Error reading data from InfluxDB! ${err.stack}`)
+    logger.error(`Error reading data from InfluxDB! ${err.stack}`)
     throw new Error(err)
   }
 }
