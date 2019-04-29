@@ -4,7 +4,8 @@ import { PrimaryButton } from '../buttons'
 
 const ImageBase = styled(PrimaryButton.withComponent('label'))`
   width: auto;
-  padding: 15px 35px;
+  height: 48px;
+  padding: 0 35px;
   font-family: ${({ theme }) => theme.fonts.boldFont};
   align-items: center;
   display: inline-flex;
