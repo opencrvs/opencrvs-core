@@ -10,6 +10,7 @@
     "react-docgen-typescript": "^1.7.0",
     "react-dom": "^16.3.2",
     "react-pdf": "^4.0.2",
+    "react-scripts": "3.0.0",
     "react-select": "^2.0.0",
     "react-styleguidist": "^7.0.13",
     "recharts": "^1.4.0",
@@ -36,7 +37,7 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "^22.2.3",
+    "@types/jest": "^24.0.12",
     "@types/node": "^10.12.5",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
@@ -45,7 +46,6 @@
     "dotenv": "^6.1.0",
     "lint-staged": "^7.1.0",
     "prettier": "^1.15.2",
-    "react-scripts-ts": "^2.16.0",
     "rimraf": "^2.6.2",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",

@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "transformIgnorePatterns": ["/!node_modules\\/lodash-es/"],
-  "compilerOptions": {
-    "module": "commonjs"
-  }
-}
