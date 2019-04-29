@@ -23,7 +23,7 @@ export type IPasswordInputProps = ICustomProps &
 const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
   width: 100%;
   padding: 8px 10px;
-  min-height: 30px;
+  height: 48px;
   transition: border-color 500ms ease-out;
   border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '1px')}
     ${({ error, touched, theme }) =>

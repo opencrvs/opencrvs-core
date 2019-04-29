@@ -37,6 +37,7 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   .react-select__control {
     background: ${({ theme }) => theme.colors.inputBackground};
     border-radius: 0;
+    height: 48px;
     box-shadow: none;
     font-size: 18px;
     font-weight: 400px;
