@@ -42,6 +42,9 @@ type Query {
     locationIds: [String]
     status: String
     searchContent: String
+    trackingId: String
+    registrationNumber: String
+    contactNumber: String
     eventType: String
     count: Int
     skip: Int

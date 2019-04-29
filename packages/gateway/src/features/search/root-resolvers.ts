@@ -2,11 +2,6 @@ import { GQLResolver } from 'src/graphql/schema'
 import { postSearch } from 'src/features/fhir/utils'
 import { ISearchCriteria } from './type-resovlers'
 
-export interface ITimeRange {
-  timeStart: string | undefined
-  timeEnd: string | undefined
-}
-
 export const resolvers: GQLResolver = {
   Query: {
     async searchEvents(
@@ -16,6 +11,9 @@ export const resolvers: GQLResolver = {
         status,
         locationIds,
         searchContent,
+        trackingId,
+        registrationNumber,
+        contactNumber,
         count = 10,
         skip = 0,
         sort = 'desc'
@@ -38,6 +36,15 @@ export const resolvers: GQLResolver = {
       }
       if (searchContent) {
         searchCriteria.query = searchContent
+      }
+      if (trackingId) {
+        searchCriteria.trackingId = trackingId
+      }
+      if (registrationNumber) {
+        searchCriteria.registrationNumber = registrationNumber
+      }
+      if (contactNumber) {
+        searchCriteria.contactNumber = contactNumber
       }
 
       const searchResult = await postSearch(authHeader, searchCriteria)

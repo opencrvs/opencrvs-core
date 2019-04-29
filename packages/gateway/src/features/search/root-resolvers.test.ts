@@ -13,7 +13,6 @@ describe('Search root resolvers', () => {
           hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
         })
       )
-      // @ts-ignore
       const result = await resolvers.Query.searchEvents(
         {},
         {
@@ -31,7 +30,6 @@ describe('Search root resolvers', () => {
           hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
         })
       )
-      // @ts-ignore
       const result = await resolvers.Query.searchEvents(
         {},
         {
@@ -49,7 +47,6 @@ describe('Search root resolvers', () => {
           hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
         })
       )
-      // @ts-ignore
       const result = await resolvers.Query.searchEvents(
         {},
         {
@@ -67,11 +64,61 @@ describe('Search root resolvers', () => {
           hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
         })
       )
-      // @ts-ignore
       const result = await resolvers.Query.searchEvents(
         {},
         {
           searchContent: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for trackingId', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          trackingId: 'B123456'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for registrationNumber', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          registrationNumber: 'D2019123258D1234562'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for contactNumber', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          contactNumber: '01622688231'
         }
       )
 
@@ -85,7 +132,6 @@ describe('Search root resolvers', () => {
           hits: null
         })
       )
-      // @ts-ignore
       const result = await resolvers.Query.searchEvents(
         {},
         {
