@@ -139,7 +139,7 @@ export const ErrorText = styled.p`
 `
 
 export const FieldWrapper = styled.div`
-  min-height: 6.7em;
+  min-height: 6.5em;
 `
 
 export interface IProps {
