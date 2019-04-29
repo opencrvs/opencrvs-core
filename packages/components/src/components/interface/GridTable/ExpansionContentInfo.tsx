@@ -12,15 +12,15 @@ import {
 import { IDynamicValues, IExpandedContentPreference, IStatus } from './types'
 
 const ExpansionContent = styled.div`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
   margin-bottom: 1px;
 `
 const ExpansionContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
-  color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   &:last-child {
     margin-bottom: 0;
   }
@@ -46,24 +46,24 @@ const ValueContainer = styled.div`
   line-height: 1.3em;
 `
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 const Separator = styled.div`
   height: 20px;
   width: 1px;
   margin: 1px 8px;
-  background: ${({ theme }) => theme.colors.copyAlpha80};
+  background: ${({ theme }: any) => theme.colors.copyAlpha80};
 `
 const DuplicateIndicatorContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
   & span {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    font-family: ${({ theme }: any) => theme.fonts.boldFont};
     margin-left: 10px;
   }
 `
@@ -71,7 +71,7 @@ const PaddedContent = styled.div`
   padding: 25px;
 `
 const BorderedPaddedContent = styled(PaddedContent)`
-  border-bottom: ${({ theme }) => `2px solid ${theme.colors.seperatorBorder}`};
+  border-bottom: ${({ theme }: any) => `2px solid ${theme.colors.seperatorBorder}`};
 `
 const HistoryWrapper = styled.div`
   padding: 10px 25px;

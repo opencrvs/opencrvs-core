@@ -85,25 +85,25 @@ const ExpansionSpinnerContainer = styled.div`
   justify-content: center;
 `
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `
 
 const Container = styled.div`
   margin: 35px 250px 0px 250px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px) {
     margin-left: 20px;
     margin-right: 20px;
   }
 `
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
@@ -111,7 +111,7 @@ const ValueContainer = styled.div`
   flex-wrap: wrap;
   line-height: 1.3em;
   & span:not(:last-child) {
-    border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
+    border-right: 1px solid ${({ theme }: any) => theme.colors.copyAlpha80};
     margin-right: 10px;
     padding-right: 10px;
   }
@@ -122,7 +122,7 @@ export const ActionPageWrapper = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }: any) => theme.colors.background};
   z-index: 4;
   width: 100%;
   height: 100%;
@@ -177,8 +177,8 @@ const ExpansionContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: row;
-  color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
@@ -189,22 +189,22 @@ const ExpansionContentContainer = styled.div`
   margin-left: 10px;
 `
 const StyledPrimaryButton = styled(PrimaryButton)`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
 `
 
 const StyledSecondaryButton = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
-  color: ${({ theme }) => theme.colors.primary} !important;
+  border: solid 1px ${({ theme }: any) => theme.colors.disabledButton};
+  color: ${({ theme }: any) => theme.colors.primary} !important;
   font-weight: bold;
   svg {
     margin-right: 15px;
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }: any) => theme.colors.disabledButton};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }: any) => theme.colors.inputBackground};
   }
 `
 const StatusIcon = styled.div`

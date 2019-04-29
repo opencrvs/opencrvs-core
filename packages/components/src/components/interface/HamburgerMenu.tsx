@@ -46,12 +46,12 @@ const MenuContainer = styled.div`
   top: 0;
   right: 0;
   width: 199px;
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }: any) => theme.colors.primary};
   z-index: 3;
   position: absolute;
 
   .rc-menu {
-    background-color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }: any) => theme.colors.primary};
     outline: none;
     margin-bottom: 0;
     padding-left: 0;
@@ -73,7 +73,7 @@ const MenuContainer = styled.div`
   .rc-menu-item-active,
   .rc-menu-item-selected,
   .rc-menu-submenu-active > .rc-menu-submenu-title {
-    background-color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }: any) => theme.colors.primary};
     font-weight: bold;
   }
 
@@ -84,7 +84,7 @@ const MenuContainer = styled.div`
 
   .rc-menu-item,
   .rc-menu-submenu-title {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    font-family: ${({ theme }: any) => theme.fonts.lightFont};
     cursor: pointer;
     padding: 18px 22px;
     min-height: 30px;
@@ -106,7 +106,7 @@ const MenuContainer = styled.div`
   }
 
   ul.rc-menu.rc-menu-sub.rc-menu-vertical > li {
-    border-top: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
+    border-top: 1px inset ${({ theme }: any) => theme.colors.blackAlpha20};
   }
 
   li.rc-menu-submenu.rc-menu-submenu-vertical > div:nth-child(2) {
@@ -135,26 +135,26 @@ const StyledNestedSubMenu = styled(SubMenu)`
     padding: 18px 22px !important;
   }
   .rc-menu-item:hover {
-    background-color: ${({ theme }) => theme.colors.secondary};
+    background-color: ${({ theme }: any) => theme.colors.secondary};
   }
   .rc-menu-item-selected {
-    background-color: ${({ theme }) => theme.colors.secondary};
+    background-color: ${({ theme }: any) => theme.colors.secondary};
     font-weight: bold;
   }
 `
 const StyledNestedMenuItem = styled(MenuItem)`
-  background-color: ${({ theme }) => theme.colors.secondary};
+  background-color: ${({ theme }: any) => theme.colors.secondary};
 `
 const SubMenuTitleWrapper = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   font-size: 16px;
   font-weight: normal;
 `
 
 const MenuTitleWrapper = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   font-size: 14px;
   text-transform: uppercase;
   font-weight: bold;
@@ -162,7 +162,7 @@ const MenuTitleWrapper = styled.span`
   padding-right: 40px;
 `
 const IconWrapper = styled.i`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   right: 30px;
   margin-left: 20px;
   position: absolute;
@@ -171,7 +171,7 @@ const IconClose = styled.div`
   font-size: 45px;
   margin-top: 0px;
   margin-right: 2px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
 `
 interface IMenuItem {
   title: string

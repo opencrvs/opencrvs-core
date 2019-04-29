@@ -5,7 +5,7 @@ import { ActionPage } from '@opencrvs/components/lib/interface'
 import { OverlayContainer } from './ImageUploadOption'
 
 const PreviewContainer = styled(OverlayContainer)`
-  background: ${({ theme }) => theme.colors.black};
+  background: ${({ theme }: any) => theme.colors.black};
 `
 const ImageHolder = styled.div`
   position: relative;

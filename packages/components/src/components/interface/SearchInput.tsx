@@ -18,14 +18,14 @@ export type ISearchInputProps = ISerachInputCustomProps &
 
 const SearchContainer = styled.div`
   width: 100%;
-  padding: 10px ${({ theme }) => theme.grid.margin}px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.white};
+  padding: 10px ${({ theme }: any) => theme.grid.margin}px;
+  background: ${({ theme }: any) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   display: flex;
   align-items: center;
   justify-content: center;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     flex-wrap: wrap;
   }
 `
@@ -38,27 +38,27 @@ const SearchIconAndInput = styled.div`
 const SearchButton = styled(PrimaryButton)`
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) => theme.colors.secondary};
+  background: ${({ theme }: any) => theme.colors.secondary};
   font-weight: bold;
   margin: 0 5px;
   &:hover {
     background: linear-gradient(
-      ${({ theme }) => theme.colors.headerGradientDark},
-      ${({ theme }) => theme.colors.secondary}
+      ${({ theme }: any) => theme.colors.headerGradientDark},
+      ${({ theme }: any) => theme.colors.secondary}
     );
-    color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }: any) => theme.colors.white};
+    border: ${({ theme }: any) => theme.colors.white};
   }
 `
 
 const SearchIcon = styled(Search)`
   margin-bottom: 5px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.sm}px) {
     display: none;
   }
 `
 const StyledSearchButton = styled(SearchButton)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     margin-top: 20px;
     margin-bottom: 11px;
     max-width: 200px;
@@ -66,13 +66,13 @@ const StyledSearchButton = styled(SearchButton)`
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }: any) => theme.colors.disabledButton};
     }
     g {
-      fill: ${({ theme }) => theme.colors.disabled};
+      fill: ${({ theme }: any) => theme.colors.disabled};
     }
     h3 {
-      color: ${({ theme }) => theme.colors.disabled};
+      color: ${({ theme }: any) => theme.colors.disabled};
     }
   }
 `
@@ -84,28 +84,28 @@ const StyledInput = styled.input.attrs<ISearchInputProps>({})`
   min-width: 0px;
   transition: border-color 500ms ease-out;
   border: 0px solid;
-  border-bottom: solid 1px ${({ theme }) => theme.colors.secondary};
+  border-bottom: solid 1px ${({ theme }: any) => theme.colors.secondary};
   ${({ error, touched, theme }) =>
     error && touched ? theme.colors.error : theme.colors.disabled};
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
-  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }: any) => theme.fonts.defaultFontStyle};
+  color: ${({ theme }: any) => theme.colors.secondary};
 
   &:focus {
-    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
+    border-bottom: solid 1px ${({ theme }: any) => theme.colors.accent};
   }
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &::-webkit-outer-spin-button,

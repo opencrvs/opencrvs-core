@@ -4,16 +4,16 @@ import { Content } from './Content'
 
 const Page = styled.div`
   display: flex;
-  min-width: ${({ theme }) => theme.grid.minWidth}px;
+  min-width: ${({ theme }: any) => theme.grid.minWidth}px;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }: any) => theme.colors.background};
   min-height: 100vh;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  ${({ theme }: any) => theme.fonts.defaultFontStyle};
 `
 
 const Wrapper = styled.div`
   margin: auto;
-  max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
+  max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px;
 `
 
 export class PageWrapper extends React.Component {

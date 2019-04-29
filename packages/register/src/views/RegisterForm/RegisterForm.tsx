@@ -64,11 +64,11 @@ import * as Sentry from '@sentry/browser'
 import * as debounce from 'lodash/debounce'
 
 const FormSectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.copy};
 `
 const FormActionSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }: any) => theme.colors.inputBackground};
   margin: 0px -25px;
 `
 const FormAction = styled.div`
@@ -79,7 +79,7 @@ const FormAction = styled.div`
   padding-left: 25px;
 `
 const FormActionDivider = styled.div`
-  border-bottom: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
+  border-bottom: 1px inset ${({ theme }: any) => theme.colors.blackAlpha20};
 `
 
 const FormPrimaryButton = styled(PrimaryButton)`
@@ -94,7 +94,7 @@ const BackButtonContainer = styled.div`
 const BackButton = styled(PrimaryButton)`
   width: 69px;
   height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }: any) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
   /* stylelint-disable */
@@ -105,8 +105,8 @@ const BackButton = styled(PrimaryButton)`
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  color: ${({ theme }: any) => theme.colors.primary};
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;
@@ -120,19 +120,19 @@ const DraftButtonContainer = styled.div`
   align-items: center;
 `
 const DraftButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  color: ${({ theme }) => theme.colors.secondary};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  color: ${({ theme }: any) => theme.colors.secondary};
   font-size: 14px;
   text-decoration: underline;
   letter-spacing: 0px;
   margin-left: 14px;
 `
 const Notice = styled.div`
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }: any) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   padding: 25px;
-  color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   line-height: 24px;
   margin: 30px -25px;
@@ -140,7 +140,7 @@ const Notice = styled.div`
 const CancelButton = styled.a`
   text-decoration: underline;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }: any) => theme.colors.primary};
 `
 
 export const messages = defineMessages({
@@ -235,7 +235,7 @@ const FormViewContainer = styled.div`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
@@ -256,16 +256,16 @@ const ConfirmBtn = styled(PrimaryButton)`
   align-items: center;
   justify-content: space-evenly;
   &:disabled {
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }: any) => theme.colors.primary};
     path {
-      stroke: ${({ theme }) => theme.colors.disabled};
+      stroke: ${({ theme }: any) => theme.colors.disabled};
     }
   }
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `

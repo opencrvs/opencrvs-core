@@ -26,7 +26,7 @@ interface IList {
 }
 
 const StyledList = styled.ul`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -34,12 +34,12 @@ const StyledList = styled.ul`
 `
 
 const ListItemContainer = styled.li`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  background-color: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  background-color: ${({ theme }: any) => theme.colors.white};
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   width: 100%;
   margin-bottom: 1px;
   padding: 10px;
@@ -51,7 +51,7 @@ const ListItemContainer = styled.li`
 
 const InfoDiv = styled.div`
   flex-grow: 1;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
 `
@@ -60,19 +60,19 @@ const StatusDiv = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-end;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     width: 100%;
     margin-top: 10px;
   }
 `
 
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   margin-right: 3px;
 `
 
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 
 function LabelValue({ label, value }: IProp) {

@@ -16,7 +16,7 @@ const Estimate = styled.div`
   height: 60px;
   width: 100%;
   box-sizing: border-box;
-  border: 2px dashed ${({ theme }) => theme.colors.accent};
+  border: 2px dashed ${({ theme }: any) => theme.colors.accent};
   padding: 6px;
 `
 

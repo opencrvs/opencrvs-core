@@ -9,10 +9,10 @@ const ActionContainer = styled.div`
 const HeaderContainer = styled.div`
   background: linear-gradient(
     270deg,
-    ${({ theme }) => theme.colors.headerGradientLight} 0%,
-    ${({ theme }) => theme.colors.headerGradientDark} 100%
+    ${({ theme }: any) => theme.colors.headerGradientLight} 0%,
+    ${({ theme }: any) => theme.colors.headerGradientDark} 100%
   );
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   font-weight: bold;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
   height: 90px;
@@ -29,12 +29,12 @@ const HeaderContent = styled.div`
 const BackButtonContainer = styled.div`
   float: left;
   cursor: pointer;
-  margin-left: ${({ theme }) => theme.grid.margin}px;
+  margin-left: ${({ theme }: any) => theme.grid.margin}px;
 `
 const BackButton = styled(PrimaryButton)`
   width: 69px;
   height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }: any) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
   /* stylelint-disable */
@@ -44,17 +44,17 @@ const BackButton = styled(PrimaryButton)`
   }
 `
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;
   margin-left: 14px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
 const MenuTitle = styled.span`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   font-size: 25px;
   font-weight: 300;
   position: absolute;

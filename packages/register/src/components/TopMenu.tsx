@@ -86,13 +86,13 @@ const TopMenuContainer = styled.div`
 
 const BackButtonContainer = styled.div`
   cursor: pointer;
-  margin-left: ${({ theme }) => theme.grid.margin}px;
+  margin-left: ${({ theme }: any) => theme.grid.margin}px;
 `
 
 const BackButton = styled(PrimaryButton)`
   width: 69px;
   height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }: any) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
   /* stylelint-disable */
@@ -103,7 +103,7 @@ const BackButton = styled(PrimaryButton)`
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;

@@ -20,7 +20,7 @@ const Container = styled.div`
 const DotFilled = styled.span`
   height: 18px;
   width: 18px;
-  background-color: ${({ theme }) => theme.colors.accentLight};
+  background-color: ${({ theme }: any) => theme.colors.accentLight};
   border-radius: 50%;
   display: inline-block;
   margin: 24px;
@@ -29,7 +29,7 @@ const DotFilled = styled.span`
 const DotUnfilled = styled.span`
   height: 18px;
   width: 18px;
-  border: 2px solid ${({ theme }) => theme.colors.accentLight};
+  border: 2px solid ${({ theme }: any) => theme.colors.accentLight};
   border-radius: 50%;
   display: inline-block;
   margin: 24px;
@@ -41,9 +41,9 @@ const NumberContainer = styled.div`
 `
 
 const Key = styled.span`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   font-size: 34px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   padding: 24px 48px;
   text-align: center;
 `

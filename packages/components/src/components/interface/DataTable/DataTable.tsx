@@ -17,15 +17,15 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const StyledList = styled.ul`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   list-style-type: none;
   padding: 0;
   margin: 0;
   width: 100%;
 `
 const ResultsText = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.placeholder};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
   font-weight: 500;
   margin: 10px 0;

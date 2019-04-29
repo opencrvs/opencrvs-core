@@ -5,8 +5,8 @@ export const Content = styled.section`
   flex: 1;
   width: 100%;
   height: 100%;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  color: ${({ theme }: any) => theme.colors.copy};
+  ${({ theme }: any) => theme.fonts.defaultFontStyle};
   letter-spacing: 0.5px;
 `
 

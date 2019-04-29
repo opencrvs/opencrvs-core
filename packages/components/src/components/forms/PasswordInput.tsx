@@ -30,20 +30,20 @@ const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
       error && touched ? theme.colors.error : theme.colors.secondary};
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.inputBackground};
+  ${({ theme }: any) => theme.fonts.defaultFontStyle};
+  color: ${({ theme }: any) => theme.colors.secondary};
+  background: ${({ theme }: any) => theme.colors.inputBackground};
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &::-webkit-outer-spin-button,
@@ -72,8 +72,8 @@ const IconButton = styled.button`
   border: none;
   cursor: pointer;
   outline: none;
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }: any) => theme.colors.secondary};
+  background: ${({ theme }: any) => theme.colors.background};
 `
 
 export class PasswordInput extends React.Component<

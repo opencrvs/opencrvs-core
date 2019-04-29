@@ -3,29 +3,29 @@ import styled, { StyledComponentClass } from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
 export const PrimaryButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.primary};
-  border: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.primary};
+  border: ${({ theme }: any) => theme.colors.white};
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  ${({ theme }: any) => theme.fonts.capsFontStyle};
 
   &:hover {
     background: linear-gradient(
-      ${({ theme }) => theme.colors.hoverGradientDark},
-      ${({ theme }) => theme.colors.primary}
+      ${({ theme }: any) => theme.colors.hoverGradientDark},
+      ${({ theme }: any) => theme.colors.primary}
     );
-    color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }: any) => theme.colors.white};
+    border: ${({ theme }: any) => theme.colors.white};
   }
 
   &:active {
-    color: ${({ theme }) => theme.colors.accentGradientDark};
+    color: ${({ theme }: any) => theme.colors.accentGradientDark};
     outline: none;
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }: any) => theme.colors.white};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }: any) => theme.colors.disabled};
   }
 `

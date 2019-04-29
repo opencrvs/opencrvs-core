@@ -15,18 +15,18 @@ const StyledSpinner = styledSpinner`
   width: 6em;
   height: 6em;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.accentGradientDark};
-  background: -moz-linear-gradient(left, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  background: ${({ theme }: any) => theme.colors.accentGradientDark};
+  background: -moz-linear-gradient(left, ${({ theme }: any) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }: any) =>
   theme.colors.accentGradientDark} 42%);
-  background: -webkit-linear-gradient(left, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  background: -webkit-linear-gradient(left, ${({ theme }: any) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }: any) =>
   theme.colors.accentGradientDark} 42%);
-  background: -o-linear-gradient(left, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  background: -o-linear-gradient(left, ${({ theme }: any) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }: any) =>
   theme.colors.accentGradientDark} 42%);
-  background: linear-gradient(to right, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
+  background: linear-gradient(to right, ${({ theme }: any) =>
+    theme.colors.accentGradientLight} 10%, ${({ theme }: any) =>
   theme.colors.accentGradientDark} 42%);
   position: relative;
   -webkit-animation: load3 0.4s infinite linear;

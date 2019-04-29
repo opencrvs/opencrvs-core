@@ -16,8 +16,8 @@ interface IButtonProps {
 const PaginationContainer = styled.div`
   width: 100%;
   height: 60px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  color: ${({ theme }) => theme.colors.primary};
+  padding: 0 ${({ theme }: any) => theme.grid.margin}px;
+  color: ${({ theme }: any) => theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,12 +35,12 @@ const PaginationLabel = styled.div`
   }
 `
 const PageNumber = styled.span`
-  ${({ theme }) => theme.fonts.heavyFontStyle};
-  color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }: any) => theme.fonts.heavyFontStyle};
+  color: ${({ theme }: any) => theme.colors.primary};
 `
 const PaginationText = styled.span`
   margin: 0 5px;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  ${({ theme }: any) => theme.fonts.capsFontStyle};
 `
 interface IState {
   canPrevious: boolean

@@ -12,7 +12,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) =>
+  background: ${({ theme }: any) =>
     `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
       theme.colors.headerGradientLight
     } 100%)`};
@@ -22,8 +22,8 @@ const Container = styled.div`
 `
 
 const TitleText = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }: any) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   text-align: center;
   font-size: 24px;
   margin-top: 24px;
@@ -31,8 +31,8 @@ const TitleText = styled.span`
 `
 
 const DescriptionText = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   text-align: center;
   font-size: 18px;
   max-width: 360px;
@@ -43,9 +43,9 @@ const ErrorBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  background: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }: any) => theme.colors.white};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  background: ${({ theme }: any) => theme.colors.danger};
   height: 40px;
   width: 360px;
   margin-top: -30px;

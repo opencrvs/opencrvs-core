@@ -10,11 +10,11 @@ export interface IViewHeadingProps {
 }
 
 const ViewHeadingContainer = styled.div`
-  padding: ${({ theme }) => theme.grid.margin}px 50px;
+  padding: ${({ theme }: any) => theme.grid.margin}px 50px;
 `
 
 const Breadcrumb = styled.div`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   letter-spacing: 2.14px;
   font-size: 15px;
   text-transform: uppercase;
@@ -23,13 +23,13 @@ const Breadcrumb = styled.div`
 
 const ViewTitle = styled.h2`
   font-size: 32px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   margin: 0;
   font-weight: 100;
 `
 
 const ViewDescription = styled.p`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   margin: 0;
   margin-top: 5px;
   font-size: 18px;

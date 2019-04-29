@@ -15,7 +15,7 @@ const InputErrorWrapper = styledErrorWrapper`
   width: 100%;
   padding-top:4px;
   display: inline-block;
-  ${({ theme }) => theme.fonts.infoFontStyle}
+  ${({ theme }: any) => theme.fonts.infoFontStyle}
   color: ${({ theme, color }) => (color ? color : theme.colors.error)};
   text-align: ${({ centred }) => (centred ? 'center' : 'left')};
 

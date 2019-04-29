@@ -24,8 +24,8 @@ const Column = styled.div`
 `
 
 const LegendItemBase = styled.div`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.copy};
   &::after {
     content: ':';
   }
@@ -39,23 +39,23 @@ const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
 const EstimateLegendItem = styled(LegendItemBase)`
   &::before {
     height: 8px;
-    border: 2px dotted ${({ theme }) => theme.colors.accent};
+    border: 2px dotted ${({ theme }: any) => theme.colors.accent};
     background: transparent;
   }
 `
 
 const DataLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.copy};
   margin-top: 1em;
   margin-bottom: auto;
 `
 const DataTitle = styled.h3.attrs<{ description?: string }>({})`
   font-size: 20px;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }: any) => theme.colors.accent};
   margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     margin: 0;
   }
 `
@@ -65,7 +65,7 @@ const DataDescription = styled.span`
 `
 const FooterContainer = styled.div`
   display: flex;
-  border-top: 1px solid ${({ theme }) => theme.colors.background};
+  border-top: 1px solid ${({ theme }: any) => theme.colors.background};
   margin-top: 10px;
   padding-top: 10px;
 `
@@ -73,8 +73,8 @@ const FooterData = styled.div`
   flex-direction: column;
   flex: 1;
   display: flex;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.copy};
 `
 const FooterDataLabel = styled.span`
   font-size: 12px;

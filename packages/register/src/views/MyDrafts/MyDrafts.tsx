@@ -19,21 +19,21 @@ import { IDraft } from 'drafts'
 import * as moment from 'moment'
 
 const Container = styled.div`
-  margin: 0 ${({ theme }) => theme.grid.margin}px;
+  margin: 0 ${({ theme }: any) => theme.grid.margin}px;
 `
 const StyledSecondaryButton = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
-  color: ${({ theme }) => theme.colors.primary} !important;
+  border: solid 1px ${({ theme }: any) => theme.colors.disabledButton};
+  color: ${({ theme }: any) => theme.colors.primary} !important;
   font-weight: bold;
   svg {
     margin-right: 15px;
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }: any) => theme.colors.disabledButton};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }: any) => theme.colors.inputBackground};
   }
 `
 type IProps = {

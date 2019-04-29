@@ -11,7 +11,7 @@ export interface IPage {
 const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div.attrs<IPage>({})`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }: any) => theme.colors.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -29,7 +29,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    font-family: ${({ theme }: any) => theme.fonts.lightFont};
     src:
       url('/fonts/notosans-extra-light-webfont-en.ttf')
       format('truetype');
@@ -38,7 +38,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.regularFont};
+    font-family: ${({ theme }: any) => theme.fonts.regularFont};
     src:
       url('/fonts/notosans-light-webfont-en.ttf')
       format('truetype');
@@ -46,7 +46,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    font-family: ${({ theme }: any) => theme.fonts.boldFont};
     src:
       url('/fonts/notosans-regular-webfont-en.ttf')
       format('truetype');
@@ -54,7 +54,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    font-family: ${({ theme }: any) => theme.fonts.lightFont};
     src:
       url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
       format('truetype');
@@ -63,7 +63,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.regularFont};
+    font-family: ${({ theme }: any) => theme.fonts.regularFont};
     src:
       url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
       format('truetype');
@@ -71,7 +71,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    font-family: ${({ theme }: any) => theme.fonts.boldFont};
     src:
       url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
       format('truetype');

@@ -11,8 +11,8 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  color: ${({ theme }: any) => theme.colors.placeholder};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   font-size: 16px;
   margin: 60px 0 25px;
   padding: 0 25px;
@@ -22,15 +22,15 @@ const TableHeader = styled.div`
 const StyledBox = styled(Box)`
   margin-top: 15px;
   padding: 12px 0px 0px 0px;
-  color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.placeholder};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
   line-height: 22px;
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `

@@ -10,7 +10,7 @@ export type IInputLabel = {
 const styledInputLabel = styled.label.attrs<IInputLabel>({})
 
 const StyledInputLabel = styledInputLabel`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ color, disabled, theme }) =>
     disabled ? theme.colors.disabled : color ? color : theme.colors.secondary} ;

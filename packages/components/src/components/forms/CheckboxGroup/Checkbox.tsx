@@ -12,14 +12,14 @@ const Label = styled.label`
   position: relative;
   left: 6px;
   top: -2px;
-  color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
 `
 
 const Check = styled.span`
   display: inline-block;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }: any) => theme.colors.primary};
   height: 20px;
   width: 20px;
   transition: border 0.25s linear;
@@ -31,7 +31,7 @@ const Check = styled.span`
     display: block;
     position: relative;
     content: '';
-    background: ${({ theme }) => theme.colors.white};
+    background: ${({ theme }: any) => theme.colors.white};
     border-radius: 2px;
     height: 16px;
     width: 16px;
@@ -46,7 +46,7 @@ const Check = styled.span`
     position: relative;
     content: '';
     border-radius: 2px;
-    background: ${({ theme }) => theme.colors.white};
+    background: ${({ theme }: any) => theme.colors.white};
     height: 14px;
     width: 14px;
     top: 2px;
@@ -74,7 +74,7 @@ const Input = styled.input`
   /* stylelint-disable */
   &:checked ~ ${Check}::after {
     /* stylelint-enable */
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }: any) => theme.colors.primary};
   }
 `
 

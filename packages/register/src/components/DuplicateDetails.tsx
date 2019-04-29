@@ -175,13 +175,13 @@ const messages = defineMessages({
 })
 
 const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
-  border-top: ${({ theme }) => ` 4px solid ${theme.colors.expandedIndicator}`};
-  ${({ currentStatus }) =>
+  border-top: ${({ theme }: any) => ` 4px solid ${theme.colors.expandedIndicator}`};
+  ${({ currentStatus }: any) =>
     currentStatus === 'rejected' ? `box-shadow: none` : ''}
 `
 
 const Separator = styled.div`
-  border-top: 1px solid ${({ theme }) => theme.colors.background};
+  border-top: 1px solid ${({ theme }: any) => theme.colors.background};
   margin: 24px -25px 24px -25px;
 `
 
@@ -192,8 +192,8 @@ const DetailTextContainer = styled.div`
 
 const DetailText = styled.div`
   flex: 1;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.copy};
   font-size: 16px;
 `
 
@@ -204,8 +204,8 @@ const DetailTextSplitContainer = styled(DetailText)`
 `
 
 const Link = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.primary};
   font-size: 16px;
   text-decoration: underline;
 `
@@ -229,21 +229,21 @@ const ListStatusContainer = styled.span`
 `
 
 const RejectApplication = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.danger};
   text-decoration: underline;
   cursor: pointer;
   margin-left: 60px;
   svg {
     margin-right: 15px;
   }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.sm}px) {
     margin-left: 30px;
   }
 `
 const ConditionalSeparator = styled(Separator)`
   display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.sm}px) {
     border: 0px;
     display: block;
   }

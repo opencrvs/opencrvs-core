@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const StyledList = styled.ul`
   width: 100%;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 
 const StyledListItem = styled.li`

@@ -107,7 +107,7 @@ export const LogoContainer = styled.div`
 export const Title = styled.div`
   margin: auto;
   margin-top: 30px;
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   text-align: center;
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
@@ -116,25 +116,25 @@ export const StyledPrimaryButton = styled(PrimaryButton)`
   display: flex;
   flex: 1;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.16);
-  padding: 10px ${({ theme }) => theme.grid.margin}px;
+  padding: 10px ${({ theme }: any) => theme.grid.margin}px;
   margin-bottom: 10px;
 `
 
 export const StyledButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   flex-direction: row;
   justify-content: center;
-  padding: 10px ${({ theme }) => theme.grid.margin}px;
+  padding: 10px ${({ theme }: any) => theme.grid.margin}px;
 
   :hover {
     text-decoration: underline;
-    text-decoration-color: ${({ theme }) => theme.colors.accentLight};
+    text-decoration-color: ${({ theme }: any) => theme.colors.accentLight};
   }
 `
 export const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.danger};
-  padding: 2px ${({ theme }) => theme.grid.margin}px;
+  color: ${({ theme }: any) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.danger};
+  padding: 2px ${({ theme }: any) => theme.grid.margin}px;
   text-align: center;
 `
 

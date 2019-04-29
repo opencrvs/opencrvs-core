@@ -17,7 +17,7 @@ export const OverlayContainer = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }: any) => theme.colors.background};
   z-index: 4;
   width: 100%;
   height: 100%;

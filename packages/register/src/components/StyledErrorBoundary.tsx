@@ -13,23 +13,23 @@ const ErrorContainer = styled.div`
   margin-top: 20px;
 `
 const ErrorTitle = styled.h1`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.secondary};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.secondary};
   font-size: 32px;
   margin: 10px;
 `
 const ErrorMessage = styled.div`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.secondary};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.secondary};
   font-size: 24px;
   margin: 5px 0;
 `
 
 const GoToHomepage = styled(Button)`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  color: ${({ theme }) => theme.colors.accent};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  color: ${({ theme }: any) => theme.colors.accent};
   font-weight: 600;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
   font-size: 14px;
   letter-spacing: 2.5px;
   text-transform: uppercase;

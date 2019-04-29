@@ -70,14 +70,14 @@ export interface IProps extends IButtonProps {
   id: string
 }
 export const IconTabs = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  padding: 0 ${({ theme }: any) => theme.grid.margin}px;
   position: relative;
   white-space: nowrap;
   border-bottom: 1px solid rgb(210, 210, 210);
   margin-top: 50px;
 `
 export const IconTab = styled(Button).attrs<IProps>({})`
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }: any) => theme.colors.secondary};
   font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
   padding-left: 0;
   padding-right: 0;
@@ -268,7 +268,7 @@ const Container = styled.div`
   z-index: 1;
   position: relative;
   margin-top: -30px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  padding: 0 ${({ theme }: any) => theme.grid.margin}px;
 `
 const StyledPlusIcon = styled(Plus)`
   display: flex;
@@ -279,7 +279,7 @@ const StyledIconAction = styled(IconAction)`
   min-height: 96px;
   padding: 0 20px 0 0;
   box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
-  background-color: ${({ theme }) => theme.colors.accentLight};
+  background-color: ${({ theme }: any) => theme.colors.accentLight};
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
@@ -287,15 +287,15 @@ const StyledIconAction = styled(IconAction)`
     font-weight: 300;
     margin: -2px 0 -2px 120px;
     line-height: 1.3em;
-    color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }: any) => theme.colors.white};
   }
 `
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `

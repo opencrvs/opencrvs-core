@@ -125,19 +125,19 @@ const StyledSpinner = styled(Spinner)`
 const Container = styled.div`
   margin: 35px 250px 0px 250px;
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px) {
     margin-left: 20px;
     margin-right: 20px;
   }
 `
 
 const TitleBox = styled(Box)`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
 `
 
 const Header = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   display: flex;
   align-items: center;
 `
@@ -152,18 +152,18 @@ const Grid = styled.div`
   grid-gap: 20px;
   grid-template-columns: auto auto;
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
   }
 `
 const BackButton = styled.a`
   text-decoration: underline;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }: any) => theme.colors.primary};
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `

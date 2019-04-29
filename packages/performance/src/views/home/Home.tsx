@@ -266,20 +266,20 @@ const getData = (intl: InjectedIntl): IData[] => {
 const BoxTitle = styled.div`
   line-height: 25px;
   text-transform: capitalize !important;
-  ${({ theme }) => theme.fonts.h2FontStyle}
-  color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }: any) => theme.fonts.h2FontStyle}
+  color: ${({ theme }: any) => theme.colors.primary};
 `
 
 const FooterText = styled.div`
   height: 17px;
   line-height: 17px;
   margin-top: 25px;
-  ${({ theme }) => theme.fonts.infoFontStyle}
-  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }: any) => theme.fonts.infoFontStyle}
+  color: ${({ theme }: any) => theme.colors.copy};
 `
 
 const ChartContainer = styled(Box)`
-  max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
+  max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px;
   margin: auto;
   margin-bottom: 20px;
   &:last-child {
@@ -297,11 +297,11 @@ const LabelContainer = styled.div`
   align-items: center;
   flex-flow: row wrap;
   padding: 20px 0;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   width: 100%;
 `
 const Label = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   background-color: rgba(150, 150, 150, 0.1);
   border-radius: 17px;
   padding: 5px 10px 5px 7px;
@@ -330,8 +330,8 @@ const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `

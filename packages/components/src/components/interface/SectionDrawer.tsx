@@ -4,16 +4,16 @@ import { ExpansionButton } from './../buttons'
 import * as ReactDOM from 'react-dom'
 
 const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
 const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   display: flex;
   align-items: center;
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
+  border-bottom: solid 1px ${({ theme }: any) => theme.colors.background};
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'auto')};
 `
 const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
@@ -23,8 +23,8 @@ const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
     visited && !isExpanded ? theme.colors.primary : theme.colors.secondary};
 `
 const EditLink = styled.a`
-  color: ${({ theme }) => theme.colors.accent};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.accent};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   text-decoration: underline;
 `
 const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
@@ -35,7 +35,7 @@ const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
     expanded === true ? theme.colors.expandedIndicator : 'none'};
 `
 const Seperator = styled.span`
-  color: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }: any) => theme.colors.background};
   margin: 0px 15px;
   &:before {
     content: '|';

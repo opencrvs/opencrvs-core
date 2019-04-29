@@ -13,9 +13,9 @@ const ListItemSingleAction = styled(Button)`
   display: flex;
   flex: 1;
   justify-content: center;
-  color: ${({ theme }) => theme.colors.accent};
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  color: ${({ theme }: any) => theme.colors.accent};
+  background: ${({ theme }: any) => theme.colors.white};
+  ${({ theme }: any) => theme.fonts.capsFontStyle};
   font-weight: 600;
   margin-bottom: 1px;
   padding: 15px 25px;
@@ -24,9 +24,9 @@ const ListItemSingleAction = styled(Button)`
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }: any) => theme.colors.white};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }: any) => theme.colors.disabled};
   }
 `
 

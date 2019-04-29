@@ -9,5 +9,5 @@ export const Link = styled.a.attrs<{ error?: boolean }>({})`
   cursor: pointer;
   border: 0;
   text-decoration: underline;
-  ${({ theme }) => theme.fonts.infoFontStyle};
+  ${({ theme }: any) => theme.fonts.infoFontStyle};
 `

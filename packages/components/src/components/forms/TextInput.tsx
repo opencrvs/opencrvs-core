@@ -19,9 +19,9 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.inputBackground};
+  ${({ theme }: any) => theme.fonts.defaultFontStyle};
+  color: ${({ theme }: any) => theme.colors.secondary};
+  background: ${({ theme }: any) => theme.colors.inputBackground};
 
   ${({ hideBorder, error, touched, theme }) =>
     hideBorder
@@ -48,15 +48,15 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
       `}
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }: any) => theme.colors.placeholder};
   }
 
   &::-webkit-outer-spin-button,

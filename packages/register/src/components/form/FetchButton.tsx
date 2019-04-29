@@ -65,28 +65,28 @@ const Backdrop = styled.div`
 const ModalContent = styled.div`
   width: 30vw;
   border-radius: 2px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }: any) => theme.colors.white};
   padding: 30px 30px 60px 30px;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   text-align: center;
   font-size: 14px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   position: relative;
 `
 
 const Heading = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   text-align: center;
   font-size: 15px;
   font-weight: bold;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 
 const Info = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   text-align: center;
   font-size: 15px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -102,12 +102,12 @@ const ConfirmButton = styled.a`
   margin: 10px;
   display: block;
   text-decoration: underline;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }: any) => theme.colors.primary};
   cursor: pointer;
 `
 const StyledPrimaryButton = styled(PrimaryButton)`
   display: block;
-  ${({ theme }) => {
+  ${({ theme }: any) => {
     return `@media (min-width: ${theme.grid.breakpoints.md}px) {
       width: 515px;
     }`

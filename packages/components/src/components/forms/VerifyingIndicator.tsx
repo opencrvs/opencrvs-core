@@ -3,7 +3,7 @@ import styled, { withTheme } from 'styled-components'
 import { ITheme } from 'components/theme'
 
 const StyledSpan = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }: any) => theme.colors.primary};
   display: flex;
   flex-direction: row;
   align-items: center;

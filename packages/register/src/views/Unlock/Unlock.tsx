@@ -32,8 +32,8 @@ const messages = defineMessages({
 })
 
 const PageWrapper = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  background: ${({ theme }) =>
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
+  background: ${({ theme }: any) =>
     `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
       theme.colors.headerGradientLight
     } 100%);`};
@@ -46,7 +46,7 @@ const PageWrapper = styled.div`
 `
 const LogoutHeader = styled.a`
   float: right;
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   display: flex;
   position: absolute;
   top: 30px;
@@ -56,11 +56,11 @@ const LogoutHeader = styled.a`
   }
 `
 const Name = styled.p`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
 `
 const ErrorMsg = styled.div`
-  background-color: ${({ theme }) => theme.colors.danger};
-  color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }: any) => theme.colors.danger};
+  color: ${({ theme }: any) => theme.colors.white};
   padding: 10px 20px;
   text-align: center;
 `

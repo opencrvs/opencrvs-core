@@ -22,7 +22,7 @@ const ControlsContainer = styled.div`
   user-select: none;
   border-radius: 2px;
 
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   & div {
     text-align: center;
@@ -30,7 +30,7 @@ const ControlsContainer = styled.div`
     height: 40px;
     width: 40px;
 
-    border-bottom: 1px solid ${({ theme }) => theme.colors.disabledButton};
+    border-bottom: 1px solid ${({ theme }: any) => theme.colors.disabledButton};
     & svg {
       height: 100%;
       width: 100%;
@@ -41,7 +41,7 @@ const ControlsContainer = styled.div`
       border: none;
     }
     &:active {
-      box-shadow: 0px 0px 5px 1px ${({ theme }) => theme.colors.disabled};
+      box-shadow: 0px 0px 5px 1px ${({ theme }: any) => theme.colors.disabled};
     }
   }
 `

@@ -84,7 +84,7 @@ export const ActionPageWrapper = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }: any) => theme.colors.background};
   z-index: 4;
   width: 100%;
   height: 100%;
@@ -96,8 +96,8 @@ const StyledSpinner = styled(Spinner)`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.error};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
   text-align: center;
   margin-top: 100px;
 `
@@ -117,7 +117,7 @@ const Column = styled.div`
 `
 
 const ButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }: any) => theme.colors.inputBackground};
   padding: 25px;
   margin-bottom: 2px;
 `
@@ -139,21 +139,21 @@ const StyledIconAction = styled(IconAction)`
     padding: 0px;
   }
   h3 {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    font-family: ${({ theme }: any) => theme.fonts.boldFont};
     margin-left: 70px;
-    color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }: any) => theme.colors.secondary};
     text-decoration: underline;
     font-size: 16px;
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }: any) => theme.colors.disabledButton};
     }
     g {
-      fill: ${({ theme }) => theme.colors.disabled};
+      fill: ${({ theme }: any) => theme.colors.disabled};
     }
     h3 {
-      color: ${({ theme }) => theme.colors.disabled};
+      color: ${({ theme }: any) => theme.colors.disabled};
     }
   }
 `
@@ -165,16 +165,16 @@ const ConfirmBtn = styled(PrimaryButton)`
     margin: 0 auto;
   }
   &:disabled {
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }: any) => theme.colors.primary};
     path {
-      stroke: ${({ theme }) => theme.colors.disabled};
+      stroke: ${({ theme }: any) => theme.colors.disabled};
     }
   }
 `
 
 const EditRegistration = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
-  color: ${({ theme }) => theme.colors.primary} !important;
+  border: solid 1px ${({ theme }: any) => theme.colors.disabledButton};
+  color: ${({ theme }: any) => theme.colors.primary} !important;
   font-weight: bold;
   margin: 0px 20px;
   top: 3px;
@@ -184,20 +184,20 @@ const EditRegistration = styled(SecondaryButton)`
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }: any) => theme.colors.disabledButton};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }: any) => theme.colors.inputBackground};
   }
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     margin-left: 0px;
     margin-top: 15px;
   }
 `
 
 const Info = styled.div`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   margin-bottom: 30px;
 `
 const B = styled.div`

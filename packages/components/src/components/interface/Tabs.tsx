@@ -3,7 +3,7 @@ import styled, { StyledComponentClass } from 'styled-components'
 import { Button, IButtonProps } from '../buttons'
 
 export const Tabs = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  padding: 0 ${({ theme }: any) => theme.grid.margin}px;
   position: relative;
   white-space: nowrap;
 `

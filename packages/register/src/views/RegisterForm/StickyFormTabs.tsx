@@ -9,8 +9,8 @@ const StickyFormTabsContainer = styled.div`
   div.sticky-inner-wrapper {
     background: linear-gradient(
       270deg,
-      ${({ theme }) => theme.colors.headerGradientLight} 0%,
-      ${({ theme }) => theme.colors.headerGradientDark} 100%
+      ${({ theme }: any) => theme.colors.headerGradientLight} 0%,
+      ${({ theme }: any) => theme.colors.headerGradientDark} 100%
     );
   }
 `

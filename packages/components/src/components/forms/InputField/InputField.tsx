@@ -11,7 +11,7 @@ const InputHeader = styled.div`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
@@ -21,7 +21,7 @@ const Optional = styled.span.attrs<
 const Required = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.danger};
@@ -36,17 +36,17 @@ const Padding = styled.span`
   padding: 0 4px;
   display: inline-flex;
   align-items: center;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }: any) => theme.colors.accent};
 `
 
 const InputDescription = styled.p<{
   ignoreMediaQuery?: boolean
 }>`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
 
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery

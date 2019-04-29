@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 const SubSectionWrapper = styled.div`
-  border-top: solid 1px ${({ theme }) => theme.colors.background};
+  border-top: solid 1px ${({ theme }: any) => theme.colors.background};
   width: calc(100% + 50px);
   margin-left: -25px;
   padding-top: 14px;
@@ -15,13 +15,13 @@ const SubSectionWrapper = styled.div`
 `
 
 const Title = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.lightFont};
+  color: ${({ theme }: any) => theme.colors.copy};
 `
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};

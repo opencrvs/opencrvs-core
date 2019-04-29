@@ -6,9 +6,9 @@ import { IActionProps } from './Action'
 const ActionContainer = styled(Button)`
   width: 100%;
   min-height: 90px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.white};
+  padding: 0 ${({ theme }: any) => theme.grid.margin}px;
+  background: ${({ theme }: any) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   text-align: left;
   justify-content: flex-start;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
@@ -21,14 +21,14 @@ const ActionContainer = styled(Button)`
 const ActionTitle = styled.h3.attrs<{
   disabled?: boolean
 }>({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  background-color: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
+  background-color: ${({ theme }: any) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.copy};
   margin-left: 11px;
 `
 
 const StyledStatus = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   background-color: rgba(150, 150, 150, 0.1);
   border-radius: 17px;
   padding: 5px 13px 5px 7px;
@@ -40,7 +40,7 @@ const StyledStatus = styled.div`
     text-transform: uppercase;
     margin-left: 5px;
     font-size: 13px;
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }: any) => theme.colors.primary};
   }
 `
 

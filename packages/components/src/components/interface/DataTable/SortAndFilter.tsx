@@ -16,8 +16,8 @@ const Wrapper = styled.div`
   margin-top: 15px;
 `
 const LabelText = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }: any) => theme.colors.placeholder};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
   font-weight: 500;
 `

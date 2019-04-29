@@ -9,7 +9,7 @@ export enum ICON_ALIGNMENT {
 const ButtonBase = styled.button`
   width: auto;
   padding: 15px 35px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-family: ${({ theme }: any) => theme.fonts.boldFont};
   align-items: center;
   display: inline-flex;
   border: 0;

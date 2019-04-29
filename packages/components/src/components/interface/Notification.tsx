@@ -21,7 +21,7 @@ const easeIn = keyframes`
   to { bottom: 0; }
 `
 const NotificationContainer = styledNotification`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   position: fixed;
   left: 0;
   right: 0;
@@ -29,7 +29,7 @@ const NotificationContainer = styledNotification`
   height:100px;
   width: 100%;
   display:flex;
-  background: ${({ theme }) => theme.colors.accent};
+  background: ${({ theme }: any) => theme.colors.accent};
   z-index: 1;
   justify-content: center;
   align-items: center;
@@ -41,19 +41,19 @@ const NotificationContainer = styledNotification`
   }
 
   &.success, &.error, &.warning {
-    background: ${({ theme }) => theme.colors.placeholder};
+    background: ${({ theme }: any) => theme.colors.placeholder};
     border-top: 10px solid;
   }
 
   &.success {
-    border-color: ${({ theme }) => theme.colors.success};
+    border-color: ${({ theme }: any) => theme.colors.success};
   }
 
   &.error {
-    border-color: ${({ theme }) => theme.colors.error};
+    border-color: ${({ theme }: any) => theme.colors.error};
   }
   &.warning {
-    border-color: ${({ theme }) => theme.colors.warning};
+    border-color: ${({ theme }: any) => theme.colors.warning};
   }
   &.clickable {
     cursor:pointer;
@@ -61,11 +61,11 @@ const NotificationContainer = styledNotification`
 `
 
 const NotificationMessage = styled.div`
-  background: ${({ theme }) => theme.colors.copyAlpha80};
+  background: ${({ theme }: any) => theme.colors.copyAlpha80};
   border-radius: 21px;
   padding: 5px 10px;
   margin: 5px;
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }: any) => theme.colors.white};
   font-weight: bold;
 `
 

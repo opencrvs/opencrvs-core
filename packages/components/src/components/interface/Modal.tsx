@@ -26,22 +26,22 @@ const Backdrop = styled.div`
 const ModalContent = styled.div`
   width: 70%;
   border-radius: 2px;
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }: any) => theme.colors.white};
   padding: 50px;
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   text-align: center;
   font-size: 18px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   position: relative;
 `
 
 const Heading = styled.h3`
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme }: any) => theme.colors.copy};
   text-align: center;
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 24px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 
 const Actions = styled.div`

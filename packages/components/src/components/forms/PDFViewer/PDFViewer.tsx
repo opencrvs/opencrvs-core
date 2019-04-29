@@ -10,7 +10,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
 `
 
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {

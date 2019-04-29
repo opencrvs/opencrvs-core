@@ -21,32 +21,32 @@ interface IProps {
 
 const Container = styled.div`
   display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.md}px) {
     display: block;
   }
 `
 
 const Link = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 16px;
   text-decoration: underline;
   cursor: pointer;
 `
 
 const PreviewLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }: any) => theme.colors.primary};
 `
 
 const DeleteLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }: any) => theme.colors.danger};
   margin-left: 8px;
 `
 
 const FileContainer = styled.div`
   height: 75px;
-  border: 1px solid ${({ theme }) => theme.colors.accentLight};
+  border: 1px solid ${({ theme }: any) => theme.colors.accentLight};
   border-radius: 1px;
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }: any) => theme.colors.inputBackground};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   flex: 1;
   display: flex;
@@ -64,9 +64,9 @@ const DeleteContainer = styled.div`
 `
 
 const MetadataContainer = styled.div`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
   font-size: 18px;
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }: any) => theme.colors.secondary};
 
   display: flex;
   flex-direction: column;

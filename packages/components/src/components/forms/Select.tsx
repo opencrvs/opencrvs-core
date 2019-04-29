@@ -33,9 +33,9 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   width: 100%;
 
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  ${({ theme }: any) => theme.fonts.defaultFontStyle};
   .react-select__control {
-    background: ${({ theme }) => theme.colors.inputBackground};
+    background: ${({ theme }: any) => theme.colors.inputBackground};
     border-radius: 0;
     box-shadow: none;
     font-size: 18px;
@@ -52,7 +52,7 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   }
 
   .react-select__option {
-    color: ${({ theme }) => theme.colors.copy};
+    color: ${({ theme }: any) => theme.colors.copy};
     font-size: 14px;
   }
 
@@ -61,9 +61,9 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.creamCan};
+    box-shadow: 0 0 0px 3px ${({ theme }: any) => theme.colors.creamCan};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
-      ${({ theme }) => theme.colors.secondary};
+      ${({ theme }: any) => theme.colors.secondary};
   }
 
   ${({ ignoreMediaQuery, theme }) => {

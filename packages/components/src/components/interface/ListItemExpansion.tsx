@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { IAction } from './ListItem'
 
 const ExpansionContent = styled.div`
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
   padding: 25px;
 `
 const ActionContainer = styled.div`
@@ -13,7 +13,7 @@ const ActionContainer = styled.div`
   align-items: center;
   flex-wrap: wrap;
   margin-top: 1px;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }: any) => theme.colors.white};
   padding: 20px 25px;
 `
 const ActionItem = styled.div`

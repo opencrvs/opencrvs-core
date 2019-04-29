@@ -7,7 +7,7 @@ import { DocumentImage } from './components/DocumentImage'
 import { isEqual } from 'lodash'
 
 const Header = styled.div`
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
+  border-bottom: solid 1px ${({ theme }: any) => theme.colors.background};
   margin-bottom: 15px;
   display: flex;
   align-items: center;
@@ -21,9 +21,9 @@ const Icon = styled.div`
 `
 const TitleContainer = styled.div`
   width: 276px;
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }: any) => theme.colors.secondary};
   font-size: 18px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  font-family: ${({ theme }: any) => theme.fonts.regularFont};
 `
 const Title = styled.div`
   font-weight: bold;
@@ -32,9 +32,9 @@ const SelectContainer = styled.div`
   width: 70%;
 `
 const WhiteBackground = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }: any) => theme.colors.white};
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }: any) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
