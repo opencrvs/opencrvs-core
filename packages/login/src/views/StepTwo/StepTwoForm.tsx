@@ -120,6 +120,7 @@ const CodeInput = injectIntl(
         label={intl.formatMessage(messages.verficationCodeLabel)}
         optionalLabel={intl.formatMessage(messages.optionalLabel)}
         ignoreMediaQuery
+        hideErrorLabel
         hideAsterisk
         mode={THEME_MODE.DARK}
       >

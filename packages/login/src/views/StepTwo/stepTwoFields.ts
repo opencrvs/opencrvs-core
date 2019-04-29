@@ -1,4 +1,3 @@
-import * as validations from '../../utils/validate'
 import { IFieldGroup } from '../../utils/fieldUtils'
 
 export const stepTwoFields: IFieldGroup = {
@@ -6,7 +5,7 @@ export const stepTwoFields: IFieldGroup = {
     id: 'code',
     name: 'code',
     maxLength: 6,
-    validate: [validations.required, validations.isNumber],
+    validate: [],
     disabled: false,
     type: 'tel',
     focusInput: true
