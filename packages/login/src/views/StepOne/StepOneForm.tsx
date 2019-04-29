@@ -16,7 +16,6 @@ import {
 import { stepOneFields } from './stepOneFields'
 
 import { IAuthenticationData } from '../../utils/authApi'
-import { localiseValidationError } from '../../forms/i18n'
 import { Logo } from '@opencrvs/components/lib/icons'
 import {
   ERROR_CODE_TOO_MANY_ATTEMPTS,
@@ -182,12 +181,10 @@ const MobileInput = injectIntl((props: Props) => {
       {...mobileField}
       {...otherProps}
       touched={meta.touched}
-      error={meta.error && localiseValidationError(intl, meta.error)}
       label={intl.formatMessage(mobileField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
-      hideErrorLabel
       mode={THEME_MODE.DARK}
     >
       <TextInput
@@ -210,11 +207,9 @@ const Password = injectIntl((props: Props) => {
       {...passwordField}
       {...otherProps}
       touched={meta.touched}
-      error={meta.error && localiseValidationError(intl, meta.error)}
       label={intl.formatMessage(passwordField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
-      hideErrorLabel
       hideAsterisk
       mode={THEME_MODE.DARK}
     >
