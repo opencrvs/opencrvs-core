@@ -128,14 +128,14 @@ export class PasswordInput extends React.Component<
                 hideIcon
               ) : (
                 <span title="Hide password">
-                  <EyeOff />{' '}
+                  <EyeOn />{' '}
                 </span>
               )
             ) : showIcon ? (
               showIcon
             ) : (
               <span title="Show password">
-                <EyeOn />{' '}
+                <EyeOff />{' '}
               </span>
             )}
           </IconButton>
