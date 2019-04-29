@@ -18,23 +18,14 @@ import { profileReducer, ProfileState } from './profile/profileReducer'
 import { offlineDataReducer, IOfflineDataState } from './offline/reducer'
 import { intlReducer, IntlState } from './i18n/reducer'
 import { draftsReducer, IDraftsState } from 'drafts'
-import {
-  reviewReducer,
-  IReviewFormState
-} from '/forms/register/reviewReducer'
+import { reviewReducer, IReviewFormState } from 'forms/register/reviewReducer'
 import {
   registerFormReducer,
   IRegisterFormState
 } from './forms/register/reducer'
 import { navigationReducer, INavigationState } from 'navigation'
-import {
-  notificationReducer,
-  NotificationState
-} from 'notification/reducer'
-import {
-  IRejectState,
-  rejectReducer
-} from '/review/reducer'
+import { notificationReducer, NotificationState } from 'notification/reducer'
+import { IRejectState, rejectReducer } from 'review/reducer'
 import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
 import * as Sentry from '@sentry/browser'
 import * as createSentryMiddleware from 'redux-sentry-middleware'

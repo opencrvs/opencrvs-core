@@ -3,7 +3,7 @@ import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { PIN } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import * as bcrypt from 'bcryptjs'
-import { storage } from '/storage'
+import { storage } from 'storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import messages from './messages'
 

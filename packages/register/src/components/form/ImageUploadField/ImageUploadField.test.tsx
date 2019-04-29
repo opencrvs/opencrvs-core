@@ -3,7 +3,7 @@ import { IntlProvider } from 'react-intl'
 import { createShallowRenderedComponent } from 'tests/util'
 import { ImageUploadField } from './ImageUploadField'
 import { documentsSection } from 'forms/register/fieldDefinitions/birth/documents-section'
-import { IImageUploaderWithOptionsFormField } from '/forms'
+import { IImageUploaderWithOptionsFormField } from 'forms'
 
 describe('image upload component', () => {
   const mock = jest.fn()

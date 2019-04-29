@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 import { FormattedMessage, MessageValue } from 'react-intl'
-import { IFormFieldValue } from '/forms'
+import { IFormFieldValue } from 'forms'
 
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'

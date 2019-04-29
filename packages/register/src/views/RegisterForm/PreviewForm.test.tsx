@@ -21,7 +21,7 @@ import { storage } from 'storage'
 import { Event } from 'forms'
 import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
-import { checkAuth } from '/profile/profileActions'
+import { checkAuth } from 'profile/profileActions'
 import * as CommonUtils from 'utils/commonUtils'
 
 interface IPersonDetails {

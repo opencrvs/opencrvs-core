@@ -32,13 +32,6 @@ import {
   maxLength,
   numeric
 } from 'utils/validate'
-
-export interface IFatherSectionFormData {
-  firstName: string
-  foo: string
-  bar: string
-  baz: string
-}
 import { identityNameMapper } from 'forms/identity'
 import { IFormSection } from '../../../index'
 import { conditionals } from '../../../utils'
@@ -70,6 +63,13 @@ import {
   getFatherDateOfBirthLabel,
   getDateOfMarriageLabel
 } from './staticLabel'
+
+export interface IFatherSectionFormData {
+  firstName: string
+  foo: string
+  bar: string
+  baz: string
+}
 
 export const messages = defineMessages({
   fatherTab: {

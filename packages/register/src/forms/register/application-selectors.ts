@@ -1,5 +1,5 @@
 import { IRegisterFormState } from './reducer'
-import { IStoreState } from '/store'
+import { IStoreState } from 'store'
 import { IFormSection, Event } from 'forms'
 
 const getPartialState = (store: IStoreState): IRegisterFormState =>

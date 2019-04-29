@@ -1,9 +1,6 @@
 import { required, IValidationResult } from '../utils/validate'
 import { IFormField, IFormSectionData, IDynamicFormField } from './'
-import {
-  getConditionalActionsForField,
-  getFieldValidation
-} from '/forms/utils'
+import { getConditionalActionsForField, getFieldValidation } from 'forms/utils'
 import { IOfflineDataState } from 'offline/reducer'
 
 export function getValidationErrorsForField(

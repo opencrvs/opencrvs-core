@@ -33,10 +33,6 @@ import {
   numeric,
   maxLength
 } from 'utils/validate'
-
-export interface IMotherSectionFormData {
-  firstName: string
-}
 import { IFormSection } from '../../../index'
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
@@ -64,6 +60,10 @@ import {
   transformRegistrationData,
   FETCH_REGISTRATION
 } from '../../queries/registration'
+
+export interface IMotherSectionFormData {
+  firstName: string
+}
 
 const messages = defineMessages({
   motherTab: {

@@ -50,11 +50,11 @@ import {
 import {
   FETCH_REGISTRATION,
   transformRegistrationData
-} from '/forms/register/queries/registration'
+} from 'forms/register/queries/registration'
 import {
   FETCH_PERSON,
   transformPersonData
-} from '/forms/register/queries/person'
+} from 'forms/register/queries/person'
 
 const messages = defineMessages({
   deceasedTab: {

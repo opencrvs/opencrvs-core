@@ -33,7 +33,7 @@ import {
 } from 'offline/reducer'
 import { Validation } from 'utils/validate'
 import * as moment from 'moment'
-import { IDynamicValues } from '/navigation'
+import { IDynamicValues } from 'navigation'
 
 interface IRange {
   start: number

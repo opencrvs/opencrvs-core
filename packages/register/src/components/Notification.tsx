@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { getLanguage } from '/i18n/selectors'
-import { IStoreState } from '/store'
+import { getLanguage } from 'i18n/selectors'
+import { IStoreState } from 'store'
 import {
   Notification,
   NOTIFICATION_TYPE
@@ -67,7 +67,7 @@ class Component extends React.Component<
       this.props.waitingSW.postMessage('skipWaiting')
     }
     this.props.hideNewContentAvailableNotification()
-    location.reload()
+    window.location.reload()
   }
 
   hideBackgroundSyncedNotification = () => {

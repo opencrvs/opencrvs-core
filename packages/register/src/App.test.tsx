@@ -1,9 +1,5 @@
 import * as React from 'react'
-import {
-  createTestApp,
-  mockOfflineData,
-  createTestComponent
-} from 'tests/util'
+import { createTestApp, mockOfflineData, createTestComponent } from 'tests/util'
 import { getOfflineDataSuccess } from 'offline/actions'
 import { createClient } from 'utils/apolloClient'
 import * as actions from 'notification/actions'

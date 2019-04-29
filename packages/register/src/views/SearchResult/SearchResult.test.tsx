@@ -3,7 +3,7 @@ import {
   ListItem,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import { checkAuth } from '/profile/profileActions'
+import { checkAuth } from 'profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { queries } from 'profile/queries'

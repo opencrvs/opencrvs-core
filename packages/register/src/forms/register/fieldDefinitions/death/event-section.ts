@@ -14,10 +14,7 @@ import { isValidDeathOccurrenceDate } from 'utils/validate'
 import { messages as addressMessages } from '../../../address'
 import { countries } from 'forms/countries'
 import { conditionals } from 'forms/utils'
-import {
-  OFFLINE_FACILITIES_KEY,
-  OFFLINE_LOCATIONS_KEY
-} from 'offline/reducer'
+import { OFFLINE_FACILITIES_KEY, OFFLINE_LOCATIONS_KEY } from 'offline/reducer'
 import {
   sectionFieldToBundleFieldTransformer,
   copyEventAddressTransformer

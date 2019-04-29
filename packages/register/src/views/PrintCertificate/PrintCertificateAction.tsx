@@ -43,12 +43,7 @@ import {
 } from './generatePDF'
 import { CERTIFICATE_DATE_FORMAT } from 'utils/constants'
 import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
-import {
-  storeDraft,
-  createReviewDraft,
-  IDraftsState,
-  IDraft
-} from '/drafts'
+import { storeDraft, createReviewDraft, IDraftsState, IDraft } from 'drafts'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import {
@@ -61,10 +56,7 @@ import {
   MutationProvider,
   MutationContext
 } from 'views/DataProvider/MutationProvider'
-import {
-  QueryProvider,
-  QueryContext
-} from 'views/DataProvider/QueryProvider'
+import { QueryProvider, QueryContext } from 'views/DataProvider/QueryProvider'
 import { getUserDetails } from 'profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from 'utils/userUtils'

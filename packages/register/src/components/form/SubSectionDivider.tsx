@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { ISubSectionProps } from '@opencrvs/components/lib/forms'
-import { Omit } from '/utils'
+import { Omit } from 'utils'
 
 import { SubSectionDivider as SubSectionDividerComponent } from '@opencrvs/components/lib/forms'
 

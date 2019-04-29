@@ -15,10 +15,7 @@ import {
   greaterThanZero
 } from 'utils/validate'
 import { conditionals } from '../../../utils'
-import {
-  OFFLINE_FACILITIES_KEY,
-  OFFLINE_LOCATIONS_KEY
-} from 'offline/reducer'
+import { OFFLINE_FACILITIES_KEY, OFFLINE_LOCATIONS_KEY } from 'offline/reducer'
 import { messages as addressMessages } from '../../../address'
 import { countries } from '../../../countries'
 import {
@@ -37,6 +34,7 @@ import {
   eventLocationIDQueryTransformer,
   eventLocationQueryTransformer
 } from 'forms/mappings/query/field-mappings'
+import { IFormSection } from '../../../index'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -44,7 +42,6 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
-import { IFormSection } from '../../../index'
 
 const messages = defineMessages({
   childTab: {

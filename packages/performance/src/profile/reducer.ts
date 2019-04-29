@@ -8,11 +8,7 @@ import {
   isTokenStillValid,
   removeToken
 } from '../utils/authUtils'
-import {
-  IUserDetails,
-  getUserDetails,
-  storeUserDetails
-} from 'utils/userUtils'
+import { IUserDetails, getUserDetails, storeUserDetails } from 'utils/userUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from './queries'

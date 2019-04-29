@@ -26,15 +26,15 @@ import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   REVIEW_EVENT_PARENT_FORM_TAB,
   DRAFT_DEATH_FORM_TAB
-} from '/navigation/routes'
-import { getRegisterForm } from '/forms/register/application-selectors'
-import { getReviewForm } from '/forms/register/review-selectors'
-import { Event, IFormData } from '/forms'
+} from 'navigation/routes'
+import { getRegisterForm } from 'forms/register/application-selectors'
+import { getReviewForm } from 'forms/register/review-selectors'
+import { Event, IFormData } from 'forms'
 import { draftToGqlTransformer } from 'transformer'
 import { IForm } from 'forms'
 import { clone } from 'lodash'
-import { FETCH_REGISTRATION } from '/forms/register/queries/registration'
-import { FETCH_PERSON } from '/forms/register/queries/person'
+import { FETCH_REGISTRATION } from 'forms/register/queries/registration'
+import { FETCH_PERSON } from 'forms/register/queries/person'
 import { storage } from 'storage'
 import { IUserDetails } from 'utils/userUtils'
 

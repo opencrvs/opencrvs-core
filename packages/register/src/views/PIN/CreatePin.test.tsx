@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createTestComponent } from '../../tests/util'
 import { CreatePin } from './CreatePin'
 import { createStore } from 'store'
-import { storage } from '/storage'
+import { storage } from 'storage'
 import { ReactWrapper } from 'enzyme'
 
 storage.setItem = jest.fn()

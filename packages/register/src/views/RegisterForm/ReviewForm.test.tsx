@@ -4,18 +4,18 @@ import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'views/DataProvider/birth/quer
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from 'views/DataProvider/death/queries'
 import { createTestComponent, mockUserResponseWithName } from 'tests/util'
 import { createStore } from 'store'
-import { getReviewForm } from '/forms/register/review-selectors'
+import { getReviewForm } from 'forms/register/review-selectors'
 import {
   createReviewDraft,
   IDraft,
   getStorageDraftsSuccess,
   storeDraft
-} from '/drafts'
+} from 'drafts'
 import { v4 as uuid } from 'uuid'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '/navigation/routes'
-import { RegisterForm } from '/views/RegisterForm/RegisterForm'
-import { checkAuth } from '/profile/profileActions'
-import { Event } from '/forms'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from 'navigation/routes'
+import { RegisterForm } from 'views/RegisterForm/RegisterForm'
+import { checkAuth } from 'profile/profileActions'
+import { Event } from 'forms'
 import { queries } from 'profile/queries'
 
 const declareScope =

@@ -3,28 +3,18 @@ import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import {
-  RegisterForm,
-  IFormProps
-} from '/views/RegisterForm/RegisterForm'
+import { RegisterForm, IFormProps } from 'views/RegisterForm/RegisterForm'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { IStoreState } from '/store'
+import { IStoreState } from 'store'
 import { connect } from 'react-redux'
-import { getReviewForm } from '/forms/register/review-selectors'
-import {
-  storeDraft,
-  IDraft,
-  createReviewDraft
-} from '/drafts'
+import { getReviewForm } from 'forms/register/review-selectors'
+import { storeDraft, IDraft, createReviewDraft } from 'drafts'
 import { Dispatch } from 'redux'
 import { getScope } from 'profile/profileSelectors'
-import { Scope } from '/utils/authUtils'
+import { Scope } from 'utils/authUtils'
 import { gqlToDraftTransformer } from 'transformer'
 import { IFormData, Event, Action } from 'forms'
-import {
-  QueryProvider,
-  QueryContext
-} from 'views/DataProvider/QueryProvider'
+import { QueryProvider, QueryContext } from 'views/DataProvider/QueryProvider'
 import * as Sentry from '@sentry/browser'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'navigation/routes'
 

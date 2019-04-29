@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import {
-  IStoreState,
-  createStore,
-  AppStore
-} from '/store'
+import { IStoreState, createStore, AppStore } from 'store'
 import { mount, configure, shallow } from 'enzyme'
 import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
@@ -14,12 +10,12 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import * as Adapter from 'enzyme-adapter-react-16'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { ENGLISH_STATE } from '/i18n/locales/en'
+import { ENGLISH_STATE } from 'i18n/locales/en'
 import { IntlProvider, intlShape } from 'react-intl'
-import { I18nContainer } from '/i18n/components/I18nContainer'
+import { I18nContainer } from 'i18n/components/I18nContainer'
 import { App } from '../App'
 import { MockedProvider } from 'react-apollo/test-utils'
-
+// @ts-ignore
 configure({ adapter: new Adapter() })
 
 export function getInitialState(): IStoreState {

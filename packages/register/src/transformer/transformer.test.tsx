@@ -16,9 +16,9 @@ import * as fetch from 'jest-fetch-mock'
 import { storage } from 'storage'
 import { v4 as uuid } from 'uuid'
 import { draftToGqlTransformer } from 'transformer'
-import { getRegisterForm } from '/forms/register/application-selectors'
+import { getRegisterForm } from 'forms/register/application-selectors'
 import { getOfflineDataSuccess } from 'offline/actions'
-import { Event, IForm } from '/forms'
+import { Event, IForm } from 'forms'
 import { clone } from 'lodash'
 
 interface IPersonDetails {

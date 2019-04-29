@@ -11,7 +11,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { App, store } from '../App'
 import { IStoreState, createStore } from '../store'
 import { IntlContainer } from '../i18n/components/I18nContainer'
-
+// @ts-ignore
 configure({ adapter: new Adapter() })
 addLocaleData([...en])
 

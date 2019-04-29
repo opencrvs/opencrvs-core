@@ -3,15 +3,12 @@ import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import { getLanguage } from '/i18n/selectors'
-import { IStoreState } from '/store'
+import { getLanguage } from 'i18n/selectors'
+import { IStoreState } from 'store'
 import { setInitialDrafts } from 'drafts'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getInitialDraftsLoaded } from 'drafts/selectors'
-import {
-  getOfflineDataLoaded,
-  getOfflineLoadingError
-} from 'offline/selectors'
+import { getOfflineDataLoaded, getOfflineLoadingError } from 'offline/selectors'
 import { parse } from 'querystring'
 import { IURLParams } from '../utils/authUtils'
 import { checkAuth } from '../profile/profileActions'

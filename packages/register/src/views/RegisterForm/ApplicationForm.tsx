@@ -1,16 +1,13 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps } from 'react-intl'
-import {
-  RegisterForm,
-  IFormProps
-} from '/views/RegisterForm/RegisterForm'
+import { RegisterForm, IFormProps } from 'views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   DRAFT_DEATH_FORM_TAB
-} from '/navigation/routes'
-import { getRegisterForm } from '/forms/register/application-selectors'
-import { IStoreState } from '/store'
+} from 'navigation/routes'
+import { getRegisterForm } from 'forms/register/application-selectors'
+import { IStoreState } from 'store'
 import { connect } from 'react-redux'
 import { Event } from 'forms'
 import { Scope } from 'utils/authUtils'

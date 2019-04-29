@@ -1,5 +1,5 @@
 import { getReviewForm } from './review-selectors'
-import { createStore } from '/store'
+import { createStore } from 'store'
 
 describe('when user in review form review tab should be there', () => {
   const { store } = createStore()

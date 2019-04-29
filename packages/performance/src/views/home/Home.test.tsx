@@ -2,13 +2,9 @@ import * as React from 'react'
 import { Home } from './Home'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from 'store'
-import {
-  createTestComponent,
-  mockUserResponse,
-  userDetails
-} from 'tests/util'
+import { createTestComponent, mockUserResponse, userDetails } from 'tests/util'
 import { queries } from 'profile/queries'
-import { setInitialUserDetails } from '/profile/actions'
+import { setInitialUserDetails } from 'profile/actions'
 import { FETCH_METRIC } from './queries'
 
 const mockFetchUserDetails = jest.fn()

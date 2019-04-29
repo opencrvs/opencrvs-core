@@ -1,6 +1,6 @@
 import * as actions from './actions'
 import { initialState, languages } from './reducer'
-import { createStore } from '/store'
+import { createStore } from 'store'
 const action = {
   type: actions.CHANGE_LANGUAGE,
   payload: {

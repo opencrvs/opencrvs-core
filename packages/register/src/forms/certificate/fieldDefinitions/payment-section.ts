@@ -1,9 +1,4 @@
-import {
-  IFormSection,
-  ViewType,
-  SELECT_WITH_OPTIONS,
-  PARAGRAPH
-} from 'forms'
+import { IFormSection, ViewType, SELECT_WITH_OPTIONS, PARAGRAPH } from 'forms'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({

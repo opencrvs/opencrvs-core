@@ -6,10 +6,7 @@ import * as React from 'react'
 
 import { FormFieldGenerator } from 'components/form'
 import { collectBirthCertificateFormSection } from 'forms/certificate/fieldDefinitions/collector-section'
-import {
-  IInformativeRadioGroupFormField,
-  INFORMATIVE_RADIO_GROUP
-} from 'forms'
+import { IInformativeRadioGroupFormField, INFORMATIVE_RADIO_GROUP } from 'forms'
 import { ReactWrapper } from 'enzyme'
 import { ParentDetails } from './ParentDetails'
 import { InformativeRadioGroup } from './InformativeRadioGroup'

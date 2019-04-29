@@ -1,9 +1,5 @@
 import * as React from 'react'
-import {
-  createTestComponent,
-  selectOption,
-  mockOfflineData
-} from 'tests/util'
+import { createTestComponent, selectOption, mockOfflineData } from 'tests/util'
 import { FormFieldGenerator } from './FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createDraft, storeDraft } from 'drafts'
