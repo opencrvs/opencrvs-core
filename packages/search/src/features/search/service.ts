@@ -8,6 +8,9 @@ const DEFAULT_SEARCH_TYPE = 'compositions'
 export const searchComposition = async (params: ISearchQuery) => {
   const {
     query = EMPTY_STRING,
+    trackingId = EMPTY_STRING,
+    contactNumber = EMPTY_STRING,
+    registrationNumber = EMPTY_STRING,
     event = EMPTY_STRING,
     status = EMPTY_STRING,
     applicationLocationId = EMPTY_STRING,
@@ -21,7 +24,14 @@ export const searchComposition = async (params: ISearchQuery) => {
     from,
     size,
     body: {
-      query: queryBuilder(query, applicationLocationId, { event, status }),
+      query: queryBuilder(
+        query,
+        trackingId,
+        contactNumber,
+        registrationNumber,
+        applicationLocationId,
+        { event, status }
+      ),
       sort: [{ dateOfApplication: sort }]
     }
   })
