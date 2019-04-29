@@ -11,7 +11,7 @@ type BirthRegistrationByAgeMetrics {
 type BirthRegistrationWithIn45D {
   label: String
   value: Int
-  total: Int
+  totalEstimate: Int
 }
 
 type Query {

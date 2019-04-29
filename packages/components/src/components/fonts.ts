@@ -39,8 +39,8 @@ export const fonts = (country: string): IFonts => ({
   regularFont: countryFonts[country].regularFontFamily,
   englishTextFont: 'noto_sansregular',
   defaultFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
-    font-weight: 300;
-    font-size: 16px;
+    font-weight: 400;
+    font-size: 18px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 18px;
     }
@@ -54,9 +54,9 @@ export const fonts = (country: string): IFonts => ({
     letter-spacing: 0.1px;`,
   infoFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
     font-weight: 300;
-    font-size: 14px;
+    font-size: 16px;
     @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 14px;
+      font-size: 16px;
     }
     letter-spacing: 0.1px;`,
   capsFontStyle: `font-family: ${countryFonts[country].regularFontFamily};

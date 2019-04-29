@@ -15,14 +15,14 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         scope: ['admin'],
-        mobile: '+345345343'
+        mobile: '+345345348'
       })
 
       const authRes = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          mobile: '+345345348',
           password: '2r23432'
         }
       })
@@ -32,7 +32,8 @@ describe('authenticate handler receives a request', () => {
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: smsCode
+          code: smsCode,
+          mobile: '+345345349'
         }
       })
 
@@ -49,13 +50,13 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         scope: ['admin'],
-        mobile: '+345345343'
+        mobile: '+345345349'
       })
       const authRes = await server.server.inject({
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          mobile: '+345345349',
           password: '2r23432'
         }
       })
@@ -65,7 +66,8 @@ describe('authenticate handler receives a request', () => {
         url: '/verifyCode',
         payload: {
           nonce: authRes.result.nonce,
-          code: badCode
+          code: badCode,
+          mobile: '+345345349'
         }
       })
       expect(res.statusCode).toBe(401)

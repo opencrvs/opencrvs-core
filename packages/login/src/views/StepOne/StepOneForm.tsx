@@ -18,6 +18,7 @@ import { stepOneFields } from './stepOneFields'
 import { IAuthenticationData } from '../../utils/authApi'
 import { localiseValidationError } from '../../forms/i18n'
 import { Logo } from '@opencrvs/components/lib/icons'
+import { ERROR_CODE_TOO_MANY_ATTEMPTS } from '../../utils/authUtils'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -60,6 +61,13 @@ export const messages = defineMessages({
     defaultMessage: 'Sorry that mobile number and password did not work.',
     description:
       'The error that appears when the user entered details are unauthorised'
+  },
+  tooManyLoginAttemptError: {
+    id: 'login.tooManyLoginAttemptError',
+    defaultMessage:
+      'Too many login attempts. You can try again after one minute.',
+    description:
+      'The error that appears when the user attempts more than 10 times in a minute'
   },
   optionalLabel: {
     id: 'login.optionalLabel',
@@ -137,6 +145,7 @@ export const FieldWrapper = styled.div`
 export interface IProps {
   formId: string
   submissionError: boolean
+  errorCode?: number
 }
 export interface IDispatchProps {
   submitAction: (values: IAuthenticationData) => void
@@ -170,7 +179,6 @@ const MobileInput = injectIntl((props: Props) => {
         touched={Boolean(meta.touched)}
         error={Boolean(meta.error)}
         type="tel"
-        placeholder={intl.formatMessage(mobileField.placeholder)}
         ignoreMediaQuery
       />
     </InputField>
@@ -214,7 +222,8 @@ export class StepOneForm extends React.Component<
       handleSubmit,
       formId,
       submitAction,
-      submissionError
+      submissionError,
+      errorCode
     } = this.props
 
     return (
@@ -225,7 +234,9 @@ export class StepOneForm extends React.Component<
         <Title>
           {submissionError && (
             <ErrorText>
-              {intl.formatMessage(messages.submissionError)}
+              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
+                ? intl.formatMessage(messages.tooManyLoginAttemptError)
+                : intl.formatMessage(messages.submissionError)}
             </ErrorText>
           )}
         </Title>

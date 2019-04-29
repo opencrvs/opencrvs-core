@@ -12,6 +12,7 @@ import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from 'src/constants'
 interface IVerifyPayload {
   nonce: string
   code: string
+  mobile: string
 }
 
 interface IVerifyResponse {
@@ -43,7 +44,8 @@ export default async function authenticateHandler(
 
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
-  code: Joi.string()
+  code: Joi.string(),
+  mobile: Joi.string()
 })
 export const responseSchma = Joi.object({
   token: Joi.string()
