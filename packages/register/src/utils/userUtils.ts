@@ -98,6 +98,12 @@ export async function removeUserDetails() {
 }
 
 export async function getCurrentUserID(): Promise<string> {
-  const str = await storage.getItem('USER_DETAILS')
-  return (str && (JSON.parse(str) as IUserDetails).userMgntUserID) || ''
+  const userIDfromTempStorage = await storage.getItem('USER_ID')
+  if (userIDfromTempStorage) {
+    await storage.removeItem('USER_ID') // delete the temporary storage
+    return userIDfromTempStorage
+  } else {
+    const str = await storage.getItem('USER_DETAILS')
+    return (str && (JSON.parse(str) as IUserDetails).userMgntUserID) || ''
+  }
 }

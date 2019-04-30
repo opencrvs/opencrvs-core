@@ -23,6 +23,25 @@ jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 beforeEach(() => {
   history.replaceState({}, '', '/')
   assign.mockClear()
+  const indexedDB = {
+    USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
+    USER_DATA: JSON.stringify([
+      {
+        userID: 'shakib75',
+        userPIN: '$2a$10$nD0E23/QJK0tjbPN23zg1u7rYnhsm8Y5/08.H20SSdqLVyuwFtVsG',
+        drafts: []
+      }
+    ]),
+    screenLock: undefined,
+    USER_ID: 'shakib75'
+  }
+
+  storage.getItem = jest.fn(async (key: string) =>
+    Promise.resolve(indexedDB[key])
+  )
+  storage.setItem = jest.fn(
+    async (key: string, value: string) => (indexedDB[key] = value)
+  )
 })
 
 describe('when user is selecting the vital event', () => {

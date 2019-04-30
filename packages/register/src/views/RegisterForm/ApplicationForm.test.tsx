@@ -2,14 +2,19 @@ import {
   createTestApp,
   mockOfflineData,
   assign,
-  validToken,
-  getItem,
+  // validToken,
+  // getItem,
   flushPromises,
-  setItem,
+  // setItem,
   selectOption
 } from 'src/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
-import { storeDraft, createDraft, IDraft } from 'src/drafts'
+import {
+  storeDraft,
+  createDraft,
+  IDraft,
+  getDraftsOfCurrentUser
+} from 'src/drafts'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -34,8 +39,8 @@ describe('when user has starts a new application', () => {
   let store: Store
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
+    // getItem.mockReturnValue(validToken)
+    // setItem.mockClear()
     fetch.resetMocks()
     fetch.mockResponses(
       [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
@@ -51,25 +56,50 @@ describe('when user has starts a new application', () => {
   })
   describe('In case of insecured page show unlock screen', () => {
     let draft: IDraft
-    storage.getItem = jest
-      .fn()
-      .mockReturnValueOnce(null)
-      .mockReturnValueOnce(null)
-      .mockReturnValueOnce('true')
-      .mockReturnValueOnce(
-        '$2a$10$nD0E23/QJK0tjbPN23zg1u7rYnhsm8Y5/08.H20SSdqLVyuwFtVsG'
-      )
+    // storage.getItem = jest
+    //   .fn()
+    //   .mockReturnValueOnce(null)
+    //   .mockReturnValueOnce(null)
+    //   .mockReturnValueOnce('true')
+    //   .mockReturnValueOnce(
+    //     '$2a$10$nD0E23/QJK0tjbPN23zg1u7rYnhsm8Y5/08.H20SSdqLVyuwFtVsG'
+    //   )
     beforeEach(async () => {
       draft = createDraft(Event.BIRTH)
+      const indexedDB = {
+        USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
+        USER_DATA: JSON.stringify([
+          {
+            userID: 'shakib75',
+            userPIN:
+              '$2a$10$nD0E23/QJK0tjbPN23zg1u7rYnhsm8Y5/08.H20SSdqLVyuwFtVsG',
+            drafts: []
+          }
+        ]),
+        screenLock: undefined,
+        USER_ID: 'shakib75'
+      }
+
+      storage.getItem = jest.fn(async (key: string) =>
+        Promise.resolve(indexedDB[key])
+      )
+      storage.setItem = jest.fn(
+        async (key: string, value: string) => (indexedDB[key] = value)
+      )
+
       store.dispatch(storeDraft(draft))
+      console.log('DRAFTS', getDraftsOfCurrentUser())
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
       )
+      console.log('HISTORY', history)
       await flushPromises()
       app.update()
     })
     it('renders unlock screen', () => {
-      expect(app.find('#unlockPage').hostNodes().length).toBe(1)
+      const temp = app.find('#unlockPage')
+      console.log('TEMP', temp, 'NODES', temp.hostNodes())
+      expect(temp.hostNodes().length).toBe(1)
     })
   })
   describe('when user is in birth registration by parent informant view', () => {
