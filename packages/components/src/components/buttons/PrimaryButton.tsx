@@ -28,7 +28,7 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }) => theme.colors.disabledButton};
     cursor: not-allowed;
     color: ${({ theme }) => theme.colors.disabled};
   }

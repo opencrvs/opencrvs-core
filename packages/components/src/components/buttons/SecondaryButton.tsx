@@ -19,7 +19,7 @@ export const SecondaryButton = styled(Button)`
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.disabled};
+    border: ${({ theme }) => `2px solid ${theme.colors.disabled}`};
     cursor: not-allowed;
     color: ${({ theme }) => theme.colors.disabled};
   }
