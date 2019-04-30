@@ -341,6 +341,7 @@
 "@types/fhir@^0.0.30":
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.30.tgz#a0aec3b2d7dd2a7584474dac446ede5f9a4d7a13"
+  integrity sha512-vDU62tUFeAYBVQThiWAfGd6D25TiLLDDS5pV19vim52FLpwWTBliLMvotbF4D/U+BmjxBKIuHGZgFnoh/HtV5g==
 
 "@types/geojson@^7946.0.4":
   version "7946.0.6"
