@@ -78,9 +78,8 @@ class CreatePinComponent extends React.Component<IProps> {
     const hash = bcrypt.hashSync(pin, salt)
 
     const currentUserID = await getCurrentUserID()
-    const allUserData =
-      (JSON.parse(await storage.getItem('USER_DATA')) as IUserData[]) ||
-      ([] as IUserData[])
+    const userData = (await storage.getItem('USER_DATA')) || '[]'
+    const allUserData = JSON.parse(userData) as IUserData[]
     const currentUserData = allUserData.find(
       user => user.userID === currentUserID
     )

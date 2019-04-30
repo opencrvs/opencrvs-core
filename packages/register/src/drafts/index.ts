@@ -240,12 +240,7 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
     return '{}'
   }
 
-  let currentUserID = await storage.getItem('USER_ID')
-  if (!currentUserID) {
-    currentUserID = await getCurrentUserID() // get user-id the old-fashioned way
-  } else {
-    await storage.removeItem('USER_ID') // delete the temporary storage
-  }
+  const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
   if (!allUserData.length) {
@@ -260,6 +255,7 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     uData => uData.userID === currentUserID
   )
+
   const currentUserDrafts: IDraft[] =
     (currentUserData && currentUserData.drafts) || []
   const payload: IUserData = {
@@ -272,11 +268,7 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
 export async function writeDraftByUser(draftsState: IDraftsState) {
   const uID = draftsState.userID || (await getCurrentUserID())
   const str = await storage.getItem('USER_DATA')
-  if (!str) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !str ? [] : (JSON.parse(str) as IUserData[])
+  const allUserData: IUserData[] = str ? (JSON.parse(str) as IUserData[]) : []
   const currentUserData = allUserData.find(uData => uData.userID === uID)
 
   if (currentUserData) {
