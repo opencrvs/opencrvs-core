@@ -62,10 +62,10 @@ export const messages = defineMessages({
     description:
       'The error that appears when the user entered details are unauthorised'
   },
-  tooManyLoginAttemptError: {
-    id: 'login.tooManyLoginAttemptError',
+  tooManyAttemptError: {
+    id: 'login.tooManyAttemptError',
     defaultMessage:
-      'Too many login attempts. You can try again after one minute.',
+      'Sorry you have reached your attempt up to 10 times. Please try again after 1 minute',
     description:
       'The error that appears when the user attempts more than 10 times in a minute'
   },
@@ -235,7 +235,7 @@ export class StepOneForm extends React.Component<
           {submissionError && (
             <ErrorText>
               {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
-                ? intl.formatMessage(messages.tooManyLoginAttemptError)
+                ? intl.formatMessage(messages.tooManyAttemptError)
                 : intl.formatMessage(messages.submissionError)}
             </ErrorText>
           )}
