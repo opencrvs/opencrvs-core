@@ -112,13 +112,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         >(authApi.verifyCode, {
           successActionCreator: actions.completeVerifyCode,
           failActionCreator: actions.failVerifyCode,
-          args: [
-            {
-              code,
-              nonce: state.authenticationDetails.nonce,
-              mobile: state.stepOneDetails.mobile
-            }
-          ]
+          args: [{ code, nonce: state.authenticationDetails.nonce }]
         })
       )
     case actions.VERIFY_CODE_FAILED:

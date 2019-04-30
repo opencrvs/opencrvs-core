@@ -34,8 +34,8 @@ export default function getPlugins() {
     {
       plugin: Rate,
       options: {
-        userAttribute: 'id',
-        max: 2,
+        userAttribute: 'mobile',
+        max: 10,
         duration: 60 * 1000 // per minute (the value is in milliseconds)
       }
     }
