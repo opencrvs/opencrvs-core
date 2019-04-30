@@ -1,5 +1,4 @@
 import * as Good from 'good'
-import * as Rate from 'hapi-rate-limitor'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -29,14 +28,6 @@ export default function getPlugins() {
             'stdout'
           ]
         }
-      }
-    },
-    {
-      plugin: Rate,
-      options: {
-        userAttribute: 'mobile',
-        max: 10,
-        duration: 60 * 1000 // per minute (the value is in milliseconds)
       }
     }
   ]

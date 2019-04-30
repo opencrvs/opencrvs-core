@@ -38,7 +38,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345344',
+          mobile: '+345345343',
           password: '2r23432'
         }
       })
@@ -64,14 +64,14 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345345',
+          mobile: '+345345343',
           password: '2r23432'
         }
       })
 
       expect(spy).toHaveBeenCalled()
       expect(spy.mock.calls[0]).toHaveLength(2)
-      expect(spy.mock.calls[0][0]).toBe('+345345345')
+      expect(spy.mock.calls[0][0]).toBe('+345345343')
     })
   })
 })
