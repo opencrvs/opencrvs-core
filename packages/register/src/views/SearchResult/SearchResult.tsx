@@ -870,7 +870,6 @@ export class SearchResultView extends React.Component<
                     )
                   }
                   if (error) {
-                    console.log(`ERROR in QUERY ${JSON.stringify(error)}`)
                     Sentry.captureException(error)
 
                     return (
