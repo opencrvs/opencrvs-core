@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
 
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
-
 import {
   InputField,
   TextInput,
@@ -18,7 +17,6 @@ import { stepOneFields } from './stepOneFields'
 import { IAuthenticationData } from '../../utils/authApi'
 import { localiseValidationError } from '../../forms/i18n'
 import { Logo } from '@opencrvs/components/lib/icons'
-import { ERROR_CODE_TOO_MANY_ATTEMPTS } from '../../utils/authUtils'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -62,13 +60,6 @@ export const messages = defineMessages({
     description:
       'The error that appears when the user entered details are unauthorised'
   },
-  tooManyLoginAttemptError: {
-    id: 'login.tooManyLoginAttemptError',
-    defaultMessage:
-      'Too many login attempts. You can try again after one minute.',
-    description:
-      'The error that appears when the user attempts more than 10 times in a minute'
-  },
   optionalLabel: {
     id: 'login.optionalLabel',
     defaultMessage: 'Optional',
@@ -89,7 +80,10 @@ export const FormWrapper = styled.form`
   margin: auto;
   width: 100%;
   margin-bottom: 50px;
-  margin-top: 30px;
+  margin-top: 64px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-top: 48px;
+  }
 `
 
 export const ActionWrapper = styled.div`
@@ -102,6 +96,11 @@ export const LogoContainer = styled.div`
   flex-direction: row;
   display: flex;
   justify-content: center;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & svg {
+      transform: scale(0.8);
+    }
+  }
 `
 
 export const Title = styled.div`
@@ -139,13 +138,12 @@ export const ErrorText = styled.p`
 `
 
 export const FieldWrapper = styled.div`
-  min-height: 6.7em;
+  min-height: 6.5em;
 `
 
 export interface IProps {
   formId: string
   submissionError: boolean
-  errorCode?: number
 }
 export interface IDispatchProps {
   submitAction: (values: IAuthenticationData) => void
@@ -222,8 +220,7 @@ export class StepOneForm extends React.Component<
       handleSubmit,
       formId,
       submitAction,
-      submissionError,
-      errorCode
+      submissionError
     } = this.props
 
     return (
@@ -234,9 +231,7 @@ export class StepOneForm extends React.Component<
         <Title>
           {submissionError && (
             <ErrorText>
-              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
-                ? intl.formatMessage(messages.tooManyLoginAttemptError)
-                : intl.formatMessage(messages.submissionError)}
+              {intl.formatMessage(messages.submissionError)}
             </ErrorText>
           )}
         </Title>
