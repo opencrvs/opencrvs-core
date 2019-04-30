@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Spinner } from './Spinner'
-
 export interface ILoader {
   id: string
   loadingText?: string
@@ -19,7 +18,6 @@ const StyledSpinner = styled(Spinner)`
   width: 100%;
   height: 100%;
 `
-
 const StyledSpinnerContainer = styledSpinnerContainer`
   width: ${({ diameter }) => diameter}px;
   height: ${({ diameter }) => diameter}px;
@@ -34,9 +32,8 @@ const LoadingContainer = styledLoader`
   margin: ${({ marginPercent }) => marginPercent}% auto;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
 `
-
 const LoadingTextContainer = styled.div`
   margin-top: 20px;
   font-family: ${({ theme }) => theme.fonts.lightFont};
@@ -48,22 +45,15 @@ const LoadingTextContainer = styled.div`
 
 export class Loader extends React.Component<ILoader> {
   render() {
-    const {
-      children,
-      id,
-      loadingText,
-      marginPercent,
-      spinnerDiameter
-    } = this.props
+    const { id, loadingText, marginPercent, spinnerDiameter } = this.props
     return (
       <LoadingContainer id={id} marginPercent={marginPercent}>
+        <LoadingTextContainer>{loadingText}</LoadingTextContainer>
         <LoadingSpinnerContainer>
           <StyledSpinnerContainer diameter={spinnerDiameter}>
             <StyledSpinner id={id + '_spinner'} />
           </StyledSpinnerContainer>
         </LoadingSpinnerContainer>
-        <LoadingTextContainer>{loadingText}</LoadingTextContainer>
-        {children}
       </LoadingContainer>
     )
   }
