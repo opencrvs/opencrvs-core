@@ -952,6 +952,7 @@ export const BENGALI_STATE: ILanguage = {
     'unlockApp.lastTry': 'শেষ চেষ্টা',
     'unlockApp.locked':
       'আপনার অ্যাকাউন্ট লক করা হয়েছে. 1 মিনিটের মধ্যে আবার চেষ্টা করুন।',
-    'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে'
+    'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
+    'register.SearchResult.searchingFor': 'অনুসন্ধান চলসে '
   }
 }

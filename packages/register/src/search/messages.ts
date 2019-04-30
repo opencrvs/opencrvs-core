@@ -322,5 +322,10 @@ export const messages = defineMessages({
     id: 'register.SearchResult.informantContact',
     defaultMessage: 'Informant contact number',
     description: 'The rejected reason'
+  },
+  searchingFor: {
+    id: 'register.SearchResult.searchingFor',
+    defaultMessage: 'Searching for ',
+    description: 'The searching for text'
   }
 })

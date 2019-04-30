@@ -19,7 +19,8 @@ import {
   ListItemExpansion,
   SearchInput,
   SelectFieldType,
-  Spinner
+  Spinner,
+  Loader
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
@@ -70,9 +71,6 @@ import styled, { withTheme } from 'styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 
-const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
-`
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
   height: 70px;
@@ -747,7 +745,7 @@ export class SearchResultView extends React.Component<
   }
 
   render() {
-    const { intl, match, theme } = this.props
+    const { intl, match } = this.props
     const searchParam = match.params.searchText
     const sortBy = {
       input: {
@@ -858,9 +856,16 @@ export class SearchResultView extends React.Component<
                 {({ loading, error, data }) => {
                   if (loading) {
                     return (
-                      <StyledSpinner
-                        id="search-result-spinner"
-                        baseColor={theme.colors.background}
+                      <Loader
+                        id="search_loader"
+                        marginPercent={35}
+                        spinnerDiameter={60}
+                        loadingText={
+                          intl.formatMessage(messages.searchingFor) +
+                          '“' +
+                          searchParam +
+                          '”'
+                        }
                       />
                     )
                   }
