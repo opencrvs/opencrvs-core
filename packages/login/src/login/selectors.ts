@@ -9,9 +9,6 @@ export const getSubmissionError = (
   store: IStoreState
 ): LoginState['submissionError'] => getKey(store, 'submissionError')
 
-export const getErrorCode = (store: IStoreState): LoginState['errorCode'] =>
-  getKey(store, 'errorCode')
-
 export const getResentSMS = (store: IStoreState): LoginState['resentSMS'] =>
   getKey(store, 'resentSMS')
 

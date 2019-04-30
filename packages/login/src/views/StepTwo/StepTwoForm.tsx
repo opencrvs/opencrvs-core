@@ -27,7 +27,6 @@ import {
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
-import { ERROR_CODE_TOO_MANY_ATTEMPTS } from '../../utils/authUtils'
 
 export const messages = defineMessages({
   stepTwoTitle: {
@@ -63,13 +62,6 @@ export const messages = defineMessages({
     description:
       'The error that appears when the user entered sms code is unauthorised'
   },
-  tooManyAttemptError: {
-    id: 'login.tooManyAttemptError',
-    defaultMessage:
-      'Sorry you have reached your attempt up to 10 times. Please try again after 1 minute',
-    description:
-      'The error that appears when the user attempts more than 10 times in a minute'
-  },
   resentSMS: {
     id: 'login.resentSMS',
     defaultMessage: 'We just resent you another code to {number}',
@@ -93,7 +85,6 @@ const StyledMobile2FA = styled(Mobile2FA)`
 export interface IProps {
   formId: string
   submissionError: boolean
-  errorCode?: number
   resentSMS: boolean
   submitting: boolean
   stepOneDetails: { mobile: string }
@@ -150,8 +141,7 @@ export class StepTwoForm extends React.Component<
       submitting,
       resentSMS,
       stepOneDetails,
-      submissionError,
-      errorCode
+      submissionError
     } = this.props
     const mobileNumber = stepOneDetails.mobile.replace(
       stepOneDetails.mobile.slice(5, 10),
@@ -186,9 +176,7 @@ export class StepTwoForm extends React.Component<
 
           {submissionError && (
             <ErrorText>
-              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
-                ? intl.formatMessage(messages.tooManyAttemptError)
-                : intl.formatMessage(messages.codeSubmissionError)}
+              {intl.formatMessage(messages.codeSubmissionError)}
             </ErrorText>
           )}
         </Title>

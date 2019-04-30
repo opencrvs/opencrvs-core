@@ -18,7 +18,6 @@ import { stepOneFields } from './stepOneFields'
 import { IAuthenticationData } from '../../utils/authApi'
 import { localiseValidationError } from '../../forms/i18n'
 import { Logo } from '@opencrvs/components/lib/icons'
-import { ERROR_CODE_TOO_MANY_ATTEMPTS } from '../../utils/authUtils'
 
 export const messages = defineMessages({
   stepOneTitle: {
@@ -61,13 +60,6 @@ export const messages = defineMessages({
     defaultMessage: 'Sorry that mobile number and password did not work.',
     description:
       'The error that appears when the user entered details are unauthorised'
-  },
-  tooManyAttemptError: {
-    id: 'login.tooManyAttemptError',
-    defaultMessage:
-      'Sorry you have reached your attempt up to 10 times. Please try again after 1 minute',
-    description:
-      'The error that appears when the user attempts more than 10 times in a minute'
   },
   optionalLabel: {
     id: 'login.optionalLabel',
@@ -145,7 +137,6 @@ export const FieldWrapper = styled.div`
 export interface IProps {
   formId: string
   submissionError: boolean
-  errorCode?: number
 }
 export interface IDispatchProps {
   submitAction: (values: IAuthenticationData) => void
@@ -222,8 +213,7 @@ export class StepOneForm extends React.Component<
       handleSubmit,
       formId,
       submitAction,
-      submissionError,
-      errorCode
+      submissionError
     } = this.props
 
     return (
@@ -234,9 +224,7 @@ export class StepOneForm extends React.Component<
         <Title>
           {submissionError && (
             <ErrorText>
-              {errorCode === ERROR_CODE_TOO_MANY_ATTEMPTS
-                ? intl.formatMessage(messages.tooManyAttemptError)
-                : intl.formatMessage(messages.submissionError)}
+              {intl.formatMessage(messages.submissionError)}
             </ErrorText>
           )}
         </Title>

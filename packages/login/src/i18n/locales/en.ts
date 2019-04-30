@@ -11,8 +11,6 @@ export const ENGLISH_STATE = {
     'login.submissionError':
       'Sorry that mobile number and password did not work.',
     'login.codeSubmissionError': 'Sorry that code did not work.',
-    'login.tooManyAttemptError':
-      'Sorry you have reached your attempt up to 10 times. Please try again after 1 minute',
     'login.resentSMS': 'We just resent you another code to {number}',
     'login.stepTwoResendTitle': 'Verification code resent',
     'login.resendMobile': 'Resend SMS',
