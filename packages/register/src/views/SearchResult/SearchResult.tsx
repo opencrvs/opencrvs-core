@@ -413,7 +413,7 @@ export class SearchResultView extends React.Component<
             id
           }}
         >
-          {({ loading, error, data }) => {
+          {({ loading, error, data }: any) => {
             const { intl, language } = this.props
             moment.locale(language)
             if (error) {
@@ -855,7 +855,7 @@ export class SearchResultView extends React.Component<
                   searchContent: searchParam
                 }}
               >
-                {({ loading, error, data }) => {
+                {({ loading, error, data }: any) => {
                   if (loading) {
                     return (
                       <StyledSpinner

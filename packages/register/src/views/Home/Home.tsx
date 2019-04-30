@@ -25,7 +25,6 @@ import {
   IconAction,
   CountAction
 } from '@opencrvs/components/lib/buttons'
-import { ITheme } from '@opencrvs/components/lib/theme'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'styledComponents'
@@ -144,7 +143,7 @@ const StyledIconAction = styled(IconAction)`
   min-height: 96px;
   padding: 0 20px 0 0;
   box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
-  background-color: ${({ theme }: ITheme) => theme.colors.accentLight};
+  background-color: ${({ theme }) => theme.colors.accentLight};
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
@@ -152,7 +151,7 @@ const StyledIconAction = styled(IconAction)`
     font-weight: 300;
     margin: -2px 0 -2px 120px;
     line-height: 1.3em;
-    color: ${({ theme }: ITheme) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.white};
   }
 `
 interface IHomeProps {

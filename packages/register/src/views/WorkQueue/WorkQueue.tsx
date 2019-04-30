@@ -78,7 +78,7 @@ export const IconTabs = styled.div`
 `
 export const IconTab = styled(Button).attrs<IProps>({})`
   color: ${({ theme }) => theme.colors.secondary};
-  font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
+  font-weight: ${({ theme, active }) => (active ? 'bold' : 'normal')};
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
@@ -736,7 +736,7 @@ export class WorkQueueView extends React.Component<
                 locationIds: [registrarUnion]
               }}
             >
-              {({ loading, error, data }) => {
+              {({ loading, error, data }: any) => {
                 if (loading) {
                   parentQueryLoading = true
                   return (
@@ -855,7 +855,7 @@ export class WorkQueueView extends React.Component<
                   skip: (this.state.currentPage - 1) * this.pageSize
                 }}
               >
-                {({ loading, error, data }) => {
+                {({ loading, error, data }: any) => {
                   if (loading) {
                     return (
                       (!parentQueryLoading && (
@@ -962,7 +962,7 @@ export class WorkQueueView extends React.Component<
                   skip: (this.state.currentPage - 1) * this.pageSize
                 }}
               >
-                {({ loading, error, data }) => {
+                {({ loading, error, data }: any) => {
                   if (loading) {
                     return (
                       (!parentQueryLoading && (
