@@ -30,13 +30,7 @@ describe('Login app step two', () => {
       component.find('form#STEP_TWO').simulate('submit')
 
       await wait()
-      const resp = {
-        status: 400,
-        response: { message: 'Error' }
-      }
       const request = moxios.requests.mostRecent()
-      request.reject(resp)
-
       expect(request.url).toMatch(/verifyCode/)
       component.unmount()
     })
