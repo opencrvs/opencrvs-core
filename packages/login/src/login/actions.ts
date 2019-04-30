@@ -32,7 +32,7 @@ export type AuthenticateResponseAction = {
 
 export type AuthenticationFailedAction = {
   type: typeof AUTHENTICATION_FAILED
-  payload: AxiosError
+  payload: Error
 }
 
 export type ResendSMSAction = {
@@ -61,7 +61,7 @@ export type VerifyCodeCompleteAction = {
 
 export type VerifyCodeFailedAction = {
   type: typeof VERIFY_CODE_FAILED
-  payload: AxiosError
+  payload: Error
 }
 
 export type GoToAppAction = {

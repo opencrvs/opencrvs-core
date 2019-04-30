@@ -10,8 +10,7 @@ import * as Hapi from 'hapi'
 import { AUTH_HOST, AUTH_PORT } from './constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
-  responseSchema as resAuthSchema,
-  IAuthPayload
+  responseSchema as resAuthSchema
 } from './features/authenticate/handler'
 import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
@@ -72,11 +71,6 @@ export async function createServer() {
       },
       response: {
         schema: resResendSmsSchema
-      },
-      plugins: {
-        'hapi-rate-limitor': {
-          enabled: false
-        }
       }
     }
   })
@@ -115,24 +109,8 @@ export async function createServer() {
       },
       response: {
         schema: resRefreshSchema
-      },
-      plugins: {
-        'hapi-rate-limitor': {
-          enabled: false
-        }
       }
     }
-  })
-
-  server.ext('onPostAuth', (request, h) => {
-    const payload = request.payload as IAuthPayload
-    const credentials = {
-      id: payload && payload.mobile + request.url.pathname
-    } as Hapi.AuthCredentials
-
-    h.request.auth.credentials = credentials
-
-    return h.continue
   })
 
   await server.register(getPlugins())
