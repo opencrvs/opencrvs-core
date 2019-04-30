@@ -11661,10 +11661,6 @@ redis-commands@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/redis-commands/-/redis-commands-1.4.0.tgz#52f9cf99153efcce56a8f86af986bd04e988602f"
 
-redis-mock@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/redis-mock/-/redis-mock-0.27.0.tgz#a9de1650cf62146cafbc35a2e2f2fadc197828e0"
-
 redis-parser@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/redis-parser/-/redis-parser-2.6.0.tgz#52ed09dacac108f1a631c07e9b69941e7a19504b"
