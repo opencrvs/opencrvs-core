@@ -723,9 +723,13 @@ export const postSearch = (
     })
 }
 
-export const getMetrics = (authHeader: IAuthHeader, timeRange: ITimeRange) => {
-  const params = new URLSearchParams({ ...timeRange })
-  return fetch(`${METRICS_URL}metrics/birth?` + params, {
+export const getMetrics = (
+  authHeader: IAuthHeader,
+  timeRange: ITimeRange,
+  locationId: string
+) => {
+  const params = new URLSearchParams({ ...timeRange, locationId })
+  return fetch(`${METRICS_URL}/birth?` + params, {
     method: 'GET',
     headers: {
       ...authHeader

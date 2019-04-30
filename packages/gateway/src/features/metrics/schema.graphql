@@ -1,4 +1,5 @@
 type BirthRegistrationMetrics {
+  keyFigures: [BirthKeyFigures]
   regByAge: [BirthRegistrationByAgeMetrics]
   regWithin45d: [BirthRegistrationWithIn45D]
 }
@@ -14,9 +15,22 @@ type BirthRegistrationWithIn45D {
   totalEstimate: Int
 }
 
+type BirthKeyFigures {
+  label: String
+  value: Int
+  total: Int
+  categoricalData: [BirthKeyFiguresData]
+}
+
+type BirthKeyFiguresData {
+  name: String
+  value: Int
+}
+
 type Query {
   fetchBirthRegistrationMetrics(
-    timeStart: String
-    timeEnd: String
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
   ): BirthRegistrationMetrics
 }
