@@ -107,6 +107,9 @@ describe('Create PIN view', async () => {
 
     c.update()
 
-    expect(storage.setItem).toBeCalledWith('pin', expect.any(String))
+    expect(storage.setItem).toHaveBeenCalledWith(
+      'USER_DATA',
+      expect.any(String)
+    )
   })
 })
