@@ -6,6 +6,10 @@ const country = process.env.REACT_APP_COUNTRY
   ? process.env.REACT_APP_COUNTRY
   : 'gbr'
 
+const language = process.env.REACT_APP_LANGUAGE
+  ? process.env.REACT_APP_LANGUAGE
+  : 'en'
+
 const Wrapper = styled.div`
   * {
     box-sizing: border-box;
@@ -23,7 +27,7 @@ export class ThemeWrapper extends React.Component {
   render() {
     return (
       <Wrapper>
-        <ThemeProvider theme={getTheme(country)}>
+        <ThemeProvider theme={getTheme(country, language)}>
           {this.props.children}
         </ThemeProvider>
       </Wrapper>
