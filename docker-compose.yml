@@ -98,3 +98,10 @@ services:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://hearth:3447/fhir
       - ADMINISTRATIVE_STRUCTURE_URL=http://174.136.37.245:8090/gen
+
+  styleguide:
+    image: jembi/ocrvs-styleguide:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./Dockerfile-styleguide
+    restart: unless-stopped
