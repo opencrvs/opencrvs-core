@@ -5,7 +5,6 @@ import * as Sentry from '@sentry/browser'
 export interface ICodeVerifyData {
   nonce: string
   code: string
-  mobile: string
 }
 
 export interface IAuthenticationData {

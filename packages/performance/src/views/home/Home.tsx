@@ -12,6 +12,7 @@ import styled from 'src/styled-components'
 import { withTheme } from 'styled-components'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { getUserDetails } from 'src/profile/selectors'
+import { getUserLocation } from 'src/utils/userUtils'
 import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
 import { IUserDetails } from 'src/utils/userUtils'
 import { Page } from 'src/components/Page'
@@ -362,7 +363,8 @@ class HomeView extends React.Component<FullProps> {
               query={FETCH_METRIC}
               variables={{
                 timeStart: '1527098400000',
-                timeEnd: '1556042400000'
+                timeEnd: '1556042400000',
+                locationId: userDetails && getUserLocation(userDetails, 'UNION')
               }}
             >
               {({ loading, error, data }) => {

@@ -25,7 +25,8 @@ describe('verify metrics handler', () => {
   it('returns ok for valid request', async () => {
     const res = await server.server.inject({
       method: 'GET',
-      url: '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419',
+      url:
+        '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419&locationId=43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -54,7 +55,7 @@ describe('verify metrics handler', () => {
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468',
+        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468&locationId=43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
       headers: {
         Authorization: `Bearer ${token}`
       }
