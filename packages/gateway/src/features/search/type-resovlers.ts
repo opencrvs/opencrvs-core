@@ -13,6 +13,9 @@ export interface ISearchCriteria {
   status?: string
   applicationLocationId?: string
   query?: string
+  trackingId?: string
+  contactNumber?: string
+  registrationNumber?: string
   from: number
   size: number
   sort?: string

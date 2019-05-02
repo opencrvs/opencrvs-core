@@ -340,46 +340,6 @@ type RegistrationCount {
   rejected: Int
 }
 
-# schema for elastic search query types
-type EventSearchResultSet {
-  results: [EventSearchSet]
-  totalItems: Int
-}
-
-interface EventSearchSet {
-  id: ID!
-  type: String
-  registration: RegistrationSearchSet
-}
-
-type RegistrationSearchSet {
-  status: String
-  contactNumber: String
-  dateOfApplication: Date
-  trackingId: String
-  registrationNumber: String
-  eventLocationId: String
-  registeredLocationId: String
-  reason: String
-  comment: String
-}
-
-type BirthEventSearchSet implements EventSearchSet {
-  id: ID!
-  type: String
-  childName: [HumanName]
-  dateOfBirth: Date
-  registration: RegistrationSearchSet
-}
-
-type DeathEventSearchSet implements EventSearchSet {
-  id: ID!
-  type: String
-  deceasedName: [HumanName]
-  dateOfDeath: Date
-  registration: RegistrationSearchSet
-}
-
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
@@ -413,16 +373,6 @@ type Query {
     skip: Int
   ): EventRegResultSet
   countEventRegistrations(locationIds: [String]): RegistrationCount
-  # schema for elastic search queries
-  searchEvents(
-    locationIds: [String]
-    status: String
-    searchContent: String
-    eventType: String
-    count: Int
-    skip: Int
-    sort: String
-  ): EventSearchResultSet
   fetchRegistration(id: ID!): EventRegistration
 }
 

@@ -33,7 +33,7 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO
 } from './constants'
-import { ISearchCriteria } from '../registration/search-type-resovlers'
+import { ISearchCriteria } from '../search/type-resovlers'
 import { ITimeRange } from '../metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 

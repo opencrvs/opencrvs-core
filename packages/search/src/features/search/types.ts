@@ -4,6 +4,9 @@ export enum SortOrder {
 }
 export interface ISearchQuery {
   query?: string
+  trackingId?: string
+  contactNumber?: string
+  registrationNumber?: string
   event?: string
   status?: string
   applicationLocationId?: string

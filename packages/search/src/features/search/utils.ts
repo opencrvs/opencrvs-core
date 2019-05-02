@@ -16,6 +16,9 @@ export const EMPTY_STRING = ''
 
 export function queryBuilder(
   query: string,
+  trackingId: string,
+  contactNumber: string,
+  registrationNumber: string,
   applicationLocationId: string,
   filters: IFilter
 ) {
@@ -28,6 +31,30 @@ export function queryBuilder(
         query: `${query}`,
         fields: SEARCHABLE_FIELDS,
         fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (trackingId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'trackingId.keyword': trackingId
+      }
+    })
+  }
+
+  if (contactNumber !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'contactNumber.keyword': contactNumber
+      }
+    })
+  }
+
+  if (registrationNumber !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'registrationNumber.keyword': registrationNumber
       }
     })
   }
