@@ -35,6 +35,7 @@ services:
       - COUNTRY=bgd
       - AUTH_URL=http://auth:4040
 
+  # User facing services
   workflow:
     image: jembi/ocrvs-workflow:${VERSION:-latest}
     build: packages/workflow
@@ -47,6 +48,7 @@ services:
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=bgd
       - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
 
   search:
     image: jembi/ocrvs-search:${VERSION:-latest}
@@ -58,6 +60,7 @@ services:
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
 
   metrics:
     image: jembi/ocrvs-metrics:${VERSION:-latest}
@@ -68,6 +71,8 @@ services:
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
       - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
+  # END User facing services
 
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
