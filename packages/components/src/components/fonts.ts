@@ -17,49 +17,68 @@ export interface IFonts {
 
 const countryFonts = {
   bgd: {
-    boldFontFamily: 'noto_sans_bengalibold',
-    lightFontFamily: 'noto_sans_bengalilight',
-    regularFontFamily: 'noto_sans_bengaliregular'
+    bn: {
+      boldFontFamily: 'noto_sans_bengalibold',
+      lightFontFamily: 'noto_sans_bengalilight',
+      regularFontFamily: 'noto_sans_bengaliregular'
+    },
+    en: {
+      boldFontFamily: 'noto_sansbold',
+      lightFontFamily: 'noto_sanslight',
+      regularFontFamily: 'noto_sansregular'
+    }
   },
   gbr: {
-    boldFontFamily: 'noto_sansbold',
-    lightFontFamily: 'noto_sanslight',
-    regularFontFamily: 'noto_sansregular'
+    en: {
+      boldFontFamily: 'noto_sansbold',
+      lightFontFamily: 'noto_sanslight',
+      regularFontFamily: 'noto_sansregular'
+    }
   },
   za: {
-    boldFontFamily: 'noto_sansbold',
-    lightFontFamily: 'noto_sanslight',
-    regularFontFamily: 'noto_sansregular'
+    en: {
+      boldFontFamily: 'noto_sansbold',
+      lightFontFamily: 'noto_sanslight',
+      regularFontFamily: 'noto_sansregular'
+    }
   }
 }
 
-export const fonts = (country: string): IFonts => ({
-  boldFont: countryFonts[country].boldFontFamily,
-  lightFont: countryFonts[country].lightFontFamily,
-  regularFont: countryFonts[country].regularFontFamily,
+export const fonts = (country: string, language: string): IFonts => ({
+  boldFont: countryFonts[country][language].boldFontFamily,
+  lightFont: countryFonts[country][language].lightFontFamily,
+  regularFont: countryFonts[country][language].regularFontFamily,
   englishTextFont: 'noto_sansregular',
-  defaultFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
+  defaultFontStyle: `font-family: ${
+    countryFonts[country][language].regularFontFamily
+  };
     font-weight: 400;
     font-size: 18px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 18px;
     }
     letter-spacing: 0.1px;`,
-  lightFontStyle: `font-family: ${countryFonts[country].lightFontFamily};
+  lightFontStyle: `font-family: ${
+    countryFonts[country][language].lightFontFamily
+  };
     font-weight: 300;
     font-size: 16px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 18px;
     }
     letter-spacing: 0.1px;`,
-  infoFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
+  infoFontStyle: `font-family: ${
+    countryFonts[country][language].regularFontFamily
+  };
     font-weight: 300;
     font-size: 16px;
     @media (max-width: ${grid.breakpoints.lg}px) {
       font-size: 16px;
     }
     letter-spacing: 0.1px;`,
-  capsFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
+  capsFontStyle: `font-family: ${
+    countryFonts[country][language].regularFontFamily
+  };
     font-weight: 300;
     font-size: 14px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -67,7 +86,9 @@ export const fonts = (country: string): IFonts => ({
     }
     letter-spacing: 2.5px;
     text-transform: uppercase;`,
-  heavyFontStyle: `font-family: ${countryFonts[country].regularFontFamily};
+  heavyFontStyle: `font-family: ${
+    countryFonts[country][language].regularFontFamily
+  };
       font-weight: 600;
       font-size: 16px;
       @media (max-width: ${grid.breakpoints.lg}px) {
@@ -75,7 +96,7 @@ export const fonts = (country: string): IFonts => ({
       }
       letter-spacing: 2.5px;
       text-transform: uppercase;`,
-  h1FontStyle: `font-family: ${countryFonts[country].lightFontFamily};
+  h1FontStyle: `font-family: ${countryFonts[country][language].lightFontFamily};
     font-weight: 300;
     font-size: 30px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -83,7 +104,7 @@ export const fonts = (country: string): IFonts => ({
     }
     letter-spacing: 0.1px;
     text-transform: uppercase;`,
-  h2FontStyle: `font-family: ${countryFonts[country].lightFontFamily};
+  h2FontStyle: `font-family: ${countryFonts[country][language].lightFontFamily};
     font-weight: 300;
     font-size: 24px;
     @media (max-width: ${grid.breakpoints.lg}px) {
@@ -91,7 +112,7 @@ export const fonts = (country: string): IFonts => ({
     }
     letter-spacing: 0.1px;
     text-transform: uppercase;`,
-  h3FontStyle: `font-family: ${countryFonts[country].lightFontFamily};
+  h3FontStyle: `font-family: ${countryFonts[country][language].lightFontFamily};
     font-weight: 300;
     font-size: 20px;
     @media (max-width: ${grid.breakpoints.lg}px) {

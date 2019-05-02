@@ -9,8 +9,8 @@ export interface ITheme {
   fonts: IFonts
   grid: IGrid
 }
-export const getTheme = (country: string): ITheme => ({
+export const getTheme = (country: string, language: string): ITheme => ({
   colors,
-  fonts: fonts(country),
+  fonts: fonts(country, language),
   grid
 })

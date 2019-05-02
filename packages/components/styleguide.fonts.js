@@ -2,19 +2,30 @@
 
 const fonts = {
   bgd: {
-    boldFontFamily: 'noto_sans_bengalibold',
-    lightFontFamily: 'noto_sans_bengalilight',
-    regularFontFamily: 'noto_sans_bengaliregular'
+    bn: {
+      boldFontFamily: 'noto_sans_bengalibold',
+      lightFontFamily: 'noto_sans_bengalilight',
+      regularFontFamily: 'noto_sans_bengaliregular'
+    },
+    en: {
+      boldFontFamily: 'noto_sansbold',
+      lightFontFamily: 'noto_sanslight',
+      regularFontFamily: 'noto_sansregular'
+    }
   },
   gbr: {
-    boldFontFamily: 'noto_sansbold',
-    lightFontFamily: 'noto_sanslight',
-    regularFontFamily: 'noto_sansregular'
+    en: {
+      boldFontFamily: 'noto_sansbold',
+      lightFontFamily: 'noto_sanslight',
+      regularFontFamily: 'noto_sansregular'
+    }
   },
   za: {
-    boldFontFamily: 'noto_sansbold',
-    lightFontFamily: 'noto_sanslight',
-    regularFontFamily: 'noto_sansregular'
+    en: {
+      boldFontFamily: 'noto_sansbold',
+      lightFontFamily: 'noto_sanslight',
+      regularFontFamily: 'noto_sansregular'
+    }
   }
 }
 
