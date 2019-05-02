@@ -133,7 +133,7 @@ export const StyledButton = styled(Button)`
 export const ErrorText = styled.p`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.danger};
-  padding: 2px ${({ theme }) => theme.grid.margin}px;
+  padding: 8px;
   text-align: center;
 `
 
