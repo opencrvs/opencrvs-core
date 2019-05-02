@@ -11,10 +11,6 @@ export const BENGALI_STATE = {
     'login.submit': 'সাবমিট',
     'login.forgotPassword': 'পাসওয়ার্ড ভুলে গেছেন',
     'login.submissionError': 'মোবাইল নম্বর/পাসওয়ার্ড সঠিক নয়',
-    'login.tooManyLoginAttemptError':
-      'আপনি অধিক সংখ্যক ভুল মোবাইল নম্বর/পাসওয়ার্ড দিয়েছেন। ১ মিনিট পর আবার চেষ্টা করুন।',
-    'login.tooManyCodeAttemptError':
-      'আপনি অধিক সংখ্যক ভুল কোড দিয়েছেন। ১ মিনিট পর আবার চেষ্টা করুন।',
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
     'login.fieldMissing': 'মোবাইল নম্বর/পাসওয়ার্ড দিতে হবে',
     'login.resentSMS':

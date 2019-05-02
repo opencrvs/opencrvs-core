@@ -42,8 +42,7 @@ describe('authApi', () => {
   it('submits the SMS code', async () => {
     const data = {
       nonce: '12345',
-      code: '123456',
-      mobile: '27845829934'
+      code: '123456'
     }
 
     const expectedResponse = { nonce: '12345' }

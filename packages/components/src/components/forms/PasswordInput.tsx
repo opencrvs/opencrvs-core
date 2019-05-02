@@ -25,7 +25,7 @@ const StyledField = styled.div.attrs<IPasswordInputProps>({})`
 const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
   width: 100%;
   padding: 8px 10px;
-  min-height: 30px;
+  height: 40px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
@@ -132,8 +132,7 @@ export class PasswordInput extends React.Component<
       this.focusField()
     }
   }
-  toggleVisibility(event: React.MouseEvent) {
-    event.preventDefault()
+  toggleVisibility() {
     this.setState({
       isVisible: !this.state.isVisible
     })
@@ -149,17 +148,21 @@ export class PasswordInput extends React.Component<
           type={this.state.isVisible ? 'text' : 'password'}
         />
         {!ignoreVisibility && (
-          <IconButton onClick={this.toggleVisibility}>
+          <IconButton onClick={this.toggleVisibility} type="button">
             {this.state.isVisible ? (
               hideIcon ? (
                 hideIcon
               ) : (
-                <EyeOff />
+                <span title="Hide password">
+                  <EyeOn />{' '}
+                </span>
               )
             ) : showIcon ? (
               showIcon
             ) : (
-              <EyeOn />
+              <span title="Show password">
+                <EyeOff />{' '}
+              </span>
             )}
           </IconButton>
         )}

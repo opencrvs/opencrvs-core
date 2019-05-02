@@ -11,7 +11,7 @@ import { logger } from 'src/logger'
 import { unauthorized } from 'boom'
 import { PRODUCTION } from 'src/constants'
 
-export interface IAuthPayload {
+interface IAuthPayload {
   mobile: string
   password: string
 }
