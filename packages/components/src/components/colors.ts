@@ -37,5 +37,6 @@ export const colors = {
   offlineBoxText: '#747987',
   offlineBoxTitle: '#41485F',
   seperatorBorder: '#f7f7f7',
-  creamCan: '#EDC55E'
+  creamCan: '#EDC55E',
+  dropdownHover: '#E5EEFC'
 }
