@@ -1,11 +1,13 @@
 import * as React from 'react'
 import styled from '../styled-components'
+import { Hamburger, SearchDark } from '@opencrvs/components/lib/icons'
+import { Button } from '@opencrvs/components/lib/buttons'
 
 interface IMobileHeaderProps {
   id?: string
-  left?: React.ReactNode
+  leftIcon?: () => React.ReactNode
   title: string
-  right?: React.ReactNode
+  rightIcon?: () => React.ReactNode
 }
 
 const HeaderContainer = styled.div`
@@ -44,14 +46,22 @@ const EndComponentContainer = styled.div`
 `
 class MobileHeader extends React.Component<IMobileHeaderProps> {
   render() {
-    const { id, left, right, title } = this.props
+    const { id, leftIcon, rightIcon, title } = this.props
     return (
       <HeaderContainer id={id}>
-        {left && <EndComponentContainer>{left}</EndComponentContainer>}
+        <EndComponentContainer>
+          <Button id="mobile_header_left">
+            {leftIcon ? leftIcon() : <Hamburger />}
+          </Button>
+        </EndComponentContainer>
         <HeaderBody>
           <Title id="header_title">{title}</Title>
         </HeaderBody>
-        {right && <EndComponentContainer>{right}</EndComponentContainer>}
+        <EndComponentContainer>
+          <Button id="mobile_header_right">
+            {rightIcon ? rightIcon() : <SearchDark />}
+          </Button>
+        </EndComponentContainer>
       </HeaderContainer>
     )
   }
