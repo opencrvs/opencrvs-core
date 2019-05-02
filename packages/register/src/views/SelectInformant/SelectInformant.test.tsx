@@ -49,6 +49,7 @@ describe('when user is selecting the informant', () => {
 
   beforeEach(async () => {
     history.replace(SELECT_INFORMANT)
+    await flushPromises()
     app.update()
     app
       .find('#createPinBtn')
