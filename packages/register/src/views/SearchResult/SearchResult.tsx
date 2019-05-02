@@ -719,6 +719,7 @@ export class SearchResultView extends React.Component<
         key={key}
         itemData={{}}
         actions={listItemActions}
+        isBoxShadow={true}
         expandedCellRenderer={() => (
           <ListItemExpansion>
             {this.renderExpansionContent(item.id)}
