@@ -18,7 +18,6 @@ import {
   ListItem,
   ListItemExpansion,
   SearchInput,
-  SelectFieldType,
   Spinner,
   Loader
 } from '@opencrvs/components/lib/interface'
@@ -761,90 +760,6 @@ export class SearchResultView extends React.Component<
   render() {
     const { intl, match } = this.props
     const searchParam = match.params.searchText
-    const sortBy = {
-      input: {
-        label: intl.formatMessage(messages.filtersSortBy)
-      },
-      selects: {
-        name: '',
-        options: [
-          {
-            name: 'createdAt',
-            options: [
-              {
-                value: 'asc',
-                label: intl.formatMessage(messages.filtersOldestToNewest)
-              },
-              {
-                value: 'desc',
-                label: intl.formatMessage(messages.filtersNewestToOldest)
-              }
-            ],
-            value: this.state.sortBy,
-            type: SelectFieldType.Date
-          }
-        ]
-      }
-    }
-    const filterBy = {
-      input: {
-        label: intl.formatMessage(messages.filtersFilterBy)
-      },
-      selects: {
-        name: '',
-        options: [
-          {
-            name: 'eventType',
-            options: [
-              {
-                value: '',
-                label: intl.formatMessage(messages.filtersAllEvents)
-              },
-              {
-                value: 'Birth',
-                label: intl.formatMessage(messages.filtersBirth)
-              },
-              {
-                value: 'Death',
-                label: intl.formatMessage(messages.filtersDeath)
-              },
-              {
-                value: 'Marriage',
-                label: intl.formatMessage(messages.filtersMarriage)
-              }
-            ],
-            value: this.state.eventType || ''
-          },
-          {
-            name: 'status',
-            options: [
-              {
-                value: '',
-                label: intl.formatMessage(messages.filtersAllStatuses)
-              },
-              {
-                value: 'DECLARED',
-                label: intl.formatMessage(messages.filtersApplication)
-              },
-              {
-                value: 'REGISTERED',
-                label: intl.formatMessage(messages.filtersRegistered)
-              },
-              {
-                value: 'CERTIFIED',
-                label: intl.formatMessage(messages.filtersCollected)
-              },
-              {
-                value: 'REJECTED',
-                label: intl.formatMessage(messages.filtersRejected)
-              }
-            ],
-            value: this.state.status || ''
-          }
-        ]
-      }
-    }
-
     return (
       <ActionPageWrapper>
         <ActionPage
@@ -911,8 +826,7 @@ export class SearchResultView extends React.Component<
                       </SearchResultText>
                       <DataTable
                         data={transformedData}
-                        sortBy={sortBy}
-                        filterBy={filterBy}
+                        zeroPagination={true}
                         cellRenderer={this.renderCell}
                         resultLabel={intl.formatMessage(
                           messages.dataTableResults
@@ -920,25 +834,6 @@ export class SearchResultView extends React.Component<
                         noResultText={intl.formatMessage(
                           messages.dataTableNoResults
                         )}
-                        onPageChange={(currentPage: number) => {
-                          this.onPageChange(currentPage)
-                        }}
-                        onSortChange={(value: ISelectGroupValue) =>
-                          this.onSortChange(value.createdAt)
-                        }
-                        onFilterChange={(
-                          value: ISelectGroupValue,
-                          changedValue: ISelectGroupValue
-                        ) => {
-                          this.onFilterChange(value, changedValue)
-                        }}
-                        pageSize={this.pageSize}
-                        totalPages={Math.ceil(
-                          ((data.listEventRegistrations &&
-                            data.listEventRegistrations.totalItems) ||
-                            0) / this.pageSize
-                        )}
-                        initialPage={this.state.currentPage}
                       />
                     </>
                   )
