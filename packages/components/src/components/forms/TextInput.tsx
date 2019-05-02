@@ -15,7 +15,7 @@ export type ITextInputProps = ICustomProps &
 const StyledInput = styled.input.attrs<ITextInputProps>({})`
   width: 100%;
   padding: 8px 10px;
-  min-height: 30px;
+  height: 40px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
@@ -29,21 +29,21 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
       border:none;
       ${
         error && touched
-          ? `box-shadow: 0 0 0px 1px ${theme.colors.error};`
+          ? `box-shadow: 0 0 0px 2px ${theme.colors.error};`
           : 'box-shadow: none;'
       }
       &:focus {
-        box-shadow: 0 0 0px 1px ${
+        box-shadow: 0 0 0px 2px ${
           error && touched ? theme.colors.error : theme.colors.creamCan
         };
       }
         `
       : `
-      border: 1px solid ${
+      border: 2px solid ${
         error && touched ? theme.colors.error : theme.colors.secondary
       };
       &:focus {
-        box-shadow: 0 0 0px 1px ${theme.colors.creamCan};
+        box-shadow: 0 0 0px 3px ${theme.colors.creamCan};
       }
       `}
 

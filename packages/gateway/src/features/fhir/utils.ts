@@ -33,7 +33,7 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO
 } from './constants'
-import { ISearchCriteria } from '../registration/search-type-resovlers'
+import { ISearchCriteria } from '../search/type-resovlers'
 import { ITimeRange } from '../metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 
@@ -723,9 +723,13 @@ export const postSearch = (
     })
 }
 
-export const getMetrics = (authHeader: IAuthHeader, timeRange: ITimeRange) => {
-  const params = new URLSearchParams({ ...timeRange })
-  return fetch(`${METRICS_URL}metrics/birth?` + params, {
+export const getMetrics = (
+  authHeader: IAuthHeader,
+  timeRange: ITimeRange,
+  locationId: string
+) => {
+  const params = new URLSearchParams({ ...timeRange, locationId })
+  return fetch(`${METRICS_URL}/birth?` + params, {
     method: 'GET',
     headers: {
       ...authHeader

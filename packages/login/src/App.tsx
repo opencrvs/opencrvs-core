@@ -25,7 +25,9 @@ export class App extends React.Component {
             <ThemeProvider
               theme={getTheme(
                 (window as Window & { config: { [key: string]: string } })
-                  .config.COUNTRY
+                  .config.COUNTRY,
+                (window as Window & { config: { [key: string]: string } })
+                  .config.LANGUAGE
               )}
             >
               <ConnectedRouter history={history}>

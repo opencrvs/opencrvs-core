@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 export const Logo = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={80} height={80} viewBox="0 0 100 100" {...props}>
+  <svg width={120} height={120} viewBox="0 0 100 100" {...props}>
     <defs>
       <linearGradient
         x1="3.135%"

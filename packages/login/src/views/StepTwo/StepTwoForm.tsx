@@ -119,7 +119,6 @@ const CodeInput = injectIntl(
           {...props.input}
           touched={Boolean(meta.touched)}
           error={Boolean(meta.error)}
-          placeholder="000000"
           ignoreMediaQuery
         />
       </InputField>
