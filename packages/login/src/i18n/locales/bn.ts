@@ -12,6 +12,7 @@ export const BENGALI_STATE = {
     'login.forgotPassword': 'পাসওয়ার্ড ভুলে গেছেন',
     'login.submissionError': 'মোবাইল নম্বর/পাসওয়ার্ড সঠিক নয়',
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
+    'login.fieldMissing': 'মোবাইল নম্বর/পাসওয়ার্ড দিতে হবে',
     'login.resentSMS':
       'আমরা আপনার মোবাইল নম্বর, {number} তে একটি নতুন এসএমএস প্রেরণ করেছি',
     'login.stepTwoResendTitle': 'ভেরিফিকেশন কোড পুনঃপ্রেরণ',

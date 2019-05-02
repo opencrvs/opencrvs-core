@@ -26,7 +26,6 @@ import {
 
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
-import { localiseValidationError } from '../../forms/i18n'
 
 export const messages = defineMessages({
   stepTwoTitle: {
@@ -107,7 +106,6 @@ const CodeInput = injectIntl(
         {...field}
         {...otherProps}
         touched={meta.touched}
-        error={meta.error && localiseValidationError(intl, meta.error)}
         label={intl.formatMessage(messages.verficationCodeLabel)}
         optionalLabel={intl.formatMessage(messages.optionalLabel)}
         ignoreMediaQuery
