@@ -34,6 +34,9 @@ describe('Login app step one', () => {
         .simulate('change', { target: { value: 'test' } })
     })
 
+    afterEach(() => {
+      app.unmount()
+    })
     it('sends the phone number and the password to our api when user submits the form', async () => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 401,

@@ -146,6 +146,56 @@ describe('reducer', () => {
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
   })
+  it('validate mobile no and password field when not filled', async () => {
+    const action = {
+      type: actions.AUTHENTICATE_VALIDATE,
+      payload: 500
+    }
+    expect(actions.authenticate({ mobile: '', password: 'test' })).toEqual(
+      action
+    )
+  })
+  it('return error code when validate mobile no format is checked', async () => {
+    const action = {
+      type: actions.AUTHENTICATE_VALIDATE,
+      payload: 503
+    }
+    expect(
+      actions.authenticate({ mobile: 'sd7111111111', password: 'test' })
+    ).toEqual(action)
+  })
+  it('AUTHENTICATE_VALIDATE return errorCode', async () => {
+    const expectedState = {
+      ...initialState,
+      submissionError: true,
+      errorCode: 503
+    }
+
+    const action = {
+      type: actions.AUTHENTICATE_VALIDATE,
+      payload: 503
+    }
+    store.dispatch(action)
+    expect(store.getState().login).toEqual(expectedState)
+  })
+  it('succesfully logged in user with correct payload', async () => {
+    const expectedState = {
+      ...initialState,
+      stepSubmitting: false,
+      token:
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NTY3ODM5NDMsImV4cCI6MTU4ODMxOTk0MywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInNjb3BlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.ggXSgfcD_OJqEd8_pmzw_AoqiqIq5sWXKtReCx6YdbQ'
+    }
+
+    const action = {
+      type: actions.VERIFY_CODE_COMPLETED,
+      payload: {
+        token:
+          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NTY3ODM5NDMsImV4cCI6MTU4ODMxOTk0MywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInNjb3BlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.ggXSgfcD_OJqEd8_pmzw_AoqiqIq5sWXKtReCx6YdbQ'
+      }
+    }
+    store.dispatch(action)
+    expect(store.getState().login).toEqual(expectedState)
+  })
 })
 
 describe('selectors', () => {
