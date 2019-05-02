@@ -32,6 +32,12 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
       "./test/setupJest.ts"
