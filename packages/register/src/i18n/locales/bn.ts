@@ -954,6 +954,7 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার অ্যাকাউন্ট লক করা হয়েছে. 1 মিনিটের মধ্যে আবার চেষ্টা করুন।',
     'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
     'register.SearchResult.searchingFor': '“{param}” এর অনুসন্ধান চলসে ',
-    'register.SearchResult.searchResultFor': '“{param}” এর অনুসন্ধান ফলাফল'
+    'register.SearchResult.searchResultFor': '“{param}” এর অনুসন্ধান ফলাফল',
+    'register.SearchResult.totalResultText': '{total} ফলাফল পাওয়া গেছে'
   }
 }

@@ -139,6 +139,19 @@ const SearchResultText = styled.div`
     margin-top: 24px;
   }
 `
+const TotalResultText = styled.div`
+  left: 268px;
+  margin-top: 6px;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 24px;
+  letter-spacing: 0.4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    left: 24px;
+  }
+`
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -824,6 +837,11 @@ export class SearchResultView extends React.Component<
                           param: searchParam
                         })}
                       </SearchResultText>
+                      <TotalResultText>
+                        {intl.formatMessage(messages.totalResultText, {
+                          total: transformedData.length
+                        })}
+                      </TotalResultText>
                       <DataTable
                         data={transformedData}
                         zeroPagination={true}
