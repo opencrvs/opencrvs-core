@@ -55,6 +55,7 @@ describe('when the home page loads for a field worker', () => {
     beforeEach(async () => {
       store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
       history.replace(HOME)
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')
@@ -75,11 +76,13 @@ describe('when the home page loads for a field worker', () => {
       expect(app.find('#home_action_list').hostNodes()).toHaveLength(1)
     })
     describe('when user clicks the "Declare a new vital event" button', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         app
           .find('#new_event_declaration')
           .hostNodes()
           .simulate('click')
+        await flushPromises()
+        app.update()
       })
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
@@ -90,11 +93,12 @@ describe('when the home page loads for a field worker', () => {
         store.dispatch(
           getStorageUserDetailsSuccess(JSON.stringify(registerUserDetails))
         )
+        await flushPromises()
         app.update()
       })
 
       it('search result view renders to load list', () => {
-        expect(app.find('#search-result-spinner').hostNodes()).toHaveLength(1)
+        expect(app.find('#new_registration').hostNodes()).toHaveLength(1)
       })
     })
   })
