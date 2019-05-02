@@ -1,9 +1,9 @@
 {
   "name": "@opencrvs/register",
-  "version": "1.0.0-alpha.4.1",
+  "version": "1.0.0-alpha.5",
   "private": true,
   "dependencies": {
-    "@opencrvs/components": "^1.0.0-alpha.4.1",
+    "@opencrvs/components": "^1.0.0-alpha.5",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -21,6 +21,7 @@
     "graphql": "^0.13.2",
     "graphql-tools": "^3.0.2",
     "history": "^4.7.2",
+    "jimp": "^0.6.1",
     "jwt-decode": "^2.2.0",
     "lint-staged": "^7.1.0",
     "localforage": "^1.7.2",
@@ -51,7 +52,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 react-scripts-ts start",
-    "build": "react-scripts-ts build && yarn gen:sw",
+    "build": "react-scripts-ts --max_old_space_size=4096 build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",

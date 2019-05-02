@@ -3,21 +3,22 @@ require('dotenv').config()
 const { styleGuideCountryFonts } = require('./styleguide.fonts')
 
 const country = process.env.REACT_APP_COUNTRY || 'gbr'
+const language = process.env.REACT_APP_LANGUAGE || 'en'
 
 const fontFaces = [
   {
-    fontFamily: styleGuideCountryFonts[country].lightFontFamily,
+    fontFamily: styleGuideCountryFonts[country][language].lightFontFamily,
     fontStyle: 'normal',
     fontWeight: '300',
     src: `url('notosans-light-webfont-en.ttf') format('truetype')`
   },
   {
-    fontFamily: styleGuideCountryFonts[country].regularFontFamily,
+    fontFamily: styleGuideCountryFonts[country][language].regularFontFamily,
     fontStyle: 'normal',
     src: `url('notosans-regular-webfont-en.ttf') format('truetype')`
   },
   {
-    fontFamily: styleGuideCountryFonts[country].boldFontFamily,
+    fontFamily: styleGuideCountryFonts[country][language].boldFontFamily,
     fontStyle: 'normal',
     src: `url('notosans-bold-webfont-en.ttf') format('truetype')`
   }

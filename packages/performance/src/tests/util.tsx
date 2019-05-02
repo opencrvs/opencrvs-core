@@ -59,7 +59,9 @@ export function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
+          <ThemeProvider
+            theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+          >
             {nodeWithIntlProp(node)}
           </ThemeProvider>
         </I18nContainer>
@@ -161,6 +163,40 @@ export const user = {
         }
       ],
       __typename: 'Location'
+    },
+    {
+      id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+      name: 'KALIGANJ',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '165'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UPAZILA'
+        }
+      ],
+      __typename: 'Location'
+    },
+    {
+      id: '123456789',
+      name: 'BAKTARPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3473'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UNION'
+        }
+      ],
+      __typename: 'Location'
     }
   ],
   primaryOffice: undefined,
@@ -202,6 +238,38 @@ export const userDetails = {
         {
           system: 'http://opencrvs.org/specs/id/jurisdiction-type',
           value: 'DISTRICT'
+        }
+      ]
+    },
+    {
+      id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+      name: 'KALIGANJ',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '165'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UPAZILA'
+        }
+      ]
+    },
+    {
+      id: '123456789',
+      name: 'BAKTARPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3473'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UNION'
         }
       ]
     }

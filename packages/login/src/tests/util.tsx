@@ -28,7 +28,9 @@ export function createTestComponent(node: React.ReactElement<object>) {
         <ThemeProvider
           theme={getTheme(
             (window as Window & { config: { [key: string]: string } }).config
-              .COUNTRY
+              .COUNTRY,
+            (window as Window & { config: { [key: string]: string } }).config
+              .LANGUAGE
           )}
         >
           {node}
