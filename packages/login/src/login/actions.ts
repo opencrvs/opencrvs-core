@@ -37,7 +37,7 @@ export type AuthenticateResponseAction = {
 
 export type AuthenticationFailedAction = {
   type: typeof AUTHENTICATION_FAILED
-  payload: Error
+  payload: AxiosError
 }
 
 export type ResendSMSAction = {

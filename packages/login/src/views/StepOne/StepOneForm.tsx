@@ -159,6 +159,7 @@ export const FieldWrapper = styled.div`
 export interface IProps {
   formId: string
   submissionError: boolean
+  errorCode?: number
 }
 export interface IDispatchProps {
   submitAction: (values: IAuthenticationData) => void
