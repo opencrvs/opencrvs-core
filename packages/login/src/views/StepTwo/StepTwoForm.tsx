@@ -28,7 +28,6 @@ import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 import { localiseValidationError } from '../../forms/i18n'
 
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
-import { ERROR_CODE_TOO_MANY_ATTEMPTS } from '../../utils/authUtils'
 
 export const messages = defineMessages({
   stepTwoTitle: {
