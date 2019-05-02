@@ -126,6 +126,20 @@ export const ActionPageWrapper = styled.div`
   height: 100%;
   overflow-y: scroll;
 `
+const SearchResultText = styled.div`
+  left: 268px;
+  margin-top: 30px;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 36px;
+  letter-spacing: 0.4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    left: 24px;
+    margin-top: 24px;
+  }
+`
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -860,12 +874,9 @@ export class SearchResultView extends React.Component<
                         id="search_loader"
                         marginPercent={35}
                         spinnerDiameter={60}
-                        loadingText={
-                          intl.formatMessage(messages.searchingFor) +
-                          '“' +
-                          searchParam +
-                          '”'
-                        }
+                        loadingText={intl.formatMessage(messages.searchingFor, {
+                          param: searchParam
+                        })}
                       />
                     )
                   }
@@ -893,6 +904,11 @@ export class SearchResultView extends React.Component<
                         onSubmit={this.props.goToSearchResult}
                         {...this.props}
                       />
+                      <SearchResultText>
+                        {intl.formatMessage(messages.searchResultFor, {
+                          param: searchParam
+                        })}
+                      </SearchResultText>
                       <DataTable
                         data={transformedData}
                         sortBy={sortBy}

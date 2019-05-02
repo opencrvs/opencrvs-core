@@ -325,7 +325,12 @@ export const messages = defineMessages({
   },
   searchingFor: {
     id: 'register.SearchResult.searchingFor',
-    defaultMessage: 'Searching for ',
+    defaultMessage: 'Searching for “{param}”',
     description: 'The searching for text'
+  },
+  searchResultFor: {
+    id: 'register.SearchResult.searchResultFor',
+    defaultMessage: 'Search results for “{param}”',
+    description: 'The search result text'
   }
 })
