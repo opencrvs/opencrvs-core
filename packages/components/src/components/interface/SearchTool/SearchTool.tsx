@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { SearchBlue, TrackingID, BRN, Phone, ArrowDownBlue } from '../../icons'
+import {
+  SearchBlue,
+  TrackingID,
+  BRN,
+  Phone,
+  ArrowDownBlue,
+  ClearText
+} from '../../icons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -71,7 +78,9 @@ const DropDown = styled.div`
   cursor: pointer;
   display: flex;
 `
-
+const ClearTextIcon = styled(ClearText)`
+  margin: 0 5px;
+`
 interface ISearchType {
   label: string
   value: string
@@ -169,7 +178,11 @@ export class SearchTool extends React.Component<IProps, IState> {
           type="text"
           placeholder={selectedCriteria}
           onChange={this.onChangeHandler}
+          value={this.state.searchParam}
         />
+        {this.state.searchParam && (
+          <ClearTextIcon onClick={() => this.setState({ searchParam: '' })} />
+        )}
         <DropDown onClick={this.toggleDropdownDisplay}>
           <SelectedSearchCriteria>
             {this.state.selectedSearchType.label}
