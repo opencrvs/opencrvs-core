@@ -817,3 +817,34 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     ]
   }
 }
+
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+
+export const inValidImageB64String =
+  'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+
+export const getFileFromBase64String = (
+  base64String: string,
+  name: string,
+  contentType: string
+): File => {
+  const byteCharacters = atob(base64String)
+  const bytesLength = byteCharacters.length
+  const slicesCount = Math.ceil(bytesLength / 1024)
+  const byteArrays = new Array(slicesCount)
+
+  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+    const begin = sliceIndex * 1024
+    const end = Math.min(begin + 1024, bytesLength)
+
+    const bytes = new Array(end - begin)
+    for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
+      bytes[i] = byteCharacters[offset].charCodeAt(0)
+    }
+    byteArrays[sliceIndex] = new Uint8Array(bytes)
+  }
+  return new File(byteArrays, name, {
+    type: contentType
+  })
+}

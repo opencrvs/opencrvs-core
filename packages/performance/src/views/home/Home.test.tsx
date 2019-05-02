@@ -25,7 +25,8 @@ describe('when user is in the home page', () => {
         query: FETCH_METRIC,
         variables: {
           timeStart: '1527098400000',
-          timeEnd: '1556042400000'
+          timeEnd: '1556042400000',
+          locationId: '123456789'
         }
       },
       result: {
