@@ -17,8 +17,10 @@ const ListItemSingleAction = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.capsFontStyle};
   font-weight: 600;
+  min-width: 100px;
+  margin-right: 1px;
+  padding: 0px 0px;
   margin-bottom: 1px;
-  padding: 15px 25px;
   &:last-child {
     margin-bottom: 0;
   }
