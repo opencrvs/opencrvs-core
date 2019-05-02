@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/jest": "^23.1.1",
     "jest": "23.6.0",
+    "jest-fetch-mock": "^2.1.2",
     "ts-jest": "^22.4.6"
   },
   "lint-staged": {
@@ -32,6 +33,9 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "setupFiles": [
+      "./test/setupJest.ts"
+    ],
     "moduleFileExtensions": [
       "ts",
       "tsx",
