@@ -115,6 +115,20 @@ describe('reducer', () => {
     store.dispatch(action)
     expect(store.getState().login).toEqual(expectedState)
   })
+  it('updates the state when resendSMS service failed', () => {
+    const expectedState = {
+      ...initialState,
+      resentSMS: false,
+      submissionError: true
+    }
+    const action = {
+      type: actions.RESEND_SMS_FAILED,
+      payload: 503
+    }
+    store.dispatch(action)
+    expect(store.getState().login).toEqual(expectedState)
+  })
+
   it('updates the state with data ready to send to verify sms code service', async () => {
     const expectedState = {
       ...initialState,

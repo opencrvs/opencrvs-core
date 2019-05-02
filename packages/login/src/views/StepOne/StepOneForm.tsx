@@ -245,7 +245,6 @@ export class StepOneForm extends React.Component<
           <Logo />
         </LogoContainer>
         <Title>
-          {console.log(errorCode)}
           {submissionError && (
             <ErrorText>
               {errorCode === ERROR_CODE_FIELD_MISSING &&
