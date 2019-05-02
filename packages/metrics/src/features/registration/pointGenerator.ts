@@ -1,4 +1,9 @@
-import { BirthRegistrationPoint, PointLocation, IAuthHeader } from '.'
+import {
+  BirthRegistrationPoint,
+  PointLocation,
+  IAuthHeader,
+  IBirthRegistrationTags
+} from '.'
 import {
   getSectionBySectionCode,
   getRegLastLocation,
@@ -18,14 +23,18 @@ export const generateBirthRegPoint = async (
 
   const fields: BirthRegistrationPoint = {
     current_status: 'registered',
-    gender: child.gender,
     age_in_days: child.birthDate ? getAgeInDays(child.birthDate) : undefined,
     ...(await generatePointLocations(payload, authHeader))
   }
 
+  const tags: IBirthRegistrationTags = {
+    reg_status: regStatus,
+    gender: child.gender
+  }
+
   const point = {
     measurement: 'birth_reg',
-    tags: { reg_status: regStatus },
+    tags,
     fields
   }
 

@@ -41,10 +41,9 @@ describe('Verify point generation', () => {
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
-      tags: { reg_status: 'update-reg' },
+      tags: { reg_status: 'update-reg', gender: 'male' },
       fields: {
         current_status: 'registered',
-        gender: 'male',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
@@ -76,10 +75,9 @@ describe('Verify point generation', () => {
     })
     expect(point).toEqual({
       measurement: 'birth_reg',
-      tags: { reg_status: 'update-reg' },
+      tags: { reg_status: 'update-reg', gender: 'male' },
       fields: {
         current_status: 'registered',
-        gender: 'male',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         age_in_days: undefined
       }
@@ -107,10 +105,9 @@ describe('Verify point generation', () => {
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
-      tags: { reg_status: 'update-reg' },
+      tags: { reg_status: 'update-reg', gender: 'male' },
       fields: {
         current_status: 'registered',
-        gender: 'male',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
         age_in_days: 435

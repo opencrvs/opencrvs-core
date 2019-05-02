@@ -1,6 +1,5 @@
 export interface BirthRegistrationPoint extends Point {
   current_status: string
-  gender: string | undefined
   age_in_days: number | undefined
   locationLevel5?: string
   locationLevel4?: string
@@ -21,4 +20,9 @@ export interface PointLocation {
 
 export interface IAuthHeader {
   Authorization: string
+}
+
+export interface IBirthRegistrationTags {
+  reg_status: string
+  gender: string | undefined
 }
