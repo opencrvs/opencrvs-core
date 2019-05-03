@@ -314,7 +314,9 @@ interface IBaseWorkQueueProps {
 }
 
 interface IWorkQueueState {
-  currentPage: number
+  progressCurrentPage: number
+  reviewCurrentPage: number
+  updatesCurrentPage: number
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -340,7 +342,9 @@ export class WorkQueueView extends React.Component<
   constructor(props: IWorkQueueProps) {
     super(props)
     this.state = {
-      currentPage: 1
+      progressCurrentPage: 1,
+      reviewCurrentPage: 1,
+      updatesCurrentPage: 1
     }
   }
   userHasRegisterScope() {
@@ -686,7 +690,13 @@ export class WorkQueueView extends React.Component<
   }
 
   onPageChange = (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
+    if (this.props.tabId === TAB_ID.inProgress) {
+      this.setState({ progressCurrentPage: newPageNumber })
+    } else if (this.props.tabId === TAB_ID.readyForReview) {
+      this.setState({ reviewCurrentPage: newPageNumber })
+    } else if (this.props.tabId === TAB_ID.sentForUpdates) {
+      this.setState({ updatesCurrentPage: newPageNumber })
+    }
   }
 
   render() {
@@ -842,7 +852,7 @@ export class WorkQueueView extends React.Component<
                 totalPages={Math.ceil(
                   ((drafts && drafts.length) || 0) / this.pageSize
                 )}
-                initialPage={this.state.currentPage}
+                initialPage={this.state.progressCurrentPage}
               />
             )}
             {tabId === TAB_ID.readyForReview && (
@@ -852,7 +862,7 @@ export class WorkQueueView extends React.Component<
                   status: EVENT_STATUS.DECLARED,
                   locationIds: [registrarUnion],
                   count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize
+                  skip: (this.state.reviewCurrentPage - 1) * this.pageSize
                 }}
               >
                 {({ loading, error, data }) => {
@@ -945,7 +955,7 @@ export class WorkQueueView extends React.Component<
                           data.listEventRegistrations.totalItems) ||
                           0) / this.pageSize
                       )}
-                      initialPage={this.state.currentPage}
+                      initialPage={this.state.reviewCurrentPage}
                       expandable={true}
                     />
                   )
@@ -959,7 +969,7 @@ export class WorkQueueView extends React.Component<
                   status: EVENT_STATUS.REJECTED,
                   locationIds: [registrarUnion],
                   count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize
+                  skip: (this.state.updatesCurrentPage - 1) * this.pageSize
                 }}
               >
                 {({ loading, error, data }) => {
@@ -1036,7 +1046,7 @@ export class WorkQueueView extends React.Component<
                           data.listEventRegistrations.totalItems) ||
                           0) / this.pageSize
                       )}
-                      initialPage={this.state.currentPage}
+                      initialPage={this.state.updatesCurrentPage}
                       expandable={true}
                     />
                   )
