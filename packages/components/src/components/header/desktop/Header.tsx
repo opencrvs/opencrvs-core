@@ -1,8 +1,7 @@
-import { Menu } from '@opencrvs/components/lib/header'
-import { HeaderLogo } from '@opencrvs/components/lib/icons'
 import * as React from 'react'
 import styled from 'styled-components'
-import { IMenuItem } from './Menu'
+import { IMenuItem, Menu } from './Menu'
+import { HeaderLogo } from 'src/components/icons'
 
 interface IProps {
   menuItems: IMenuItem[]
