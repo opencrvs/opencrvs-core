@@ -54,3 +54,10 @@ jobs:
         - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
         - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
+
+notifications:
+  slack:
+    secure: DhI2stRdMYu43Nw1ZkYj8elOUc5gLmEKMponUp4seLYATmG8/MKL525yKnrQlvd88W1J1FX4SFSu0t/pl5n0iFOTNCUlw5WWu1hPotR02xrb85S9oDRGvIsOJYjPC/bh2nru1BJf3lgCfQCNRUQkrv2wWlrScuj0oF16ibbo5mLMX8iY/a3KDvWyhW7/mvK4KNHdxfNzocMHvZqassRDfIvJUM1SVNIGH7lavnhEzmUTahgQ9F0aydGUKzrx5V/KiI3yB+zzKYDtZj7D8DkSPfbyJ4OWflds+RzmQUn9ytqGTu+A8Gx53s4uEsdamTAKUHlJn1Lecdei6YWUgcd/WRGPB3EqJHAW7nkeWrqBjpn2v7muGz1K21vk140+96Gvwcin5sQ6u+e/axf/PYYXlKtOzAqkOnzTH+YjSM7Zv4yM1Qbl0RlaFoElSno+8BXhps76I+NGkIVllYvsEGbeIPUqbXApPIZgfvlj1Qxuvmz8xENLNOX0/U1ztZLaOa//orXAh8UMA2MqXIUkPbCk7PoQD5PQ8tnx5oQM/cZ3xTECdtjWDkVZjbU2puSANMj9Vxe747NzjoHabsXqHMuUvatS39s7k6jlW//G7kiPHzqGiSFQEPHZhRu7ekdG2r7otaqYuZNNBGvuDQJJVopro6gtT+Mqzv8jPTJ3IlG3zp0=
+    on_success: never
+    on_failure: always
+    on_pull_requests: false

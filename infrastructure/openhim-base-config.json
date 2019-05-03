@@ -62,6 +62,63 @@
     {
       "requestBody": true,
       "responseBody": true,
+      "name": "Metrics passthrough",
+      "urlPattern": "^/metrics/(?!/event).+$",
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "autoRetryPeriodMinutes": 60,
+      "autoRetryEnabled": false,
+      "rewriteUrlsConfig": [],
+      "addAutoRewriteRules": true,
+      "rewriteUrls": false,
+      "status": "enabled",
+      "alerts": [],
+      "txRerunAcl": [],
+      "txViewFullAcl": [],
+      "txViewAcl": [],
+      "properties": [],
+      "matchContentTypes": [],
+      "routes": [
+        {
+          "name": "Metrics",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": "",
+          "forwardAuthHeader": true,
+          "status": "enabled",
+          "type": "http"
+        }
+      ],
+      "authType": "public",
+      "whitelist": [],
+      "allow": [],
+      "type": "http",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE",
+        "PUT",
+        "OPTIONS",
+        "HEAD",
+        "TRACE",
+        "CONNECT",
+        "PATCH"
+      ],
+      "priority": 1
+    },
+    {
+      "requestBody": true,
+      "responseBody": true,
       "name": "New Birth Declaration",
       "urlPattern": "^/events/birth/new-declaration$",
       "matchContentRegex": null,
@@ -94,7 +151,7 @@
           "primary": true,
           "username": "",
           "password": "",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
         }
@@ -151,7 +208,7 @@
           "primary": true,
           "username": "",
           "password": "",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
         },
@@ -165,7 +222,7 @@
           "primary": false,
           "username": "",
           "password": "",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
         }
@@ -223,7 +280,7 @@
           "primary": true,
           "username": "",
           "password": "",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
         },
@@ -237,7 +294,7 @@
           "primary": false,
           "username": "",
           "password": "",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
         }
@@ -294,7 +351,7 @@
           "primary": true,
           "username": "",
           "password": "",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "status": "enabled",
           "type": "http"
         }
@@ -346,7 +403,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Search -> Birth Rejection",
           "secured": false,
           "host": "search",
@@ -403,7 +460,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Search -> New Death Declaration",
           "secured": false,
           "host": "search",
@@ -460,7 +517,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Search -> New Death Registration",
           "secured": false,
           "host": "search",
@@ -517,7 +574,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Search -> Death Registration",
           "secured": false,
           "host": "search",
@@ -574,7 +631,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Search -> Death Certification",
           "secured": false,
           "host": "search",
@@ -631,7 +688,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Search -> Death Rejection",
           "secured": false,
           "host": "search",

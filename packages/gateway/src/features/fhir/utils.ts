@@ -24,7 +24,7 @@ import {
   ITemplatedComposition
 } from '../registration/fhir-builders'
 import fetch from 'node-fetch'
-import { FHIR_URL, SEARCH_URL } from 'src/constants'
+import { FHIR_URL, SEARCH_URL, METRICS_URL } from 'src/constants'
 import { IAuthHeader } from 'src/common-types'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
@@ -33,7 +33,9 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO
 } from './constants'
-import { ISearchCriteria } from '../registration/search-type-resovlers'
+import { ISearchCriteria } from '../search/type-resovlers'
+import { ITimeRange } from '../metrics/root-resolvers'
+import { URLSearchParams } from 'url'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -717,6 +719,28 @@ export const postSearch = (
     .catch(error => {
       return Promise.reject(
         new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+export const getMetrics = (
+  authHeader: IAuthHeader,
+  timeRange: ITimeRange,
+  locationId: string
+) => {
+  const params = new URLSearchParams({ ...timeRange, locationId })
+  return fetch(`${METRICS_URL}/birth?` + params, {
+    method: 'GET',
+    headers: {
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Metrics request failed: ${error.message}`)
       )
     })
 }

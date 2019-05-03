@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/metrics",
-  "version": "1.0.0-alpha.4.1",
+  "version": "1.0.0-alpha.5",
   "description": "OpenCRVS metrics service",
   "main": "src/index.js",
   "license": "NONE",
@@ -16,11 +16,12 @@
   },
   "dependencies": {
     "@types/boom": "^7.2.0",
+    "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "^8.0.1",
+    "@types/joi": "^14.0.0",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/jwt-decode": "^2.2.1",
-    "@types/joi": "^14.0.0",
     "@types/node-fetch": "^2.1.2",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
@@ -30,13 +31,13 @@
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "^8.1.0",
     "influx": "^5.0.7",
+    "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
-    "joi": "^13.4.0",
+    "moment": "^2.22.2",
     "node-fetch": "^2.3.0",
     "typescript": "^3.0.1",
-    "winston": "^3.0.0",
-    "moment": "^2.22.2"
+    "winston": "^3.0.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",

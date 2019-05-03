@@ -49,7 +49,9 @@ export class App extends React.Component<IAppProps> {
         >
           <Provider store={this.props.store}>
             <I18nContainer>
-              <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
+              <ThemeProvider
+                theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+              >
                 <StyledErrorBoundary>
                   <ConnectedRouter history={this.props.history}>
                     <ScrollToTop>

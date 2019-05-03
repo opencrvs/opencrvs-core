@@ -18,6 +18,7 @@ import { ENGLISH_STATE } from '@opencrvs/performance/src/i18n/locales/en'
 import { IntlProvider, intlShape } from 'react-intl'
 import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
 import { App } from '../App'
+import { MockedProvider } from 'react-apollo/test-utils'
 
 configure({ adapter: new Adapter() })
 
@@ -51,16 +52,21 @@ export function createShallowRenderedComponent(
 
 export function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore
+  store: AppStore,
+  graphqlMocks: any = null
 ) {
   const component = mount(
-    <Provider store={store}>
-      <I18nContainer>
-        <ThemeProvider theme={getTheme(window.config.COUNTRY)}>
-          {nodeWithIntlProp(node)}
-        </ThemeProvider>
-      </I18nContainer>
-    </Provider>,
+    <MockedProvider mocks={graphqlMocks} addTypename={false}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider
+            theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+          >
+            {nodeWithIntlProp(node)}
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    </MockedProvider>,
     {
       context: { intl },
       childContextTypes: { intl: intlShape }
@@ -157,6 +163,40 @@ export const user = {
         }
       ],
       __typename: 'Location'
+    },
+    {
+      id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+      name: 'KALIGANJ',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '165'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UPAZILA'
+        }
+      ],
+      __typename: 'Location'
+    },
+    {
+      id: '123456789',
+      name: 'BAKTARPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3473'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UNION'
+        }
+      ],
+      __typename: 'Location'
     }
   ],
   primaryOffice: undefined,
@@ -198,6 +238,38 @@ export const userDetails = {
         {
           system: 'http://opencrvs.org/specs/id/jurisdiction-type',
           value: 'DISTRICT'
+        }
+      ]
+    },
+    {
+      id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+      name: 'KALIGANJ',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '165'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UPAZILA'
+        }
+      ]
+    },
+    {
+      id: '123456789',
+      name: 'BAKTARPUR',
+      status: 'active',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          value: '3473'
+        },
+        { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
+        {
+          system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+          value: 'UNION'
         }
       ]
     }

@@ -13,7 +13,7 @@ const StyledInputLabel = styledInputLabel`
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ color, disabled, theme }) =>
-    disabled ? theme.colors.disabled : color ? color : theme.colors.accent} ;
+    disabled ? theme.colors.disabled : color ? color : theme.colors.secondary} ;
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;

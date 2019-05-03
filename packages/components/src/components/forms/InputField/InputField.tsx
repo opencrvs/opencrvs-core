@@ -72,6 +72,7 @@ export interface IInputFieldProps {
   children: React.ReactNode
   ignoreMediaQuery?: boolean
   hideAsterisk?: boolean
+  hideErrorLabel?: boolean
   mode?: THEME_MODE
 }
 
@@ -90,6 +91,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       touched,
       ignoreMediaQuery,
       hideAsterisk,
+      hideErrorLabel,
       mode
     } = this.props
 
@@ -133,7 +135,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
           {postfix && <Padding>{postfix}</Padding>}
         </ComponentWrapper>
 
-        {error && touched && (
+        {error && touched && !hideErrorLabel && (
           <InputError
             id={this.props.id + '_error'}
             ignoreMediaQuery={ignoreMediaQuery}

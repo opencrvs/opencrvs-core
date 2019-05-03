@@ -1,5 +1,3 @@
-import * as validations from '../../utils/validate'
-
 import { defineMessages } from 'react-intl'
 
 export const messages = defineMessages({
@@ -25,17 +23,16 @@ export const stepOneFields = {
     id: 'mobile',
     name: 'mobile',
     maxLength: 11,
-    validate: [validations.required, validations.phoneNumberFormat],
+    validate: [],
     disabled: false,
     type: 'tel',
     focusInput: false,
-    label: messages.mobileLabel,
-    placeholder: messages.mobilePlaceholder
+    label: messages.mobileLabel
   },
   password: {
     id: 'password',
     name: 'password',
-    validate: [validations.required],
+    validate: [],
     disabled: false,
     type: 'password',
     focusInput: false,

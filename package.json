@@ -23,14 +23,14 @@
     "compose:build": "docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build",
     "compose:push": "docker-compose build && docker-compose push && yarn compose:push:version",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
-    "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b VERSION && docker-compose build && docker-compose push && unset VERSION",
+    "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && docker-compose build && docker-compose push && unset VERSION",
     "deploy": "bash deploy.sh",
     "deploy:staging": "bash deploy.sh --clear-data=no --restore-metadata=yes opencrvs-staging.jembi.org latest",
     "deploy:qa": "bash deploy.sh --clear-data=yes --restore-metadata=yes opencrvs.qa1.jembi.org",
     "deploy:bn-prod": "SSH_USER=mishealth SSH_HOST=172.16.17.54 LOG_LOCATION=/home/mishealth bash deploy.sh --clear-data=no --restore-metadata=yes opencrvsbd.org",
-    "db:backup:create": "./infrastructure/backup-metadata.sh",
-    "db:backup:restore": "./infrastructure/restore-metadata.sh",
-    "db:clear:all": "./infrastructure/clear-all-data.sh"
+    "db:backup:create": "DEV=true ./infrastructure/backup-metadata.sh",
+    "db:backup:restore": "DEV=true ./infrastructure/restore-metadata.sh",
+    "db:clear:all": "DEV=true ./infrastructure/clear-all-data.sh"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

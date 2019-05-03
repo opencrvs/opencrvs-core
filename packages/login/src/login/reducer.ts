@@ -13,6 +13,7 @@ export type LoginState = {
   submissionError: boolean
   resentSMS: boolean
   stepOneDetails: { mobile: string }
+  errorCode?: number
 }
 
 export const initialState: LoginState = {
@@ -49,8 +50,19 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           args: [action.payload]
         })
       )
+    case actions.AUTHENTICATE_VALIDATE:
+      return {
+        ...state,
+        submissionError: true,
+        errorCode: action.payload
+      }
     case actions.AUTHENTICATION_FAILED:
-      return { ...state, submitting: false, submissionError: true }
+      return {
+        ...state,
+        submitting: false,
+        submissionError: true,
+        errorCode: action.payload.response && action.payload.response.status
+      }
     case actions.AUTHENTICATION_COMPLETED:
       return loop(
         {

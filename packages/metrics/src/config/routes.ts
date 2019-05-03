@@ -25,8 +25,7 @@ export const getRoutes = () => {
       path: '/events/birth/new-registration',
       handler: newBirthRegistrationHandler,
       config: {
-        tags: ['api'],
-        auth: false
+        tags: ['api']
       }
     },
     {
@@ -34,8 +33,7 @@ export const getRoutes = () => {
       path: '/events/birth/registration',
       handler: birthRegistrationHandler,
       config: {
-        tags: ['api'],
-        auth: false
+        tags: ['api']
       }
     },
 
@@ -48,7 +46,8 @@ export const getRoutes = () => {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
-            timeEnd: Joi.string().required()
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string().required()
           })
         },
         tags: ['api']

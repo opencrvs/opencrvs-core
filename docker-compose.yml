@@ -31,6 +31,7 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
+      - METRICS_URL=http://metrics:1050
       - COUNTRY=bgd
 
   workflow:
@@ -55,6 +56,15 @@ services:
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
 
+  metrics:
+    image: jembi/ocrvs-metrics:${VERSION:-latest}
+    build: packages/metrics
+    restart: unless-stopped
+    environment:
+      - INFLUX_HOST=influxdb
+      - INFLUX_PORT=8086
+      - INFLUX_DB=ocrvs
+
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
     build: packages/auth
@@ -71,7 +81,7 @@ services:
     build: packages/user-mgnt
     restart: unless-stopped
     environment:
-      - MONGO_URL=mongodb://mongo/user-mgnt
+      - MONGO_URL=mongodb://mongo1/user-mgnt
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
