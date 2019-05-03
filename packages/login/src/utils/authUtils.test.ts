@@ -5,6 +5,14 @@ const performanceJWT =
 
 describe('authUtils', () => {
   describe('getTokenPayload. Returns the correct payload from a token', () => {
+    it('should return null if token not passed', () => {
+      expect(getTokenPayload('')).toEqual(null)
+    })
+
+    it('should return null if error occurs', () => {
+      expect(getTokenPayload('Invalid Token')).toEqual(null)
+    })
+
     it('should return the right payload', () => {
       const response = {
         iss: '',
