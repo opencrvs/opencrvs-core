@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Avatar } from '../../icons'
+import { Avatar, Logout } from '../../icons'
 
 const MenuMainWrapper = styled.div`
   @keyframes fadeIn {
@@ -61,7 +61,13 @@ const MenuItems = styled.ul`
   list-style: none;
   padding: 0px;
 `
+const LogoutMenu = styled(MenuItems)`
+  position: absolute;
+  bottom: 0px;
+`
 const MenuItem = styled.li`
+  display: flex;
+  align-items: center;
   padding: 10px 30px;
   font-weight: bold;
   cursor: pointer;
@@ -69,10 +75,9 @@ const MenuItem = styled.li`
     color: ${({ theme }) => theme.colors.cardGradientEnd};
   }
 `
-const Logout = styled.div`
-  position: absolute;
-  bottom: 50px;
-  left: 50px;
+const Icon = styled.span`
+  display: flex;
+  margin-right: 10px;
 `
 
 interface IUserDetails {
@@ -120,12 +125,19 @@ export class ExpandingMenu extends React.Component<IProps, IState> {
             <MenuItems>
               {this.props.menuItems.map((item: IMenuItem, index: number) => (
                 <MenuItem key={index}>
-                  {item.icon}
+                  <Icon>{item.icon}</Icon>
                   {item.label}
                 </MenuItem>
               ))}
             </MenuItems>
-            <Logout />
+            <LogoutMenu>
+              <MenuItem>
+                <Icon>
+                  <Logout />
+                </Icon>
+                Logout
+              </MenuItem>
+            </LogoutMenu>
           </MenuContainer>
         </MenuMainWrapper>
       )
