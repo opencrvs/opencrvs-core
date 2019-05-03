@@ -76,6 +76,7 @@ export const fonts = (country: string, language: string): IFonts => ({
       font-size: 16px;
     }
     letter-spacing: 0.1px;`,
+
   capsFontStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };
