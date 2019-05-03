@@ -1,6 +1,7 @@
 import * as React from 'react'
+import styled from 'styled-components'
 
-export const MenuLogo = (props: React.HTMLAttributes<SVGElement>) => (
+export const HeaderLogo = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={109} height={47} fill="none" {...props}>
     <path
       d="M11.483 34.26h89.409l-3.483 2.76H8l3.483-2.76z"
