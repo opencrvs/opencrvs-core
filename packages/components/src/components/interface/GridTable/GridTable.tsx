@@ -57,13 +57,11 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
-  border-top: ${({ theme, expanded }) =>
-    expanded ? `2px solid ${theme.colors.seperatorBorder}` : 'none'};
   margin-top: 5px;
   overflow: hidden;
-  transition: max-height 600ms;
+  transition-property: all;
+  transition-duration: 0.5s;
   max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
-  animation: ${fadeIn} 600ms;
 `
 
 export enum ColumnContentAlignment {
@@ -203,7 +201,7 @@ export class GridTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       initialPage = defaultConfiguration.initialPage
     } = this.props
-    const { currentPage } = this.state
+    const currentPage = initialPage
     const totalPages = this.props.totalPages
       ? this.props.totalPages
       : getTotalPageNumber(
@@ -258,18 +256,16 @@ export class GridTable extends React.Component<
                 </RowWrapper>
 
                 <ExpandedSectionContainer expanded={expanded}>
-                  {expanded && (
-                    <ExpansionContentInfo
-                      data={item}
-                      preference={this.props.expandedContentRows}
-                    />
-                  )}
+                  <ExpansionContentInfo
+                    data={item}
+                    preference={this.props.expandedContentRows}
+                  />
                 </ExpandedSectionContainer>
               </StyledBox>
             )
           }
         )}
-        {content.length > 0 && (
+        {content.length > 10 && (
           <Pagination
             initialPage={initialPage}
             totalPages={totalPages}
