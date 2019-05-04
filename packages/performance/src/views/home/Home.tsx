@@ -89,23 +89,11 @@ const messages = defineMessages({
     description:
       'Live births registered within 45 days of actual birth label on graph'
   },
-  liveBirthsWithin45DaysDescription: {
-    id: 'performance.graph.liveBirthsWithin45DaysDescription',
-    defaultMessage: '142500 out of 204000',
-    description:
-      'Live births registered within 45 days of actual birth description on graph'
-  },
   liveBirthsWithin1yearLabel: {
     id: 'performance.graph.liveBirthsWithin1yearLabel',
     defaultMessage: 'Registrations within<br />1 year of birth',
     description:
       'Live births registered within 1 year of actual birth label on graph'
-  },
-  liveBirthsWithin1yearDescription: {
-    id: 'performance.graph.liveBirthsWithin1yearDescription',
-    defaultMessage: '61500 out of 204000',
-    description:
-      'Live births registered within 1 year of actual birth description on graph'
   },
   totalLiveBirthsLabel: {
     id: 'performance.graph.totalLiveBirthsLabel',
@@ -174,14 +162,25 @@ const messages = defineMessages({
 })
 
 interface IData {
+  percentage: number
   value: number
   label: React.ReactNode
-  description?: string
   total?: boolean
   estimate?: boolean
+  description?: string
   categoricalData?: ICategoryDataPoint[]
 }
 
+const getKeyFigureLabel = (type: string, intl: InjectedIntl): string => {
+  switch (type) {
+    case 'DAYS_0_TO_45':
+      return intl.formatHTMLMessage(messages.liveBirthsWithin45DaysLabel)
+    case 'DAYS_46_TO_365':
+      return intl.formatHTMLMessage(messages.liveBirthsWithin1yearLabel)
+    default:
+      return intl.formatHTMLMessage(messages.totalLiveBirthsLabel)
+  }
+}
 const getData = (
   keyFigures: GQLBirthKeyFigures[],
   intl: InjectedIntl
@@ -190,116 +189,44 @@ const getData = (
     (keyFigures &&
       keyFigures.map((keyFigureData, index) => {
         return {
-          value: keyFigureData.value || 0,
+          percentage: keyFigureData.value || 0,
+          value: keyFigureData.total || 0,
           label: (
             <FormattedHTMLMessage
               id={`graph.label${index}`}
-              defaultMessage={intl.formatHTMLMessage(
-                messages.liveBirthsWithin45DaysLabel
+              defaultMessage={getKeyFigureLabel(
+                keyFigureData.label || '',
+                intl
               )}
             />
           ),
-          description: intl.formatMessage(
-            messages.liveBirthsWithin45DaysDescription
-          ),
+          description: `${keyFigureData.total ||
+            0} out of estimated ${keyFigureData.estimate || 0}`,
+          total:
+            (keyFigureData.label && keyFigureData.label === 'DAYS_0_TO_365') ||
+            false,
           categoricalData:
-            (keyFigureData.categoricalData &&
-              keyFigureData.categoricalData.map(category => {
-                return {
-                  name: (category && category.name) || '',
-                  label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-                  value: (category && category.value) || 0,
-                  icon: () => <Female />
-                }
-              })) ||
-            []
+            keyFigureData.categoricalData &&
+            keyFigureData.categoricalData.map(category => {
+              return {
+                name: (category && category.name) || '',
+                label: intl.formatMessage(
+                  (category &&
+                    category.name === 'female' &&
+                    messages.genderCategoryFemaleLabel) ||
+                    messages.genderCategoryMaleLabel
+                ),
+                value: (category && category.value) || 0,
+                icon: () =>
+                  (category && category.name === 'female' && <Female />) || (
+                    <Male />
+                  )
+              }
+            })
         }
       })) ||
     []
   )
-
-  return [
-    {
-      value: 142500,
-      label: (
-        <FormattedHTMLMessage
-          id="graph.label1"
-          defaultMessage={intl.formatHTMLMessage(
-            messages.liveBirthsWithin45DaysLabel
-          )}
-        />
-      ),
-      description: intl.formatMessage(
-        messages.liveBirthsWithin45DaysDescription
-      ),
-      categoricalData: [
-        {
-          name: 'female',
-          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-          value: 48000,
-          icon: () => <Female />
-        },
-        {
-          name: 'male',
-          label: intl.formatMessage(messages.genderCategoryMaleLabel),
-          value: 56000,
-          icon: () => <Male />
-        }
-      ]
-    },
-    {
-      value: 61500,
-      label: (
-        <FormattedHTMLMessage
-          id="graph.label2"
-          defaultMessage={intl.formatHTMLMessage(
-            messages.liveBirthsWithin1yearLabel
-          )}
-        />
-      ),
-      description: intl.formatMessage(
-        messages.liveBirthsWithin1yearDescription
-      ),
-      categoricalData: [
-        {
-          name: 'female',
-          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-          value: 48000,
-          icon: () => <Female />
-        },
-        {
-          name: 'male',
-          label: intl.formatMessage(messages.genderCategoryMaleLabel),
-          value: 56000,
-          icon: () => <Male />
-        }
-      ]
-    },
-    {
-      value: 204000,
-      label: (
-        <FormattedHTMLMessage
-          id="graph.label3"
-          defaultMessage={intl.formatHTMLMessage(messages.totalLiveBirthsLabel)}
-        />
-      ),
-      total: true,
-      categoricalData: [
-        {
-          name: 'female',
-          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-          value: 92000,
-          icon: () => <Female />
-        },
-        {
-          name: 'male',
-          label: intl.formatMessage(messages.genderCategoryMaleLabel),
-          value: 112000,
-          icon: () => <Male />
-        }
-      ]
-    }
-  ]
 }
 
 const BoxTitle = styled.div`
