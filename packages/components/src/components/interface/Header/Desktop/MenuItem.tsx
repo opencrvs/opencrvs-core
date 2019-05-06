@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Button } from '../../buttons'
-import { Selector } from '../../icons'
+import { Button } from '../../../buttons'
+import { Selector } from '../../../icons'
 
 export interface ICustomProps {
   selected?: boolean
