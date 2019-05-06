@@ -24,7 +24,6 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-bottom:100px;
   * {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
