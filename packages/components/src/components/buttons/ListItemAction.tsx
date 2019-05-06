@@ -14,13 +14,12 @@ const Container = styled.div`
 `
 const ListItemSingleAction = styled(Button)`
   display: flex;
-  flex: 1;
   justify-content: center;
   color: ${({ theme }) => theme.colors.accent};
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.capsFontStyle};
   font-weight: 600;
-  min-width: 100px;
+  width: 140px;
   margin-right: 1px;
   padding: 0px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
