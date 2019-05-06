@@ -556,10 +556,6 @@ export class SearchResultView extends React.Component<
         value: item.dod
       })
     }
-    info.push({
-      label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
-      value: item.date_of_application
-    })
     if (!applicationIsRegistered || !applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
