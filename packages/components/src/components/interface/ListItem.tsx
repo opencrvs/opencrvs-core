@@ -43,7 +43,7 @@ const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
   {}
 )`
   width: 100%;
-  margin-bottom: 1px;
+  margin-bottom: 8px;
   transition: border-top 300ms;
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 22px 0 rgba(0,0,0,0.23)` : ``};
