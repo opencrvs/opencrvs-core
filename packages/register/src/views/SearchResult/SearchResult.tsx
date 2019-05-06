@@ -556,12 +556,6 @@ export class SearchResultView extends React.Component<
         value: item.dod
       })
     }
-    if (!applicationIsRegistered || !applicationIsCertified) {
-      info.push({
-        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
-        value: item.tracking_id
-      })
-    }
     if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
@@ -569,6 +563,11 @@ export class SearchResultView extends React.Component<
           { event: item.event.toLowerCase() }
         ),
         value: item.registrationNumber
+      })
+    } else {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
+        value: item.tracking_id
       })
     }
 
