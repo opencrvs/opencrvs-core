@@ -16,6 +16,7 @@ import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { IUserData } from 'src/drafts'
+import { Spinner } from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({
   incorrect: {
@@ -70,6 +71,7 @@ interface IState {
   pin: string
   userPin: string
   resetKey: number
+  showSpinner: boolean
 }
 type ErrorState = {
   attempt: number
@@ -98,7 +100,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       errorMessage: '',
       pin: '',
       userPin: '',
-      resetKey: Date.now()
+      resetKey: Date.now(),
+      showSpinner: false
     }
   }
 
@@ -151,10 +154,20 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   }
 
   onPinProvided = async (pin: string) => {
+    this.setState(state => {
+      // tslint:disable-next-line: no-unused-expression
+      showSpinner: true
+    })
     const { intl } = this.props
     const { userPin } = this.state
-    const pinMatched = bcrypt.compareSync(pin, userPin)
-
+    let pinMatched = false
+    bcrypt.compare(pin, userPin).then(value => {
+      pinMatched = value
+      this.setState(state => {
+        // tslint:disable-next-line: label-position
+        showSpinner: false
+      })
+    })
     if (this.state.attempt > MAX_ALLOWED_ATTEMPT) {
       return
     }
@@ -240,6 +253,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <Logo />
         {this.showName()}
         {this.showErrorMessage()}
+        <Spinner id="hashingSpinner" show={this.state.showSpinner} />
         <PINKeypad
           onComplete={this.onPinProvided}
           pin={this.state.pin}
