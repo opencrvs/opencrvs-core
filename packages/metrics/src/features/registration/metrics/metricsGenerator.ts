@@ -2,21 +2,19 @@ import { readPoints } from 'src/influxdb/client'
 import {
   ageIntervals,
   calculateInterval,
+  generateEmptyBirthKeyFigure,
+  fetchEstimateByLocation,
   IPoint,
   LABEL_FOMRAT
 } from 'src/features/registration/metrics/utils'
 import * as moment from 'moment'
-import { fetchFHIR } from '../fhirUtils'
 import { IAuthHeader } from '..'
 import {
-  OPENCRVS_SPECIFICATION_URL,
-  CRUD_BIRTH_RATE_SEC,
-  TOTAL_POPULATION_SEC,
   MALE,
   FEMALE,
   WITHIN_45_DAYS,
-  WITHIN_1_YEAR,
-  TIME_TO
+  WITHIN_45_DAYS_TO_1_YEAR,
+  WITHIN_1_YEAR
 } from './constants'
 
 interface IGroupedByGender {
@@ -24,16 +22,22 @@ interface IGroupedByGender {
   gender: string
 }
 
-type BirthKeyFigures = {
+export type BirthKeyFigures = {
   label: string
   value: number
   total: number
+  estimate: number
   categoricalData: BirthKeyFiguresData[]
 }
 
 type BirthKeyFiguresData = {
   name: string
   value: number
+}
+
+export type Estimation = {
+  crudRate: number
+  population: number
 }
 
 export async function regByAge(timeStart: string, timeEnd: string) {
@@ -90,153 +94,111 @@ export async function fetchKeyFigures(
   locationId: string,
   authHeader: IAuthHeader
 ) {
-  const year = new Date(Number(TIME_TO) / 100000).getFullYear().toString()
-  const locationData: fhir.Location = await fetchFHIR(locationId, authHeader)
-  const extensions = locationData.extension
-  let crudBirthRate: number = 1
-  let midYearPoulation: number = 1
-  let valueArray: any[]
+  const estimations = await fetchEstimateByLocation(
+    locationId,
+    authHeader,
+    // TODO: need to adjust this when date range is properly introduced
+    new Date().getFullYear()
+  )
 
-  if (!extensions) {
-    return []
-  }
+  const keyFigures: BirthKeyFigures[] = []
 
-  extensions.forEach(extension => {
-    if (extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC) {
-      valueArray = JSON.parse(extension.valueString as string)
-      valueArray.forEach(data => {
-        if (year in data) {
-          crudBirthRate = data[year]
-        }
-      })
-    } else if (
-      extension.url ===
-      OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
-    ) {
-      valueArray = JSON.parse(extension.valueString as string)
-      valueArray.forEach(data => {
-        if (year in data) {
-          midYearPoulation = data[year]
-        }
-      })
-    }
-  })
-
-  const within45Days: IGroupedByGender[] = await readPoints(
+  /* Populating < 45D data */
+  const within45DaysData: IGroupedByGender[] = await readPoints(
     `SELECT COUNT(age_in_days) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
-      AND time <= ${timeEnd}
-      AND ( locationLevel2 = '${locationId}' 
-          OR locationLevel3 = '${locationId}' )
+      AND time <= ${timeEnd}      
+      AND ( locationLevel2 = 'Location/${locationId}' 
+          OR locationLevel3 = 'Location/${locationId}'
+          OR locationLevel4 = 'Location/${locationId}' 
+          OR locationLevel5 = 'Location/${locationId}' )
       AND age_in_days <= 45
     GROUP BY gender`
   )
-
-  const within1Year: IGroupedByGender[] = await readPoints(
+  keyFigures.push(
+    populateBirthKeyFigurePoint(WITHIN_45_DAYS, within45DaysData, estimations)
+  )
+  /* Populating > 45D and < 365D data */
+  const within1YearData: IGroupedByGender[] = await readPoints(
     `SELECT COUNT(age_in_days) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
-      AND time <= ${timeEnd}
+      AND time <= ${timeEnd}      
+      AND ( locationLevel2 = 'Location/${locationId}' 
+          OR locationLevel3 = 'Location/${locationId}'
+          OR locationLevel4 = 'Location/${locationId}' 
+          OR locationLevel5 = 'Location/${locationId}' )
       AND age_in_days > 45
-      AND age_in_days <= 365
-      AND ( locationLevel2 = '${locationId}'
-        OR locationLevel3 = '${locationId}' )
+      AND age_in_days <= 365      
     GROUP BY gender`
   )
-
-  let total45 = 0
-  let total45Male = 0
-  let total45Female = 0
-  let total1Year = 0
-  let total1YearMale = 0
-  let total1YearFemale = 0
-
-  within45Days.forEach(data => {
-    if (data.gender === MALE) {
-      total45Male = data.total
-    } else {
-      total45Female = data.total
-    }
-  })
-
-  within1Year.forEach(data => {
-    if (data.gender === MALE) {
-      total1YearMale = data.total
-    } else {
-      total1YearFemale = data.total
-    }
-  })
-
-  total45 = total45Female + total45Male
-  total45Male = Math.ceil(
-    (total45Male / ((crudBirthRate * midYearPoulation) / 1000)) * 100
-  )
-  total45Female = Math.ceil(
-    (total45Female / ((crudBirthRate * midYearPoulation) / 1000)) * 100
-  )
-  total45 = Math.ceil(
-    (total45 / ((crudBirthRate * midYearPoulation) / 1000)) * 100
-  )
-
-  total1Year = total1YearMale + total1YearFemale
-  total1YearMale = Math.ceil(
-    (total1YearMale / ((crudBirthRate * midYearPoulation) / 1000)) * 100
-  )
-  total1YearFemale = Math.ceil(
-    (total1YearFemale / ((crudBirthRate * midYearPoulation) / 1000)) * 100
-  )
-  total1Year = Math.ceil(
-    (total1Year / ((crudBirthRate * midYearPoulation) / 1000)) * 100
-  )
-
-  const total = total45 + total1Year
-
-  const categoricalData45: BirthKeyFiguresData[] = [
-    {
-      name: FEMALE,
-      value: total45Female
-    },
-    {
-      name: MALE,
-      value: total45Male
-    }
-  ]
-
-  const categoricalData1Year: BirthKeyFiguresData[] = [
-    {
-      name: FEMALE,
-      value: total1YearFemale
-    },
-    {
-      name: MALE,
-      value: total1YearMale
-    }
-  ]
-
-  const keyFigs: BirthKeyFigures[] = [
-    createBirthKeyFiguresObj(WITHIN_45_DAYS, total45, total, categoricalData45),
-    createBirthKeyFiguresObj(
-      WITHIN_1_YEAR,
-      total1Year,
-      total,
-      categoricalData1Year
+  keyFigures.push(
+    populateBirthKeyFigurePoint(
+      WITHIN_45_DAYS_TO_1_YEAR,
+      within1YearData,
+      estimations
     )
-  ]
-
-  return keyFigs
+  )
+  /* Populating < 365D data */
+  let fullData: IGroupedByGender[] = []
+  if (within45DaysData) {
+    fullData = fullData.concat(within45DaysData)
+  }
+  if (within1YearData) {
+    fullData = fullData.concat(within1YearData)
+  }
+  keyFigures.push(
+    populateBirthKeyFigurePoint(WITHIN_1_YEAR, fullData, estimations)
+  )
+  return keyFigures
 }
 
-const createBirthKeyFiguresObj = (
-  label: string,
-  value: number,
-  total: number,
-  categoricalData: BirthKeyFiguresData[]
+const populateBirthKeyFigurePoint = (
+  figureLabel: string,
+  groupedByGenderData: IGroupedByGender[],
+  estimations: Estimation
 ): BirthKeyFigures => {
+  if (!groupedByGenderData || groupedByGenderData === []) {
+    return generateEmptyBirthKeyFigure(figureLabel, estimations.population)
+  }
+  let percentage = 0
+  let totalMale = 0
+  let totalFemale = 0
+
+  groupedByGenderData.forEach(data => {
+    if (data.gender === FEMALE) {
+      totalFemale = data.total
+    } else if (data.gender === MALE) {
+      totalMale = data.total
+    }
+  })
+  if (totalMale + totalFemale === 0) {
+    return generateEmptyBirthKeyFigure(figureLabel, estimations.population)
+  }
+
+  /* TODO: need to implement different percentage calculation logic 
+     based on different date range here */
+  percentage = Math.round(
+    ((totalMale + totalFemale) /
+      ((estimations.crudRate * estimations.population) / 1000)) *
+      100
+  )
+
   return {
-    label,
-    value,
-    total,
-    categoricalData
+    label: figureLabel,
+    value: percentage,
+    total: totalMale + totalFemale,
+    estimate: estimations.population,
+    categoricalData: [
+      {
+        name: FEMALE,
+        value: totalFemale
+      },
+      {
+        name: MALE,
+        value: totalMale
+      }
+    ]
   }
 }

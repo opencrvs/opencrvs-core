@@ -1,5 +1,14 @@
 import * as moment from 'moment'
-
+import { BirthKeyFigures, Estimation } from './metricsGenerator'
+import {
+  MALE,
+  FEMALE,
+  OPENCRVS_SPECIFICATION_URL,
+  CRUD_BIRTH_RATE_SEC,
+  TOTAL_POPULATION_SEC
+} from './constants'
+import { fetchFHIR } from '../fhirUtils'
+import { IAuthHeader } from '..'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -42,4 +51,97 @@ export const calculateInterval = (startTime: string, endTime: string) => {
   } else {
     return WEEKLY_INTERVAL
   }
+}
+
+export const generateEmptyBirthKeyFigure = (
+  label: string,
+  estimate: number
+): BirthKeyFigures => {
+  return {
+    label,
+    value: 0,
+    total: 0,
+    estimate,
+    categoricalData: [
+      {
+        name: FEMALE,
+        value: 0
+      },
+      {
+        name: MALE,
+        value: 0
+      }
+    ]
+  }
+}
+
+export const fetchEstimateByLocation = async (
+  locationId: string,
+  authHeader: IAuthHeader,
+  estimatedYear: number
+): Promise<Estimation> => {
+  let crudRate: number = 0
+  let population: number = 0
+
+  const locationData: fhir.Location = await fetchLocation(
+    locationId,
+    authHeader
+  )
+  if (!locationData.extension) {
+    throw new Error('Invalid location data found')
+  }
+  let estimateExtensionFound: boolean = false
+  locationData.extension.forEach(extension => {
+    if (extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC) {
+      estimateExtensionFound = true
+      const valueArray: [] = JSON.parse(extension.valueString as string)
+      for (let key = estimatedYear; key > 1; key--) {
+        valueArray.forEach(data => {
+          if (key in data) {
+            crudRate = data[key]
+          }
+        })
+        if (crudRate > 0) {
+          break
+        }
+      }
+    } else if (
+      extension.url ===
+      OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
+    ) {
+      estimateExtensionFound = true
+      const valueArray: [] = JSON.parse(extension.valueString as string)
+      for (let key = estimatedYear; key > 1; key--) {
+        valueArray.forEach(data => {
+          if (key in data) {
+            population = data[key]
+          }
+        })
+        if (population > 0) {
+          break
+        }
+      }
+    }
+  })
+  if (!estimateExtensionFound) {
+    if (!locationData.partOf || !locationData.partOf.reference) {
+      throw new Error('Unable to fetch estimate data from location tree')
+    }
+    return await fetchEstimateByLocation(
+      locationData.partOf.reference.split('/')[1],
+      authHeader,
+      estimatedYear
+    )
+  }
+  return {
+    crudRate,
+    population
+  }
+}
+
+export const fetchLocation = async (
+  locationId: string,
+  authHeader: IAuthHeader
+) => {
+  return await fetchFHIR(`Location/${locationId}`, authHeader)
 }

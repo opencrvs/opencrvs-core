@@ -10,7 +10,10 @@ import {
 import { Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import { withTheme } from 'styled-components'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLHumanName,
+  GQLBirthKeyFigures
+} from '@opencrvs/gateway/src/graphql/schema'
 import { getUserDetails } from 'src/profile/selectors'
 import { getUserLocation } from 'src/utils/userUtils'
 import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
@@ -179,7 +182,42 @@ interface IData {
   categoricalData?: ICategoryDataPoint[]
 }
 
-const getData = (intl: InjectedIntl): IData[] => {
+const getData = (
+  keyFigures: GQLBirthKeyFigures[],
+  intl: InjectedIntl
+): IData[] => {
+  return (
+    (keyFigures &&
+      keyFigures.map((keyFigureData, index) => {
+        return {
+          value: keyFigureData.value || 0,
+          label: (
+            <FormattedHTMLMessage
+              id={`graph.label${index}`}
+              defaultMessage={intl.formatHTMLMessage(
+                messages.liveBirthsWithin45DaysLabel
+              )}
+            />
+          ),
+          description: intl.formatMessage(
+            messages.liveBirthsWithin45DaysDescription
+          ),
+          categoricalData:
+            (keyFigureData.categoricalData &&
+              keyFigureData.categoricalData.map(category => {
+                return {
+                  name: (category && category.name) || '',
+                  label: intl.formatMessage(messages.genderCategoryFemaleLabel),
+                  value: (category && category.value) || 0,
+                  icon: () => <Female />
+                }
+              })) ||
+            []
+        }
+      })) ||
+    []
+  )
+
   return [
     {
       value: 142500,
@@ -363,7 +401,7 @@ class HomeView extends React.Component<FullProps> {
               query={FETCH_METRIC}
               variables={{
                 timeStart: '1527098400000',
-                timeEnd: '1556042400000',
+                timeEnd: '1567142659530',
                 locationId: userDetails && getUserLocation(userDetails, 'UNION')
               }}
             >
@@ -391,7 +429,13 @@ class HomeView extends React.Component<FullProps> {
                       <BoxTitle id="box_title">
                         {intl.formatMessage(messages.birthRegistrationBoxTitle)}
                       </BoxTitle>
-                      <Legend data={getData(intl)} smallestToLargest={false} />
+                      <Legend
+                        data={getData(
+                          data.fetchBirthRegistrationMetrics.keyFigures,
+                          intl
+                        )}
+                        smallestToLargest={false}
+                      />
                       <FooterText id="footer_text">
                         {intl.formatMessage(
                           messages.birthRegistrationBoxFooter

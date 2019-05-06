@@ -468,6 +468,7 @@ export interface GQLBirthKeyFigures {
   label?: string
   value?: number
   total?: number
+  estimate?: number
   categoricalData?: Array<GQLBirthKeyFiguresData | null>
 }
 
@@ -2162,6 +2163,7 @@ export interface GQLBirthKeyFiguresTypeResolver<TParent = any> {
   label?: BirthKeyFiguresToLabelResolver<TParent>
   value?: BirthKeyFiguresToValueResolver<TParent>
   total?: BirthKeyFiguresToTotalResolver<TParent>
+  estimate?: BirthKeyFiguresToEstimateResolver<TParent>
   categoricalData?: BirthKeyFiguresToCategoricalDataResolver<TParent>
 }
 
@@ -2174,6 +2176,13 @@ export interface BirthKeyFiguresToValueResolver<TParent = any, TResult = any> {
 }
 
 export interface BirthKeyFiguresToTotalResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthKeyFiguresToEstimateResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
