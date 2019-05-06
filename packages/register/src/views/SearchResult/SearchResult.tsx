@@ -814,6 +814,7 @@ export class SearchResultView extends React.Component<
                     )
                   }
                   const transformedData = transformData(data, intl)
+                  const total = transformedData.length
                   return (
                     <>
                       <SearchInput
@@ -830,25 +831,30 @@ export class SearchResultView extends React.Component<
                       />
                       <SearchResultText>
                         {intl.formatMessage(messages.searchResultFor, {
+                          total,
                           param: searchParam
                         })}
                       </SearchResultText>
-                      <TotalResultText>
-                        {intl.formatMessage(messages.totalResultText, {
-                          total: transformedData.length
-                        })}
-                      </TotalResultText>
-                      <DataTable
-                        data={transformedData}
-                        zeroPagination={true}
-                        cellRenderer={this.renderCell}
-                        resultLabel={intl.formatMessage(
-                          messages.dataTableResults
-                        )}
-                        noResultText={intl.formatMessage(
-                          messages.dataTableNoResults
-                        )}
-                      />
+                      {total > 0 && (
+                        <>
+                          <TotalResultText>
+                            {intl.formatMessage(messages.totalResultText, {
+                              total
+                            })}
+                          </TotalResultText>
+                          <DataTable
+                            data={transformedData}
+                            zeroPagination={true}
+                            cellRenderer={this.renderCell}
+                            resultLabel={intl.formatMessage(
+                              messages.dataTableResults
+                            )}
+                            noResultText={intl.formatMessage(
+                              messages.dataTableNoResults
+                            )}
+                          />
+                        </>
+                      )}
                     </>
                   )
                 }}

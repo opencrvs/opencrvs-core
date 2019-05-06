@@ -330,12 +330,14 @@ export const messages = defineMessages({
   },
   searchResultFor: {
     id: 'register.SearchResult.searchResultFor',
-    defaultMessage: 'Search results for “{param}”',
+    defaultMessage:
+      '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
     description: 'The search result text'
   },
   totalResultText: {
     id: 'register.SearchResult.totalResultText',
-    defaultMessage: '{total} record found',
+    defaultMessage:
+      '{total, plural, =0 {} one {# record found} other {# records found}} ',
     description: 'The total result text'
   }
 })
