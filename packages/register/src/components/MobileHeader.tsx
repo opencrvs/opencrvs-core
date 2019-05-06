@@ -1,13 +1,16 @@
 import * as React from 'react'
 import styled from '../styled-components'
-import { Hamburger, SearchDark } from '@opencrvs/components/lib/icons'
 import { Button } from '@opencrvs/components/lib/buttons'
 
+interface IMenuAction {
+  icon: () => React.ReactNode
+  handler: () => void
+}
 interface IMobileHeaderProps {
   id?: string
-  leftIcon?: () => React.ReactNode
+  left?: IMenuAction
   title: string
-  rightIcon?: () => React.ReactNode
+  right?: IMenuAction
 }
 
 const HeaderContainer = styled.div`
@@ -46,21 +49,25 @@ const EndComponentContainer = styled.div`
 `
 class MobileHeader extends React.Component<IMobileHeaderProps> {
   render() {
-    const { id, leftIcon, rightIcon, title } = this.props
+    const { id, left, right, title } = this.props
     return (
       <HeaderContainer id={id}>
         <EndComponentContainer>
-          <Button id="mobile_header_left">
-            {leftIcon ? leftIcon() : <Hamburger />}
-          </Button>
+          {left && (
+            <Button id="mobile_header_left" onClick={left.handler}>
+              {left.icon()}
+            </Button>
+          )}
         </EndComponentContainer>
         <HeaderBody>
           <Title id="header_title">{title}</Title>
         </HeaderBody>
         <EndComponentContainer>
-          <Button id="mobile_header_right">
-            {rightIcon ? rightIcon() : <SearchDark />}
-          </Button>
+          {right && (
+            <Button id="mobile_header_right" onClick={right.handler}>
+              {right.icon()}
+            </Button>
+          )}
         </EndComponentContainer>
       </HeaderContainer>
     )
