@@ -15,8 +15,27 @@ const clearPassword = (component: ReactWrapper) => {
 }
 
 describe('Unlock page loads Properly', () => {
-  storage.getItem = jest.fn(
-    () => '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82'
+  // mock indexeddb
+  const indexedDB = {
+    USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
+    USER_DATA: JSON.stringify([
+      {
+        userID: 'shakib75',
+        userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
+        drafts: []
+      }
+    ]),
+    screenLock: undefined,
+    USER_ID: 'shakib75',
+    locked_time: undefined
+  }
+
+  storage.getItem = jest.fn(async (key: string) =>
+    Promise.resolve(indexedDB[key])
+  )
+
+  storage.setItem = jest.fn(
+    async (key: string, value: string) => (indexedDB[key] = value)
   )
 
   const { store } = createStore()

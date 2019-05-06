@@ -15,7 +15,6 @@ import {
   storeDraft,
   setInitialDrafts,
   IUserData,
-  getCurrentUserID,
   getDraftsOfCurrentUser,
   writeDraftByUser
 } from 'src/drafts'
@@ -36,7 +35,7 @@ import { clone } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from 'src/storage'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails, getCurrentUserID } from 'src/utils/userUtils'
 
 describe('when user logs in', async () => {
   // Some mock data
@@ -59,37 +58,38 @@ describe('when user logs in', async () => {
     userMgntUserID: 'shakib75'
   }
 
+  // Mocking indexeddb
   const indexedDB = {
     USER_DATA: JSON.stringify([currentUserData, anotherUserData]),
-    USER_DETAILS: JSON.stringify(currentUserDetails)
+    USER_DETAILS: JSON.stringify(currentUserDetails),
+    USER_ID: 'shakib75'
   }
 
-  // Mocking storage reading
   storage.getItem = jest.fn(
-    (key: string): string => {
-      switch (key) {
-        case 'USER_DATA':
-        case 'USER_DETAILS':
-          return indexedDB[key]
-        default:
-          return 'undefined'
-      }
-    }
+    (key: string): Promise<string> =>
+      new Promise((resolve, reject) => {
+        Object.keys(indexedDB).includes(key)
+          ? resolve(indexedDB[key])
+          : reject(undefined)
+      })
   )
 
-  // Mocking storage writing
-  storage.setItem = jest.fn((key: string, value: string) => {
-    switch (key) {
-      case 'USER_DATA':
-      case 'USER_DETAILS':
+  storage.setItem = jest.fn(
+    (key: string, value: string): Promise<void> =>
+      new Promise((resolve, reject) => {
         indexedDB[key] = value
-      default:
-        break
-    }
-  })
+      })
+  )
+
+  storage.removeItem = jest.fn(
+    (key: string) =>
+      new Promise((resolve, reject) => {
+        indexedDB[key] = undefined
+      })
+  )
 
   it('should read userID correctly', async () => {
-    const uID = await getCurrentUserID() // reads from USER_DETAILS and returns the userMgntUserID, if exists
+    const uID = await getCurrentUserID() // reads from indexeddb and returns the userMgntUserID, if exists
     expect(uID).toEqual('shakib75')
   })
 

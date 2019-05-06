@@ -6,6 +6,8 @@ import { storage } from 'src/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from 'src/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
+import { IUserData } from 'src/drafts'
+import { getCurrentUserID } from 'src/utils/userUtils'
 
 export const SCREEN_LOCK = 'screenLock'
 
@@ -61,9 +63,21 @@ class ProtectedPageComponent extends React.Component<
     this.setState({ secured: true, pinExists: true })
     storage.removeItem(SCREEN_LOCK)
   }
-  /* eventually we will take this pin from current user-details */
+
   async getPIN() {
-    return await storage.getItem('pin')
+    const currentUserID = await getCurrentUserID()
+    const userData = await storage.getItem('USER_DATA')
+    if (!userData) {
+      return ''
+    }
+    const allUserData = JSON.parse(userData) as IUserData[]
+    if (!allUserData || !allUserData.length) {
+      return ''
+    }
+    const currentUserData = allUserData.find(
+      user => user.userID === currentUserID
+    ) || { userPIN: '' }
+    return currentUserData.userPIN || ''
   }
 
   onIdle() {

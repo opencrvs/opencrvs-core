@@ -51,30 +51,10 @@ describe('when user has starts a new application', () => {
     history = testApp.history
     store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+    await flushPromises()
+    app.update()
   })
-  describe('In case of insecured page show unlock screen', () => {
-    let draft: IDraft
-    storage.getItem = jest
-      .fn()
-      .mockReturnValueOnce(null)
-      .mockReturnValueOnce(null)
-      .mockReturnValueOnce('true')
-      .mockReturnValueOnce(
-        '$2a$10$nD0E23/QJK0tjbPN23zg1u7rYnhsm8Y5/08.H20SSdqLVyuwFtVsG'
-      )
-    beforeEach(async () => {
-      draft = createDraft(Event.BIRTH)
-      store.dispatch(storeDraft(draft))
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
-      )
-      await flushPromises()
-      app.update()
-    })
-    it('renders unlock screen', () => {
-      expect(app.find('#unlockPage').hostNodes().length).toBe(1)
-    })
-  })
+
   describe('when user is in birth registration by parent informant view', () => {
     let draft: IDraft
     beforeEach(async () => {
@@ -339,6 +319,8 @@ describe('when user has starts a new application', () => {
     })
     describe('when user is in document tab', () => {
       beforeEach(async () => {
+        await flushPromises()
+        app.update()
         app
           .find('#tab_documents')
           .hostNodes()

@@ -3,7 +3,7 @@ import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
 import { storage } from 'src/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
-import { IUserDetails } from 'src/utils/userUtils'
+import { getCurrentUserID } from 'src/utils/userUtils'
 
 const SET_INITIAL_DRAFTS = 'DRAFTS/SET_INITIAL_DRAFTS'
 const STORE_DRAFT = 'DRAFTS/STORE_DRAFT'
@@ -75,6 +75,7 @@ export type Action =
 
 export interface IUserData {
   userID: string
+  userPIN?: string
   drafts: IDraft[]
 }
 
@@ -225,7 +226,7 @@ export const draftsReducer: LoopReducer<IDraftsState, Action> = (
       }
       return {
         ...state,
-        initialDraftsLoaded: true
+        initialDraftsLoaded: false
       }
     default:
       return state
@@ -240,6 +241,7 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   }
 
   const currentUserID = await getCurrentUserID()
+
   const allUserData = JSON.parse(storageTable) as IUserData[]
   if (!allUserData.length) {
     // No user-data at all
@@ -253,6 +255,7 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     uData => uData.userID === currentUserID
   )
+
   const currentUserDrafts: IDraft[] =
     (currentUserData && currentUserData.drafts) || []
   const payload: IUserData = {
@@ -265,11 +268,7 @@ export async function getDraftsOfCurrentUser(): Promise<string> {
 export async function writeDraftByUser(draftsState: IDraftsState) {
   const uID = draftsState.userID || (await getCurrentUserID())
   const str = await storage.getItem('USER_DATA')
-  if (!str) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !str ? [] : (JSON.parse(str) as IUserData[])
+  const allUserData: IUserData[] = str ? (JSON.parse(str) as IUserData[]) : []
   const currentUserData = allUserData.find(uData => uData.userID === uID)
 
   if (currentUserData) {
@@ -281,12 +280,4 @@ export async function writeDraftByUser(draftsState: IDraftsState) {
     })
   }
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
-}
-
-export async function getCurrentUserID(): Promise<string> {
-  const str = await storage.getItem('USER_DETAILS')
-  if (!str) {
-    return ''
-  }
-  return (JSON.parse(str) as IUserDetails).userMgntUserID || ''
 }

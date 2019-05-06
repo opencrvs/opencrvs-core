@@ -133,6 +133,12 @@ context('Birth Registration Integration Test', () => {
       cy.logout()
       cy.login('registrar')
       cy.wait(1000)
+      // CREATE PIN
+      cy.get('#createPinBtn').click()
+      for (let i = 0; i < 8; i++) {
+        cy.get('#keypad-1').click()
+      }
+      cy.wait(2000)
       // WORK QUEUE
       cy.contains(`${trackingIDText}`)
         .siblings('#ActionWrapper')
