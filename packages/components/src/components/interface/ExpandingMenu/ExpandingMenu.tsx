@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Avatar } from '../../icons'
 
-const MenuMainWrapper = styled.div.attrs<{ expand?: boolean }>({})`
+const MenuMainWrapper = styled.div`
   @keyframes fadeIn {
     0% {
       background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
@@ -11,31 +11,18 @@ const MenuMainWrapper = styled.div.attrs<{ expand?: boolean }>({})`
       background: ${({ theme }) => theme.colors.menuBackground};
     }
   }
-  @keyframes fadeOut {
-    0% {
-      background: ${({ theme }) => theme.colors.menuBackground};
-    }
-    99% {
-      background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
-    }
-    100% {
-      width: 0%;
-    }
-  }
-
-  background: ${({ theme, expand }) =>
-    expand ? theme.colors.menuBackground : 'none'};
-  width: ${({ expand }) => (expand ? '100%' : '0%')};
+  background: ${({ theme }) => theme.colors.menuBackground};
+  width: 100%;
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.secondary};
   height: 100vh;
   z-index: 99999;
-  animation: 300ms ease-out 0s 1
-    ${({ expand }) => (expand ? 'fadeIn' : 'fadeOut')};
+  animation: 300ms ease-out 0s 1 fadeIn;
   position: fixed;
   top: 0px;
+  left: 0px;
 `
-const MenuContainer = styled.div.attrs<{ expand?: boolean }>({})`
+const MenuContainer = styled.div`
   @keyframes slideInFromLeft {
     0% {
       transform: translateX(-100%);
@@ -44,23 +31,12 @@ const MenuContainer = styled.div.attrs<{ expand?: boolean }>({})`
       transform: translateX(0);
     }
   }
-  @keyframes slideInFromRight {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-100%);
-    }
-  }
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.colors.background};
   width: 320px;
   height: 100vh;
-  animation: 300ms ease-out 0s 1
-    ${({ expand }) => (expand ? 'slideInFromLeft' : 'slideInFromRight')};
-  transform: ${({ expand }) =>
-    expand ? 'translateX(0)' : 'translateX(-100%)'};
+  animation: 300ms ease-out 0s 1 slideInFromLeft;
 `
 const UserInfo = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -126,12 +102,10 @@ interface IProps {
   showMenu: boolean
   userDetails: IUserDetails
   menuItems: IMenuItem[]
-}
-interface IState {
-  showMenu: boolean
+  menuCollapse: () => void
 }
 
-export class ExpandingMenu extends React.Component<IProps, IState> {
+export class ExpandingMenu extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props)
 
@@ -139,38 +113,20 @@ export class ExpandingMenu extends React.Component<IProps, IState> {
       showMenu: this.props.showMenu
     }
   }
-  toggleMenu = () => {
-    this.setState(prevState => ({ showMenu: !prevState.showMenu }))
-  }
   render() {
     return (
-      <MenuMainWrapper onClick={this.toggleMenu} expand={this.state.showMenu}>
-        <MenuContainer
-          onClick={e => e.stopPropagation()}
-          expand={this.state.showMenu}
-        >
-          <UserInfo>
-            <Avatar />
-            <UserName>{this.props.userDetails.name}</UserName>
-            <Role>{this.props.userDetails.role}</Role>
-          </UserInfo>
-          <MenuItems>
-            {this.props.menuItems.map(
-              (item: IMenuItem, index: number) =>
-                !item.secondary && (
-                  <MenuItem key={index} onClick={item.onClick}>
-                    <Icon>{item.icon}</Icon>
-                    <IconHover>{item.iconHover || item.icon}</IconHover>
-                    {item.label}
-                  </MenuItem>
-                )
-            )}
-          </MenuItems>
-          <LogoutMenu>
+      this.props.showMenu && (
+        <MenuMainWrapper onClick={() => this.props.menuCollapse()}>
+          <MenuContainer onClick={e => e.stopPropagation()}>
+            <UserInfo>
+              <Avatar />
+              <UserName>{this.props.userDetails.name}</UserName>
+              <Role>{this.props.userDetails.role}</Role>
+            </UserInfo>
             <MenuItems>
               {this.props.menuItems.map(
                 (item: IMenuItem, index: number) =>
-                  item.secondary && (
+                  !item.secondary && (
                     <MenuItem key={index} onClick={item.onClick}>
                       <Icon>{item.icon}</Icon>
                       <IconHover>{item.iconHover || item.icon}</IconHover>
@@ -179,9 +135,23 @@ export class ExpandingMenu extends React.Component<IProps, IState> {
                   )
               )}
             </MenuItems>
-          </LogoutMenu>
-        </MenuContainer>
-      </MenuMainWrapper>
+            <LogoutMenu>
+              <MenuItems>
+                {this.props.menuItems.map(
+                  (item: IMenuItem, index: number) =>
+                    item.secondary && (
+                      <MenuItem key={index} onClick={item.onClick}>
+                        <Icon>{item.icon}</Icon>
+                        <IconHover>{item.iconHover || item.icon}</IconHover>
+                        {item.label}
+                      </MenuItem>
+                    )
+                )}
+              </MenuItems>
+            </LogoutMenu>
+          </MenuContainer>
+        </MenuMainWrapper>
+      )
     )
   }
 }
