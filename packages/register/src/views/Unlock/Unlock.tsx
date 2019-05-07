@@ -66,6 +66,7 @@ const ErrorMsg = styled.div`
   padding: 10px 20px;
   text-align: center;
 `
+
 interface IState {
   showLogoutModal: boolean
   pin: string
@@ -154,20 +155,16 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   }
 
   onPinProvided = async (pin: string) => {
-    this.setState(state => {
-      // tslint:disable-next-line: no-unused-expression
-      showSpinner: true
-    })
     const { intl } = this.props
     const { userPin } = this.state
-    let pinMatched = false
-    bcrypt.compare(pin, userPin).then(value => {
-      pinMatched = value
-      this.setState(state => {
-        // tslint:disable-next-line: label-position
-        showSpinner: false
-      })
+    this.setState({
+      showSpinner: true
     })
+    const pinMatched = await bcrypt.compare(pin, userPin)
+    this.setState({
+      showSpinner: false
+    })
+
     if (this.state.attempt > MAX_ALLOWED_ATTEMPT) {
       return
     }
@@ -252,13 +249,18 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         </LogoutHeader>
         <Logo />
         {this.showName()}
-        {this.showErrorMessage()}
-        <Spinner id="hashingSpinner" show={this.state.showSpinner} />
-        <PINKeypad
-          onComplete={this.onPinProvided}
-          pin={this.state.pin}
-          key={this.state.resetKey}
-        />
+        {this.state.showSpinner ? (
+          <Spinner id="hashingSpinner" />
+        ) : (
+          <div>
+            {this.showErrorMessage()}
+            <PINKeypad
+              onComplete={this.onPinProvided}
+              pin={this.state.pin}
+              key={this.state.resetKey}
+            />
+          </div>
+        )}
         <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}
