@@ -33,7 +33,56 @@ describe('when user is in the home page', () => {
       result: {
         data: {
           fetchBirthRegistrationMetrics: {
-            keyFigures: [],
+            keyFigures: [
+              {
+                label: 'DAYS_0_TO_45',
+                value: 17,
+                total: 500,
+                estimate: 3000,
+                categoricalData: [
+                  {
+                    name: 'female',
+                    value: 280
+                  },
+                  {
+                    name: 'male',
+                    value: 220
+                  }
+                ]
+              },
+              {
+                label: 'DAYS_46_TO_365',
+                value: 33,
+                total: 1000,
+                estimate: 3000,
+                categoricalData: [
+                  {
+                    name: 'female',
+                    value: 480
+                  },
+                  {
+                    name: 'male',
+                    value: 520
+                  }
+                ]
+              },
+              {
+                label: 'DAYS_0_TO_365',
+                value: 50,
+                total: 1500,
+                estimate: 3000,
+                categoricalData: [
+                  {
+                    name: 'female',
+                    value: 760
+                  },
+                  {
+                    name: 'male',
+                    value: 740
+                  }
+                ]
+              }
+            ],
             regByAge: [
               {
                 label: '45d',

@@ -161,6 +161,72 @@ const messages = defineMessages({
   }
 })
 
+const BoxTitle = styled.div`
+  line-height: 25px;
+  text-transform: capitalize !important;
+  ${({ theme }) => theme.fonts.h2FontStyle}
+  color: ${({ theme }) => theme.colors.primary};
+`
+
+const FooterText = styled.div`
+  height: 17px;
+  line-height: 17px;
+  margin-top: 25px;
+  ${({ theme }) => theme.fonts.infoFontStyle}
+  color: ${({ theme }) => theme.colors.copy};
+`
+
+const ChartContainer = styled(Box)`
+  max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
+  margin: auto;
+  margin-bottom: 20px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`
+
+const Container = styled.div`
+  padding: 20px 10px;
+`
+
+const LabelContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row wrap;
+  padding: 20px 0;
+  color: ${({ theme }) => theme.colors.copy};
+  width: 100%;
+`
+const Label = styled.div`
+  font-family: ${({ theme }) => theme.fonts.boldFont};
+  background-color: rgba(150, 150, 150, 0.1);
+  border-radius: 17px;
+  padding: 5px 10px 5px 7px;
+  margin: 2px 10px 2px 0;
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  align-items: center;
+  height: 32px;
+  & span {
+    text-transform: uppercase;
+    margin-left: 5px;
+    font-size: 13px;
+  }
+`
+
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
+`
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  text-align: center;
+  margin-top: 100px;
+`
+
 interface IData {
   percentage: number
   value: number
@@ -170,6 +236,13 @@ interface IData {
   description?: string
   categoricalData?: ICategoryDataPoint[]
 }
+interface IHomeProps {
+  theme: ITheme
+  language: string
+  userDetails: IUserDetails
+}
+
+type FullProps = IHomeProps & InjectedIntlProps
 
 const getKeyFigureLabel = (type: string, intl: InjectedIntl): string => {
   switch (type) {
@@ -228,80 +301,6 @@ const getData = (
     []
   )
 }
-
-const BoxTitle = styled.div`
-  line-height: 25px;
-  text-transform: capitalize !important;
-  ${({ theme }) => theme.fonts.h2FontStyle}
-  color: ${({ theme }) => theme.colors.primary};
-`
-
-const FooterText = styled.div`
-  height: 17px;
-  line-height: 17px;
-  margin-top: 25px;
-  ${({ theme }) => theme.fonts.infoFontStyle}
-  color: ${({ theme }) => theme.colors.copy};
-`
-
-const ChartContainer = styled(Box)`
-  max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
-  margin: auto;
-  margin-bottom: 20px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-`
-
-const Container = styled.div`
-  padding: 20px 10px;
-`
-
-const LabelContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-flow: row wrap;
-  padding: 20px 0;
-  color: ${({ theme }) => theme.colors.copy};
-  width: 100%;
-`
-const Label = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  background-color: rgba(150, 150, 150, 0.1);
-  border-radius: 17px;
-  padding: 5px 10px 5px 7px;
-  margin: 2px 10px 2px 0;
-  display: flex;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  align-items: center;
-  height: 32px;
-  & span {
-    text-transform: uppercase;
-    margin-left: 5px;
-    font-size: 13px;
-  }
-`
-interface IHomeProps {
-  theme: ITheme
-  language: string
-  userDetails: IUserDetails
-}
-
-type FullProps = IHomeProps & InjectedIntlProps
-
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  text-align: center;
-  margin-top: 100px;
-`
-
 class HomeView extends React.Component<FullProps> {
   render() {
     const { intl, language, userDetails, theme } = this.props

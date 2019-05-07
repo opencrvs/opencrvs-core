@@ -168,9 +168,9 @@ const populateBirthKeyFigurePoint = (
 
   groupedByGenderData.forEach(data => {
     if (data.gender === FEMALE) {
-      totalFemale = data.total
+      totalFemale += data.total
     } else if (data.gender === MALE) {
-      totalMale = data.total
+      totalMale += data.total
     }
   })
   if (totalMale + totalFemale === 0) {
