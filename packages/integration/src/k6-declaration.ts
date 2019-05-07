@@ -11,17 +11,17 @@ export const options = {
 
 export function setup() {
   return {
-    registrarToken: fetchToken('+8801733333333', 'test')
+    fieldAgentToken: fetchToken('+8801711111111', 'test')
   }
 }
 
 export default data => {
-  group('Birth Registration', () => {
+  group('Birth Declaration', () => {
     const reg = genReg({ femaleRate: 0.45 })
     const res = post(API_URL, JSON.stringify(reg), {
       headers: {
         'Content-Type': 'application/fhir+json',
-        Authorization: `Bearer ${data.registrarToken}`
+        Authorization: `Bearer ${data.fieldAgentToken}`
       }
     })
     check(res, {
