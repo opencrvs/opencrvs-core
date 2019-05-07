@@ -1,0 +1,48 @@
+import * as React from 'react'
+import styled from 'styled-components'
+import { Button } from '../../../buttons'
+import { Selector } from '../../../icons'
+
+export interface ICustomProps {
+  selected?: boolean
+}
+
+export type IMenuItemContainerProps = ICustomProps &
+  React.InputHTMLAttributes<HTMLInputElement>
+
+const Item = styled(Button).attrs<IMenuItemContainerProps>({})`
+  color: ${({ theme, selected }) =>
+    selected ? theme.colors.white : theme.colors.disabledTab};
+  font-family: ${({ theme }) => theme.fonts.regularFont};
+  letter-spacing: 0.25px;
+`
+
+const ItemContainer = styled.div`
+  position: relative;
+  height: 100%;
+`
+
+const ItemSelector = styled(Selector)`
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+`
+
+interface IProps {
+  selected: boolean
+  onClick?: () => void
+}
+
+export class MenuItem extends React.Component<IProps> {
+  render() {
+    return (
+      <ItemContainer>
+        <Item selected={this.props.selected} onClick={this.props.onClick}>
+          {this.props.children}
+        </Item>
+        {this.props.selected ? <ItemSelector /> : <></>}
+      </ItemContainer>
+    )
+  }
+}
