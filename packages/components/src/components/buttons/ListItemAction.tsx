@@ -12,7 +12,9 @@ const Container = styled.div`
     margin-left: 0px;
   }
 `
-const ListItemSingleAction = styled(Button)`
+const ListItemSingleAction = styled(Button).attrs<{ isFullHeight?: boolean }>(
+  {}
+)`
   display: flex;
   justify-content: center;
   color: ${({ theme }) => theme.colors.accent};
@@ -21,7 +23,7 @@ const ListItemSingleAction = styled(Button)`
   font-weight: 600;
   width: 140px;
   margin-right: 1px;
-  padding: 0px 0px;
+  ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-right: 0px;
   }
@@ -36,21 +38,27 @@ const ListItemSingleAction = styled(Button)`
     color: ${({ theme }) => theme.colors.disabled};
   }
 `
-
+const ExpansionSec = styled(ExpansionButton).attrs<{ isFullHeight?: boolean }>(
+  {}
+)`
+  ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
+`
 interface IListItemActionProps {
   actions: IAction[]
   id?: string
   expanded?: boolean
+  isFullHeight?: boolean
   onExpand?: () => void
 }
 
 export function ListItemAction(props: IListItemActionProps) {
-  const { actions, expanded, onExpand, id } = props
+  const { actions, expanded, onExpand, id, isFullHeight } = props
   return (
     <Container id={id}>
       {actions &&
         actions.map((action: IAction) => (
           <ListItemSingleAction
+            isFullHeight={isFullHeight}
             key={action.label as string}
             id={action.label as string}
             onClick={action.handler}
@@ -58,7 +66,13 @@ export function ListItemAction(props: IListItemActionProps) {
             {action.label}
           </ListItemSingleAction>
         ))}
-      {onExpand && <ExpansionButton expanded={expanded} onClick={onExpand} />}
+      {onExpand && (
+        <ExpansionSec
+          isFullHeight={isFullHeight}
+          expanded={expanded}
+          onClick={onExpand}
+        />
+      )}
     </Container>
   )
 }

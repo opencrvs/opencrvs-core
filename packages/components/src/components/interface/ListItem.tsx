@@ -27,6 +27,7 @@ export interface IListItemProps {
   actions?: IAction[]
   itemData: IDynamicValues
   isBoxShadow?: boolean
+  isItemFullHeight?: boolean
   expandedCellRenderer?: (itemData: IDynamicValues, key: number) => JSX.Element
 }
 
@@ -161,7 +162,8 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
       index,
       actions,
       itemData,
-      isBoxShadow
+      isBoxShadow,
+      isItemFullHeight
     } = this.props
     const { expanded } = this.state
     return (
@@ -192,6 +194,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
             </StatusDiv>
           </ListContentContainer>
           <ListItemAction
+            isFullHeight={isItemFullHeight}
             actions={actions || []}
             expanded={expanded}
             onExpand={
