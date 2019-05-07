@@ -12,6 +12,7 @@ import { setInitialUserDetails } from '@opencrvs/performance/src/profile/actions
 import { FETCH_METRIC } from './queries'
 
 const mockFetchUserDetails = jest.fn()
+Date.now = jest.fn(() => 1567142659530)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
@@ -24,14 +25,15 @@ describe('when user is in the home page', () => {
       request: {
         query: FETCH_METRIC,
         variables: {
-          timeStart: '1527098400000',
-          timeEnd: '1556042400000',
+          timeStart: 1527098400000,
+          timeEnd: 1567142659530,
           locationId: '123456789'
         }
       },
       result: {
         data: {
           fetchBirthRegistrationMetrics: {
+            keyFigures: [],
             regByAge: [
               {
                 label: '45d',

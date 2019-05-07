@@ -327,8 +327,8 @@ class HomeView extends React.Component<FullProps> {
             <Query
               query={FETCH_METRIC}
               variables={{
-                timeStart: '1527098400000',
-                timeEnd: '1567142659530',
+                timeStart: 1527098400000,
+                timeEnd: Date.now(),
                 locationId: userDetails && getUserLocation(userDetails, 'UNION')
               }}
             >
