@@ -8,7 +8,8 @@ export enum ICON_ALIGNMENT {
 
 const ButtonBase = styled.button`
   width: auto;
-  padding: 15px 35px;
+  padding: 0 35px;
+  height: 48px;
   font-family: ${({ theme }) => theme.fonts.boldFont};
   align-items: center;
   display: inline-flex;
@@ -32,13 +33,13 @@ export function Button({
 }: IButtonProps) {
   return (
     <ButtonBase {...otherProps}>
-      {icon &&
-        align === ICON_ALIGNMENT.LEFT && (
-          <LeftButtonIcon>{icon()}</LeftButtonIcon>
-        )}
+      {icon && align === ICON_ALIGNMENT.LEFT && (
+        <LeftButtonIcon>{icon()}</LeftButtonIcon>
+      )}
       {children}
-      {icon &&
-        align === ICON_ALIGNMENT.RIGHT && <ButtonIcon>{icon()}</ButtonIcon>}
+      {icon && align === ICON_ALIGNMENT.RIGHT && (
+        <ButtonIcon>{icon()}</ButtonIcon>
+      )}
     </ButtonBase>
   )
 }

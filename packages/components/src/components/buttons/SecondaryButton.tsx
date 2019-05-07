@@ -5,26 +5,21 @@ import { Button, IButtonProps } from './Button'
 export const SecondaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.accent};
   background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `1px solid ${theme.colors.accent}`};
+  border: ${({ theme }) => `2px solid ${theme.colors.accent}`};
+  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   border-radius: 2px;
   ${({ theme }) => theme.fonts.capsFontStyle};
 
   &:hover {
-    background: linear-gradient(
-      ${({ theme }) => theme.colors.hoverGradientDark},
-      ${({ theme }) => theme.colors.primary}
-    );
-    color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => `1px solid ${theme.colors.white}`};
+    opacity: 0.8;
   }
 
   &:active {
-    color: ${({ theme }) => theme.colors.accentGradientDark};
-    outline: none;
+    outline: 3px solid ${({ theme }) => theme.colors.creamCan};
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.white};
+    border: ${({ theme }) => `2px solid ${theme.colors.disabled}`};
     cursor: not-allowed;
     color: ${({ theme }) => theme.colors.disabled};
   }
