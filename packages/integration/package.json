@@ -7,6 +7,7 @@
   "private": true,
   "scripts": {
     "start": "yarn build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js",
+    "start:once": "yarn build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js -u 1 -i 1",
     "build": "yarn tsc src/k6-registration.ts --outDir build"
   },
   "dependencies": {

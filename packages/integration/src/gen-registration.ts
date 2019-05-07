@@ -1,12 +1,45 @@
 // @ts-ignore
-import * as faker from 'cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js'
+import * as fakerModule from 'cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js'
 
 export default rates => {
+  // Add typing for faker, needed due to url import
+  const faker: Faker.FakerStatic = fakerModule
+
   const compositionUuid = faker.random.uuid()
   const childFirstName = faker.name.firstName()
   const childLastName = faker.name.lastName()
   const childGender = Math.random() > rates.femaleRate ? 'male' : 'female'
-  const childDob = faker.date.past(5, new Date())
+  const regDate = faker.date.past(5, new Date())
+  const childDOB = faker.date.past(5, regDate)
+
+  // Set earliest parent age to 16 at child DOB
+  const earliestParentAge = new Date(childDOB.getTime())
+  earliestParentAge.setFullYear(earliestParentAge.getFullYear() - 16)
+
+  const motherNID = faker.random
+    .number({
+      min: 1000000000000,
+      max: 9999999999999
+    })
+    .toString()
+  const motherFirstName = faker.name.firstName()
+  const motherLastName = faker.name.lastName()
+  const motherDOB = faker.date.past(20, earliestParentAge)
+
+  const fatherNID = faker.random
+    .number({
+      min: 1000000000000,
+      max: 9999999999999
+    })
+    .toString()
+  const fatherFirstName = faker.name.firstName()
+  const fatherLastName = faker.name.lastName()
+  const fatherDOB = faker.date.past(20, earliestParentAge)
+
+  const dateOfMarriage = faker.date.past(5, earliestParentAge)
+
+  const addressNumber = faker.random.number(999)
+  const addressStreet = faker.address.streetName()
 
   return {
     resourceType: 'Bundle',
@@ -103,7 +136,7 @@ export default rates => {
             }
           ],
           subject: {},
-          date: '2019-05-06T13:10:09.023Z',
+          date: regDate.toISOString(),
           author: []
         }
       },
@@ -129,8 +162,8 @@ export default rates => {
               valueString: '01711111111'
             }
           ],
-          lastModified: '2019-05-06T13:10:09.033Z',
-          note: [{ text: 'note', time: '2019-05-06T13:10:09.033Z' }]
+          lastModified: regDate.toISOString(),
+          note: [{ text: 'note', time: regDate.toISOString() }]
         }
       },
       {
@@ -147,7 +180,7 @@ export default rates => {
             }
           ],
           gender: childGender,
-          birthDate: childDob.toISOString().substring(0, 10)
+          birthDate: childDOB.toISOString().substring(0, 10)
         }
       },
       {
@@ -155,12 +188,12 @@ export default rates => {
         resource: {
           resourceType: 'Patient',
           active: true,
-          identifier: [{ value: '1234567898765', type: 'NATIONAL_ID' }],
+          identifier: [{ value: motherNID, type: 'NATIONAL_ID' }],
           name: [
-            { use: 'bn', given: ['গায়ত্রী'], family: ['স্পিভক'] },
-            { use: 'en', given: ['Gayatri'], family: ['Spivak'] }
+            { use: 'bn', given: [motherFirstName], family: [motherLastName] },
+            { use: 'en', given: [fatherFirstName], family: [fatherLastName] }
           ],
-          birthDate: '2010-08-01',
+          birthDate: motherDOB.toISOString().substring(0, 10),
           maritalStatus: {
             coding: [
               {
@@ -174,7 +207,7 @@ export default rates => {
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/date-of-marriage',
-              valueDateTime: '2018-08-01'
+              valueDateTime: dateOfMarriage.toISOString().substring(0, 10)
             },
             {
               url:
@@ -199,9 +232,9 @@ export default rates => {
             {
               type: 'PERMANENT',
               line: [
-                '40',
+                addressNumber,
                 '',
-                'My street',
+                addressStreet,
                 '692344f2-9185-4649-b515-66fc1e33147f',
                 '',
                 '7719942b-16a7-474a-8af1-cd0c94c730d2'
@@ -214,9 +247,9 @@ export default rates => {
             {
               type: 'CURRENT',
               line: [
-                '40',
+                addressNumber,
                 '',
-                'My street',
+                addressStreet,
                 '692344f2-9185-4649-b515-66fc1e33147f',
                 '',
                 '7719942b-16a7-474a-8af1-cd0c94c730d2'
@@ -234,12 +267,12 @@ export default rates => {
         resource: {
           resourceType: 'Patient',
           active: true,
-          identifier: [{ value: '1234567898765', type: 'NATIONAL_ID' }],
+          identifier: [{ value: fatherNID, type: 'NATIONAL_ID' }],
           name: [
-            { use: 'bn', given: ['গায়ত্রী'], family: ['স্পিভক'] },
-            { use: 'en', given: ['Gayatri'], family: ['Spivak'] }
+            { use: 'bn', given: [fatherFirstName], family: [fatherLastName] },
+            { use: 'en', given: [fatherFirstName], family: [fatherLastName] }
           ],
-          birthDate: '2010-08-01',
+          birthDate: fatherDOB.toDateString().substring(0, 10),
           maritalStatus: {
             coding: [
               {
@@ -253,7 +286,7 @@ export default rates => {
           extension: [
             {
               url: 'http://opencrvs.org/specs/extension/date-of-marriage',
-              valueDateTime: '2018-08-01'
+              valueDateTime: dateOfMarriage.toISOString().substring(0, 10)
             },
             {
               url:
@@ -277,9 +310,9 @@ export default rates => {
             {
               type: 'CURRENT',
               line: [
-                '40',
+                addressNumber,
                 '',
-                'My street',
+                addressStreet,
                 '692344f2-9185-4649-b515-66fc1e33147f',
                 '',
                 '7719942b-16a7-474a-8af1-cd0c94c730d2'
@@ -292,9 +325,9 @@ export default rates => {
             {
               type: 'PERMANENT',
               line: [
-                '40',
+                addressNumber,
                 '',
-                'My street',
+                addressStreet,
                 '692344f2-9185-4649-b515-66fc1e33147f',
                 '',
                 '7719942b-16a7-474a-8af1-cd0c94c730d2'
@@ -473,6 +506,6 @@ export default rates => {
         }
       }
     ],
-    meta: { lastUpdated: '2019-05-06T13:10:09.023Z' }
+    meta: { lastUpdated: regDate.toISOString() }
   }
 }
