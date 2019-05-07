@@ -1,8 +1,8 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { Avatar, LogoutBlack, LogoutBlue } from '../../icons'
+import styled, { css } from 'styled-components'
+import { Avatar } from '../../icons'
 
-const MenuMainWrapper = styled.div`
+const MenuMainWrapper = styled.div.attrs<{ expand?: boolean }>({})`
   @keyframes fadeIn {
     0% {
       background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
@@ -11,13 +11,27 @@ const MenuMainWrapper = styled.div`
       background: ${({ theme }) => theme.colors.menuBackground};
     }
   }
+  @keyframes fadeOut {
+    0% {
+      background: ${({ theme }) => theme.colors.menuBackground};
+    }
+    99% {
+      background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
+    }
+    100% {
+      width: 0%;
+    }
+  }
+
+  background: ${({ theme, expand }) =>
+    expand ? theme.colors.menuBackground : 'none'};
+  width: ${({ expand }) => (expand ? '100%' : '0%')};
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.menuBackground};
-  width: 100%;
   height: 100vh;
   z-index: 99999;
-  animation: 300ms ease-out 0s 1 fadeIn;
+  animation: 300ms ease-out 0s 1
+    ${({ expand }) => (expand ? 'fadeIn' : 'fadeOut')};
   position: fixed;
   top: 0px;
 `
@@ -45,6 +59,8 @@ const MenuContainer = styled.div.attrs<{ expand?: boolean }>({})`
   height: 100vh;
   animation: 300ms ease-out 0s 1
     ${({ expand }) => (expand ? 'slideInFromLeft' : 'slideInFromRight')};
+  transform: ${({ expand }) =>
+    expand ? 'translateX(0)' : 'translateX(-100%)'};
 `
 const UserInfo = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -103,6 +119,7 @@ interface IMenuItem {
   icon: React.ReactNode
   iconHover?: React.ReactNode
   label: string
+  secondary?: boolean
   onClick: (e: React.MouseEvent) => void
 }
 interface IProps {
@@ -127,40 +144,44 @@ export class ExpandingMenu extends React.Component<IProps, IState> {
   }
   render() {
     return (
-      this.state.showMenu && (
-        <MenuMainWrapper onClick={this.toggleMenu}>
-          <MenuContainer
-            onClick={e => e.stopPropagation()}
-            expand={this.state.showMenu}
-          >
-            <UserInfo>
-              <Avatar />
-              <UserName>{this.props.userDetails.name}</UserName>
-              <Role>{this.props.userDetails.role}</Role>
-            </UserInfo>
+      <MenuMainWrapper onClick={this.toggleMenu} expand={this.state.showMenu}>
+        <MenuContainer
+          onClick={e => e.stopPropagation()}
+          expand={this.state.showMenu}
+        >
+          <UserInfo>
+            <Avatar />
+            <UserName>{this.props.userDetails.name}</UserName>
+            <Role>{this.props.userDetails.role}</Role>
+          </UserInfo>
+          <MenuItems>
+            {this.props.menuItems.map(
+              (item: IMenuItem, index: number) =>
+                !item.secondary && (
+                  <MenuItem key={index} onClick={item.onClick}>
+                    <Icon>{item.icon}</Icon>
+                    <IconHover>{item.iconHover || item.icon}</IconHover>
+                    {item.label}
+                  </MenuItem>
+                )
+            )}
+          </MenuItems>
+          <LogoutMenu>
             <MenuItems>
-              {this.props.menuItems.map((item: IMenuItem, index: number) => (
-                <MenuItem key={index} onClick={item.onClick}>
-                  <Icon>{item.icon}</Icon>
-                  <IconHover>{item.iconHover || item.icon}</IconHover>
-                  {item.label}
-                </MenuItem>
-              ))}
+              {this.props.menuItems.map(
+                (item: IMenuItem, index: number) =>
+                  item.secondary && (
+                    <MenuItem key={index} onClick={item.onClick}>
+                      <Icon>{item.icon}</Icon>
+                      <IconHover>{item.iconHover || item.icon}</IconHover>
+                      {item.label}
+                    </MenuItem>
+                  )
+              )}
             </MenuItems>
-            <LogoutMenu>
-              <MenuItem>
-                <Icon>
-                  <LogoutBlack />
-                </Icon>
-                <IconHover>
-                  <LogoutBlue />
-                </IconHover>
-                Logout
-              </MenuItem>
-            </LogoutMenu>
-          </MenuContainer>
-        </MenuMainWrapper>
-      )
+          </LogoutMenu>
+        </MenuContainer>
+      </MenuMainWrapper>
     )
   }
 }
