@@ -14,7 +14,7 @@ export interface IMobileHeaderProps {
 }
 
 const HeaderContainer = styled.div`
-  padding: 16px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   background: linear-gradient(
