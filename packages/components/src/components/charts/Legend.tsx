@@ -133,7 +133,9 @@ function LegendFooter({
   return (
     <FooterContainer>
       {dataPoints.map((dataPoint: ICategoryDataPoint, i) => {
-        let title = `${Math.round((dataPoint.value / total) * 100)}%`
+        let title = `${
+          total === 0 ? 0 : Math.round((dataPoint.value / total) * 100)
+        }%`
 
         if (isTotal) {
           title = dataPoint.value.toString()
