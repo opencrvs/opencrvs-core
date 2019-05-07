@@ -746,4 +746,673 @@ describe('WorkQueue tests', async () => {
 
     testComponent.component.unmount()
   })
+
+  it('should not show pagination bar if items less than 11', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATIONS_QUERY,
+          variables: {
+            status: EVENT_STATUS.DECLARED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            listEventRegistrations: {
+              totalItems: 11,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  registration: {
+                    trackingId: 'B111111',
+                    contactPhoneNumber: '01622688231',
+                    type: 'BIRTH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'অনিক'
+                      }
+                    ],
+                    birthDate: '2010-10-10'
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                },
+                {
+                  id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+                  registration: {
+                    trackingId: 'B222222',
+                    contactPhoneNumber: null,
+                    type: 'DEATH',
+                    status: [
+                      {
+                        timestamp: '2018-12-07T13:11:49.380Z',
+                        user: {
+                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          name: [
+                            {
+                              use: 'en',
+                              firstNames: 'Mohammad',
+                              familyName: 'Ashraful'
+                            },
+                            {
+                              use: 'bn',
+                              firstNames: '',
+                              familyName: ''
+                            }
+                          ],
+                          role: 'LOCAL_REGISTRAR'
+                        },
+                        location: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: ['']
+                        },
+                        office: {
+                          id: '123',
+                          name: 'Kaliganj Union Sub Center',
+                          alias: [''],
+                          address: {
+                            district: '7876',
+                            state: 'iuyiuy'
+                          }
+                        },
+                        type: 'REGISTERED'
+                      }
+                    ]
+                  },
+                  deceased: {
+                    name: [
+                      {
+                        use: 'bn',
+                        firstNames: '',
+                        familyName: 'মাসুম'
+                      }
+                    ],
+                    deceased: {
+                      deathDate: '2010-10-10'
+                    }
+                  },
+                  informant: {
+                    individual: {
+                      telecom: [
+                        {
+                          system: 'phone',
+                          value: '01622688231'
+                        }
+                      ]
+                    }
+                  },
+                  createdAt: '2018-05-23T14:44:58+02:00'
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const pagiBtn = testComponent.component.find('#pagination')
+
+    expect(pagiBtn.hostNodes()).toHaveLength(1)
+
+    testComponent.component
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.unmount()
+  })
 })

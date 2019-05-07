@@ -265,7 +265,7 @@ export class GridTable extends React.Component<
             )
           }
         )}
-        {content.length > 10 && (
+        {content.length > pageSize && (
           <Pagination
             initialPage={initialPage}
             totalPages={totalPages}
