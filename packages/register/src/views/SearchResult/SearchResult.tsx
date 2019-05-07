@@ -1,7 +1,4 @@
-import {
-  PrimaryButton,
-  SecondaryButton
-} from '@opencrvs/components/lib/buttons'
+import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import {
   Duplicate,
   Edit,
@@ -211,9 +208,6 @@ const ExpansionContainer = styled.div`
 const ExpansionContentContainer = styled.div`
   flex: 1;
   margin-left: 10px;
-`
-const StyledPrimaryButton = styled(PrimaryButton)`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
 `
 
 const StyledSecondaryButton = styled(SecondaryButton)`
@@ -624,15 +618,6 @@ export class SearchResultView extends React.Component<
           label: this.props.intl.formatMessage(messages.print),
           handler: () => this.props.goToPrintCertificate(item.id, item.event)
         })
-
-        expansionActions.push(
-          <StyledPrimaryButton
-            id={`printCertificate_${item.tracking_id}`}
-            onClick={() => this.props.goToPrintCertificate(item.id, item.event)}
-          >
-            {this.props.intl.formatMessage(messages.printCertificateBtnText)}
-          </StyledPrimaryButton>
-        )
       }
     }
 
@@ -653,22 +638,17 @@ export class SearchResultView extends React.Component<
               item.event.toLowerCase()
             )
         })
-
-        expansionActions.push(
-          <StyledPrimaryButton
-            id={`reviewAndRegisterBtn_${item.tracking_id}`}
-            onClick={() =>
-              this.props.gotoTab(
-                REVIEW_EVENT_PARENT_FORM_TAB,
-                item.id,
-                'review',
-                item.event.toLowerCase()
-              )
-            }
-          >
-            {this.props.intl.formatMessage(messages.reviewAndRegister)}
-          </StyledPrimaryButton>
-        )
+      } else if (applicationIsRejected) {
+        listItemActions.push({
+          label: this.props.intl.formatMessage(messages.review),
+          handler: () =>
+            this.props.gotoTab(
+              REVIEW_EVENT_PARENT_FORM_TAB,
+              item.id,
+              'review',
+              item.event.toLowerCase()
+            )
+        })
       }
     }
 
@@ -682,16 +662,6 @@ export class SearchResultView extends React.Component<
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
         handler: () => this.props.goToReviewDuplicate(item.id)
       })
-      expansionActions.push(
-        <StyledPrimaryButton
-          id={`reviewDuplicatesBtn_${item.tracking_id}`}
-          onClick={() => {
-            this.props.goToReviewDuplicate(item.id)
-          }}
-        >
-          {this.props.intl.formatMessage(messages.reviewDuplicates)}
-        </StyledPrimaryButton>
-      )
     }
     if (applicationIsRegistered) {
       expansionActions.push(
