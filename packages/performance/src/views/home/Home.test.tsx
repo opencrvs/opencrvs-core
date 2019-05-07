@@ -81,6 +81,18 @@ describe('when user is in the home page', () => {
                     value: 740
                   }
                 ]
+              },
+              {
+                label: 'dummy',
+                value: 0,
+                total: 0,
+                estimate: 0,
+                categoricalData: [
+                  {
+                    name: '',
+                    value: 0
+                  }
+                ]
               }
             ],
             regByAge: [

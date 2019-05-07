@@ -267,10 +267,11 @@ const getData = (
           label: (
             <FormattedHTMLMessage
               id={`graph.label${index}`}
-              defaultMessage={getKeyFigureLabel(
-                keyFigureData.label || '',
-                intl
-              )}
+              defaultMessage={
+                (keyFigureData.label &&
+                  getKeyFigureLabel(keyFigureData.label, intl)) ||
+                ''
+              }
             />
           ),
           description: `${keyFigureData.total ||
