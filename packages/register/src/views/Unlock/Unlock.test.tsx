@@ -1,17 +1,18 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent, flushPromises } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
 import { storage } from 'src/storage'
+import { pins } from './ComparePINs'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
   backSpaceElem.update()
+  backSpaceElem.simulate('click')
+  backSpaceElem.simulate('click')
+  backSpaceElem.simulate('click')
+  backSpaceElem.simulate('click')
 }
 
 describe('Unlock page loads Properly', () => {
@@ -63,6 +64,17 @@ describe('Unlock page loads Properly', () => {
       .length
     expect(errorElem).toBe(0)
   })
+})
+
+describe('For wrong inputs', async () => {
+  const { store } = createStore()
+  const testComponent = createTestComponent(
+    <Unlock onCorrectPinMatch={() => null} />,
+    store
+  )
+
+  // These tests are only for wrong inputs, so this mock fn only returns a promise of false
+  pins.comparePins = jest.fn(async (pin1, pin2) => Promise.resolve(false))
 
   it('Should Display Incorrect error message', async () => {
     clearPassword(testComponent.component)
@@ -79,16 +91,19 @@ describe('Unlock page loads Properly', () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Incorrect pin. Please try again')
-    }, 100)
+    }, 1000)
   })
 
   it('Should display the Last try message', async () => {
+    await flushPromises()
+    testComponent.component.update()
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    clearPassword(testComponent.component)
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     clearPassword(testComponent.component)
@@ -96,6 +111,8 @@ describe('Unlock page loads Properly', () => {
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     setTimeout(() => {
@@ -104,16 +121,17 @@ describe('Unlock page loads Properly', () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Last Try')
-    }, 100)
+    }, 1000)
   })
 
   it('Should display Locked Message', async () => {
-    clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     setTimeout(() => {
@@ -125,13 +143,15 @@ describe('Unlock page loads Properly', () => {
     }, 1000)
   })
 
-  it('Should display Locked Message', async () => {
+  it('Should not accept correct pin while locked', async () => {
     clearPassword(testComponent.component)
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     setTimeout(() => {

@@ -11,12 +11,12 @@ import { IUserDetails, getCurrentUserID } from '../../utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
-import * as bcrypt from 'bcryptjs'
 import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { IUserData } from 'src/drafts'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import { pins } from './ComparePINs'
 
 const messages = defineMessages({
   incorrect: {
@@ -32,6 +32,15 @@ const messages = defineMessages({
     defaultMessage: 'Locked'
   }
 })
+
+const SpinnerWrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
 
 const PageWrapper = styled.div`
   font-family: ${({ theme }) => theme.fonts.boldFont};
@@ -160,7 +169,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.setState({
       showSpinner: true
     })
-    const pinMatched = await bcrypt.compare(pin, userPin)
+    const pinMatched = await pins.comparePins(pin, userPin)
     this.setState({
       showSpinner: false
     })
@@ -241,7 +250,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.props.redirectToAuthentication()
   }
   render() {
-    return (
+    return this.state.showSpinner ? <SpinnerWrapper><Spinner id="hashingSpinner" /></SpinnerWrapper> : (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.toggleLogoutModal} id="logout">
           <span>Logout</span>
@@ -249,18 +258,12 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         </LogoutHeader>
         <Logo />
         {this.showName()}
-        {this.state.showSpinner ? (
-          <Spinner id="hashingSpinner" />
-        ) : (
-          <div>
-            {this.showErrorMessage()}
-            <PINKeypad
-              onComplete={this.onPinProvided}
-              pin={this.state.pin}
-              key={this.state.resetKey}
-            />
-          </div>
-        )}
+        {this.showErrorMessage()}
+        <PINKeypad
+          onComplete={this.onPinProvided}
+          pin={this.state.pin}
+          key={this.state.resetKey}
+        />
         <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}
