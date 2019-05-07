@@ -1,12 +1,12 @@
 import * as React from 'react'
-import styled from '../styled-components'
-import { Button } from '@opencrvs/components/lib/buttons'
+import { Button } from '../../../buttons'
+import styled from 'styled-components'
 
 interface IMenuAction {
   icon: () => React.ReactNode
   handler: () => void
 }
-interface IMobileHeaderProps {
+export interface IMobileHeaderProps {
   id?: string
   left?: IMenuAction
   title: string
