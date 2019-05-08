@@ -201,7 +201,7 @@ export class GridTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       initialPage = defaultConfiguration.initialPage
     } = this.props
-    const currentPage = initialPage
+    const { currentPage } = this.state
     const totalPages = this.props.totalPages
       ? this.props.totalPages
       : getTotalPageNumber(
@@ -256,10 +256,12 @@ export class GridTable extends React.Component<
                 </RowWrapper>
 
                 <ExpandedSectionContainer expanded={expanded}>
-                  <ExpansionContentInfo
-                    data={item}
-                    preference={this.props.expandedContentRows}
-                  />
+                  {expanded && (
+                    <ExpansionContentInfo
+                      data={item}
+                      preference={this.props.expandedContentRows}
+                    />
+                  )}
                 </ExpandedSectionContainer>
               </StyledBox>
             )
