@@ -98,8 +98,6 @@ export const profileReducer: LoopReducer<
             }
           }),
           Cmd.run(() => {
-            // save the user-id temporarily, before the
-            // SET_INITIAL_USER_DETAILS action is 'fired'
             storage.setItem('USER_ID', payload.sub)
           }),
           Cmd.action(actions.setInitialUserDetails())

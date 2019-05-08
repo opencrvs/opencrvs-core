@@ -100,7 +100,7 @@ export async function removeUserDetails() {
 export async function getCurrentUserID(): Promise<string> {
   const userIDfromTempStorage = await storage.getItem('USER_ID')
   if (userIDfromTempStorage) {
-    await storage.removeItem('USER_ID') // delete the temporary storage
+    await storage.removeItem('USER_ID')
     return userIDfromTempStorage
   } else {
     const str = await storage.getItem('USER_DETAILS')
