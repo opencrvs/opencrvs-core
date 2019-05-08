@@ -265,10 +265,11 @@ export class GridTable extends React.Component<
             )
           }
         )}
-        {content.length > pageSize && (
+
+        {totalPages > pageSize && (
           <Pagination
             initialPage={initialPage}
-            totalPages={totalPages}
+            totalPages={Math.ceil(totalPages / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}

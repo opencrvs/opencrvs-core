@@ -849,9 +849,7 @@ export class WorkQueueView extends React.Component<
                   this.onPageChange(currentPage)
                 }}
                 pageSize={this.pageSize}
-                totalPages={Math.ceil(
-                  ((drafts && drafts.length) || 0) / this.pageSize
-                )}
+                totalPages={(drafts && drafts.length) || 0}
                 initialPage={this.state.progressCurrentPage}
               />
             )}
@@ -950,11 +948,11 @@ export class WorkQueueView extends React.Component<
                         this.onPageChange(currentPage)
                       }}
                       pageSize={this.pageSize}
-                      totalPages={Math.ceil(
-                        ((data.listEventRegistrations &&
+                      totalPages={
+                        (data.listEventRegistrations &&
                           data.listEventRegistrations.totalItems) ||
-                          0) / this.pageSize
-                      )}
+                        0
+                      }
                       initialPage={this.state.reviewCurrentPage}
                       expandable={true}
                     />
@@ -1041,11 +1039,11 @@ export class WorkQueueView extends React.Component<
                         this.onPageChange(currentPage)
                       }}
                       pageSize={this.pageSize}
-                      totalPages={Math.ceil(
-                        ((data.listEventRegistrations &&
+                      totalPages={
+                        (data.listEventRegistrations &&
                           data.listEventRegistrations.totalItems) ||
-                          0) / this.pageSize
-                      )}
+                        0
+                      }
                       initialPage={this.state.updatesCurrentPage}
                       expandable={true}
                     />
