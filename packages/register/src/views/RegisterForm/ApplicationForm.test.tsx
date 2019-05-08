@@ -6,10 +6,7 @@ import {
   getItem,
   flushPromises,
   setItem,
-<<<<<<< 36a3ffd100553e83cdb8cfc4916772109b90c031
-=======
   selectOption,
->>>>>>> Rebase with master and fix tests
   getFileFromBase64String,
   validImageB64String,
   inValidImageB64String
@@ -378,51 +375,11 @@ describe('when user has starts a new application', () => {
               await flushPromises()
               app.update()
             })
-<<<<<<< 36a3ffd100553e83cdb8cfc4916772109b90c031
-            it('user should be asked about the type of documents', () => {
-              expect(
-                app
-                  .find('#whatDocToUpload_label')
-                  .hostNodes()
-<<<<<<< 0c107ba8108594d3164cc1153f9ade850e8f5327
-                  .simulate('change', {
-                    target: {
-                      files: [
-                        getFileFromBase64String(
-                          validImageB64String,
-                          'index.png',
-                          'image/png'
-                        )
-                      ]
-                    }
-                  })
-                await flushPromises()
-
-                app.update()
-
-                app
-                  .find('#action_page_back_button')
-                  .hostNodes()
-                  .simulate('click')
-                await new Promise(resolve => {
-                  setTimeout(() => {
-                    resolve()
-                  }, 100)
-                })
-=======
-                  .text()
-              ).toEqual('Which document type are you uploading?')
-=======
             it('upload button should appear now', () => {
               expect(app.find('#upload_document').hostNodes()).toHaveLength(1)
->>>>>>> Rebase with master and fix tests
             })
             describe('when image is uploaded/captured', () => {
               beforeEach(async () => {
-<<<<<<< 36a3ffd100553e83cdb8cfc4916772109b90c031
-                selectOption(app, '#whatDocToUpload', 'National ID (front)')
->>>>>>> Fix ApplicationForm tests
-=======
                 app
                   .find('#image_file_uploader_field')
                   .hostNodes()
@@ -450,7 +407,6 @@ describe('when user has starts a new application', () => {
                     resolve()
                   }, 100)
                 })
->>>>>>> Rebase with master and fix tests
 
                 app.update()
               })
@@ -487,45 +443,6 @@ describe('when user has starts a new application', () => {
                 it('uploaded image should not be available anymore', () => {
                   expect(app.find('#file_item_0').hostNodes()).toHaveLength(0)
                 })
-              })
-            })
-
-            describe('when invalid image is uploaded/captured', () => {
-              beforeEach(async () => {
-                app
-                  .find('#image_file_uploader_field')
-                  .hostNodes()
-                  .simulate('change', {
-                    target: {
-                      files: [
-                        getFileFromBase64String(
-                          inValidImageB64String,
-                          'index.png',
-                          'image/png'
-                        )
-                      ]
-                    }
-                  })
-                await flushPromises()
-
-                app.update()
-
-                app
-                  .find('#action_page_back_button')
-                  .hostNodes()
-                  .simulate('click')
-                await new Promise(resolve => {
-                  setTimeout(() => {
-                    resolve()
-                  }, 100)
-                })
-
-                app.update()
-              })
-              it('uploaded section should not appear now', () => {
-                expect(app.find('#file_list_viewer').hostNodes()).toHaveLength(
-                  0
-                )
               })
             })
 
