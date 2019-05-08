@@ -59,10 +59,7 @@ describe('verify metrics util', () => {
         { Authorization: 'bearer token' },
         2017
       )
-      expect(result).toEqual({
-        crudRate: '17.3',
-        population: '37247123'
-      })
+      expect(result).toEqual(644375)
     })
     it('Throws error if location doesnot have extension', async () => {
       fetch.mockResponse(
@@ -144,10 +141,7 @@ describe('verify metrics util', () => {
         { Authorization: 'bearer token' },
         2017
       )
-      expect(result).toEqual({
-        crudRate: '17.3',
-        population: '37247123'
-      })
+      expect(result).toEqual(644375)
     })
   })
 })

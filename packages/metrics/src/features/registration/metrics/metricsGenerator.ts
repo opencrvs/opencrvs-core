@@ -35,11 +35,6 @@ type BirthKeyFiguresData = {
   value: number
 }
 
-export type Estimation = {
-  crudRate: number
-  population: number
-}
-
 export async function regByAge(timeStart: string, timeEnd: string) {
   let metricsData: any[] = []
   for (let i = 0; i < ageIntervals.length; i++) {
@@ -94,7 +89,7 @@ export async function fetchKeyFigures(
   locationId: string,
   authHeader: IAuthHeader
 ) {
-  const estimations = await fetchEstimateByLocation(
+  const estimation = await fetchEstimateByLocation(
     locationId,
     authHeader,
     // TODO: need to adjust this when date range is properly introduced
@@ -117,7 +112,7 @@ export async function fetchKeyFigures(
     GROUP BY gender`
   )
   keyFigures.push(
-    populateBirthKeyFigurePoint(WITHIN_45_DAYS, within45DaysData, estimations)
+    populateBirthKeyFigurePoint(WITHIN_45_DAYS, within45DaysData, estimation)
   )
   /* Populating > 45D and < 365D data */
   const within1YearData: IGroupedByGender[] = await readPoints(
@@ -137,7 +132,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS_TO_1_YEAR,
       within1YearData,
-      estimations
+      estimation
     )
   )
   /* Populating < 365D data */
@@ -149,7 +144,7 @@ export async function fetchKeyFigures(
     fullData = fullData.concat(within1YearData)
   }
   keyFigures.push(
-    populateBirthKeyFigurePoint(WITHIN_1_YEAR, fullData, estimations)
+    populateBirthKeyFigurePoint(WITHIN_1_YEAR, fullData, estimation)
   )
   return keyFigures
 }
@@ -157,10 +152,10 @@ export async function fetchKeyFigures(
 const populateBirthKeyFigurePoint = (
   figureLabel: string,
   groupedByGenderData: IGroupedByGender[],
-  estimations: Estimation
+  estimation: number
 ): BirthKeyFigures => {
   if (!groupedByGenderData || groupedByGenderData === []) {
-    return generateEmptyBirthKeyFigure(figureLabel, estimations.population)
+    return generateEmptyBirthKeyFigure(figureLabel, estimation)
   }
   let percentage = 0
   let totalMale = 0
@@ -174,22 +169,18 @@ const populateBirthKeyFigurePoint = (
     }
   })
   if (totalMale + totalFemale === 0) {
-    return generateEmptyBirthKeyFigure(figureLabel, estimations.population)
+    return generateEmptyBirthKeyFigure(figureLabel, estimation)
   }
 
   /* TODO: need to implement different percentage calculation logic 
      based on different date range here */
-  percentage = Math.round(
-    ((totalMale + totalFemale) /
-      ((estimations.crudRate * estimations.population) / 1000)) *
-      100
-  )
+  percentage = Math.round(((totalMale + totalFemale) / estimation) * 100)
 
   return {
     label: figureLabel,
     value: percentage,
     total: totalMale + totalFemale,
-    estimate: estimations.population,
+    estimate: estimation,
     categoricalData: [
       {
         name: FEMALE,
