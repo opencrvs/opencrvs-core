@@ -7,7 +7,8 @@ import { InjectedFormProps } from 'redux-form'
 import {
   TextInput,
   InputField,
-  THEME_MODE
+  THEME_MODE,
+  ErrorMessage
 } from '@opencrvs/components/lib/forms'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from './stepTwoFields'
@@ -19,8 +20,7 @@ import {
   Container,
   LogoContainer,
   StyledButton,
-  FieldWrapper,
-  ErrorText
+  FieldWrapper
 } from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
@@ -173,9 +173,9 @@ export class StepTwoForm extends React.Component<
           )}
 
           {submissionError && (
-            <ErrorText>
+            <ErrorMessage>
               {intl.formatMessage(messages.codeSubmissionError)}
-            </ErrorText>
+            </ErrorMessage>
           )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
