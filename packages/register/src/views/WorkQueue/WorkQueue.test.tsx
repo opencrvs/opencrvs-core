@@ -806,7 +806,7 @@ describe('WorkQueue tests', async () => {
     testComponent.component.unmount()
   })
 
-  it('should not show pagination bar if items less than 11', async () => {
+  it('should show pagination bar if items more than 11 in ReviewTab', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
@@ -832,7 +832,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue />,
+      <WorkQueue match={{ params: { tabId: 'review' } }} />,
       store,
       graphqlMock
     )
@@ -902,6 +902,7 @@ describe('WorkQueue tests', async () => {
       .last()
       .hostNodes()
       .simulate('click')
+
     testComponent.component.unmount()
   })
 

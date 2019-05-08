@@ -692,9 +692,11 @@ export class WorkQueueView extends React.Component<
   onPageChange = (newPageNumber: number) => {
     if (this.props.tabId === TAB_ID.inProgress) {
       this.setState({ progressCurrentPage: newPageNumber })
-    } else if (this.props.tabId === TAB_ID.readyForReview) {
+    }
+    if (this.props.tabId === TAB_ID.readyForReview) {
       this.setState({ reviewCurrentPage: newPageNumber })
-    } else if (this.props.tabId === TAB_ID.sentForUpdates) {
+    }
+    if (this.props.tabId === TAB_ID.sentForUpdates) {
       this.setState({ updatesCurrentPage: newPageNumber })
     }
   }
