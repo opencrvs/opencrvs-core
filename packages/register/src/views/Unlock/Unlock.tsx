@@ -247,10 +247,15 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   logout = () => {
     storage.removeItem(SCREEN_LOCK)
+    storage.removeItem(SECURITY_PIN_EXPIRED_AT)
     this.props.redirectToAuthentication()
   }
   render() {
-    return this.state.showSpinner ? <SpinnerWrapper><Spinner id="hashingSpinner" /></SpinnerWrapper> : (
+    return this.state.showSpinner ? (
+      <SpinnerWrapper>
+        <Spinner id="hashingSpinner" />
+      </SpinnerWrapper>
+    ) : (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.toggleLogoutModal} id="logout">
           <span>Logout</span>
