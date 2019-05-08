@@ -640,7 +640,7 @@ export class SearchResultView extends React.Component<
         })
       } else if (applicationIsRejected) {
         listItemActions.push({
-          label: this.props.intl.formatMessage(messages.review),
+          label: this.props.intl.formatMessage(messages.reject),
           handler: () =>
             this.props.gotoTab(
               REVIEW_EVENT_PARENT_FORM_TAB,

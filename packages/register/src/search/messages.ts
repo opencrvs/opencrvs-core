@@ -339,5 +339,10 @@ export const messages = defineMessages({
     defaultMessage:
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     description: 'The total result text'
+  },
+  reject: {
+    id: 'register.SearchResult.reject',
+    defaultMessage: 'Update',
+    description: 'The title of reject button in list item actions'
   }
 })

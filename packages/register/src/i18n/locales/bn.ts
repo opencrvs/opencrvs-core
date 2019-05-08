@@ -957,6 +957,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {“{param}” এর জন্য কোন ফলাফল পাওয়া যায়নি} other {“{param}” এর অনুসন্ধান ফলাফল}}',
     'register.SearchResult.totalResultText':
-      '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} '
+      '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
+    'register.SearchResult.reject': 'হালনাগাদ'
   }
 }
