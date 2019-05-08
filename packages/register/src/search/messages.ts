@@ -344,5 +344,10 @@ export const messages = defineMessages({
     id: 'register.SearchResult.reject',
     defaultMessage: 'Update',
     description: 'The title of reject button in list item actions'
+  },
+  rejectComments: {
+    id: 'register.SearchResult.rejectComments',
+    defaultMessage: 'Comments',
+    description: 'The rejected comments'
   }
 })

@@ -55,7 +55,8 @@ import {
   LANG_EN,
   LOCAL_DATE_FORMAT,
   REJECTED,
-  REJECT_REASON
+  REJECT_REASON,
+  REJECT_COMMENTS
 } from 'src/utils/constants'
 import {
   createNamesMap,
@@ -417,6 +418,14 @@ export class SearchResultView extends React.Component<
               REJECT_REASON
             )) ||
           '',
+        rejectComments:
+          (status &&
+            status.type === REJECTED &&
+            extractCommentFragmentValue(
+              status.comments as GQLComment[],
+              REJECT_COMMENTS
+            )) ||
+          '',
         informantContactNumber: contactInfo && contactInfo.value
       }
     })
@@ -457,6 +466,7 @@ export class SearchResultView extends React.Component<
                   collectorName,
                   collectorType,
                   rejectReasons,
+                  rejectComments,
                   informantContactNumber
                 } = status
                 const type = status.type as string
@@ -507,10 +517,16 @@ export class SearchResultView extends React.Component<
                         />
                       </ValueContainer>
                       {rejectReasons && (
-                        <LabelValue
-                          label={intl.formatMessage(messages.rejectReason)}
-                          value={rejectReasons}
-                        />
+                        <>
+                          <LabelValue
+                            label={intl.formatMessage(messages.rejectReason)}
+                            value={rejectReasons}
+                          />
+                          <LabelValue
+                            label={intl.formatMessage(messages.rejectComments)}
+                            value={rejectComments}
+                          />
+                        </>
                       )}
                     </ExpansionContentContainer>
                   </ExpansionContainer>
