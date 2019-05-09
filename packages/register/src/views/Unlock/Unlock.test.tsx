@@ -4,6 +4,7 @@ import { createTestComponent } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
 import { storage } from 'src/storage'
+import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -170,6 +171,9 @@ describe('Logout Sequence', async () => {
     store
   )
 
+  const indexedDB = { screenLock: 'true' }
+  storage.removeItem = jest.fn(key => delete indexedDB[key])
+
   it('Should Pop the Logout modal', () => {
     testComponent.component
       .find('#logout')
@@ -180,5 +184,13 @@ describe('Logout Sequence', async () => {
       .find('#logout_confirm')
       .hostNodes().length
     expect(modalIsDisplayed).toBe(1)
+  })
+
+  it('Should remove the indexeddb entries related to screen lock', () => {
+    testComponent.component
+      .find('#logout_confirm')
+      .hostNodes()
+      .simulate('click')
+    expect(indexedDB[SCREEN_LOCK]).toBeFalsy()
   })
 })
