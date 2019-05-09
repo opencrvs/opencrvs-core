@@ -14,6 +14,7 @@ import { IDynamicValues, IExpandedContentPreference, IStatus } from './types'
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
   margin-bottom: 1px;
+  border-top: ${({ theme }) => `2px solid ${theme.colors.seperatorBorder}`};
 `
 const ExpansionContainer = styled.div`
   flex: 1;

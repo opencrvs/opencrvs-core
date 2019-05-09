@@ -222,6 +222,9 @@ class GridTableExample extends React.Component {
         ]}
         noResultText="No result to display"
         expandable={false}
+        itemPerPage={10}
+        totalItems={(list && list.length) || 0}
+        initialPage={1}
       />
     )
   }

@@ -83,7 +83,7 @@ export class Pagination extends React.Component<
     }
 
     return (
-      <PaginationContainer>
+      <PaginationContainer id="pagination">
         <Icon
           onClick={() => {
             this.changePage(currentPage - 1)
