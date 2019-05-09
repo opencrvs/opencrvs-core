@@ -8,7 +8,7 @@ const {
   SettingsBlue,
   HelpBlack,
   HelpBlue,
-  LogoutBlack,
+  LogoutDark,
   LogoutBlue,
   Hamburger
 } = require('../../icons')
@@ -39,7 +39,7 @@ const menuItems = [
     onClick: () => alert('on Click Event')
   },
   {
-    icon: <LogoutBlack />,
+    icon: <LogoutDark />,
     iconHover: <LogoutBlue />,
     label: 'Logout',
     secondary: true,

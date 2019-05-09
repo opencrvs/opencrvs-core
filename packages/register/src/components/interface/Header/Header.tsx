@@ -11,7 +11,7 @@ import {
   SettingsBlue,
   HelpBlack,
   HelpBlue,
-  LogoutBlack,
+  LogoutDark,
   LogoutBlue
 } from '@opencrvs/components/lib/icons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
@@ -114,7 +114,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         onClick: () => alert('Help!')
       },
       {
-        icon: <LogoutBlack />,
+        icon: <LogoutDark />,
         iconHover: <LogoutBlue />,
         label: 'Logout',
         secondary: true,
