@@ -57,13 +57,11 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
-  border-top: ${({ theme, expanded }) =>
-    expanded ? `2px solid ${theme.colors.seperatorBorder}` : 'none'};
   margin-top: 5px;
   overflow: hidden;
-  transition: max-height 600ms;
+  transition-property: all;
+  transition-duration: 0.5s;
   max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
-  animation: ${fadeIn} 600ms;
 `
 
 export enum ColumnContentAlignment {
@@ -269,10 +267,11 @@ export class GridTable extends React.Component<
             )
           }
         )}
-        {content.length > 0 && (
+
+        {totalPages > pageSize && (
           <Pagination
             initialPage={initialPage}
-            totalPages={totalPages}
+            totalPages={Math.ceil(totalPages / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}
