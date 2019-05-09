@@ -682,7 +682,7 @@ export class WorkQueueView extends React.Component<
       ]
       return {
         id: draft.id,
-        event: (draft.event && draft.event.toUpperCase()) || '',
+        event: (draft.event && sentenceCase(draft.event)) || '',
         name: name || '',
         date_of_modification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||
