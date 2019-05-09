@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.boldFont};
   font-size: 16px;
   margin: 60px 0 25px;
@@ -21,8 +21,8 @@ const TableHeader = styled.div`
 
 const StyledBox = styled(Box)`
   margin-top: 15px;
-  padding: 12px 0px 0px 0px;
-  color: ${({ theme }) => theme.colors.placeholder};
+  padding: 12px 0px 5px 0px;
+  color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 16px;
   line-height: 22px;
@@ -38,7 +38,7 @@ const ErrorText = styled.div`
 const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   width: 100%;
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
-  padding: 0 25px;
+  padding: 0 24px;
 `
 
 const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
