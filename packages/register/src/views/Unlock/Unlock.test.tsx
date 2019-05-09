@@ -125,9 +125,27 @@ describe('Unlock page loads Properly', () => {
     }, 1000)
   })
 
-  it('Should display Locked Message', async () => {
+  it('Should keep displaying the locked message on further attempts', async () => {
     clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
+  })
+
+  it('Should not accept the correct pin when locked', async () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
