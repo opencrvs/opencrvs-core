@@ -37,7 +37,7 @@ import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { Header } from 'src/components/interface/Header/Header'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
 import { IDraft } from 'src/drafts'
 import { Event } from 'src/forms'
@@ -45,8 +45,8 @@ import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction,
-  goToSearchResult
+  goToSearchResult,
+  goToTab as goToTabAction
 } from 'src/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -267,7 +267,7 @@ const messages = defineMessages({
 const Container = styled.div`
   z-index: 1;
   position: relative;
-  margin-top: -30px;
+  margin-top: 10px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
 const StyledPlusIcon = styled(Plus)`
@@ -702,32 +702,13 @@ export class WorkQueueView extends React.Component<
   }
 
   render() {
-    const { theme, intl, userDetails, language, tabId, drafts } = this.props
+    const { theme, intl, userDetails, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
 
-    let fullName = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
-      ) as GQLHumanName
-      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    }
-
-    const role =
-      userDetails && userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
-        : ''
-
     return (
       <>
-        <HomeViewHeader
-          title={intl.formatMessage(messages.hello, {
-            fullName
-          })}
-          description={role}
-          id="home_view"
-        />
+        <Header />
         <Container>
           <HeaderContent>
             <StyledIconAction
