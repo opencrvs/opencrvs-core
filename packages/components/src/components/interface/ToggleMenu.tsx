@@ -67,7 +67,7 @@ const MenuItemLabel = styled.span`
   line-height: 24px;
   margin: 13px;
 `
-export interface IMenuItem {
+export interface IToggleMenuItem {
   label: string
   icon: JSX.Element
   handler: () => void
@@ -77,7 +77,7 @@ interface IProps {
   id: string
   menuHeader: JSX.Element
   toggleButton: JSX.Element
-  menuItems: IMenuItem[]
+  menuItems: IToggleMenuItem[]
 }
 
 interface IState {
@@ -123,7 +123,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
-              {menuItems.map((mi: IMenuItem, index) => (
+              {menuItems.map((mi: IToggleMenuItem, index) => (
                 <MenuItem key={`${id}-${index}`} onClick={mi.handler}>
                   {mi.icon && <MenuItemIcon>{mi.icon}</MenuItemIcon>}
                   <MenuItemLabel>{mi.label}</MenuItemLabel>

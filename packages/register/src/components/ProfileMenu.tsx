@@ -7,7 +7,7 @@ import {
   defineMessages,
   InjectedIntl
 } from 'react-intl'
-import { IMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
+import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
 import {
   Settings,
   LogoutDark,
@@ -106,8 +106,8 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     }))
   }
 
-  getMenuItems = (intl: InjectedIntl): IMenuItem[] => {
-    const items = [] as IMenuItem[]
+  getMenuItems = (intl: InjectedIntl): IToggleMenuItem[] => {
+    const items = [] as IToggleMenuItem[]
     items.push({
       icon: <Settings />,
       label: intl.formatMessage(messages.settings),
