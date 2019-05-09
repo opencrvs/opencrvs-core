@@ -950,6 +950,13 @@ export const ENGLISH_STATE: ILanguage = {
     'unlockApp.lastTry': 'Last Try',
     'unlockApp.locked':
       'your account has been locked. Please try again in 1 minute.',
-    'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format'
+    'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
+    'register.SearchResult.searchingFor': 'Searching for “{param}”',
+    'register.SearchResult.searchResultFor':
+      '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
+    'register.SearchResult.totalResultText':
+      '{total, plural, =0 {} one {# record found} other {# records found}} ',
+    'register.SearchResult.reject': 'Update',
+    'register.SearchResult.rejectComments': 'Comments'
   }
 }

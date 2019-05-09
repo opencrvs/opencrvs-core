@@ -322,5 +322,32 @@ export const messages = defineMessages({
     id: 'register.SearchResult.informantContact',
     defaultMessage: 'Informant contact number',
     description: 'The rejected reason'
+  },
+  searchingFor: {
+    id: 'register.SearchResult.searchingFor',
+    defaultMessage: 'Searching for “{param}”',
+    description: 'The searching for text'
+  },
+  searchResultFor: {
+    id: 'register.SearchResult.searchResultFor',
+    defaultMessage:
+      '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
+    description: 'The search result text'
+  },
+  totalResultText: {
+    id: 'register.SearchResult.totalResultText',
+    defaultMessage:
+      '{total, plural, =0 {} one {# record found} other {# records found}} ',
+    description: 'The total result text'
+  },
+  reject: {
+    id: 'register.SearchResult.reject',
+    defaultMessage: 'Update',
+    description: 'The title of reject button in list item actions'
+  },
+  rejectComments: {
+    id: 'register.SearchResult.rejectComments',
+    defaultMessage: 'Comments',
+    description: 'The rejected comments'
   }
 })

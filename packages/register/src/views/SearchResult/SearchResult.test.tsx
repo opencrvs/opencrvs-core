@@ -84,7 +84,6 @@ describe('SearchResult tests', async () => {
                   type: 'Death',
                   registration: {
                     status: 'DECLARED',
-                    dateOfApplication: '2019-04-10T07:51:35.698Z',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
@@ -106,7 +105,6 @@ describe('SearchResult tests', async () => {
                   type: 'Death',
                   registration: {
                     status: 'REJECTED',
-                    dateOfApplication: '2019-04-10T07:55:39.307Z',
                     trackingId: 'DXMJPYA',
                     registrationNumber: null,
                     registeredLocationId:
@@ -132,7 +130,6 @@ describe('SearchResult tests', async () => {
                   type: 'Birth',
                   registration: {
                     status: 'REGISTERED',
-                    dateOfApplication: '2019-04-11T09:39:20.845Z',
                     trackingId: 'BQRZWDR',
                     registrationNumber: '2019333494BQRZWDR2',
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
@@ -154,7 +151,6 @@ describe('SearchResult tests', async () => {
                   type: 'Birth',
                   registration: {
                     status: 'CERTIFIED',
-                    dateOfApplication: '2019-04-11T06:30:18.273Z',
                     trackingId: 'B3DBJMP',
                     registrationNumber: '2019333494B3DBJMP5',
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
@@ -198,7 +194,6 @@ describe('SearchResult tests', async () => {
         name: 'ইলিয়াস খান',
         dob: '',
         dod: '01-01-2007',
-        date_of_application: '10-04-2019',
         registrationNumber: '',
         tracking_id: 'DW0UTHR',
         event: 'Death',
@@ -211,7 +206,6 @@ describe('SearchResult tests', async () => {
         name: 'জহির রায়হান',
         dob: '',
         dod: '01-01-2010',
-        date_of_application: '10-04-2019',
         registrationNumber: '',
         tracking_id: 'DXMJPYA',
         event: 'Death',
@@ -224,7 +218,6 @@ describe('SearchResult tests', async () => {
         name: 'ফকরুল ইসলাম',
         dob: '01-01-2010',
         dod: '',
-        date_of_application: '11-04-2019',
         registrationNumber: '2019333494BQRZWDR2',
         tracking_id: 'BQRZWDR',
         event: 'Birth',
@@ -237,7 +230,6 @@ describe('SearchResult tests', async () => {
         name: 'রফিক ইসলাম',
         dob: '01-01-2008',
         dod: '',
-        date_of_application: '11-04-2019',
         registrationNumber: '2019333494B3DBJMP5',
         tracking_id: 'B3DBJMP',
         event: 'Birth',
@@ -316,7 +308,6 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'REGISTERED',
-                      dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: '123456789098765432',
                       registeredLocationId:
@@ -464,7 +455,6 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'CERTIFIED',
-                      dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: '123456789098765432',
                       registeredLocationId:
@@ -570,7 +560,6 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'REJECTED',
-                      dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
@@ -725,7 +714,6 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'DECLARED',
-                      dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
@@ -868,7 +856,6 @@ describe('SearchResult tests', async () => {
                     type: '',
                     registration: {
                       status: 'DECLARED',
-                      dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
@@ -1016,7 +1003,6 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'DECLARED',
-                      dateOfApplication: '2019-04-03T08:56:12.031Z',
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
