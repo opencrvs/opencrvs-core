@@ -16,6 +16,7 @@ import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { IUserData } from 'src/drafts'
+import { ErrorMessage } from '@opencrvs/components/lib/forms'
 
 const messages = defineMessages({
   incorrect: {
