@@ -143,6 +143,25 @@ describe('For wrong inputs', async () => {
     }, 1000)
   })
 
+  it('Should not accept any attempt during timeout', async () => {
+    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+
+    await flushPromises()
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
+  })
+
   it('Should not accept correct pin while locked', async () => {
     clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-0').hostNodes()
