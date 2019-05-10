@@ -59,7 +59,10 @@ describe('verify metrics util', () => {
         { Authorization: 'bearer token' },
         2017
       )
-      expect(result).toEqual(644375)
+      expect(result).toEqual({
+        estimation: 644375,
+        locationId: '1'
+      })
     })
     it('Throws error if location doesnot have extension', async () => {
       fetch.mockResponse(
@@ -95,7 +98,7 @@ describe('verify metrics util', () => {
         fetchEstimateByLocation('1', { Authorization: 'bearer token' }, 2017)
       ).rejects.toThrowError('Unable to fetch estimate data from location tree')
     })
-    it('Throws error if location is not partOf address', async () => {
+    it('Returns the estimatedFigures for right location', async () => {
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -141,7 +144,10 @@ describe('verify metrics util', () => {
         { Authorization: 'bearer token' },
         2017
       )
-      expect(result).toEqual(644375)
+      expect(result).toEqual({
+        estimation: 644375,
+        locationId: '0'
+      })
     })
   })
 })

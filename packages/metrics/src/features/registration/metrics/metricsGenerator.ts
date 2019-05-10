@@ -35,6 +35,11 @@ type BirthKeyFiguresData = {
   value: number
 }
 
+export type Estimation = {
+  estimation: number
+  locationId: string
+}
+
 export async function regByAge(timeStart: string, timeEnd: string) {
   let metricsData: any[] = []
   for (let i = 0; i < ageIntervals.length; i++) {
@@ -89,7 +94,7 @@ export async function fetchKeyFigures(
   locationId: string,
   authHeader: IAuthHeader
 ) {
-  const estimation = await fetchEstimateByLocation(
+  const estimatedFigure = await fetchEstimateByLocation(
     locationId,
     authHeader,
     // TODO: need to adjust this when date range is properly introduced
@@ -97,22 +102,26 @@ export async function fetchKeyFigures(
   )
 
   const keyFigures: BirthKeyFigures[] = []
-
+  const queryLocationId = `Location/${estimatedFigure.locationId}`
   /* Populating < 45D data */
   const within45DaysData: IGroupedByGender[] = await readPoints(
     `SELECT COUNT(age_in_days) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}      
-      AND ( locationLevel2 = 'Location/${locationId}' 
-          OR locationLevel3 = 'Location/${locationId}'
-          OR locationLevel4 = 'Location/${locationId}' 
-          OR locationLevel5 = 'Location/${locationId}' )
+      AND ( locationLevel2 = '${queryLocationId}' 
+          OR locationLevel3 = '${queryLocationId}'
+          OR locationLevel4 = '${queryLocationId}' 
+          OR locationLevel5 = '${queryLocationId}' )
       AND age_in_days <= 45
     GROUP BY gender`
   )
   keyFigures.push(
-    populateBirthKeyFigurePoint(WITHIN_45_DAYS, within45DaysData, estimation)
+    populateBirthKeyFigurePoint(
+      WITHIN_45_DAYS,
+      within45DaysData,
+      estimatedFigure.estimation
+    )
   )
   /* Populating > 45D and < 365D data */
   const within1YearData: IGroupedByGender[] = await readPoints(
@@ -120,10 +129,10 @@ export async function fetchKeyFigures(
       FROM birth_reg
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}      
-      AND ( locationLevel2 = 'Location/${locationId}' 
-          OR locationLevel3 = 'Location/${locationId}'
-          OR locationLevel4 = 'Location/${locationId}' 
-          OR locationLevel5 = 'Location/${locationId}' )
+      AND ( locationLevel2 = '${queryLocationId}' 
+          OR locationLevel3 = '${queryLocationId}'
+          OR locationLevel4 = '${queryLocationId}' 
+          OR locationLevel5 = '${queryLocationId}' )      
       AND age_in_days > 45
       AND age_in_days <= 365      
     GROUP BY gender`
@@ -132,7 +141,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS_TO_1_YEAR,
       within1YearData,
-      estimation
+      estimatedFigure.estimation
     )
   )
   /* Populating < 365D data */
@@ -144,7 +153,11 @@ export async function fetchKeyFigures(
     fullData = fullData.concat(within1YearData)
   }
   keyFigures.push(
-    populateBirthKeyFigurePoint(WITHIN_1_YEAR, fullData, estimation)
+    populateBirthKeyFigurePoint(
+      WITHIN_1_YEAR,
+      fullData,
+      estimatedFigure.estimation
+    )
   )
   return keyFigures
 }

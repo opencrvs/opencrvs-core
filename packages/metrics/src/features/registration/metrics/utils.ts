@@ -1,5 +1,5 @@
 import * as moment from 'moment'
-import { BirthKeyFigures } from './metricsGenerator'
+import { BirthKeyFigures, Estimation } from './metricsGenerator'
 import {
   MALE,
   FEMALE,
@@ -79,7 +79,7 @@ export const fetchEstimateByLocation = async (
   locationId: string,
   authHeader: IAuthHeader,
   estimatedYear: number
-): Promise<number> => {
+): Promise<Estimation> => {
   let crudRate: number = 0
   let population: number = 0
 
@@ -133,7 +133,10 @@ export const fetchEstimateByLocation = async (
       estimatedYear
     )
   }
-  return Math.round((crudRate * population) / 1000)
+  return {
+    estimation: Math.round((crudRate * population) / 1000),
+    locationId
+  }
 }
 
 export const fetchLocation = async (
