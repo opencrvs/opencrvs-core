@@ -1,15 +1,15 @@
 import React = require('react')
 import styled from 'styled-components'
+import { Button } from '../buttons'
 
 const ToggleMenuContainer = styled.div`
   position: relative;
-  display: inline-block;
+  display: flex;
+  button {
+    padding: 0;
+    height: auto;
+  }
 `
-const ToggleButtonContainer = styled.div`
-  display: block;
-  cursor: pointer;
-`
-
 const MenuContainer = styled.ul`
   border-radius: 2px;
   background-color: ${({ theme }) => theme.colors.white};
@@ -114,12 +114,9 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer>
-          <ToggleButtonContainer
-            id={`${id}ToggleButton`}
-            onClick={this.showMenu}
-          >
+          <Button id={`${id}ToggleButton`} onClick={this.showMenu}>
             {toggleButton}
-          </ToggleButtonContainer>
+          </Button>
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
