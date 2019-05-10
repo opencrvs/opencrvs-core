@@ -22,35 +22,35 @@ interface IGroupedByGender {
   gender: string
 }
 
-export type BirthKeyFigures = {
+export interface IBirthKeyFigures {
   label: string
   value: number
   total: number
   estimate: number
-  categoricalData: BirthKeyFiguresData[]
+  categoricalData: IBirthKeyFiguresData[]
 }
 
-type BirthKeyFiguresData = {
+interface IBirthKeyFiguresData {
   name: string
   value: number
 }
 
-export type Estimation = {
+export interface IEstimation {
   estimation: number
   locationId: string
 }
 
 export async function regByAge(timeStart: string, timeEnd: string) {
-  let metricsData: any[] = []
-  for (let i = 0; i < ageIntervals.length; i++) {
+  const metricsData: any[] = []
+  for (const ageInterval of ageIntervals) {
     const points = await readPoints(
       `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > ${
-        ageIntervals[i].minAgeInDays
-      } AND age_in_days <= ${ageIntervals[i].maxAgeInDays}`
+        ageInterval.minAgeInDays
+      } AND age_in_days <= ${ageInterval.maxAgeInDays}`
     )
 
     metricsData.push({
-      label: ageIntervals[i].title,
+      label: ageInterval.title,
       value: (points && points.length > 0 && points[0].count) || 0
     })
   }
@@ -63,8 +63,8 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
   const points = await readPoints(
     `
       SELECT COUNT(age_in_days) AS count
-        FROM birth_reg 
-      WHERE time >= ${timeStart} AND time <= ${timeEnd} 
+        FROM birth_reg
+      WHERE time >= ${timeStart} AND time <= ${timeEnd}
         GROUP BY time(${interval})
     `
   )
@@ -101,8 +101,9 @@ export async function fetchKeyFigures(
     new Date().getFullYear()
   )
 
-  const keyFigures: BirthKeyFigures[] = []
+  const keyFigures: IBirthKeyFigures[] = []
   const queryLocationId = `Location/${estimatedFigure.locationId}`
+
   /* Populating < 45D data */
   const within45DaysData: IGroupedByGender[] = await readPoints(
     `SELECT COUNT(age_in_days) AS total
@@ -134,7 +135,7 @@ export async function fetchKeyFigures(
           OR locationLevel4 = '${queryLocationId}' 
           OR locationLevel5 = '${queryLocationId}' )      
       AND age_in_days > 45
-      AND age_in_days <= 365      
+      AND age_in_days <= 365
     GROUP BY gender`
   )
   keyFigures.push(
@@ -166,7 +167,7 @@ const populateBirthKeyFigurePoint = (
   figureLabel: string,
   groupedByGenderData: IGroupedByGender[],
   estimation: number
-): BirthKeyFigures => {
+): IBirthKeyFigures => {
   if (!groupedByGenderData || groupedByGenderData === []) {
     return generateEmptyBirthKeyFigure(figureLabel, estimation)
   }
@@ -185,7 +186,7 @@ const populateBirthKeyFigurePoint = (
     return generateEmptyBirthKeyFigure(figureLabel, estimation)
   }
 
-  /* TODO: need to implement different percentage calculation logic 
+  /* TODO: need to implement different percentage calculation logic
      based on different date range here */
   percentage = Math.round(((totalMale + totalFemale) / estimation) * 100)
 

@@ -1,5 +1,5 @@
 import * as moment from 'moment'
-import { BirthKeyFigures, Estimation } from './metricsGenerator'
+import { IBirthKeyFigures, IEstimation } from './metricsGenerator'
 import {
   MALE,
   FEMALE,
@@ -56,7 +56,7 @@ export const calculateInterval = (startTime: string, endTime: string) => {
 export const generateEmptyBirthKeyFigure = (
   label: string,
   estimate: number
-): BirthKeyFigures => {
+): IBirthKeyFigures => {
   return {
     label,
     value: 0,
@@ -79,7 +79,7 @@ export const fetchEstimateByLocation = async (
   locationId: string,
   authHeader: IAuthHeader,
   estimatedYear: number
-): Promise<Estimation> => {
+): Promise<IEstimation> => {
   let crudRate: number = 0
   let population: number = 0
 
