@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { IMenuItem, Menu } from './Menu'
 import { HeaderLogo } from '../../../icons'
 
-interface IProps {
+export interface IDesktopHeaderProps {
   menuItems: IMenuItem[]
 }
 
@@ -18,7 +18,7 @@ const HeaderContainer = styled.div`
   );
 `
 
-export class DesktopHeader extends React.Component<IProps> {
+export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
   render() {
     const { menuItems } = this.props
 
