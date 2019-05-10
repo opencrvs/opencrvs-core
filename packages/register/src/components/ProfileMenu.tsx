@@ -9,8 +9,8 @@ import {
 } from 'react-intl'
 import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
 import {
-  Settings,
-  LogoutDark,
+  SettingsBlack,
+  LogoutBlack,
   ProfileIcon
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from 'src/store'
@@ -109,12 +109,12 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   getMenuItems = (intl: InjectedIntl): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
-      icon: <Settings />,
+      icon: <SettingsBlack />,
       label: intl.formatMessage(messages.settings),
       handler: () => alert('Settings')
     })
     items.push({
-      icon: <LogoutDark />,
+      icon: <LogoutBlack />,
       label: intl.formatMessage(messages.logout),
       handler: () => {
         this.toggleLogoutModal()
