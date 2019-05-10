@@ -11,7 +11,7 @@ import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
 import {
   SettingsBlack,
   LogoutBlack,
-  ProfileIcon
+  AvatarSmall
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from 'src/store'
 import { IUserDetails } from 'src/utils/userUtils'
@@ -162,7 +162,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
       <>
         <ToggleMenu
           id="ProfileMenu"
-          toggleButton={<ProfileIcon />}
+          toggleButton={<AvatarSmall />}
           menuHeader={this.getMenuHeader(intl, language, userDetails)}
           menuItems={this.getMenuItems(intl)}
         />

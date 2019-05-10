@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const ProfileIcon = (props: React.HTMLAttributes<SVGElement>) => (
+export const AvatarSmall = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={40} height={40} fill="none" {...props}>
     <circle cx={20} cy={20} r={20} fill="#35495D" />
     <path
