@@ -10,21 +10,25 @@ import { getUserDetails } from 'src/profile/profileSelectors'
 import { IStoreState } from 'src/store'
 import { IUserDetails } from 'src/utils/userUtils'
 import { StatusProgress } from '@opencrvs/components/lib/icons'
-import { SubPage } from '@opencrvs/components/lib/interface'
-import {
-  IStatus,
-  GQLRegStatus
-} from '@opencrvs/components/lib/interface/GridTable/types'
+import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { Event, IFormSectionData } from 'src/forms'
+import { getDraftApplicantFullName } from 'src/utils/draftUtils'
 import styled from 'styled-components'
 import { createNamesMap } from 'src/utils/data-formatting'
 import { formatLongDate } from 'src/utils/date-formatting'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema.d'
+import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Event } from '@opencrvs/register/src/forms'
+import {
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM
+} from 'src/navigation/routes'
+import { Query } from 'react-apollo'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
+import * as Sentry from '@sentry/browser'
 
 const HistoryWrapper = styled.div`
-  padding: 10px 25px;
-  margin: 20px 0px;
+  padding: 10px 0px;
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -51,10 +55,33 @@ const ValueContainer = styled.div`
   flex-wrap: wrap;
   line-height: 1.3em;
 `
-const ExpansionContentContainer = styled.div`
+const StatusContainer = styled.div`
   flex: 1;
   margin-left: 10px;
 `
+const ActionButton = styled(PrimaryButton)`
+  margin: 20px 25px 30px;
+`
+const QuerySpinner = styled(Spinner)`
+  width: 70px;
+  height: 70px;
+  top: 150px !important;
+`
+const SpinnerContainer = styled.div`
+  min-height: 70px;
+  min-width: 70px;
+  display: flex;
+  justify-content: center;
+`
+
+enum ApplicationStatus {
+  DRAFT_STARTED = 'DRAFT_STARTED',
+  DRAFT_MODIFIED = 'DRAFT_MODIFIED',
+  DECLARED = 'DECLARED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED'
+}
 
 interface IDetailProps {
   language: string
@@ -63,6 +90,20 @@ interface IDetailProps {
   userDetails: IUserDetails
   goToTab: typeof goToTabAction
   goToHome: typeof goToHomeAction
+}
+
+interface IStatus {
+  type: ApplicationStatus | null
+  practitionerName: string
+  timestamp: string | null
+  practitionerRole: string
+  officeName: string | Array<string | null> | null
+}
+
+interface IHistoryData {
+  title: string
+  history: IStatus[]
+  action?: React.ReactElement
 }
 
 const messages = defineMessages({
@@ -134,6 +175,11 @@ const messages = defineMessages({
     id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
+  },
+  update: {
+    id: 'register.workQueue.list.buttons.update',
+    defaultMessage: 'Update',
+    description: 'The title of update button in list item actions'
   }
 })
 
@@ -165,40 +211,30 @@ function ValuesWithSeparator(props: {
   )
 }
 
-const getFullName = (
-  sectionData: IFormSectionData,
+function generateHistoryEntry(
+  type: ApplicationStatus,
+  name: GQLHumanName[] | undefined,
+  date: string,
+  role: string,
+  office: string,
   language: string = 'en'
-): string => {
-  let fullName = ''
-
-  if (language === 'en') {
-    if (sectionData.firstNames) {
-      fullName = `${sectionData.firstNamesEng as string} ${sectionData.familyNameEng as string}`
-    } else {
-      fullName = sectionData.familyNameEng as string
-    }
-  } else {
-    if (sectionData.firstNames) {
-      fullName = `${sectionData.firstNames as string} ${sectionData.familyName as string}`
-    } else {
-      fullName = sectionData.familyName as string
-    }
+): IStatus {
+  return {
+    type,
+    practitionerName:
+      (name && (createNamesMap(name)[language] as string)) ||
+      (name &&
+        /* tslint:disable:no-string-literal */
+        (createNamesMap(name)['default'] as string)) ||
+      /* tslint:enable:no-string-literal */
+      '',
+    timestamp: (date && formatLongDate(date, language, 'LL')) || null,
+    practitionerRole: role,
+    officeName: office
   }
-  return fullName
 }
 
 class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
-  getDraftApplicantName() {
-    const draft = this.props.draft
-    switch (draft.event) {
-      case Event.BIRTH:
-        return getFullName(draft.data.child, this.props.language)
-      case Event.DEATH:
-        return getFullName(draft.data.deceased, this.props.language)
-      default:
-        return ''
-    }
-  }
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DRAFT_STARTED':
@@ -217,6 +253,69 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         return messages.workflowStatusDateApplication
     }
   }
+
+  generateDraftHistorData = (): IHistoryData => {
+    const { draft, userDetails } = this.props
+    const history: IStatus[] = []
+    history.push(
+      generateHistoryEntry(
+        ApplicationStatus.DRAFT_STARTED,
+        userDetails.name as GQLHumanName[],
+        (draft.savedOn && new Date(draft.savedOn).toString()) || '',
+        userDetails && userDetails.role
+          ? this.props.intl.formatMessage(messages[userDetails.role as string])
+          : '',
+        (userDetails &&
+          userDetails.primaryOffice &&
+          userDetails.primaryOffice.name) ||
+          ''
+      )
+    )
+    if (draft.modifiedOn) {
+      history.push(
+        generateHistoryEntry(
+          ApplicationStatus.DRAFT_MODIFIED,
+          userDetails.name as GQLHumanName[],
+          new Date(draft.modifiedOn).toString(),
+          userDetails && userDetails.role
+            ? this.props.intl.formatMessage(
+                messages[userDetails.role as string]
+              )
+            : '',
+          (userDetails &&
+            userDetails.primaryOffice &&
+            userDetails.primaryOffice.name) ||
+            ''
+        )
+      )
+    }
+    const tabRoute =
+      draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
+    return {
+      title: getDraftApplicantFullName(draft, this.props.language),
+      history,
+      action: (
+        <ActionButton
+          id="draft_update"
+          onClick={() =>
+            this.props.goToTab(
+              tabRoute,
+              draft.id,
+              '',
+              (draft.event && draft.event.toString()) || ''
+            )
+          }
+        >
+          {this.props.intl.formatMessage(messages.update)}
+        </ActionButton>
+      )
+    }
+  }
+
+  generateGqlHistorData = (data: GQLQuery): IHistoryData | null => {
+    return null
+  }
+
   renderHistory(statuses: IStatus[]): JSX.Element[] | null {
     return (
       (statuses &&
@@ -225,7 +324,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           return (
             <HistoryWrapper key={i}>
               <StatusProgress />
-              <ExpansionContentContainer>
+              <StatusContainer>
                 <LabelValue
                   label={this.props.intl.formatMessage(
                     this.getWorkflowDateLabel(status.type as string)
@@ -248,85 +347,52 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                     separator={<Separator />}
                   />
                 </ValueContainer>
-              </ExpansionContentContainer>
+              </StatusContainer>
             </HistoryWrapper>
           )
         })) ||
       null
     )
   }
-  render() {
-    const { draft, goToHome, userDetails } = this.props
-    const status: IStatus[] = []
-    status.push({
-      type: GQLRegStatus.DRAFT_STARTED,
-      practitionerName:
-        (userDetails &&
-          userDetails.name &&
-          (createNamesMap(userDetails.name as GQLHumanName[])[
-            this.props.language
-          ] as string)) ||
-        (userDetails &&
-          userDetails.name &&
-          /* tslint:disable:no-string-literal */
-          (createNamesMap(userDetails.name as GQLHumanName[])[
-            'default'
-          ] as string)) ||
-        /* tslint:enable:no-string-literal */
-        '',
-      timestamp:
-        (draft.savedOn &&
-          formatLongDate(String(draft.savedOn), this.props.intl.locale)) ||
-        null,
-      practitionerRole:
-        userDetails && userDetails.role
-          ? this.props.intl.formatMessage(messages[userDetails.role as string])
-          : '',
-      officeName:
-        (userDetails &&
-          userDetails.primaryOffice &&
-          userDetails.primaryOffice.name) ||
-        ''
-    })
-    if (draft.modifiedOn) {
-      status.push({
-        type: GQLRegStatus.DRAFT_MODIFIED,
-        practitionerName:
-          (userDetails &&
-            userDetails.name &&
-            (createNamesMap(userDetails.name as GQLHumanName[])[
-              this.props.language
-            ] as string)) ||
-          (userDetails &&
-            userDetails.name &&
-            /* tslint:disable:no-string-literal */
-            (createNamesMap(userDetails.name as GQLHumanName[])[
-              'default'
-            ] as string)) ||
-          /* tslint:enable:no-string-literal */
-          '',
-        timestamp:
-          (draft.modifiedOn &&
-            formatLongDate(String(draft.modifiedOn), this.props.intl.locale)) ||
-          null,
-        practitionerRole:
-          userDetails && userDetails.role
-            ? this.props.intl.formatMessage(
-                messages[userDetails.role as string]
-              )
-            : '',
-        officeName:
-          (userDetails &&
-            userDetails.primaryOffice &&
-            userDetails.primaryOffice.name) ||
-          ''
-      })
-    }
+
+  renderSubPage(historyData: IHistoryData | undefined) {
     return (
-      draft && (
-        <SubPage title={this.getDraftApplicantName()} goBack={goToHome}>
-          {this.renderHistory(status)}
+      (historyData && (
+        <SubPage title={historyData.title} goBack={this.props.goToHome}>
+          {this.renderHistory(historyData.history)}
+          {historyData.action}
         </SubPage>
+      )) ||
+      null
+    )
+  }
+
+  render() {
+    return (
+      (this.props.draft &&
+        this.renderSubPage(this.generateDraftHistorData())) || (
+        <>
+          <Query
+            query={FETCH_REGISTRATION_BY_COMPOSITION}
+            variables={{
+              id: this.props.applicationId
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (error) {
+                Sentry.captureException(error)
+              } else if (loading) {
+                return (
+                  <SpinnerContainer>
+                    <QuerySpinner id="query-spinner" />
+                  </SpinnerContainer>
+                )
+              }
+              // return this.renderSubPage(this.generateGqlHistorData(data))
+              return null
+            }}
+          </Query>
+        </>
       )
     )
   }
@@ -352,14 +418,14 @@ function mapStateToProps(
         state.drafts.drafts.find(
           application => application.id === match.params.applicationId
         )) ||
-      {}
+      null
   }
 }
 
 export const Details = connect(
   mapStateToProps,
   {
-    gotoTab: goToTabAction,
+    goToTab: goToTabAction,
     goToHome: goToHomeAction
   }
 )(injectIntl(DetailView))

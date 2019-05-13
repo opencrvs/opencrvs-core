@@ -1,9 +1,7 @@
 import { IAction } from '../ListItem'
 export { IAction } from '../ListItem'
 
-export enum GQLRegStatus {
-  DRAFT_STARTED = 'DRAFT_STARTED',
-  DRAFT_MODIFIED = 'DRAFT_MODIFIED',
+enum GQLRegStatus {
   DECLARED = 'DECLARED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
