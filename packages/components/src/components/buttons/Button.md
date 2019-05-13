@@ -2,13 +2,15 @@ A skeleton button component that can be used as a baseline for all other buttons
 
 It should not be styled in any way and all changes that won't apply to **all** other buttons should be handled elsewhere.
 
-
 ```js
-<Button id="myButton" onClick={() => alert("Hello")}>Press me</Button>
+<Button id="myButton" onClick={() => alert('Hello')}>
+  Press me
+</Button>
 ```
 
 **With icon**
+
 ```js
-const {ArrowWithGradientIcon} = require('../icons/ArrowWithGradient.tsx');
-<Button icon={ArrowWithGradientIcon}>Press me</Button>
+const { ArrowWithGradientIcon } = require('../icons/ArrowWithGradient.tsx')
+;<Button icon={ArrowWithGradientIcon}>Press me</Button>
 ```

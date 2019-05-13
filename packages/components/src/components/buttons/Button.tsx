@@ -18,6 +18,12 @@ const ButtonBase = styled.button`
   justify-content: space-between;
   cursor: pointer;
   background: transparent;
+  &:disabled {
+    background: ${({ theme }) => theme.colors.disabledButton};
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -45,14 +51,11 @@ export function Button({
 }
 
 const LeftButtonIcon = styled.div`
-  align-self: center;
-  position: absolute;
+  position: relative !important;
+  margin-right: 20px;
+  top: 2px;
 `
-export const ButtonIcon = styled.div`
-  /* TODO these feel weird..*/
+const ButtonIcon = styled.div`
   display: flex;
   justify-content: center;
-
-  /* TODO 1. only apply margin if not only child */
-  margin-left: 2em;
 `
