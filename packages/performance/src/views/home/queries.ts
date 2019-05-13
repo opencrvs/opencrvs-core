@@ -11,6 +11,16 @@ export const FETCH_METRIC = gql`
       timeEnd: $timeEnd
       locationId: $locationId
     ) {
+      keyFigures {
+        label
+        value
+        total
+        estimate
+        categoricalData {
+          name
+          value
+        }
+      }
       regByAge {
         label
         value
