@@ -13,6 +13,11 @@ const DELETE_DRAFT = 'DRAFTS/DELETE_DRAFT'
 const GET_DRAFTS_SUCCESS = 'DRAFTS/GET_DRAFTS_SUCCESS'
 const GET_DRAFTS_FAILED = 'DRAFTS/GET_DRAFTS_FAILED'
 
+export enum SUBMISSION_STATUS {
+  DRAFT,
+  SUBMITTED
+}
+
 export interface IDraft {
   id: string
   data: IFormData
@@ -22,6 +27,7 @@ export interface IDraft {
   review?: boolean
   event: Event
   registrationStatus?: string
+  submissionStatus?: SUBMISSION_STATUS
 }
 
 interface IStoreDraftAction {
