@@ -18,7 +18,8 @@ import {
   isValidBirthDate,
   validIDNumber,
   numeric,
-  maxLength
+  maxLength,
+  isNotToday
 } from 'src/utils/validate'
 import { countries } from 'src/forms/countries'
 import {
@@ -446,7 +447,7 @@ export const applicantsSection: IFormSection = {
       label: messages.applicantsDateOfBirth,
       required: false,
       initialValue: '',
-      validate: [isValidBirthDate],
+      validate: [isValidBirthDate, isNotToday],
       mapping: {
         mutation: fieldValueNestingTransformer(
           NESTED_SECTION,
