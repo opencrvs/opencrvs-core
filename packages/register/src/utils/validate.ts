@@ -60,6 +60,11 @@ export const messages = defineMessages({
     defaultMessage: 'Must be a valid date',
     description: 'The error message appears when the given date is not valid'
   },
+  dateNotToday: {
+    id: 'validations.dateNotToday',
+    defaultMessage: "Cannot be today's date.",
+    description: "The error message appears when the given date is today's date"
+  },
   isValidBirthDate: {
     id: 'validations.isValidBirthDate',
     defaultMessage: 'Must be a valid birth date',
@@ -387,6 +392,20 @@ export const dateNotInFuture: ValidationInitializer = (): Validation => (
     return undefined
   } else {
     return { message: messages.dateFormat }
+  }
+}
+
+export const dateNotToday: ValidationInitializer = (): Validation => (
+  value: string
+) => isNotToday(value)
+
+export const isNotToday: Validation = (date: string) => {
+  const inputDate = new Date(date).setHours(0, 0, 0, 0)
+  const today = new Date().setHours(0, 0, 0, 0)
+  if (inputDate === today) {
+    return { message: messages.dateNotToday }
+  } else {
+    return undefined
   }
 }
 

@@ -30,6 +30,7 @@ import {
   dateLessThan,
   dateNotInFuture,
   dateFormatIsCorrect,
+  dateNotToday,
   numeric,
   maxLength
 } from 'src/utils/validate'
@@ -361,6 +362,10 @@ export const motherSection: IFormSection = {
           },
           {
             validator: dateNotInFuture,
+            dependencies: []
+          },
+          {
+            validator: dateNotToday,
             dependencies: []
           },
           {
