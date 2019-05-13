@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { AppHeader, ExpandingMenu } from '@opencrvs/components/lib/interface'
+import {
+  AppHeader,
+  ExpandingMenu,
+  SearchTool
+} from '@opencrvs/components/lib/interface'
 import {
   Hamburger,
   SearchDark,
@@ -24,13 +28,14 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 import { IStoreState } from 'src/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { goToHome, goToPerformance } from 'src/navigation'
+import { goToHome, goToPerformance, goToSearchResult } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
+  goToSearchResult: typeof goToSearchResult
 }
 interface IState {
   showMenu: boolean
@@ -171,7 +176,15 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const rightMenu = [
       {
-        element: <ProfileMenu />
+        element: (
+          <SearchTool
+            key="searchMenu"
+            searchHandler={this.props.goToSearchResult}
+          />
+        )
+      },
+      {
+        element: <ProfileMenu key="profileMenu" />
       }
     ]
 
@@ -209,6 +222,7 @@ export const Header = connect(
     userDetails: getUserDetails(store)
   }),
   {
-    redirectToAuthentication
+    redirectToAuthentication,
+    goToSearchResult
   }
 )(injectIntl<IProps>(HeaderComp))

@@ -15,7 +15,7 @@ const Wrapper = styled.form`
   border-radius: 2px;
   display: flex;
   font-family: ${({ theme }) => theme.fonts.lightFont};
-  padding: 10px;
+  padding: 0 10px;
   position: relative;
 `
 const SearchTextInput = styled.input`
