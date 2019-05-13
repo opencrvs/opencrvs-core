@@ -578,7 +578,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ).filter(errors => errors.length > 0).length
 
     const isRejected =
-      this.props.draft.status && this.props.draft.status === REJECTED
+      this.props.draft.registrationStatus &&
+      this.props.draft.registrationStatus === REJECTED
 
     return (
       <>

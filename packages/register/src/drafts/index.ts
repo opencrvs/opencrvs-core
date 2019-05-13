@@ -21,7 +21,7 @@ export interface IDraft {
   eventType?: string
   review?: boolean
   event: Event
-  status?: string
+  registrationStatus?: string
 }
 
 interface IStoreDraftAction {
@@ -99,7 +99,13 @@ export function createReviewDraft(
   event: Event,
   status?: string
 ): IDraft {
-  return { id: draftId, data: formData, review: true, event, status }
+  return {
+    id: draftId,
+    data: formData,
+    review: true,
+    event,
+    registrationStatus: status
+  }
 }
 
 export function storeDraft(draft: IDraft): IStoreDraftAction {
