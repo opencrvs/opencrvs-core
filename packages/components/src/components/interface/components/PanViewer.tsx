@@ -34,7 +34,7 @@ const ControlsContainer = styled.div`
     & svg {
       height: 100%;
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       box-sizing: border-box;
     }
     &:last-child {
