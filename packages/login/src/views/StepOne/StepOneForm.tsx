@@ -9,15 +9,19 @@ import {
   InputField,
   TextInput,
   PasswordInput,
-  THEME_MODE
+  THEME_MODE,
+  ErrorMessage
 } from '@opencrvs/components/lib/forms'
 
 import { stepOneFields } from './stepOneFields'
 
 import { IAuthenticationData } from '../../utils/authApi'
-import { localiseValidationError } from '../../forms/i18n'
 import { Logo } from '@opencrvs/components/lib/icons'
-
+import {
+  ERROR_CODE_FIELD_MISSING,
+  ERROR_CODE_INVALID_CREDENTIALS,
+  ERROR_CODE_PHONE_NUMBER_VALIDATE
+} from '../../utils/authUtils'
 export const messages = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
@@ -64,6 +68,18 @@ export const messages = defineMessages({
     id: 'login.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
+  },
+  fieldMissing: {
+    id: 'login.fieldMissing',
+    defaultMessage: 'Mobile number and password must be provided',
+    description: "The error if user doesn't fill all the field"
+  },
+  phoneNumberFormat: {
+    id: 'validations.phoneNumberFormat',
+    defaultMessage:
+      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+    description:
+      'The error message that appears on phone numbers where the first character must be a 0'
   }
 })
 
@@ -130,12 +146,6 @@ export const StyledButton = styled(Button)`
     text-decoration-color: ${({ theme }) => theme.colors.accentLight};
   }
 `
-export const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.danger};
-  padding: 2px ${({ theme }) => theme.grid.margin}px;
-  text-align: center;
-`
 
 export const FieldWrapper = styled.div`
   min-height: 6.5em;
@@ -144,6 +154,7 @@ export const FieldWrapper = styled.div`
 export interface IProps {
   formId: string
   submissionError: boolean
+  errorCode?: number
 }
 export interface IDispatchProps {
   submitAction: (values: IAuthenticationData) => void
@@ -164,7 +175,6 @@ const MobileInput = injectIntl((props: Props) => {
       {...mobileField}
       {...otherProps}
       touched={meta.touched}
-      error={meta.error && localiseValidationError(intl, meta.error)}
       label={intl.formatMessage(mobileField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
@@ -191,7 +201,6 @@ const Password = injectIntl((props: Props) => {
       {...passwordField}
       {...otherProps}
       touched={meta.touched}
-      error={meta.error && localiseValidationError(intl, meta.error)}
       label={intl.formatMessage(passwordField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
@@ -220,7 +229,8 @@ export class StepOneForm extends React.Component<
       handleSubmit,
       formId,
       submitAction,
-      submissionError
+      submissionError,
+      errorCode
     } = this.props
 
     return (
@@ -230,9 +240,14 @@ export class StepOneForm extends React.Component<
         </LogoContainer>
         <Title>
           {submissionError && (
-            <ErrorText>
-              {intl.formatMessage(messages.submissionError)}
-            </ErrorText>
+            <ErrorMessage>
+              {errorCode === ERROR_CODE_FIELD_MISSING &&
+                intl.formatMessage(messages.fieldMissing)}
+              {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
+                intl.formatMessage(messages.submissionError)}
+              {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
+                intl.formatMessage(messages.phoneNumberFormat)}
+            </ErrorMessage>
           )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
@@ -257,9 +272,9 @@ export class StepOneForm extends React.Component<
             />
           </FieldWrapper>
           <ActionWrapper>
-            <StyledPrimaryButton id="login-mobile-submit" type="submit">
+            <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
-            </StyledPrimaryButton>
+            </PrimaryButton>
             <StyledButton id="login-forgot-password" type="button">
               {intl.formatMessage(messages.forgotPassword)}
             </StyledButton>

@@ -298,5 +298,19 @@ describe('Search type resolvers', () => {
       )
       expect(locationid).toEqual('112345')
     })
+    it('returns duplicates from search set', () => {
+      const duplicates = searchTypeResolvers.RegistrationSearchSet.duplicates({
+        event: 'Death',
+        type: 'DECLARED',
+        deceasedFirstNames: 'Anik',
+        deceasedFamilyName: 'Hoque',
+        deceasedFirstNamesLocal: 'অনিক',
+        deceasedFamilyNameLocal: 'হক',
+        deathDate: '01-01-2019',
+        applicationLocationId: '112345',
+        relatesTo: ['8a737727-a7db-4e77-865f-310dd7afb836']
+      })
+      expect(duplicates).toEqual(['8a737727-a7db-4e77-865f-310dd7afb836'])
+    })
   })
 })

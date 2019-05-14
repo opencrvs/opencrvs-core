@@ -7,7 +7,8 @@ import { InjectedFormProps } from 'redux-form'
 import {
   TextInput,
   InputField,
-  THEME_MODE
+  THEME_MODE,
+  ErrorMessage
 } from '@opencrvs/components/lib/forms'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from './stepTwoFields'
@@ -18,15 +19,14 @@ import {
   ActionWrapper,
   Container,
   LogoContainer,
-  StyledPrimaryButton,
   StyledButton,
-  FieldWrapper,
-  ErrorText
+  FieldWrapper
 } from '../StepOne/StepOneForm'
 
 import { IVerifyCodeNumbers } from '../../login/actions'
 import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
-import { localiseValidationError } from '../../forms/i18n'
+
+import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 
 export const messages = defineMessages({
   stepTwoTitle: {
@@ -107,7 +107,6 @@ const CodeInput = injectIntl(
         {...field}
         {...otherProps}
         touched={meta.touched}
-        error={meta.error && localiseValidationError(intl, meta.error)}
         label={intl.formatMessage(messages.verficationCodeLabel)}
         optionalLabel={intl.formatMessage(messages.optionalLabel)}
         ignoreMediaQuery
@@ -174,9 +173,9 @@ export class StepTwoForm extends React.Component<
           )}
 
           {submissionError && (
-            <ErrorText>
+            <ErrorMessage>
               {intl.formatMessage(messages.codeSubmissionError)}
-            </ErrorText>
+            </ErrorMessage>
           )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
@@ -190,13 +189,13 @@ export class StepTwoForm extends React.Component<
           </FieldWrapper>
 
           <ActionWrapper>
-            <StyledPrimaryButton
+            <PrimaryButton
               id="login-mobile-submit"
               disabled={submitting}
               type="submit"
             >
               {intl.formatMessage(messages.submit)}
-            </StyledPrimaryButton>{' '}
+            </PrimaryButton>{' '}
             <br />
             <StyledButton
               onClick={this.props.onResendSMS}

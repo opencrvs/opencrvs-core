@@ -15,7 +15,7 @@ export const colors = {
   warning: '#EEB268',
   copy: '#35495D',
   copyAlpha80: '#35495D80',
-  hoverGradientDark: '#376fb7',
+  hoverGradientDark: '#3C55A3 ',
   inputBackground: '#F9F9F9',
   white: '#FFFFFF',
   black: '#000000',
@@ -37,5 +37,8 @@ export const colors = {
   offlineBoxText: '#747987',
   offlineBoxTitle: '#41485F',
   seperatorBorder: '#f7f7f7',
-  creamCan: '#EDC55E'
+  creamCan: '#EDC55E',
+  dropdownHover: '#E5EEFC',
+  menuBackground: '#35495dcc',
+  menuBackgroundTransparent: '#35495d00'
 }

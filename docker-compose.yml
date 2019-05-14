@@ -22,6 +22,11 @@ services:
       dockerfile: ./Dockerfile-login
     restart: unless-stopped
 
+  styleguide:
+    image: jembi/ocrvs-styleguide:${VERSION:-latest}
+    build: packages/components
+    restart: unless-stopped
+
   gateway:
     image: jembi/ocrvs-gateway:${VERSION:-latest}
     build: packages/gateway

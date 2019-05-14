@@ -45,6 +45,7 @@ export interface ISearchResultProps {
   filterBy?: ISortAndFilter
   resultLabel: string
   noResultText: string
+  zeroPagination?: boolean
   cellRenderer: (cellData: IDynamicValues, key: number) => JSX.Element
   onSortChange?: (
     values: ISelectGroupValue,
@@ -199,9 +200,10 @@ export class DataTable extends React.Component<
   getDisplayItems = (
     currentPage: number,
     pageSize: number,
-    allItems: IDynamicValues[]
+    allItems: IDynamicValues[],
+    zeroPagination: boolean | undefined
   ) => {
-    if (allItems.length <= pageSize) {
+    if (zeroPagination || allItems.length <= pageSize) {
       // expect that allItem is already sliced correctly externally
       return allItems
     }
@@ -236,6 +238,7 @@ export class DataTable extends React.Component<
       data,
       sortBy,
       filterBy,
+      zeroPagination,
       pageSize = defaultConfiguration.pageSize,
       initialPage = defaultConfiguration.initialPage
     } = this.props
@@ -270,21 +273,27 @@ export class DataTable extends React.Component<
 
     return (
       <Wrapper>
-        <SortAndFilter
-          sortBy={sortByItemsWithValues}
-          filterBy={filterByItemsWithValues}
-          onChangeSort={this.onSortChange}
-          onChangeFilter={this.onFilterChange}
-        />
-        <ResultsText>
-          {resultLabel}({data.length})
-        </ResultsText>
-        <StyledList>
-          {this.getDisplayItems(currentPage, pageSize, data).map(
-            (item, index) => this.props.cellRenderer(item, index)
+        {!zeroPagination && (
+            <SortAndFilter
+              sortBy={sortByItemsWithValues}
+              filterBy={filterByItemsWithValues}
+              onChangeSort={this.onSortChange}
+              onChangeFilter={this.onFilterChange}
+            />
+          ) && (
+            <ResultsText>
+              {resultLabel}({data.length})
+            </ResultsText>
           )}
+        <StyledList>
+          {this.getDisplayItems(
+            currentPage,
+            pageSize,
+            data,
+            zeroPagination
+          ).map((item, index) => this.props.cellRenderer(item, index))}
         </StyledList>
-        {data.length > 0 && (
+        {!zeroPagination && data.length > 0 && (
           <Pagination
             initialPage={initialPage}
             totalPages={totalPages}

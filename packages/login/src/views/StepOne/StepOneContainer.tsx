@@ -5,14 +5,15 @@ import { StepOneForm, IProps, IDispatchProps } from './StepOneForm'
 import { IStoreState } from '../../store'
 
 import * as actions from '../../login/actions'
-import { getSubmissionError } from '../../login/selectors'
+import { getSubmissionError, getErrorCode } from '../../login/selectors'
 
 const FORM_NAME = 'STEP_ONE'
 
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
     formId: FORM_NAME,
-    submissionError: getSubmissionError(store)
+    submissionError: getSubmissionError(store),
+    errorCode: getErrorCode(store)
   }
 }
 
