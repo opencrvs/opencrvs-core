@@ -28,7 +28,8 @@ import { IStoreState } from 'src/store'
 import {
   IApplication,
   modifyApplication,
-  deleteApplication
+  deleteApplication,
+  SUBMISSION_STATUS
 } from 'src/applications'
 import {
   FooterAction,
@@ -41,7 +42,7 @@ import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
-import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
+import { CONFIRMATION_SCREEN, HOME } from 'src/navigation/routes'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
 import {
@@ -508,8 +509,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  submitForm = () => {
-    this.setState({ showSubmitModal: true })
+  submitForm = (application: IApplication) => {
+    application.submissionStatus =
+      SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
+    this.props.modifyApplication(application)
+    this.props.history.push(HOME)
   }
 
   registerApplication = () => {
@@ -680,7 +684,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <ReviewSection
                       tabRoute={this.props.tabRoute}
                       draft={application}
-                      submitClickEvent={this.submitForm}
+                      submitClickEvent={() => this.submitForm(application)}
                       saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
                       deleteApplicationClickEvent={() => {
                         this.props.deleteApplication(application)
