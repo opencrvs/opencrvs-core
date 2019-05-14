@@ -10,7 +10,6 @@ import {
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
-  ISelectGroupValue,
   ListItem,
   ListItemExpansion,
   Spinner,
@@ -56,7 +55,8 @@ import {
   REJECT_COMMENTS,
   TRACKING_ID_TEXT,
   BRN_DRN_TEXT,
-  PHONE_TEXT
+  PHONE_TEXT,
+  SEARCH_RESULT_SORT
 } from 'src/utils/constants'
 import {
   createNamesMap,
@@ -251,31 +251,7 @@ type ISearchResultProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
-
-interface ISearchResultState {
-  printCertificateModalVisible: boolean
-  regId: string | null
-  currentPage: number
-  sortBy?: string
-  eventType?: string
-  status?: string
-  searchContent?: string
-}
-export class SearchResultView extends React.Component<
-  ISearchResultProps,
-  ISearchResultState
-> {
-  state = {
-    printCertificateModalVisible: false,
-    regId: null,
-    currentPage: 1,
-    sortBy: 'asc',
-    eventType: '',
-    status: '',
-    searchContent: ''
-  }
-  pageSize = 10
-
+export class SearchResultView extends React.Component<ISearchResultProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'DECLARED':
@@ -737,23 +713,6 @@ export class SearchResultView extends React.Component<
 
     return identifier && identifier.id
   }
-  onPageChange = async (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
-  }
-  onSortChange = (sortBy: string) => {
-    this.setState({ sortBy })
-  }
-  onFilterChange = (
-    value: ISelectGroupValue,
-    changedValue: ISelectGroupValue
-  ) => {
-    this.setState({
-      eventType: this.state.eventType,
-      status: this.state.status,
-      ...changedValue
-    })
-  }
-
   render() {
     const { intl, match } = this.props
     const { searchText, searchType } = match.params
@@ -766,12 +725,7 @@ export class SearchResultView extends React.Component<
               query={SEARCH_EVENTS}
               variables={{
                 locationIds: [this.getLocalLocationId()],
-                count: this.pageSize,
-                skip: (this.state.currentPage - 1) * this.pageSize,
-                sort: this.state.sortBy,
-                eventType: this.state.eventType,
-                status: this.state.status,
-                searchContent: searchText,
+                sort: SEARCH_RESULT_SORT,
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                 registrationNumber:
                   searchType === BRN_DRN_TEXT ? searchText : '',

@@ -34,3 +34,4 @@ export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const TRACKING_ID_TEXT = 'trackingId'
 export const BRN_DRN_TEXT = 'brn-drn'
 export const PHONE_TEXT = 'phone'
+export const SEARCH_RESULT_SORT = 'DESC'
