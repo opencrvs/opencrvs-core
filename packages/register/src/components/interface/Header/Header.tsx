@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { AppHeader, ExpandingMenu } from '@opencrvs/components/lib/interface'
+import {
+  AppHeader,
+  ExpandingMenu,
+  SearchTool,
+  ISearchType
+} from '@opencrvs/components/lib/interface'
 import {
   Hamburger,
   SearchDark,
@@ -12,7 +17,10 @@ import {
   HelpBlack,
   HelpBlue,
   LogoutBlack,
-  LogoutBlue
+  LogoutBlue,
+  TrackingID,
+  BRN,
+  Phone
 } from '@opencrvs/components/lib/icons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { storage } from 'src/storage'
@@ -24,12 +32,17 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 import { IStoreState } from 'src/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { goToHome, goToPerformance } from 'src/navigation'
+import { goToHome, goToPerformance, goToSearchResult } from 'src/navigation'
+import { ProfileMenu } from 'src/components/ProfileMenu'
+import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
+  goToSearchResult: typeof goToSearchResult
+  searchText?: string
+  selectedSearchType?: string
 }
 interface IState {
   showMenu: boolean
@@ -66,6 +79,36 @@ const messages = defineMessages({
     id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
+  },
+  TYPE_TRACKING_ID: {
+    id: 'register.home.header.searchType.trackingId',
+    defaultMessage: 'Tracking ID',
+    description: 'Search menu tracking id type'
+  },
+  TYPE_BRN_DRN: {
+    id: 'register.home.header.searchType.brn_drn',
+    defaultMessage: 'BRN/DRN',
+    description: 'Search menu brn drn type'
+  },
+  TYPE_PHONE: {
+    id: 'register.home.header.searchType.phone',
+    defaultMessage: 'Phone No.',
+    description: 'Search menu phone no type'
+  },
+  PLACE_HOLDER_TRACKING_ID: {
+    id: 'register.home.header.searchType.placeHolder.trackingId',
+    defaultMessage: 'Enter Tracking ID',
+    description: 'Search menu tracking id place holder'
+  },
+  PLACE_HOLDER_BRN_DRN: {
+    id: 'register.home.header.searchType.placeHolder.brn_drn',
+    defaultMessage: 'Enter BRN/DRN',
+    description: 'Search menu brn drn place holder'
+  },
+  PLACE_HOLDER_PHONE: {
+    id: 'register.home.header.searchType.placeHolder.phone',
+    defaultMessage: 'Enter Phone No.',
+    description: 'Search menu phone no place holder'
   }
 })
 
@@ -153,6 +196,7 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
+    const { intl } = this.props
     const menuItems = [
       {
         key: 'application',
@@ -168,11 +212,51 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
+    const searchTypeList: ISearchType[] = [
+      {
+        label: intl.formatMessage(messages.TYPE_TRACKING_ID),
+        value: TRACKING_ID_TEXT,
+        icon: <TrackingID />,
+        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_TRACKING_ID),
+        isDefault: true
+      },
+      {
+        label: intl.formatMessage(messages.TYPE_BRN_DRN),
+        value: BRN_DRN_TEXT,
+        icon: <BRN />,
+        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_BRN_DRN)
+      },
+      {
+        label: intl.formatMessage(messages.TYPE_PHONE),
+        value: PHONE_TEXT,
+        icon: <Phone />,
+        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_PHONE)
+      }
+    ]
+
+    const rightMenu = [
+      {
+        element: (
+          <SearchTool
+            key="searchMenu"
+            searchText={this.props.searchText}
+            selectedSearchType={this.props.selectedSearchType}
+            searchTypeList={searchTypeList}
+            searchHandler={this.props.goToSearchResult}
+          />
+        )
+      },
+      {
+        element: <ProfileMenu key="profileMenu" />
+      }
+    ]
+
     return (
       <>
         <AppHeader
           menuItems={menuItems}
           id="register_app_header"
+          desktopRightMenu={rightMenu}
           mobileLeft={{
             icon: () => this.hamburger(),
             handler: this.toggleMenu
@@ -201,6 +285,7 @@ export const Header = connect(
     userDetails: getUserDetails(store)
   }),
   {
-    redirectToAuthentication
+    redirectToAuthentication,
+    goToSearchResult
   }
 )(injectIntl<IProps>(HeaderComp))

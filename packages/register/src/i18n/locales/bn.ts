@@ -959,6 +959,14 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
     'register.SearchResult.reject': 'হালনাগাদ',
-    'register.SearchResult.rejectComments': 'মন্তব্য'
+    'register.SearchResult.rejectComments': 'মন্তব্য',
+    'register.home.header.searchType.trackingId': 'ট্র্যাকিং আইডি',
+    'register.home.header.searchType.brn_drn': 'বিআরএন/ডিআরএন',
+    'register.home.header.searchType.phone': 'ফোন নম্বর',
+    'register.home.header.searchType.placeHolder.trackingId':
+      'ট্র্যাকিং আইডি প্রবেশ করান',
+    'register.home.header.searchType.placeHolder.brn_drn':
+      'বিআরএন/ডিআরএন প্রবেশ করান',
+    'register.home.header.searchType.placeHolder.phone': 'ফোন নম্বর প্রবেশ করান'
   }
 }

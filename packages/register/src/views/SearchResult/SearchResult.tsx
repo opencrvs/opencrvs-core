@@ -9,12 +9,10 @@ import {
   StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
-  ActionPage,
   ISearchInputProps,
   ISelectGroupValue,
   ListItem,
   ListItemExpansion,
-  SearchInput,
   Spinner,
   Loader
 } from '@opencrvs/components/lib/interface'
@@ -38,8 +36,7 @@ import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToSearchResult
+  goToReviewDuplicate as goToReviewDuplicateAction
 } from 'src/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { getScope, getUserDetails } from 'src/profile/profileSelectors'
@@ -67,6 +64,7 @@ import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
+import { Header } from 'src/components/interface/Header/Header'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -238,11 +236,11 @@ interface IBaseSearchResultProps {
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  goToSearchResult: typeof goToSearchResult
 }
 
 interface IMatchParams {
   searchText: string
+  searchType: string
 }
 
 type ISearchResultProps = InjectedIntlProps &
@@ -755,101 +753,83 @@ export class SearchResultView extends React.Component<
 
   render() {
     const { intl, match } = this.props
-    const searchParam = match.params.searchText
+    const { searchText, searchType } = match.params
     return (
-      <ActionPageWrapper>
-        <ActionPage
-          goBack={() => {
-            window.location.assign('/')
-          }}
-          title={intl.formatMessage(messages.title)}
-        >
-          <Container>
-            <HeaderContent>
-              <Query
-                query={SEARCH_EVENTS}
-                variables={{
-                  locationIds: [this.getLocalLocationId()],
-                  count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize,
-                  sort: this.state.sortBy,
-                  eventType: this.state.eventType,
-                  status: this.state.status,
-                  searchContent: searchParam
-                }}
-              >
-                {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      <Loader
-                        id="search_loader"
-                        marginPercent={35}
-                        spinnerDiameter={60}
-                        loadingText={intl.formatMessage(messages.searchingFor, {
-                          param: searchParam
-                        })}
-                      />
-                    )
-                  }
-                  if (error) {
-                    Sentry.captureException(error)
-
-                    return (
-                      <ErrorText id="search-result-error-text">
-                        {intl.formatMessage(messages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-                  const transformedData = transformData(data, intl)
-                  const total = transformedData.length
+      <>
+        <Header searchText={searchText} selectedSearchType={searchType} />
+        <Container>
+          <HeaderContent>
+            <Query
+              query={SEARCH_EVENTS}
+              variables={{
+                locationIds: [this.getLocalLocationId()],
+                count: this.pageSize,
+                skip: (this.state.currentPage - 1) * this.pageSize,
+                sort: this.state.sortBy,
+                eventType: this.state.eventType,
+                status: this.state.status,
+                searchContent: searchText
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
                   return (
-                    <>
-                      <SearchInput
-                        id="search-input-text"
-                        searchValue={searchParam}
-                        placeholder={intl.formatMessage(
-                          messages.searchInputPlaceholder
-                        )}
-                        buttonLabel={intl.formatMessage(
-                          messages.searchInputButtonTitle
-                        )}
-                        onSubmit={this.props.goToSearchResult}
-                        {...this.props}
-                      />
-                      <SearchResultText>
-                        {intl.formatMessage(messages.searchResultFor, {
-                          total,
-                          param: searchParam
-                        })}
-                      </SearchResultText>
-                      {total > 0 && (
-                        <>
-                          <TotalResultText>
-                            {intl.formatMessage(messages.totalResultText, {
-                              total
-                            })}
-                          </TotalResultText>
-                          <DataTable
-                            data={transformedData}
-                            zeroPagination={true}
-                            cellRenderer={this.renderCell}
-                            resultLabel={intl.formatMessage(
-                              messages.dataTableResults
-                            )}
-                            noResultText={intl.formatMessage(
-                              messages.dataTableNoResults
-                            )}
-                          />
-                        </>
-                      )}
-                    </>
+                    <Loader
+                      id="search_loader"
+                      marginPercent={35}
+                      spinnerDiameter={60}
+                      loadingText={intl.formatMessage(messages.searchingFor, {
+                        param: searchText
+                      })}
+                    />
                   )
-                }}
-              </Query>
-            </HeaderContent>
-          </Container>
-        </ActionPage>
-      </ActionPageWrapper>
+                }
+                if (error) {
+                  Sentry.captureException(error)
+
+                  return (
+                    <ErrorText id="search-result-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+                const transformedData = transformData(data, intl)
+                const total = transformedData.length
+                return (
+                  <>
+                    <SearchResultText>
+                      {intl.formatMessage(messages.searchResultFor, {
+                        total,
+                        param: searchText
+                      })}
+                    </SearchResultText>
+                    {total > 0 && (
+                      <>
+                        <TotalResultText>
+                          {intl.formatMessage(messages.totalResultText, {
+                            total
+                          })}
+                        </TotalResultText>
+                        <DataTable
+                          data={transformedData}
+                          zeroPagination={true}
+                          cellRenderer={this.renderCell}
+                          resultLabel={intl.formatMessage(
+                            messages.dataTableResults
+                          )}
+                          noResultText={intl.formatMessage(
+                            messages.dataTableNoResults
+                          )}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            </Query>
+          </HeaderContent>
+        </Container>
+      </>
     )
   }
 }
@@ -861,7 +841,6 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
-    goToSearchResult,
     gotoTab: goToTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
