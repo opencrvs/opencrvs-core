@@ -88,7 +88,9 @@ interface IState {
 }
 interface IProps {
   searchTypeList: ISearchType[]
-  searchHandler: (param: string) => void
+  searchText?: string
+  selectedSearchType?: string
+  searchHandler: (searchText: string, searchType: string) => void
 }
 export class SearchTool extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -96,11 +98,20 @@ export class SearchTool extends React.Component<IProps, IState> {
 
     this.state = {
       dropDownIsVisible: false,
-      searchParam: '',
+      searchParam: this.props.searchText ? this.props.searchText : '',
       selectedSearchType: this.getDefaultSearchType()
     }
   }
+
   getDefaultSearchType(): ISearchType {
+    if (this.props.selectedSearchType) {
+      return (
+        this.props.searchTypeList.find(
+          (item: ISearchType) => item.value === this.props.selectedSearchType
+        ) || this.props.searchTypeList[0]
+      )
+    }
+
     return (
       this.props.searchTypeList.find(
         (item: ISearchType) => item.isDefault === true
@@ -109,7 +120,11 @@ export class SearchTool extends React.Component<IProps, IState> {
   }
   search = () => {
     return (
-      this.state.searchParam && this.props.searchHandler(this.state.searchParam)
+      this.state.searchParam &&
+      this.props.searchHandler(
+        this.state.searchParam,
+        this.state.selectedSearchType.value
+      )
     )
   }
   dropdown() {

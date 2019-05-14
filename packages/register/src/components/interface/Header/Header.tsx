@@ -41,6 +41,8 @@ type IProps = InjectedIntlProps & {
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
   goToSearchResult: typeof goToSearchResult
+  searchText?: string
+  selectedSearchType?: string
 }
 interface IState {
   showMenu: boolean
@@ -237,6 +239,8 @@ class HeaderComp extends React.Component<IProps, IState> {
         element: (
           <SearchTool
             key="searchMenu"
+            searchText={this.props.searchText}
+            selectedSearchType={this.props.selectedSearchType}
             searchTypeList={searchTypeList}
             searchHandler={this.props.goToSearchResult}
           />
