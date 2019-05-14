@@ -27,7 +27,7 @@ export interface IApplication {
   review?: boolean
   event: Event
   registrationStatus?: string
-  submissionStatus?: SUBMISSION_STATUS
+  submissionStatus?: string
 }
 
 interface IStoreApplicationAction {
@@ -100,7 +100,8 @@ export function createApplication(event: Event) {
   return {
     id: uuid(),
     data: {},
-    event
+    event,
+    submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
   }
 }
 export function createReviewApplication(
