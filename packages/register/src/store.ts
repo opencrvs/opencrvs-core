@@ -17,7 +17,7 @@ import {
 import { profileReducer, ProfileState } from './profile/profileReducer'
 import { offlineDataReducer, IOfflineDataState } from './offline/reducer'
 import { intlReducer, IntlState } from './i18n/reducer'
-import { draftsReducer, IDraftsState } from 'src/drafts'
+import { applicationsReducer, IApplicationsState } from 'src/applications'
 import {
   reviewReducer,
   IReviewFormState
@@ -43,7 +43,7 @@ export interface IStoreState {
   profile: ProfileState
   router: RouterState
   i18n: IntlState
-  drafts: IDraftsState
+  applicationsState: IApplicationsState
   registerForm: IRegisterFormState
   navigation: INavigationState
   notification: NotificationState
@@ -57,7 +57,7 @@ const reducers = combineReducers<IStoreState>({
   profile: profileReducer,
   router: routerReducer,
   i18n: intlReducer,
-  drafts: draftsReducer,
+  applicationsState: applicationsReducer,
   registerForm: registerFormReducer,
   navigation: navigationReducer,
   notification: notificationReducer,

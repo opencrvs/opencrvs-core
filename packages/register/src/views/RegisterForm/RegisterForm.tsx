@@ -25,7 +25,11 @@ import {
 } from '../../forms'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import { IStoreState } from 'src/store'
-import { IDraft, modifyDraft, deleteDraft } from 'src/drafts'
+import {
+  IApplication,
+  modifyApplication,
+  deleteApplication
+} from 'src/applications'
 import {
   FooterAction,
   FooterPrimaryButton,
@@ -288,7 +292,7 @@ function getPreviousSection(
 }
 
 export interface IFormProps {
-  draft: IDraft
+  application: IApplication
   registerForm: IForm
   tabRoute: string
   duplicate?: boolean
@@ -297,8 +301,8 @@ export interface IFormProps {
 type DispatchProps = {
   goToTab: typeof goToTabAction
   goBack: typeof goBackAction
-  modifyDraft: typeof modifyDraft
-  deleteDraft: typeof deleteDraft
+  modifyApplication: typeof modifyApplication
+  deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   handleSubmit: (values: unknown) => void
 }
@@ -375,19 +379,22 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return this.props.scope && this.props.scope.includes('register')
   }
 
-  modifyDraft = (
+  modifyApplication = (
     sectionData: IFormSectionData,
     activeSection: IFormSection,
-    draft: IDraft
+    application: IApplication
   ) => {
-    if (draft.review && !this.state.isDataAltered) {
+    if (application.review && !this.state.isDataAltered) {
       this.setState({ isDataAltered: true })
     }
-    this.props.modifyDraft({
-      ...draft,
+    this.props.modifyApplication({
+      ...application,
       data: {
-        ...draft.data,
-        [activeSection.id]: { ...draft.data[activeSection.id], ...sectionData }
+        ...application.data,
+        [activeSection.id]: {
+          ...application.data[activeSection.id],
+          ...sectionData
+        }
       }
     })
   }
@@ -395,18 +402,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
   rejectSubmission = () => {
     const {
       history,
-      draft,
-      draft: { event }
+      application,
+      application: { event }
     } = this.props
 
     const personData =
       event === Event.DEATH
-        ? this.props.draft.data.deceased
-        : this.props.draft.data.child
+        ? this.props.application.data.deceased
+        : this.props.application.data.child
     const fullName = getFullName(personData)
 
     history.push(CONFIRMATION_SCREEN, {
-      trackNumber: draft.data.registration.trackingId,
+      trackNumber: application.data.registration.trackingId,
       eventName: REJECTION,
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng,
@@ -416,19 +423,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
         history.location.state && history.location.state.duplicateContextId
     })
 
-    this.props.deleteDraft(draft)
+    this.props.deleteApplication(application)
   }
 
   successfulSubmission = (response: string) => {
     const {
       history,
-      draft,
-      draft: { event }
+      application,
+      application: { event }
     } = this.props
     const personData =
       event === Event.DEATH
-        ? this.props.draft.data.deceased
-        : this.props.draft.data.child
+        ? this.props.application.data.deceased
+        : this.props.application.data.child
     const fullName = getFullName(personData)
     const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
 
@@ -440,19 +447,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
+    this.props.deleteApplication(application)
   }
 
   offlineSubmission = () => {
     const {
       history,
-      draft,
-      draft: { event }
+      application,
+      application: { event }
     } = this.props
     const personData =
       event === Event.DEATH
-        ? this.props.draft.data.deceased
-        : this.props.draft.data.child
+        ? this.props.application.data.deceased
+        : this.props.application.data.child
     const fullName = getFullName(personData)
 
     history.push(CONFIRMATION_SCREEN, {
@@ -462,19 +469,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
       fullNameInBn: fullName.fullNameInBn,
       fullNameInEng: fullName.fullNameInEng
     })
-    this.props.deleteDraft(draft)
+    this.props.deleteApplication(application)
   }
 
   successfullyRegistered = (response: string) => {
     const {
       history,
-      draft,
-      draft: { event }
+      application: application,
+      application: { event }
     } = this.props
     const personData =
       event === Event.DEATH
-        ? this.props.draft.data.deceased
-        : this.props.draft.data.child
+        ? this.props.application.data.deceased
+        : this.props.application.data.child
     const fullName = getFullName(personData)
     const duplicate = history.location.state && history.location.state.duplicate
     const eventName = duplicate ? DUPLICATION : REGISTRATION
@@ -490,7 +497,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicateContextId:
         history.location.state && history.location.state.duplicateContextId
     })
-    this.props.deleteDraft(draft)
+    this.props.deleteApplication(application)
   }
 
   registrationOnError = (error: Error) => {
@@ -525,36 +532,36 @@ class RegisterFormView extends React.Component<FullProps, State> {
     if (Math.abs(deltaX) > Math.abs(deltaY * 4)) {
       if (deltaX > 0) {
         this.onSwiped(
-          this.props.draft.id,
+          this.props.application.id,
           getNextSection(
             this.props.registerForm.sections,
             this.props.activeSection
           ),
           this.props.tabRoute,
-          this.props.draft.event.toLowerCase()
+          this.props.application.event.toLowerCase()
         )
       } else {
         this.onSwiped(
-          this.props.draft.id,
+          this.props.application.id,
           getPreviousSection(
             this.props.registerForm.sections,
             this.props.activeSection
           ),
           this.props.tabRoute,
-          this.props.draft.event.toLowerCase()
+          this.props.application.event.toLowerCase()
         )
       }
     }
   }
 
   onSwiped = (
-    draftId: string,
+    applicationId: string,
     selectedSection: IFormSection | null,
     tabRoute: string,
     event: string
   ): void => {
     if (selectedSection) {
-      this.props.goToTab(tabRoute, draftId, selectedSection.id, event)
+      this.props.goToTab(tabRoute, applicationId, selectedSection.id, event)
     }
   }
 
@@ -583,7 +590,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   getEvent() {
-    const eventType = this.props.draft.event || 'BIRTH'
+    const eventType = this.props.application.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
         return Event.BIRTH
@@ -606,7 +613,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       intl,
       activeSection,
       setAllFieldsDirty,
-      draft,
+      application,
       history,
       registerForm,
       offlineResources,
@@ -614,7 +621,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicate
     } = this.props
 
-    const isReviewForm = draft.review
+    const isReviewForm = application.review
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
       ? messages.reviewEventRegistration
@@ -629,7 +636,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         )
       : registerForm.sections
     const isErrorOccured = this.state.hasError
-    const debouncedModifyDraft = debounce(this.modifyDraft, 500)
+    const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
       <FormViewContainer>
@@ -643,7 +650,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <>
             <ViewHeaderWithTabs
               id="informant_parent_view"
-              title={intl.formatMessage(title, { event: draft.event })}
+              title={intl.formatMessage(title, { event: application.event })}
             >
               <StickyFormTabs
                 sections={sectionForReview}
@@ -651,9 +658,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 onTabClick={(tabId: string) =>
                   goToTab(
                     this.props.tabRoute,
-                    draft.id,
+                    application.id,
                     tabId,
-                    draft.event.toLowerCase()
+                    application.event.toLowerCase()
                   )
                 }
               />
@@ -672,11 +679,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   {activeSection.viewType === VIEW_TYPE.PREVIEW && (
                     <ReviewSection
                       tabRoute={this.props.tabRoute}
-                      draft={draft}
+                      draft={application}
                       submitClickEvent={this.submitForm}
                       saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
                       deleteApplicationClickEvent={() => {
-                        this.props.deleteDraft(draft)
+                        this.props.deleteApplication(application)
                         history.push('/')
                       }}
                     />
@@ -684,7 +691,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   {activeSection.viewType === VIEW_TYPE.REVIEW && (
                     <ReviewSection
                       tabRoute={this.props.tabRoute}
-                      draft={draft}
+                      draft={application}
                       rejectApplicationClickEvent={() => {
                         this.toggleRejectForm()
                       }}
@@ -721,12 +728,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         <FormFieldGenerator
                           id={activeSection.id}
                           onChange={values => {
-                            debouncedModifyDraft(values, activeSection, draft)
+                            debouncedModifyApplication(
+                              values,
+                              activeSection,
+                              application
+                            )
                           }}
                           setAllFieldsDirty={setAllFieldsDirty}
                           fields={activeSection.fields}
                           offlineResources={offlineResources}
-                          draftData={draft.data}
+                          draftData={application.data}
                         />
                       </form>
                       <FormActionSection>
@@ -744,9 +755,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               onClick={() =>
                                 goToTab(
                                   this.props.tabRoute,
-                                  draft.id,
+                                  application.id,
                                   nextSection.id,
-                                  draft.event.toLowerCase()
+                                  application.event.toLowerCase()
                                 )
                               }
                               id="next_section"
@@ -794,7 +805,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             event={this.getEvent()}
             action={Action.SUBMIT_FOR_REVIEW}
             form={registerForm}
-            draft={draft}
+            application={application}
             onCompleted={this.successfulSubmission}
             onError={this.offlineSubmission}
           >
@@ -850,7 +861,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             event={this.getEvent()}
             action={Action.REGISTER_APPLICATION}
             form={registerForm}
-            draft={draft}
+            application={application}
             onCompleted={this.successfullyRegistered}
             onError={this.registrationOnError}
           >
@@ -904,7 +915,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             onBack={this.toggleRejectForm}
             confirmRejectionEvent={this.rejectSubmission}
             duplicate={duplicate}
-            draftId={draft.id}
+            draftId={application.id}
             event={this.getEvent()}
           />
         )}
@@ -928,9 +939,9 @@ function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
     Props &
-    RouteComponentProps<{ tabId: string; draftId: string }>
+    RouteComponentProps<{ tabId: string; applicationId: string }>
 ) {
-  const { match, registerForm, draft } = props
+  const { match, registerForm, application } = props
 
   const activeSectionId = getActiveSectionId(registerForm, match.params)
 
@@ -942,11 +953,11 @@ function mapStateToProps(
     throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
   }
 
-  if (!draft) {
-    throw new Error(`Draft "${match.params.draftId}" missing!`)
+  if (!application) {
+    throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
   const visitedSections = registerForm.sections.filter(({ id }) =>
-    Boolean(draft.data[id])
+    Boolean(application.data[id])
   )
 
   const rightMostVisited = visitedSections[visitedSections.length - 1]
@@ -958,7 +969,7 @@ function mapStateToProps(
 
   const fields = replaceInitialValues(
     activeSection.fields,
-    draft.data[activeSectionId] || {}
+    application.data[activeSectionId] || {}
   )
 
   const offlineResources = getOfflineState(state)
@@ -972,15 +983,15 @@ function mapStateToProps(
       ...activeSection,
       fields
     },
-    draft
+    application
   }
 }
 
 export const RegisterForm = connect<Props, DispatchProps>(
   mapStateToProps,
   {
-    modifyDraft,
-    deleteDraft,
+    modifyApplication,
+    deleteApplication,
     goToTab: goToTabAction,
     goBack: goBackAction,
     toggleDraftSavedNotification,

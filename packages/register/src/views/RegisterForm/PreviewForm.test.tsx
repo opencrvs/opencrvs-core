@@ -11,7 +11,7 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB
 } from 'src/navigation/routes'
-import { storeDraft, IDraft } from 'src/drafts'
+import { storeApplication, IApplication } from 'src/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -60,7 +60,7 @@ describe('when user is previewing the form data', () => {
   })
 
   describe('when user is in the preview section', () => {
-    let customDraft: IDraft
+    let customDraft: IApplication
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
@@ -149,7 +149,7 @@ describe('when user is previewing the form data', () => {
       }
 
       customDraft = { id: uuid(), data, event: Event.BIRTH }
-      store.dispatch(storeDraft(customDraft))
+      store.dispatch(storeApplication(customDraft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
       )
@@ -275,7 +275,7 @@ describe('when user is previewing the form data', () => {
     })
   })
   describe('when user is in the birth review section', () => {
-    let customDraft: IDraft
+    let customDraft: IApplication
 
     const childDetails: IPersonDetails = {
       attendantAtBirth: 'NURSE',
@@ -386,7 +386,7 @@ describe('when user is previewing the form data', () => {
       }
 
       customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
-      store.dispatch(storeDraft(customDraft))
+      store.dispatch(storeApplication(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_TAB.replace(
           ':draftId',
@@ -532,7 +532,7 @@ describe('when user is previewing the form data', () => {
     })
   })
   describe('when user is in the death review section', () => {
-    let customDraft: IDraft
+    let customDraft: IApplication
 
     const deceasedDetails = {
       iDType: 'PASSPORT',
@@ -664,7 +664,7 @@ describe('when user is previewing the form data', () => {
       }
       // @ts-ignore
       customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
-      store.dispatch(storeDraft(customDraft))
+      store.dispatch(storeApplication(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_TAB.replace(
           ':draftId',

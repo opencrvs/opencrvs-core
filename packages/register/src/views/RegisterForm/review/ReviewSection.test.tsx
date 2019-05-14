@@ -3,7 +3,7 @@ import { ReviewSection, renderSelectDynamicLabel } from './ReviewSection'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from 'src/store'
 import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
-import { createDraft, createReviewDraft } from 'src/drafts'
+import { createApplication, createReviewApplication } from 'src/applications'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { Event } from 'src/forms'
 import { v4 as uuid } from 'uuid'
@@ -11,9 +11,19 @@ import { REJECTED } from 'src/utils/constants'
 
 const { store } = createStore()
 const mockHandler = jest.fn()
-const draft = createDraft(Event.BIRTH)
-const rejectedDraftBirth = createReviewDraft(uuid(), {}, Event.BIRTH, REJECTED)
-const rejectedDraftDeath = createReviewDraft(uuid(), {}, Event.DEATH, REJECTED)
+const draft = createApplication(Event.BIRTH)
+const rejectedDraftBirth = createReviewApplication(
+  uuid(),
+  {},
+  Event.BIRTH,
+  REJECTED
+)
+const rejectedDraftDeath = createReviewApplication(
+  uuid(),
+  {},
+  Event.DEATH,
+  REJECTED
+)
 
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },

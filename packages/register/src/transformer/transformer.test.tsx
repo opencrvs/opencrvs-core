@@ -8,7 +8,7 @@ import {
   setItem
 } from 'src/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
-import { storeDraft, IDraft } from 'src/drafts'
+import { storeApplication, IApplication } from 'src/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -37,7 +37,7 @@ describe('when draft data is transformed to graphql', () => {
   let app: ReactWrapper
   let history: History
   let store: Store
-  let customDraft: IDraft
+  let customDraft: IApplication
   let form: IForm
 
   const childDetails: IPersonDetails = {
@@ -142,7 +142,7 @@ describe('when draft data is transformed to graphql', () => {
     }
 
     customDraft = { id: uuid(), data, event: Event.BIRTH }
-    store.dispatch(storeDraft(customDraft))
+    store.dispatch(storeApplication(customDraft))
     form = getRegisterForm(store.getState())[Event.BIRTH]
     history.replace(
       DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())

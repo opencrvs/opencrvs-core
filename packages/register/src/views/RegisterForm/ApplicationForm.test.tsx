@@ -12,7 +12,11 @@ import {
   inValidImageB64String
 } from 'src/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
-import { storeDraft, createDraft, IDraft } from 'src/drafts'
+import {
+  storeApplication,
+  createApplication,
+  IApplication
+} from 'src/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -53,7 +57,7 @@ describe('when user has starts a new application', () => {
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
   describe('In case of insecured page show unlock screen', () => {
-    let draft: IDraft
+    let draft: IApplication
     storage.getItem = jest
       .fn()
       .mockReturnValueOnce(null)
@@ -63,8 +67,8 @@ describe('when user has starts a new application', () => {
         '$2a$10$nD0E23/QJK0tjbPN23zg1u7rYnhsm8Y5/08.H20SSdqLVyuwFtVsG'
       )
     beforeEach(async () => {
-      draft = createDraft(Event.BIRTH)
-      store.dispatch(storeDraft(draft))
+      draft = createApplication(Event.BIRTH)
+      store.dispatch(storeApplication(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
       )
@@ -76,12 +80,12 @@ describe('when user has starts a new application', () => {
     })
   })
   describe('when user is in birth registration by parent informant view', () => {
-    let draft: IDraft
+    let draft: IApplication
     beforeEach(async () => {
       storage.getItem = jest.fn()
       storage.setItem = jest.fn()
-      draft = createDraft(Event.BIRTH)
-      store.dispatch(storeDraft(draft))
+      draft = createApplication(Event.BIRTH)
+      store.dispatch(storeApplication(draft))
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
       )

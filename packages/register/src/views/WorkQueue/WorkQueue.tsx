@@ -35,7 +35,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Header } from 'src/components/interface/Header/Header'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import {
   goToEvents as goToEventsAction,
@@ -306,7 +306,7 @@ interface IBaseWorkQueueProps {
   goToWorkQueueTab: typeof goToWorkQueueTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
-  drafts: IDraft[]
+  drafts: IApplication[]
 }
 
 interface IWorkQueueState {
@@ -622,7 +622,7 @@ export class WorkQueueView extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IDraft) => {
+    return this.props.drafts.map((draft: IApplication) => {
       let name
       let tabRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
@@ -1040,7 +1040,7 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
-    drafts: state.drafts.drafts
+    drafts: state.applicationsState.applications
   }
 }
 
