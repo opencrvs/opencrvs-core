@@ -126,7 +126,6 @@ export const ActionPageWrapper = styled.div`
 `
 const SearchResultText = styled.div`
   left: 268px;
-  margin-top: 30px;
   font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.secondary};
   font-weight: bold;
