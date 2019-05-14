@@ -86,6 +86,7 @@ describe('SearchResult tests', async () => {
                     status: 'DECLARED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
                   },
                   dateOfDeath: '2007-01-01',
@@ -107,6 +108,7 @@ describe('SearchResult tests', async () => {
                     status: 'REJECTED',
                     trackingId: 'DXMJPYA',
                     registrationNumber: null,
+                    duplicates: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     reason:
@@ -132,6 +134,7 @@ describe('SearchResult tests', async () => {
                     status: 'REGISTERED',
                     trackingId: 'BQRZWDR',
                     registrationNumber: '2019333494BQRZWDR2',
+                    duplicates: null,
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
                   },
                   dateOfBirth: '2010-01-01',
@@ -153,6 +156,7 @@ describe('SearchResult tests', async () => {
                     status: 'CERTIFIED',
                     trackingId: 'B3DBJMP',
                     registrationNumber: '2019333494B3DBJMP5',
+                    duplicates: null,
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
                   },
                   dateOfBirth: '2008-01-01',
@@ -198,6 +202,7 @@ describe('SearchResult tests', async () => {
         tracking_id: 'DW0UTHR',
         event: 'Death',
         declaration_status: 'DECLARED',
+        duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
         rejection_reasons: '',
         rejection_comment: ''
       },
@@ -210,6 +215,7 @@ describe('SearchResult tests', async () => {
         tracking_id: 'DXMJPYA',
         event: 'Death',
         declaration_status: 'REJECTED',
+        duplicates: null,
         rejection_reasons: '',
         rejection_comment: ''
       },
@@ -219,6 +225,7 @@ describe('SearchResult tests', async () => {
         dob: '01-01-2010',
         dod: '',
         registrationNumber: '2019333494BQRZWDR2',
+        duplicates: null,
         tracking_id: 'BQRZWDR',
         event: 'Birth',
         declaration_status: 'REGISTERED',
@@ -231,6 +238,7 @@ describe('SearchResult tests', async () => {
         dob: '01-01-2008',
         dod: '',
         registrationNumber: '2019333494B3DBJMP5',
+        duplicates: null,
         tracking_id: 'B3DBJMP',
         event: 'Birth',
         declaration_status: 'CERTIFIED',
@@ -308,6 +316,7 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'REGISTERED',
+                      duplicates: null,
                       trackingId: 'BDQNYZH',
                       registrationNumber: '123456789098765432',
                       registeredLocationId:
@@ -455,6 +464,7 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'CERTIFIED',
+                      duplicates: null,
                       trackingId: 'BDQNYZH',
                       registrationNumber: '123456789098765432',
                       registeredLocationId:
@@ -560,6 +570,7 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'REJECTED',
+                      duplicates: null,
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
@@ -714,6 +725,7 @@ describe('SearchResult tests', async () => {
                     type: 'Birth',
                     registration: {
                       status: 'DECLARED',
+                      duplicates: null,
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
@@ -856,6 +868,7 @@ describe('SearchResult tests', async () => {
                     type: '',
                     registration: {
                       status: 'DECLARED',
+                      duplicates: null,
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:
@@ -1002,7 +1015,8 @@ describe('SearchResult tests', async () => {
                     id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                     type: 'Birth',
                     registration: {
-                      status: 'DECLARED',
+                      status: 'DEFAULT',
+                      duplicates: null,
                       trackingId: 'BDQNYZH',
                       registrationNumber: null,
                       registeredLocationId:

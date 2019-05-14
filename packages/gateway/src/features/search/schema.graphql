@@ -19,6 +19,7 @@ type RegistrationSearchSet {
   registeredLocationId: String
   reason: String
   comment: String
+  duplicates: [ID]
 }
 
 type BirthEventSearchSet implements EventSearchSet {

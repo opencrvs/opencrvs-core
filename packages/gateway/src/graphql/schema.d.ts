@@ -520,6 +520,7 @@ export interface GQLRegistrationSearchSet {
   registeredLocationId?: string
   reason?: string
   comment?: string
+  duplicates?: Array<string | null>
 }
 
 export interface GQLMutation {
@@ -2296,6 +2297,7 @@ export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   >
   reason?: RegistrationSearchSetToReasonResolver<TParent>
   comment?: RegistrationSearchSetToCommentResolver<TParent>
+  duplicates?: RegistrationSearchSetToDuplicatesResolver<TParent>
 }
 
 export interface RegistrationSearchSetToStatusResolver<
@@ -2355,6 +2357,13 @@ export interface RegistrationSearchSetToReasonResolver<
 }
 
 export interface RegistrationSearchSetToCommentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
