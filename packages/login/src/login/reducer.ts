@@ -14,7 +14,6 @@ export type LoginState = {
   errorCode?: number
   resentSMS: boolean
   stepOneDetails: { mobile: string }
-  errorCode?: number
 }
 
 export const initialState: LoginState = {
