@@ -19,8 +19,13 @@ export const Tab = styled(Button).attrs<IProps>({})`
     active ? theme.colors.white : theme.colors.disabledTab};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  padding-left: 20px;
-  padding-right: 20px;
+  & div {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  &:disabled {
+    background: transparent;
+  }
   font-family: ${({ theme, active }) =>
     active ? theme.fonts.regularFont : theme.fonts.lightFont};
   font-size: 18px;
