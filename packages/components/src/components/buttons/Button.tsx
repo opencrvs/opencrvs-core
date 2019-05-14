@@ -58,7 +58,7 @@ export function Button({
   } else {
     return (
       <ButtonBase {...otherProps}>
-        <Wrapper style={{ justifyContent: 'center' }}>{children}</Wrapper>
+        <CenterWrapper>{children}</CenterWrapper>
       </ButtonBase>
     )
   }
@@ -67,6 +67,13 @@ const Wrapper = styled.div`
   padding: 0 32px;
   align-items: center;
   justify-content: space-between;
+  display: inline-flex;
+  width: 100%;
+`
+const CenterWrapper = styled.div`
+  padding: 0 32px;
+  align-items: center;
+  justify-content: center;
   display: inline-flex;
   width: 100%;
 `

@@ -8,6 +8,7 @@ const StyledButton = styled(Button)`
   display: flex;
   padding: 0 8px;
   flex: 1;
+  background: ${({ theme }) => theme.colors.white};
   margin-bottom: 1px;
   &:last-child {
     margin-bottom: 0;
