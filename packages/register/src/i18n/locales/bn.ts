@@ -3,18 +3,8 @@ import { ILanguage } from '../reducer'
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
   messages: {
-    'app.loading.data.loadingOfflineData':
-      'আমরা কিছু প্রয়োজনীয় তথ্য লোড করছি, যাতে আপনি অফলাইনে  আবেদন জমা দিতে পারেন',
-    'app.loading.data.offlineDataLoaded':
-      'ওপেন সি আর ভি এস ব্যবহারের জন্য প্রস্তুত',
-    'app.loading.data.continueButton': 'চালিয়ে যান',
-    'login.stepOneTitle': 'লগইন',
     'session.expire.text': 'আপনার সেশনের মেয়াদ শেষ হয়ে গেছে',
-    'myDrafts.title': 'আমার খসড়া',
-    'myDrafts.labels.results.name': 'নাম',
-    'myDrafts.labels.results.dob': 'জন্ম তারিখ',
-    'myDrafts.labels.results.savedOn': 'সংরক্ষিত',
-    'myDrafts.labels.results.trackingID': 'ট্র্যাকিং আইডি',
+    'login.stepOneTitle': 'লগইন',
     'menu.back': 'পিছনে',
     'menu.menu': 'তালিকা',
     'menu.items.homepage': 'হোম পেইজ',
@@ -658,10 +648,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.statuses.application': 'আবেদন',
     'register.workQueue.labels.statuses.registered': 'নিবন্ধভুক্ত',
     'register.workQueue.labels.statuses.collected': 'সংগৃহীত',
-    'register.workQueue.statusLabel.application': 'আবেদন',
-    'register.workQueue.statusLabel.registered': 'নিবন্ধভুক্ত',
-    'register.workQueue.statusLabel.collected': 'সংগৃহীত',
-    'register.workQueue.statusLabel.rejected': 'প্রত্যাখ্যাত',
+    'register.workQueue.labels.statuses.rejected': 'প্রত্যাখ্যাত',
     'register.workQueue.labels.events.all': 'সব ইভেন্ট',
     'register.workQueue.labels.events.birth': 'জন্ম',
     'register.workQueue.labels.events.death': 'মৃত্যু',
@@ -699,6 +686,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.buttons.reviewAndRegister': 'পর্যালোচনা এবং নিবন্ধন',
     'register.workQueue.list.buttons.review': 'পর্যালোচনা',
     'register.workQueue.list.buttons.print': 'মুদ্রণ',
+    'register.workQueue.list.buttons.update': 'Update',
     'register.workQueue.title.certificateCollection': 'সার্টিফিকেট সংগ্রহ',
     'register.workQueue.list.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'register.workQueue.buttons.newApplication': 'নতুন আবেদন',
@@ -952,6 +940,12 @@ export const BENGALI_STATE: ILanguage = {
     'unlockApp.lastTry': 'শেষ চেষ্টা',
     'unlockApp.locked':
       'আপনার অ্যাকাউন্ট লক করা হয়েছে. 1 মিনিটের মধ্যে আবার চেষ্টা করুন।',
+    'error.code': '401',
+    'error.title.unauthorized': 'Unauthorized!',
+    'error.title': 'Whoops!',
+    'error.description1': 'Something went wrong.',
+    'error.description2': "It's not you, it us. This is our fault.",
+    'goto.homepage': 'Go to Homepage',
     'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
     'register.SearchResult.searchingFor': '“{param}” এর অনুসন্ধান চলসে ',
     'register.SearchResult.searchResultFor':

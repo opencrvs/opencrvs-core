@@ -3,17 +3,8 @@ import { ILanguage } from '../reducer'
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
   messages: {
-    'app.loading.data.loadingOfflineData':
-      'We are loading some essential data, so that you can submit applications offline.  Please wait ...',
-    'app.loading.data.offlineDataLoaded': 'OpenCRVS is ready for use.',
-    'app.loading.data.continueButton': 'Continue',
-    'login.stepOneTitle': 'Login',
     'session.expire.text': 'Your session has expired. Please login again.',
-    'myDrafts.title': 'My drafts',
-    'myDrafts.labels.results.name': 'Name',
-    'myDrafts.labels.results.dob': 'D.o.B.',
-    'myDrafts.labels.results.savedOn': 'Saved on',
-    'myDrafts.labels.results.trackingID': 'Tracking ID',
+    'login.stepOneTitle': 'Login',
     'menu.back': 'Back',
     'menu.menu': 'Menu',
     'menu.items.homepage': 'Homepage',
@@ -658,10 +649,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.labels.statuses.application': 'Application',
     'register.workQueue.labels.statuses.registered': 'Registered',
     'register.workQueue.labels.statuses.collected': 'Collected',
-    'register.workQueue.statusLabel.application': 'Application',
-    'register.workQueue.statusLabel.registered': 'Registered',
-    'register.workQueue.statusLabel.collected': 'Collected',
-    'register.workQueue.statusLabel.rejected': 'rejected',
+    'register.workQueue.labels.statuses.rejected': 'Rejected',
     'register.workQueue.labels.events.all': 'All life events',
     'register.workQueue.labels.events.birth': 'Birth',
     'register.workQueue.labels.events.death': 'Death',
@@ -688,8 +676,10 @@ export const ENGLISH_STATE: ILanguage = {
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
+    'register.workQueue.labels.results.deathRegistrationNumber': 'DRN',
     'register.workQueue.labels.results.eventRegistrationNumber':
       '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
+    'register.workQueue.labels.results.action': 'Action',
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
@@ -700,6 +690,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.header.description':
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
+    'register.workQueue.tabs.inProgress': 'In progress',
+    'register.workQueue.tabs.readyForReview': 'Ready for review',
+    'register.workQueue.tabs.sentForUpdates': 'Sent for updates',
     'register.workQueue.list.buttons.review': 'Review',
     'register.workQueue.list.buttons.update': 'Update',
     'register.workQueue.list.buttons.print': 'Print',
@@ -806,6 +799,8 @@ export const ENGLISH_STATE: ILanguage = {
     'review.form.section.reviewTitle': 'Review',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.englishOnlyNameFormat': 'Must contain only English characters',
+    'validations.dobEarlierThanDom': 'Must be earlier than marriage date',
+    'validations.domLaterThanDob': 'Must be later than birth date',
     'register.home.header.hello': 'Hello {fullName}',
     'register.form.valueYes': 'Yes',
     'register.form.valueNo': 'No',
@@ -950,6 +945,12 @@ export const ENGLISH_STATE: ILanguage = {
     'unlockApp.lastTry': 'Last Try',
     'unlockApp.locked':
       'your account has been locked. Please try again in 1 minute.',
+    'error.code': '401',
+    'error.title.unauthorized': 'Unauthorized!',
+    'error.title': 'Whoops!',
+    'error.description1': 'Something went wrong.',
+    'error.description2': "It's not you, it us. This is our fault.",
+    'goto.homepage': 'Go to Homepage',
     'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
     'register.SearchResult.searchingFor': 'Searching for “{param}”',
     'register.SearchResult.searchResultFor':

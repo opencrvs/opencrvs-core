@@ -105,9 +105,6 @@ interface IDispatchProps {
   checkAuth: (urlValues: IURLParams) => void
   showConfigurationErrorNotification: () => void
 }
-interface IState {
-  loadingDataModal: boolean
-}
 
 class Component extends React.Component<
   RouteComponentProps<{}> & IPageProps & IDispatchProps,
@@ -145,11 +142,6 @@ class Component extends React.Component<
     this.props.setInitialDrafts()
   }
 
-  closeLoadingModal = () => {
-    this.setState(state => ({
-      loadingDataModal: false
-    }))
-  }
   render() {
     const { initialDraftsLoaded, offlineDataLoaded, children } = this.props
 
