@@ -240,6 +240,7 @@ interface IBaseSearchResultProps {
 
 interface IMatchParams {
   searchText: string
+  searchType: string
 }
 
 type ISearchResultProps = InjectedIntlProps &
@@ -752,10 +753,10 @@ export class SearchResultView extends React.Component<
 
   render() {
     const { intl, match } = this.props
-    const searchParam = match.params.searchText
+    const { searchText, searchType } = match.params
     return (
       <>
-        <Header />
+        <Header searchText={searchText} selectedSearchType={searchType} />
         <Container>
           <HeaderContent>
             <Query
@@ -767,7 +768,7 @@ export class SearchResultView extends React.Component<
                 sort: this.state.sortBy,
                 eventType: this.state.eventType,
                 status: this.state.status,
-                searchContent: searchParam
+                searchContent: searchText
               }}
             >
               {({ loading, error, data }) => {
@@ -778,7 +779,7 @@ export class SearchResultView extends React.Component<
                       marginPercent={35}
                       spinnerDiameter={60}
                       loadingText={intl.formatMessage(messages.searchingFor, {
-                        param: searchParam
+                        param: searchText
                       })}
                     />
                   )
@@ -799,7 +800,7 @@ export class SearchResultView extends React.Component<
                     <SearchResultText>
                       {intl.formatMessage(messages.searchResultFor, {
                         total,
-                        param: searchParam
+                        param: searchText
                       })}
                     </SearchResultText>
                     {total > 0 && (

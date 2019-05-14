@@ -65,10 +65,11 @@ export function goToPerformance() {
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
-export function goToSearchResult(searchText?: string) {
+export function goToSearchResult(searchText?: string, searchType?: string) {
   return push(
     formatUrl(SEARCH_RESULT, {
-      searchText: (searchText && searchText.toString()) || ''
+      searchText: (searchText && searchText.toString()) || '',
+      searchType: (searchType && searchType.toString()) || ''
     })
   )
 }
