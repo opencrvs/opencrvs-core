@@ -48,7 +48,17 @@ describe('SearchResult tests', async () => {
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <SearchResult match={{ params: { searchText: '' } }} />,
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
       store
     )
 
@@ -66,12 +76,10 @@ describe('SearchResult tests', async () => {
           query: SEARCH_EVENTS,
           variables: {
             locationIds: ['123456789'],
-            count: 10,
-            skip: 0,
-            sort: 'asc',
-            eventType: '',
-            status: '',
-            searchContent: ''
+            sort: 'DESC',
+            trackingId: 'DW0UTHR',
+            registrationNumber: '',
+            contactNumber: ''
           }
         },
         result: {
@@ -181,7 +189,17 @@ describe('SearchResult tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <SearchResult match={{ params: { searchText: '' } }} />,
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
       store,
       graphqlMock
     )
@@ -256,9 +274,11 @@ describe('SearchResult tests', async () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['123456789'],
-            skip: 0,
-            count: 10
+            locationIds: ['1234567s2323289'],
+            sort: 'DESC',
+            trackingId: 'DW0sdsHR',
+            registrationNumber: '',
+            contactNumber: ''
           }
         },
         error: new Error('boom')
@@ -267,7 +287,17 @@ describe('SearchResult tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <SearchResult match={{ params: { searchText: '' } }} />,
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
       store,
       graphqlMock
     )
@@ -298,12 +328,10 @@ describe('SearchResult tests', async () => {
             query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
-              count: 10,
-              skip: 0,
-              sort: 'asc',
-              eventType: '',
-              status: '',
-              searchContent: 'rafiq'
+              sort: 'DESC',
+              trackingId: 'DW0UTHR',
+              registrationNumber: '',
+              contactNumber: ''
             }
           },
           result: {
@@ -406,7 +434,17 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+        <SearchResult
+          match={{
+            params: {
+              searchText: 'DW0UTHR',
+              searchType: 'tracking-id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         graphqlMock
       )
@@ -446,12 +484,10 @@ describe('SearchResult tests', async () => {
             query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
-              count: 10,
-              skip: 0,
-              sort: 'asc',
-              eventType: '',
-              status: '',
-              searchContent: 'rafiq'
+              sort: 'DESC',
+              trackingId: 'DW0UTHR',
+              registrationNumber: '',
+              contactNumber: ''
             }
           },
           result: {
@@ -512,7 +548,17 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+        <SearchResult
+          match={{
+            params: {
+              searchText: 'DW0UTHR',
+              searchType: 'tracking-id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         graphqlMock
       )
@@ -552,12 +598,10 @@ describe('SearchResult tests', async () => {
             query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
-              count: 10,
-              skip: 0,
-              sort: 'asc',
-              eventType: '',
-              status: '',
-              searchContent: 'rafiq'
+              sort: 'DESC',
+              trackingId: 'DW0UTHR',
+              registrationNumber: '',
+              contactNumber: ''
             }
           },
           result: {
@@ -667,7 +711,17 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+        <SearchResult
+          match={{
+            params: {
+              searchText: 'DW0UTHR',
+              searchType: 'tracking-id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         graphqlMock
       )
@@ -707,12 +761,10 @@ describe('SearchResult tests', async () => {
             query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
-              count: 10,
-              skip: 0,
-              sort: 'asc',
-              eventType: '',
-              status: '',
-              searchContent: 'rafiq'
+              sort: 'DESC',
+              trackingId: '',
+              registrationNumber: '0FRTRSC111HHH',
+              contactNumber: ''
             }
           },
           result: {
@@ -810,7 +862,17 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+        <SearchResult
+          match={{
+            params: {
+              searchText: '0FRTRSC111HHH',
+              searchType: 'brn-drn'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         graphqlMock
       )
@@ -850,12 +912,10 @@ describe('SearchResult tests', async () => {
             query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
-              count: 10,
-              skip: 0,
-              sort: 'asc',
-              eventType: '',
-              status: '',
-              searchContent: 'rafiq'
+              sort: 'DESC',
+              trackingId: '',
+              registrationNumber: '',
+              contactNumber: '017111111111'
             }
           },
           result: {
@@ -958,7 +1018,17 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+        <SearchResult
+          match={{
+            params: {
+              searchText: '017111111111',
+              searchType: 'phone'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         graphqlMock
       )
@@ -998,12 +1068,10 @@ describe('SearchResult tests', async () => {
             query: SEARCH_EVENTS,
             variables: {
               locationIds: ['123456789'],
-              count: 10,
-              skip: 0,
-              sort: 'asc',
-              eventType: '',
-              status: '',
-              searchContent: 'rafiq'
+              sort: 'DESC',
+              trackingId: '',
+              registrationNumber: '',
+              contactNumber: '017111111111'
             }
           },
           result: {
@@ -1127,7 +1195,17 @@ describe('SearchResult tests', async () => {
 
       const testComponent = createTestComponent(
         // @ts-ignore
-        <SearchResult match={{ params: { searchText: 'rafiq' } }} />,
+        <SearchResult
+          match={{
+            params: {
+              searchText: '017111111111',
+              searchType: 'phone'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         graphqlMock
       )
