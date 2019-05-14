@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton, ButtonIcon } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowForward,
   ArrowBack,
@@ -97,11 +97,6 @@ const BackButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
-  /* stylelint-disable */
-  ${ButtonIcon} {
-    /* stylelint-enable */
-    margin-left: 0em;
-  }
 `
 
 const BackButtonText = styled.span`
@@ -119,14 +114,7 @@ const DraftButtonContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
 `
-const DraftButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  color: ${({ theme }) => theme.colors.secondary};
-  font-size: 14px;
-  text-decoration: underline;
-  letter-spacing: 0px;
-  margin-left: 14px;
-`
+
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
@@ -777,9 +765,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               onClick={() => this.onSaveAsDraftClicked()}
                             >
                               <DraftSimple />
-                              <DraftButtonText>
+                              <LinkButton>
                                 {intl.formatMessage(messages.valueSaveAsDraft)}
-                              </DraftButtonText>
+                              </LinkButton>
                             </DraftButtonContainer>
                           }
                         </FormAction>
