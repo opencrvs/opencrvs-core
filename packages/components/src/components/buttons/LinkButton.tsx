@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export const LinkButton = styled.a`
   width: auto;
+  margin: 0 8px;
   text-decoration: underline;
   font-family: ${({ theme }) => theme.fonts.regularFont};
   align-items: center;
