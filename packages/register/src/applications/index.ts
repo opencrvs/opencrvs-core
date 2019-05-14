@@ -15,7 +15,7 @@ const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
 
 export enum SUBMISSION_STATUS {
   DRAFT,
-  SUBMITTED
+  READY_TO_SUBMIT
 }
 
 export interface IApplication {
