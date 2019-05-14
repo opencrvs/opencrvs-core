@@ -8,9 +8,9 @@ interface IMenuAction {
 }
 export interface IMobileHeaderProps {
   id?: string
-  left?: IMenuAction
+  mobileLeft?: IMenuAction
   title: string
-  right?: IMenuAction
+  mobileRight?: IMenuAction
 }
 
 const HeaderContainer = styled.div`
@@ -49,13 +49,13 @@ const EndComponentContainer = styled.div`
 `
 class MobileHeader extends React.Component<IMobileHeaderProps> {
   render() {
-    const { id, left, right, title } = this.props
+    const { id, mobileLeft, mobileRight, title } = this.props
     return (
       <HeaderContainer id={id}>
         <EndComponentContainer>
-          {left && (
-            <Button id="mobile_header_left" onClick={left.handler}>
-              {left.icon()}
+          {mobileLeft && (
+            <Button id="mobile_header_left" onClick={mobileLeft.handler}>
+              {mobileLeft.icon()}
             </Button>
           )}
         </EndComponentContainer>
@@ -63,9 +63,9 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
           <Title id="header_title">{title}</Title>
         </HeaderBody>
         <EndComponentContainer>
-          {right && (
-            <Button id="mobile_header_right" onClick={right.handler}>
-              {right.icon()}
+          {mobileRight && (
+            <Button id="mobile_header_right" onClick={mobileRight.handler}>
+              {mobileRight.icon()}
             </Button>
           )}
         </EndComponentContainer>

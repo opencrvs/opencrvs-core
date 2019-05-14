@@ -173,12 +173,12 @@ class HeaderComp extends React.Component<IProps, IState> {
         <AppHeader
           menuItems={menuItems}
           id="register_app_header"
-          left={{
+          mobileLeft={{
             icon: () => this.hamburger(),
             handler: this.toggleMenu
           }}
           title="Mobile header"
-          right={{
+          mobileRight={{
             icon: () => <SearchDark />,
             handler: () => {
               alert('sdfsdf')
