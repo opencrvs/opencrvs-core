@@ -131,6 +131,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registeredLocationId(searchData: ISearchDataTemplate) {
       return searchData.applicationLocationId
+    },
+    duplicates(searchData: ISearchDataTemplate) {
+      return searchData.relatesTo
     }
   }
 }

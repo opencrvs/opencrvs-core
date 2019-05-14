@@ -28,6 +28,7 @@ export const SEARCH_EVENTS = gql`
           trackingId
           registrationNumber
           registeredLocationId
+          duplicates
         }
         ... on BirthEventSearchSet {
           dateOfBirth

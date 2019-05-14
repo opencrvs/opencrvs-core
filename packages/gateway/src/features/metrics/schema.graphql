@@ -19,6 +19,7 @@ type BirthKeyFigures {
   label: String
   value: Int
   total: Int
+  estimate: Int
   categoricalData: [BirthKeyFiguresData]
 }
 

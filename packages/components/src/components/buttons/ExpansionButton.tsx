@@ -5,7 +5,6 @@ import { PlusTransparent, MinusTransparent } from '../icons'
 
 const StyledButton = styled(Button)`
   color: ${({ theme }) => theme.colors.accent};
-  background: ${({ theme }) => theme.colors.white};
   display: flex;
   padding: 0 8px;
   flex: 1;

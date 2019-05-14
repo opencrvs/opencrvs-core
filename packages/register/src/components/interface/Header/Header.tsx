@@ -25,6 +25,7 @@ import { IStoreState } from 'src/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { goToHome, goToPerformance } from 'src/navigation'
+import { ProfileMenu } from 'src/components/ProfileMenu'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
@@ -168,11 +169,18 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
+    const rightMenu = [
+      {
+        element: <ProfileMenu />
+      }
+    ]
+
     return (
       <>
         <AppHeader
           menuItems={menuItems}
           id="register_app_header"
+          desktopRightMenu={rightMenu}
           left={{
             icon: () => this.hamburger(),
             handler: this.toggleMenu
