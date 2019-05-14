@@ -8,6 +8,9 @@ export const SEARCH_EVENTS = gql`
     $status: String
     $count: Int
     $skip: Int
+    $trackingId: String
+    $contactNumber: String
+    $registrationNumber: String
     $locationIds: [String]
   ) {
     searchEvents(
@@ -17,6 +20,9 @@ export const SEARCH_EVENTS = gql`
       status: $status
       count: $count
       skip: $skip
+      trackingId: $trackingId
+      registrationNumber: $registrationNumber
+      contactNumber: $contactNumber
       locationIds: $locationIds
     ) {
       totalItems

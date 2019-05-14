@@ -53,7 +53,10 @@ import {
   LOCAL_DATE_FORMAT,
   REJECTED,
   REJECT_REASON,
-  REJECT_COMMENTS
+  REJECT_COMMENTS,
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT
 } from 'src/utils/constants'
 import {
   createNamesMap,
@@ -768,7 +771,11 @@ export class SearchResultView extends React.Component<
                 sort: this.state.sortBy,
                 eventType: this.state.eventType,
                 status: this.state.status,
-                searchContent: searchText
+                searchContent: searchText,
+                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                registrationNumber:
+                  searchType === BRN_DRN_TEXT ? searchText : '',
+                contactNumber: searchType === PHONE_TEXT ? searchText : ''
               }}
             >
               {({ loading, error, data }) => {
