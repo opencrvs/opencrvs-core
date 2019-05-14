@@ -273,6 +273,7 @@ const Container = styled.div`
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;
@@ -285,7 +286,7 @@ const StyledIconAction = styled(IconAction)`
     /* stylelint-enable */
     font-size: 28px;
     font-weight: 300;
-    margin: -2px 0 -2px 120px;
+    margin: -20px 0 0 0;
     line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
