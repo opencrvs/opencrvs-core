@@ -8,7 +8,7 @@ export interface IBox extends React.HTMLAttributes<HTMLDivElement> {}
 const Wrapper = styled.div.attrs<IBox>({})`
   padding: 25px;
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
+  box-shadow: rgba(53, 67, 93, 0.32) 0px 2px 6px;
 `
 
 class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {

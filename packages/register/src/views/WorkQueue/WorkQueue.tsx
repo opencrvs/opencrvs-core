@@ -63,6 +63,7 @@ import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
+import { sentenceCase } from 'src/utils/data-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -437,7 +438,8 @@ export class WorkQueueView extends React.Component<
           event:
             (reg.registration &&
               reg.registration.type &&
-              reg.registration.type.toString()) ||
+              reg.registration.type.toString() &&
+              sentenceCase(reg.registration.type)) ||
             '',
           duplicates: (reg.registration && reg.registration.duplicates) || [],
           actions,
@@ -573,7 +575,8 @@ export class WorkQueueView extends React.Component<
           event:
             (reg.registration &&
               reg.registration.type &&
-              reg.registration.type.toString()) ||
+              reg.registration.type.toString() &&
+              sentenceCase(reg.registration.type)) ||
             '',
           duplicates: (reg.registration && reg.registration.duplicates) || [],
           actions,
@@ -679,7 +682,7 @@ export class WorkQueueView extends React.Component<
       ]
       return {
         id: draft.id,
-        event: (draft.event && draft.event.toUpperCase()) || '',
+        event: (draft.event && sentenceCase(draft.event)) || '',
         name: name || '',
         date_of_modification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||
