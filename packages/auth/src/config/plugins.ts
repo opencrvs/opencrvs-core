@@ -1,6 +1,10 @@
 import * as Good from 'good'
-import * as Rate from 'hapi-rate-limitor'
-import { MAX_RATE_LIMIT, MAX_RATE_LIMIT_DURATION } from 'src/constants'
+import * as RateLimit from 'hapi-rate-limitor'
+import {
+  MAX_RATE_LIMIT,
+  MAX_RATE_LIMIT_DURATION,
+  REDIS_HOST
+} from 'src/constants'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -36,8 +40,12 @@ export default function getPlugins() {
 
   if (process.env.RATE_LIMIT !== 'false') {
     plugins.push({
-      plugin: Rate,
+      plugin: RateLimit,
       options: {
+        redis: {
+          port: 6379,
+          host: REDIS_HOST
+        },
         userAttribute: 'id',
         max: MAX_RATE_LIMIT,
         duration: MAX_RATE_LIMIT_DURATION
