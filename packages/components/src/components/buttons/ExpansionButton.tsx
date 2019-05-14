@@ -7,8 +7,8 @@ const StyledButton = styled(Button)`
   color: ${({ theme }) => theme.colors.accent};
   background: ${({ theme }) => theme.colors.white};
   display: flex;
+  padding: 0 8px;
   flex: 1;
-  min-height: 50px;
   margin-bottom: 1px;
   &:last-child {
     margin-bottom: 0;
@@ -23,7 +23,6 @@ interface IExpansionButtonProps extends IButtonProps {
 export function ExpansionButton(props: IExpansionButtonProps) {
   return (
     <StyledButton
-      align={ICON_ALIGNMENT.LEFT}
       icon={() => {
         return props.expanded ? <MinusTransparent /> : <PlusTransparent />
       }}
