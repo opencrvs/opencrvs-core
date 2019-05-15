@@ -107,15 +107,8 @@ interface IDispatchProps {
 }
 
 class Component extends React.Component<
-  RouteComponentProps<{}> & IPageProps & IDispatchProps,
-  IState
+  RouteComponentProps<{}> & IPageProps & IDispatchProps
 > {
-  constructor(props: RouteComponentProps<{}> & IPageProps & IDispatchProps) {
-    super(props)
-    this.state = {
-      loadingDataModal: false
-    }
-  }
   componentWillReceiveProps(nextProps: RouteComponentProps<{}>) {
     const { hash } = nextProps.location
     const hashChanged = hash && hash !== this.props.location.hash
