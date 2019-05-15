@@ -709,13 +709,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.rejectionReason': 'Reason',
     'register.workQueue.labels.results.rejectionComment': 'Comment',
-    'register.workQueue.print.form.name': 'Print',
-    'register.workQueue.print.form.title': 'Print certificate',
+    'print.certificate.form.name': 'Print',
+    'print.certificate.form.title': 'Print certificate',
     'formFields.print.whoToCollect': 'Who is collecting the certificate?',
-    'register.workQueue.print.collector.mother': 'Mother',
-    'register.workQueue.print.collector.father': 'Father',
-    'register.workQueue.print.collector.other': 'Other',
-    'register.workQueue.print.collector.informant': 'Informant',
+    'print.certificate.collector.mother': 'Mother',
+    'print.certificate.collector.father': 'Father',
+    'print.certificate.collector.other': 'Other',
+    'print.certificate.collector.informant': 'Informant',
     'formFields.print.confirmMotherInformation':
       'Does their proof of ID document match the following details?',
     'formFields.print.otherPersonGivenNames': 'Given name',
@@ -726,33 +726,31 @@ export const ENGLISH_STATE: ILanguage = {
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     'formFields.print.otherPersonPrompt':
       'Because there are no details of this person on record, we need to capture their details:',
-    'register.workQueue.print.payment': 'Payment',
-    'register.workQueue.print.paymentMethod': 'Payment method',
-    'register.workQueue.print.manualPaymentMethod': 'Manual',
-    'register.workQueue.print.collectPayment':
+    'print.certificate.payment': 'Payment',
+    'print.certificate.paymentMethod': 'Payment method',
+    'print.certificate.manualPaymentMethod': 'Manual',
+    'print.certificate.collectPayment':
       'Please collect the payment, print the receipt and hand it over to the payee.',
-    'register.workQueue.print.serviceMonth':
+    'print.certificate.serviceMonth':
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.serviceYear':
+    'print.certificate.serviceYear':
       'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.birthService':
+    'print.certificate.birthService':
       'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.deathService':
+    'print.certificate.deathService':
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
-    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
-    'register.workQueue.print.printCertificate': 'Print certificate',
-    'register.workQueue.print.finish': 'Finish',
-    'register.workQueue.print.certificatePreview': 'Certificate Preview',
-    'register.workQueue.print.selectSignature': 'Select e-signatures',
-    'register.workQueue.print.addAnotherSignature': 'Add another',
+    'print.certificate.printCertificate': 'Print certificate',
+    'print.certificate.finish': 'Finish',
+    'print.certificate.certificatePreview': 'Certificate Preview',
+    'print.certificate.selectSignature': 'Select e-signatures',
+    'print.certificate.addAnotherSignature': 'Add another',
     'register.noLabel': ' ',
-    'register.workQueue.print.signature.person1':
-      'UP Secretary Shakib al hasan',
-    'register.workQueue.print.signature.person2':
-      'Local Registrar Mohammad Ashraful',
-    'register.workQueue.print.userReviewed':
+    'print.certificate.signature.person1': 'UP Secretary Shakib al hasan',
+    'print.certificate.signature.person2': 'Local Registrar Mohammad Ashraful',
+    'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',

@@ -3,17 +3,17 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   preview: {
-    id: 'register.workQueue.print.certificatePreview',
+    id: 'print.certificate.certificatePreview',
     defaultMessage: 'Certificate Preview',
     description: 'The title for certificate preview form'
   },
   selectSignature: {
-    id: 'register.workQueue.print.selectSignature',
+    id: 'print.certificate.selectSignature',
     defaultMessage: 'Select e-signatures',
     description: 'The label for choose signature select'
   },
   addAnotherSignature: {
-    id: 'register.workQueue.print.addAnotherSignature',
+    id: 'print.certificate.addAnotherSignature',
     defaultMessage: 'Add another'
   },
   noLabel: {
@@ -21,15 +21,15 @@ const messages = defineMessages({
     defaultMessage: ' '
   },
   person1: {
-    id: 'register.workQueue.print.signature.person1',
+    id: 'print.certificate.signature.person1',
     defaultMessage: 'UP Secretary Shakib al hasan'
   },
   person2: {
-    id: 'register.workQueue.print.signature.person2',
+    id: 'print.certificate.signature.person2',
     defaultMessage: 'Local Registrar Mohammad Ashraful'
   },
   informantHasReviewedInformaiton: {
-    id: 'register.workQueue.print.userReviewed',
+    id: 'print.certificate.userReviewed',
     defaultMessage:
       'The informant has reviewed and confirmed that the information on the certificate is correct.'
   }

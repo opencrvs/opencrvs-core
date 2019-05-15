@@ -699,13 +699,13 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
     'register.workQueue.labels.results.rejectionReason': 'কারণ',
     'register.workQueue.labels.results.rejectionComment': 'মন্তব্য',
-    'register.workQueue.print.form.name': 'মুদ্রণ',
-    'register.workQueue.print.form.title': 'সার্টিফিকেট মুদ্রণ',
+    'print.certificate.form.name': 'মুদ্রণ',
+    'print.certificate.form.title': 'সার্টিফিকেট মুদ্রণ',
     'formFields.print.whoToCollect': 'সার্টিফিকেটটি কে সংগ্রহ করছে?',
-    'register.workQueue.print.collector.mother': 'মা',
-    'register.workQueue.print.collector.father': 'পিতা',
-    'register.workQueue.print.collector.other': 'অন্যান্য',
-    'register.workQueue.print.collector.informant': 'তথ্যদাতা',
+    'print.certificate.collector.mother': 'মা',
+    'print.certificate.collector.father': 'পিতা',
+    'print.certificate.collector.other': 'অন্যান্য',
+    'print.certificate.collector.informant': 'তথ্যদাতা',
     'formFields.print.confirmMotherInformation':
       "যাচাইকৃত আইডি'র সঙ্গে নিম্নের বিবরণ মিলে কি না?",
     'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
@@ -716,33 +716,32 @@ export const BENGALI_STATE: ILanguage = {
       'দয়া করে সতর্ক থাকুন। আপনি যদি আরো অগ্রসর হন তবে সংগ্রাহক থেকে প্রয়োজনীয় প্রমাণক ছাড়াই আপনি একটি সার্টিফিকেট দেওয়ার জন্য দায়বদ্ধ হবেন।',
     'formFields.print.otherPersonPrompt':
       'যেহেতু রেকর্ডে ব্যক্তির কোন বিবরণ নেই, তাদের বিবরণ নিতে হবে:',
-    'register.workQueue.print.payment': 'মূল্যপরিশোধ',
-    'register.workQueue.print.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
-    'register.workQueue.print.manualPaymentMethod': 'হস্তকৃত',
-    'register.workQueue.print.collectPayment':
+    'print.certificate.payment': 'মূল্যপরিশোধ',
+    'print.certificate.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
+    'print.certificate.manualPaymentMethod': 'হস্তকৃত',
+    'print.certificate.collectPayment':
       'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
-    'register.workQueue.print.serviceMonth':
+    'print.certificate.serviceMonth':
       'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.serviceYear':
+    'print.certificate.serviceYear':
       'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.birthService':
+    'print.certificate.birthService':
       'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.deathService':
+    'print.certificate.deathService':
       'সেবা: <strong>মৃত্যুদিবসের {service} পরে মৃত্যু নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
-    'register.workQueue.print.printCertificate': 'সার্টিফিকেট মুদ্রণ',
-    'register.workQueue.print.finish': 'সমাপ্ত',
-    'register.workQueue.print.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
-    'register.workQueue.print.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
-    'register.workQueue.print.addAnotherSignature':
-      'আরও একটি স্বাক্ষর যোগ করুন',
+    'print.certificate.printCertificate': 'সার্টিফিকেট মুদ্রণ',
+    'print.certificate.finish': 'সমাপ্ত',
+    'print.certificate.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
+    'print.certificate.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
+    'print.certificate.addAnotherSignature': 'আরও একটি স্বাক্ষর যোগ করুন',
     'register.noLabel': ' ',
-    'register.workQueue.print.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
-    'register.workQueue.print.signature.person2':
+    'print.certificate.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
+    'print.certificate.signature.person2':
       'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
-    'register.workQueue.print.userReviewed':
+    'print.certificate.userReviewed':
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া গেছে',
