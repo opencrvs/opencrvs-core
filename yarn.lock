@@ -807,9 +807,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-intl@^2.3.8":
+"@types/react-intl@^2.3.17", "@types/react-intl@^2.3.8":
   version "2.3.17"
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.17.tgz#e1fc6e46e8af58bdef9531259d509380a8a99e8e"
+  integrity sha512-FGd6J1GQ7zvl1GZ3BBev83B7nfak8dqoR2PZ+l5MoisKMpd4xOLhZJC1ugpmk3Rz5F85t6HbOg9mYqXW97BsNA==
 
 "@types/react-redux@^6.0.0", "@types/react-redux@^6.0.9":
   version "6.0.13"
@@ -11611,7 +11612,7 @@ react-input-autosize@^2.2.1:
   dependencies:
     prop-types "^15.5.8"
 
-react-intl@^2.4.0:
+react-intl@^2.4.0, react-intl@^2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.8.0.tgz#20b0c1f01d1292427768aa8ec9e51ab7e36503ba"
   dependencies:
