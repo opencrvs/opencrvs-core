@@ -241,7 +241,15 @@ describe('when user is previewing the form data', () => {
             app.update()
           })
 
+          it('confirmation screen should show up', () => {
+            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
+          })
           it('should redirect to home page', () => {
+            app
+              .find('#submit_confirm')
+              .hostNodes()
+              .simulate('click')
+            app.update()
             expect(history.location.pathname).toBe(HOME)
           })
         })

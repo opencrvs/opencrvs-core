@@ -920,6 +920,12 @@ describe('when user is in the register form preview section', () => {
         .simulate('click')
       component.update()
 
+      const confirmBtn = component.find('#submit_confirm').hostNodes()
+      expect(confirmBtn.length).toEqual(1)
+
+      confirmBtn.simulate('click')
+      component.update()
+
       expect(history.location.pathname).toBe(HOME)
     })
   })
@@ -1114,6 +1120,12 @@ describe('When user is in Preview section death event', async () => {
       .hostNodes()
       .simulate('click')
 
+    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    expect(confirmBtn.length).toEqual(1)
+
+    confirmBtn.simulate('click')
+    component.update()
+
     expect(history.location.pathname).toBe(HOME)
   })
   it('Check if death location as hospital is parsed properly', () => {
@@ -1214,6 +1226,12 @@ describe('When user is in Preview section death event in offline mode', async ()
       .find('#submit_form')
       .hostNodes()
       .simulate('click')
+
+    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    expect(confirmBtn.length).toEqual(1)
+
+    confirmBtn.simulate('click')
+    component.update()
 
     expect(history.location.pathname).toBe(HOME)
   })
