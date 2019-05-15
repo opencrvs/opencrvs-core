@@ -21,7 +21,8 @@ import {
   dateGreaterThan,
   dateLessThan,
   dateNotInFuture,
-  dateFormatIsCorrect
+  dateFormatIsCorrect,
+  dateNotToday
 } from './validate'
 
 describe('validate', () => {
@@ -424,6 +425,21 @@ describe('validate', () => {
       const validDate = '2011-08-12'
       const response = undefined
       expect(isValidBirthDate(validDate)).toEqual(response)
+    })
+  })
+
+  describe("dateNotToday. Checks if a given date is today's date", () => {
+    it("should give an error message if the date is today's date", () => {
+      const todaysDate = new Date()
+      todaysDate.setHours(0, 0, 0)
+      const today = todaysDate.toDateString()
+      expect(dateNotToday()(today)).toEqual({ message: messages.dateNotToday })
+    })
+    it("should not give an error message if the date is not today's date", () => {
+      const todaysDate = new Date('1999-12-31')
+      todaysDate.setHours(0, 0, 0)
+      const today = todaysDate.toDateString()
+      expect(dateNotToday()(today)).toEqual(undefined)
     })
   })
 
