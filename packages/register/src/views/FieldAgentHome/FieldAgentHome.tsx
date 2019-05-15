@@ -146,19 +146,19 @@ const StyledIconAction = styled(IconAction)`
     color: ${({ theme }) => theme.colors.white};
   }
 `
-interface IHomeProps {
+interface IFieldAgentHomeProps {
   language: string
   userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
   draftCount: string
 }
 
-type FullProps = IHomeProps &
+type FullProps = IFieldAgentHomeProps &
   InjectedIntlProps &
   ISearchInputProps &
   RouteComponentProps<{}>
 
-class HomeView extends React.Component<FullProps> {
+class FieldAgentHomeView extends React.Component<FullProps> {
   render() {
     const { intl, language, userDetails, history } = this.props
     if (userDetails && userDetails.name && userDetails.role === 'FIELD_AGENT') {
@@ -239,9 +239,9 @@ const mapStateToProps = (store: IStoreState) => {
     userDetails: getUserDetails(store)
   }
 }
-export const Home = connect(
+export const FieldAgentHome = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction
   }
-)(injectIntl(HomeView))
+)(injectIntl(FieldAgentHomeView))

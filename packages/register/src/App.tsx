@@ -20,7 +20,6 @@ import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
 import { ReviewForm } from './views/RegisterForm/ReviewForm'
 import { SearchResult } from './views/SearchResult/SearchResult'
 import ScrollToTop from 'src/components/ScrollToTop'
-import { Home } from 'src/views/Home/Home'
 import { createClient } from 'src/utils/apolloClient'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
@@ -29,6 +28,7 @@ import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificat
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { RegistrarHome } from './views/RegistrarHome/RegistrarHome'
+import { FieldAgentHome } from './views/FieldAgentHome/FieldAgentHome'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -61,7 +61,7 @@ export class App extends React.Component<IAppProps> {
                               <ProtectedRoute
                                 exact
                                 path={routes.HOME}
-                                component={Home}
+                                component={FieldAgentHome}
                               />
                               <ProtectedRoute
                                 exact
