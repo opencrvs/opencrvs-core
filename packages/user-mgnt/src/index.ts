@@ -3,13 +3,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
 
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  CHECK_INVALID_TOKEN,
-  AUTH_URL
-} from './constants'
+import { AUTH_HOST, AUTH_PORT, CERT_PUBLIC_KEY_PATH } from './constants'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -21,7 +15,6 @@ import getUserMobile, {
 import getPlugins from './config/plugins'
 import * as database from './database'
 import { readFileSync } from 'fs'
-import { validateFunc } from '@opencrvs/commons'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -34,8 +27,8 @@ const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   const server = new Hapi.Server({
-    host: HOST,
-    port: PORT,
+    host: AUTH_HOST,
+    port: AUTH_PORT,
     routes: {
       cors: { origin: ['*'] }
     }
@@ -50,8 +43,10 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:user-mgnt-user'
     },
-    validate: (payload: any, request: Hapi.Request) =>
-      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
+    validate: (payload: any, request: any) => ({
+      isValid: true,
+      credentials: payload
+    })
   })
 
   server.auth.default('jwt')
@@ -109,7 +104,7 @@ export async function createServer() {
   async function start() {
     await server.start()
     await database.start()
-    server.log('info', `server started on ${HOST}:${PORT}`)
+    server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
   }
 
   async function stop() {
