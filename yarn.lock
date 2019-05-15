@@ -11852,7 +11852,7 @@ react-smooth@~1.0.0:
     raf "^3.4.0"
     react-transition-group "^2.5.0"
 
-react-stickynode@^2.0.1:
+react-stickynode@^2.0.1, react-stickynode@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/react-stickynode/-/react-stickynode-2.1.1.tgz#1d5160641c72b1a954c872b26130919cb1ce4a78"
   dependencies:
