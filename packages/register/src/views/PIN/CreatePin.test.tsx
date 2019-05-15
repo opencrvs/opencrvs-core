@@ -24,7 +24,7 @@ describe('Create PIN view', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
@@ -67,7 +67,7 @@ describe('Create PIN view', async () => {
 
     expect(c.find('span#title-text').text()).toBe('Create a PIN')
 
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
@@ -80,11 +80,29 @@ describe('Create PIN view', async () => {
     expect(c.find('span#title-text').text()).toBe('Re-enter your new PIN')
   })
 
+  it('gives error when there are 4 repeating digits in the PIN', async () => {
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-1').simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, 50)
+    })
+    c.update()
+
+    expect(c.find('span#title-text').text()).toBe(
+      'PIN cannot have 4 repeating digits.'
+    )
+  })
+
   it('stores the hashed PIN in storage if PINs match', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
@@ -97,7 +115,7 @@ describe('Create PIN view', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {

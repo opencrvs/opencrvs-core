@@ -57,10 +57,19 @@ const ErrorBox = styled.div`
 type IProps = InjectedIntlProps & { onComplete: () => void }
 
 class CreatePinComponent extends React.Component<IProps> {
-  state = { pin: null, pinMatchError: false }
+  state = { pin: null, pinMatchError: false, repeatingDigits: false }
 
   firstPINEntry = (pin: string) => {
-    this.setState({ pin })
+    const { pin: enteredPIN } = this.state
+    if (this.repeatingDigitsExist(enteredPIN)) {
+      this.setState({ pin: null, repeatingDigits: true })
+    } else {
+      this.setState({ pin, repeatingDigits: false })
+    }
+  }
+
+  repeatingDigitsExist = (pin: string | null) => {
+    return pin && Number(pin) % 1111 === 0
   }
 
   secondPINEntry = (pin: string) => {
@@ -98,7 +107,7 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 
   render() {
-    const { pin, pinMatchError } = this.state
+    const { pin, pinMatchError, repeatingDigits } = this.state
     const { intl } = this.props
 
     return (
@@ -117,10 +126,15 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.pinMatchError)}
               </ErrorBox>
             )}
+            {repeatingDigits && (
+              <ErrorBox id="error-text">
+                {intl.formatMessage(messages.pinRepeatingDigitsError)}
+              </ErrorBox>
+            )}
             <PINKeypad onComplete={this.firstPINEntry} />
           </>
         )}
-        {pin && (
+        {pin && !repeatingDigits && (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.reEnterTitle)}
