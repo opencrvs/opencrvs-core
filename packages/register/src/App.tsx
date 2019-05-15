@@ -30,6 +30,7 @@ import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScree
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
+import { Details } from 'src/views/Home/Details'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 
 interface IAppProps {
@@ -133,6 +134,10 @@ export class App extends React.Component<IAppProps> {
                               <ProtectedRoute
                                 path={routes.PRINT_CERTIFICATE}
                                 component={PrintCertificateAction}
+                              />
+                              <ProtectedRoute
+                                path={routes.APPLICATION_DETAIL}
+                                component={Details}
                               />
                             </Switch>
                           </ProtectedPage>

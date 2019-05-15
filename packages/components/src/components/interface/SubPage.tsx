@@ -6,10 +6,13 @@ import { Box } from './Box'
 
 const SubPageContainer = styled.div`
   width: 100%;
-`
-const HeaderContainer = styled.div`
+  height: 100vh;
+  font-family: ${({ theme }) => theme.fonts.regularFont};
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
+`
+
+const HeaderContainer = styled.div`
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   height: 64px;
   max-width: 940px;
@@ -29,14 +32,17 @@ const BackButton = styled(Button)`
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
 const MenuTitle = styled.span`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
   font-size: 18px;
   font-weight: 600;
   line-height: 27px;
   margin-left: 35px;
 `
 const BodyContainer = styled(Box)`
+  max-width: 940px;
+  height: inherit;
+  margin: auto;
   padding: 30px 0px 30px 65px;
+  font-size: 16px;
 `
 interface IProps {
   title: string
