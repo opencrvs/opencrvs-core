@@ -71,20 +71,6 @@ describe('when user is selecting the vital event', () => {
       history.replace(SELECT_VITAL_EVENT)
       await flushPromises()
       app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      Array.apply(null, { length: 8 }).map(() => {
-        app
-          .find('#keypad-1')
-          .hostNodes()
-          .simulate('click')
-      })
-      await flushPromises()
-      app.update()
     })
     it('lists the options', () => {
       expect(app.find('button#select_birth_event')).toHaveLength(1)
