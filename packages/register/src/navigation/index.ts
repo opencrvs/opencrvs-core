@@ -6,8 +6,6 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
-  MY_RECORDS,
-  MY_DRAFTS,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
   WORK_QUEUE_TAB
@@ -73,12 +71,6 @@ export function goToSearchResult(searchText?: string) {
       searchText: (searchText && searchText.toString()) || ''
     })
   )
-}
-export function goToMyRecords() {
-  return push(MY_RECORDS)
-}
-export function goToMyDrafts() {
-  return push(MY_DRAFTS)
 }
 
 export function goToBirthRegistrationAsParent(draftId: string) {

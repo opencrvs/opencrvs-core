@@ -22,10 +22,8 @@ import { SearchResult } from './views/SearchResult/SearchResult'
 import ScrollToTop from 'src/components/ScrollToTop'
 import { Home } from 'src/views/Home/Home'
 import { createClient } from 'src/utils/apolloClient'
-import { MyRecords } from './views/MyRecords/MyRecords'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
-import { MyDrafts } from './views/MyDrafts/MyDrafts'
 import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -117,14 +115,6 @@ export class App extends React.Component<IAppProps> {
                               <ProtectedRoute
                                 path={routes.SEARCH_RESULT}
                                 component={SearchResult}
-                              />
-                              <ProtectedRoute
-                                path={routes.MY_RECORDS}
-                                component={MyRecords}
-                              />
-                              <ProtectedRoute
-                                path={routes.MY_DRAFTS}
-                                component={MyDrafts}
                               />
                               <ProtectedRoute
                                 path={routes.REVIEW_DUPLICATES}

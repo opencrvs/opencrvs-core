@@ -279,22 +279,22 @@ export const messages = defineMessages({
     description: 'The description for NATIONAL_REGISTRAR role'
   },
   application: {
-    id: 'register.workQueue.statusLabel.application',
+    id: 'register.workQueue.labels.statuses.application',
     defaultMessage: 'application',
     description: 'The status label for application'
   },
   registered: {
-    id: 'register.workQueue.statusLabel.registered',
+    id: 'register.workQueue.labels.statuses.registered',
     defaultMessage: 'registered',
     description: 'The status label for registered'
   },
   rejected: {
-    id: 'register.workQueue.statusLabel.rejected',
+    id: 'register.workQueue.labels.statuses.rejected',
     defaultMessage: 'rejected',
     description: 'The status label for rejected'
   },
   collected: {
-    id: 'register.workQueue.statusLabel.collected',
+    id: 'register.workQueue.labels.statuses.collected',
     defaultMessage: 'collected',
     description: 'The status label for collected'
   },

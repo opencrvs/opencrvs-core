@@ -72,11 +72,6 @@ const messages = defineMessages({
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
   },
-  noId: {
-    id: 'formFields.idTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
-  },
   fetchDeceasedDetails: {
     id: 'formFields.fetchDeceasedDetails',
     defaultMessage: "Retrieve Deceased's Details",
