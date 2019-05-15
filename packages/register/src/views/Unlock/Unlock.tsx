@@ -17,6 +17,7 @@ import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { IUserData } from 'src/drafts'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { pins } from './ComparePINs'
+import { ErrorMessage } from '@opencrvs/components/lib/forms'
 
 const messages = defineMessages({
   incorrect: {
@@ -66,14 +67,11 @@ const LogoutHeader = styled.a`
     margin-right: 10px;
   }
 `
+const Container = styled.div`
+  text-align: center;
+`
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
-`
-const ErrorMsg = styled.div`
-  background-color: ${({ theme }) => theme.colors.danger};
-  color: ${({ theme }) => theme.colors.white};
-  padding: 10px 20px;
-  text-align: center;
 `
 
 interface IState {
@@ -152,7 +150,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   showErrorMessage() {
     return (
       this.state.errorMessage && (
-        <ErrorMsg id="errorMsg">{this.state.errorMessage}</ErrorMsg>
+        <ErrorMessage id="errorMsg">{this.state.errorMessage}</ErrorMessage>
       )
     )
   }
@@ -261,14 +259,17 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           <span>Logout</span>
           <Logout />
         </LogoutHeader>
-        <Logo />
-        {this.showName()}
-        {this.showErrorMessage()}
-        <PINKeypad
-          onComplete={this.onPinProvided}
-          pin={this.state.pin}
-          key={this.state.resetKey}
-        />
+        <Container>
+          <Logo />
+          {this.showName()}
+
+          {this.showErrorMessage()}
+          <PINKeypad
+            onComplete={this.onPinProvided}
+            pin={this.state.pin}
+            key={this.state.resetKey}
+          />
+        </Container>
         <LogoutConfirmation
           show={this.state.showLogoutModal}
           handleClose={this.toggleLogoutModal}

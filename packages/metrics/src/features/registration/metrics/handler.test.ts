@@ -47,7 +47,7 @@ describe('verify metrics handler', () => {
     server = await createServer()
   })
 
-  it.only('returns ok for valid request', async () => {
+  it('returns ok for valid request', async () => {
     fetch.mockResponse(JSON.stringify(mockLocation))
     readPoints.mockImplementation(() => {
       return [
@@ -86,20 +86,21 @@ describe('verify metrics handler', () => {
     expect(res.statusCode).toBe(400)
   })
 
-  it('return 500 for exception', async () => {
+  it('returns empty keyfigure if no matching data found', async () => {
+    fetch.mockResponse(JSON.stringify(mockLocation))
     readPoints.mockImplementation(() => {
-      throw new Error()
+      return null
     })
 
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/metrics/birth?timeStart=1552469068679101074&timeEnd=1554814894419279468&locationId=Location/b21ce04e-7ccd-4d65-929f-453bc193a736',
+        '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419&locationId=Location/b21ce04e-7ccd-4d65-929f-453bc193a736',
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
 
-    expect(res.statusCode).toBe(500)
+    expect(res.statusCode).toBe(200)
   })
 })

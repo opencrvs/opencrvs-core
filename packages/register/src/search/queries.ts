@@ -25,10 +25,10 @@ export const SEARCH_EVENTS = gql`
         type
         registration {
           status
-          dateOfApplication
           trackingId
           registrationNumber
           registeredLocationId
+          duplicates
         }
         ... on BirthEventSearchSet {
           dateOfBirth

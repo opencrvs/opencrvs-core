@@ -18,6 +18,7 @@ export const DEATH = 'death'
 export const OFFLINE = 'offline'
 export const REJECTED = 'REJECTED'
 export const REJECT_REASON = 'reason'
+export const REJECT_COMMENTS = 'comment'
 export const DECLARED = 'DECLARED'
 export const LANG_EN = 'en'
 

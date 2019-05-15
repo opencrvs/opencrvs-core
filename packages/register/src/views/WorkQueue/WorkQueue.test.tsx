@@ -37,6 +37,65 @@ const nameObj = {
   }
 }
 
+const demoUserData = {
+  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+  registration: {
+    trackingId: 'B111111',
+    contactPhoneNumber: '01622688231',
+    type: 'BIRTH',
+    status: [
+      {
+        timestamp: '2018-12-07T13:11:49.380Z',
+        user: {
+          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful'
+            },
+            {
+              use: 'bn',
+              firstNames: '',
+              familyName: ''
+            }
+          ],
+          role: 'LOCAL_REGISTRAR'
+        },
+        location: {
+          id: '123',
+          name: 'Kaliganj Union Sub Center',
+          alias: ['']
+        },
+        office: {
+          id: '123',
+          name: 'Kaliganj Union Sub Center',
+          alias: [''],
+          address: {
+            district: '7876',
+            state: 'iuyiuy'
+          }
+        },
+        type: 'REGISTERED'
+      }
+    ]
+  },
+  child: {
+    name: [
+      {
+        use: 'bn',
+        firstNames: '',
+        familyName: 'অনিক'
+      }
+    ],
+    birthDate: '2010-10-10'
+  },
+  createdAt: '2018-05-23T14:44:58+02:00'
+}
+const userData: any = []
+for (let i = 0; i < 14; i++) {
+  userData.push(demoUserData)
+}
 merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
@@ -508,7 +567,7 @@ describe('WorkQueue tests', async () => {
     expect(data[0].event_time_elapsed).toBe('8 years ago')
     expect(data[0].application_time_elapsed).toBe('10 months ago')
     expect(data[0].tracking_id).toBe('B111111')
-    expect(data[0].event).toBe('BIRTH')
+    expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
 
     testComponent.component.unmount()
@@ -685,7 +744,7 @@ describe('WorkQueue tests', async () => {
     expect(data[1].id).toBe('cc66d69c-7f0a-4047-9283-f066571830f1')
     expect(data[1].contact_number).toBe('01622688231')
     expect(data[1].date_of_rejection).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[1].event).toBe('DEATH')
+    expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
 
     testComponent.component.unmount()
@@ -741,9 +800,147 @@ describe('WorkQueue tests', async () => {
     expect(data[1].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[1].name).toBe('Anik')
     expect(data[1].date_of_modification).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[1].event).toBe('BIRTH')
+    expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
 
+    testComponent.component.unmount()
+  })
+
+  it('should show pagination bar if items more than 11 in ReviewTab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATIONS_QUERY,
+          variables: {
+            status: EVENT_STATUS.DECLARED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            listEventRegistrations: {
+              totalItems: 13,
+              results: userData
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue match={{ params: { tabId: 'review' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const pagiBtn = testComponent.component.find('#pagination')
+
+    expect(pagiBtn.hostNodes()).toHaveLength(1)
+
+    testComponent.component
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.unmount()
+  })
+
+  it('should show pagination bar in Review  if items more than 11', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATIONS_QUERY,
+          variables: {
+            status: EVENT_STATUS.REJECTED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            listEventRegistrations: {
+              totalItems: 13,
+              results: userData
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue match={{ params: { tabId: 'updates' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const pagiBtn = testComponent.component.find('#pagination')
+
+    expect(pagiBtn.hostNodes()).toHaveLength(1)
+    testComponent.component
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+
+    testComponent.component.unmount()
+  })
+
+  it('Should render pagination in progress tab if data is more than 10', async () => {
+    jest.clearAllMocks()
+    for (let i = 0; i < 12; i++) {
+      const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
+      store.dispatch(storeDraft(draft))
+    }
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <WorkQueue
+        match={{
+          params: {
+            tabId: 'progress'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    const pagiBtn = testComponent.component.find('#pagination')
+
+    expect(pagiBtn.hostNodes()).toHaveLength(1)
+    testComponent.component
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
     testComponent.component.unmount()
   })
 })
