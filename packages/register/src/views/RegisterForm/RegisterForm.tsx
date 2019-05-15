@@ -509,7 +509,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  submitForm = (application: IApplication) => {
+  submitForm = () => {
+    this.setState({ showSubmitModal: true })
+  }
+
+  confirmSubmission = (application: IApplication) => {
     application.submissionStatus =
       SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
     this.props.modifyApplication(application)
@@ -684,7 +688,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     <ReviewSection
                       tabRoute={this.props.tabRoute}
                       draft={application}
-                      submitClickEvent={() => this.submitForm(application)}
+                      submitClickEvent={this.submitForm}
                       saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
                       deleteApplicationClickEvent={() => {
                         this.props.deleteApplication(application)
@@ -805,60 +809,38 @@ class RegisterFormView extends React.Component<FullProps, State> {
         )}
 
         {this.state.showSubmitModal && (
-          <MutationProvider
-            event={this.getEvent()}
-            action={Action.SUBMIT_FOR_REVIEW}
-            form={registerForm}
-            application={application}
-            onCompleted={this.successfulSubmission}
-            onError={this.offlineSubmission}
+          <Modal
+            title={intl.formatMessage(messages.submitConfirmation)}
+            actions={[
+              <ConfirmBtn
+                key="submit"
+                id="submit_confirm"
+                // @ts-ignore
+                onClick={() => this.confirmSubmission(application)}
+              >
+                <>
+                  <TickLarge />
+                  {intl.formatMessage(messages.submitButton)}
+                </>
+              </ConfirmBtn>,
+              <CancelButton
+                id="cancel-btn"
+                key="cancel"
+                onClick={() => {
+                  this.toggleSubmitModalOpen()
+                  if (document.documentElement) {
+                    document.documentElement.scrollTop = 0
+                  }
+                }}
+              >
+                {intl.formatMessage(messages.cancel)}
+              </CancelButton>
+            ]}
+            show={this.state.showSubmitModal}
+            handleClose={this.toggleSubmitModalOpen}
           >
-            <MutationContext.Consumer>
-              {({ mutation, loading, data }) => (
-                <Modal
-                  title={intl.formatMessage(messages.submitConfirmation)}
-                  actions={[
-                    <ConfirmBtn
-                      key="submit"
-                      id="submit_confirm"
-                      disabled={loading || data}
-                      // @ts-ignore
-                      onClick={() => mutation()}
-                      icon={() => {
-                        return !loading ? (
-                          <>
-                            <TickLarge />
-                            <span style={{ paddingLeft: '16px' }}>
-                              {' '}
-                              {intl.formatMessage(messages.submitButton)}
-                            </span>
-                          </>
-                        ) : (
-                          <ButtonSpinner id="submit_confirm_spinner" />
-                        )
-                      }}
-                    />,
-                    <CancelButton
-                      id="cancel-btn"
-                      key="cancel"
-                      onClick={() => {
-                        this.toggleSubmitModalOpen()
-                        if (document.documentElement) {
-                          document.documentElement.scrollTop = 0
-                        }
-                      }}
-                    >
-                      {intl.formatMessage(messages.cancel)}
-                    </CancelButton>
-                  ]}
-                  show={this.state.showSubmitModal}
-                  handleClose={this.toggleSubmitModalOpen}
-                >
-                  {intl.formatMessage(messages.submitDescription)}
-                </Modal>
-              )}
-            </MutationContext.Consumer>
-          </MutationProvider>
+            {intl.formatMessage(messages.submitDescription)}
+          </Modal>
         )}
         {this.state.showRegisterModal && (
           <MutationProvider
