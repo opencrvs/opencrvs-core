@@ -1,12 +1,12 @@
 import { readFileSync } from 'fs'
 
-export const HOST = process.env.AUTH_HOST || 'localhost'
-export const PORT = process.env.AUTH_PORT || 2020
+export const HOST = process.env.HOST || 'localhost'
+export const PORT = process.env.PORT || 2020
 
 export const LANGUAGE = process.env.LANGUAGE || 'bn'
 export const COUNTRY_ALPHA3 = process.env.COUNTRY_ALPHA3 || 'BGD'
-/* 
-  For these locales sms content will not be sent as unicoded payload 
+/*
+  For these locales sms content will not be sent as unicoded payload
   In future based on our experience on different countries we can add more locals here
 */
 export const NON_UNICODED_LANGUAGES = ['en']
@@ -35,3 +35,8 @@ export const INFOBIP_API_KEY = process.env.INFOBIP_API_KEY_PATH
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
+
+export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
+// Check if the token has been invalided in the auth service before it has expired
+// This needs to be a string to make it easy to pass as an ENV var.
+export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
