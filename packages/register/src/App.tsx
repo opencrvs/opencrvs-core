@@ -27,8 +27,8 @@ import { SessionExpireConfirmation } from './components/SessionExpireConfirmatio
 import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { RegistrarHome } from './views/RegistrarHome/RegistrarHome'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -100,13 +100,13 @@ export class App extends React.Component<IAppProps> {
                               />
                               <ProtectedRoute
                                 exact
-                                path={routes.WORK_QUEUE}
-                                component={WorkQueue}
+                                path={routes.REGISTRAR_HOME}
+                                component={RegistrarHome}
                               />
                               <ProtectedRoute
                                 exact
-                                path={routes.WORK_QUEUE_TAB}
-                                component={WorkQueue}
+                                path={routes.REGISTRAR_HOME_TAB}
+                                component={RegistrarHome}
                               />
                               <ProtectedRoute
                                 path={routes.CONFIRMATION_SCREEN}

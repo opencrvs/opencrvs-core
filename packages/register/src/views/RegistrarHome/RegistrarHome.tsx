@@ -56,7 +56,7 @@ import { createNamesMap } from 'src/utils/data-formatting'
 import { formatLongDate } from 'src/utils/date-formatting'
 import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
-import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
+import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { sentenceCase } from 'src/utils/data-formatting'
 
@@ -295,29 +295,29 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-interface IBaseWorkQueueProps {
+interface IBaseRegistrarHomeProps {
   theme: ITheme
   language: string
   scope: Scope
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
-  goToWorkQueueTab: typeof goToWorkQueueTabAction
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
   drafts: IDraft[]
 }
 
-interface IWorkQueueState {
+interface IRegistrarHomeState {
   progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
 }
 
-type IWorkQueueProps = InjectedIntlProps &
+type IRegistrarHomeProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseWorkQueueProps
+  IBaseRegistrarHomeProps
 
 const TAB_ID = {
   inProgress: 'progress',
@@ -329,12 +329,12 @@ export const EVENT_STATUS = {
   DECLARED: 'DECLARED',
   REJECTED: 'REJECTED'
 }
-export class WorkQueueView extends React.Component<
-  IWorkQueueProps,
-  IWorkQueueState
+export class RegistrarHomeView extends React.Component<
+  IRegistrarHomeProps,
+  IRegistrarHomeState
 > {
   pageSize = 10
-  constructor(props: IWorkQueueProps) {
+  constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
       progressCurrentPage: 1,
@@ -750,7 +750,7 @@ export class WorkQueueView extends React.Component<
                         align={ICON_ALIGNMENT.LEFT}
                         icon={() => <StatusProgress />}
                         onClick={() =>
-                          this.props.goToWorkQueueTab(TAB_ID.inProgress)
+                          this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
                         }
                       >
                         {intl.formatMessage(messages.inProgress)} (
@@ -763,7 +763,7 @@ export class WorkQueueView extends React.Component<
                         align={ICON_ALIGNMENT.LEFT}
                         icon={() => <StatusOrange />}
                         onClick={() =>
-                          this.props.goToWorkQueueTab(TAB_ID.readyForReview)
+                          this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
                         }
                       >
                         {intl.formatMessage(messages.readyForReview)} (
@@ -776,7 +776,7 @@ export class WorkQueueView extends React.Component<
                         align={ICON_ALIGNMENT.LEFT}
                         icon={() => <StatusRejected />}
                         onClick={() =>
-                          this.props.goToWorkQueueTab(TAB_ID.sentForUpdates)
+                          this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
                         }
                       >
                         {intl.formatMessage(messages.sentForUpdates)} (
@@ -1043,13 +1043,13 @@ function mapStateToProps(
   }
 }
 
-export const WorkQueue = connect(
+export const RegistrarHome = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
-    goToWorkQueueTab: goToWorkQueueTabAction,
+    goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(WorkQueueView)))
+)(injectIntl(withTheme(RegistrarHomeView)))
