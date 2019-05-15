@@ -70,7 +70,7 @@ describe('when user has starts a new application', () => {
       draft = createApplication(Event.BIRTH)
       store.dispatch(storeApplication(draft))
       history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
+        DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
       )
       await flushPromises()
       app.update()
@@ -87,7 +87,7 @@ describe('when user has starts a new application', () => {
       draft = createApplication(Event.BIRTH)
       store.dispatch(storeApplication(draft))
       history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', draft.id.toString())
+        DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
       )
       app.update()
       app
@@ -120,8 +120,9 @@ describe('when user has starts a new application', () => {
       it('stores the value to a new draft', () => {
         const mockCalls = (storage.setItem as jest.Mock).mock.calls
         const userData = mockCalls[mockCalls.length - 1]
-        const storedDrafts = JSON.parse(userData[userData.length - 1])[0].drafts
-        expect(storedDrafts[0].data.child.firstNames).toEqual('hello')
+        const storedApplications = JSON.parse(userData[userData.length - 1])[0]
+          .applications
+        expect(storedApplications[0].data.child.firstNames).toEqual('hello')
       })
     })
 

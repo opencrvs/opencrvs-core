@@ -1,22 +1,22 @@
-import * as React from 'react'
-import { ReviewForm } from './ReviewForm'
-import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/birth/queries'
-import { GET_DEATH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/death/queries'
-import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
-import { createStore } from 'src/store'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import {
   createReviewApplication,
-  IApplication,
   getStorageApplicationsSuccess,
+  IApplication,
   storeApplication
 } from '@opencrvs/register/src/applications'
-import { v4 as uuid } from 'uuid'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
-import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
-import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { Event } from '@opencrvs/register/src/forms'
+import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
+import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
+import * as React from 'react'
 import { queries } from 'src/profile/queries'
+import { createStore } from 'src/store'
+import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
+import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/birth/queries'
+import { GET_DEATH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/death/queries'
+import { v4 as uuid } from 'uuid'
+import { ReviewForm } from './ReviewForm'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -91,12 +91,12 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('it returns birth registration', async () => {
-    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: draft.id }
+          variables: { id: application.id }
         },
         result: {
           data: {
@@ -218,20 +218,20 @@ describe('ReviewForm tests', async () => {
         history={history}
         scope={scope}
         staticContext={mock}
-        event={draft.event}
+        event={application.event}
         registerForm={form}
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: draft.id,
+            applicationId: application.id,
             tabId: 'review',
-            event: draft.event.toLowerCase()
+            event: application.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={draft.id}
+        applicationId={application.id}
       />,
       store,
       graphqlMock
@@ -244,7 +244,7 @@ describe('ReviewForm tests', async () => {
     testComponent.component.update()
     const data = testComponent.component
       .find(RegisterForm)
-      .prop('draft') as IApplication
+      .prop('application') as IApplication
 
     expect(data.data.child).toEqual({
       _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
@@ -272,12 +272,12 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('Shared contact phone number should be set properly', async () => {
-    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: draft.id }
+          variables: { id: application.id }
         },
         result: {
           data: {
@@ -378,20 +378,20 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={draft.event}
+        event={application.event}
         registerForm={form}
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: draft.id,
+            applicationId: application.id,
             tabId: 'review',
-            event: draft.event.toLowerCase()
+            event: application.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={draft.id}
+        applicationId={application.id}
       />,
       store,
       graphqlMock
@@ -404,18 +404,18 @@ describe('ReviewForm tests', async () => {
 
     const data = testComponent.component
       .find(RegisterForm)
-      .prop('draft') as IApplication
+      .prop('application') as IApplication
 
     expect(data.data.registration.registrationPhone).toBe('01733333333')
     testComponent.component.unmount()
   })
   it('when registration has attachment', async () => {
-    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: draft.id }
+          variables: { id: application.id }
         },
         result: {
           data: {
@@ -479,20 +479,20 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={draft.event}
+        event={application.event}
         registerForm={form}
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: draft.id,
+            applicationId: application.id,
             tabId: 'review',
-            event: draft.event.toLowerCase()
+            event: application.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={draft.id}
+        applicationId={application.id}
       />,
       store,
       graphqlMock
@@ -506,7 +506,7 @@ describe('ReviewForm tests', async () => {
 
     const data = testComponent.component
       .find(RegisterForm)
-      .prop('draft') as IApplication
+      .prop('application') as IApplication
 
     expect(data.data.documents.image_uploader).toEqual([
       {
@@ -521,12 +521,12 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('check registration', async () => {
-    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
         request: {
           query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-          variables: { id: draft.id }
+          variables: { id: application.id }
         },
         result: {
           data: {
@@ -637,20 +637,20 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={draft.event}
+        event={application.event}
         registerForm={form}
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: draft.id,
+            applicationId: application.id,
             tabId: 'review',
-            event: draft.event.toLowerCase()
+            event: application.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={draft.id}
+        applicationId={application.id}
       />,
       store,
       graphqlMock
@@ -664,7 +664,7 @@ describe('ReviewForm tests', async () => {
 
     const data = testComponent.component
       .find(RegisterForm)
-      .prop('draft') as IApplication
+      .prop('application') as IApplication
 
     expect(data.data.registration).toEqual({
       _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
@@ -679,8 +679,8 @@ describe('ReviewForm tests', async () => {
     testComponent.component.unmount()
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
-    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
-    draft.data = {
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    application.data = {
       child: {
         attendantAtBirth: 'NURSE',
         childBirthDate: '2001-01-01',
@@ -703,11 +703,11 @@ describe('ReviewForm tests', async () => {
       getStorageApplicationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [draft]
+          drafts: [application]
         })
       )
     )
-    store.dispatch(storeApplication(draft))
+    store.dispatch(storeApplication(application))
 
     const testComponent = createTestComponent(
       <ReviewForm
@@ -715,20 +715,20 @@ describe('ReviewForm tests', async () => {
         history={history}
         staticContext={mock}
         scope={scope}
-        event={draft.event}
+        event={application.event}
         registerForm={form}
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: draft.id,
+            applicationId: application.id,
             tabId: 'review',
-            event: draft.event.toLowerCase()
+            event: application.event.toLowerCase()
           },
           isExact: true,
           path: '',
           url: ''
         }}
-        applicationId={draft.id}
+        applicationId={application.id}
       />,
       store
     )
@@ -740,7 +740,7 @@ describe('ReviewForm tests', async () => {
     testComponent.component.update()
     const data = testComponent.component
       .find(RegisterForm)
-      .prop('draft') as IApplication
+      .prop('application') as IApplication
 
     expect(data.data).toEqual({
       child: {
@@ -766,12 +766,12 @@ describe('ReviewForm tests', async () => {
   })
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
-      const draft = createReviewApplication(uuid(), {}, Event.DEATH)
+      const application = createReviewApplication(uuid(), {}, Event.DEATH)
       const graphqlMock = [
         {
           request: {
             query: GET_DEATH_REGISTRATION_FOR_REVIEW,
-            variables: { id: draft.id }
+            variables: { id: application.id }
           },
           result: {
             data: {
@@ -946,20 +946,20 @@ describe('ReviewForm tests', async () => {
           history={history}
           scope={scope}
           staticContext={mock}
-          event={draft.event}
+          event={application.event}
           registerForm={getReviewForm(store.getState()).death}
           tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
           match={{
             params: {
-              draftId: draft.id,
+              applicationId: application.id,
               tabId: 'review',
-              event: draft.event.toLowerCase()
+              event: application.event.toLowerCase()
             },
             isExact: true,
             path: '',
             url: ''
           }}
-          applicationId={draft.id}
+          applicationId={application.id}
         />,
         store,
         graphqlMock
@@ -972,7 +972,7 @@ describe('ReviewForm tests', async () => {
       testComponent.component.update()
       const data = testComponent.component
         .find(RegisterForm)
-        .prop('draft') as IApplication
+        .prop('application') as IApplication
 
       expect(data.data.deceased).toEqual({
         iDType: 'PASSPORT',
@@ -1014,12 +1014,12 @@ describe('ReviewForm tests', async () => {
       testComponent.component.unmount()
     })
     it('populates proper casue of death section', async () => {
-      const draft = createReviewApplication(uuid(), {}, Event.DEATH)
+      const application = createReviewApplication(uuid(), {}, Event.DEATH)
       const graphqlMock = [
         {
           request: {
             query: GET_DEATH_REGISTRATION_FOR_REVIEW,
-            variables: { id: draft.id }
+            variables: { id: application.id }
           },
           result: {
             data: {
@@ -1194,20 +1194,20 @@ describe('ReviewForm tests', async () => {
           history={history}
           scope={scope}
           staticContext={mock}
-          event={draft.event}
+          event={application.event}
           registerForm={getReviewForm(store.getState()).death}
           tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
           match={{
             params: {
-              draftId: draft.id,
+              applicationId: application.id,
               tabId: 'review',
-              event: draft.event.toLowerCase()
+              event: application.event.toLowerCase()
             },
             isExact: true,
             path: '',
             url: ''
           }}
-          applicationId={draft.id}
+          applicationId={application.id}
         />,
         store,
         graphqlMock
@@ -1220,7 +1220,7 @@ describe('ReviewForm tests', async () => {
       testComponent.component.update()
       const data = testComponent.component
         .find(RegisterForm)
-        .prop('draft') as IApplication
+        .prop('application') as IApplication
 
       expect(data.data.causeOfDeath).toEqual({
         causeOfDeathEstablished: true,
@@ -1238,12 +1238,12 @@ describe('ReviewForm tests', async () => {
     })
 
     it('shows error message for user with declare scope', async () => {
-      const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+      const application = createReviewApplication(uuid(), {}, Event.BIRTH)
       const graphqlMock = [
         {
           request: {
             query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-            variables: { id: draft.id }
+            variables: { id: application.id }
           },
           result: {
             data: {
@@ -1284,20 +1284,20 @@ describe('ReviewForm tests', async () => {
           history={history}
           staticContext={mock}
           scope={scope}
-          event={draft.event}
+          event={application.event}
           registerForm={form}
           tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
           match={{
             params: {
-              draftId: draft.id,
+              draftId: application.id,
               tabId: 'review',
-              event: draft.event.toLowerCase()
+              event: application.event.toLowerCase()
             },
             isExact: true,
             path: '',
             url: ''
           }}
-          applicationId={draft.id}
+          applicationId={application.id}
         />,
         store,
         graphqlMock

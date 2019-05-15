@@ -4,8 +4,7 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames,
-  wait
+  mockDeathApplicationDataWithoutFirstNames
 } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -25,7 +24,8 @@ import { createStore } from '../../store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   REVIEW_EVENT_PARENT_FORM_TAB,
-  DRAFT_DEATH_FORM_TAB
+  DRAFT_DEATH_FORM_TAB,
+  HOME
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -920,13 +920,7 @@ describe('when user is in the register form preview section', () => {
         .simulate('click')
       component.update()
 
-      const previewBtn = component.find('#cancel-btn').hostNodes()
-      expect(previewBtn.length).toEqual(1)
-
-      previewBtn.simulate('click')
-      component.update()
-
-      expect(component.find('#cancel-btn').hostNodes().length).toEqual(0)
+      expect(history.location.pathname).toBe(HOME)
     })
   })
 })
@@ -1120,8 +1114,7 @@ describe('When user is in Preview section death event', async () => {
       .hostNodes()
       .simulate('click')
 
-    const modalSubmitBtn = component.find('#submit_confirm').hostNodes()
-    expect(modalSubmitBtn.length).toEqual(1)
+    expect(history.location.pathname).toBe(HOME)
   })
   it('Check if death location as hospital is parsed properly', () => {
     const hospitalLocatioMockDeathApplicationData = clone(
@@ -1222,11 +1215,6 @@ describe('When user is in Preview section death event in offline mode', async ()
       .hostNodes()
       .simulate('click')
 
-    component
-      .find('#submit_confirm')
-      .hostNodes()
-      .simulate('click')
-    await wait()
-    expect(history.location.pathname).toContain('confirm')
+    expect(history.location.pathname).toBe(HOME)
   })
 })

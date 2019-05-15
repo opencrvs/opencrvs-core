@@ -9,9 +9,14 @@ import {
 } from 'src/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
-  REVIEW_EVENT_PARENT_FORM_TAB
+  REVIEW_EVENT_PARENT_FORM_TAB,
+  HOME
 } from 'src/navigation/routes'
-import { storeApplication, IApplication } from 'src/applications'
+import {
+  storeApplication,
+  IApplication,
+  SUBMISSION_STATUS
+} from 'src/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -148,10 +153,18 @@ describe('when user is previewing the form data', () => {
         documents: { image_uploader: '' }
       }
 
-      customDraft = { id: uuid(), data, event: Event.BIRTH }
+      customDraft = {
+        id: uuid(),
+        data,
+        event: Event.BIRTH,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      }
       store.dispatch(storeApplication(customDraft))
       history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
+        DRAFT_BIRTH_PARENT_FORM.replace(
+          ':applicationId',
+          customDraft.id.toString()
+        )
       )
 
       app.update()
@@ -228,22 +241,8 @@ describe('when user is previewing the form data', () => {
             app.update()
           })
 
-          it('confirmation screen should show up', () => {
-            expect(app.find('#submit_confirm').hostNodes()).toHaveLength(1)
-          })
-
-          it('On successful submission tracking id should be visible', async () => {
-            jest.setMock('react-apollo', { default: ReactApollo })
-
-            app
-              .find('#submit_confirm')
-              .hostNodes()
-              .simulate('click')
-
-            await flushPromises()
-            app.update()
-
-            expect(app.find('#tracking_id_viewer').hostNodes()).toHaveLength(1)
+          it('should redirect to home page', () => {
+            expect(history.location.pathname).toBe(HOME)
           })
         })
       })
@@ -389,7 +388,7 @@ describe('when user is previewing the form data', () => {
       store.dispatch(storeApplication(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_TAB.replace(
-          ':draftId',
+          ':applicationId',
           customDraft.id.toString()
         )
           .replace(':event', 'birth')
@@ -667,7 +666,7 @@ describe('when user is previewing the form data', () => {
       store.dispatch(storeApplication(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_TAB.replace(
-          ':draftId',
+          ':applicationId',
           customDraft.id.toString()
         )
           .replace(':event', 'death')

@@ -8,7 +8,11 @@ import {
   setItem
 } from 'src/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
-import { storeApplication, IApplication } from 'src/applications'
+import {
+  storeApplication,
+  IApplication,
+  SUBMISSION_STATUS
+} from 'src/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -141,11 +145,19 @@ describe('when draft data is transformed to graphql', () => {
       documents: { image_uploader: '' }
     }
 
-    customDraft = { id: uuid(), data, event: Event.BIRTH }
+    customDraft = {
+      id: uuid(),
+      data,
+      event: Event.BIRTH,
+      submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    }
     store.dispatch(storeApplication(customDraft))
     form = getRegisterForm(store.getState())[Event.BIRTH]
     history.replace(
-      DRAFT_BIRTH_PARENT_FORM.replace(':draftId', customDraft.id.toString())
+      DRAFT_BIRTH_PARENT_FORM.replace(
+        ':applicationId',
+        customDraft.id.toString()
+      )
     )
 
     app.update()
