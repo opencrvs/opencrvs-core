@@ -5,6 +5,8 @@ import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
 import { storage } from 'src/storage'
 import { pins } from './ComparePINs'
+import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -190,6 +192,13 @@ describe('Logout Sequence', async () => {
     <Unlock onCorrectPinMatch={() => redirect} />,
     store
   )
+  const indexeddb = {
+    SCREEN_LOCK: true,
+    SECURITY_PIN_EXPIRED_AT: 1234
+  }
+  storage.removeItem = jest.fn((key: string) => {
+    delete indexeddb[key]
+  })
 
   it('Should Pop the Logout modal', () => {
     testComponent.component
@@ -201,5 +210,14 @@ describe('Logout Sequence', async () => {
       .find('#logout_confirm')
       .hostNodes().length
     expect(modalIsDisplayed).toBe(1)
+  })
+
+  it('should clear lock-related indexeddb entries upon logout', () => {
+    testComponent.component
+      .find('#logout_confirm')
+      .hostNodes()
+      .simulate('click')
+    expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
+    expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
   })
 })
