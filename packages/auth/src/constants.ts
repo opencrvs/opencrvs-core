@@ -38,4 +38,3 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:resources-user'
 ]
 export const JWT_ISSUER = 'opencrvs:auth-service'
-export const INVALID_TOKEN_NAMESPACE = 'invalidToken'

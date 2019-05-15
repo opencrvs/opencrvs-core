@@ -14,8 +14,8 @@ RUN yarn install
 COPY . .
 
 # set environment
-ENV PORT=3030
-ENV HOST=0.0.0.0
+ENV AUTH_PORT=3030
+ENV AUTH_HOST=0.0.0.0
 # TODO change this for production
 ENV NODE_ENV=DEVELOPMENT
 
