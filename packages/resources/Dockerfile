@@ -15,7 +15,7 @@ COPY . .
 
 # set environment
 ENV PORT=3040
-ENV HOST=0.0.0.0
+ENV AUTH_HOST=0.0.0.0
 # TODO change this for production
 ENV NODE_ENV=DEVELOPMENT
 
