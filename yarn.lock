@@ -852,6 +852,7 @@
 "@types/react-stickynode@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@types/react-stickynode/-/react-stickynode-1.4.0.tgz#7ba60ef8af1ab11a3371c68a4b028663996b7d50"
+  integrity sha512-oBz1zR9w1CWmTym42BtzINVzLolvnpK1AOmWcUDYJhp/YhPT1S06nXQsrIrCSM8jiTdQN8G9YYJHmd0vFQdffg==
   dependencies:
     "@types/react" "*"
 
