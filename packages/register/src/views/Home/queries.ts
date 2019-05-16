@@ -6,6 +6,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
       id
       registration {
         id
+        type
         status {
           id
           user {

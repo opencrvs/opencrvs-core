@@ -952,6 +952,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
     'register.SearchResult.reject': 'হালনাগাদ',
-    'register.SearchResult.rejectComments': 'মন্তব্য'
+    'register.SearchResult.rejectComments': 'মন্তব্য',
+    'register.details.status.dateLabel.draft.started': 'শুরু করা হয়েছে',
+    'register.details.status.dateLabel.draft.updated': 'আপডেট করা হয়েছে',
+    'register.detail.status.applicant.number': 'আবেদনকারীর মোবাইল নম্বর'
   }
 }

@@ -956,6 +956,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     'register.SearchResult.reject': 'Update',
-    'register.SearchResult.rejectComments': 'Comments'
+    'register.SearchResult.rejectComments': 'Comments',
+    'register.details.status.dateLabel.draft.started': 'Started on',
+    'register.details.status.dateLabel.draft.updated': 'Updated on',
+    'register.detail.status.applicant.number': 'Applicant contact number'
   }
 }

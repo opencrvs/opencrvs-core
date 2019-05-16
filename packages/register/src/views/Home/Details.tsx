@@ -9,14 +9,29 @@ import {
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { IStoreState } from 'src/store'
 import { IUserDetails } from 'src/utils/userUtils'
-import { StatusProgress } from '@opencrvs/components/lib/icons'
+import {
+  StatusProgress,
+  StatusOrange,
+  StatusGreen,
+  StatusCollected,
+  StatusRejected
+} from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { getDraftApplicantFullName } from 'src/utils/draftUtils'
 import styled from 'styled-components'
-import { createNamesMap } from 'src/utils/data-formatting'
+import {
+  createNamesMap,
+  extractCommentFragmentValue
+} from 'src/utils/data-formatting'
 import { formatLongDate } from 'src/utils/date-formatting'
-import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import {
+  GQLHumanName,
+  GQLQuery,
+  GQLPerson,
+  GQLRegStatus,
+  GQLComment
+} from '@opencrvs/gateway/src/graphql/schema.d'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Event } from '@opencrvs/register/src/forms'
 import {
@@ -26,6 +41,7 @@ import {
 import { Query } from 'react-apollo'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 import * as Sentry from '@sentry/browser'
+import { REJECTED, REJECT_REASON, REJECT_COMMENTS } from 'src/utils/constants'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px;
@@ -73,14 +89,13 @@ const SpinnerContainer = styled.div`
   display: flex;
   justify-content: center;
 `
+const StatusIcon = styled.div`
+  margin-top: 3px;
+`
 
-enum ApplicationStatus {
+enum DraftStatus {
   DRAFT_STARTED = 'DRAFT_STARTED',
-  DRAFT_MODIFIED = 'DRAFT_MODIFIED',
-  DECLARED = 'DECLARED',
-  REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED'
+  DRAFT_MODIFIED = 'DRAFT_MODIFIED'
 }
 
 interface IDetailProps {
@@ -93,11 +108,15 @@ interface IDetailProps {
 }
 
 interface IStatus {
-  type: ApplicationStatus | null
+  type: DraftStatus | GQLRegStatus | null
   practitionerName: string
   timestamp: string | null
   practitionerRole: string
   officeName: string | Array<string | null> | null
+  trackingId?: string
+  contactNumber?: string
+  rejectReason?: string
+  rejectComment?: string
 }
 
 interface IHistoryData {
@@ -114,7 +133,7 @@ const messages = defineMessages({
       'Label for the workflow timestamp when the status is draft created'
   },
   workflowStatusDateDraftUpdated: {
-    id: 'register.details.status.dateLabel.draft.updateds',
+    id: 'register.details.status.dateLabel.draft.updated',
     defaultMessage: 'Updated on',
     description:
       'Label for the workflow timestamp when the status is draft updated'
@@ -180,6 +199,26 @@ const messages = defineMessages({
     id: 'register.workQueue.list.buttons.update',
     defaultMessage: 'Update',
     description: 'The title of update button in list item actions'
+  },
+  workflowApplicantNumber: {
+    id: 'register.detail.status.applicant.number',
+    defaultMessage: 'Applicant contact number',
+    description: 'The title of contact number label'
+  },
+  workflowApplicantTrackingID: {
+    id: 'register.duplicates.details.trackingId',
+    defaultMessage: 'Tracking ID',
+    description: 'Tracking ID label'
+  },
+  workflowApplicationRejectReason: {
+    id: 'register.workQueue.labels.results.rejectionReason',
+    defaultMessage: 'Reason',
+    description: 'Label for rejection reason'
+  },
+  workflowApplicationRejectComment: {
+    id: 'register.workQueue.labels.results.rejectionComment',
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment'
   }
 })
 
@@ -212,12 +251,16 @@ function ValuesWithSeparator(props: {
 }
 
 function generateHistoryEntry(
-  type: ApplicationStatus,
-  name: GQLHumanName[] | undefined,
+  type: DraftStatus | GQLRegStatus | null,
+  name: GQLHumanName[] | null,
   date: string,
   role: string,
   office: string,
-  language: string = 'en'
+  language: string = 'en',
+  trackingId?: string,
+  contactNumber?: string,
+  rejectReason?: string,
+  rejectComment?: string
 ): IStatus {
   return {
     type,
@@ -230,7 +273,11 @@ function generateHistoryEntry(
       '',
     timestamp: (date && formatLongDate(date, language, 'LL')) || null,
     practitionerRole: role,
-    officeName: office
+    officeName: office,
+    trackingId,
+    contactNumber,
+    rejectReason,
+    rejectComment
   }
 }
 
@@ -253,13 +300,51 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         return messages.workflowStatusDateApplication
     }
   }
+  getWorkflowStatusIcon = (status: string) => {
+    switch (status) {
+      case 'DRAFT_STARTED':
+        return <StatusProgress />
+      case 'DRAFT_MODIFIED':
+        return <StatusProgress />
+      case 'APPLICATION':
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
+      case 'REGISTERED':
+        return (
+          <StatusIcon>
+            <StatusGreen />
+          </StatusIcon>
+        )
+      case 'REJECTED':
+        return (
+          <StatusIcon>
+            <StatusRejected />
+          </StatusIcon>
+        )
+      case 'CERTIFIED':
+        return (
+          <StatusIcon>
+            <StatusCollected />
+          </StatusIcon>
+        )
+      default:
+        return (
+          <StatusIcon>
+            <StatusOrange />
+          </StatusIcon>
+        )
+    }
+  }
 
   generateDraftHistorData = (): IHistoryData => {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
     history.push(
       generateHistoryEntry(
-        ApplicationStatus.DRAFT_STARTED,
+        DraftStatus.DRAFT_STARTED,
         userDetails.name as GQLHumanName[],
         (draft.savedOn && new Date(draft.savedOn).toString()) || '',
         userDetails && userDetails.role
@@ -268,13 +353,14 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         (userDetails &&
           userDetails.primaryOffice &&
           userDetails.primaryOffice.name) ||
-          ''
+          '',
+        this.props.language
       )
     )
     if (draft.modifiedOn) {
       history.push(
         generateHistoryEntry(
-          ApplicationStatus.DRAFT_MODIFIED,
+          DraftStatus.DRAFT_MODIFIED,
           userDetails.name as GQLHumanName[],
           new Date(draft.modifiedOn).toString(),
           userDetails && userDetails.role
@@ -285,7 +371,8 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           (userDetails &&
             userDetails.primaryOffice &&
             userDetails.primaryOffice.name) ||
-            ''
+            '',
+          this.props.language
         )
       )
     }
@@ -312,18 +399,91 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     }
   }
 
-  generateGqlHistorData = (data: GQLQuery): IHistoryData | null => {
-    return null
+  generateGqlHistorData = (data: GQLQuery): IHistoryData => {
+    const history: IStatus[] =
+      (data.fetchRegistration &&
+        data.fetchRegistration.registration &&
+        data.fetchRegistration.registration.status &&
+        data.fetchRegistration.registration.status.map((status, i) => {
+          return generateHistoryEntry(
+            (status && status.type) || null,
+            (status && status.user && (status.user.name as GQLHumanName[])) ||
+              null,
+            (status && status.timestamp) || '',
+            status && status.user && status.user.role
+              ? this.props.intl.formatMessage(
+                  messages[status.user.role as string]
+                )
+              : '',
+            this.props.language === 'en'
+              ? (status &&
+                  status.office &&
+                  status.office.name &&
+                  (status.office.name as string)) ||
+                  ''
+              : (status &&
+                  status.office &&
+                  status.office.alias &&
+                  status.office.alias.toString()) ||
+                  '',
+            this.props.language,
+            data.fetchRegistration &&
+              data.fetchRegistration.registration &&
+              data.fetchRegistration.registration.trackingId,
+            data.fetchRegistration &&
+              data.fetchRegistration.registration &&
+              data.fetchRegistration.registration.contactPhoneNumber,
+            status && status.type === REJECTED
+              ? extractCommentFragmentValue(
+                  status.comments as GQLComment[],
+                  REJECT_REASON
+                )
+              : undefined,
+            status && status.type === REJECTED
+              ? extractCommentFragmentValue(
+                  status.comments as GQLComment[],
+                  REJECT_COMMENTS
+                )
+              : undefined
+          )
+        })) ||
+      []
+    const currentState = history.length > 0 ? history[0].type : null
+    const applicant: GQLPerson =
+      // @ts-ignore
+      (data.fetchRegistration && data.fetchRegistration.child) ||
+      // @ts-ignore
+      (data.fetchRegistration && data.fetchRegistration.deceased) ||
+      null
+    return {
+      title:
+        (applicant &&
+          applicant.name &&
+          (createNamesMap(applicant.name as GQLHumanName[])[
+            this.props.language
+          ] as string)) ||
+        '',
+      history,
+      action:
+        currentState && currentState === REJECTED ? (
+          <ActionButton id="reject_update" disabled>
+            {this.props.intl.formatMessage(messages.update)}
+          </ActionButton>
+        ) : (
+          undefined
+        )
+    }
   }
 
   renderHistory(statuses: IStatus[]): JSX.Element[] | null {
     return (
-      (statuses &&
+      (
+        statuses &&
         statuses.map((status, i) => {
           const { practitionerName, practitionerRole, officeName } = status
           return (
             <HistoryWrapper key={i}>
-              <StatusProgress />
+              {this.getWorkflowStatusIcon(status.type as string)}
               <StatusContainer>
                 <LabelValue
                   label={this.props.intl.formatMessage(
@@ -347,11 +507,43 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                     separator={<Separator />}
                   />
                 </ValueContainer>
+                {status.contactNumber && (
+                  <LabelValue
+                    label={this.props.intl.formatMessage(
+                      messages.workflowApplicantNumber
+                    )}
+                    value={status.contactNumber}
+                  />
+                )}
+                {status.trackingId && (
+                  <LabelValue
+                    label={this.props.intl.formatMessage(
+                      messages.workflowApplicantTrackingID
+                    )}
+                    value={status.trackingId}
+                  />
+                )}
+                {status.rejectReason && (
+                  <LabelValue
+                    label={this.props.intl.formatMessage(
+                      messages.workflowApplicationRejectReason
+                    )}
+                    value={status.rejectReason}
+                  />
+                )}
+                {status.rejectComment && (
+                  <LabelValue
+                    label={this.props.intl.formatMessage(
+                      messages.workflowApplicationRejectComment
+                    )}
+                    value={status.rejectComment}
+                  />
+                )}
               </StatusContainer>
             </HistoryWrapper>
           )
-        })) ||
-      null
+        })
+      ).reverse() || null
     )
   }
 
@@ -388,8 +580,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                   </SpinnerContainer>
                 )
               }
-              // return this.renderSubPage(this.generateGqlHistorData(data))
-              return null
+              return this.renderSubPage(this.generateGqlHistorData(data))
             }}
           </Query>
         </>
@@ -416,6 +607,7 @@ function mapStateToProps(
         match.params &&
         match.params.applicationId &&
         state.drafts.drafts.find(
+          // TODO: need to add status (DRAFT | FAILED) check here once the colum is added
           application => application.id === match.params.applicationId
         )) ||
       null
