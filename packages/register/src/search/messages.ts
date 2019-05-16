@@ -279,22 +279,22 @@ export const messages = defineMessages({
     description: 'The description for NATIONAL_REGISTRAR role'
   },
   application: {
-    id: 'register.workQueue.statusLabel.application',
+    id: 'register.workQueue.labels.statuses.application',
     defaultMessage: 'application',
     description: 'The status label for application'
   },
   registered: {
-    id: 'register.workQueue.statusLabel.registered',
+    id: 'register.workQueue.labels.statuses.registered',
     defaultMessage: 'registered',
     description: 'The status label for registered'
   },
   rejected: {
-    id: 'register.workQueue.statusLabel.rejected',
+    id: 'register.workQueue.labels.statuses.rejected',
     defaultMessage: 'rejected',
     description: 'The status label for rejected'
   },
   collected: {
-    id: 'register.workQueue.statusLabel.collected',
+    id: 'register.workQueue.labels.statuses.collected',
     defaultMessage: 'collected',
     description: 'The status label for collected'
   },
@@ -322,5 +322,32 @@ export const messages = defineMessages({
     id: 'register.SearchResult.informantContact',
     defaultMessage: 'Informant contact number',
     description: 'The rejected reason'
+  },
+  searchingFor: {
+    id: 'register.SearchResult.searchingFor',
+    defaultMessage: 'Searching for “{param}”',
+    description: 'The searching for text'
+  },
+  searchResultFor: {
+    id: 'register.SearchResult.searchResultFor',
+    defaultMessage:
+      '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
+    description: 'The search result text'
+  },
+  totalResultText: {
+    id: 'register.SearchResult.totalResultText',
+    defaultMessage:
+      '{total, plural, =0 {} one {# record found} other {# records found}} ',
+    description: 'The total result text'
+  },
+  reject: {
+    id: 'register.SearchResult.reject',
+    defaultMessage: 'Update',
+    description: 'The title of reject button in list item actions'
+  },
+  rejectComments: {
+    id: 'register.SearchResult.rejectComments',
+    defaultMessage: 'Comments',
+    description: 'The rejected comments'
   }
 })

@@ -12,10 +12,5 @@ const menuItems = [
   }
 ]
 
-class DesktopHeaderSample extends React.Component {
-  render() {
-    return <DesktopHeader menuItems={menuItems} />
-  }
-}
-;<DesktopHeaderSample />
+;<DesktopHeader menuItems={menuItems} />
 ```

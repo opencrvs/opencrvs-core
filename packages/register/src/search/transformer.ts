@@ -47,15 +47,12 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
           deathReg.dateOfDeath &&
           formatLongDate(deathReg.dateOfDeath, locale)) ||
         '',
-      date_of_application: formatLongDate(
-        reg.registration && reg.registration.dateOfApplication,
-        locale
-      ),
       registrationNumber:
         (reg.registration && reg.registration.registrationNumber) || '',
       tracking_id: (reg.registration && reg.registration.trackingId) || '',
       event: reg.type,
       declaration_status: status,
+      duplicates: reg.registration && reg.registration.duplicates,
       rejection_reasons:
         (status === 'REJECTED' &&
           reg.registration &&
