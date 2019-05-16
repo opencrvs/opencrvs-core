@@ -35,6 +35,6 @@ interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode
 }
 
-export function FAButton({ icon, ...otherProps }: IButtonProps) {
+export function FloatingActionButton({ icon, ...otherProps }: IButtonProps) {
   return <ButtonStyled {...otherProps}>{icon && icon()}</ButtonStyled>
 }
