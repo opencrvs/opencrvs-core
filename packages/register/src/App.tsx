@@ -5,7 +5,7 @@ import ApolloClient from 'apollo-client'
 import { ApolloProvider } from 'react-apollo'
 import { History } from 'history'
 import { Switch } from 'react-router'
-import { ThemeProvider } from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { createStore, AppStore } from './store'
@@ -29,13 +29,16 @@ import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificat
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
-
+import { Footer } from '@opencrvs/components/lib/interface/'
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
   history: History
 }
-
+const MainSection = styled.section`
+  flex-grow: 8;
+  margin-bottom: 48px;
+`
 export const store = createStore()
 
 export class App extends React.Component<IAppProps> {
@@ -56,76 +59,79 @@ export class App extends React.Component<IAppProps> {
                       <SessionExpireConfirmation />
                       <NotificationComponent>
                         <Page>
-                          <ProtectedPage>
-                            <Switch>
-                              <ProtectedRoute
-                                exact
-                                path={routes.HOME}
-                                component={Home}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.SELECT_VITAL_EVENT}
-                                component={SelectVitalEvent}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.SELECT_INFORMANT}
-                                component={SelectInformant}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.DRAFT_BIRTH_PARENT_FORM}
-                                component={ApplicationForm}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
-                                component={ApplicationForm}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.DRAFT_DEATH_FORM}
-                                component={ApplicationForm}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.DRAFT_DEATH_FORM_TAB}
-                                component={ApplicationForm}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
-                                component={ReviewForm}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.WORK_QUEUE}
-                                component={WorkQueue}
-                              />
-                              <ProtectedRoute
-                                exact
-                                path={routes.WORK_QUEUE_TAB}
-                                component={WorkQueue}
-                              />
-                              <ProtectedRoute
-                                path={routes.CONFIRMATION_SCREEN}
-                                component={ConfirmationScreen}
-                              />
-                              <ProtectedRoute
-                                path={routes.SEARCH_RESULT}
-                                component={SearchResult}
-                              />
-                              <ProtectedRoute
-                                path={routes.REVIEW_DUPLICATES}
-                                component={ReviewDuplicates}
-                              />
-                              <ProtectedRoute
-                                path={routes.PRINT_CERTIFICATE}
-                                component={PrintCertificateAction}
-                              />
-                            </Switch>
-                          </ProtectedPage>
+                          <MainSection>
+                            <ProtectedPage>
+                              <Switch>
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.HOME}
+                                  component={Home}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_VITAL_EVENT}
+                                  component={SelectVitalEvent}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_INFORMANT}
+                                  component={SelectInformant}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.DRAFT_BIRTH_PARENT_FORM}
+                                  component={ApplicationForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                                  component={ApplicationForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.DRAFT_DEATH_FORM}
+                                  component={ApplicationForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.DRAFT_DEATH_FORM_TAB}
+                                  component={ApplicationForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
+                                  component={ReviewForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.WORK_QUEUE}
+                                  component={WorkQueue}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.WORK_QUEUE_TAB}
+                                  component={WorkQueue}
+                                />
+                                <ProtectedRoute
+                                  path={routes.CONFIRMATION_SCREEN}
+                                  component={ConfirmationScreen}
+                                />
+                                <ProtectedRoute
+                                  path={routes.SEARCH_RESULT}
+                                  component={SearchResult}
+                                />
+                                <ProtectedRoute
+                                  path={routes.REVIEW_DUPLICATES}
+                                  component={ReviewDuplicates}
+                                />
+                                <ProtectedRoute
+                                  path={routes.PRINT_CERTIFICATE}
+                                  component={PrintCertificateAction}
+                                />
+                              </Switch>
+                            </ProtectedPage>
+                          </MainSection>
+                          <Footer />
                         </Page>
                       </NotificationComponent>
                     </ScrollToTop>
