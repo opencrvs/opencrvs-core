@@ -9,9 +9,14 @@ context('Menu', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn').click()
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 3; i++) {
       cy.get('#keypad-1').click()
     }
+    cy.get('#keypad-2').click()
+    for (let i = 0; i < 3; i++) {
+      cy.get('#keypad-1').click()
+    }
+    cy.get('#keypad-2').click()
     cy.get('#sub-menu', { timeout: 30000 }).click()
     cy.get('#ChangeLanguage-nested-menu').click()
     cy.get('#English-nested-menu-item')
