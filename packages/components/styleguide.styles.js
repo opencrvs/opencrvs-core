@@ -10,6 +10,11 @@ const fontFaces = [
     fontFamily: styleGuideCountryFonts[country][language].regularFontFamily,
     fontStyle: 'normal',
     src: `url('notosans-regular-webfont-en.ttf') format('truetype')`
+  },
+  {
+    fontFamily: styleGuideCountryFonts[country][language].semiBoldFontFamily,
+    fontStyle: 'normal',
+    src: `url('notosans-regular-semibold-webfont-en.ttf') format('truetype')`
   }
 ]
 

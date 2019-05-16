@@ -37,12 +37,10 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-extra-light-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-en.ttf')
       format('truetype');
-    font-weight: 300;
-    font-style: normal;
   }
 
   @font-face {
@@ -50,24 +48,13 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
     src:
     url('/fonts/notosans-regular-webfont-en.ttf')
       format('truetype');
-    font-style: normal;
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-regular-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
       format('truetype');
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
-    src:
-      url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
-      format('truetype');
-    font-weight: 300;
-    font-style: normal;
   }
 
   @font-face {
@@ -75,16 +62,8 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
     src:
       url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
       format('truetype');
-    font-style: normal;
   }
 
-  @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
-    src:
-      url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
-      format('truetype');
-    font-style: normal;
-  }
 `
 
 const StyledSpinner = styled(Spinner)`

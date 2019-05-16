@@ -4,6 +4,7 @@ export interface IFonts {
   bodyStyle: string
   bigBodyStyle: string
   regularFont: string
+  semiBoldFont: string
   bigBodyBoldStyle: string
   heroStyle: string
   h1Style: string
@@ -19,20 +20,24 @@ export interface IFonts {
 const countryFonts = {
   bgd: {
     bn: {
-      regularFontFamily: 'noto_sans_bengaliregular'
+      semiBoldFontFamily: 'noto_sans_bengali_semi_bold',
+      regularFontFamily: 'noto_sans_bengali_regular'
     },
     en: {
-      regularFontFamily: 'noto_sansregular'
+      semiBoldFontFamily: 'noto_sans_semi_bold',
+      regularFontFamily: 'noto_sans_regular'
     }
   },
   gbr: {
     en: {
-      regularFontFamily: 'noto_sansregular'
+      semiBoldFontFamily: 'noto_sans_semi_bold',
+      regularFontFamily: 'noto_sans_regular'
     }
   },
   za: {
     en: {
-      regularFontFamily: 'noto_sansregular'
+      semiBoldFontFamily: 'noto_sans_semi_bold',
+      regularFontFamily: 'noto_sans_regular'
     }
   }
 }
@@ -40,6 +45,7 @@ const countryFonts = {
 export const fonts = (country: string, language: string): IFonts => ({
   englishTextFont: 'noto_sansregular',
   regularFont: countryFonts[country][language].regularFontFamily,
+  semiBoldFont: countryFonts[country][language].semiBoldFontFamily,
   bigBodyBoldStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };
