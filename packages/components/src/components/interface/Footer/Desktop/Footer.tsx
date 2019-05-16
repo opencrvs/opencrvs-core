@@ -13,7 +13,7 @@ const FooterContainer = styled.section`
   padding: 8px 16px;
   display: flex;
   flex-grow: 1;
-  max-height: 60px;
+  max-height: 54px;
   & > p {
     font-size: 16px;
     color: ${({ theme }) => theme.colors.white};
