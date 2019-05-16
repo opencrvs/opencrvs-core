@@ -9,20 +9,31 @@ import { Parser } from 'json2csv'
 interface ITranslationCSVItem {
   Translation_Key: string
   Value: string
+  Description: string
 }
 
 interface IMessages {
   [key: string]: string
 }
 
+interface IReactIntlSource {
+  [key: string]: {
+    defaultMessage: string
+    description: string
+  }
+}
+
 function buildTranslationsCSVData(
-  translations: IMessages
+  translations: IMessages,
+  source: IReactIntlSource
 ): ITranslationCSVItem[] {
   const data: ITranslationCSVItem[] = []
-  Object.keys(translations).forEach(key => {
+  Object.keys(source).forEach(key => {
     const translation: ITranslationCSVItem = {
       Translation_Key: key,
-      Value: translations[key]
+      Value: translations[key],
+      // tslint:disable-next-line:no-string-literal
+      Description: source[key]['description']
     }
     data.push(translation)
   })
@@ -45,17 +56,20 @@ async function extractMessages() {
         res = main(contents)
         results = results.concat(res)
       })
-      const locale = {}
+      const reactIntlSource = {}
 
       results.forEach(r => {
-        locale[r.id] = r.defaultMessage
+        reactIntlSource[r.id] = {
+          defaultMessage: r.defaultMessage,
+          description: r.description
+        }
       })
 
       const englishTranslations = ENGLISH_STATE.messages
       const bengaliTranslations = BENGALI_STATE.messages
       let missingKeys = false
 
-      Object.keys(locale).forEach(key => {
+      Object.keys(reactIntlSource).forEach(key => {
         if (!englishTranslations.hasOwnProperty(key)) {
           missingKeys = true
           // tslint:disable-next-line:no-console
@@ -91,13 +105,17 @@ async function extractMessages() {
         return
       }
 
-      const fields = ['Translation_Key', 'Value']
+      const fields = ['Translation_Key', 'Value', 'Description']
 
       const json2csvParser = new Parser({ fields })
-      const languageCSV = json2csvParser.parse(
-        buildTranslationsCSVData(bengaliTranslations)
+      const bengaliLanguageCSV = json2csvParser.parse(
+        buildTranslationsCSVData(bengaliTranslations, reactIntlSource)
       )
-      fs.writeFileSync(`src/i18n/locales/bn.csv`, languageCSV)
+      fs.writeFileSync(`src/i18n/locales/bn.csv`, bengaliLanguageCSV)
+      const englishLanguageCSV = json2csvParser.parse(
+        buildTranslationsCSVData(englishTranslations, reactIntlSource)
+      )
+      fs.writeFileSync(`src/i18n/locales/en.csv`, englishLanguageCSV)
     })
   } catch (err) {
     // tslint:disable-next-line:no-console

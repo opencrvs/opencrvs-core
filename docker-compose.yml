@@ -38,9 +38,7 @@ services:
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - COUNTRY=bgd
-      - AUTH_URL=http://auth:4040
 
-  # User facing services
   workflow:
     image: jembi/ocrvs-workflow:${VERSION:-latest}
     build: packages/workflow
@@ -52,8 +50,6 @@ services:
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=bgd
-      - AUTH_URL=http://auth:4040
-      - CHECK_INVALID_TOKEN=true
 
   search:
     image: jembi/ocrvs-search:${VERSION:-latest}
@@ -64,8 +60,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
-      - AUTH_URL=http://auth:4040
-      - CHECK_INVALID_TOKEN=true
 
   metrics:
     image: jembi/ocrvs-metrics:${VERSION:-latest}
@@ -75,9 +69,6 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
-      - AUTH_URL=http://auth:4040
-      - CHECK_INVALID_TOKEN=true
-  # END User facing services
 
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
@@ -96,7 +87,6 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
-      - AUTH_URL=http://auth:4040
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
@@ -104,7 +94,6 @@ services:
     restart: unless-stopped
     environment:
       - LANGUAGE=bn
-      - AUTH_URL=http://auth:4040
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
@@ -114,4 +103,3 @@ services:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://hearth:3447/fhir
       - ADMINISTRATIVE_STRUCTURE_URL=http://174.136.37.245:8090/gen
-      - AUTH_URL=http://auth:4040

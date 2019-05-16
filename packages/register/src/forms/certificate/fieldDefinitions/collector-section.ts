@@ -25,12 +25,12 @@ const messages = defineMessages({
     description: 'The title of print certificate action'
   },
   printCertificate: {
-    id: 'register.workQueue.print.form.name',
+    id: 'print.certificate.form.name',
     defaultMessage: 'Print',
     description: 'The title of review button in list expansion actions'
   },
   print: {
-    id: 'register.workQueue.print.form.title',
+    id: 'print.certificate.form.title',
     defaultMessage: 'Print certificate',
     description: 'The title of review button in list expansion actions'
   },
@@ -40,25 +40,25 @@ const messages = defineMessages({
     description: 'The label for collector of certificate select'
   },
   informant: {
-    id: 'register.workQueue.print.collector.informant',
+    id: 'print.certificate.collector.informant',
     defaultMessage: 'Informant',
     description:
       'The label for select value when informant is the collector of certificate'
   },
   mother: {
-    id: 'register.workQueue.print.collector.mother',
+    id: 'print.certificate.collector.mother',
     defaultMessage: 'Mother',
     description:
       'The label for select value when mother is the collector of certificate'
   },
   father: {
-    id: 'register.workQueue.print.collector.father',
+    id: 'print.certificate.collector.father',
     defaultMessage: 'Father',
     description:
       'The label for select value when father is the collector of certificate'
   },
   other: {
-    id: 'register.workQueue.print.collector.other',
+    id: 'print.certificate.collector.other',
     defaultMessage: 'Other',
     description:
       'The label for select value when the collector of certificate is other person'
