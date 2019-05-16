@@ -965,6 +965,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.placeHolderPhone': 'Enter Phone No.',
     'register.home.header.defaultTitle': 'Applications',
     'register.home.header.applicationTitle': 'Applications',
-    'register.home.header.performanceTitle': 'Performance'
+    'register.home.header.performanceTitle': 'Performance',
+    'register.fieldAgentHome.inProgress': 'In progress ({total})',
+    'register.fieldAgentHome.sentForReview': 'Sent for review ({total})',
+    'register.fieldAgentHome.requireUpdates': 'Require updates ({total})'
   }
 }

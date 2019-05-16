@@ -36,3 +36,7 @@ export const BRN_DRN_TEXT = 'brn-drn'
 export const PHONE_TEXT = 'phone'
 export const SEARCH_RESULT_SORT = 'DESC'
 export const FIELD_AGENT_ROLE = 'FIELD_AGENT'
+
+export const FIELD_AGENT_HOME_TAB_IN_PROGRESS = 'progress'
+export const FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW = 'review'
+export const FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES = 'updates'

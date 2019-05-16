@@ -8,7 +8,8 @@ import {
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
-  REGISTRAR_HOME_TAB
+  REGISTRAR_HOME_TAB,
+  FIELD_AGENT_HOME_TAB
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -44,7 +45,15 @@ type GoToREGISTRAR_HOME = {
   }
 }
 
-export type Action = GoToTabAction | GoToREGISTRAR_HOME
+export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
+type GoTo_FIELD_AGENT_HOME = {
+  type: typeof GO_TO_FIELD_AGENT_HOME
+  payload: {
+    tabId: string
+  }
+}
+
+export type Action = GoToTabAction | GoToREGISTRAR_HOME | GoTo_FIELD_AGENT_HOME
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -106,6 +115,13 @@ export function goToRegistrarHomeTab(tabId: string) {
   }
 }
 
+export function goToFieldAgentHomeTab(tabId: string) {
+  return {
+    type: GO_TO_FIELD_AGENT_HOME,
+    payload: { tabId }
+  }
+}
+
 export function goToTab(
   tabRoute: string,
   draftId: string,
@@ -152,6 +168,14 @@ export function navigationReducer(state: INavigationState, action: Action) {
         state,
         Cmd.action(
           push(formatUrl(REGISTRAR_HOME_TAB, { tabId: RegistrarHomeTabId }))
+        )
+      )
+    case GO_TO_FIELD_AGENT_HOME:
+      const { tabId: FieldAgentHomeTabId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
         )
       )
   }

@@ -65,6 +65,11 @@ export class App extends React.Component<IAppProps> {
                               />
                               <ProtectedRoute
                                 exact
+                                path={routes.FIELD_AGENT_HOME_TAB}
+                                component={FieldAgentHome}
+                              />
+                              <ProtectedRoute
+                                exact
                                 path={routes.SELECT_VITAL_EVENT}
                                 component={SelectVitalEvent}
                               />
