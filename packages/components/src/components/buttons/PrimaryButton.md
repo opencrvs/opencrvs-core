@@ -13,22 +13,9 @@
   id="myButton"
   onClick={() => alert('Hello')}
   icon={() => (
-    <svg width="29" height="14">
-      <title>Group</title>
-      <g
-        fill-rule="nonzero"
-        stroke="#FFF"
-        stroke-width="2.5"
-        fill="none"
-        stroke-linecap="round"
-      >
-        <path d="M27 7H4.059" />
-        <path
-          stroke-linejoin="round"
-          d="M7.17 12.355L1.762 6.948l5.304-5.303"
-        />
-      </g>
-    </svg>
+    <span style={{ color: '#fff', fontSize: '40px', lineHeight: '30px' }}>
+      +
+    </span>
   )}
 />
 ```

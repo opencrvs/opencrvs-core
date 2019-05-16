@@ -75,7 +75,6 @@ const CenterWrapper = styled.div`
   align-items: center;
   justify-content: center;
   display: inline-flex;
-  width: 100%;
 `
 const LeftButtonIcon = styled.div`
   position: relative !important;
