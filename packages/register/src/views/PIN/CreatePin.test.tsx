@@ -89,11 +89,11 @@ describe('Create PIN view', async () => {
     await new Promise(resolve => {
       setTimeout(() => {
         resolve()
-      }, 50)
+      }, 500)
     })
     c.update()
 
-    expect(c.find('span#title-text').text()).toBe(
+    expect(c.find('div#error-text').text()).toBe(
       'PIN cannot have 4 repeating digits.'
     )
   })

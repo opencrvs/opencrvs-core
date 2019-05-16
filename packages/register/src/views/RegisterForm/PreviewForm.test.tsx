@@ -161,12 +161,29 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
       await flushPromises()
       app.update()
-      Array.apply(null, { length: 8 }).map(() => {
+
+      Array.apply(null, { length: 3 }).map(() => {
         app
           .find('#keypad-1')
           .hostNodes()
           .simulate('click')
       })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 3 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
       await flushPromises()
       app.update()
     })
@@ -178,7 +195,11 @@ describe('when user is previewing the form data', () => {
           .hostNodes()
           .simulate('click')
 
-        await flushPromises()
+        await new Promise(resolve => {
+          setTimeout(() => {
+            resolve()
+          }, 500)
+        })
         app.update()
       })
 
@@ -402,12 +423,28 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
       await flushPromises()
       app.update()
-      Array.apply(null, { length: 8 }).map(() => {
+      Array.apply(null, { length: 3 }).map(() => {
         app
           .find('#keypad-1')
           .hostNodes()
           .simulate('click')
       })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 3 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
       await flushPromises()
       app.update()
     })
@@ -681,12 +718,28 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
       await flushPromises()
       app.update()
-      Array.apply(null, { length: 8 }).map(() => {
+      Array.apply(null, { length: 3 }).map(() => {
         app
           .find('#keypad-1')
           .hostNodes()
           .simulate('click')
       })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 3 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
       await flushPromises()
       app.update()
     })

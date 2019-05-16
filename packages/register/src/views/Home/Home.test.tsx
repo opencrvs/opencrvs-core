@@ -63,12 +63,28 @@ describe('when the home page loads for a field worker', () => {
         .simulate('click')
       await flushPromises()
       app.update()
-      Array.apply(null, { length: 8 }).map(() => {
+      Array.apply(null, { length: 3 }).map(() => {
         app
           .find('#keypad-1')
           .hostNodes()
           .simulate('click')
       })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 3 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      app
+        .find('#keypad-2')
+        .hostNodes()
+        .simulate('click')
       await flushPromises()
       app.update()
     })
