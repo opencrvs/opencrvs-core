@@ -16,6 +16,7 @@ const HeaderContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   background: linear-gradient(
     180deg,
     ${({ theme }) => theme.colors.headerGradientDark} 0%,
