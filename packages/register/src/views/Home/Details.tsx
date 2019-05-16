@@ -19,7 +19,7 @@ import {
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { getDraftApplicantFullName } from 'src/utils/draftUtils'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import {
   createNamesMap,
   extractCommentFragmentValue
@@ -42,6 +42,7 @@ import { Query } from 'react-apollo'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 import * as Sentry from '@sentry/browser'
 import { REJECTED, REJECT_REASON, REJECT_COMMENTS } from 'src/utils/constants'
+import { ITheme } from '@opencrvs/components/lib/theme'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px;
@@ -99,6 +100,7 @@ enum DraftStatus {
 }
 
 interface IDetailProps {
+  theme: ITheme
   language: string
   applicationId: string
   draft: IDraft
@@ -120,7 +122,7 @@ interface IStatus {
 }
 
 interface IHistoryData {
-  title: string
+  title?: string
   history: IStatus[]
   action?: React.ReactElement
 }
@@ -219,6 +221,11 @@ const messages = defineMessages({
     id: 'register.workQueue.labels.results.rejectionComment',
     defaultMessage: 'Comment',
     description: 'Label for rejection comment'
+  },
+  emptyTitle: {
+    id: 'register.detail.subpage.emptyTitle',
+    defaultMessage: 'No name provided',
+    description: 'Label for empty title'
   }
 })
 
@@ -342,21 +349,6 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   generateDraftHistorData = (): IHistoryData => {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
-    history.push(
-      generateHistoryEntry(
-        DraftStatus.DRAFT_STARTED,
-        userDetails.name as GQLHumanName[],
-        (draft.savedOn && new Date(draft.savedOn).toString()) || '',
-        userDetails && userDetails.role
-          ? this.props.intl.formatMessage(messages[userDetails.role as string])
-          : '',
-        (userDetails &&
-          userDetails.primaryOffice &&
-          userDetails.primaryOffice.name) ||
-          '',
-        this.props.language
-      )
-    )
     if (draft.modifiedOn) {
       history.push(
         generateHistoryEntry(
@@ -376,10 +368,26 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         )
       )
     }
+    history.push(
+      generateHistoryEntry(
+        DraftStatus.DRAFT_STARTED,
+        userDetails.name as GQLHumanName[],
+        (draft.savedOn && new Date(draft.savedOn).toString()) || '',
+        userDetails && userDetails.role
+          ? this.props.intl.formatMessage(messages[userDetails.role as string])
+          : '',
+        (userDetails &&
+          userDetails.primaryOffice &&
+          userDetails.primaryOffice.name) ||
+          '',
+        this.props.language
+      )
+    )
     const tabRoute =
       draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
+    const title = getDraftApplicantFullName(draft, this.props.language)
     return {
-      title: getDraftApplicantFullName(draft, this.props.language),
+      title: title !== '' ? title : undefined,
       history,
       action: (
         <ActionButton
@@ -550,7 +558,11 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   renderSubPage(historyData: IHistoryData | undefined) {
     return (
       (historyData && (
-        <SubPage title={historyData.title} goBack={this.props.goToHome}>
+        <SubPage
+          title={historyData.title}
+          emptyTitle={this.props.intl.formatMessage(messages.emptyTitle)}
+          goBack={this.props.goToHome}
+        >
           {this.renderHistory(historyData.history)}
           {historyData.action}
         </SubPage>
@@ -573,10 +585,14 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             {({ loading, error, data }) => {
               if (error) {
                 Sentry.captureException(error)
+                throw error
               } else if (loading) {
                 return (
                   <SpinnerContainer>
-                    <QuerySpinner id="query-spinner" />
+                    <QuerySpinner
+                      id="query-spinner"
+                      baseColor={this.props.theme.colors.background}
+                    />
                   </SpinnerContainer>
                 )
               }
@@ -620,4 +636,4 @@ export const Details = connect(
     goToTab: goToTabAction,
     goToHome: goToHomeAction
   }
-)(injectIntl(DetailView))
+)(injectIntl(withTheme(DetailView)))

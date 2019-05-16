@@ -12,7 +12,7 @@ const SubPageContainer = styled.div`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-const HeaderContainer = styled.div`
+const HeaderBlock = styled.div`
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   height: 64px;
   max-width: 940px;
@@ -37,6 +37,9 @@ const MenuTitle = styled.span`
   line-height: 27px;
   margin-left: 35px;
 `
+const EmptyTitle = styled(MenuTitle)`
+  color: ${({ theme }) => theme.colors.error};
+`
 const BodyContainer = styled(Box)`
   max-width: 940px;
   height: inherit;
@@ -45,25 +48,28 @@ const BodyContainer = styled(Box)`
   font-size: 16px;
 `
 interface IProps {
-  title: string
+  title?: string
+  emptyTitle: string
   goBack: () => void
 }
 
 export class SubPage extends React.Component<IProps> {
   render() {
-    const { title, goBack } = this.props
+    const { title, emptyTitle, goBack } = this.props
 
     return (
       <SubPageContainer>
-        <HeaderContainer>
+        <HeaderBlock>
           <BackButton
             id="sub_page_back_button"
             onClick={goBack}
             icon={() => <BackArrow />}
           />
-          <MenuTitle>{title}</MenuTitle>
-        </HeaderContainer>
-        <BodyContainer>{this.props.children}</BodyContainer>
+          {(title && <MenuTitle>{title}</MenuTitle>) || (
+            <EmptyTitle>{emptyTitle}</EmptyTitle>
+          )}
+        </HeaderBlock>
+        <BodyContainer>{this.props.children}</BodyContainer>π{' '}
       </SubPageContainer>
     )
   }

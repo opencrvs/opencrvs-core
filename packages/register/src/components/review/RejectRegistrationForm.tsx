@@ -10,7 +10,6 @@ import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
-import { Dispatch } from 'redux'
 import { goToSearchResult } from 'src/navigation'
 import {
   MutationProvider,
@@ -167,11 +166,7 @@ export const RejectRegistrationForm = connect(
     language: state.i18n.language,
     form: getRejectForm(state)
   }),
-  function mapDispatchToProps(dispatch: Dispatch) {
-    return {
-      goToSearchResult: () => {
-        dispatch(goToSearchResult())
-      }
-    }
+  {
+    goToSearchResult
   }
 )(injectIntl(RejectRegistrationView))
