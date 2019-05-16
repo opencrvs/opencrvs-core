@@ -12,6 +12,11 @@ export default defineMessages({
       "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
     description: 'The description displayed while creating a PIN'
   },
+  pinSequentialDigitsError: {
+    id: 'createPIN.pinSeqDigitsError',
+    defaultMessage: 'PIN code contains sequential digits.',
+    description: 'The error displayed if PIN contains sequential digits.'
+  },
   pinMatchError: {
     id: 'createPIN.pinMatchError',
     defaultMessage: 'PIN code did not match. Please try again.',
