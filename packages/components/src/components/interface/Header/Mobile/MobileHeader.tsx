@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Button } from '../../../buttons'
 import styled from 'styled-components'
+import { CircleButton } from '../../../buttons'
 
 interface IMenuAction {
   icon: () => React.ReactNode
@@ -54,11 +54,13 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
       <HeaderContainer id={id}>
         <EndComponentContainer>
           {left && (
-            <Button
+            <CircleButton
               id="mobile_header_left"
               onClick={left.handler}
-              icon={() => left.icon()}
-            />
+              dark={true}
+            >
+              {left.icon()}
+            </CircleButton>
           )}
         </EndComponentContainer>
         <HeaderBody>
@@ -66,11 +68,13 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
         </HeaderBody>
         <EndComponentContainer>
           {right && (
-            <Button
+            <CircleButton
               id="mobile_header_right"
               onClick={right.handler}
-              icon={() => right.icon()}
-            />
+              dark={true}
+            >
+              {right.icon()}
+            </CircleButton>
           )}
         </EndComponentContainer>
       </HeaderContainer>
