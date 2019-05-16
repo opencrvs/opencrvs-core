@@ -7,20 +7,9 @@ const language = process.env.REACT_APP_LANGUAGE || 'en'
 
 const fontFaces = [
   {
-    fontFamily: styleGuideCountryFonts[country][language].lightFontFamily,
-    fontStyle: 'normal',
-    fontWeight: '300',
-    src: `url('notosans-light-webfont-en.ttf') format('truetype')`
-  },
-  {
     fontFamily: styleGuideCountryFonts[country][language].regularFontFamily,
     fontStyle: 'normal',
     src: `url('notosans-regular-webfont-en.ttf') format('truetype')`
-  },
-  {
-    fontFamily: styleGuideCountryFonts[country][language].boldFontFamily,
-    fontStyle: 'normal',
-    src: `url('notosans-bold-webfont-en.ttf') format('truetype')`
   }
 ]
 
@@ -43,7 +32,7 @@ const theme = {
     baseBackground: colors.light,
     border: colors.paleGrey,
     codeBackground: colors.paleGrey,
-    error: colors.danger,
+    error: colors.error,
     light: colors.grey,
     lightest: colors.lightGrey,
     link: colors.primary,

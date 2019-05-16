@@ -68,7 +68,7 @@ const FormSectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
 `
 const FormActionSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   margin: 0px -25px;
 `
 const FormAction = styled.div`

@@ -230,7 +230,7 @@ const ListStatusContainer = styled.span`
 
 const RejectApplication = styled.a`
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.error};
   text-decoration: underline;
   cursor: pointer;
   margin-left: 60px;

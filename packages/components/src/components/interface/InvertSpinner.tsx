@@ -17,17 +17,13 @@ const StyledSpinner = styledSpinner`
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.white};
   background: -moz-linear-gradient(left, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
-  theme.colors.white} 42%);
+    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
   background: -webkit-linear-gradient(left, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
-  theme.colors.white} 42%);
+    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
   background: -o-linear-gradient(left, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
-  theme.colors.white} 42%);
+    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
   background: linear-gradient(to right, ${({ theme }) =>
-    theme.colors.accentGradientLight} 10%, ${({ theme }) =>
-  theme.colors.white} 42%);
+    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
   position: relative;
   -webkit-animation: load3 0.4s infinite linear;
   animation: load3 0.4s infinite linear;

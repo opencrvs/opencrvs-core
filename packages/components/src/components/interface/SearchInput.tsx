@@ -89,7 +89,7 @@ const StyledInput = styled.input.attrs<ISearchInputProps>({})`
     error && touched ? theme.colors.error : theme.colors.disabled};
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
 
   &:focus {

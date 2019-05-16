@@ -125,7 +125,7 @@ const Column = styled.div`
 `
 
 const ButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   padding: 25px;
   margin-bottom: 2px;
 `
@@ -195,7 +195,7 @@ const EditRegistration = styled(SecondaryButton)`
     border: solid 1px ${({ theme }) => theme.colors.disabledButton};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }) => theme.colors.background};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

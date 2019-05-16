@@ -156,7 +156,7 @@ const NextButton = styled(PrimaryButton)`
   font-weight: bold;
 `
 const ButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   padding: 25px;
   margin-bottom: 2px;
 `
@@ -207,7 +207,7 @@ const RegisterApplication = styled(PrimaryButton)`
 `
 const RequiredFieldLink = styled(Button)`
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.error};
   text-decoration: underline;
   padding: 0;
   text-align: left;
@@ -248,7 +248,7 @@ const DButtonContainer = styled(ButtonContainer)`
 `
 const DeleteApplication = styled.a`
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.error};
   text-decoration: underline;
   cursor: pointer;
   svg {
@@ -265,7 +265,7 @@ const SaveDraftText = styled.span`
 `
 
 const DraftButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   min-height: 83px;
   display: flex;
   justify-content: flex-start;

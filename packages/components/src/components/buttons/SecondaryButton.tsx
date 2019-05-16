@@ -15,7 +15,7 @@ export const SecondaryButton = styled(Button)`
   }
 
   &:active {
-    outline: 3px solid ${({ theme }) => theme.colors.creamCan};
+    outline: 3px solid ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {

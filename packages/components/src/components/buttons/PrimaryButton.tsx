@@ -24,7 +24,7 @@ export const PrimaryButton = styled(Button)`
   &:active {
     background: ${({ theme }) => theme.colors.primary};
     padding: 0 32px;
-    border: 3px solid ${({ theme }) => theme.colors.creamCan};
+    border: 3px solid ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {

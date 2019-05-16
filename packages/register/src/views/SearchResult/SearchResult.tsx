@@ -223,7 +223,7 @@ const StyledSecondaryButton = styled(SecondaryButton)`
     border: solid 1px ${({ theme }) => theme.colors.disabledButton};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }) => theme.colors.background};
   }
 `
 const StatusIcon = styled.div`

@@ -24,7 +24,7 @@ const Required = styled.span.attrs<
   font-family: ${({ theme }) => theme.fonts.regularFont};
   font-size: 18px;
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.danger};
+    disabled ? theme.colors.disabled : theme.colors.error};
   flex-grow: 0;
 `
 

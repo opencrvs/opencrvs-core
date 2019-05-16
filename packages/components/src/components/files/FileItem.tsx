@@ -38,7 +38,7 @@ const PreviewLink = styled(Link)`
 `
 
 const DeleteLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.error};
   margin-left: 8px;
 `
 
@@ -46,7 +46,7 @@ const FileContainer = styled.div`
   height: 75px;
   border: 1px solid ${({ theme }) => theme.colors.accentLight};
   border-radius: 1px;
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   flex: 1;
   display: flex;
@@ -99,7 +99,7 @@ class FileItemComponent extends React.Component<IProps> {
           </PreviewLink>
         </FileContainer>
         <DeleteContainer id={`${id}_delete_link`} onClick={onDelete}>
-          <Cross color={theme.colors.danger} />
+          <Cross color={theme.colors.error} />
           <DeleteLink>{deleteLabel ? deleteLabel : 'Delete'}</DeleteLink>
         </DeleteContainer>
       </Container>

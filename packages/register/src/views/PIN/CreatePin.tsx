@@ -12,10 +12,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) =>
-    `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
-      theme.colors.headerGradientLight
-    } 100%)`};
+  ${({ theme }) => theme.gradients.gradientNightshade};
   height: 100vh;
   overflow-y: hidden;
   overflow-x: hidden;
@@ -45,7 +42,7 @@ const ErrorBox = styled.div`
   justify-content: center;
   color: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  background: ${({ theme }) => theme.colors.danger};
+  background: ${({ theme }) => theme.colors.error};
   height: 40px;
   width: 360px;
   margin-top: -30px;
