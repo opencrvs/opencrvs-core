@@ -51,35 +51,35 @@ interface IState {
 }
 
 const messages = defineMessages({
-  fieldAgent: {
-    id: 'register.home.header.fieldAgent',
+  FIELD_AGENT: {
+    id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
-    description: 'The description for field agent role'
+    description: 'The description for FIELD_AGENT role'
   },
-  registrationClerk: {
-    id: 'register.home.header.registrationClerk',
+  REGISTRATION_CLERK: {
+    id: 'register.home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',
-    description: 'The description for registration clerk role'
+    description: 'The description for REGISTRATION_CLERK role'
   },
-  localRegistrar: {
-    id: 'register.home.header.Registrar',
+  LOCAL_REGISTRAR: {
+    id: 'register.home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
-    description: 'The description for local registrar role'
+    description: 'The description for LOCAL_REGISTRAR role'
   },
-  districtRegistrar: {
-    id: 'register.home.header.districtRegistrar',
+  DISTRICT_REGISTRAR: {
+    id: 'register.home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
-    description: 'The description for district registrar role'
+    description: 'The description for DISTRICT_REGISTRAR role'
   },
-  stateRegistrar: {
-    id: 'register.home.header.stateRegistrar',
+  STATE_REGISTRAR: {
+    id: 'register.home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
-    description: 'The description for state registrar role'
+    description: 'The description for STATE_REGISTRAR role'
   },
-  nationalRegistrar: {
-    id: 'register.home.header.nationalRegistrar',
+  NATIONAL_REGISTRAR: {
+    id: 'register.home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
-    description: 'The description for national registrar role'
+    description: 'The description for NATIONAL_REGISTRAR role'
   },
   typeTrackingId: {
     id: 'register.home.header.typeTrackingId',

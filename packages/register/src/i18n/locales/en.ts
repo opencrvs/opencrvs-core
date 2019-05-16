@@ -514,12 +514,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
-    'register.home.header.fieldAgent': 'Field Agent',
-    'register.home.header.registrationClerk': 'Registration Clerk',
-    'register.home.header.localRegistrar': 'Registrar',
-    'register.home.header.districtRegistrar': 'District Registrar',
-    'register.home.header.stateRegistrar': 'State Registrar',
-    'register.home.header.nationalRegistrar': 'National Registrar',
+    'register.home.header.FIELD_AGENT': 'Field Agent',
+    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
+    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
+    'register.home.header.STATE_REGISTRAR': 'State Registrar',
+    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
