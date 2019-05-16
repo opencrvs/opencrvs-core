@@ -20,7 +20,8 @@ import {
   LogoutBlue,
   TrackingID,
   BRN,
-  Phone
+  Phone,
+  ArrowBack
 } from '@opencrvs/components/lib/icons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { storage } from 'src/storage'
@@ -43,6 +44,7 @@ type IProps = InjectedIntlProps & {
   goToSearchResult: typeof goToSearchResult
   searchText?: string
   selectedSearchType?: string
+  mobileSearchBar?: boolean
 }
 interface IState {
   showMenu: boolean
@@ -113,7 +115,50 @@ const messages = defineMessages({
 })
 
 class HeaderComp extends React.Component<IProps, IState> {
-  state = { showMenu: false, showLogoutModal: false }
+  searchToolElement: JSX.Element
+  searchTypeList: ISearchType[]
+
+  constructor(props: IProps) {
+    super(props)
+    this.searchTypeList = [
+      {
+        label: props.intl.formatMessage(messages.TYPE_TRACKING_ID),
+        value: TRACKING_ID_TEXT,
+        icon: <TrackingID />,
+        placeHolderText: props.intl.formatMessage(
+          messages.PLACE_HOLDER_TRACKING_ID
+        ),
+        isDefault: true
+      },
+      {
+        label: props.intl.formatMessage(messages.TYPE_BRN_DRN),
+        value: BRN_DRN_TEXT,
+        icon: <BRN />,
+        placeHolderText: props.intl.formatMessage(messages.PLACE_HOLDER_BRN_DRN)
+      },
+      {
+        label: props.intl.formatMessage(messages.TYPE_PHONE),
+        value: PHONE_TEXT,
+        icon: <Phone />,
+        placeHolderText: props.intl.formatMessage(messages.PLACE_HOLDER_PHONE)
+      }
+    ]
+
+    this.searchToolElement = (
+      <SearchTool
+        key="searchMenu"
+        searchText={this.props.searchText}
+        selectedSearchType={this.props.selectedSearchType}
+        searchTypeList={this.searchTypeList}
+        searchHandler={this.props.goToSearchResult}
+      />
+    )
+
+    this.state = {
+      showMenu: false,
+      showLogoutModal: false
+    }
+  }
 
   hamburger = () => {
     const { userDetails, language, intl } = this.props
@@ -196,7 +241,6 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl } = this.props
     const menuItems = [
       {
         key: 'application',
@@ -212,44 +256,33 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    const searchTypeList: ISearchType[] = [
-      {
-        label: intl.formatMessage(messages.TYPE_TRACKING_ID),
-        value: TRACKING_ID_TEXT,
-        icon: <TrackingID />,
-        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_TRACKING_ID),
-        isDefault: true
-      },
-      {
-        label: intl.formatMessage(messages.TYPE_BRN_DRN),
-        value: BRN_DRN_TEXT,
-        icon: <BRN />,
-        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_BRN_DRN)
-      },
-      {
-        label: intl.formatMessage(messages.TYPE_PHONE),
-        value: PHONE_TEXT,
-        icon: <Phone />,
-        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_PHONE)
-      }
-    ]
-
     const rightMenu = [
       {
-        element: (
-          <SearchTool
-            key="searchMenu"
-            searchText={this.props.searchText}
-            selectedSearchType={this.props.selectedSearchType}
-            searchTypeList={searchTypeList}
-            searchHandler={this.props.goToSearchResult}
-          />
-        )
+        element: this.searchToolElement
       },
       {
         element: <ProfileMenu key="profileMenu" />
       }
     ]
+
+    const mobileHeaderActionProps = this.props.mobileSearchBar
+      ? {
+          mobileLeft: {
+            icon: () => <ArrowBack />,
+            handler: () => history.back()
+          },
+          mobileBody: this.searchToolElement
+        }
+      : {
+          mobileLeft: {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          },
+          mobileRight: {
+            icon: () => <SearchDark />,
+            handler: this.props.goToSearchResult
+          }
+        }
 
     return (
       <>
@@ -257,17 +290,8 @@ class HeaderComp extends React.Component<IProps, IState> {
           menuItems={menuItems}
           id="register_app_header"
           desktopRightMenu={rightMenu}
-          mobileLeft={{
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          }}
           title="Mobile header"
-          mobileRight={{
-            icon: () => <SearchDark />,
-            handler: () => {
-              alert('sdfsdf')
-            }
-          }}
+          {...mobileHeaderActionProps}
         />
         <LogoutConfirmation
           show={this.state.showLogoutModal}

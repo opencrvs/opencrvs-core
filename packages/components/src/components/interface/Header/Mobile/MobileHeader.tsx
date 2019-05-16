@@ -10,6 +10,7 @@ export interface IMobileHeaderProps {
   id?: string
   mobileLeft?: IMenuAction
   title: string
+  mobileBody?: JSX.Element
   mobileRight?: IMenuAction
 }
 
@@ -31,12 +32,18 @@ const Title = styled.span`
   line-height: 30px;
   letter-spacing: 0.15px;
   color: ${({ theme }) => theme.colors.white};
+  align-self: center;
 `
 
 const HeaderBody = styled.div`
   margin: 0 16px;
   flex: 1;
   display: flex;
+  height: 40px;
+
+  form {
+    width: 100%;
+  }
 `
 
 const EndComponentContainer = styled.div`
@@ -49,26 +56,31 @@ const EndComponentContainer = styled.div`
 `
 class MobileHeader extends React.Component<IMobileHeaderProps> {
   render() {
-    const { id, mobileLeft, mobileRight, title } = this.props
+    const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
     return (
       <HeaderContainer id={id}>
-        <EndComponentContainer>
-          {mobileLeft && (
+        {mobileLeft && (
+          <EndComponentContainer>
             <Button id="mobile_header_left" onClick={mobileLeft.handler}>
               {mobileLeft.icon()}
             </Button>
-          )}
-        </EndComponentContainer>
+          </EndComponentContainer>
+        )}
+
         <HeaderBody>
-          <Title id="header_title">{title}</Title>
+          {mobileBody || <Title id="header_title">{title}</Title>}
         </HeaderBody>
-        <EndComponentContainer>
-          {mobileRight && (
-            <Button id="mobile_header_right" onClick={mobileRight.handler}>
+
+        {mobileRight && (
+          <EndComponentContainer>
+            <Button
+              id="mobile_header_right"
+              onClick={() => mobileRight.handler()}
+            >
               {mobileRight.icon()}
             </Button>
-          )}
-        </EndComponentContainer>
+          </EndComponentContainer>
+        )}
       </HeaderContainer>
     )
   }

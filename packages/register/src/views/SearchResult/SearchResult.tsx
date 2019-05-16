@@ -756,7 +756,11 @@ export class SearchResultView extends React.Component<
     const { searchText, searchType } = match.params
     return (
       <>
-        <Header searchText={searchText} selectedSearchType={searchType} />
+        <Header
+          searchText={searchText}
+          selectedSearchType={searchType}
+          mobileSearchBar={true}
+        />
         <Container>
           <HeaderContent>
             <Query
