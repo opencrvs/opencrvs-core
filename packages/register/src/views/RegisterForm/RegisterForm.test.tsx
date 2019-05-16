@@ -920,6 +920,21 @@ describe('when user is in the register form preview section', () => {
         .simulate('click')
       component.update()
 
+      const cancelBtn = component.find('#cancel-btn').hostNodes()
+      expect(cancelBtn.length).toEqual(1)
+
+      cancelBtn.simulate('click')
+      component.update()
+
+      expect(component.find('#submit_confirm').hostNodes().length).toEqual(0)
+      expect(component.find('#submit_form').hostNodes().length).toEqual(1)
+
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
       const confirmBtn = component.find('#submit_confirm').hostNodes()
       expect(confirmBtn.length).toEqual(1)
 
