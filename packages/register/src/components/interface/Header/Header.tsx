@@ -50,63 +50,63 @@ interface IState {
 }
 
 const messages = defineMessages({
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
+  fieldAgent: {
+    id: 'register.home.header.fieldAgent',
     defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
+    description: 'The description for field agent role'
   },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
+  registrationClerk: {
+    id: 'register.home.header.registrationClerk',
     defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
+    description: 'The description for registration clerk role'
   },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
+  localRegistrar: {
+    id: 'register.home.header.Registrar',
     defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
+    description: 'The description for local registrar role'
   },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
+  districtRegistrar: {
+    id: 'register.home.header.districtRegistrar',
     defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
+    description: 'The description for district registrar role'
   },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
+  stateRegistrar: {
+    id: 'register.home.header.stateRegistrar',
     defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
+    description: 'The description for state registrar role'
   },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
+  nationalRegistrar: {
+    id: 'register.home.header.nationalRegistrar',
     defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
+    description: 'The description for national registrar role'
   },
-  TYPE_TRACKING_ID: {
-    id: 'register.home.header.searchType.trackingId',
+  typeTrackingId: {
+    id: 'register.home.header.typeTrackingId',
     defaultMessage: 'Tracking ID',
     description: 'Search menu tracking id type'
   },
-  TYPE_BRN_DRN: {
-    id: 'register.home.header.searchType.brn_drn',
+  typeBrnDrn: {
+    id: 'register.home.header.typeBrnDrn',
     defaultMessage: 'BRN/DRN',
     description: 'Search menu brn drn type'
   },
-  TYPE_PHONE: {
-    id: 'register.home.header.searchType.phone',
+  typePhone: {
+    id: 'register.home.header.typePhone',
     defaultMessage: 'Phone No.',
     description: 'Search menu phone no type'
   },
-  PLACE_HOLDER_TRACKING_ID: {
-    id: 'register.home.header.searchType.placeHolder.trackingId',
+  placeHolderTrackingId: {
+    id: 'register.home.header.placeHolderTrackingId',
     defaultMessage: 'Enter Tracking ID',
     description: 'Search menu tracking id place holder'
   },
-  PLACE_HOLDER_BRN_DRN: {
-    id: 'register.home.header.searchType.placeHolder.brn_drn',
+  placeHolderBrnDrn: {
+    id: 'register.home.header.placeHolderBrnDrn',
     defaultMessage: 'Enter BRN/DRN',
     description: 'Search menu brn drn place holder'
   },
-  PLACE_HOLDER_PHONE: {
-    id: 'register.home.header.searchType.placeHolder.phone',
+  placeHolderPhone: {
+    id: 'register.home.header.placeHolderPhone',
     defaultMessage: 'Enter Phone No.',
     description: 'Search menu phone no place holder'
   }
@@ -214,23 +214,23 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const searchTypeList: ISearchType[] = [
       {
-        label: intl.formatMessage(messages.TYPE_TRACKING_ID),
+        label: intl.formatMessage(messages.typeTrackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
-        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_TRACKING_ID),
+        placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
       {
-        label: intl.formatMessage(messages.TYPE_BRN_DRN),
+        label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <BRN />,
-        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_BRN_DRN)
+        placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
-        label: intl.formatMessage(messages.TYPE_PHONE),
+        label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
-        placeHolderText: intl.formatMessage(messages.PLACE_HOLDER_PHONE)
+        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       }
     ]
 

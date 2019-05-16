@@ -516,12 +516,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
-    'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
-    'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
-    'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
-    'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
-    'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
-    'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক',
+    'register.home.header.fieldAgent': 'মাঠকর্মী',
+    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.localRegistrar': 'নিবন্ধক',
+    'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
+    'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',
+    'register.home.header.nationalRegistrar': 'জাতীয় নিবন্ধক',
     'register.notification.newContentAvailable':
       'কিছু তথ্য হালনাগাদ করা হয়েছে, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
@@ -953,13 +953,11 @@ export const BENGALI_STATE: ILanguage = {
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
     'register.SearchResult.reject': 'হালনাগাদ',
     'register.SearchResult.rejectComments': 'মন্তব্য',
-    'register.home.header.searchType.trackingId': 'ট্র্যাকিং আইডি',
-    'register.home.header.searchType.brn_drn': 'বিআরএন/ডিআরএন',
-    'register.home.header.searchType.phone': 'ফোন নম্বর',
-    'register.home.header.searchType.placeHolder.trackingId':
-      'ট্র্যাকিং আইডি প্রবেশ করান',
-    'register.home.header.searchType.placeHolder.brn_drn':
-      'বিআরএন/ডিআরএন প্রবেশ করান',
-    'register.home.header.searchType.placeHolder.phone': 'ফোন নম্বর প্রবেশ করান'
+    'register.home.header.searchType.typeTrackingId': 'ট্র্যাকিং আইডি',
+    'register.home.header.typeBrnDrn': 'বিআরএন/ডিআরএন',
+    'register.home.header.typePhone': 'ফোন নম্বর',
+    'register.home.header.placeHolderTrackingId': 'ট্র্যাকিং আইডি প্রবেশ করান',
+    'register.home.header.placeHolderBrnDrn': 'বিআরএন/ডিআরএন প্রবেশ করান',
+    'register.home.header.placeHolderPhone': 'ফোন নম্বর প্রবেশ করান'
   }
 }

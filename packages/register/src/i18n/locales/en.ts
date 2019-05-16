@@ -514,12 +514,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.fieldAgent': 'Field Agent',
+    'register.home.header.registrationClerk': 'Registration Clerk',
+    'register.home.header.localRegistrar': 'Registrar',
+    'register.home.header.districtRegistrar': 'District Registrar',
+    'register.home.header.stateRegistrar': 'State Registrar',
+    'register.home.header.nationalRegistrar': 'National Registrar',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
@@ -957,12 +957,11 @@ export const ENGLISH_STATE: ILanguage = {
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     'register.SearchResult.reject': 'Update',
     'register.SearchResult.rejectComments': 'Comments',
-    'register.home.header.searchType.trackingId': 'Tracking ID',
-    'register.home.header.searchType.brn_drn': 'BRN/DRN',
-    'register.home.header.searchType.phone': 'Phone No.',
-    'register.home.header.searchType.placeHolder.trackingId':
-      'Enter Tracking ID',
-    'register.home.header.searchType.placeHolder.brn_drn': 'Enter BRN/DRN',
-    'register.home.header.searchType.placeHolder.phone': 'Enter Phone No.'
+    'register.home.header.typeTrackingId': 'Tracking ID',
+    'register.home.header.typeBrnDrn': 'BRN/DRN',
+    'register.home.header.typePhone': 'Phone No.',
+    'register.home.header.placeHolderTrackingId': 'Enter Tracking ID',
+    'register.home.header.placeHolderBrnDrn': 'Enter BRN/DRN',
+    'register.home.header.placeHolderPhone': 'Enter Phone No.'
   }
 }
