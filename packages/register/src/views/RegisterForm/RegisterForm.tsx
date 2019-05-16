@@ -238,7 +238,6 @@ const ButtonSpinner = styled(InvertSpinner)`
 
 const ConfirmBtn = styled(PrimaryButton)`
   font-weight: bold;
-  padding: 15px 20px 15px 20px;
   min-width: 150px;
   display: flex;
   align-items: center;
@@ -810,15 +809,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       disabled={loading || data}
                       // @ts-ignore
                       onClick={() => mutation()}
-                    >
-                      {!loading && (
-                        <>
-                          <TickLarge />
-                          {intl.formatMessage(messages.submitButton)}
-                        </>
-                      )}
-                      {loading && <ButtonSpinner id="submit_confirm_spinner" />}
-                    </ConfirmBtn>,
+                      icon={() => {
+                        return !loading ? (
+                          <>
+                            <TickLarge />
+                            <span style={{ paddingLeft: '16px' }}>
+                              {' '}
+                              {intl.formatMessage(messages.submitButton)}
+                            </span>
+                          </>
+                        ) : (
+                          <ButtonSpinner id="submit_confirm_spinner" />
+                        )
+                      }}
+                    />,
                     <CancelButton
                       id="cancel-btn"
                       key="cancel"

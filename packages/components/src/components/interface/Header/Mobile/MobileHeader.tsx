@@ -54,9 +54,11 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
       <HeaderContainer id={id}>
         <EndComponentContainer>
           {left && (
-            <Button id="mobile_header_left" onClick={left.handler}>
-              {left.icon()}
-            </Button>
+            <Button
+              id="mobile_header_left"
+              onClick={left.handler}
+              icon={() => left.icon()}
+            />
           )}
         </EndComponentContainer>
         <HeaderBody>
@@ -64,9 +66,11 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
         </HeaderBody>
         <EndComponentContainer>
           {right && (
-            <Button id="mobile_header_right" onClick={right.handler}>
-              {right.icon()}
-            </Button>
+            <Button
+              id="mobile_header_right"
+              onClick={right.handler}
+              icon={() => right.icon()}
+            />
           )}
         </EndComponentContainer>
       </HeaderContainer>
