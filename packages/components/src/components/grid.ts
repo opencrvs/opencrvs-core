@@ -1,5 +1,4 @@
-import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled from 'styled-components'
 export interface IGrid {
   breakpoints: {
     xs: number
@@ -19,7 +18,7 @@ export const grid: IGrid = {
     xs: 0,
     sm: 360,
     md: 600,
-    lg: 1032
+    lg: 1024
   },
   columns: 12,
   gutter: 12,
