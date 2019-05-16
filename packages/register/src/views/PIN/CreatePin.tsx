@@ -57,12 +57,16 @@ const ErrorBox = styled.div`
 type IProps = InjectedIntlProps & { onComplete: () => void }
 
 class CreatePinComponent extends React.Component<IProps> {
-  state = { pin: null, pinMatchError: false, repeatingDigits: false }
+  state = {
+    pin: null,
+    pinMatchError: false,
+    repeatingDigits: false,
+    refresher: false
+  }
 
   firstPINEntry = (pin: string) => {
-    const { pin: enteredPIN } = this.state
-    if (this.repeatingDigitsExist(enteredPIN)) {
-      this.setState({ pin: null, repeatingDigits: true })
+    if (this.repeatingDigitsExist(pin)) {
+      this.setState({ repeatingDigits: true, refresher: !this.state.refresher })
     } else {
       this.setState({ pin, repeatingDigits: false })
     }
@@ -113,7 +117,7 @@ class CreatePinComponent extends React.Component<IProps> {
     return (
       <Container>
         <PIN />
-        {pin === null && (
+        {pin === null && !repeatingDigits && (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.createTitle)}
@@ -126,15 +130,27 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.pinMatchError)}
               </ErrorBox>
             )}
-            {repeatingDigits && (
-              <ErrorBox id="error-text">
-                {intl.formatMessage(messages.pinRepeatingDigitsError)}
-              </ErrorBox>
-            )}
-            <PINKeypad onComplete={this.firstPINEntry} />
+            <PINKeypad pin="" onComplete={this.firstPINEntry} />
           </>
         )}
-        {pin && !repeatingDigits && (
+        {repeatingDigits && (
+          <>
+            <TitleText id="title-text">
+              {intl.formatMessage(messages.createTitle)}
+            </TitleText>
+            <DescriptionText id="description-text">
+              {intl.formatMessage(messages.createDescription)}
+            </DescriptionText>
+            <ErrorBox id="error-text">
+              {intl.formatMessage(messages.pinRepeatingDigitsError)}
+            </ErrorBox>
+            <PINKeypad
+              onComplete={this.firstPINEntry}
+              key={this.state.refresher.toString()}
+            />
+          </>
+        )}
+        {pin && (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.reEnterTitle)}
