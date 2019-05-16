@@ -40,6 +40,7 @@ type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
+  title?: string
   goToSearchResult: typeof goToSearchResult
   searchText?: string
   selectedSearchType?: string
@@ -109,6 +110,21 @@ const messages = defineMessages({
     id: 'register.home.header.placeHolderPhone',
     defaultMessage: 'Enter Phone No.',
     description: 'Search menu phone no place holder'
+  },
+  defaultTitle: {
+    id: 'register.home.header.defaultTitle',
+    defaultMessage: 'Applications',
+    description: 'Header default title'
+  },
+  applicationTitle: {
+    id: 'register.home.header.applicationTitle',
+    defaultMessage: 'Applications',
+    description: 'Application title'
+  },
+  performanceTitle: {
+    id: 'register.home.header.performanceTitle',
+    defaultMessage: 'Performance',
+    description: 'Performance title'
   }
 })
 
@@ -197,16 +213,17 @@ class HeaderComp extends React.Component<IProps, IState> {
 
   render() {
     const { intl } = this.props
+    const title = this.props.title || intl.formatMessage(messages.defaultTitle)
     const menuItems = [
       {
         key: 'application',
-        title: 'Application',
+        title: intl.formatMessage(messages.applicationTitle),
         onClick: goToHome,
         selected: true
       },
       {
         key: 'performance',
-        title: 'Performance',
+        title: intl.formatMessage(messages.performanceTitle),
         onClick: goToPerformance,
         selected: false
       }
@@ -261,7 +278,7 @@ class HeaderComp extends React.Component<IProps, IState> {
             icon: () => this.hamburger(),
             handler: this.toggleMenu
           }}
-          title="Mobile header"
+          title={title}
           right={{
             icon: () => <SearchDark />,
             handler: () => {

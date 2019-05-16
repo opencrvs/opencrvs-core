@@ -958,6 +958,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.typePhone': 'ফোন নম্বর',
     'register.home.header.placeHolderTrackingId': 'ট্র্যাকিং আইডি প্রবেশ করান',
     'register.home.header.placeHolderBrnDrn': 'বিআরএন/ডিআরএন প্রবেশ করান',
-    'register.home.header.placeHolderPhone': 'ফোন নম্বর প্রবেশ করান'
+    'register.home.header.placeHolderPhone': 'ফোন নম্বর প্রবেশ করান',
+    'register.home.header.defaultTitle': 'আবেদন',
+    'register.home.header.applicationTitle': 'আবেদন',
+    'register.home.header.Performance': 'কর্মদক্ষতা ব্যাবস্থাপনা'
   }
 }
