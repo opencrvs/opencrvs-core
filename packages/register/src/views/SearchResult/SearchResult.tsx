@@ -81,7 +81,7 @@ const ExpansionSpinnerContainer = styled.div`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
@@ -94,19 +94,18 @@ const Container = styled.div`
   }
 `
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  line-height: 1.3em;
   & span:not(:last-child) {
-    border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
+    border-right: 1px solid ${({ theme }) => theme.colors.placeholder};
     margin-right: 10px;
     padding-right: 10px;
   }
@@ -126,12 +125,8 @@ export const ActionPageWrapper = styled.div`
 const SearchResultText = styled.div`
   left: 268px;
   margin-top: 30px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.secondary};
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 36px;
-  letter-spacing: 0.4px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
     margin-top: 24px;
@@ -140,12 +135,8 @@ const SearchResultText = styled.div`
 const TotalResultText = styled.div`
   left: 268px;
   margin-top: 6px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
   color: ${({ theme }) => theme.colors.secondary};
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 24px;
-  letter-spacing: 0.4px;
+  ${({ theme }) => theme.fonts.captionStyle};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
   }
@@ -200,7 +191,7 @@ const ExpansionContainer = styled.div`
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
@@ -214,7 +205,7 @@ const ExpansionContentContainer = styled.div`
 const StyledSecondaryButton = styled(SecondaryButton)`
   border: solid 1px ${({ theme }) => theme.colors.disabledButton};
   color: ${({ theme }) => theme.colors.primary} !important;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.buttonStyle};
   svg {
     margin-right: 15px;
   }

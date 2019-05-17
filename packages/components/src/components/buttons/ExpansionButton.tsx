@@ -4,7 +4,7 @@ import { Button, IButtonProps, ICON_ALIGNMENT } from './Button'
 import { PlusTransparent, MinusTransparent } from '../icons'
 
 const StyledButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.secondary};
   display: flex;
   flex: 1;
   min-height: 50px;

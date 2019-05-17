@@ -64,7 +64,7 @@ import * as Sentry from '@sentry/browser'
 import * as debounce from 'lodash/debounce'
 
 const FormSectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FormActionSection = styled.div`
@@ -79,7 +79,7 @@ const FormAction = styled.div`
   padding-left: 25px;
 `
 const FormActionDivider = styled.div`
-  border-bottom: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
+  border-bottom: 1px inset ${({ theme }) => theme.colors.placeholder};
 `
 
 const FormPrimaryButton = styled(PrimaryButton)`
@@ -105,11 +105,9 @@ const BackButton = styled(PrimaryButton)`
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
   color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: 2px;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   margin-left: 14px;
 `
 
@@ -120,11 +118,9 @@ const DraftButtonContainer = styled.div`
   align-items: center;
 `
 const DraftButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
   color: ${({ theme }) => theme.colors.secondary};
-  font-size: 14px;
   text-decoration: underline;
-  letter-spacing: 0px;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   margin-left: 14px;
 `
 const Notice = styled.div`
@@ -132,9 +128,7 @@ const Notice = styled.div`
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   padding: 25px;
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  line-height: 24px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   margin: 30px -25px;
 `
 const CancelButton = styled.a`
@@ -235,8 +229,7 @@ const FormViewContainer = styled.div`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
@@ -249,7 +242,6 @@ const ButtonSpinner = styled(InvertSpinner)`
 `
 
 const ConfirmBtn = styled(PrimaryButton)`
-  font-weight: bold;
   padding: 15px 20px 15px 20px;
   min-width: 150px;
   display: flex;
@@ -265,7 +257,7 @@ const ConfirmBtn = styled(PrimaryButton)`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `

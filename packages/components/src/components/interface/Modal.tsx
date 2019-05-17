@@ -30,18 +30,15 @@ const ModalContent = styled.div`
   padding: 50px;
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  font-size: 18px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   position: relative;
 `
 
 const Heading = styled.h3`
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  font-size: 18px;
-  font-weight: bold;
   margin-bottom: 24px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 
 const Actions = styled.div`

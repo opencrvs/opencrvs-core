@@ -19,15 +19,15 @@ const fontFaces = [
 ]
 
 const colors = {
-  danger: '#d9534f',
+  danger: '#D53F3F',
   dark: '#000',
-  grey: '#7a898f',
+  grey: '#83898F',
   light: '#fff',
-  lightGrey: '#aec0c6',
-  paleGrey: '#ebf1f3',
-  primary: '#485F88',
-  secondary: '#4CA1F2',
-  tertiary: '#203a44'
+  lightGrey: '#A7B0B2',
+  paleGrey: '#C1C7C9',
+  primary: '#35495D',
+  secondary: '#5E93ED',
+  tertiary: '#373D3F'
 }
 
 const theme = {
@@ -49,19 +49,19 @@ const theme = {
   fontFamily: {
     base:
       '"' +
-      styleGuideCountryFonts[country].lightFontFamily +
+      styleGuideCountryFonts[country].regularFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     bold:
       '"' +
-      styleGuideCountryFonts[country].boldFontFamily +
+      styleGuideCountryFonts[country].semiBoldFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     light:
       '"' +
-      styleGuideCountryFonts[country].lightFontFamily +
+      styleGuideCountryFonts[country].regularFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',

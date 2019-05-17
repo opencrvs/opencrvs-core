@@ -20,13 +20,13 @@ const ExpansionContainer = styled.div`
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   &:last-child {
     margin-bottom: 0;
   }
 `
 const BoldSpan = styled.span`
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.boldBodyStyle};
   padding: 0 10px;
 `
 const StatusIcon = styled.div`
@@ -43,27 +43,26 @@ const ExpansionContentContainer = styled.div`
 const ValueContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  line-height: 1.3em;
 `
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 const Separator = styled.div`
   height: 20px;
   width: 1px;
   margin: 1px 8px;
-  background: ${({ theme }) => theme.colors.copyAlpha80};
+  background: ${({ theme }) => theme.colors.placeholder};
 `
 const DuplicateIndicatorContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
   & span {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
     margin-left: 10px;
   }
 `

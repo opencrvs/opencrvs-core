@@ -79,13 +79,13 @@ export const IconTabs = styled.div`
 `
 export const IconTab = styled(Button).attrs<IProps>({})`
   color: ${({ theme }) => theme.colors.secondary};
-  font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
+  ${({ theme, active }) =>
+    active ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle};
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
   margin-right: 50px;
   outline: none;
-  font-size: 16px;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & div {
     position: relative;
@@ -280,14 +280,12 @@ const StyledIconAction = styled(IconAction)`
   min-height: 96px;
   padding: 0 20px 0 0;
   box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
-  background-color: ${({ theme }) => theme.colors.accentLight};
+  background-color: ${({ theme }) => theme.colors.secondary};
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
-    font-size: 28px;
-    font-weight: 300;
+    ${({ theme }) => theme.fonts.h3Style};
     margin: -2px 0 -2px 120px;
-    line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
 `
@@ -296,7 +294,7 @@ const StyledSpinner = styled(Spinner)`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `

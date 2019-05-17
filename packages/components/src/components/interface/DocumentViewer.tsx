@@ -22,11 +22,10 @@ const Icon = styled.div`
 const TitleContainer = styled.div`
   width: 276px;
   color: ${({ theme }) => theme.colors.secondary};
-  font-size: 18px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
 `
 const Title = styled.div`
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 const SelectContainer = styled.div`
   width: 70%;

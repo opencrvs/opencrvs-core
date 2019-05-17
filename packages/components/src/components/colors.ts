@@ -25,13 +25,15 @@ const colorDictionary = {
 export const gradients = {
   gradientNightshade:
     'background: linear-gradient(180deg, #42506B 0%, #485F88 100%)',
-  gradientSkyDark: 'linear-gradient(180deg, #3C55A3 0%, #4C68C1 100%)',
-  gradientSkyLight: 'linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)'
+  gradientSkyDark:
+    'background: linear-gradient(180deg, #3C55A3 0%, #4C68C1 100%)',
+  gradientSkyLight:
+    'background: linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)'
 }
 
 export const shadows = {
-  shadowMisty: '0px 2px 6px rgba(53, 67, 93, 0.32)',
-  shadowThick: '0px 2px 8px rgba(53, 67, 93, 0.54)'
+  shadowMisty: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
+  shadowThick: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
 }
 
 export const colors = {
@@ -51,21 +53,15 @@ export const colors = {
   gradientLight: colorDictionary.nightshadeLight,
   focus: colorDictionary.yellowFocus,
 
-  accent: colorDictionary.yellowFocus,
-  accentLight: colorDictionary.yellowFocus,
   headerGradientDark: colorDictionary.yellowFocus,
   headerGradientLight: colorDictionary.yellowFocus,
-  copyAlpha80: colorDictionary.yellowFocus,
   hoverGradientDark: colorDictionary.yellowFocus,
-  blackAlpha20: colorDictionary.yellowFocus,
+
   cardGradientEnd: colorDictionary.yellowFocus,
-  chartPrimary: colorDictionary.yellowFocus,
-  chartSecondary: colorDictionary.yellowFocus,
-  chartTertiary: colorDictionary.yellowFocus,
+
   chartAreaGradientStart: colorDictionary.yellowFocus,
   chartAreaGradientEnd: colorDictionary.yellowFocus,
-  expandedIndicator: colorDictionary.yellowFocus,
-  expandedIndicatorSecondary: colorDictionary.yellowFocus,
+
   imageContainerBackground: colorDictionary.yellowFocus,
   disabledButton: colorDictionary.yellowFocus,
   rejectionIconColor: colorDictionary.yellowFocus,

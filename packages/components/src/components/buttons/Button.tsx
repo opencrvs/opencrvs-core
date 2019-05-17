@@ -10,11 +10,13 @@ const ButtonBase = styled.button`
   width: auto;
   padding: 0 35px;
   height: 48px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   align-items: center;
   display: inline-flex;
   border: 0;
-  font-size: inherit;
+  button:focus {
+    outline: 0;
+  }
   justify-content: space-between;
   cursor: pointer;
   background: transparent;

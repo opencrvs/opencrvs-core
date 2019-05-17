@@ -2,6 +2,7 @@ import { grid } from './grid'
 
 export interface IFonts {
   bodyStyle: string
+  bodyBoldStyle: string
   bigBodyStyle: string
   regularFont: string
   semiBoldFont: string
@@ -47,9 +48,8 @@ export const fonts = (country: string, language: string): IFonts => ({
   regularFont: countryFonts[country][language].regularFontFamily,
   semiBoldFont: countryFonts[country][language].semiBoldFontFamily,
   bigBodyBoldStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
+    countryFonts[country][language].semiBoldFontFamily
   };
-    font-weight: 600;
     font-size: 18px;
     line-height: 27px;`,
   bigBodyStyle: `font-family: ${
@@ -61,22 +61,23 @@ export const fonts = (country: string, language: string): IFonts => ({
   bodyStyle: `font-family: ${countryFonts[country][language].regularFontFamily};
     font-size: 16px;
     line-height: 24px;`,
-  subtitleStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
+  bodyBoldStyle: `font-family: ${
+    countryFonts[country][language].semiBoldFontFamily
   };
-    font-weight: 600;
+      line-height: 24px;`,
+  subtitleStyle: `font-family: ${
+    countryFonts[country][language].semiBoldFontFamily
+  };
     font-size: 14px;
     line-height: 21px;
     letter-spacing: 0.4px;`,
   captionStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };
-    font-weight: 500;
     font-size: 12px;
     line-height: 18px;
     letter-spacing: 0.4px;`,
-  h4Style: `font-family: ${countryFonts[country][language].regularFontFamily};
-    font-weight: 600;
+  h4Style: `font-family: ${countryFonts[country][language].semiBoldFontFamily};
     font-size: 24px;
     line-height: 36px;`,
   h3Style: `font-family: ${countryFonts[country][language].regularFontFamily};
@@ -94,9 +95,8 @@ export const fonts = (country: string, language: string): IFonts => ({
     line-height: 120px;
     letter-spacing: -1.5px;`,
   buttonStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
+    countryFonts[country][language].semiBoldFontFamily
   };
-    font-weight: 600;
     font-size: 16px;
     line-height: 24px;
     letter-spacing: 1px;`

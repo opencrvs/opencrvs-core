@@ -36,11 +36,8 @@ const LoadingContainer = styledLoader`
 `
 const LoadingTextContainer = styled.div`
   margin-top: 20px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 18px;
-  line-height: 27px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   text-align: center;
-  letter-spacing: 0.4px;
 `
 
 export class Loader extends React.Component<ILoader> {

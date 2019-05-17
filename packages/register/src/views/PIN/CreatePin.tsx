@@ -20,18 +20,16 @@ const Container = styled.div`
 
 const TitleText = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.h4Style};
   text-align: center;
-  font-size: 24px;
   margin-top: 24px;
   margin-bottom: 16px;
 `
 
 const DescriptionText = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   text-align: center;
-  font-size: 18px;
   max-width: 360px;
   margin-bottom: 40px;
 `
@@ -41,7 +39,7 @@ const ErrorBox = styled.div`
   align-items: center;
   justify-content: center;
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   background: ${({ theme }) => theme.colors.error};
   height: 40px;
   width: 360px;

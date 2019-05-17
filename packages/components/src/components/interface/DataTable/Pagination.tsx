@@ -40,7 +40,7 @@ const PageNumber = styled.span`
 `
 const PaginationText = styled.span`
   margin: 0 5px;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  ${({ theme }) => theme.fonts.buttonStyle};
 `
 interface IState {
   canPrevious: boolean

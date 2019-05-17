@@ -44,18 +44,15 @@ const BackButton = styled(PrimaryButton)`
   }
 `
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: 2px;
   margin-left: 14px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
 const MenuTitle = styled.span`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 25px;
+  ${({ theme }) => theme.fonts.h4Style};
   font-weight: 300;
   position: absolute;
   left: 50%;

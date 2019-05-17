@@ -26,10 +26,7 @@ const HeaderContainer = styled.div`
 `
 
 const Title = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  line-height: 30px;
-  letter-spacing: 0.15px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.white};
 `
 

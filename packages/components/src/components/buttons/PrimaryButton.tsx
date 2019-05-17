@@ -8,7 +8,7 @@ export const PrimaryButton = styled(Button)`
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   justify-content: center;
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  ${({ theme }) => theme.fonts.buttonStyle};
 
   &:hover {
     background: linear-gradient(

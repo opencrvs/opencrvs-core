@@ -13,7 +13,7 @@ const MenuMainWrapper = styled.div`
   }
   background: ${({ theme }) => theme.colors.menuBackground};
   width: 100%;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
   height: 100vh;
   z-index: 99999;
@@ -44,13 +44,11 @@ const UserInfo = styled.div`
   text-align: justify;
 `
 const UserName = styled.p`
-  font-size: 20px;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.h4Style};
   margin: 25px 0px 5px;
 `
 const Role = styled.p`
-  font-size: 15px;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   margin: 0px;
 `
 const MenuItems = styled.ul`
@@ -76,7 +74,6 @@ const MenuItem = styled.li`
   display: flex;
   align-items: center;
   padding: 10px 30px;
-  font-weight: bold;
   cursor: pointer;
   &:hover {
     color: ${({ theme }) => theme.colors.cardGradientEnd};

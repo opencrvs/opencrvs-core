@@ -39,7 +39,6 @@ const SearchButton = styled(PrimaryButton)`
   align-items: center;
   justify-content: center;
   background: ${({ theme }) => theme.colors.secondary};
-  font-weight: bold;
   margin: 0 5px;
   &:hover {
     background: linear-gradient(
@@ -93,7 +92,7 @@ const StyledInput = styled.input.attrs<ISearchInputProps>({})`
   color: ${({ theme }) => theme.colors.secondary};
 
   &:focus {
-    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
+    border-bottom: solid 1px ${({ theme }) => theme.colors.secondary};
   }
 
   &::-webkit-input-placeholder {

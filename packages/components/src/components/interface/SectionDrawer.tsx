@@ -9,8 +9,7 @@ const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
 const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   display: flex;
   align-items: center;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
@@ -23,8 +22,8 @@ const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
     visited && !isExpanded ? theme.colors.primary : theme.colors.secondary};
 `
 const EditLink = styled.a`
-  color: ${({ theme }) => theme.colors.accent};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-decoration: underline;
 `
 const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
@@ -32,7 +31,7 @@ const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
   border-radius: 1px 1px 0 0;
   transition: background 300ms;
   background: ${({ theme, expanded }) =>
-    expanded === true ? theme.colors.expandedIndicator : 'none'};
+    expanded === true ? theme.colors.primary : 'none'};
 `
 const Seperator = styled.span`
   color: ${({ theme }) => theme.colors.background};

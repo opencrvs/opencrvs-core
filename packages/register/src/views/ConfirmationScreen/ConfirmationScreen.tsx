@@ -80,10 +80,7 @@ const Container = styled.div`
 `
 const StyledP = styled.p`
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 24px;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 
 const SubmissionName = styled(StyledP)`
@@ -108,7 +105,7 @@ const TrackingBox = styled(Box)<StyleProps>`
         offline ? theme.colors.disabled : theme.colors.primary}
       0%,
     ${({ theme, offline }) =>
-        offline ? theme.colors.white : theme.colors.accentLight}
+        offline ? theme.colors.white : theme.colors.secondary}
       100%
   );
   color: ${({ theme, offline }) =>
@@ -152,13 +149,11 @@ const BoxTextDiv = styled.div`
 `
 
 const TrackingHeader = styled.h3`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
 `
 
-const TrackingNumber = styled.h1`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 30px;
+const TrackingNumber = styled.h2`
+  ${({ theme }) => theme.fonts.h2Style};
   margin-top: -15px;
 `
 

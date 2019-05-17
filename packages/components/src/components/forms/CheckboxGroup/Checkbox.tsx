@@ -13,8 +13,7 @@ const Label = styled.label`
   left: 6px;
   top: -2px;
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 const Check = styled.span`

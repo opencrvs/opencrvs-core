@@ -37,6 +37,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
       url('/fonts/notosans-semibold-webfont-en.ttf')
@@ -44,6 +45,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
     url('/fonts/notosans-regular-webfont-en.ttf')
@@ -51,6 +53,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
       url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
@@ -58,6 +61,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
       url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')

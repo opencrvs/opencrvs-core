@@ -14,14 +14,14 @@ const Wrapper = styled.form`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 2px;
   display: flex;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   padding: 10px;
   position: relative;
 `
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 10px;
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   flex-grow: 1;
   &:focus {
     outline: none;
@@ -62,7 +62,7 @@ const IconWrapper = styled.span`
   padding: 8px 16px;
 `
 const Label = styled.span`
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   color: ${({ theme }) => theme.colors.secondary};
 `
 const SelectedSearchCriteria = styled.span`
@@ -70,7 +70,7 @@ const SelectedSearchCriteria = styled.span`
   border-radius: 2px;
   padding: 5px 10px;
   color: ${({ theme }) => theme.colors.white};
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   margin-right: 10px;
 `
 const DropDown = styled.div`

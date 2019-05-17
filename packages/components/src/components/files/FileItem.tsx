@@ -27,8 +27,7 @@ const Container = styled.div`
 `
 
 const Link = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-decoration: underline;
   cursor: pointer;
 `
@@ -44,7 +43,7 @@ const DeleteLink = styled(Link)`
 
 const FileContainer = styled.div`
   height: 75px;
-  border: 1px solid ${({ theme }) => theme.colors.accentLight};
+  border: 1px solid ${({ theme }) => theme.colors.secondary};
   border-radius: 1px;
   background-color: ${({ theme }) => theme.colors.background};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
@@ -64,8 +63,7 @@ const DeleteContainer = styled.div`
 `
 
 const MetadataContainer = styled.div`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
 
   display: flex;

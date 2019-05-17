@@ -17,8 +17,7 @@ const Wrapper = styled.div`
 `
 const LabelText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
   font-weight: 500;
 `
 const ComponentWrapper = styled.span`

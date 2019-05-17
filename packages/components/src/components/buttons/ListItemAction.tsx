@@ -17,10 +17,9 @@ const ListItemSingleAction = styled(Button).attrs<{ isFullHeight?: boolean }>(
 )`
   display: flex;
   justify-content: center;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.capsFontStyle};
-  font-weight: 600;
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   width: 140px;
   margin-right: 1px;
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}

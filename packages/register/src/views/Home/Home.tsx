@@ -135,14 +135,12 @@ const StyledIconAction = styled(IconAction)`
   min-height: 96px;
   padding: 0 20px 0 0;
   box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
-  background-color: ${({ theme }) => theme.colors.accentLight};
+  background-color: ${({ theme }) => theme.colors.secondary};
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
-    font-size: 28px;
-    font-weight: 300;
+    ${({ theme }) => theme.fonts.h4Style}
     margin: -2px 0 -2px 120px;
-    line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
 `
