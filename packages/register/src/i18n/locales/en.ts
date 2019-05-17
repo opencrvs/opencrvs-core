@@ -989,6 +989,19 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'In progress',
     'register.registrarHome.readyForReview': 'Ready for review',
     'register.registrarHome.sentForUpdates': 'Sent for updates',
-    'register.registrarHome.action': 'Action'
+    'register.registrarHome.action': 'Action',
+    'settings.title': 'Settings',
+    'profile.title': 'Profile',
+    'security.title': 'Security',
+    'account.title': 'Account',
+    'system.title': 'System',
+    'label.nameEN': 'English name',
+    'label.nameBN': 'Bangla name',
+    'label.phone': 'Phone number',
+    'label.role': 'Role',
+    'label.password': 'Password',
+    'label.pin': 'PIN',
+    'label.language': 'Language',
+    'action.change': 'Change'
   }
 }

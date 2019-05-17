@@ -987,6 +987,19 @@ export const BENGALI_STATE: ILanguage = {
       'পর্যালোচনার জন্য পাঠানো ({total})',
     'register.fieldAgentHome.requireUpdates': 'হালনাগাদ প্রয়োজন ({total})',
     'register.registrarHome.updateButton': 'হালনাগাদ',
-    'register.home.header.performanceTitle': 'কর্মদক্ষতা'
+    'register.home.header.performanceTitle': 'কর্মদক্ষতা',
+    'settings.title': 'সেটিংস',
+    'profile.title': 'প্রোফাইল',
+    'security.title': 'নিরাপত্তা',
+    'account.title': 'অ্যাকাউন্ট',
+    'system.title': 'সিস্টেম',
+    'label.nameEN': 'ইংরেজি নাম',
+    'label.nameBN': 'বাংলার নাম',
+    'label.phone': 'ফোন নম্বর',
+    'label.role': 'দায়িত্ব',
+    'label.password': 'পাসওয়ার্ড',
+    'label.pin': 'পিন',
+    'label.language': 'ভাষা',
+    'action.change': 'পরিবর্তন'
   }
 }

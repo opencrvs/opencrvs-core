@@ -8,9 +8,14 @@ import {
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
+<<<<<<< HEAD
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
   SEARCH
+=======
+  WORK_QUEUE_TAB,
+  SETTINGS
+>>>>>>> New Settings page
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -129,6 +134,10 @@ export function goToFieldAgentHomeTab(tabId: string) {
     type: GO_TO_FIELD_AGENT_HOME,
     payload: { tabId }
   }
+}
+
+export function goToSettings() {
+  return push(SETTINGS)
 }
 
 export function goToTab(
