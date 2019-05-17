@@ -965,6 +965,19 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.placeHolderPhone': 'Enter Phone No.',
     'register.home.header.defaultTitle': 'Applications',
     'register.home.header.applicationTitle': 'Applications',
-    'register.home.header.performanceTitle': 'Performance'
+    'register.home.header.performanceTitle': 'Performance',
+    'settings.title': 'Settings',
+    'profile.title': 'Profile',
+    'security.title': 'Security',
+    'account.title': 'Account',
+    'system.title': 'System',
+    'label.englishName': 'English name',
+    'label.banglaName': 'Bangla name',
+    'label.phone': 'Phone number',
+    'label.role': 'Role',
+    'label.password': 'Password',
+    'label.pin': 'PIN',
+    'label.language': 'Language',
+    'action.change': 'Change'
   }
 }

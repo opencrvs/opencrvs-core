@@ -30,6 +30,8 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { Footer } from '@opencrvs/components/lib/interface/'
+import { SettingsPage } from './views/Settings/SettingsPage'
+
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
@@ -127,6 +129,11 @@ export class App extends React.Component<IAppProps> {
                                 <ProtectedRoute
                                   path={routes.PRINT_CERTIFICATE}
                                   component={PrintCertificateAction}
+                                />
+                                />
+                                <ProtectedRoute
+                                  path={routes.SETTINGS}
+                                  component={SettingsPage}
                                 />
                               </Switch>
                             </ProtectedPage>
