@@ -29,6 +29,7 @@ import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificat
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { SettingsPage } from './views/Settings/SettingsPage'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -123,6 +124,11 @@ export class App extends React.Component<IAppProps> {
                               <ProtectedRoute
                                 path={routes.PRINT_CERTIFICATE}
                                 component={PrintCertificateAction}
+                              />
+                              <ProtectedRoute
+                                exact
+                                path={routes.SETTINGS}
+                                component={SettingsPage}
                               />
                             </Switch>
                           </ProtectedPage>

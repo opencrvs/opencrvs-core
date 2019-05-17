@@ -8,7 +8,8 @@ import {
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
-  WORK_QUEUE_TAB
+  WORK_QUEUE_TAB,
+  SETTINGS
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -104,6 +105,10 @@ export function goToWorkQueueTab(tabId: string) {
     type: GO_TO_WORK_QUEUE,
     payload: { tabId }
   }
+}
+
+export function goToSettings() {
+  return push(SETTINGS)
 }
 
 export function goToTab(
