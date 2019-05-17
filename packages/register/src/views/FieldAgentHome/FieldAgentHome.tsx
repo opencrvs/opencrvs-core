@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, Redirect } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { goToEvents as goToEventsAction } from 'src/navigation'
@@ -23,6 +23,7 @@ import {
   StatusRejected
 } from '@opencrvs/components/lib/icons'
 import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
+import { REGISTRAR_HOME } from 'src/navigation/routes'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -149,6 +150,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
             </Topbar>
           </>
         )}
+        {!isFieldAgent && <Redirect to={REGISTRAR_HOME} />}
       </>
     )
   }
