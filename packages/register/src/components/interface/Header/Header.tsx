@@ -38,6 +38,7 @@ import {
   goToPerformance,
   goToSearchResult,
   goToSearch
+  goToSettings
 } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
 import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
@@ -50,6 +51,7 @@ type IProps = InjectedIntlProps & {
   title?: string
   goToSearchResult: typeof goToSearchResult
   goToSearch: typeof goToSearch
+  goToSettings: typeof goToSettings
   searchText?: string
   selectedSearchType?: string
   mobileSearchBar?: boolean
@@ -180,7 +182,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
         label: 'Settings',
-        onClick: () => alert('Settings')
+        onClick: this.props.goToSettings
       },
       {
         icon: <HelpBlack />,
@@ -343,6 +345,7 @@ export const Header = connect(
   {
     redirectToAuthentication,
     goToSearchResult,
-    goToSearch
+    goToSearch,
+    goToSettings
   }
 )(injectIntl<IProps>(HeaderComp))
