@@ -28,9 +28,8 @@ import {
   validIDNumber,
   dateGreaterThan,
   dateLessThan,
-  dateNotInFuture,
+  dateInPast,
   dateFormatIsCorrect,
-  dateNotToday,
   numeric,
   maxLength
 } from 'src/utils/validate'
@@ -361,11 +360,7 @@ export const motherSection: IFormSection = {
             dependencies: []
           },
           {
-            validator: dateNotInFuture,
-            dependencies: []
-          },
-          {
-            validator: dateNotToday,
+            validator: dateInPast,
             dependencies: []
           },
           {
@@ -422,7 +417,7 @@ export const motherSection: IFormSection = {
             dependencies: []
           },
           {
-            validator: dateNotInFuture,
+            validator: dateInPast,
             dependencies: []
           },
           {

@@ -20,9 +20,8 @@ import {
   greaterThanZero,
   dateGreaterThan,
   dateLessThan,
-  dateNotInFuture,
-  dateFormatIsCorrect,
-  dateNotToday
+  dateInPast,
+  dateFormatIsCorrect
 } from './validate'
 
 describe('validate', () => {
@@ -428,18 +427,25 @@ describe('validate', () => {
     })
   })
 
-  describe("dateNotToday. Checks if a given date is today's date", () => {
+  describe("dateInPast. Checks if a given date is in the past", () => {
+    it("should not give an error message if the date is in the past", () => {
+      const todaysDate = new Date('1999-12-31')
+      todaysDate.setHours(0, 0, 0)
+      const today = todaysDate.toDateString()
+      expect(dateInPast()(today)).toEqual(undefined)
+    })
     it("should give an error message if the date is today's date", () => {
       const todaysDate = new Date()
       todaysDate.setHours(0, 0, 0)
       const today = todaysDate.toDateString()
-      expect(dateNotToday()(today)).toEqual({ message: messages.dateNotToday })
+      expect(dateInPast()(today)).toEqual({ message: messages.dateFormat })
     })
-    it("should not give an error message if the date is not today's date", () => {
-      const todaysDate = new Date('1999-12-31')
+
+    it("should give an error message if the date is in the future", () => {
+      const todaysDate = new Date(2040, 12, 12)
       todaysDate.setHours(0, 0, 0)
       const today = todaysDate.toDateString()
-      expect(dateNotToday()(today)).toEqual(undefined)
+      expect(dateInPast()(today)).toEqual({ message: messages.dateFormat })
     })
   })
 
@@ -676,11 +682,11 @@ describe('validate', () => {
   describe('dateNotInFuture. Checks if a given date is in the future', () => {
     it('should be okay with date not in future', () => {
       const pastDate = '2003-02-23'
-      expect(dateNotInFuture()(pastDate)).toEqual(undefined)
+      expect(dateInPast()(pastDate)).toEqual(undefined)
     })
     it('should give error message with date in future', () => {
       const futureDate = '2053-02-23'
-      expect(dateNotInFuture()(futureDate)).toEqual({
+      expect(dateInPast()(futureDate)).toEqual({
         message: messages.dateFormat
       })
     })
