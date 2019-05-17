@@ -11,6 +11,10 @@ const ActionContainer = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   text-align: left;
   justify-content: flex-start;
+  & > div {
+    padding: 0;
+    justify-content: flex-start;
+  }
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 2px;
   &:last-child {

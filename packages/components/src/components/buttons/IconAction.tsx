@@ -4,13 +4,17 @@ import { Button, ICON_ALIGNMENT as IconAlignment } from './Button'
 import { IActionProps } from './Action'
 
 const ActionContainer = styled(Button)`
-  width: 100%;
   min-height: 120px;
+  width: 100%;
+  text-align: left;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.white};
-  text-align: left;
-  justify-content: flex-start;
+  & div {
+    justify-content: flex-start;
+    padding: 0;
+  }
+
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 10px;
   &:last-child {

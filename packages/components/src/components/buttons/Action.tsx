@@ -12,6 +12,9 @@ const ActionContainer = styled(Button)`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.white};
+  & div {
+    padding: 0;
+  }
   text-align: left;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 10px;

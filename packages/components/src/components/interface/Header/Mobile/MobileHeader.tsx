@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Button } from '../../../buttons'
 import styled from 'styled-components'
+import { CircleButton } from '../../../buttons'
 
 interface IMenuAction {
   icon: () => React.ReactNode
@@ -19,8 +19,8 @@ const HeaderContainer = styled.div`
   align-items: center;
   background: linear-gradient(
     180deg,
-    ${({ theme }) => theme.colors.headerGradientLight} 0%,
-    ${({ theme }) => theme.colors.headerGradientDark} 100%
+    ${({ theme }) => theme.colors.headerGradientDark} 0%,
+    ${({ theme }) => theme.colors.headerGradientLight} 100%
   );
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
 `
@@ -51,9 +51,13 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
       <HeaderContainer id={id}>
         <EndComponentContainer>
           {left && (
-            <Button id="mobile_header_left" onClick={left.handler}>
+            <CircleButton
+              id="mobile_header_left"
+              onClick={left.handler}
+              dark={true}
+            >
               {left.icon()}
-            </Button>
+            </CircleButton>
           )}
         </EndComponentContainer>
         <HeaderBody>
@@ -61,9 +65,13 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
         </HeaderBody>
         <EndComponentContainer>
           {right && (
-            <Button id="mobile_header_right" onClick={right.handler}>
+            <CircleButton
+              id="mobile_header_right"
+              onClick={right.handler}
+              dark={true}
+            >
               {right.icon()}
-            </Button>
+            </CircleButton>
           )}
         </EndComponentContainer>
       </HeaderContainer>

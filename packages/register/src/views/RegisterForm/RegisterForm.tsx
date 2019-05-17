@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton, ButtonIcon } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowForward,
   ArrowBack,
@@ -60,7 +60,7 @@ import { toggleDraftSavedNotification } from 'src/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
 import * as Sentry from '@sentry/browser'
-// @ts-ignore - typescript doesn't like importing the individual lodash modules but I need this for mocking
+// @ts-ignore - Required for mocking
 import * as debounce from 'lodash/debounce'
 
 const FormSectionTitle = styled.h2`
@@ -97,11 +97,6 @@ const BackButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
-  /* stylelint-disable */
-  ${ButtonIcon} {
-    /* stylelint-enable */
-    margin-left: 0em;
-  }
 `
 
 const BackButtonText = styled.span`
@@ -116,12 +111,6 @@ const DraftButtonContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-`
-const DraftButtonText = styled.span`
-  color: ${({ theme }) => theme.colors.secondary};
-  text-decoration: underline;
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 14px;
 `
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -242,7 +231,6 @@ const ButtonSpinner = styled(InvertSpinner)`
 `
 
 const ConfirmBtn = styled(PrimaryButton)`
-  padding: 15px 20px 15px 20px;
   min-width: 150px;
   display: flex;
   align-items: center;
@@ -769,9 +757,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               onClick={() => this.onSaveAsDraftClicked()}
                             >
                               <DraftSimple />
-                              <DraftButtonText>
+                              <LinkButton>
                                 {intl.formatMessage(messages.valueSaveAsDraft)}
-                              </DraftButtonText>
+                              </LinkButton>
                             </DraftButtonContainer>
                           }
                         </FormAction>
@@ -814,15 +802,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       disabled={loading || data}
                       // @ts-ignore
                       onClick={() => mutation()}
-                    >
-                      {!loading && (
-                        <>
-                          <TickLarge />
-                          {intl.formatMessage(messages.submitButton)}
-                        </>
-                      )}
-                      {loading && <ButtonSpinner id="submit_confirm_spinner" />}
-                    </ConfirmBtn>,
+                      icon={() => {
+                        return !loading ? (
+                          <>
+                            <TickLarge />
+                            <span style={{ paddingLeft: '16px' }}>
+                              {' '}
+                              {intl.formatMessage(messages.submitButton)}
+                            </span>
+                          </>
+                        ) : (
+                          <ButtonSpinner id="submit_confirm_spinner" />
+                        )
+                      }}
+                    />,
                     <CancelButton
                       id="cancel-btn"
                       key="cancel"

@@ -129,6 +129,7 @@ const StyledActionList = styled(ActionList)`
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;

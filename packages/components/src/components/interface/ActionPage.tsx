@@ -1,8 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ArrowBack } from '../icons'
-import { ButtonIcon, PrimaryButton, IconAction } from '../buttons'
-
+import { PrimaryButton } from '../buttons'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -37,11 +36,6 @@ const BackButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
-  /* stylelint-disable */
-  ${ButtonIcon} {
-    /* stylelint-enable */
-    margin-left: 0em;
-  }
 `
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};

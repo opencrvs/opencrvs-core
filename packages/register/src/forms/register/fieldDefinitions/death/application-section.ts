@@ -514,7 +514,7 @@ export const applicantsSection: IFormSection = {
       name: 'applicantPhone',
       type: TEL,
       label: messages.applicantsPhone,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [phoneNumberFormat],
       mapping: {

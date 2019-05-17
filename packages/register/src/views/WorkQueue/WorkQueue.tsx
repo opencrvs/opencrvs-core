@@ -11,11 +11,7 @@ import {
   StatusProgress,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
-import {
-  ISearchInputProps,
-  SearchInput,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ISearchInputProps, Spinner } from '@opencrvs/components/lib/interface'
 import {
   ColumnContentAlignment,
   GridTable
@@ -45,7 +41,6 @@ import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToSearchResult,
   goToTab as goToTabAction
 } from 'src/navigation'
 import {
@@ -274,6 +269,7 @@ const Container = styled.div`
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;
@@ -309,7 +305,6 @@ interface IBaseWorkQueueProps {
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
   drafts: IDraft[]
-  goToSearchResult: typeof goToSearchResult
 }
 
 interface IWorkQueueState {
@@ -718,12 +713,6 @@ export class WorkQueueView extends React.Component<
               onClick={this.props.goToEvents}
               title={intl.formatMessage(messages.newRegistration)}
             />
-            <SearchInput
-              placeholder={intl.formatMessage(messages.searchInputPlaceholder)}
-              buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
-              onSubmit={this.props.goToSearchResult}
-              {...this.props}
-            />
             <Query
               query={COUNT_REGISTRATION_QUERY}
               variables={{
@@ -1059,7 +1048,6 @@ export const WorkQueue = connect(
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
     goToWorkQueueTab: goToWorkQueueTabAction,
-    goToSearchResult,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }

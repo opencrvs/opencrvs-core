@@ -1,12 +1,5 @@
 import * as React from 'react'
-import {
-  SearchBlue,
-  TrackingID,
-  BRN,
-  Phone,
-  ArrowDownBlue,
-  ClearText
-} from '../../icons'
+import { SearchBlue, ArrowDownBlue, ClearText } from '../../icons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -81,11 +74,12 @@ const DropDown = styled.div`
 const ClearTextIcon = styled(ClearText)`
   margin: 0 5px;
 `
-interface ISearchType {
+export interface ISearchType {
   label: string
   value: string
   icon: React.ReactNode
   isDefault?: boolean
+  placeHolderText: string
 }
 interface IState {
   dropDownIsVisible: boolean
@@ -93,45 +87,51 @@ interface IState {
   selectedSearchType: ISearchType
 }
 interface IProps {
-  searchHandler: (param: string) => void
+  searchTypeList: ISearchType[]
+  searchText?: string
+  selectedSearchType?: string
+  searchHandler: (searchText: string, searchType: string) => void
 }
-const SEARCH_TYPES = [
-  {
-    label: 'Tracking ID',
-    value: 'trackingid',
-    icon: <TrackingID />,
-    isDefault: true
-  },
-  { label: 'BRN/DRN', value: 'brn-drn', icon: <BRN /> },
-  { label: 'Phone no.', value: 'phone', icon: <Phone /> }
-]
-
 export class SearchTool extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
 
     this.state = {
       dropDownIsVisible: false,
-      searchParam: '',
+      searchParam: this.props.searchText ? this.props.searchText : '',
       selectedSearchType: this.getDefaultSearchType()
     }
   }
+
   getDefaultSearchType(): ISearchType {
+    if (this.props.selectedSearchType) {
+      return (
+        this.props.searchTypeList.find(
+          (item: ISearchType) => item.value === this.props.selectedSearchType
+        ) || this.props.searchTypeList[0]
+      )
+    }
+
     return (
-      SEARCH_TYPES.find((item: ISearchType) => item.isDefault === true) ||
-      SEARCH_TYPES[0]
+      this.props.searchTypeList.find(
+        (item: ISearchType) => item.isDefault === true
+      ) || this.props.searchTypeList[0]
     )
   }
   search = () => {
     return (
-      this.state.searchParam && this.props.searchHandler(this.state.searchParam)
+      this.state.searchParam &&
+      this.props.searchHandler(
+        this.state.searchParam,
+        this.state.selectedSearchType.value
+      )
     )
   }
   dropdown() {
     return (
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
-          {SEARCH_TYPES.map(item => {
+          {this.props.searchTypeList.map(item => {
             return (
               <DropDownItem
                 key={item.value}
@@ -169,14 +169,14 @@ export class SearchTool extends React.Component<IProps, IState> {
     this.setState({ searchParam: event.target.value, dropDownIsVisible: false })
   }
   render() {
-    const selectedCriteria = `Enter ${this.state.selectedSearchType.label}`
+    const { placeHolderText } = this.state.selectedSearchType
     return (
       <Wrapper action="javascript:void(0);" onSubmit={this.search}>
         <SearchBlue onClick={this.search} />
         <SearchTextInput
           id="searchText"
           type="text"
-          placeholder={selectedCriteria}
+          placeholder={placeHolderText}
           onChange={this.onChangeHandler}
           value={this.state.searchParam}
         />

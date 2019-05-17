@@ -190,21 +190,7 @@ const RejectApplication = styled(IconAction)`
     }
   }
 `
-const RegisterApplication = styled(PrimaryButton)`
-  font-weight: bold;
-  padding: 15px 35px 15px 20px;
-  div {
-    position: relative !important;
-    margin-right: 20px;
-    top: 2px;
-  }
-  &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
-    path {
-      stroke: ${({ theme }) => theme.colors.disabled};
-    }
-  }
-`
+
 const RequiredFieldLink = styled(Button)`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.error};
@@ -704,7 +690,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <Column>
             {!!registerClickEvent && (
               <ButtonContainer>
-                <RegisterApplication
+                <PrimaryButton
                   id="registerApplicationBtn"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
@@ -712,7 +698,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   disabled={!this.state.allSectionVisited}
                 >
                   {intl.formatMessage(messages.valueRegister)}
-                </RegisterApplication>
+                </PrimaryButton>
               </ButtonContainer>
             )}
 
@@ -730,7 +716,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             {!!submitClickEvent && (
               <ButtonContainer>
-                <RegisterApplication
+                <PrimaryButton
                   id="submit_form"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
@@ -742,7 +728,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       ? messages.valueRegister
                       : messages.valueSendForReview
                   )}
-                </RegisterApplication>
+                </PrimaryButton>
               </ButtonContainer>
             )}
 
