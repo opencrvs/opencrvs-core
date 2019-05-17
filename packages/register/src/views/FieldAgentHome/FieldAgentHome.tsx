@@ -104,7 +104,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
         {isFieldAgent && (
           <>
             <Header />
-            <Topbar>
+            <Topbar id="top-bar">
               <IconTab
                 id={`tab_${TAB_ID.inProgress}`}
                 key={TAB_ID.inProgress}
