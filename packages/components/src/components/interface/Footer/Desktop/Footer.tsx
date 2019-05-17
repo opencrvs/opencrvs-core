@@ -1,11 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-interface IProps {
-  left?: React.ReactNode
-  right?: React.ReactNode
-}
-
 const FooterContainer = styled.section`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -25,7 +20,6 @@ const FooterContainer = styled.section`
   }
   align-items: center;
   width: 100%;
-  justify-content: space-between;
   background: linear-gradient(
     180deg,
     ${({ theme }) => theme.colors.headerGradientDark} 0%,
@@ -33,14 +27,8 @@ const FooterContainer = styled.section`
   );
 `
 
-export class Footer extends React.Component<IProps> {
+export class Footer extends React.Component {
   render() {
-    return (
-      <FooterContainer>
-        {!this.props.left && <p>© OpenCRVS {new Date().getFullYear()}</p>}
-        {this.props.left}
-        {this.props.right}
-      </FooterContainer>
-    )
+    return <FooterContainer>{this.props.children}</FooterContainer>
   }
 }

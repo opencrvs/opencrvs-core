@@ -131,7 +131,9 @@ export class App extends React.Component<IAppProps> {
                               </Switch>
                             </ProtectedPage>
                           </MainSection>
-                          <Footer />
+                          <Footer>
+                            <p>OpenCRVS {new Date().getFullYear()}</p>
+                          </Footer>
                         </Page>
                       </NotificationComponent>
                     </ScrollToTop>
