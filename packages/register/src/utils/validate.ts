@@ -385,28 +385,22 @@ export const dateLessThan: ValidationInitializer = (
       }
 }
 
-export const dateNotInFuture: ValidationInitializer = (): Validation => (
+export const dateInPast: ValidationInitializer = (): Validation => (
   value: string
-) => {
-  if (isDateNotInFuture(value)) {
+) => isDateInPast(value)
+
+export const isDateInPast: Validation = (value: string) => {
+  if (isDateNotInFuture(value) && isNotToday(value)) {
     return undefined
   } else {
     return { message: messages.dateFormat }
   }
 }
 
-export const dateNotToday: ValidationInitializer = (): Validation => (
-  value: string
-) => isNotToday(value)
-
-export const isNotToday: Validation = (date: string) => {
+export const isNotToday = (date: string): boolean => {
   const inputDate = new Date(date).setHours(0, 0, 0, 0)
   const today = new Date().setHours(0, 0, 0, 0)
-  if (inputDate === today) {
-    return { message: messages.dateNotToday }
-  } else {
-    return undefined
-  }
+  return inputDate !== today
 }
 
 export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (

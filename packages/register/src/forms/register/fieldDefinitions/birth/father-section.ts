@@ -27,11 +27,10 @@ import {
   validIDNumber,
   dateGreaterThan,
   dateLessThan,
-  dateNotInFuture,
+  dateInPast,
   dateFormatIsCorrect,
   maxLength,
-  numeric,
-  dateNotToday
+  numeric
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -404,11 +403,7 @@ export const fatherSection: IFormSection = {
             dependencies: []
           },
           {
-            validator: dateNotInFuture,
-            dependencies: []
-          },
-          {
-            validator: dateNotToday,
+            validator: dateInPast,
             dependencies: []
           },
           {
@@ -464,10 +459,6 @@ export const fatherSection: IFormSection = {
         validate: [
           {
             validator: dateFormatIsCorrect,
-            dependencies: []
-          },
-          {
-            validator: dateNotToday,
             dependencies: []
           },
           {
