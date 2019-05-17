@@ -3,14 +3,17 @@
   "version": "1.0.0-alpha.5",
   "private": true,
   "dependencies": {
+    "@types/react-intl": "^2.3.17",
     "@types/react-select": "^2.0.2",
     "css-animation": "^1.4.1",
     "rc-menu": "^7.4.13",
     "react": "^16.3.2",
     "react-docgen-typescript": "^1.7.0",
     "react-dom": "^16.3.2",
+    "react-intl": "^2.8.0",
     "react-pdf": "^4.0.2",
     "react-select": "^2.0.0",
+    "react-stickynode": "^2.1.1",
     "react-styleguidist": "^7.0.13",
     "recharts": "^1.4.0",
     "styled-components": "^3.3.3"
@@ -21,8 +24,6 @@
     "start": "concurrently 'styleguidist server' 'tsc -w'",
     "postinstall": "yarn build",
     "build": "yarn clean && tsc",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-styleguide -t ocrvs-styleguide",
-    "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-styleguide ocrvs-styleguide",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "test": "yarn test:compilation",
     "test:compilation": "tsc --noEmit"
@@ -37,9 +38,11 @@
   },
   "devDependencies": {
     "@types/jest": "^22.2.3",
+    "@types/lodash": "^4.14.126",
     "@types/node": "^10.12.5",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
+    "@types/react-stickynode": "^1.4.0",
     "@types/recharts": "^1.1.1",
     "concurrently": "^3.5.1",
     "dotenv": "^6.1.0",

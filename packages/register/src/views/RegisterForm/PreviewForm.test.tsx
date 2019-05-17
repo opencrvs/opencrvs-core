@@ -670,7 +670,7 @@ describe('when user is previewing the form data', () => {
           ':draftId',
           customDraft.id.toString()
         )
-          .replace(':event', 'birth')
+          .replace(':event', 'death')
           .replace(':tabId', 'review')
       )
       app.update()

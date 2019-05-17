@@ -20,8 +20,8 @@ import {
   LogoutBlue,
   TrackingID,
   BRN,
-  Phone,
-  ArrowBack
+  Phone
+  // ArrowBack // TODO Add later
 } from '@opencrvs/components/lib/icons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { storage } from 'src/storage'
@@ -41,10 +41,10 @@ type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
+  title?: string
   goToSearchResult: typeof goToSearchResult
   searchText?: string
   selectedSearchType?: string
-  mobileSearchBar?: boolean
 }
 interface IState {
   showMenu: boolean
@@ -82,35 +82,50 @@ const messages = defineMessages({
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
   },
-  TYPE_TRACKING_ID: {
-    id: 'register.home.header.searchType.trackingId',
+  typeTrackingId: {
+    id: 'register.home.header.typeTrackingId',
     defaultMessage: 'Tracking ID',
     description: 'Search menu tracking id type'
   },
-  TYPE_BRN_DRN: {
-    id: 'register.home.header.searchType.brn_drn',
+  typeBrnDrn: {
+    id: 'register.home.header.typeBrnDrn',
     defaultMessage: 'BRN/DRN',
     description: 'Search menu brn drn type'
   },
-  TYPE_PHONE: {
-    id: 'register.home.header.searchType.phone',
+  typePhone: {
+    id: 'register.home.header.typePhone',
     defaultMessage: 'Phone No.',
     description: 'Search menu phone no type'
   },
-  PLACE_HOLDER_TRACKING_ID: {
-    id: 'register.home.header.searchType.placeHolder.trackingId',
+  placeHolderTrackingId: {
+    id: 'register.home.header.placeHolderTrackingId',
     defaultMessage: 'Enter Tracking ID',
     description: 'Search menu tracking id place holder'
   },
-  PLACE_HOLDER_BRN_DRN: {
-    id: 'register.home.header.searchType.placeHolder.brn_drn',
+  placeHolderBrnDrn: {
+    id: 'register.home.header.placeHolderBrnDrn',
     defaultMessage: 'Enter BRN/DRN',
     description: 'Search menu brn drn place holder'
   },
-  PLACE_HOLDER_PHONE: {
-    id: 'register.home.header.searchType.placeHolder.phone',
+  placeHolderPhone: {
+    id: 'register.home.header.placeHolderPhone',
     defaultMessage: 'Enter Phone No.',
     description: 'Search menu phone no place holder'
+  },
+  defaultTitle: {
+    id: 'register.home.header.defaultTitle',
+    defaultMessage: 'Applications',
+    description: 'Header default title'
+  },
+  applicationTitle: {
+    id: 'register.home.header.applicationTitle',
+    defaultMessage: 'Applications',
+    description: 'Application title'
+  },
+  performanceTitle: {
+    id: 'register.home.header.performanceTitle',
+    defaultMessage: 'Performance',
+    description: 'Performance title'
   }
 })
 
@@ -120,39 +135,6 @@ class HeaderComp extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props)
-    this.searchTypeList = [
-      {
-        label: props.intl.formatMessage(messages.TYPE_TRACKING_ID),
-        value: TRACKING_ID_TEXT,
-        icon: <TrackingID />,
-        placeHolderText: props.intl.formatMessage(
-          messages.PLACE_HOLDER_TRACKING_ID
-        ),
-        isDefault: true
-      },
-      {
-        label: props.intl.formatMessage(messages.TYPE_BRN_DRN),
-        value: BRN_DRN_TEXT,
-        icon: <BRN />,
-        placeHolderText: props.intl.formatMessage(messages.PLACE_HOLDER_BRN_DRN)
-      },
-      {
-        label: props.intl.formatMessage(messages.TYPE_PHONE),
-        value: PHONE_TEXT,
-        icon: <Phone />,
-        placeHolderText: props.intl.formatMessage(messages.PLACE_HOLDER_PHONE)
-      }
-    ]
-
-    this.searchToolElement = (
-      <SearchTool
-        key="searchMenu"
-        searchText={this.props.searchText}
-        selectedSearchType={this.props.selectedSearchType}
-        searchTypeList={this.searchTypeList}
-        searchHandler={this.props.goToSearchResult}
-      />
-    )
 
     this.state = {
       showMenu: false,
@@ -241,48 +223,80 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
+    const { intl } = this.props
+    const title = this.props.title || intl.formatMessage(messages.defaultTitle)
     const menuItems = [
       {
         key: 'application',
-        title: 'Application',
+        title: intl.formatMessage(messages.applicationTitle),
         onClick: goToHome,
         selected: true
       },
       {
         key: 'performance',
-        title: 'Performance',
+        title: intl.formatMessage(messages.performanceTitle),
         onClick: goToPerformance,
         selected: false
       }
     ]
 
+    const searchTypeList: ISearchType[] = [
+      {
+        label: intl.formatMessage(messages.typeTrackingId),
+        value: TRACKING_ID_TEXT,
+        icon: <TrackingID />,
+        placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
+        isDefault: true
+      },
+      {
+        label: intl.formatMessage(messages.typeBrnDrn),
+        value: BRN_DRN_TEXT,
+        icon: <BRN />,
+        placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
+      },
+      {
+        label: intl.formatMessage(messages.typePhone),
+        value: PHONE_TEXT,
+        icon: <Phone />,
+        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
+      }
+    ]
+
     const rightMenu = [
       {
-        element: this.searchToolElement
+        element: (
+          <SearchTool
+            key="searchMenu"
+            searchText={this.props.searchText}
+            selectedSearchType={this.props.selectedSearchType}
+            searchTypeList={searchTypeList}
+            searchHandler={this.props.goToSearchResult}
+          />
+        )
       },
       {
         element: <ProfileMenu key="profileMenu" />
       }
     ]
 
-    const mobileHeaderActionProps = this.props.mobileSearchBar
-      ? {
-          mobileLeft: {
-            icon: () => <ArrowBack />,
-            handler: () => history.back()
-          },
-          mobileBody: this.searchToolElement
-        }
-      : {
-          mobileLeft: {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          },
-          mobileRight: {
-            icon: () => <SearchDark />,
-            handler: this.props.goToSearchResult
-          }
-        }
+    //  const mobileHeaderActionProps = this.props.mobileSearchBar
+    //   ? {
+    //       mobileLeft: {
+    //         icon: () => <ArrowBack />,
+    //         handler: () => history.back()
+    //       },
+    //       mobileBody: this.searchToolElement
+    //     }
+    //   : {
+    //       mobileLeft: {
+    //         icon: () => this.hamburger(),
+    //         handler: this.toggleMenu
+    //       },
+    //       mobileRight: {
+    //         icon: () => <SearchDark />,
+    //         handler: this.props.goToSearchResult
+    //       }
+    //     }
 
     return (
       <>
@@ -290,8 +304,17 @@ class HeaderComp extends React.Component<IProps, IState> {
           menuItems={menuItems}
           id="register_app_header"
           desktopRightMenu={rightMenu}
-          title="Mobile header"
-          {...mobileHeaderActionProps}
+          mobileLeft={{
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          }}
+          title={title}
+          mobileRight={{
+            icon: () => <SearchDark />,
+            handler: () => {
+              alert('sdfsdf')
+            }
+          }}
         />
         <LogoutConfirmation
           show={this.state.showLogoutModal}

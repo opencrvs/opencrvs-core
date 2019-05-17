@@ -3,17 +3,8 @@ import { ILanguage } from '../reducer'
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
   messages: {
-    'app.loading.data.loadingOfflineData':
-      'We are loading some essential data, so that you can submit applications offline.  Please wait ...',
-    'app.loading.data.offlineDataLoaded': 'OpenCRVS is ready for use.',
-    'app.loading.data.continueButton': 'Continue',
-    'login.stepOneTitle': 'Login',
     'session.expire.text': 'Your session has expired. Please login again.',
-    'myDrafts.title': 'My drafts',
-    'myDrafts.labels.results.name': 'Name',
-    'myDrafts.labels.results.dob': 'D.o.B.',
-    'myDrafts.labels.results.savedOn': 'Saved on',
-    'myDrafts.labels.results.trackingID': 'Tracking ID',
+    'login.stepOneTitle': 'Login',
     'menu.back': 'Back',
     'menu.menu': 'Menu',
     'menu.items.homepage': 'Homepage',
@@ -658,10 +649,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.labels.statuses.application': 'Application',
     'register.workQueue.labels.statuses.registered': 'Registered',
     'register.workQueue.labels.statuses.collected': 'Collected',
-    'register.workQueue.statusLabel.application': 'Application',
-    'register.workQueue.statusLabel.registered': 'Registered',
-    'register.workQueue.statusLabel.collected': 'Collected',
-    'register.workQueue.statusLabel.rejected': 'rejected',
+    'register.workQueue.labels.statuses.rejected': 'Rejected',
     'register.workQueue.labels.events.all': 'All life events',
     'register.workQueue.labels.events.birth': 'Birth',
     'register.workQueue.labels.events.death': 'Death',
@@ -688,8 +676,10 @@ export const ENGLISH_STATE: ILanguage = {
       'Registration number',
     'register.workQueue.labels.results.trackingID': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
+    'register.workQueue.labels.results.deathRegistrationNumber': 'DRN',
     'register.workQueue.labels.results.eventRegistrationNumber':
       '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
+    'register.workQueue.labels.results.action': 'Action',
     'register.workQueue.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
@@ -700,6 +690,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.header.description':
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
+    'register.workQueue.tabs.inProgress': 'In progress',
+    'register.workQueue.tabs.readyForReview': 'Ready for review',
+    'register.workQueue.tabs.sentForUpdates': 'Sent for updates',
     'register.workQueue.list.buttons.review': 'Review',
     'register.workQueue.list.buttons.update': 'Update',
     'register.workQueue.list.buttons.print': 'Print',
@@ -716,13 +709,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
     'register.workQueue.labels.results.rejectionReason': 'Reason',
     'register.workQueue.labels.results.rejectionComment': 'Comment',
-    'register.workQueue.print.form.name': 'Print',
-    'register.workQueue.print.form.title': 'Print certificate',
+    'print.certificate.form.name': 'Print',
+    'print.certificate.form.title': 'Print certificate',
     'formFields.print.whoToCollect': 'Who is collecting the certificate?',
-    'register.workQueue.print.collector.mother': 'Mother',
-    'register.workQueue.print.collector.father': 'Father',
-    'register.workQueue.print.collector.other': 'Other',
-    'register.workQueue.print.collector.informant': 'Informant',
+    'print.certificate.collector.mother': 'Mother',
+    'print.certificate.collector.father': 'Father',
+    'print.certificate.collector.other': 'Other',
+    'print.certificate.collector.informant': 'Informant',
     'formFields.print.confirmMotherInformation':
       'Does their proof of ID document match the following details?',
     'formFields.print.otherPersonGivenNames': 'Given name',
@@ -733,33 +726,31 @@ export const ENGLISH_STATE: ILanguage = {
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     'formFields.print.otherPersonPrompt':
       'Because there are no details of this person on record, we need to capture their details:',
-    'register.workQueue.print.payment': 'Payment',
-    'register.workQueue.print.paymentMethod': 'Payment method',
-    'register.workQueue.print.manualPaymentMethod': 'Manual',
-    'register.workQueue.print.collectPayment':
+    'print.certificate.payment': 'Payment',
+    'print.certificate.paymentMethod': 'Payment method',
+    'print.certificate.manualPaymentMethod': 'Manual',
+    'print.certificate.collectPayment':
       'Please collect the payment, print the receipt and hand it over to the payee.',
-    'register.workQueue.print.serviceMonth':
+    'print.certificate.serviceMonth':
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.serviceYear':
+    'print.certificate.serviceYear':
       'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.birthService':
+    'print.certificate.birthService':
       'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
-    'register.workQueue.print.deathService':
+    'print.certificate.deathService':
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
-    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'Print receipt',
     'print.certificate.next': 'Next',
-    'register.workQueue.print.printCertificate': 'Print certificate',
-    'register.workQueue.print.finish': 'Finish',
-    'register.workQueue.print.certificatePreview': 'Certificate Preview',
-    'register.workQueue.print.selectSignature': 'Select e-signatures',
-    'register.workQueue.print.addAnotherSignature': 'Add another',
+    'print.certificate.printCertificate': 'Print certificate',
+    'print.certificate.finish': 'Finish',
+    'print.certificate.certificatePreview': 'Certificate Preview',
+    'print.certificate.selectSignature': 'Select e-signatures',
+    'print.certificate.addAnotherSignature': 'Add another',
     'register.noLabel': ' ',
-    'register.workQueue.print.signature.person1':
-      'UP Secretary Shakib al hasan',
-    'register.workQueue.print.signature.person2':
-      'Local Registrar Mohammad Ashraful',
-    'register.workQueue.print.userReviewed':
+    'print.certificate.signature.person1': 'UP Secretary Shakib al hasan',
+    'print.certificate.signature.person2': 'Local Registrar Mohammad Ashraful',
+    'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.workQueue.buttons.reviewDuplicates': 'Review Duplicates',
@@ -806,6 +797,8 @@ export const ENGLISH_STATE: ILanguage = {
     'review.form.section.reviewTitle': 'Review',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.englishOnlyNameFormat': 'Must contain only English characters',
+    'validations.dobEarlierThanDom': 'Must be earlier than marriage date',
+    'validations.domLaterThanDob': 'Must be later than birth date',
     'register.home.header.hello': 'Hello {fullName}',
     'register.form.valueYes': 'Yes',
     'register.form.valueNo': 'No',
@@ -950,6 +943,12 @@ export const ENGLISH_STATE: ILanguage = {
     'unlockApp.lastTry': 'Last Try',
     'unlockApp.locked':
       'your account has been locked. Please try again in 1 minute.',
+    'error.code': '401',
+    'error.title.unauthorized': 'Unauthorized!',
+    'error.title': 'Whoops!',
+    'error.description1': 'Something went wrong.',
+    'error.description2': "It's not you, it us. This is our fault.",
+    'goto.homepage': 'Go to Homepage',
     'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
     'register.SearchResult.searchingFor': 'Searching for “{param}”',
     'register.SearchResult.searchResultFor':
@@ -958,12 +957,14 @@ export const ENGLISH_STATE: ILanguage = {
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     'register.SearchResult.reject': 'Update',
     'register.SearchResult.rejectComments': 'Comments',
-    'register.home.header.searchType.trackingId': 'Tracking ID',
-    'register.home.header.searchType.brn_drn': 'BRN/DRN',
-    'register.home.header.searchType.phone': 'Phone No.',
-    'register.home.header.searchType.placeHolder.trackingId':
-      'Enter Tracking ID',
-    'register.home.header.searchType.placeHolder.brn_drn': 'Enter BRN/DRN',
-    'register.home.header.searchType.placeHolder.phone': 'Enter Phone No.'
+    'register.home.header.typeTrackingId': 'Tracking ID',
+    'register.home.header.typeBrnDrn': 'BRN/DRN',
+    'register.home.header.typePhone': 'Phone No.',
+    'register.home.header.placeHolderTrackingId': 'Enter Tracking ID',
+    'register.home.header.placeHolderBrnDrn': 'Enter BRN/DRN',
+    'register.home.header.placeHolderPhone': 'Enter Phone No.',
+    'register.home.header.defaultTitle': 'Applications',
+    'register.home.header.applicationTitle': 'Applications',
+    'register.home.header.performanceTitle': 'Performance'
   }
 }

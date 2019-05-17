@@ -3,8 +3,11 @@ import styled, { withTheme } from 'styled-components'
 import { IDataPoint, ICategoryDataPoint } from './datapoint'
 import { ITheme } from '../theme'
 
+interface ILegendDataPoint extends IDataPoint {
+  percentage: number
+}
 export interface ILegendProps {
-  data: IDataPoint[]
+  data: ILegendDataPoint[]
   smallestToLargest: boolean
 }
 
@@ -86,14 +89,12 @@ const FooterIconTitle = styled.div`
 const FooterIcon = styled.div`
   margin: 0 8px;
 `
-const calculateSum = (points: IDataPoint[]) =>
-  points.reduce((sum, item) => sum + item.value, 0)
 
 function LegendHeader({
   dataPoint,
   colour
 }: {
-  dataPoint: IDataPoint
+  dataPoint: ILegendDataPoint
   colour: string
 }) {
   if (dataPoint.estimate) {
@@ -103,16 +104,8 @@ function LegendHeader({
   return <LegendItem colour={colour}>{dataPoint.label}</LegendItem>
 }
 
-function LegendBody({
-  dataPoint,
-  total,
-  estimate
-}: {
-  dataPoint: IDataPoint
-  total: number
-  estimate: number
-}) {
-  let title = `${Math.round((dataPoint.value / total) * 100)}%`
+function LegendBody({ dataPoint }: { dataPoint: ILegendDataPoint }) {
+  let title = `${dataPoint.percentage}%`
 
   if (dataPoint.total) {
     title = dataPoint.value.toString()
@@ -121,7 +114,7 @@ function LegendBody({
   return (
     <DataLabel>
       <DataTitle description={dataPoint.description}>{title}</DataTitle>
-      {dataPoint.description && (
+      {!dataPoint.total && dataPoint.description && (
         <DataDescription>{dataPoint.description}</DataDescription>
       )}
     </DataLabel>
@@ -140,7 +133,9 @@ function LegendFooter({
   return (
     <FooterContainer>
       {dataPoints.map((dataPoint: ICategoryDataPoint, i) => {
-        let title = `${Math.round((dataPoint.value / total) * 100)}%`
+        let title = `${
+          total === 0 ? 0 : Math.round((dataPoint.value / total) * 100)
+        }%`
 
         if (isTotal) {
           title = dataPoint.value.toString()
@@ -169,8 +164,6 @@ export const Legend = withTheme(
     if (smallestToLargest) {
       sortedData = [...data].sort((a, b) => a.value - b.value)
     }
-    const allTotalPoints = sortedData.filter(({ total }) => total)
-    const allEstimatePoints = sortedData.filter(({ estimate }) => estimate)
 
     const colours = [
       theme.colors.chartPrimary,
@@ -187,11 +180,7 @@ export const Legend = withTheme(
             return (
               <Column key={i}>
                 <LegendHeader dataPoint={dataPoint} colour={colour} />
-                <LegendBody
-                  dataPoint={dataPoint}
-                  total={calculateSum(allTotalPoints)}
-                  estimate={calculateSum(allEstimatePoints)}
-                />
+                <LegendBody dataPoint={dataPoint} />
                 {dataPoint.categoricalData && (
                   <LegendFooter
                     dataPoints={dataPoint.categoricalData}

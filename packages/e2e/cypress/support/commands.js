@@ -61,7 +61,7 @@ Cypress.Commands.add('login', (userType, options = {}) => {
     })
 
   // Wait for app to load so token can be stored
-  cy.wait(3000)
+  cy.wait(6000)
 })
 
 Cypress.Commands.add('selectOption', (selector, text, option) => {

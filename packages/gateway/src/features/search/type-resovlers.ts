@@ -9,15 +9,10 @@ interface ISearchDataTemplate {
   [key: string]: string
 }
 export interface ISearchCriteria {
-  event?: string
-  status?: string
   applicationLocationId?: string
-  query?: string
   trackingId?: string
   contactNumber?: string
   registrationNumber?: string
-  from: number
-  size: number
   sort?: string
 }
 
@@ -131,6 +126,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registeredLocationId(searchData: ISearchDataTemplate) {
       return searchData.applicationLocationId
+    },
+    duplicates(searchData: ISearchDataTemplate) {
+      return searchData.relatesTo
     }
   }
 }
