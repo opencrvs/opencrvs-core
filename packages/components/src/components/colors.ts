@@ -40,5 +40,6 @@ export const colors = {
   creamCan: '#EDC55E',
   dropdownHover: '#E5EEFC',
   menuBackground: '#35495dcc',
-  menuBackgroundTransparent: '#35495d00'
+  menuBackgroundTransparent: '#35495d00',
+  buttonHoverColor: '#F2F3F4'
 }
