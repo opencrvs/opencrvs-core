@@ -32,7 +32,12 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 import { IStoreState } from 'src/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { goToHome, goToPerformance, goToSearchResult } from 'src/navigation'
+import {
+  goToHome,
+  goToPerformance,
+  goToSearchResult,
+  goToSettings
+} from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
 import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
 
@@ -42,6 +47,7 @@ type IProps = InjectedIntlProps & {
   language: string
   title?: string
   goToSearchResult: typeof goToSearchResult
+  goToSettings: typeof goToSettings
   searchText?: string
   selectedSearchType?: string
 }
@@ -164,7 +170,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
         label: 'Settings',
-        onClick: () => alert('Settings')
+        onClick: this.props.goToSettings
       },
       {
         icon: <HelpBlack />,
@@ -303,6 +309,7 @@ export const Header = connect(
   }),
   {
     redirectToAuthentication,
-    goToSearchResult
+    goToSearchResult,
+    goToSettings
   }
 )(injectIntl<IProps>(HeaderComp))
