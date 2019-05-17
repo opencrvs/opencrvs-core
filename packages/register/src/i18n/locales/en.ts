@@ -646,13 +646,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.selects.sort.item0': 'Oldest to newest',
     'register.workQueue.selects.sort.item1': 'Newest to oldest',
     'register.workQueue.labels.statuses.all': 'All statuses',
-    'register.workQueue.labels.statuses.application': 'Application',
-    'register.workQueue.labels.statuses.registered': 'Registered',
-    'register.workQueue.labels.statuses.collected': 'Collected',
-    'register.workQueue.labels.statuses.rejected': 'Rejected',
+    'register.searchResult.labels.statuses.application': 'Application',
+    'register.searchResult.labels.statuses.registered': 'Registered',
+    'register.searchResult.labels.statuses.collected': 'Collected',
+    'register.searchResult.labels.statuses.rejected': 'Rejected',
     'register.workQueue.labels.events.all': 'All life events',
-    'register.workQueue.labels.events.birth': 'Birth',
-    'register.workQueue.labels.events.death': 'Death',
+    'register.searchResult.labels.events.birth': 'Birth',
+    'register.searchResult.labels.events.death': 'Death',
     'register.workQueue.labels.events.marriage': 'Marriage',
     'register.workQueue.labels.locations.all': 'All locations',
     'register.workQueue.labels.selects.sort': 'Sort by:',
@@ -666,6 +666,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.listItemName': 'Name',
     'register.registrarHome.listItemDoB': 'D.o.B.',
     'register.registrarHome.listItemDod': 'D.o.D.',
+    'register.searchResult.listItemName': 'Name',
+    'register.searchResult.listItemDoB': 'D.o.B.',
+    'register.searchResult.listItemDod': 'D.o.D.',
     'register.workQueue.labels.results.dom': 'D.o.M.',
     'register.workQueue.labels.results.dateOfApplication':
       'Date of application',
@@ -675,23 +678,29 @@ export const ENGLISH_STATE: ILanguage = {
     'register.workQueue.labels.results.registrationNumber':
       'Registration number',
     'register.registrarHome.results.trackingId': 'Tracking ID',
+    'register.searchResult.results.trackingId': 'Tracking ID',
     'register.workQueue.labels.results.birthRegistrationNumber': 'BRN',
     'register.workQueue.labels.results.deathRegistrationNumber': 'DRN',
-    'register.workQueue.labels.results.eventRegistrationNumber':
+    'register.searchResult.labels.results.eventRegistrationNumber':
       '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
     'register.registrarHome.queryError': 'An error occurred while searching',
+    'register.searchResult.queryError': 'An error occurred while searching',
     'print.certificate.queryError':
       'An error occurred while quering for birth registration data',
     'print.certificate.confirm': 'Confirm',
     'register.registrarHome.results': 'Results',
+    'register.searchResult.results': 'Results',
     'register.registrarHome.noResults': 'No result to display',
+    'register.searchResult.noResults': 'No result to display',
     'register.registrarHome.title': 'Hello Registrar',
     'register.registrarHome.description':
       'Review | Registration | Certification',
     'register.workQueue.buttons.newRegistraion': 'New birth registration',
     'register.registrarHome.reviewButton': 'Review',
+    'register.searchResult.reviewButton': 'Review',
     'register.registrarHome.updateButton': 'Update',
     'register.workQueue.list.buttons.print': 'Print',
+    'register.searchResult.list.buttons.print': 'Print',
     'register.workQueue.title.certificateCollection': 'Certificate Collection',
     'register.workQueue.list.buttons.printCertificate': 'Print certificate',
     'register.workQueue.buttons.newApplication': 'New application',
@@ -702,9 +711,18 @@ export const ENGLISH_STATE: ILanguage = {
       'Application rejected on',
     'register.workQueue.listItem.status.dateLabel.collected':
       'Certificate collected on',
+    'register.searchResult.listItem.status.dateLabel.application':
+      'Application submitted on',
+    'register.searchResult.listItem.status.dateLabel.registered':
+      'Registered on',
+    'register.searchResult.listItem.status.dateLabel.rejected':
+      'Application rejected on',
+    'register.searchResult.listItem.status.dateLabel.collected':
+      'Certificate collected on',
     'register.workQueue.listItem.status.label.byPractitioner': 'By',
-    'register.workQueue.labels.results.rejectionReason': 'Reason',
-    'register.workQueue.labels.results.rejectionComment': 'Comment',
+    'register.searchResult.listItem.status.label.byPractitioner': 'By',
+    'register.searchResult.labels.results.rejectionReason': 'Reason',
+    'register.searchResult.labels.results.rejectionComment': 'Comment',
     'print.certificate.form.name': 'Print',
     'print.certificate.form.title': 'Print certificate',
     'formFields.print.whoToCollect': 'Who is collecting the certificate?',
@@ -750,9 +768,11 @@ export const ENGLISH_STATE: ILanguage = {
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
     'register.registrarHome.results.reviewDuplicates': 'Review Duplicates',
+    'register.searchResult.results.reviewDuplicates': 'Review Duplicates',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
+    'register.searchResult.editButton': 'Edit',
     'review.edit.modal.confirmationText':
       'Are you sure you want to edit the application?',
     'review.rejection.form': 'Rejection form',
@@ -965,6 +985,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.performanceTitle': 'Performance',
     'register.fieldAgentHome.inProgress': 'In progress ({total})',
     'register.fieldAgentHome.sentForReview': 'Sent for review ({total})',
-    'register.fieldAgentHome.requireUpdates': 'Require updates ({total})'
+    'register.fieldAgentHome.requireUpdates': 'Require updates ({total})',
+    'register.registrarHome.inProgress': 'In progress',
+    'register.registrarHome.readyForReview': 'Ready for review',
+    'register.registrarHome.sentForUpdates': 'Sent for updates',
+    'register.registrarHome.action': 'Action'
   }
 }
