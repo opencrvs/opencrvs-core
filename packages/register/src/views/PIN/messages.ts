@@ -14,7 +14,7 @@ export default defineMessages({
   },
   pinSequentialDigitsError: {
     id: 'createPIN.pinSeqDigitsError',
-    defaultMessage: 'PIN code contains sequential digits.',
+    defaultMessage: 'PIN contains sequential digits.',
     description: 'The error displayed if PIN contains sequential digits.'
   },
   pinMatchError: {
