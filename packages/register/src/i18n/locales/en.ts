@@ -956,6 +956,15 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     'register.SearchResult.reject': 'Update',
-    'register.SearchResult.rejectComments': 'Comments'
+    'register.SearchResult.rejectComments': 'Comments',
+    'register.home.header.typeTrackingId': 'Tracking ID',
+    'register.home.header.typeBrnDrn': 'BRN/DRN',
+    'register.home.header.typePhone': 'Phone No.',
+    'register.home.header.placeHolderTrackingId': 'Enter Tracking ID',
+    'register.home.header.placeHolderBrnDrn': 'Enter BRN/DRN',
+    'register.home.header.placeHolderPhone': 'Enter Phone No.',
+    'register.home.header.defaultTitle': 'Applications',
+    'register.home.header.applicationTitle': 'Applications',
+    'register.home.header.performanceTitle': 'Performance'
   }
 }
