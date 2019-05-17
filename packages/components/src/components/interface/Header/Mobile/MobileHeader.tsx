@@ -44,6 +44,10 @@ const HeaderBody = styled.div`
   form {
     width: 100%;
   }
+
+  &:last-child {
+    margin-right: 0;
+  }
 `
 
 const EndComponentContainer = styled.div`

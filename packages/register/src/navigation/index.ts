@@ -1,4 +1,4 @@
-import { push, goBack as back } from 'react-router-redux'
+import { push, goBack as back, replace } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   HOME,
@@ -8,7 +8,8 @@ import {
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
-  WORK_QUEUE_TAB
+  WORK_QUEUE_TAB,
+  SEARCH
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -66,12 +67,16 @@ export function goToPerformance() {
 }
 
 export function goToSearchResult(searchText: string, searchType: string) {
-  return push(
+  return replace(
     formatUrl(SEARCH_RESULT, {
       searchText,
       searchType
     })
   )
+}
+
+export function goToSearch() {
+  return push(SEARCH)
 }
 
 export function goToBirthRegistrationAsParent(draftId: string) {

@@ -91,6 +91,7 @@ interface IProps {
   searchText?: string
   selectedSearchType?: string
   searchHandler: (searchText: string, searchType: string) => void
+  onClearText?: () => void
 }
 export class SearchTool extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -168,6 +169,16 @@ export class SearchTool extends React.Component<IProps, IState> {
   onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ searchParam: event.target.value, dropDownIsVisible: false })
   }
+
+  onClearTextHandler = () => {
+    const { onClearText } = this.props
+    this.setState({ searchParam: '' })
+
+    if (onClearText) {
+      onClearText()
+    }
+  }
+
   render() {
     const { placeHolderText } = this.state.selectedSearchType
     return (
@@ -181,7 +192,7 @@ export class SearchTool extends React.Component<IProps, IState> {
           value={this.state.searchParam}
         />
         {this.state.searchParam && (
-          <ClearTextIcon onClick={() => this.setState({ searchParam: '' })} />
+          <ClearTextIcon onClick={this.onClearTextHandler} />
         )}
         <DropDown onClick={this.toggleDropdownDisplay}>
           <SelectedSearchCriteria>

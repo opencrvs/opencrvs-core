@@ -113,6 +113,10 @@ export class App extends React.Component<IAppProps> {
                                 component={ConfirmationScreen}
                               />
                               <ProtectedRoute
+                                path={routes.SEARCH}
+                                component={SearchResult}
+                              />
+                              <ProtectedRoute
                                 path={routes.SEARCH_RESULT}
                                 component={SearchResult}
                               />
