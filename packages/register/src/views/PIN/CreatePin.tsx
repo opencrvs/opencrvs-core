@@ -53,16 +53,22 @@ class CreatePinComponent extends React.Component<IProps> {
   state = {
     pin: null,
     pinMatchError: false,
+    pinHasSameDigits: false,
     pinHasSeqDigits: false,
     refresher: false
   }
 
   firstPINEntry = (pin: string) => {
     this.setState({ refresher: !this.state.refresher })
-    if (this.sequential(pin)) {
-      this.setState({ pinHasSeqDigits: true })
+    const sameDigits = this.sameDigits(pin)
+    const seqDigits = this.sequential(pin)
+    if (sameDigits || seqDigits) {
+      this.setState({
+        pinHasSameDigits: sameDigits,
+        pinHasSeqDigits: seqDigits
+      })
     } else {
-      this.setState({ pin, pinHasSeqDigits: false })
+      this.setState({ pin, pinHasSameDigits: false, pinHasSeqDigits: false })
     }
   }
 
@@ -75,6 +81,8 @@ class CreatePinComponent extends React.Component<IProps> {
 
     this.storePINForUser(pin)
   }
+
+  sameDigits = (pin: string) => pin && Number(pin) % 1111 === 0
 
   sequential = (pin: string) => {
     const d = pin.split('').map(i => Number(i))
@@ -92,7 +100,7 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 
   render() {
-    const { pin, pinMatchError, pinHasSeqDigits, refresher } = this.state
+    const { pin, pinMatchError, pinHasSameDigits, pinHasSeqDigits, refresher } = this.state
     const { intl } = this.props
 
     return (
@@ -114,7 +122,7 @@ class CreatePinComponent extends React.Component<IProps> {
             <PINKeypad pin="" onComplete={this.firstPINEntry} />
           </>
         )}
-        {pinHasSeqDigits && (
+        {pinHasSeqDigits &&  (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.createTitle)}
@@ -124,6 +132,23 @@ class CreatePinComponent extends React.Component<IProps> {
             </DescriptionText>
             <ErrorBox id="error-text">
               {intl.formatMessage(messages.pinSequentialDigitsError)}
+            </ErrorBox>
+            <PINKeypad
+              onComplete={this.firstPINEntry}
+              key={refresher.toString()}
+            />
+          </>
+        )}
+        {pinHasSameDigits &&  (
+          <>
+            <TitleText id="title-text">
+              {intl.formatMessage(messages.createTitle)}
+            </TitleText>
+            <DescriptionText id="description-text">
+              {intl.formatMessage(messages.createDescription)}
+            </DescriptionText>
+            <ErrorBox id="error-text">
+              {intl.formatMessage(messages.pinSameDigitsError)}
             </ErrorBox>
             <PINKeypad
               onComplete={this.firstPINEntry}

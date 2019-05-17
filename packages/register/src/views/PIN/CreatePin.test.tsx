@@ -24,7 +24,7 @@ describe('Create PIN view', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
@@ -67,7 +67,7 @@ describe('Create PIN view', async () => {
 
     expect(c.find('span#title-text').text()).toBe('Create a PIN')
 
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
@@ -78,6 +78,25 @@ describe('Create PIN view', async () => {
     c.update()
 
     expect(c.find('span#title-text').text()).toBe('Re-enter your new PIN')
+  })
+
+  it('prevents the user from using 4 sequential digits as PIN', async () => {
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-1').simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, 50)
+    })
+
+    c.update()
+
+    expect(c.find('div#error-text').text()).toBe(
+      'PIN cannot have 4 same digits.'
+    )
   })
 
   it('prevents the user from using 4 sequential digits as PIN', async () => {
@@ -103,7 +122,7 @@ describe('Create PIN view', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
@@ -116,7 +135,7 @@ describe('Create PIN view', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
       setTimeout(() => {
