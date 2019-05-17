@@ -66,7 +66,6 @@ const Name = styled.p`
 `
 
 interface IState {
-  showLogoutModal: boolean
   pin: string
   userPin: string
   resetKey: number
@@ -93,7 +92,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      showLogoutModal: false,
       attempt: 0,
       errorMessage: '',
       pin: '',
@@ -135,12 +133,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <ErrorMessage id="errorMsg">{this.state.errorMessage}</ErrorMessage>
       )
     )
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal
-    }))
   }
 
   onPinProvided = async (pin: string) => {
