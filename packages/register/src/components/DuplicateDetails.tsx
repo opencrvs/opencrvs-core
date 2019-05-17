@@ -168,7 +168,7 @@ const messages = defineMessages({
     description: 'A label for certified'
   },
   rejectLinkText: {
-    id: 'register.duplicates.details.reject',
+    id: 'register.duplicates.button.reject',
     defaultMessage: 'Reject',
     description: 'A label for reject link'
   }

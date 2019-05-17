@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { connect } from 'react-redux'
 import {
   StatusOrange,
   StatusGreen,

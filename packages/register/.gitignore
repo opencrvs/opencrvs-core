@@ -22,4 +22,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
+src/i18n/locales/bn.csv
+src/i18n/locales/en.csv
+
 .vscode

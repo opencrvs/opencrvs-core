@@ -3,18 +3,8 @@ import { ILanguage } from '../reducer'
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
   messages: {
-    'app.loading.data.loadingOfflineData':
-      'আমরা কিছু প্রয়োজনীয় তথ্য লোড করছি, যাতে আপনি অফলাইনে  আবেদন জমা দিতে পারেন',
-    'app.loading.data.offlineDataLoaded':
-      'ওপেন সি আর ভি এস ব্যবহারের জন্য প্রস্তুত',
-    'app.loading.data.continueButton': 'চালিয়ে যান',
-    'login.stepOneTitle': 'লগইন',
     'session.expire.text': 'আপনার সেশনের মেয়াদ শেষ হয়ে গেছে',
-    'myDrafts.title': 'আমার খসড়া',
-    'myDrafts.labels.results.name': 'নাম',
-    'myDrafts.labels.results.dob': 'জন্ম তারিখ',
-    'myDrafts.labels.results.savedOn': 'সংরক্ষিত',
-    'myDrafts.labels.results.trackingID': 'ট্র্যাকিং আইডি',
+    'login.stepOneTitle': 'লগইন',
     'menu.back': 'পিছনে',
     'menu.menu': 'তালিকা',
     'menu.items.homepage': 'হোম পেইজ',
@@ -658,10 +648,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.statuses.application': 'আবেদন',
     'register.workQueue.labels.statuses.registered': 'নিবন্ধভুক্ত',
     'register.workQueue.labels.statuses.collected': 'সংগৃহীত',
-    'register.workQueue.statusLabel.application': 'আবেদন',
-    'register.workQueue.statusLabel.registered': 'নিবন্ধভুক্ত',
-    'register.workQueue.statusLabel.collected': 'সংগৃহীত',
-    'register.workQueue.statusLabel.rejected': 'প্রত্যাখ্যাত',
+    'register.workQueue.labels.statuses.rejected': 'প্রত্যাখ্যাত',
     'register.workQueue.labels.events.all': 'সব ইভেন্ট',
     'register.workQueue.labels.events.birth': 'জন্ম',
     'register.workQueue.labels.events.death': 'মৃত্যু',
@@ -699,6 +686,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.buttons.reviewAndRegister': 'পর্যালোচনা এবং নিবন্ধন',
     'register.workQueue.list.buttons.review': 'পর্যালোচনা',
     'register.workQueue.list.buttons.print': 'মুদ্রণ',
+    'register.workQueue.list.buttons.update': 'Update',
     'register.workQueue.title.certificateCollection': 'সার্টিফিকেট সংগ্রহ',
     'register.workQueue.list.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'register.workQueue.buttons.newApplication': 'নতুন আবেদন',
@@ -711,13 +699,13 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.label.byPractitioner': 'কর্তৃক',
     'register.workQueue.labels.results.rejectionReason': 'কারণ',
     'register.workQueue.labels.results.rejectionComment': 'মন্তব্য',
-    'register.workQueue.print.form.name': 'মুদ্রণ',
-    'register.workQueue.print.form.title': 'সার্টিফিকেট মুদ্রণ',
+    'print.certificate.form.name': 'মুদ্রণ',
+    'print.certificate.form.title': 'সার্টিফিকেট মুদ্রণ',
     'formFields.print.whoToCollect': 'সার্টিফিকেটটি কে সংগ্রহ করছে?',
-    'register.workQueue.print.collector.mother': 'মা',
-    'register.workQueue.print.collector.father': 'পিতা',
-    'register.workQueue.print.collector.other': 'অন্যান্য',
-    'register.workQueue.print.collector.informant': 'তথ্যদাতা',
+    'print.certificate.collector.mother': 'মা',
+    'print.certificate.collector.father': 'পিতা',
+    'print.certificate.collector.other': 'অন্যান্য',
+    'print.certificate.collector.informant': 'তথ্যদাতা',
     'formFields.print.confirmMotherInformation':
       "যাচাইকৃত আইডি'র সঙ্গে নিম্নের বিবরণ মিলে কি না?",
     'formFields.print.otherPersonGivenNames': 'প্রদত্ত নাম',
@@ -728,33 +716,32 @@ export const BENGALI_STATE: ILanguage = {
       'দয়া করে সতর্ক থাকুন। আপনি যদি আরো অগ্রসর হন তবে সংগ্রাহক থেকে প্রয়োজনীয় প্রমাণক ছাড়াই আপনি একটি সার্টিফিকেট দেওয়ার জন্য দায়বদ্ধ হবেন।',
     'formFields.print.otherPersonPrompt':
       'যেহেতু রেকর্ডে ব্যক্তির কোন বিবরণ নেই, তাদের বিবরণ নিতে হবে:',
-    'register.workQueue.print.payment': 'মূল্যপরিশোধ',
-    'register.workQueue.print.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
-    'register.workQueue.print.manualPaymentMethod': 'হস্তকৃত',
-    'register.workQueue.print.collectPayment':
+    'print.certificate.payment': 'মূল্যপরিশোধ',
+    'print.certificate.paymentMethod': 'মূল্যপরিশোধ পদ্ধতি',
+    'print.certificate.manualPaymentMethod': 'হস্তকৃত',
+    'print.certificate.collectPayment':
       'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
-    'register.workQueue.print.serviceMonth':
+    'print.certificate.serviceMonth':
       'সেবা: <strong>জন্মদিবসের {service} মাস পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.serviceYear':
+    'print.certificate.serviceYear':
       'সেবা: <strong>জন্মদিবসের {service} বছর পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.birthService':
+    'print.certificate.birthService':
       'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.deathService':
+    'print.certificate.deathService':
       'সেবা: <strong>মৃত্যুদিবসের {service} পরে মৃত্যু নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'register.workQueue.print.paymentAmount': '\u09F3 {paymentAmount}',
+    'print.certificate.paymentAmount': '\u09F3 {paymentAmount}',
     'print.certificate.printReceipt': 'প্রিন্ট রসিদ',
     'print.certificate.next': 'পরবর্তী',
-    'register.workQueue.print.printCertificate': 'সার্টিফিকেট মুদ্রণ',
-    'register.workQueue.print.finish': 'সমাপ্ত',
-    'register.workQueue.print.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
-    'register.workQueue.print.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
-    'register.workQueue.print.addAnotherSignature':
-      'আরও একটি স্বাক্ষর যোগ করুন',
+    'print.certificate.printCertificate': 'সার্টিফিকেট মুদ্রণ',
+    'print.certificate.finish': 'সমাপ্ত',
+    'print.certificate.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
+    'print.certificate.selectSignature': 'ই-স্বাক্ষর নির্বাচন করুন',
+    'print.certificate.addAnotherSignature': 'আরও একটি স্বাক্ষর যোগ করুন',
     'register.noLabel': ' ',
-    'register.workQueue.print.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
-    'register.workQueue.print.signature.person2':
+    'print.certificate.signature.person1': 'ইউপি সচিব সাকিব আল হাসান',
+    'print.certificate.signature.person2':
       'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
-    'register.workQueue.print.userReviewed':
+    'print.certificate.userReviewed':
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া গেছে',
@@ -952,6 +939,12 @@ export const BENGALI_STATE: ILanguage = {
     'unlockApp.lastTry': 'শেষ চেষ্টা',
     'unlockApp.locked':
       'আপনার অ্যাকাউন্ট লক করা হয়েছে. 1 মিনিটের মধ্যে আবার চেষ্টা করুন।',
+    'error.code': '401',
+    'error.title.unauthorized': 'Unauthorized!',
+    'error.title': 'Whoops!',
+    'error.description1': 'Something went wrong.',
+    'error.description2': "It's not you, it us. This is our fault.",
+    'goto.homepage': 'Go to Homepage',
     'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
     'register.SearchResult.searchingFor': '“{param}” এর অনুসন্ধান চলসে ',
     'register.SearchResult.searchResultFor':
@@ -959,6 +952,15 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
     'register.SearchResult.reject': 'হালনাগাদ',
-    'register.SearchResult.rejectComments': 'মন্তব্য'
+    'register.SearchResult.rejectComments': 'মন্তব্য',
+    'register.home.header.searchType.typeTrackingId': 'ট্র্যাকিং আইডি',
+    'register.home.header.typeBrnDrn': 'বিআরএন/ডিআরএন',
+    'register.home.header.typePhone': 'ফোন নম্বর',
+    'register.home.header.placeHolderTrackingId': 'ট্র্যাকিং আইডি প্রবেশ করান',
+    'register.home.header.placeHolderBrnDrn': 'বিআরএন/ডিআরএন প্রবেশ করান',
+    'register.home.header.placeHolderPhone': 'ফোন নম্বর প্রবেশ করান',
+    'register.home.header.defaultTitle': 'আবেদন',
+    'register.home.header.applicationTitle': 'আবেদন',
+    'register.home.header.Performance': 'কর্মদক্ষতা ব্যাবস্থাপনা'
   }
 }
