@@ -2,7 +2,6 @@ import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { redirectToAuthentication } from 'src/profile/profileActions'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
@@ -227,7 +226,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   render() {
     return (
       <PageWrapper id="unlockPage">
-        <LogoutHeader onClick={this.toggleLogoutModal} id="logout">
+        <LogoutHeader onClick={this.logout} id="logout">
           <span>Logout</span>
           <Logout />
         </LogoutHeader>
@@ -242,11 +241,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
             key={this.state.resetKey}
           />
         </Container>
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.logout}
-        />
       </PageWrapper>
     )
   }

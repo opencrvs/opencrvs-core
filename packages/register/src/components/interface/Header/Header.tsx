@@ -22,7 +22,6 @@ import {
   BRN,
   Phone
 } from '@opencrvs/components/lib/icons'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { storage } from 'src/storage'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { connect } from 'react-redux'
@@ -177,7 +176,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         iconHover: <LogoutBlue />,
         label: 'Logout',
         secondary: true,
-        onClick: this.toggleLogoutModal
+        onClick: this.logout
       }
     ]
     const userInfo = { name, role }
@@ -198,13 +197,6 @@ class HeaderComp extends React.Component<IProps, IState> {
   logout = () => {
     storage.removeItem(SCREEN_LOCK)
     this.props.redirectToAuthentication()
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal,
-      showMenu: false
-    }))
   }
 
   toggleMenu = () => {
@@ -269,29 +261,22 @@ class HeaderComp extends React.Component<IProps, IState> {
     ]
 
     return (
-      <>
-        <AppHeader
-          menuItems={menuItems}
-          id="register_app_header"
-          desktopRightMenu={rightMenu}
-          left={{
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          }}
-          title={title}
-          right={{
-            icon: () => <SearchDark />,
-            handler: () => {
-              alert('sdfsdf')
-            }
-          }}
-        />
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.logout}
-        />
-      </>
+      <AppHeader
+        menuItems={menuItems}
+        id="register_app_header"
+        desktopRightMenu={rightMenu}
+        left={{
+          icon: () => this.hamburger(),
+          handler: this.toggleMenu
+        }}
+        title={title}
+        right={{
+          icon: () => <SearchDark />,
+          handler: () => {
+            alert('sdfsdf')
+          }
+        }}
+      />
     )
   }
 }

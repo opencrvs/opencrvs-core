@@ -953,7 +953,7 @@ export const BENGALI_STATE: ILanguage = {
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
     'register.SearchResult.reject': 'হালনাগাদ',
     'register.SearchResult.rejectComments': 'মন্তব্য',
-    'register.home.header.searchType.typeTrackingId': 'ট্র্যাকিং আইডি',
+    'register.home.header.typeTrackingId': 'ট্র্যাকিং আইডি',
     'register.home.header.typeBrnDrn': 'বিআরএন/ডিআরএন',
     'register.home.header.typePhone': 'ফোন নম্বর',
     'register.home.header.placeHolderTrackingId': 'ট্র্যাকিং আইডি প্রবেশ করান',
@@ -961,6 +961,6 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.placeHolderPhone': 'ফোন নম্বর প্রবেশ করান',
     'register.home.header.defaultTitle': 'আবেদন',
     'register.home.header.applicationTitle': 'আবেদন',
-    'register.home.header.Performance': 'কর্মদক্ষতা ব্যাবস্থাপনা'
+    'register.home.header.performanceTitle': 'কর্মদক্ষতা ব্যাবস্থাপনা'
   }
 }

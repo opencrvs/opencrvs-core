@@ -15,7 +15,6 @@ import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
-import { LogoutConfirmation } from './LogoutConfirmation'
 
 const messages = defineMessages({
   back: {
@@ -119,18 +118,6 @@ interface IState {
 type IFullProps = Props & InjectedIntlProps
 
 class TopMenuComponent extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps & IState) {
-    super(props)
-    this.state = {
-      showLogoutModal: false
-    }
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal
-    }))
-  }
   goToRegister = () => {
     this.props.goToRegister()
   }
@@ -166,7 +153,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
       {
         title: intl.formatMessage(messages.logout),
         key: 'logout',
-        onClick: this.toggleLogoutModal
+        onClick: this.props.redirectToAuthentication
       }
     ]
 
@@ -181,11 +168,6 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         <HamburgerMenu
           menuItems={menuItems}
           menuTitle={intl.formatMessage(messages.menu)}
-        />
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.props.redirectToAuthentication}
         />
       </TopMenuContainer>
     )
