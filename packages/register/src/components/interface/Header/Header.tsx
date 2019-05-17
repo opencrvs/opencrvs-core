@@ -369,6 +369,6 @@ export const Header = connect(
     goToSearchResult,
     goToSearch,
     goToSettings,
-    goToEvents: goToEventsAction,
+    goToEvents: goToEventsAction
   }
 )(injectIntl<IProps>(HeaderComp))
