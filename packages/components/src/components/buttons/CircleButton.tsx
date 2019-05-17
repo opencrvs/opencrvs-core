@@ -6,6 +6,8 @@ export const CircleButton = styled.button.attrs<{ dark?: boolean }>({})`
   background: none;
   height: 40px;
   width: 40px;
+  display: flex;
+  justify-content: center;
   transition: background-color 0.3s ease;
   border-radius: 100%;
   &:hover {

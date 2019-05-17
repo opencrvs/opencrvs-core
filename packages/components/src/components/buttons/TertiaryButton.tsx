@@ -4,7 +4,7 @@ import { Button } from './Button'
 export const TertiaryButton = styled(Button)`
   width: auto;
   font-family: ${({ theme }) => theme.fonts.boldFont};
-
+  transition: background 0.4s ease;
   align-items: center;
   display: inline-flex;
   border: 0;
