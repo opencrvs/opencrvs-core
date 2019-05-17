@@ -93,78 +93,78 @@ export const IconTab = styled(Button).attrs<IProps>({})`
 
 const messages = defineMessages({
   name: {
-    id: 'register.workQueue.labels.results.name',
+    id: 'register.registrarHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   dob: {
-    id: 'register.workQueue.labels.results.dob',
+    id: 'register.registrarHome.listItemDoB',
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
   dod: {
-    id: 'register.workQueue.labels.results.dod',
+    id: 'register.registrarHome.listItemDod',
     defaultMessage: 'D.o.D',
     description: 'Label for DoD in work queue list item'
   },
   hello: {
-    id: 'register.home.header.hello',
+    id: 'register.registrarHome.header.Hello',
     defaultMessage: 'Hello {fullName}',
     description: 'Title for the user'
   },
   searchInputPlaceholder: {
-    id: 'register.workQueue.searchInput.placeholder',
+    id: 'register.registrarHome.searchInput.placeholder',
     defaultMessage: 'Look for a record',
     description: 'The placeholder of search input'
   },
   searchInputButtonTitle: {
-    id: 'register.workQueue.buttons.search',
+    id: 'register.registrarHome.searchButton',
     defaultMessage: 'Search',
     description: 'The title of search input submit button'
   },
   queryError: {
-    id: 'register.workQueue.queryError',
+    id: 'register.registrarHome.queryError',
     defaultMessage: 'An error occurred while searching',
     description: 'The error message shown when a search query fails'
   },
   dataTableResults: {
-    id: 'register.workQueue.dataTable.results',
+    id: 'register.registrarHome.results',
     defaultMessage: 'Results',
     description: 'Results label at the top of the data table component'
   },
   dataTableNoResults: {
-    id: 'register.workQueue.dataTable.noResults',
+    id: 'register.registrarHome.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
   },
   headerTitle: {
-    id: 'register.workQueue.header.title',
+    id: 'register.registrarHome.title',
     defaultMessage: 'Hello Registrar',
     description: 'The displayed title in the Work Queue header'
   },
   headerDescription: {
-    id: 'register.workQueue.header.description',
+    id: 'register.registrarHome.description',
     defaultMessage: 'Review | Registration | Certification',
     description: 'The displayed description in the Work Queue header'
   },
   newRegistration: {
-    id: 'register.workQueue.buttons.newRegistration',
+    id: 'register.registrarHome.newRegistration',
     defaultMessage: 'New registration',
     description: 'The title of new registration button'
   },
   inProgress: {
-    id: 'register.workQueue.tabs.inProgress',
+    id: 'register.registrarHome.inProgress',
     defaultMessage: 'In progress',
     description: 'The title of In progress'
   },
   readyForReview: {
-    id: 'register.workQueue.tabs.readyForReview',
+    id: 'register.registrarHome.readyForReview',
     defaultMessage: 'Ready for review',
     description: 'The title of ready for review'
   },
   sentForUpdates: {
-    id: 'register.workQueue.tabs.sentForUpdates',
+    id: 'register.registrarHome.sentForUpdates',
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab'
   },
@@ -199,63 +199,63 @@ const messages = defineMessages({
     description: 'The description for NATIONAL_REGISTRAR role'
   },
   listItemType: {
-    id: 'register.workQueue.labels.results.type',
+    id: 'register.registrarHome.resultsType',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
   listItemTrackingNumber: {
-    id: 'register.workQueue.labels.results.trackingID',
+    id: 'register.registrarHome.results.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
   },
   listItemApplicantNumber: {
-    id: 'register.workQueue.labels.results.applicantNumber',
+    id: 'register.registrarHome.results.applicantNumber',
     defaultMessage: 'Applicant No.',
     description: 'Label for applicant number in work queue list item'
   },
   listItemApplicationDate: {
-    id: 'register.workQueue.labels.results.applicationDate',
+    id: 'register.registrarHome.results.applicationDate',
     defaultMessage: 'Application sent',
     description: 'Label for application date in work queue list item'
   },
   listItemUpdateDate: {
-    id: 'register.workQueue.labels.results.updateDate',
+    id: 'register.registrarHome.results.updateDate',
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item'
   },
   listItemModificationDate: {
-    id: 'register.workQueue.labels.results.modificationDate',
+    id: 'register.registrarHome.results.modificationDate',
     defaultMessage: 'Last edited',
     description: 'Label for rejection date in work queue list item'
   },
   listItemEventDate: {
-    id: 'register.workQueue.labels.results.eventDate',
+    id: 'register.registrarHome.results.eventDate',
     defaultMessage: 'Date of event',
     description: 'Label for event date in work queue list item'
   },
   reviewDuplicates: {
-    id: 'register.workQueue.buttons.reviewDuplicates',
+    id: 'register.registrarHome.results.reviewDuplicates',
     defaultMessage: 'Review Duplicates',
     description:
       'The title of review duplicates button in expanded area of list item'
   },
   review: {
-    id: 'register.workQueue.list.buttons.review',
+    id: 'register.registrarHome.reviewButton',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
   },
   update: {
-    id: 'register.workQueue.list.buttons.update',
+    id: 'register.registrarHome.updateButton',
     defaultMessage: 'Update',
     description: 'The title of update button in list item actions'
   },
   listItemName: {
-    id: 'register.workQueue.labels.results.name',
+    id: 'register.registrarHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   listItemAction: {
-    id: 'register.workQueue.labels.results.action',
+    id: 'register.registrarHome.action',
     defaultMessage: 'Action',
     description: 'Label for action in work queue list item'
   }

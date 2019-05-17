@@ -1,18 +1,13 @@
 import { defineMessages } from 'react-intl'
 
 export const messages = defineMessages({
-  hello: {
-    id: 'register.home.header.hello',
-    defaultMessage: 'Hello {fullName}',
-    description: 'Title for the user'
-  },
   searchInputPlaceholder: {
-    id: 'register.workQueue.searchInput.placeholder',
+    id: 'register.registrarHome.searchInput.placeholder',
     defaultMessage: 'Look for a record',
     description: 'The placeholder of search input'
   },
   searchInputButtonTitle: {
-    id: 'register.workQueue.buttons.search',
+    id: 'register.registrarHome.searchButton',
     defaultMessage: 'Search',
     description: 'The title of search input submit button'
   },
@@ -22,28 +17,28 @@ export const messages = defineMessages({
     description: 'The title of the banner'
   },
   queryError: {
-    id: 'register.workQueue.queryError',
+    id: 'register.registrarHome.queryError',
     defaultMessage: 'An error occurred while searching',
     description: 'The error message shown when a search query fails'
   },
   dataTableResults: {
-    id: 'register.workQueue.dataTable.results',
+    id: 'register.registrarHome.results',
     defaultMessage: 'Results',
     description: 'Results label at the top of the data table component'
   },
   dataTableNoResults: {
-    id: 'register.workQueue.dataTable.noResults',
+    id: 'register.registrarHome.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
   },
   headerTitle: {
-    id: 'register.workQueue.header.title',
+    id: 'register.registrarHome.title',
     defaultMessage: 'Hello Registrar',
     description: 'The displayed title in the Work Queue header'
   },
   headerDescription: {
-    id: 'register.workQueue.header.description',
+    id: 'register.registrarHome.description',
     defaultMessage: 'Review | Registration | Certification',
     description: 'The displayed description in the Work Queue header'
   },
@@ -118,17 +113,17 @@ export const messages = defineMessages({
     description: 'Label for filtering by all locations'
   },
   listItemName: {
-    id: 'register.workQueue.labels.results.name',
+    id: 'register.registrarHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   listItemDob: {
-    id: 'register.workQueue.labels.results.dob',
+    id: 'register.registrarHome.listItemDoB',
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
   listItemDod: {
-    id: 'register.workQueue.labels.results.dod',
+    id: 'register.registrarHome.listItemDod',
     defaultMessage: 'D.o.D',
     description: 'Label for DoD in work queue list item'
   },
@@ -138,7 +133,7 @@ export const messages = defineMessages({
     description: 'Label for date of application in work queue list item'
   },
   listItemTrackingNumber: {
-    id: 'register.workQueue.labels.results.trackingID',
+    id: 'register.registrarHome.results.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
   },
@@ -174,7 +169,7 @@ export const messages = defineMessages({
     description: 'Label for rejection comment'
   },
   newRegistration: {
-    id: 'register.workQueue.buttons.newRegistration',
+    id: 'register.registrarHome.newRegistration',
     defaultMessage: 'New registration',
     description: 'The title of new registration button'
   },
@@ -190,13 +185,13 @@ export const messages = defineMessages({
       'The title of review and register button in expanded area of list item'
   },
   reviewDuplicates: {
-    id: 'register.workQueue.buttons.reviewDuplicates',
+    id: 'register.registrarHome.results.reviewDuplicates',
     defaultMessage: 'Review Duplicates',
     description:
       'The title of review duplicates button in expanded area of list item'
   },
   review: {
-    id: 'register.workQueue.list.buttons.review',
+    id: 'register.registrarHome.reviewButton',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
   },
