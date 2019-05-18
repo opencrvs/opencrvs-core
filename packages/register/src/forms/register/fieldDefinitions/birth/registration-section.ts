@@ -192,7 +192,7 @@ export const registrationSection: IFormSection = {
       name: 'registrationPhone',
       type: TEL,
       label: messages.registrationPhoneLabel,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [phoneNumberFormat],
       mapping: {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import {
   goToTab as goToTabAction,
   goToHome as goToHomeAction
@@ -103,7 +103,7 @@ interface IDetailProps {
   theme: ITheme
   language: string
   applicationId: string
-  draft: IDraft
+  draft: IApplication
   userDetails: IUserDetails
   goToTab: typeof goToTabAction
   goToHome: typeof goToHomeAction
@@ -408,11 +408,15 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   }
 
   generateGqlHistorData = (data: GQLQuery): IHistoryData => {
+    const registration =
+      data.fetchRegistration && data.fetchRegistration.registration
+    // @ts-ignore
+    const informant = data.fetchRegistration && data.fetchRegistration.informant
+
     const history: IStatus[] =
-      (data.fetchRegistration &&
-        data.fetchRegistration.registration &&
-        data.fetchRegistration.registration.status &&
-        data.fetchRegistration.registration.status.map((status, i) => {
+      (registration &&
+        registration.status &&
+        registration.status.map((status, i) => {
           return generateHistoryEntry(
             (status && status.type) || null,
             (status && status.user && (status.user.name as GQLHumanName[])) ||
@@ -435,12 +439,12 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                   status.office.alias.toString()) ||
                   '',
             this.props.language,
-            data.fetchRegistration &&
-              data.fetchRegistration.registration &&
-              data.fetchRegistration.registration.trackingId,
-            data.fetchRegistration &&
-              data.fetchRegistration.registration &&
-              data.fetchRegistration.registration.contactPhoneNumber,
+            registration && registration.trackingId,
+            (registration && registration.contactPhoneNumber) ||
+              (informant &&
+                informant.individual.telecom &&
+                informant.individual.telecom[0] &&
+                informant.individual.telecom[0].value),
             status && status.type === REJECTED
               ? extractCommentFragmentValue(
                   status.comments as GQLComment[],
@@ -618,11 +622,11 @@ function mapStateToProps(
     userDetails: getUserDetails(state),
     applicationId: match && match.params && match.params.applicationId,
     draft:
-      (state.drafts.drafts &&
+      (state.applicationsState.applications &&
         match &&
         match.params &&
         match.params.applicationId &&
-        state.drafts.drafts.find(
+        state.applicationsState.applications.find(
           // TODO: need to add status (DRAFT | FAILED) check here once the colum is added
           application => application.id === match.params.applicationId
         )) ||

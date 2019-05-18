@@ -1,5 +1,5 @@
 import { Event, IFormSectionData } from 'src/forms'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 
 const getApplicantFullName = (
   sectionData: IFormSectionData,
@@ -23,13 +23,14 @@ const getApplicantFullName = (
   return fullName
 }
 
-export const getDraftApplicantFullName = (draft: IDraft, language?: string) => {
+export const getDraftApplicantFullName = (
+  draft: IApplication,
+  language?: string
+) => {
   switch (draft.event) {
     case Event.BIRTH:
       return getApplicantFullName(draft.data.child, language)
     case Event.DEATH:
       return getApplicantFullName(draft.data.deceased, language)
-    default:
-      return ''
   }
 }

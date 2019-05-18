@@ -129,6 +129,7 @@ const StyledActionList = styled(ActionList)`
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;
@@ -141,7 +142,7 @@ const StyledIconAction = styled(IconAction)`
     /* stylelint-enable */
     font-size: 28px;
     font-weight: 300;
-    margin: -2px 0 -2px 120px;
+    margin: -20px 0 0 0;
     line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
@@ -231,8 +232,9 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
-  store.drafts.drafts = store.drafts.drafts || []
-  const draftCount = store.drafts.drafts.length.toString()
+  store.applicationsState.applications =
+    store.applicationsState.applications || []
+  const draftCount = store.applicationsState.applications.length.toString()
   return {
     draftCount,
     language: getLanguage(store),

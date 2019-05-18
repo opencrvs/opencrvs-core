@@ -10,7 +10,7 @@ import { WorkQueue, EVENT_STATUS } from './WorkQueue'
 import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { checkAuth } from 'src/profile/profileActions'
-import { storeDraft, createReviewDraft } from 'src/drafts'
+import { storeApplication, createReviewApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import * as moment from 'moment'
 
@@ -244,8 +244,8 @@ describe('WorkQueue tests', async () => {
 
   it('check drafts count', async () => {
     jest.clearAllMocks()
-    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-    store.dispatch(storeDraft(draft))
+    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    store.dispatch(storeApplication(draft))
 
     const graphqlMock = [
       {
@@ -784,7 +784,7 @@ describe('WorkQueue tests', async () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
     // @ts-ignore
-    testComponent.store.dispatch(storeDraft(drafts))
+    testComponent.store.dispatch(storeApplication(drafts))
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -909,8 +909,8 @@ describe('WorkQueue tests', async () => {
   it('Should render pagination in progress tab if data is more than 10', async () => {
     jest.clearAllMocks()
     for (let i = 0; i < 12; i++) {
-      const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-      store.dispatch(storeDraft(draft))
+      const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+      store.dispatch(storeApplication(draft))
     }
     const testComponent = createTestComponent(
       // @ts-ignore
