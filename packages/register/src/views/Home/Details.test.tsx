@@ -36,6 +36,43 @@ const nameObj = {
   }
 }
 
+const defaultStatus = {
+  id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+  timestamp: '2019-04-03T07:08:24.936Z',
+  user: {
+    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Mohammad',
+        familyName: 'Ashraful'
+      },
+      {
+        use: 'bn',
+        firstNames: '',
+        familyName: ''
+      }
+    ],
+    role: 'LOCAL_REGISTRAR'
+  },
+  location: {
+    id: '123',
+    name: 'Kaliganj Union Sub Center',
+    alias: ['']
+  },
+  office: {
+    id: '123',
+    name: 'Kaliganj Union Sub Center',
+    alias: [''],
+    address: {
+      district: '7876',
+      state: 'iuyiuy'
+    }
+  },
+  type: 'DECLARED',
+  comments: null
+}
+
 merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
@@ -216,42 +253,6 @@ describe('Details tests', async () => {
     testComponent.component.unmount()
   })
   it('loads properly for required update application', async () => {
-    const defaultStatus = {
-      id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-      timestamp: '2019-04-03T07:08:24.936Z',
-      user: {
-        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-        name: [
-          {
-            use: 'en',
-            firstNames: 'Mohammad',
-            familyName: 'Ashraful'
-          },
-          {
-            use: 'bn',
-            firstNames: '',
-            familyName: ''
-          }
-        ],
-        role: 'LOCAL_REGISTRAR'
-      },
-      location: {
-        id: '123',
-        name: 'Kaliganj Union Sub Center',
-        alias: ['']
-      },
-      office: {
-        id: '123',
-        name: 'Kaliganj Union Sub Center',
-        alias: [''],
-        address: {
-          district: '7876',
-          state: 'iuyiuy'
-        }
-      },
-      type: 'APPLICATION',
-      comments: null
-    }
     const graphqlMock = [
       {
         request: {
@@ -303,7 +304,7 @@ describe('Details tests', async () => {
                       }
                     ]
                   },
-                  defaultStatus
+                  { ...defaultStatus, type: 'APPLICATION' }
                 ]
               }
             }
@@ -342,42 +343,6 @@ describe('Details tests', async () => {
     testComponent.component.unmount()
   })
   it('loads history properly for all statuses of an application', async () => {
-    const defaultStatus = {
-      id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-      timestamp: '2019-04-03T07:08:24.936Z',
-      user: {
-        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-        name: [
-          {
-            use: 'en',
-            firstNames: 'Mohammad',
-            familyName: 'Ashraful'
-          },
-          {
-            use: 'bn',
-            firstNames: '',
-            familyName: ''
-          }
-        ],
-        role: 'LOCAL_REGISTRAR'
-      },
-      location: {
-        id: '123',
-        name: 'Kaliganj Union Sub Center',
-        alias: ['']
-      },
-      office: {
-        id: '123',
-        name: 'Kaliganj Union Sub Center',
-        alias: [''],
-        address: {
-          district: '7876',
-          state: 'iuyiuy'
-        }
-      },
-      type: 'DECLARED',
-      comments: null
-    }
     const graphqlMock = [
       {
         request: {
@@ -468,5 +433,99 @@ describe('Details tests', async () => {
     ).toHaveLength(1)
 
     testComponent.component.unmount()
+  })
+  it('loads successfuly with empty history ', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: '1'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: '1',
+              registration: {
+                id: '1',
+                type: null,
+                trackingId: null,
+                contactPhoneNumber: null,
+                status: [
+                  {
+                    id: '1',
+                    timestamp: null,
+                    user: null,
+                    location: null,
+                    office: null,
+                    type: null,
+                    comments: null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <Details
+        match={{
+          params: {
+            applicationId: '1'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#sub_page_back_button').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component.unmount()
+  })
+  it('Renders error page in-case of any network error', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: '1'
+          }
+        },
+        error: new Error('boom')
+      }
+    ]
+    try {
+      createTestComponent(
+        // @ts-ignore
+        <Details
+          match={{
+            params: {
+              applicationId: '1'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error)
+    }
   })
 })
