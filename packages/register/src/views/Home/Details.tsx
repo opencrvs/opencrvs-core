@@ -551,15 +551,11 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                   </StyledLabel>
                 )) || (
                   <ValueContainer>
-                    <StyledLabel>
-                      {this.props.intl.formatMessage(
-                        messages.workflowPractitionerLabel
-                      )}
-                      :
-                    </StyledLabel>
                     <ValuesWithSeparator
                       strings={[
-                        practitionerName,
+                        `${this.props.intl.formatMessage(
+                          messages.workflowPractitionerLabel
+                        )}: ${practitionerName}`,
                         practitionerRole,
                         (officeName && (officeName as string)) || ''
                       ]}
