@@ -6,7 +6,9 @@ const getApplicantFullName = (
   language: string = 'en'
 ): string => {
   let fullName = ''
-
+  if (!sectionData) {
+    return fullName
+  }
   if (language === 'en') {
     if (sectionData.firstNamesEng) {
       fullName = `${sectionData.firstNamesEng as string} ${sectionData.familyNameEng as string}`

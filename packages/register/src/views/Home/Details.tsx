@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IApplication } from 'src/applications'
+import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 import {
   goToTab as goToTabAction,
   goToHome as goToHomeAction
@@ -272,13 +272,8 @@ function generateHistoryEntry(
   return {
     type,
     practitionerName:
-      (name && (createNamesMap(name)[language] as string)) ||
-      (name &&
-        /* tslint:disable:no-string-literal */
-        (createNamesMap(name)['default'] as string)) ||
-      /* tslint:enable:no-string-literal */
-      '',
-    timestamp: (date && formatLongDate(date, language, 'LL')) || null,
+      (name && (createNamesMap(name)[language] as string)) || '',
+    timestamp: date && formatLongDate(date, language, 'LL'),
     practitionerRole: role,
     officeName: office,
     trackingId,
@@ -295,7 +290,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         return messages.workflowStatusDateDraftStarted
       case 'DRAFT_MODIFIED':
         return messages.workflowStatusDateDraftUpdated
-      case 'APPLICATION':
+      case 'DECLARED':
         return messages.workflowStatusDateApplication
       case 'REGISTERED':
         return messages.workflowStatusDateRegistered
@@ -313,7 +308,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         return <StatusProgress />
       case 'DRAFT_MODIFIED':
         return <StatusProgress />
-      case 'APPLICATION':
+      case 'DECLARED':
         return (
           <StatusIcon>
             <StatusOrange />
@@ -494,7 +489,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         statuses.map((status, i) => {
           const { practitionerName, practitionerRole, officeName } = status
           return (
-            <HistoryWrapper key={i}>
+            <HistoryWrapper key={i} id={`history_row_${i}_${status.type}`}>
               {this.getWorkflowStatusIcon(status.type as string)}
               <StatusContainer>
                 <LabelValue
@@ -559,19 +554,16 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     )
   }
 
-  renderSubPage(historyData: IHistoryData | undefined) {
+  renderSubPage(historyData: IHistoryData) {
     return (
-      (historyData && (
-        <SubPage
-          title={historyData.title}
-          emptyTitle={this.props.intl.formatMessage(messages.emptyTitle)}
-          goBack={this.props.goToHome}
-        >
-          {this.renderHistory(historyData.history)}
-          {historyData.action}
-        </SubPage>
-      )) ||
-      null
+      <SubPage
+        title={historyData.title}
+        emptyTitle={this.props.intl.formatMessage(messages.emptyTitle)}
+        goBack={this.props.goToHome}
+      >
+        {this.renderHistory(historyData.history)}
+        {historyData.action}
+      </SubPage>
     )
   }
 
@@ -612,7 +604,6 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{
-    applicationStatus: string
     applicationId: string
   }>
 ) {
@@ -627,8 +618,12 @@ function mapStateToProps(
         match.params &&
         match.params.applicationId &&
         state.applicationsState.applications.find(
-          // TODO: need to add status (DRAFT | FAILED) check here once the colum is added
-          application => application.id === match.params.applicationId
+          application =>
+            application.id === match.params.applicationId &&
+            (application.submissionStatus ===
+              SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT] ||
+              application.submissionStatus ===
+                SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED])
         )) ||
       null
   }
