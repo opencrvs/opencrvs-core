@@ -14,7 +14,8 @@ import {
   StatusOrange,
   StatusGreen,
   StatusCollected,
-  StatusRejected
+  StatusRejected,
+  StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
@@ -96,7 +97,8 @@ const StatusIcon = styled.div`
 
 enum DraftStatus {
   DRAFT_STARTED = 'DRAFT_STARTED',
-  DRAFT_MODIFIED = 'DRAFT_MODIFIED'
+  DRAFT_MODIFIED = 'DRAFT_MODIFIED',
+  FAILED = 'FAILED'
 }
 
 interface IDetailProps {
@@ -139,6 +141,11 @@ const messages = defineMessages({
     defaultMessage: 'Updated on',
     description:
       'Label for the workflow timestamp when the status is draft updated'
+  },
+  workflowStatusDateFailed: {
+    id: 'register.details.status.dateLabel.draft.failed',
+    defaultMessage: 'Failed to send on',
+    description: 'Label for the workflow timestamp when the status is failed'
   },
   workflowStatusDateRegistered: {
     id: 'register.workQueue.listItem.status.dateLabel.registered',
@@ -200,7 +207,12 @@ const messages = defineMessages({
   update: {
     id: 'register.workQueue.list.buttons.update',
     defaultMessage: 'Update',
-    description: 'The title of update button in list item actions'
+    description: 'The title of update button for draft application'
+  },
+  retry: {
+    id: 'register.detail.subpag.buttons.retry',
+    defaultMessage: 'Retry',
+    description: 'The title of retry button for failed application'
   },
   workflowApplicantNumber: {
     id: 'register.detail.status.applicant.number',
@@ -226,6 +238,12 @@ const messages = defineMessages({
     id: 'register.detail.subpage.emptyTitle',
     defaultMessage: 'No name provided',
     description: 'Label for empty title'
+  },
+  failureMessage: {
+    id: 'register.detail.status.failedMessage',
+    defaultMessage:
+      'This is some messaging on advicing the user on what to do... in the event of a failed applicaton.',
+    description: 'Tips for failed applications'
   }
 })
 
@@ -290,6 +308,8 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         return messages.workflowStatusDateDraftStarted
       case 'DRAFT_MODIFIED':
         return messages.workflowStatusDateDraftUpdated
+      case 'FAILED':
+        return messages.workflowStatusDateFailed
       case 'DECLARED':
         return messages.workflowStatusDateApplication
       case 'REGISTERED':
@@ -308,6 +328,12 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         return <StatusProgress />
       case 'DRAFT_MODIFIED':
         return <StatusProgress />
+      case 'FAILED':
+        return (
+          <StatusIcon>
+            <StatusFailed />
+          </StatusIcon>
+        )
       case 'DECLARED':
         return (
           <StatusIcon>
@@ -344,12 +370,32 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   generateDraftHistorData = (): IHistoryData => {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
-    if (draft.modifiedOn) {
+    let action: React.ReactElement
+    if (draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]) {
+      if (draft.modifiedOn) {
+        history.push(
+          generateHistoryEntry(
+            DraftStatus.DRAFT_MODIFIED,
+            userDetails.name as GQLHumanName[],
+            new Date(draft.modifiedOn).toString(),
+            userDetails && userDetails.role
+              ? this.props.intl.formatMessage(
+                  messages[userDetails.role as string]
+                )
+              : '',
+            (userDetails &&
+              userDetails.primaryOffice &&
+              userDetails.primaryOffice.name) ||
+              '',
+            this.props.language
+          )
+        )
+      }
       history.push(
         generateHistoryEntry(
-          DraftStatus.DRAFT_MODIFIED,
+          DraftStatus.DRAFT_STARTED,
           userDetails.name as GQLHumanName[],
-          new Date(draft.modifiedOn).toString(),
+          (draft.savedOn && new Date(draft.savedOn).toString()) || '',
           userDetails && userDetails.role
             ? this.props.intl.formatMessage(
                 messages[userDetails.role as string]
@@ -362,29 +408,9 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           this.props.language
         )
       )
-    }
-    history.push(
-      generateHistoryEntry(
-        DraftStatus.DRAFT_STARTED,
-        userDetails.name as GQLHumanName[],
-        (draft.savedOn && new Date(draft.savedOn).toString()) || '',
-        userDetails && userDetails.role
-          ? this.props.intl.formatMessage(messages[userDetails.role as string])
-          : '',
-        (userDetails &&
-          userDetails.primaryOffice &&
-          userDetails.primaryOffice.name) ||
-          '',
-        this.props.language
-      )
-    )
-    const tabRoute =
-      draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
-    const title = getDraftApplicantFullName(draft, this.props.language)
-    return {
-      title: title !== '' ? title : undefined,
-      history,
-      action: (
+      const tabRoute =
+        draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
+      action = (
         <ActionButton
           id="draft_update"
           onClick={() =>
@@ -399,6 +425,27 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           {this.props.intl.formatMessage(messages.update)}
         </ActionButton>
       )
+    } else {
+      history.push(
+        generateHistoryEntry(
+          DraftStatus.FAILED,
+          null,
+          (draft.modifiedOn && new Date(draft.modifiedOn).toString()) || '',
+          '',
+          ''
+        )
+      )
+      action = (
+        <ActionButton id="failed_retry" disabled>
+          {this.props.intl.formatMessage(messages.retry)}
+        </ActionButton>
+      )
+    }
+    const title = getDraftApplicantFullName(draft, this.props.language)
+    return {
+      title: title !== '' ? title : undefined,
+      history,
+      action
     }
   }
 
@@ -498,22 +545,28 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                   )}
                   value={status.timestamp || ''}
                 />
-                <ValueContainer>
+                {(status.type === DraftStatus.FAILED && (
                   <StyledLabel>
-                    {this.props.intl.formatMessage(
-                      messages.workflowPractitionerLabel
-                    )}
-                    :
+                    {this.props.intl.formatMessage(messages.failureMessage)}
                   </StyledLabel>
-                  <ValuesWithSeparator
-                    strings={[
-                      practitionerName,
-                      practitionerRole,
-                      (officeName && (officeName as string)) || ''
-                    ]}
-                    separator={<Separator />}
-                  />
-                </ValueContainer>
+                )) || (
+                  <ValueContainer>
+                    <StyledLabel>
+                      {this.props.intl.formatMessage(
+                        messages.workflowPractitionerLabel
+                      )}
+                      :
+                    </StyledLabel>
+                    <ValuesWithSeparator
+                      strings={[
+                        practitionerName,
+                        practitionerRole,
+                        (officeName && (officeName as string)) || ''
+                      ]}
+                      separator={<Separator />}
+                    />
+                  </ValueContainer>
+                )}
                 {status.contactNumber && (
                   <LabelValue
                     label={this.props.intl.formatMessage(
@@ -620,8 +673,10 @@ function mapStateToProps(
         state.applicationsState.applications.find(
           application =>
             application.id === match.params.applicationId &&
-            application.submissionStatus ===
-              SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            (application.submissionStatus ===
+              SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT] ||
+              application.submissionStatus ===
+                SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED])
         )) ||
       null
   }

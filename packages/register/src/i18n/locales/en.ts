@@ -969,6 +969,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.details.status.dateLabel.draft.started': 'Started on',
     'register.details.status.dateLabel.draft.updated': 'Updated on',
     'register.detail.status.applicant.number': 'Applicant contact number',
-    'register.detail.subpage.emptyTitle': 'No name provided'
+    'register.detail.subpage.emptyTitle': 'No name provided',
+    'register.detail.subpag.buttons.retry': 'Retry',
+    'register.details.status.dateLabel.draft.failed': 'Failed to send on',
+    'register.detail.status.failedMessage':
+      'This is some messaging on advicing the user on what to do... in the event of a failed applicaton.'
   }
 }

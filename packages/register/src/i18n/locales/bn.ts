@@ -965,6 +965,11 @@ export const BENGALI_STATE: ILanguage = {
     'register.details.status.dateLabel.draft.started': 'শুরু করা হয়েছে',
     'register.details.status.dateLabel.draft.updated': 'আপডেট করা হয়েছে',
     'register.detail.status.applicant.number': 'আবেদনকারীর মোবাইল নম্বর',
-    'register.detail.subpage.emptyTitle': 'নাম দেয়া হয়নি'
+    'register.detail.subpage.emptyTitle': 'নাম দেয়া হয়নি',
+    'register.detail.subpag.buttons.retry': 'পুনরায় চেষ্টা করুন',
+    'register.details.status.dateLabel.draft.failed':
+      'পাঠাতে ব্যর্থ হওয়ার তারিখ',
+    'register.detail.status.failedMessage':
+      'এটি কোনও ব্যর্থতার আবেদনকারীর ক্ষেত্রে ব্যবহারকারীর পরামর্শ দেওয়ার বিষয়ে কিছু বার্তা।'
   }
 }

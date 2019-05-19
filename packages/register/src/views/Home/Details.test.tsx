@@ -12,7 +12,8 @@ import { Details } from 'src/views/Home/Details'
 import {
   createApplication,
   storeApplication,
-  modifyApplication
+  modifyApplication,
+  SUBMISSION_STATUS
 } from 'src/applications'
 import { Event } from 'src/forms'
 
@@ -144,6 +145,39 @@ describe('Details tests', async () => {
     ).toHaveLength(1)
     expect(
       testComponent.component.find('#history_row_1_DRAFT_STARTED').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component.unmount()
+  })
+  it('loads properly for failed application', () => {
+    const draft = createApplication(Event.DEATH)
+    store.dispatch(storeApplication(draft))
+    // @ts-ignore
+    draft.data.deceased = {
+      familyNameEng: 'Anik'
+    }
+    draft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
+    store.dispatch(modifyApplication(draft))
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <Details
+        match={{
+          params: {
+            applicationId: draft.id
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+
+    expect(
+      testComponent.component.find('#history_row_0_FAILED').hostNodes()
+    ).toHaveLength(1)
+    expect(
+      testComponent.component.find('#failed_retry').hostNodes()
     ).toHaveLength(1)
 
     testComponent.component.unmount()
