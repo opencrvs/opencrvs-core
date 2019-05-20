@@ -50,7 +50,8 @@ const MenuItem = styled.li`
   cursor: pointer;
   letter-spacing: 0.2px;
   font-feature-settings: 'pnum' on, 'lnum' on;
-  padding: 9px 16px;
+  padding: 12px 16px;
+  height: 48px;
   &:hover {
     background-color: rgb(244, 244, 244);
   }
@@ -58,13 +59,9 @@ const MenuItem = styled.li`
     border: 0;
   }
 `
-const MenuItemIcon = styled.span`
-  margin-right: 13px;
-`
 
 const MenuItemLabel = styled.span`
-  height: 21px;
-  line-height: 24px;
+  padding-left: 16px;
 `
 export interface IToggleMenuItem {
   label: string
@@ -123,7 +120,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
               {menuItems.map((mi: IToggleMenuItem, index) => (
                 <MenuItem key={`${id}-${index}`} onClick={mi.handler}>
-                  {mi.icon && <MenuItemIcon>{mi.icon}</MenuItemIcon>}
+                  {mi.icon && mi.icon}
                   <MenuItemLabel>{mi.label}</MenuItemLabel>
                 </MenuItem>
               ))}
