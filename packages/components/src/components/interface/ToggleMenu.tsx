@@ -35,7 +35,7 @@ const MenuContainer = styled.ul`
 const MenuHeader = styled.li`
   color: ${({ theme }) => theme.colors.copy};
   font-family: ${({ theme }) => theme.fonts.regularFont};
-  padding: 16px 11px 5px 13px;
+  padding: 16px 32px 8px 16px;
   letter-spacing: 0.4px;
   border-bottom: 1px solid rgb(244, 244, 244);
   font-feature-settings: 'pnum' on, 'lnum' on;
@@ -50,6 +50,8 @@ const MenuItem = styled.li`
   cursor: pointer;
   letter-spacing: 0.2px;
   font-feature-settings: 'pnum' on, 'lnum' on;
+  padding: 12px 16px;
+  height: 48px;
   &:hover {
     background-color: rgb(244, 244, 244);
   }
@@ -57,15 +59,9 @@ const MenuItem = styled.li`
     border: 0;
   }
 `
-const MenuItemIcon = styled.span`
-  margin: 13px;
-  margin-right: 0;
-`
 
 const MenuItemLabel = styled.span`
-  height: 21px;
-  line-height: 24px;
-  margin: 13px;
+  padding-left: 16px;
 `
 export interface IToggleMenuItem {
   label: string
@@ -114,15 +110,17 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer>
-          <Button id={`${id}ToggleButton`} onClick={this.showMenu}>
-            {toggleButton}
-          </Button>
+          <Button
+            id={`${id}ToggleButton`}
+            onClick={this.showMenu}
+            icon={() => toggleButton}
+          />
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
               {menuItems.map((mi: IToggleMenuItem, index) => (
                 <MenuItem key={`${id}-${index}`} onClick={mi.handler}>
-                  {mi.icon && <MenuItemIcon>{mi.icon}</MenuItemIcon>}
+                  {mi.icon && mi.icon}
                   <MenuItemLabel>{mi.label}</MenuItemLabel>
                 </MenuItem>
               ))}
