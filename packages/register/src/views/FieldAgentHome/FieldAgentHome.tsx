@@ -37,18 +37,13 @@ const Topbar = styled.div`
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.secondary};
   font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
-  padding: 0 15px;
-  border-radius: 0;
-  :first-child {
-    padding-left: 0px;
-  }
-  outline: none;
+  height: 50px;
   font-size: 14px;
   border-bottom: ${({ active }) => (active ? '3px solid' : '')}
     ${({ theme }) => theme.colors.accentLight};
-  & div {
+  :first-child > div {
     position: relative;
-    margin-right: 10px;
+    padding-left: 0;
   }
   &:focus {
     outline: 0;
