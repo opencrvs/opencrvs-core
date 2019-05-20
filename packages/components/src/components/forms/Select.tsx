@@ -39,22 +39,20 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
     border-radius: 0;
     height: 40px;
     box-shadow: none;
-    font-size: 18px;
-    font-weight: 400px;
+    ${({ theme }) => theme.fonts.bodyStyle};
     padding: 0 5px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
       ${({ error, touched, theme }) =>
-        error && touched ? theme.colors.error : theme.colors.secondary};
+        error && touched ? theme.colors.error : theme.colors.copy};
     &:hover {
       border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
         ${({ error, touched, theme }) =>
-          error && touched ? theme.colors.error : theme.colors.secondary};
+          error && touched ? theme.colors.error : theme.colors.copy};
     }
   }
 
   .react-select__option {
     color: ${({ theme }) => theme.colors.copy};
-    font-size: 14px;
   }
 
   .react-select__indicator-separator {
@@ -64,7 +62,7 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
   .react-select__control--is-focused {
     box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
-      ${({ theme }) => theme.colors.secondary};
+      ${({ theme }) => theme.colors.copy};
   }
 
   ${({ ignoreMediaQuery, theme }) => {

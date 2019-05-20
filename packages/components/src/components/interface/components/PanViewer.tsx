@@ -30,7 +30,7 @@ const ControlsContainer = styled.div`
     height: 40px;
     width: 40px;
 
-    border-bottom: 1px solid ${({ theme }) => theme.colors.disabledButton};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
     & svg {
       height: 100%;
       width: 100%;

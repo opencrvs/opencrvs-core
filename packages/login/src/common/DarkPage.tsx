@@ -19,7 +19,6 @@ const StyledPage = styled.div.attrs<IPage>({})`
 
   * {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

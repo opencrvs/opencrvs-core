@@ -203,7 +203,7 @@ const ExpansionContentContainer = styled.div`
 `
 
 const StyledSecondaryButton = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  border: solid 1px ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.primary} !important;
   ${({ theme }) => theme.fonts.buttonStyle};
   svg {
@@ -211,7 +211,7 @@ const StyledSecondaryButton = styled(SecondaryButton)`
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }) => theme.colors.disabled};
   }
   &:disabled {
     background-color: ${({ theme }) => theme.colors.background};

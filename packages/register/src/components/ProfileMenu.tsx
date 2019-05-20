@@ -23,7 +23,7 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   height: 27px;
 `
 

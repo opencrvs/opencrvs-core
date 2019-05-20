@@ -13,11 +13,7 @@ const HeaderContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: row;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.hoverGradientDark} 0%,
-    ${({ theme }) => theme.colors.hoverGradientLight} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
 `
 
 export class Header extends React.Component<IProps> {

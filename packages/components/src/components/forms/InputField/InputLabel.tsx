@@ -12,7 +12,7 @@ const styledInputLabel = styled.label.attrs<IInputLabel>({})
 const StyledInputLabel = styledInputLabel`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ color, disabled, theme }) =>
-    disabled ? theme.colors.disabled : color ? color : theme.colors.secondary} ;
+    disabled ? theme.colors.disabled : color ? color : theme.colors.copy} ;
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;

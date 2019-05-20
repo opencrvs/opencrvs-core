@@ -7,7 +7,6 @@ export const Content = styled.section`
   height: 100%;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
-  letter-spacing: 0.5px;
 `
 
 export const HeaderContent = styled.div`

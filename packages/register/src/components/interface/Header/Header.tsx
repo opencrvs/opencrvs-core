@@ -22,6 +22,7 @@ import {
   BRN,
   Phone
 } from '@opencrvs/components/lib/icons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { storage } from 'src/storage'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
@@ -35,6 +36,9 @@ import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { goToHome, goToPerformance, goToSearchResult } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
 import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
+import { Plus } from '@opencrvs/components/lib/icons'
+import styled from 'src/styled-components'
+import { goToEvents as goToEventsAction } from 'src/navigation'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
@@ -42,6 +46,7 @@ type IProps = InjectedIntlProps & {
   language: string
   title?: string
   goToSearchResult: typeof goToSearchResult
+  goToEvents: typeof goToEventsAction
   searchText?: string
   selectedSearchType?: string
 }
@@ -127,6 +132,14 @@ const messages = defineMessages({
     description: 'Performance title'
   }
 })
+
+const StyledPrimaryButton = styled(PrimaryButton)`
+  ${({ theme }) => theme.shadows.mistyShadow};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
 
 class HeaderComp extends React.Component<IProps, IState> {
   state = { showMenu: false, showLogoutModal: false }
@@ -254,6 +267,15 @@ class HeaderComp extends React.Component<IProps, IState> {
     const rightMenu = [
       {
         element: (
+          <StyledPrimaryButton
+            id="myButton"
+            onClick={this.props.goToEvents}
+            icon={() => <Plus />}
+          />
+        )
+      },
+      {
+        element: (
           <SearchTool
             key="searchMenu"
             searchText={this.props.searchText}
@@ -303,6 +325,7 @@ export const Header = connect(
   }),
   {
     redirectToAuthentication,
-    goToSearchResult
+    goToSearchResult,
+    goToEvents: goToEventsAction
   }
 )(injectIntl<IProps>(HeaderComp))

@@ -5,7 +5,7 @@ import { Avatar } from '../../icons'
 const MenuMainWrapper = styled.div`
   @keyframes fadeIn {
     0% {
-      background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
+      background: '#35495d00';
     }
     100% {
       background: ${({ theme }) => theme.colors.menuBackground};
@@ -76,7 +76,7 @@ const MenuItem = styled.li`
   padding: 10px 30px;
   cursor: pointer;
   &:hover {
-    color: ${({ theme }) => theme.colors.cardGradientEnd};
+    color: ${({ theme }) => theme.colors.secondary};
   }
   &:hover ${Icon} {
     display: none;

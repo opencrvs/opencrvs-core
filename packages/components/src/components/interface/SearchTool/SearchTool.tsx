@@ -8,7 +8,8 @@ const Wrapper = styled.form`
   border-radius: 2px;
   display: flex;
   ${({ theme }) => theme.fonts.bodyStyle};
-  padding: 10px;
+  padding: 0px 10px;
+  margin: 4px 0px;
   position: relative;
 `
 const SearchTextInput = styled.input`
@@ -55,15 +56,15 @@ const IconWrapper = styled.span`
   padding: 8px 16px;
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
-  background: ${({ theme }) => theme.colors.cardGradientEnd};
+  background: ${({ theme }) => theme.colors.secondary};
   border-radius: 2px;
   padding: 5px 10px;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.captionStyle};
   margin-right: 10px;
 `
 const DropDown = styled.div`

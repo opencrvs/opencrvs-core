@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
 import * as ReactDOM from 'react-dom'
+import { Link } from '@opencrvs/components/lib/typography'
 
 const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   background: ${({ theme }) => theme.colors.white};
@@ -18,14 +19,11 @@ const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
 const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
   width: 100vw;
   padding: 25px;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   color: ${({ theme, visited, isExpanded }) =>
-    visited && !isExpanded ? theme.colors.primary : theme.colors.secondary};
+    visited && !isExpanded ? theme.colors.primary : theme.colors.copy};
 `
-const EditLink = styled.a`
-  color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  text-decoration: underline;
-`
+
 const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
   height: 4px;
   border-radius: 1px 1px 0 0;
@@ -127,7 +125,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
             <b>{title}</b>
             {isExpanded && <Seperator />}
             {isExpanded && (
-              <EditLink
+              <Link
                 id={`${title.replace(/[' ]+/g, '').trim()}_link`}
                 onClick={e => {
                   e.stopPropagation()
@@ -135,7 +133,7 @@ export class SectionDrawer extends React.Component<IProps, IState> {
                 }}
               >
                 {linkText}
-              </EditLink>
+              </Link>
             )}
           </Title>
           {expandable && (

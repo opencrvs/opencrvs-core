@@ -63,8 +63,8 @@ import * as Sentry from '@sentry/browser'
 // @ts-ignore - Required for mocking
 import * as debounce from 'lodash/debounce'
 
-const FormSectionTitle = styled.h2`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+const FormSectionTitle = styled.h3`
+  ${({ theme }) => theme.fonts.h3Style};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FormActionSection = styled.div`

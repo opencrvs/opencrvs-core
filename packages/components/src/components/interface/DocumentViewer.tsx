@@ -21,8 +21,8 @@ const Icon = styled.div`
 `
 const TitleContainer = styled.div`
   width: 276px;
-  color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 const Title = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};

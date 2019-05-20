@@ -9,7 +9,6 @@ export enum ICON_ALIGNMENT {
 const ButtonBase = styled.button`
   width: auto;
   height: 48px;
-  ${({ theme }) => theme.fonts.buttonStyle};
   border: 0;
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: inherit;
@@ -17,7 +16,7 @@ const ButtonBase = styled.button`
   justify-content: center;
   background: transparent;
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.disabled};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }

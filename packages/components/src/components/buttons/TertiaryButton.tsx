@@ -3,7 +3,7 @@ import { Button } from './Button'
 
 export const TertiaryButton = styled(Button)`
   width: auto;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.buttonStyle};
   transition: background 0.4s ease;
   align-items: center;
   display: inline-flex;
@@ -14,14 +14,14 @@ export const TertiaryButton = styled(Button)`
   }
   color: ${({ theme }) => theme.colors.primary};
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.disabled};
   }
   &:hover {
     opacity: 0.8;
-    background: ${({ theme }) => theme.colors.buttonHoverColor};
+    background: ${({ theme }) => theme.colors.background};
   }
 
   &:active {
-    background: ${({ theme }) => theme.colors.creamCan};
+    background: ${({ theme }) => theme.colors.focus};
   }
 `

@@ -27,8 +27,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   flex-direction: column;
   * {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 

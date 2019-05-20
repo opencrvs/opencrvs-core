@@ -32,8 +32,8 @@ export const gradients = {
 }
 
 export const shadows = {
-  shadowMisty: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
-  shadowThick: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
+  mistyShadow: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
+  thickShadow: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
 }
 
 export const colors = {
@@ -49,29 +49,13 @@ export const colors = {
   success: colorDictionary.greenPeaPea,
   white: colorDictionary.white,
   black: colorDictionary.black,
-  gradientDark: colorDictionary.nightshadeDark,
-  gradientLight: colorDictionary.nightshadeLight,
   focus: colorDictionary.yellowFocus,
 
-  headerGradientDark: colorDictionary.yellowFocus,
-  headerGradientLight: colorDictionary.yellowFocus,
-  hoverGradientDark: colorDictionary.yellowFocus,
-
-  cardGradientEnd: colorDictionary.yellowFocus,
-
-  chartAreaGradientStart: colorDictionary.yellowFocus,
-  chartAreaGradientEnd: colorDictionary.yellowFocus,
-
-  imageContainerBackground: colorDictionary.yellowFocus,
-  disabledButton: colorDictionary.yellowFocus,
-  rejectionIconColor: colorDictionary.yellowFocus,
-  saveDraftBtn: colorDictionary.yellowFocus,
-  disabledTab: colorDictionary.yellowFocus,
-  offlineBoxText: colorDictionary.yellowFocus,
-  offlineBoxTitle: colorDictionary.yellowFocus,
-  seperatorBorder: colorDictionary.yellowFocus,
-  yellowFocus: colorDictionary.yellowFocus,
-  dropdownHover: colorDictionary.yellowFocus,
-  menuBackground: colorDictionary.yellowFocus,
-  menuBackgroundTransparent: colorDictionary.yellowFocus
+  // Exceptions - Try to use one of the above before creating exceptions
+  chartAreaGradientStart: colorDictionary.greySmoky,
+  chartAreaGradientEnd: colorDictionary.blueHover,
+  dropdownHover: colorDictionary.blueHover,
+  menuBackground: colorDictionary.blackStormy,
+  gradientDark: colorDictionary.nightshadeDark,
+  gradientLight: colorDictionary.nightshadeLight
 }

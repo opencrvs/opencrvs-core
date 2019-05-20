@@ -13,6 +13,7 @@ import {
   Delete,
   DraftSimple
 } from '@opencrvs/components/lib/icons'
+import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
@@ -41,7 +42,6 @@ import {
 } from 'react-intl'
 import {
   PrimaryButton,
-  Button,
   IconAction,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
@@ -141,19 +141,19 @@ const SectionRow = styled.p`
   }
 `
 const SectionLabel = styled.label`
-  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  color: ${({ theme }) => theme.colors.copy};
   margin-right: 5px;
   &::after {
     content: ':';
   }
 `
 const SectionValue = styled.span`
-  font-weight: bold;
-  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
 `
 const NextButton = styled(PrimaryButton)`
   margin: 15px 25px 30px;
-  font-weight: bold;
 `
 const ButtonContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
@@ -167,7 +167,7 @@ const RejectApplication = styled(IconAction)`
   padding: 0px;
   width: auto;
   div:first-of-type {
-    background: ${({ theme }) => theme.colors.rejectionIconColor};
+    background: ${({ theme }) => theme.colors.warning};
     padding: 15px 15px 10px;
     border-radius: 2px;
   }
@@ -176,11 +176,10 @@ const RejectApplication = styled(IconAction)`
     margin-left: 70px;
     color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
-    font-size: 16px;
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};
@@ -191,12 +190,8 @@ const RejectApplication = styled(IconAction)`
   }
 `
 
-const RequiredFieldLink = styled(Button)`
-  ${({ theme }) => theme.fonts.bodyStyle};
+const RequiredFieldLink = styled(Link)`
   color: ${({ theme }) => theme.colors.error};
-  text-decoration: underline;
-  padding: 0;
-  text-align: left;
 `
 const Row = styled.div`
   display: flex;
@@ -244,9 +239,7 @@ const DeleteApplication = styled.a`
 const SaveDraftText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   color: ${({ theme }) => theme.colors.secondary};
-  font-size: 14px;
   text-decoration: underline;
-  letter-spacing: 0px;
   margin-left: 14px;
 `
 

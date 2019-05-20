@@ -18,8 +18,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   margin-top: -280px;
   * {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 

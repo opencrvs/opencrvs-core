@@ -6,13 +6,8 @@ const ActionContainer = styled.div`
   width: 100%;
 `
 const HeaderContainer = styled.div`
-  background: linear-gradient(
-    270deg,
-    ${({ theme }) => theme.colors.headerGradientLight} 0%,
-    ${({ theme }) => theme.colors.headerGradientDark} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
   color: ${({ theme }) => theme.colors.white};
-  font-weight: bold;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
   height: 90px;
   display: block;
@@ -47,7 +42,6 @@ const BackButtonText = styled.span`
 `
 const MenuTitle = styled.span`
   ${({ theme }) => theme.fonts.h4Style};
-  font-weight: 300;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);

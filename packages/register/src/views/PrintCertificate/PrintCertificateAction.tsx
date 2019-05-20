@@ -152,7 +152,7 @@ const StyledIconAction = styled(IconAction)`
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};
@@ -177,7 +177,7 @@ const ConfirmBtn = styled(PrimaryButton)`
 `
 
 const EditRegistration = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  border: solid 1px ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.primary} !important;
   margin: 0px 20px;
   top: 3px;
@@ -187,7 +187,7 @@ const EditRegistration = styled(SecondaryButton)`
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }) => theme.colors.disabled};
   }
   &:disabled {
     background-color: ${({ theme }) => theme.colors.background};

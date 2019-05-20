@@ -50,7 +50,7 @@ const StyledSearchButton = styled(PrimaryButton)`
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};

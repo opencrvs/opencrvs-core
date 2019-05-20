@@ -1,12 +1,9 @@
 import {
-  ActionTitle,
   Button,
   IButtonProps,
-  IconAction,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import {
-  Plus,
   StatusOrange,
   StatusProgress,
   StatusRejected
@@ -38,7 +35,6 @@ import { IViewHeadingProps } from 'src/components/ViewHeading'
 import { IDraft } from 'src/drafts'
 import { Event } from 'src/forms'
 import {
-  goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToTab as goToTabAction
@@ -69,13 +65,12 @@ export const IconTabs = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   position: relative;
   white-space: nowrap;
-  border-bottom: 1px solid rgb(210, 210, 210);
+  ${({ theme }) => theme.shadows.mistyShadow};
   margin-top: 50px;
 `
 export const IconTab = styled(Button).attrs<IProps>({})`
-  color: ${({ theme }) => theme.colors.secondary};
-  ${({ theme, active }) =>
-    active ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
@@ -84,7 +79,9 @@ export const IconTab = styled(Button).attrs<IProps>({})`
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & div {
     position: relative;
-    margin-right: 10px;
+
+    top: 2px;
+    margin-right: 6px;
   }
   &:focus {
     outline: 0;
@@ -147,11 +144,6 @@ const messages = defineMessages({
     id: 'register.workQueue.header.description',
     defaultMessage: 'Review | Registration | Certification',
     description: 'The displayed description in the Work Queue header'
-  },
-  newRegistration: {
-    id: 'register.workQueue.buttons.newRegistration',
-    defaultMessage: 'New registration',
-    description: 'The title of new registration button'
   },
   inProgress: {
     id: 'register.workQueue.tabs.inProgress',
@@ -266,25 +258,7 @@ const Container = styled.div`
   margin-top: 10px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
-const StyledPlusIcon = styled(Plus)`
-  display: flex;
-  margin-left: -23px;
-  margin-top: -23px;
-`
-const StyledIconAction = styled(IconAction)`
-  display: flex;
-  min-height: 96px;
-  padding: 0 20px 0 0;
-  box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
-  background-color: ${({ theme }) => theme.colors.secondary};
-  /* stylelint-disable */
-  ${ActionTitle} {
-    /* stylelint-enable */
-    ${({ theme }) => theme.fonts.h3Style};
-    margin: -2px 0 -2px 120px;
-    color: ${({ theme }) => theme.colors.white};
-  }
-`
+
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
@@ -298,7 +272,6 @@ interface IBaseWorkQueueProps {
   theme: ITheme
   language: string
   scope: Scope
-  goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
   goToWorkQueueTab: typeof goToWorkQueueTabAction
@@ -707,12 +680,6 @@ export class WorkQueueView extends React.Component<
         <Header />
         <Container>
           <HeaderContent>
-            <StyledIconAction
-              id="new_registration"
-              icon={() => <StyledPlusIcon />}
-              onClick={this.props.goToEvents}
-              title={intl.formatMessage(messages.newRegistration)}
-            />
             <Query
               query={COUNT_REGISTRATION_QUERY}
               variables={{
@@ -1045,7 +1012,6 @@ function mapStateToProps(
 export const WorkQueue = connect(
   mapStateToProps,
   {
-    goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
     goToWorkQueueTab: goToWorkQueueTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,

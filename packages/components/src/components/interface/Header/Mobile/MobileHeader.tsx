@@ -17,11 +17,7 @@ const HeaderContainer = styled.div`
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.headerGradientDark} 0%,
-    ${({ theme }) => theme.colors.headerGradientLight} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
 `
 
