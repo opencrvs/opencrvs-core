@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid'
 import { mockUserResponse } from 'src/tests/util'
 import { storage } from 'src/storage'
 import { createStore } from 'src/store'
-import { WorkQueue, EVENT_STATUS } from './WorkQueue'
+import { RegistrarHome, EVENT_STATUS } from './RegistrarHome'
 import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { checkAuth } from 'src/profile/profileActions'
@@ -103,7 +103,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('WorkQueue tests', async () => {
+describe('RegistrarHome tests', async () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -114,7 +114,7 @@ describe('WorkQueue tests', async () => {
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -147,7 +147,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -200,7 +200,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -268,7 +268,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'progress'
@@ -318,7 +318,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -369,7 +369,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'updates'
@@ -547,7 +547,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue />,
+      <RegistrarHome />,
       store,
       graphqlMock
     )
@@ -721,7 +721,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'updates' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
       store,
       graphqlMock
     )
@@ -777,7 +777,7 @@ describe('WorkQueue tests', async () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'progress' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
       store
     )
 
@@ -832,7 +832,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'review' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'review' } }} />,
       store,
       graphqlMock
     )
@@ -882,7 +882,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'updates' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
       store,
       graphqlMock
     )
@@ -914,7 +914,7 @@ describe('WorkQueue tests', async () => {
     }
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'progress'

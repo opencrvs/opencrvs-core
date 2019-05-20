@@ -23,5 +23,6 @@ export const REVIEW_DUPLICATES = '/duplicates/:applicationId'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
 
-export const WORK_QUEUE = '/work-queue'
-export const WORK_QUEUE_TAB = '/work-queue/:tabId'
+export const REGISTRAR_HOME = '/registrar-home'
+export const REGISTRAR_HOME_TAB = '/registrar-home/:tabId'
+export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
