@@ -35,7 +35,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Header } from 'src/components/interface/Header/Header'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import {
   goToEvents as goToEventsAction,
@@ -269,6 +269,7 @@ const Container = styled.div`
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;
@@ -281,7 +282,7 @@ const StyledIconAction = styled(IconAction)`
     /* stylelint-enable */
     font-size: 28px;
     font-weight: 300;
-    margin: -2px 0 -2px 120px;
+    margin: -20px 0 0 0;
     line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
@@ -305,7 +306,7 @@ interface IBaseRegistrarHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
-  drafts: IDraft[]
+  drafts: IApplication[]
 }
 
 interface IRegistrarHomeState {
@@ -621,7 +622,7 @@ export class RegistrarHomeView extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IDraft) => {
+    return this.props.drafts.map((draft: IApplication) => {
       let name
       let tabRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
@@ -1039,7 +1040,7 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
-    drafts: state.drafts.drafts
+    drafts: state.applicationsState.applications
   }
 }
 

@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 import { IForm, Action } from 'src/forms'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { draftToGqlTransformer } from 'src/transformer'
 
 const SUBMIT_BIRTH_APPLICATION = gql`
@@ -28,7 +28,7 @@ export function getBirthMutationMappings(
   action: Action,
   payload?: any,
   form?: IForm,
-  draft?: IDraft
+  draft?: IApplication
 ) {
   switch (action) {
     case Action.SUBMIT_FOR_REVIEW:

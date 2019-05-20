@@ -2,15 +2,16 @@ export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 export const SELECT_INFORMANT = '/events/birth'
 
-export const DRAFT_BIRTH_PARENT_FORM = '/drafts/:draftId/events/birth/parent'
+export const DRAFT_BIRTH_PARENT_FORM =
+  '/drafts/:applicationId/events/birth/parent'
 export const DRAFT_BIRTH_PARENT_FORM_TAB =
-  '/drafts/:draftId/events/birth/parent/:tabId'
+  '/drafts/:applicationId/events/birth/parent/:tabId'
 
-export const DRAFT_DEATH_FORM = '/drafts/:draftId/events/death'
-export const DRAFT_DEATH_FORM_TAB = '/drafts/:draftId/events/death/:tabId'
+export const DRAFT_DEATH_FORM = '/drafts/:applicationId/events/death'
+export const DRAFT_DEATH_FORM_TAB = '/drafts/:applicationId/events/death/:tabId'
 
 export const REVIEW_EVENT_PARENT_FORM_TAB =
-  '/reviews/:draftId/events/:event/parent/:tabId'
+  '/reviews/:applicationId/events/:event/parent/:tabId'
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'

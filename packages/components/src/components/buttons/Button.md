@@ -2,13 +2,49 @@ A skeleton button component that can be used as a baseline for all other buttons
 
 It should not be styled in any way and all changes that won't apply to **all** other buttons should be handled elsewhere.
 
+### ⚠️ Please do not use this button for any other clicable components. You can simply make new component from scratch.
+
+## How to use this Button
+
+1. only pass text as child,
+2. only pass icon as props
+3. pass alignment from Button Libray `align={ ICON_ALIGNMENT.LEFT }`
 
 ```js
-<Button id="myButton" onClick={() => alert("Hello")}>Press me</Button>
+<Button id="myButton" onClick={() => alert('Hello')}>
+  Press me
+</Button>
 ```
 
-**With icon**
+### button with Icon only
+
 ```js
-const {ArrowWithGradientIcon} = require('../icons/ArrowWithGradient.tsx');
-<Button icon={ArrowWithGradientIcon}>Press me</Button>
+<Button
+  id="myButton"
+  onClick={() => alert('Hello')}
+  icon={() => (
+    <span style={{ color: '#fff', fontSize: '40px', lineHeight: '30px' }}>
+      +
+    </span>
+  )}
+/>
+```
+
+### button with Icon and text
+
+```js
+<Button id="myButton" onClick={() => alert('Hello')} icon={() => ' 😲'}>
+  Press me
+</Button>
+```
+
+```js
+<Button
+  align={0}
+  id="myButton"
+  onClick={() => alert('Hello')}
+  icon={() => ' 😲'}
+>
+  Press me
+</Button>
 ```

@@ -6,7 +6,7 @@ import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from 'src/components/ViewHeader'
 import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
 import { Dispatch } from 'redux'
-import { createDraft, storeDraft } from 'src/drafts'
+import { createApplication, storeApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
@@ -103,9 +103,9 @@ export const SelectVitalEvent = connect(
     return {
       goToBirthRegistration: () => dispatch(goToBirthRegistration()),
       goToDeathRegistration: () => {
-        const draft = createDraft(Event.DEATH)
-        dispatch(storeDraft(draft))
-        dispatch(goToDeathRegistration(draft.id))
+        const application = createApplication(Event.DEATH)
+        dispatch(storeApplication(application))
+        dispatch(goToDeathRegistration(application.id))
       }
     }
   }
