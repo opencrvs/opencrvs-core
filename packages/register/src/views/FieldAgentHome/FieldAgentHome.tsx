@@ -45,6 +45,13 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
     position: relative;
     padding-left: 0;
   }
+  & > div {
+    padding: 0 16px;
+  }
+  & div > div:first-child {
+    margin-right: 8px;
+  }
+
   &:focus {
     outline: 0;
   }
