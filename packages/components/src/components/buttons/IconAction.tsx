@@ -27,18 +27,16 @@ export const ActionTitle = styled.h3.attrs<{
 }>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 24px;
+  ${({ theme }) => theme.fonts.h4Style};
   margin-left: 80px;
 `
 const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
   margin: 3px 0px 0px 80px;
   strong {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
   }
 `
 

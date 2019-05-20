@@ -18,19 +18,12 @@ const HeaderContainer = styled.div`
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.headerGradientDark} 0%,
-    ${({ theme }) => theme.colors.headerGradientLight} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
 `
 
 const Title = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  line-height: 30px;
-  letter-spacing: 0.15px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.white};
   align-self: center;
 `

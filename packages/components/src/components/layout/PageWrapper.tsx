@@ -8,7 +8,7 @@ const Page = styled.div`
   flex-direction: column;
   background-color: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 const Wrapper = styled.div`

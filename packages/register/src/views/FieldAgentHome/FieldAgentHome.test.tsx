@@ -131,9 +131,5 @@ describe('when the home page loads for a Local Registrar', () => {
       )
       app.update()
     })
-
-    it('new registration renders', () => {
-      expect(app.find('#new_registration').hostNodes()).toHaveLength(1)
-    })
   })
 })

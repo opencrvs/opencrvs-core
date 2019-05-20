@@ -7,33 +7,27 @@ const language = process.env.REACT_APP_LANGUAGE || 'en'
 
 const fontFaces = [
   {
-    fontFamily: styleGuideCountryFonts[country][language].lightFontFamily,
-    fontStyle: 'normal',
-    fontWeight: '300',
-    src: `url('notosans-light-webfont-en.ttf') format('truetype')`
-  },
-  {
     fontFamily: styleGuideCountryFonts[country][language].regularFontFamily,
     fontStyle: 'normal',
     src: `url('notosans-regular-webfont-en.ttf') format('truetype')`
   },
   {
-    fontFamily: styleGuideCountryFonts[country][language].boldFontFamily,
+    fontFamily: styleGuideCountryFonts[country][language].semiBoldFontFamily,
     fontStyle: 'normal',
-    src: `url('notosans-bold-webfont-en.ttf') format('truetype')`
+    src: `url('notosans-semibold-webfont-en.ttf') format('truetype')`
   }
 ]
 
 const colors = {
-  danger: '#d9534f',
+  danger: '#D53F3F',
   dark: '#000',
-  grey: '#7a898f',
+  grey: '#83898F',
   light: '#fff',
-  lightGrey: '#aec0c6',
-  paleGrey: '#ebf1f3',
-  primary: '#485F88',
-  secondary: '#4CA1F2',
-  tertiary: '#203a44'
+  lightGrey: '#A7B0B2',
+  paleGrey: '#C1C7C9',
+  primary: '#35495D',
+  secondary: '#5E93ED',
+  tertiary: '#373D3F'
 }
 
 const theme = {
@@ -43,7 +37,7 @@ const theme = {
     baseBackground: colors.light,
     border: colors.paleGrey,
     codeBackground: colors.paleGrey,
-    error: colors.danger,
+    error: colors.error,
     light: colors.grey,
     lightest: colors.lightGrey,
     link: colors.primary,
@@ -55,19 +49,19 @@ const theme = {
   fontFamily: {
     base:
       '"' +
-      styleGuideCountryFonts[country].lightFontFamily +
+      styleGuideCountryFonts[country].regularFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     bold:
       '"' +
-      styleGuideCountryFonts[country].boldFontFamily +
+      styleGuideCountryFonts[country].semiBoldFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',
     light:
       '"' +
-      styleGuideCountryFonts[country].lightFontFamily +
+      styleGuideCountryFonts[country].regularFontFamily +
       '", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", ' +
       '"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", ' +
       'sans-serif',

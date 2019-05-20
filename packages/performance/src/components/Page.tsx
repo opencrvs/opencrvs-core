@@ -14,8 +14,7 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   flex-direction: column;
   * {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
@@ -25,54 +24,37 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-extra-light-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-en.ttf')
       format('truetype');
-    font-weight: 300;
-    font-style: normal;
   }
 
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-light-webfont-en.ttf')
+    url('/fonts/notosans-regular-webfont-en.ttf')
       format('truetype');
-    font-style: normal;
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-regular-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
       format('truetype');
-    font-style: normal;
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
-    src:
-      url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
-      format('truetype');
-    font-weight: 300;
-    font-style: normal;
-  }
-
-  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
-    src:
-      url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
-      format('truetype');
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
     src:
       url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
       format('truetype');
-    font-style: normal;
   }
+
 `
 
 export class Page extends React.Component<IPageProps> {

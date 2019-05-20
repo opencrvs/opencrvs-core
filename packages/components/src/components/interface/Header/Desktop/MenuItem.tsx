@@ -12,9 +12,8 @@ export type IMenuItemContainerProps = ICustomProps &
 
 const Item = styled(Button).attrs<IMenuItemContainerProps>({})`
   color: ${({ theme, selected }) =>
-    selected ? theme.colors.white : theme.colors.disabledTab};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  letter-spacing: 0.25px;
+    selected ? theme.colors.white : theme.colors.disabled};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 const ItemContainer = styled.div`

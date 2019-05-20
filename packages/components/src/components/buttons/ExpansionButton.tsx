@@ -4,7 +4,7 @@ import { Button, IButtonProps, ICON_ALIGNMENT } from './Button'
 import { PlusTransparent, MinusTransparent } from '../icons'
 
 const StyledButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.secondary};
   display: flex;
   padding: 0 8px;
   flex: 1;
@@ -15,6 +15,11 @@ const StyledButton = styled(Button)`
   }
   justify-content: center;
   align-items: center;
+  & > div {
+    top: 0;
+  }
+  border: none;
+  outline: none;
 `
 interface IExpansionButtonProps extends IButtonProps {
   expanded?: boolean

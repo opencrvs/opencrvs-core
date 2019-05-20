@@ -27,31 +27,28 @@ import { REGISTRAR_HOME } from 'src/navigation/routes'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 50px;
+  height: 48px;
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
   justify-content: flex-start;
   align-items: center;
 `
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
-  color: ${({ theme }) => theme.colors.secondary};
-  font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
-  height: 50px;
-  font-size: 14px;
-  border-bottom: ${({ active }) => (active ? '3px solid' : '')}
-    ${({ theme }) => theme.colors.accentLight};
-  :first-child > div {
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 0;
+  margin-right: 50px;
+  outline: none;
+  ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  & div {
     position: relative;
-    padding-left: 0;
-  }
-  & > div {
-    padding: 0 16px;
-  }
-  & div > div:first-child {
-    margin-right: 8px;
-  }
 
+    top: 2px;
+    margin-right: 6px;
+  }
   &:focus {
     outline: 0;
   }

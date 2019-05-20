@@ -8,12 +8,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div.attrs<IPage>({})`
-background: ${({ theme }) =>
-  `linear-gradient(
-  180deg,
-   ${theme.colors.headerGradientLight} 0%,
-   ${theme.colors.headerGradientDark} 100%
-)`};
+  ${({ theme }) => theme.gradients.gradientNightshade};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,7 +19,6 @@ background: ${({ theme }) =>
 
   * {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -35,54 +29,37 @@ background: ${({ theme }) =>
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-extra-light-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-en.ttf')
       format('truetype');
-    font-weight: 300;
-    font-style: normal;
   }
 
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-light-webfont-en.ttf')
+    url('/fonts/notosans-regular-webfont-en.ttf')
       format('truetype');
-    font-style: normal;
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-regular-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
       format('truetype');
-    font-style: normal;
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
-    src:
-      url('/fonts/notosans-extra-light-webfont-${languageFromProps}.ttf')
-      format('truetype');
-    font-weight: 300;
-    font-style: normal;
-  }
-
-  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
-    src:
-      url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
-      format('truetype');
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
     src:
       url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
       format('truetype');
-    font-style: normal;
   }
+
 `
 
 export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
@@ -96,7 +73,7 @@ export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
               id="login-submitting-spinner"
               baseColor={
                 getTheme(window.config.COUNTRY, window.config.LANGUAGE).colors
-                  .headerGradientDark
+                  .gradientDark
               }
             />
           ) : (

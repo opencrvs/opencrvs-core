@@ -162,17 +162,15 @@ const messages = defineMessages({
 })
 
 const BoxTitle = styled.div`
-  line-height: 25px;
   text-transform: capitalize !important;
-  ${({ theme }) => theme.fonts.h2FontStyle}
+  ${({ theme }) => theme.fonts.h2Style}
   color: ${({ theme }) => theme.colors.primary};
 `
 
 const FooterText = styled.div`
   height: 17px;
-  line-height: 17px;
   margin-top: 25px;
-  ${({ theme }) => theme.fonts.infoFontStyle}
+  ${({ theme }) => theme.fonts.bodyStyle}
   color: ${({ theme }) => theme.colors.copy};
 `
 
@@ -199,21 +197,17 @@ const LabelContainer = styled.div`
   width: 100%;
 `
 const Label = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   background-color: rgba(150, 150, 150, 0.1);
   border-radius: 17px;
   padding: 5px 10px 5px 7px;
   margin: 2px 10px 2px 0;
   display: flex;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
   align-items: center;
   height: 32px;
   & span {
     text-transform: uppercase;
     margin-left: 5px;
-    font-size: 13px;
   }
 `
 
@@ -222,7 +216,7 @@ const StyledSpinner = styled(Spinner)`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `

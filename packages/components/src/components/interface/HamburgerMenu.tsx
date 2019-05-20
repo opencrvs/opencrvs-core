@@ -74,7 +74,7 @@ const MenuContainer = styled.div`
   .rc-menu-item-selected,
   .rc-menu-submenu-active > .rc-menu-submenu-title {
     background-color: ${({ theme }) => theme.colors.primary};
-    font-weight: bold;
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
   }
 
   .rc-menu-vertical.rc-menu-sub {
@@ -84,13 +84,10 @@ const MenuContainer = styled.div`
 
   .rc-menu-item,
   .rc-menu-submenu-title {
-    font-family: ${({ theme }) => theme.fonts.lightFont};
+    ${({ theme }) => theme.fonts.bodyStyle};
     cursor: pointer;
     padding: 18px 22px;
     min-height: 30px;
-    font-size: 16px;
-    letter-spacing: 0px;
-    line-height: 19px;
     text-align: right;
     width: 199px;
   }
@@ -106,7 +103,7 @@ const MenuContainer = styled.div`
   }
 
   ul.rc-menu.rc-menu-sub.rc-menu-vertical > li {
-    border-top: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
+    border-top: 1px inset ${({ theme }) => theme.colors.placeholder};
   }
 
   li.rc-menu-submenu.rc-menu-submenu-vertical > div:nth-child(2) {
@@ -139,7 +136,7 @@ const StyledNestedSubMenu = styled(SubMenu)`
   }
   .rc-menu-item-selected {
     background-color: ${({ theme }) => theme.colors.secondary};
-    font-weight: bold;
+    ${({ theme }) => theme.fonts.bigBodyStyle};
   }
 `
 const StyledNestedMenuItem = styled(MenuItem)`
@@ -147,18 +144,13 @@ const StyledNestedMenuItem = styled(MenuItem)`
 `
 const SubMenuTitleWrapper = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 16px;
-  font-weight: normal;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 const MenuTitleWrapper = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 14px;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   text-transform: uppercase;
-  font-weight: bold;
-  line-height: 25px;
   padding-right: 40px;
 `
 const IconWrapper = styled.i`
@@ -168,10 +160,9 @@ const IconWrapper = styled.i`
   position: absolute;
 `
 const IconClose = styled.div`
-  font-size: 45px;
   margin-top: 0px;
   margin-right: 2px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.h1Style};
 `
 interface IMenuItem {
   title: string
