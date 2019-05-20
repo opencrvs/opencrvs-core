@@ -27,7 +27,7 @@ interface RateElement {
 }
 
 /*
- * Chooses a element in a array where ever element is an object with atleast a rate property.
+ * Chooses a element in a array where every element is an object with atleast a rate property.
  * The rates should add up to 1 or 100 are some easy to work with value. However, any value
  * will work as the algorithm will works out the total and works out each rate according to
  * that total.
@@ -43,7 +43,6 @@ export function chooseElementUsingRate(elements: RateElement[]): RateElement {
   let chosenElement
 
   for (const element of elements) {
-    console.log('Chose rate: ' + element.rate)
     currentRate = currentRate + element.rate
 
     if (choice < currentRate) {
