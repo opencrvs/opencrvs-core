@@ -287,8 +287,8 @@ class SettingsView extends React.Component<IProps> {
           </SettingsTitle>
           <Content>
             <Left>
-              {sections.map(sec => (
-                <DataSection {...sec} />
+              {sections.map((sec, index: number) => (
+                <DataSection key={index} {...sec} />
               ))}
             </Left>
             <Right>
