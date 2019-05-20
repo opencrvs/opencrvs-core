@@ -9,7 +9,7 @@ const Wrapper = styled.form`
   display: flex;
   ${({ theme }) => theme.fonts.bodyStyle};
   padding: 0px 10px;
-  margin: 4px 0px;
+  margin-bottom: 1px;
   position: relative;
 `
 const SearchTextInput = styled.input`

@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const CenterWrapper = styled.div`
-  padding: 0 32px;
+  padding: 0 20px;
   align-items: center;
   justify-content: center;
   display: inline-flex;
@@ -88,5 +88,6 @@ const RightButtonIcon = styled.div`
 `
 const IconOnly = styled.div`
   position: relative !important;
-  padding: 0 8px;
+  top: 4px;
+  left: 1px;
 `

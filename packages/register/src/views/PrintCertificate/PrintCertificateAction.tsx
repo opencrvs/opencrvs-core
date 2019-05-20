@@ -205,7 +205,7 @@ const Info = styled.div`
 `
 const B = styled.div`
   display: block;
-  ${({ theme }) => theme.fonts.boldBodyStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 const ButtonSpinner = styled(InvertSpinner)`

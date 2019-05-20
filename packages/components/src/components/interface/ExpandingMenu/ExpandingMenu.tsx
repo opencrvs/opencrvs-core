@@ -14,7 +14,7 @@ const MenuMainWrapper = styled.div`
   background: ${({ theme }) => theme.colors.menuBackground};
   width: 100%;
   ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.copy};
   height: 100vh;
   z-index: 99999;
   animation: 300ms ease-out 0s 1 fadeIn;
@@ -44,11 +44,11 @@ const UserInfo = styled.div`
   text-align: justify;
 `
 const UserName = styled.p`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   margin: 25px 0px 5px;
 `
 const Role = styled.p`
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.captionStyle};
   margin: 0px;
 `
 const MenuItems = styled.ul`
@@ -75,6 +75,7 @@ const MenuItem = styled.li`
   align-items: center;
   padding: 10px 30px;
   cursor: pointer;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   &:hover {
     color: ${({ theme }) => theme.colors.secondary};
   }

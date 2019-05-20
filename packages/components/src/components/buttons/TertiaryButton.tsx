@@ -8,6 +8,8 @@ export const TertiaryButton = styled(Button)`
   align-items: center;
   display: inline-flex;
   border: 0;
+
+  text-transform: none !important;
   cursor: pointer;
   & div {
     padding: 0 8px;

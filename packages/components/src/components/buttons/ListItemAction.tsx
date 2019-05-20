@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 import { ExpansionButton } from './ExpansionButton'
 import { IAction } from '../interface/ListItem'
+import { TertiaryButton } from './TertiaryButton'
 
 const Container = styled.div`
   display: flex;
@@ -12,30 +13,10 @@ const Container = styled.div`
     margin-left: 0px;
   }
 `
-const ListItemSingleAction = styled(Button).attrs<{ isFullHeight?: boolean }>(
-  {}
-)`
-  display: flex;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  width: 140px;
-  margin-right: 1px;
+const ListItemSingleAction = styled(TertiaryButton).attrs<{
+  isFullHeight?: boolean
+}>({})`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-right: 0px;
-  }
-  margin-bottom: 1px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.white};
-    cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
-  }
 `
 const ExpansionSec = styled(ExpansionButton).attrs<{ isFullHeight?: boolean }>(
   {}

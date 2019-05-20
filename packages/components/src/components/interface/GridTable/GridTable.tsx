@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 `
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.captionStyle};
   margin: 60px 0 25px;
   padding: 0 25px;
 `

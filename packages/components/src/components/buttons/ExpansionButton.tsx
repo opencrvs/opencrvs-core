@@ -15,6 +15,11 @@ const StyledButton = styled(Button)`
   }
   justify-content: center;
   align-items: center;
+  & > div {
+    top: 0;
+  }
+  border: none;
+  outline: none;
 `
 interface IExpansionButtonProps extends IButtonProps {
   expanded?: boolean

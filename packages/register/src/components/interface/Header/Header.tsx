@@ -22,7 +22,7 @@ import {
   BRN,
   Phone
 } from '@opencrvs/components/lib/icons'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { IconButton } from '@opencrvs/components/lib/buttons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 import { storage } from 'src/storage'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
@@ -133,7 +133,7 @@ const messages = defineMessages({
   }
 })
 
-const StyledPrimaryButton = styled(PrimaryButton)`
+const StyledPrimaryButton = styled(IconButton)`
   ${({ theme }) => theme.shadows.mistyShadow};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

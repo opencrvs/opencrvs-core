@@ -26,7 +26,7 @@ const ExpansionContainer = styled.div`
   }
 `
 const BoldSpan = styled.span`
-  ${({ theme }) => theme.fonts.boldBodyStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   padding: 0 10px;
 `
 const StatusIcon = styled.div`
