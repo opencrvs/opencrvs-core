@@ -14,7 +14,7 @@ const fontFaces = [
   {
     fontFamily: styleGuideCountryFonts[country][language].semiBoldFontFamily,
     fontStyle: 'normal',
-    src: `url('notosans-regular-semibold-webfont-en.ttf') format('truetype')`
+    src: `url('notosans-semibold-webfont-en.ttf') format('truetype')`
   }
 ]
 
