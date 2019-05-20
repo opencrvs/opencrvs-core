@@ -20,16 +20,16 @@ import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
 import { ReviewForm } from './views/RegisterForm/ReviewForm'
 import { SearchResult } from './views/SearchResult/SearchResult'
 import ScrollToTop from 'src/components/ScrollToTop'
-import { Home } from 'src/views/Home/Home'
 import { createClient } from 'src/utils/apolloClient'
 import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
 import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { WorkQueue } from './views/WorkQueue/WorkQueue'
 import { Details } from 'src/views/Home/Details'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { RegistrarHome } from './views/RegistrarHome/RegistrarHome'
+import { FieldAgentHome } from './views/FieldAgentHome/FieldAgentHome'
 import { Footer } from '@opencrvs/components/lib/interface/'
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -66,7 +66,12 @@ export class App extends React.Component<IAppProps> {
                                 <ProtectedRoute
                                   exact
                                   path={routes.HOME}
-                                  component={Home}
+                                  component={FieldAgentHome}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.FIELD_AGENT_HOME_TAB}
+                                  component={FieldAgentHome}
                                 />
                                 <ProtectedRoute
                                   exact
@@ -105,17 +110,21 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.WORK_QUEUE}
-                                  component={WorkQueue}
+                                  path={routes.REGISTRAR_HOME}
+                                  component={RegistrarHome}
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.WORK_QUEUE_TAB}
-                                  component={WorkQueue}
+                                  path={routes.REGISTRAR_HOME_TAB}
+                                  component={RegistrarHome}
                                 />
                                 <ProtectedRoute
                                   path={routes.CONFIRMATION_SCREEN}
                                   component={ConfirmationScreen}
+                                />
+                                <ProtectedRoute
+                                  path={routes.SEARCH}
+                                  component={SearchResult}
                                 />
                                 <ProtectedRoute
                                   path={routes.SEARCH_RESULT}

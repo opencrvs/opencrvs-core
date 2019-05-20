@@ -225,12 +225,12 @@ const messages = defineMessages({
     description: 'Tracking ID label'
   },
   workflowApplicationRejectReason: {
-    id: 'register.workQueue.labels.results.rejectionReason',
+    id: 'register.searchResult.labels.results.rejectionReason',
     defaultMessage: 'Reason',
     description: 'Label for rejection reason'
   },
   workflowApplicationRejectComment: {
-    id: 'register.workQueue.labels.results.rejectionComment',
+    id: 'register.searchResult.labels.results.rejectionComment',
     defaultMessage: 'Comment',
     description: 'Label for rejection comment'
   },
