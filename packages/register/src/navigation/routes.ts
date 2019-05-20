@@ -15,6 +15,7 @@ export const REVIEW_EVENT_PARENT_FORM_TAB =
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'
+export const SEARCH = '/search'
 export const SEARCH_RESULT = '/search-result/:searchType/:searchText'
 export const MY_RECORDS = '/my-records'
 export const MY_DRAFTS = '/my-drafts'

@@ -717,76 +717,82 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const { searchText, searchType } = match.params
     return (
       <>
-        <Header searchText={searchText} selectedSearchType={searchType} />
+        <Header
+          searchText={searchText}
+          selectedSearchType={searchType}
+          mobileSearchBar={true}
+        />
         <Container>
           <HeaderContent>
-            <Query
-              query={SEARCH_EVENTS}
-              variables={{
-                locationIds: [this.getLocalLocationId()],
-                sort: SEARCH_RESULT_SORT,
-                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
-                registrationNumber:
-                  searchType === BRN_DRN_TEXT ? searchText : '',
-                contactNumber: searchType === PHONE_TEXT ? searchText : ''
-              }}
-            >
-              {({ loading, error, data }) => {
-                if (loading) {
-                  return (
-                    <Loader
-                      id="search_loader"
-                      marginPercent={35}
-                      spinnerDiameter={60}
-                      loadingText={intl.formatMessage(messages.searchingFor, {
-                        param: searchText
-                      })}
-                    />
-                  )
-                }
-                if (error) {
-                  Sentry.captureException(error)
+            {searchText && searchType && (
+              <Query
+                query={SEARCH_EVENTS}
+                variables={{
+                  locationIds: [this.getLocalLocationId()],
+                  sort: SEARCH_RESULT_SORT,
+                  trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                  registrationNumber:
+                    searchType === BRN_DRN_TEXT ? searchText : '',
+                  contactNumber: searchType === PHONE_TEXT ? searchText : ''
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      <Loader
+                        id="search_loader"
+                        marginPercent={35}
+                        spinnerDiameter={60}
+                        loadingText={intl.formatMessage(messages.searchingFor, {
+                          param: searchText
+                        })}
+                      />
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
 
+                    return (
+                      <ErrorText id="search-result-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  const transformedData = transformData(data, intl)
+                  const total = transformedData.length
                   return (
-                    <ErrorText id="search-result-error-text">
-                      {intl.formatMessage(messages.queryError)}
-                    </ErrorText>
+                    <>
+                      <SearchResultText>
+                        {intl.formatMessage(messages.searchResultFor, {
+                          total,
+                          param: searchText
+                        })}
+                      </SearchResultText>
+                      {total > 0 && (
+                        <>
+                          <TotalResultText>
+                            {intl.formatMessage(messages.totalResultText, {
+                              total
+                            })}
+                          </TotalResultText>
+                          <DataTable
+                            data={transformedData}
+                            zeroPagination={true}
+                            cellRenderer={this.renderCell}
+                            resultLabel={intl.formatMessage(
+                              messages.dataTableResults
+                            )}
+                            noResultText={intl.formatMessage(
+                              messages.dataTableNoResults
+                            )}
+                          />
+                        </>
+                      )}
+                    </>
                   )
-                }
-                const transformedData = transformData(data, intl)
-                const total = transformedData.length
-                return (
-                  <>
-                    <SearchResultText>
-                      {intl.formatMessage(messages.searchResultFor, {
-                        total,
-                        param: searchText
-                      })}
-                    </SearchResultText>
-                    {total > 0 && (
-                      <>
-                        <TotalResultText>
-                          {intl.formatMessage(messages.totalResultText, {
-                            total
-                          })}
-                        </TotalResultText>
-                        <DataTable
-                          data={transformedData}
-                          zeroPagination={true}
-                          cellRenderer={this.renderCell}
-                          resultLabel={intl.formatMessage(
-                            messages.dataTableResults
-                          )}
-                          noResultText={intl.formatMessage(
-                            messages.dataTableNoResults
-                          )}
-                        />
-                      </>
-                    )}
-                  </>
-                )
-              }}
-            </Query>
+                }}
+              </Query>
+            )}
           </HeaderContent>
         </Container>
       </>

@@ -1,4 +1,4 @@
-import { push, goBack as back } from 'react-router-redux'
+import { push, goBack as back, replace } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   HOME,
@@ -9,7 +9,8 @@ import {
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
   REGISTRAR_HOME_TAB,
-  FIELD_AGENT_HOME_TAB
+  FIELD_AGENT_HOME_TAB,
+  SEARCH
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -75,12 +76,16 @@ export function goToPerformance() {
 }
 
 export function goToSearchResult(searchText: string, searchType: string) {
-  return push(
+  return replace(
     formatUrl(SEARCH_RESULT, {
       searchText,
       searchType
     })
   )
+}
+
+export function goToSearch() {
+  return push(SEARCH)
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {
