@@ -145,7 +145,9 @@ class FieldAgentHomeView extends React.Component<FullProps> {
             </Topbar>
           </>
         )}
-        {!isFieldAgent && <Redirect to={REGISTRAR_HOME} />}
+        {userDetails && userDetails.role && !isFieldAgent && (
+          <Redirect to={REGISTRAR_HOME} />
+        )}
       </>
     )
   }
