@@ -490,7 +490,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.blockAlphaNumericDot':
       'Can contain only block character, number and dot (e.g. C91.5)',
     'validations.phoneNumberFormat':
-      'Must be a valid {num} digit number that starts with 01 {start}',
+      'Must be a valid {num} digit number that starts with {start}',
     'validations.emailAddressFormat': 'Must be a valid email address',
     'validations.dateFormat': 'Must be a valid date',
     'validations.isValidBirthDate': 'Must be a valid birth date',
