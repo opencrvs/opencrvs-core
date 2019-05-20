@@ -30,7 +30,7 @@ type GoToTabAction = {
   type: typeof GO_TO_TAB
   payload: {
     tabRoute: string
-    draftId: string
+    applicationId: string
     tabId: string
     event: string
     fieldNameHash?: string
@@ -79,9 +79,11 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
-export function goToBirthRegistrationAsParent(draftId: string) {
+export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
-    formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
+    formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+      applicationId: applicationId.toString()
+    })
   )
 }
 
@@ -100,8 +102,10 @@ export function goToPrintCertificate(registrationId: string, event: string) {
   )
 }
 
-export function goToDeathRegistration(draftId: string) {
-  return push(formatUrl(DRAFT_DEATH_FORM, { draftId: draftId.toString() }))
+export function goToDeathRegistration(applicationId: string) {
+  return push(
+    formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
+  )
 }
 
 export function goToWorkQueueTab(tabId: string) {
@@ -113,7 +117,7 @@ export function goToWorkQueueTab(tabId: string) {
 
 export function goToTab(
   tabRoute: string,
-  draftId: string,
+  applicationId: string,
   tabId: string,
   event: string,
   fieldNameHash?: string,
@@ -121,7 +125,14 @@ export function goToTab(
 ) {
   return {
     type: GO_TO_TAB,
-    payload: { draftId, tabId, event, fieldNameHash, tabRoute, historyState }
+    payload: {
+      applicationId,
+      tabId,
+      event,
+      fieldNameHash,
+      tabRoute,
+      historyState
+    }
   }
 }
 
@@ -132,7 +143,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
     case GO_TO_TAB:
       const {
         fieldNameHash,
-        draftId,
+        applicationId,
         tabId,
         event,
         tabRoute,
@@ -143,7 +154,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
         Cmd.action(
           push(
             formatUrl(tabRoute, {
-              draftId: draftId.toString(),
+              applicationId: applicationId.toString(),
               tabId,
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),

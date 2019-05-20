@@ -6,7 +6,7 @@ import {
 } from 'src/tests/util'
 import { FormFieldGenerator } from './FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
-import { createDraft, storeDraft } from 'src/drafts'
+import { createApplication, storeApplication } from 'src/applications'
 import { createStore } from '../../store'
 import {
   SELECT_WITH_OPTIONS,
@@ -33,8 +33,8 @@ import { messages as addressMessages } from 'src/forms/address'
 
 describe('form component', () => {
   const { store } = createStore()
-  const draft = createDraft(Event.BIRTH)
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.BIRTH)
+  store.dispatch(storeApplication(draft))
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>
   const testComponent = createTestComponent(
@@ -133,8 +133,8 @@ describe('form component', () => {
 
 describe('form component registration section', () => {
   const { store } = createStore()
-  const draft = createDraft(Event.BIRTH)
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.BIRTH)
+  store.dispatch(storeApplication(draft))
   const modifyDraft = jest.fn()
   let component: ReactWrapper<{}, {}>
   const testComponent = createTestComponent(

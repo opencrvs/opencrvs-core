@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { SectionDrawer } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { getRegisterForm } from 'src/forms/register/application-selectors'
@@ -260,7 +260,7 @@ const DraftButtonContainer = styled.div`
   cursor: pointer;
 `
 interface IProps {
-  draft: IDraft
+  draft: IApplication
   registerForm: { [key: string]: IForm }
   tabRoute: string
   registerClickEvent?: () => void
@@ -364,7 +364,7 @@ export function renderSelectDynamicLabel(
 }
 
 const renderValue = (
-  draft: IDraft,
+  draft: IApplication,
   section: IFormSection,
   field: IFormField,
   intl: InjectedIntl,
@@ -406,7 +406,7 @@ const renderValue = (
 
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
-  draft: IDraft
+  draft: IApplication
 ) => {
   return formSections.reduce((sections, section: IFormSection) => {
     const errors = getValidationErrorsForForm(
@@ -439,7 +439,7 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IDraft): IDocumentViewerOptions => {
+const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
   const draftItemName = documentsSection.id
   const documentOptions: SelectComponentOptions[] = []
   const selectOptions: SelectComponentOptions[] = []
@@ -578,7 +578,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ).filter(errors => errors.length > 0).length
 
     const isRejected =
-      this.props.draft.status && this.props.draft.status === REJECTED
+      this.props.draft.registrationStatus &&
+      this.props.draft.registrationStatus === REJECTED
 
     return (
       <>

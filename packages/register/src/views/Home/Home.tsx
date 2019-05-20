@@ -232,8 +232,9 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
-  store.drafts.drafts = store.drafts.drafts || []
-  const draftCount = store.drafts.drafts.length.toString()
+  store.applicationsState.applications =
+    store.applicationsState.applications || []
+  const draftCount = store.applicationsState.applications.length.toString()
   return {
     draftCount,
     language: getLanguage(store),
