@@ -47,6 +47,8 @@ const PageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
+  position: absolute;
+  width: 100%;
 `
 const LogoutHeader = styled.a`
   float: right;
