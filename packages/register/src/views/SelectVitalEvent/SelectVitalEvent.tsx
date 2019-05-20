@@ -6,9 +6,9 @@ import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from 'src/components/ViewHeader'
 import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
 import { Dispatch } from 'redux'
-import { createDraft, storeDraft } from 'src/drafts'
+import { createApplication, storeApplication } from 'src/applications'
 import { Event } from 'src/forms'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 export const messages = defineMessages({
   registerNewEventTitle: {
@@ -64,7 +64,7 @@ class SelectVitalEventView extends React.Component<
           id="select_vital_event_view"
         />
         <ActionList>
-          <HeaderContent>
+          <BodyContent>
             <Action
               id="select_birth_event"
               title={intl.formatMessage(messages.birthActionTitle)}
@@ -90,7 +90,7 @@ class SelectVitalEventView extends React.Component<
               title={intl.formatMessage(messages.adoptionActionTitle)}
               disabled
             />
-          </HeaderContent>
+          </BodyContent>
         </ActionList>
       </>
     )
@@ -103,9 +103,9 @@ export const SelectVitalEvent = connect(
     return {
       goToBirthRegistration: () => dispatch(goToBirthRegistration()),
       goToDeathRegistration: () => {
-        const draft = createDraft(Event.DEATH)
-        dispatch(storeDraft(draft))
-        dispatch(goToDeathRegistration(draft.id))
+        const application = createApplication(Event.DEATH)
+        dispatch(storeApplication(application))
+        dispatch(goToDeathRegistration(application.id))
       }
     }
   }

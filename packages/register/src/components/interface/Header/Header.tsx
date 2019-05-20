@@ -20,7 +20,8 @@ import {
   LogoutBlue,
   TrackingID,
   BRN,
-  Phone
+  Phone,
+  ArrowBack
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
 import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
@@ -33,12 +34,18 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 import { IStoreState } from 'src/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { goToHome, goToPerformance, goToSearchResult } from 'src/navigation'
+import {
+  goToHome,
+  goToPerformance,
+  goToSearchResult,
+  goToSearch
+} from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
 import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { goToEvents as goToEventsAction } from 'src/navigation'
+import { SEARCH } from 'src/navigation/routes'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
@@ -47,8 +54,10 @@ type IProps = InjectedIntlProps & {
   title?: string
   goToSearchResult: typeof goToSearchResult
   goToEvents: typeof goToEventsAction
+  goToSearch: typeof goToSearch
   searchText?: string
   selectedSearchType?: string
+  mobileSearchBar?: boolean
 }
 interface IState {
   showMenu: boolean
@@ -142,7 +151,14 @@ const StyledPrimaryButton = styled(IconButton)`
 `
 
 class HeaderComp extends React.Component<IProps, IState> {
-  state = { showMenu: false, showLogoutModal: false }
+  constructor(props: IProps) {
+    super(props)
+
+    this.state = {
+      showMenu: false,
+      showLogoutModal: false
+    }
+  }
 
   hamburger = () => {
     const { userDetails, language, intl } = this.props
@@ -224,23 +240,8 @@ class HeaderComp extends React.Component<IProps, IState> {
     this.setState(prevState => ({ showMenu: !prevState.showMenu }))
   }
 
-  render() {
-    const { intl } = this.props
-    const title = this.props.title || intl.formatMessage(messages.defaultTitle)
-    const menuItems = [
-      {
-        key: 'application',
-        title: intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome,
-        selected: true
-      },
-      {
-        key: 'performance',
-        title: intl.formatMessage(messages.performanceTitle),
-        onClick: goToPerformance,
-        selected: false
-      }
-    ]
+  renderSearchInput(props: IProps, desktop?: boolean) {
+    const { intl, searchText, selectedSearchType } = props
 
     const searchTypeList: ISearchType[] = [
       {
@@ -264,31 +265,78 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
+    const onClearText = () => {
+      if (desktop && window.location.pathname.includes(SEARCH)) {
+        history.back()
+      }
+    }
+
+    return (
+      <SearchTool
+        key="searchMenu"
+        searchText={searchText}
+        selectedSearchType={selectedSearchType}
+        searchTypeList={searchTypeList}
+        searchHandler={props.goToSearchResult}
+        onClearText={onClearText}
+      />
+    )
+  }
+
+  render() {
+    const { intl } = this.props
+    const title = this.props.title || intl.formatMessage(messages.defaultTitle)
+    const menuItems = [
+      {
+        key: 'application',
+        title: intl.formatMessage(messages.applicationTitle),
+        onClick: goToHome,
+        selected: true
+      },
+      {
+        key: 'performance',
+        title: intl.formatMessage(messages.performanceTitle),
+        onClick: goToPerformance,
+        selected: false
+      }
+    ]
+
     const rightMenu = [
       {
         element: (
           <StyledPrimaryButton
-            id="myButton"
+            key="newEvent"
             onClick={this.props.goToEvents}
             icon={() => <Plus />}
           />
         )
       },
       {
-        element: (
-          <SearchTool
-            key="searchMenu"
-            searchText={this.props.searchText}
-            selectedSearchType={this.props.selectedSearchType}
-            searchTypeList={searchTypeList}
-            searchHandler={this.props.goToSearchResult}
-          />
-        )
+        element: this.renderSearchInput(this.props, true)
       },
       {
         element: <ProfileMenu key="profileMenu" />
       }
     ]
+
+    const mobileHeaderActionProps = this.props.mobileSearchBar
+      ? {
+          mobileLeft: {
+            icon: () => <ArrowBack />,
+            handler: () => history.back()
+          },
+          mobileBody: this.renderSearchInput(this.props)
+        }
+      : {
+          mobileLeft: {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          },
+          mobileRight: {
+            icon: () => <SearchDark />,
+            handler: () => this.props.goToSearch()
+          }
+        }
 
     return (
       <>
@@ -296,17 +344,8 @@ class HeaderComp extends React.Component<IProps, IState> {
           menuItems={menuItems}
           id="register_app_header"
           desktopRightMenu={rightMenu}
-          left={{
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          }}
           title={title}
-          right={{
-            icon: () => <SearchDark />,
-            handler: () => {
-              alert('sdfsdf')
-            }
-          }}
+          {...mobileHeaderActionProps}
         />
         <LogoutConfirmation
           show={this.state.showLogoutModal}
@@ -326,6 +365,7 @@ export const Header = connect(
   {
     redirectToAuthentication,
     goToSearchResult,
-    goToEvents: goToEventsAction
+    goToEvents: goToEventsAction,
+    goToSearch
   }
 )(injectIntl<IProps>(HeaderComp))

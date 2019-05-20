@@ -14,7 +14,7 @@ import {
   GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLBirthRegistration,
@@ -32,7 +32,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Header } from 'src/components/interface/Header/Header'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
@@ -52,7 +52,7 @@ import { createNamesMap } from 'src/utils/data-formatting'
 import { formatLongDate } from 'src/utils/date-formatting'
 import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
-import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
+import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { sentenceCase } from 'src/utils/data-formatting'
 
@@ -61,12 +61,14 @@ export interface IProps extends IButtonProps {
   disabled?: boolean
   id: string
 }
-export const IconTabs = styled.div`
+const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  position: relative;
-  white-space: nowrap;
+  height: 48px;
+  background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.mistyShadow};
-  margin-top: 50px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `
 export const IconTab = styled(Button).attrs<IProps>({})`
   color: ${({ theme }) => theme.colors.copy};
@@ -90,73 +92,73 @@ export const IconTab = styled(Button).attrs<IProps>({})`
 
 const messages = defineMessages({
   name: {
-    id: 'register.workQueue.labels.results.name',
+    id: 'register.registrarHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   dob: {
-    id: 'register.workQueue.labels.results.dob',
+    id: 'register.registrarHome.listItemDoB',
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
   dod: {
-    id: 'register.workQueue.labels.results.dod',
+    id: 'register.registrarHome.listItemDod',
     defaultMessage: 'D.o.D',
     description: 'Label for DoD in work queue list item'
   },
   hello: {
-    id: 'register.home.header.hello',
+    id: 'register.registrarHome.header.Hello',
     defaultMessage: 'Hello {fullName}',
     description: 'Title for the user'
   },
   searchInputPlaceholder: {
-    id: 'register.workQueue.searchInput.placeholder',
+    id: 'register.registrarHome.searchInput.placeholder',
     defaultMessage: 'Look for a record',
     description: 'The placeholder of search input'
   },
   searchInputButtonTitle: {
-    id: 'register.workQueue.buttons.search',
+    id: 'register.registrarHome.searchButton',
     defaultMessage: 'Search',
     description: 'The title of search input submit button'
   },
   queryError: {
-    id: 'register.workQueue.queryError',
+    id: 'register.registrarHome.queryError',
     defaultMessage: 'An error occurred while searching',
     description: 'The error message shown when a search query fails'
   },
   dataTableResults: {
-    id: 'register.workQueue.dataTable.results',
+    id: 'register.registrarHome.results',
     defaultMessage: 'Results',
     description: 'Results label at the top of the data table component'
   },
   dataTableNoResults: {
-    id: 'register.workQueue.dataTable.noResults',
+    id: 'register.registrarHome.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
   },
   headerTitle: {
-    id: 'register.workQueue.header.title',
+    id: 'register.registrarHome.title',
     defaultMessage: 'Hello Registrar',
     description: 'The displayed title in the Work Queue header'
   },
   headerDescription: {
-    id: 'register.workQueue.header.description',
+    id: 'register.registrarHome.description',
     defaultMessage: 'Review | Registration | Certification',
     description: 'The displayed description in the Work Queue header'
   },
   inProgress: {
-    id: 'register.workQueue.tabs.inProgress',
+    id: 'register.registrarHome.inProgress',
     defaultMessage: 'In progress',
     description: 'The title of In progress'
   },
   readyForReview: {
-    id: 'register.workQueue.tabs.readyForReview',
+    id: 'register.registrarHome.readyForReview',
     defaultMessage: 'Ready for review',
     description: 'The title of ready for review'
   },
   sentForUpdates: {
-    id: 'register.workQueue.tabs.sentForUpdates',
+    id: 'register.registrarHome.sentForUpdates',
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab'
   },
@@ -191,73 +193,67 @@ const messages = defineMessages({
     description: 'The description for NATIONAL_REGISTRAR role'
   },
   listItemType: {
-    id: 'register.workQueue.labels.results.type',
+    id: 'register.registrarHome.resultsType',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
   listItemTrackingNumber: {
-    id: 'register.workQueue.labels.results.trackingID',
+    id: 'register.registrarHome.results.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
   },
   listItemApplicantNumber: {
-    id: 'register.workQueue.labels.results.applicantNumber',
+    id: 'register.registrarHome.results.applicantNumber',
     defaultMessage: 'Applicant No.',
     description: 'Label for applicant number in work queue list item'
   },
   listItemApplicationDate: {
-    id: 'register.workQueue.labels.results.applicationDate',
+    id: 'register.registrarHome.results.applicationDate',
     defaultMessage: 'Application sent',
     description: 'Label for application date in work queue list item'
   },
   listItemUpdateDate: {
-    id: 'register.workQueue.labels.results.updateDate',
+    id: 'register.registrarHome.results.updateDate',
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item'
   },
   listItemModificationDate: {
-    id: 'register.workQueue.labels.results.modificationDate',
+    id: 'register.registrarHome.results.modificationDate',
     defaultMessage: 'Last edited',
     description: 'Label for rejection date in work queue list item'
   },
   listItemEventDate: {
-    id: 'register.workQueue.labels.results.eventDate',
+    id: 'register.registrarHome.results.eventDate',
     defaultMessage: 'Date of event',
     description: 'Label for event date in work queue list item'
   },
   reviewDuplicates: {
-    id: 'register.workQueue.buttons.reviewDuplicates',
+    id: 'register.registrarHome.results.reviewDuplicates',
     defaultMessage: 'Review Duplicates',
     description:
       'The title of review duplicates button in expanded area of list item'
   },
   review: {
-    id: 'register.workQueue.list.buttons.review',
+    id: 'register.registrarHome.reviewButton',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
   },
   update: {
-    id: 'register.workQueue.list.buttons.update',
+    id: 'register.registrarHome.updateButton',
     defaultMessage: 'Update',
     description: 'The title of update button in list item actions'
   },
   listItemName: {
-    id: 'register.workQueue.labels.results.name',
+    id: 'register.registrarHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   listItemAction: {
-    id: 'register.workQueue.labels.results.action',
+    id: 'register.registrarHome.action',
     defaultMessage: 'Action',
     description: 'Label for action in work queue list item'
   }
 })
-const Container = styled.div`
-  z-index: 1;
-  position: relative;
-  margin-top: 10px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-`
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -268,28 +264,28 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-interface IBaseWorkQueueProps {
+interface IBaseRegistrarHomeProps {
   theme: ITheme
   language: string
   scope: Scope
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
-  goToWorkQueueTab: typeof goToWorkQueueTabAction
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
-  drafts: IDraft[]
+  drafts: IApplication[]
 }
 
-interface IWorkQueueState {
+interface IRegistrarHomeState {
   progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
 }
 
-type IWorkQueueProps = InjectedIntlProps &
+type IRegistrarHomeProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseWorkQueueProps
+  IBaseRegistrarHomeProps
 
 const TAB_ID = {
   inProgress: 'progress',
@@ -301,12 +297,12 @@ export const EVENT_STATUS = {
   DECLARED: 'DECLARED',
   REJECTED: 'REJECTED'
 }
-export class WorkQueueView extends React.Component<
-  IWorkQueueProps,
-  IWorkQueueState
+export class RegistrarHomeView extends React.Component<
+  IRegistrarHomeProps,
+  IRegistrarHomeState
 > {
   pageSize = 10
-  constructor(props: IWorkQueueProps) {
+  constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
       progressCurrentPage: 1,
@@ -593,7 +589,7 @@ export class WorkQueueView extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IDraft) => {
+    return this.props.drafts.map((draft: IApplication) => {
       let name
       let tabRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
@@ -678,319 +674,319 @@ export class WorkQueueView extends React.Component<
     return (
       <>
         <Header />
-        <Container>
-          <HeaderContent>
-            <Query
-              query={COUNT_REGISTRATION_QUERY}
-              variables={{
-                locationIds: [registrarUnion]
+        <Query
+          query={COUNT_REGISTRATION_QUERY}
+          variables={{
+            locationIds: [registrarUnion]
+          }}
+        >
+          {({ loading, error, data }) => {
+            if (loading) {
+              parentQueryLoading = true
+              return (
+                <StyledSpinner
+                  id="search-result-spinner"
+                  baseColor={theme.colors.background}
+                />
+              )
+            }
+            parentQueryLoading = false
+            if (error) {
+              Sentry.captureException(error)
+              return (
+                <ErrorText id="search-result-error-text-count">
+                  {intl.formatMessage(messages.queryError)}
+                </ErrorText>
+              )
+            }
+
+            return (
+              <>
+                <Topbar>
+                  <IconTab
+                    id={`tab_${TAB_ID.inProgress}`}
+                    key={TAB_ID.inProgress}
+                    active={tabId === TAB_ID.inProgress}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusProgress />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
+                    }
+                  >
+                    {intl.formatMessage(messages.inProgress)} (
+                    {(drafts && drafts.length) || 0})
+                  </IconTab>
+                  <IconTab
+                    id={`tab_${TAB_ID.readyForReview}`}
+                    key={TAB_ID.readyForReview}
+                    active={tabId === TAB_ID.readyForReview}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusOrange />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
+                    }
+                  >
+                    {intl.formatMessage(messages.readyForReview)} (
+                    {data.countEventRegistrations.declared})
+                  </IconTab>
+                  <IconTab
+                    id={`tab_${TAB_ID.sentForUpdates}`}
+                    key={TAB_ID.sentForUpdates}
+                    active={tabId === TAB_ID.sentForUpdates}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusRejected />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
+                    }
+                  >
+                    {intl.formatMessage(messages.sentForUpdates)} (
+                    {data.countEventRegistrations.rejected})
+                  </IconTab>
+                </Topbar>
+              </>
+            )
+          }}
+        </Query>
+        {tabId === TAB_ID.inProgress && (
+          <BodyContent>
+            <GridTable
+              content={this.transformDraftContent()}
+              columns={[
+                {
+                  label: this.props.intl.formatMessage(messages.listItemType),
+                  width: 15,
+                  key: 'event'
+                },
+                {
+                  label: this.props.intl.formatMessage(messages.listItemName),
+                  width: 35,
+                  key: 'name'
+                },
+                {
+                  label: this.props.intl.formatMessage(
+                    messages.listItemModificationDate
+                  ),
+                  width: 35,
+                  key: 'date_of_modification'
+                },
+                {
+                  label: this.props.intl.formatMessage(messages.listItemAction),
+                  width: 15,
+                  key: 'actions',
+                  isActionColumn: true,
+                  alignment: ColumnContentAlignment.CENTER
+                }
+              ]}
+              noResultText={intl.formatMessage(messages.dataTableNoResults)}
+              onPageChange={(currentPage: number) => {
+                this.onPageChange(currentPage)
               }}
-            >
-              {({ loading, error, data }) => {
-                if (loading) {
-                  parentQueryLoading = true
-                  return (
+              pageSize={this.pageSize}
+              totalPages={drafts && drafts.length}
+              initialPage={this.state.progressCurrentPage}
+            />
+          </BodyContent>
+        )}
+        {tabId === TAB_ID.readyForReview && (
+          <Query
+            query={FETCH_REGISTRATIONS_QUERY}
+            variables={{
+              status: EVENT_STATUS.DECLARED,
+              locationIds: [registrarUnion],
+              count: this.pageSize,
+              skip: (this.state.reviewCurrentPage - 1) * this.pageSize
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) {
+                return (
+                  (!parentQueryLoading && (
                     <StyledSpinner
                       id="search-result-spinner"
                       baseColor={theme.colors.background}
                     />
-                  )
-                }
-                parentQueryLoading = false
-                if (error) {
-                  Sentry.captureException(error)
-                  return (
-                    <ErrorText id="search-result-error-text-count">
-                      {intl.formatMessage(messages.queryError)}
-                    </ErrorText>
-                  )
-                }
-
-                return (
-                  <>
-                    <IconTabs>
-                      <IconTab
-                        id={`tab_${TAB_ID.inProgress}`}
-                        key={TAB_ID.inProgress}
-                        active={tabId === TAB_ID.inProgress}
-                        align={ICON_ALIGNMENT.LEFT}
-                        icon={() => <StatusProgress />}
-                        onClick={() =>
-                          this.props.goToWorkQueueTab(TAB_ID.inProgress)
-                        }
-                      >
-                        {intl.formatMessage(messages.inProgress)} (
-                        {(drafts && drafts.length) || 0})
-                      </IconTab>
-                      <IconTab
-                        id={`tab_${TAB_ID.readyForReview}`}
-                        key={TAB_ID.readyForReview}
-                        active={tabId === TAB_ID.readyForReview}
-                        align={ICON_ALIGNMENT.LEFT}
-                        icon={() => <StatusOrange />}
-                        onClick={() =>
-                          this.props.goToWorkQueueTab(TAB_ID.readyForReview)
-                        }
-                      >
-                        {intl.formatMessage(messages.readyForReview)} (
-                        {data.countEventRegistrations.declared})
-                      </IconTab>
-                      <IconTab
-                        id={`tab_${TAB_ID.sentForUpdates}`}
-                        key={TAB_ID.sentForUpdates}
-                        active={tabId === TAB_ID.sentForUpdates}
-                        align={ICON_ALIGNMENT.LEFT}
-                        icon={() => <StatusRejected />}
-                        onClick={() =>
-                          this.props.goToWorkQueueTab(TAB_ID.sentForUpdates)
-                        }
-                      >
-                        {intl.formatMessage(messages.sentForUpdates)} (
-                        {data.countEventRegistrations.rejected})
-                      </IconTab>
-                    </IconTabs>
-                  </>
+                  )) ||
+                  null
                 )
-              }}
-            </Query>
-            {tabId === TAB_ID.inProgress && (
-              <GridTable
-                content={this.transformDraftContent()}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemType),
-                    width: 15,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemName),
-                    width: 35,
-                    key: 'name'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemModificationDate
-                    ),
-                    width: 35,
-                    key: 'date_of_modification'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemAction
-                    ),
-                    width: 15,
-                    key: 'actions',
-                    isActionColumn: true,
-                    alignment: ColumnContentAlignment.CENTER
-                  }
-                ]}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
-                onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
-                }}
-                pageSize={this.pageSize}
-                totalPages={drafts && drafts.length}
-                initialPage={this.state.progressCurrentPage}
-              />
-            )}
-            {tabId === TAB_ID.readyForReview && (
-              <Query
-                query={FETCH_REGISTRATIONS_QUERY}
-                variables={{
-                  status: EVENT_STATUS.DECLARED,
-                  locationIds: [registrarUnion],
-                  count: this.pageSize,
-                  skip: (this.state.reviewCurrentPage - 1) * this.pageSize
-                }}
-              >
-                {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      (!parentQueryLoading && (
-                        <StyledSpinner
-                          id="search-result-spinner"
-                          baseColor={theme.colors.background}
-                        />
-                      )) ||
-                      null
-                    )
-                  }
-                  if (error) {
-                    Sentry.captureException(error)
-                    return (
-                      <ErrorText id="search-result-error-text-review">
-                        {intl.formatMessage(messages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-                  return (
-                    <GridTable
-                      content={this.transformDeclaredContent(data)}
-                      columns={[
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemType
-                          ),
-                          width: 14,
-                          key: 'event'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemTrackingNumber
-                          ),
-                          width: 20,
-                          key: 'tracking_id'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemApplicationDate
-                          ),
-                          width: 23,
-                          key: 'application_time_elapsed'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemEventDate
-                          ),
-                          width: 23,
-                          key: 'event_time_elapsed'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemAction
-                          ),
-                          width: 20,
-                          key: 'actions',
-                          isActionColumn: true,
-                          alignment: ColumnContentAlignment.CENTER
-                        }
-                      ]}
-                      expandedContentRows={[
-                        {
-                          label: intl.formatMessage(messages.name),
-                          key: 'name'
-                        },
-                        {
-                          label: intl.formatMessage(messages.dob),
-                          displayForEvents: [Event.BIRTH],
-                          key: 'date_of_event'
-                        },
-                        {
-                          label: intl.formatMessage(messages.dod),
-                          displayForEvents: [Event.DEATH],
-                          key: 'date_of_event'
-                        }
-                      ]}
-                      noResultText={intl.formatMessage(
-                        messages.dataTableNoResults
-                      )}
-                      onPageChange={(currentPage: number) => {
-                        this.onPageChange(currentPage)
-                      }}
-                      pageSize={this.pageSize}
-                      totalPages={
-                        data.listEventRegistrations &&
-                        data.listEventRegistrations.totalItems
+              }
+              if (error) {
+                Sentry.captureException(error)
+                return (
+                  <ErrorText id="search-result-error-text-review">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
+              return (
+                <BodyContent>
+                  <GridTable
+                    content={this.transformDeclaredContent(data)}
+                    columns={[
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemType
+                        ),
+                        width: 14,
+                        key: 'event'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemTrackingNumber
+                        ),
+                        width: 20,
+                        key: 'tracking_id'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemApplicationDate
+                        ),
+                        width: 23,
+                        key: 'application_time_elapsed'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemEventDate
+                        ),
+                        width: 23,
+                        key: 'event_time_elapsed'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemAction
+                        ),
+                        width: 20,
+                        key: 'actions',
+                        isActionColumn: true,
+                        alignment: ColumnContentAlignment.CENTER
                       }
-                      initialPage={this.state.reviewCurrentPage}
-                      expandable={true}
-                    />
-                  )
-                }}
-              </Query>
-            )}
-            {tabId === TAB_ID.sentForUpdates && (
-              <Query
-                query={FETCH_REGISTRATIONS_QUERY}
-                variables={{
-                  status: EVENT_STATUS.REJECTED,
-                  locationIds: [registrarUnion],
-                  count: this.pageSize,
-                  skip: (this.state.updatesCurrentPage - 1) * this.pageSize
-                }}
-              >
-                {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      (!parentQueryLoading && (
-                        <StyledSpinner
-                          id="search-result-spinner"
-                          baseColor={theme.colors.background}
-                        />
-                      )) ||
-                      null
-                    )
-                  }
-                  if (error) {
-                    Sentry.captureException(error)
-                    return (
-                      <ErrorText id="search-result-error-text-reject">
-                        {intl.formatMessage(messages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-                  return (
-                    <GridTable
-                      content={this.transformRejectedContent(data)}
-                      columns={[
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemType
-                          ),
-                          width: 14,
-                          key: 'event'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemName
-                          ),
-                          width: 23,
-                          key: 'name'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemApplicantNumber
-                          ),
-                          width: 21,
-                          key: 'contact_number'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemUpdateDate
-                          ),
-                          width: 22,
-                          key: 'date_of_rejection'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemAction
-                          ),
-                          width: 20,
-                          key: 'actions',
-                          isActionColumn: true,
-                          alignment: ColumnContentAlignment.CENTER
-                        }
-                      ]}
-                      noResultText={intl.formatMessage(
-                        messages.dataTableNoResults
-                      )}
-                      onPageChange={(currentPage: number) => {
-                        this.onPageChange(currentPage)
-                      }}
-                      pageSize={this.pageSize}
-                      totalPages={
-                        data.listEventRegistrations &&
-                        data.listEventRegistrations.totalItems
+                    ]}
+                    expandedContentRows={[
+                      {
+                        label: intl.formatMessage(messages.name),
+                        key: 'name'
+                      },
+                      {
+                        label: intl.formatMessage(messages.dob),
+                        displayForEvents: [Event.BIRTH],
+                        key: 'date_of_event'
+                      },
+                      {
+                        label: intl.formatMessage(messages.dod),
+                        displayForEvents: [Event.DEATH],
+                        key: 'date_of_event'
                       }
-                      initialPage={this.state.updatesCurrentPage}
-                      expandable={true}
+                    ]}
+                    noResultText={intl.formatMessage(
+                      messages.dataTableNoResults
+                    )}
+                    onPageChange={(currentPage: number) => {
+                      this.onPageChange(currentPage)
+                    }}
+                    pageSize={this.pageSize}
+                    totalPages={
+                      data.listEventRegistrations &&
+                      data.listEventRegistrations.totalItems
+                    }
+                    initialPage={this.state.reviewCurrentPage}
+                    expandable={true}
+                  />
+                </BodyContent>
+              )
+            }}
+          </Query>
+        )}
+        {tabId === TAB_ID.sentForUpdates && (
+          <Query
+            query={FETCH_REGISTRATIONS_QUERY}
+            variables={{
+              status: EVENT_STATUS.REJECTED,
+              locationIds: [registrarUnion],
+              count: this.pageSize,
+              skip: (this.state.updatesCurrentPage - 1) * this.pageSize
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) {
+                return (
+                  (!parentQueryLoading && (
+                    <StyledSpinner
+                      id="search-result-spinner"
+                      baseColor={theme.colors.background}
                     />
-                  )
-                }}
-              </Query>
-            )}
-          </HeaderContent>
-        </Container>
+                  )) ||
+                  null
+                )
+              }
+              if (error) {
+                Sentry.captureException(error)
+                return (
+                  <ErrorText id="search-result-error-text-reject">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
+              return (
+                <BodyContent>
+                  <GridTable
+                    content={this.transformRejectedContent(data)}
+                    columns={[
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemType
+                        ),
+                        width: 14,
+                        key: 'event'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemName
+                        ),
+                        width: 23,
+                        key: 'name'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemApplicantNumber
+                        ),
+                        width: 21,
+                        key: 'contact_number'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemUpdateDate
+                        ),
+                        width: 22,
+                        key: 'date_of_rejection'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemAction
+                        ),
+                        width: 20,
+                        key: 'actions',
+                        isActionColumn: true,
+                        alignment: ColumnContentAlignment.CENTER
+                      }
+                    ]}
+                    noResultText={intl.formatMessage(
+                      messages.dataTableNoResults
+                    )}
+                    onPageChange={(currentPage: number) => {
+                      this.onPageChange(currentPage)
+                    }}
+                    pageSize={this.pageSize}
+                    totalPages={
+                      data.listEventRegistrations &&
+                      data.listEventRegistrations.totalItems
+                    }
+                    initialPage={this.state.updatesCurrentPage}
+                    expandable={true}
+                  />
+                </BodyContent>
+              )
+            }}
+          </Query>
+        )}
       </>
     )
   }
@@ -1005,16 +1001,16 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
-    drafts: state.drafts.drafts
+    drafts: state.applicationsState.applications
   }
 }
 
-export const WorkQueue = connect(
+export const RegistrarHome = connect(
   mapStateToProps,
   {
     gotoTab: goToTabAction,
-    goToWorkQueueTab: goToWorkQueueTabAction,
+    goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(WorkQueueView)))
+)(injectIntl(withTheme(RegistrarHomeView)))

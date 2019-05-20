@@ -15,7 +15,7 @@ const HeaderContainer = styled.div`
   align-items: center;
   position: relative;
 `
-const HeaderContent = styled.div`
+const BodyContent = styled.div`
   max-width: 940px;
   margin: auto;
   padding: 20px 10px;
@@ -63,13 +63,13 @@ export class ActionPage extends React.Component<
     return (
       <ActionContainer>
         <HeaderContainer>
-          <HeaderContent>
+          <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
               <BackButton icon={icon || (() => <ArrowBack />)} />
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
-          </HeaderContent>
+          </BodyContent>
         </HeaderContainer>
         {this.props.children}
       </ActionContainer>

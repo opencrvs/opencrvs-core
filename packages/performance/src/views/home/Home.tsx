@@ -39,7 +39,7 @@ const messages = defineMessages({
     description: 'The title for log out on an action'
   },
   hello: {
-    id: 'register.home.header.hello',
+    id: 'performance.header.hello',
     defaultMessage: 'Hello {fullName}',
     description: 'Title for the user'
   },
@@ -155,7 +155,7 @@ const messages = defineMessages({
     description: 'Label for gender category Male'
   },
   queryError: {
-    id: 'register.workQueue.queryError',
+    id: 'performance.graph.queryError',
     defaultMessage: 'An error occurred while searching',
     description: 'The error message shown when a search query fails'
   }

@@ -44,13 +44,13 @@ import {
 import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
 import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
 import {
-  storeDraft,
-  createReviewDraft,
-  IDraftsState,
-  IDraft
-} from '@opencrvs/register/src/drafts'
+  storeApplication,
+  createReviewApplication,
+  IApplicationsState,
+  IApplication
+} from '@opencrvs/register/src/applications'
 import { Dispatch } from 'redux'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   fatherDataDoesNotExist,
   fatherDataExists
@@ -392,12 +392,12 @@ type IProps = {
   registerForm: IForm
   userDetails: IUserDetails
   offlineResources: IOfflineDataState
-  draft: IDraft
+  draft: IApplication
 }
 
 type IFullProps = InjectedIntlProps &
   RouteComponentProps<{}> &
-  IProps & { dispatch: Dispatch; drafts: IDraftsState }
+  IProps & { dispatch: Dispatch; drafts: IApplicationsState }
 
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
@@ -965,7 +965,7 @@ class PrintCertificateActionComponent extends React.Component<
       registrationId,
       collectCertificateForm,
       paymentFormSection,
-      drafts: { drafts },
+      drafts: { applications: drafts },
       dispatch,
       offlineResources
     } = this.props
@@ -982,7 +982,7 @@ class PrintCertificateActionComponent extends React.Component<
             dispatch(goToHome())
           }}
         >
-          <HeaderContent>
+          <BodyContent>
             <QueryProvider
               event={event}
               action={Action.LOAD_CERTIFICATE_APPLICATION}
@@ -1069,7 +1069,7 @@ class PrintCertificateActionComponent extends React.Component<
                         form.fields.unshift(fatherDataDoesNotExist)
                       }
                     }
-                    const reviewDraft = createReviewDraft(
+                    const reviewDraft = createReviewApplication(
                       registrationId,
                       transData,
                       event
@@ -1078,7 +1078,7 @@ class PrintCertificateActionComponent extends React.Component<
                       draft => draft.id === registrationId
                     )
                     if (!draftExist) {
-                      dispatch(storeDraft(reviewDraft))
+                      dispatch(storeApplication(reviewDraft))
                     }
                     return (
                       <FormContainer>
@@ -1114,7 +1114,7 @@ class PrintCertificateActionComponent extends React.Component<
                 }}
               </QueryContext.Consumer>
             </QueryProvider>
-          </HeaderContent>
+          </BodyContent>
         </ActionPage>
       </ActionPageWrapper>
     )
@@ -1122,7 +1122,7 @@ class PrintCertificateActionComponent extends React.Component<
 }
 
 const getDraft = (
-  drafts: IDraft[],
+  drafts: IApplication[],
   registrationId: string,
   eventType: string
 ) =>
@@ -1157,7 +1157,11 @@ function mapStatetoProps(
 ) {
   const { registrationId, eventType } = props.match.params
 
-  const draft = getDraft(state.drafts.drafts, registrationId, eventType)
+  const draft = getDraft(
+    state.applicationsState.applications,
+    registrationId,
+    eventType
+  )
   const event = getEvent(draft.event)
 
   return {
@@ -1168,7 +1172,7 @@ function mapStatetoProps(
     certificatePreviewFormSection:
       state.printCertificateForm.certificatePreviewForm,
     draft,
-    drafts: state.drafts,
+    drafts: state.applicationsState,
     registerForm: state.registerForm.registerForm[event],
     collectCertificateForm: getCollectCertificateForm(event, state),
     userDetails: getUserDetails(state),

@@ -80,6 +80,25 @@ describe('Create PIN view', async () => {
     expect(c.find('span#title-text').text()).toBe('Re-enter your new PIN')
   })
 
+  it('prevents the user from using 4 sequential digits as PIN', async () => {
+    c.find('span#keypad-1').simulate('click')
+    c.find('span#keypad-2').simulate('click')
+    c.find('span#keypad-3').simulate('click')
+    c.find('span#keypad-4').simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, 50)
+    })
+
+    c.update()
+
+    expect(c.find('div#error-text').text()).toBe(
+      'PIN contains sequential digits.'
+    )
+  })
+
   it('stores the hashed PIN in storage if PINs match', async () => {
     c.find('span#keypad-1').simulate('click')
     c.find('span#keypad-1').simulate('click')

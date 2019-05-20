@@ -6,11 +6,11 @@ import { v4 as uuid } from 'uuid'
 import { mockUserResponse } from 'src/tests/util'
 import { storage } from 'src/storage'
 import { createStore } from 'src/store'
-import { WorkQueue, EVENT_STATUS } from './WorkQueue'
+import { RegistrarHome, EVENT_STATUS } from './RegistrarHome'
 import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { checkAuth } from 'src/profile/profileActions'
-import { storeDraft, createReviewDraft } from 'src/drafts'
+import { storeApplication, createReviewApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import * as moment from 'moment'
 
@@ -103,7 +103,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('WorkQueue tests', async () => {
+describe('RegistrarHome tests', async () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -114,7 +114,7 @@ describe('WorkQueue tests', async () => {
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -147,7 +147,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -200,7 +200,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'review'
@@ -244,8 +244,8 @@ describe('WorkQueue tests', async () => {
 
   it('check drafts count', async () => {
     jest.clearAllMocks()
-    const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-    store.dispatch(storeDraft(draft))
+    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    store.dispatch(storeApplication(draft))
 
     const graphqlMock = [
       {
@@ -268,7 +268,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'progress'
@@ -296,57 +296,6 @@ describe('WorkQueue tests', async () => {
         .text()
     ).toContain('In progress (1)')
   })
-  it('renders review and register button for user with register scope', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['123456789']
-          }
-        },
-        result: {
-          data: {
-            countEventRegistrations: {
-              declared: 10,
-              rejected: 5
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <WorkQueue
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#new_registration')
-        .hostNodes()
-        .text()
-    ).toContain('New registration')
-  })
   it('check rejected applications count', async () => {
     const graphqlMock = [
       {
@@ -369,7 +318,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'updates'
@@ -547,7 +496,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue />,
+      <RegistrarHome />,
       store,
       graphqlMock
     )
@@ -721,7 +670,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'updates' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
       store,
       graphqlMock
     )
@@ -777,14 +726,14 @@ describe('WorkQueue tests', async () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'progress' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
       store
     )
 
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
     // @ts-ignore
-    testComponent.store.dispatch(storeDraft(drafts))
+    testComponent.store.dispatch(storeApplication(drafts))
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -832,7 +781,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'review' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'review' } }} />,
       store,
       graphqlMock
     )
@@ -882,7 +831,7 @@ describe('WorkQueue tests', async () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue match={{ params: { tabId: 'updates' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
       store,
       graphqlMock
     )
@@ -909,12 +858,12 @@ describe('WorkQueue tests', async () => {
   it('Should render pagination in progress tab if data is more than 10', async () => {
     jest.clearAllMocks()
     for (let i = 0; i < 12; i++) {
-      const draft = createReviewDraft(uuid(), {}, Event.BIRTH)
-      store.dispatch(storeDraft(draft))
+      const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+      store.dispatch(storeApplication(draft))
     }
     const testComponent = createTestComponent(
       // @ts-ignore
-      <WorkQueue
+      <RegistrarHome
         match={{
           params: {
             tabId: 'progress'

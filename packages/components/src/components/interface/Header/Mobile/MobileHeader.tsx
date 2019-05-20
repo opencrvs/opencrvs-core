@@ -8,9 +8,10 @@ interface IMenuAction {
 }
 export interface IMobileHeaderProps {
   id?: string
-  left?: IMenuAction
+  mobileLeft?: IMenuAction
   title: string
-  right?: IMenuAction
+  mobileBody?: JSX.Element
+  mobileRight?: IMenuAction
 }
 
 const HeaderContainer = styled.div`
@@ -24,12 +25,22 @@ const HeaderContainer = styled.div`
 const Title = styled.span`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.white};
+  align-self: center;
 `
 
 const HeaderBody = styled.div`
   margin: 0 16px;
   flex: 1;
   display: flex;
+  height: 40px;
+
+  form {
+    width: 100%;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
 `
 
 const EndComponentContainer = styled.div`
@@ -42,34 +53,36 @@ const EndComponentContainer = styled.div`
 `
 class MobileHeader extends React.Component<IMobileHeaderProps> {
   render() {
-    const { id, left, right, title } = this.props
+    const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
     return (
       <HeaderContainer id={id}>
-        <EndComponentContainer>
-          {left && (
+        {mobileLeft && (
+          <EndComponentContainer>
             <CircleButton
               id="mobile_header_left"
-              onClick={left.handler}
+              onClick={mobileLeft.handler}
               dark={true}
             >
-              {left.icon()}
+              {mobileLeft.icon()}
             </CircleButton>
-          )}
-        </EndComponentContainer>
+          </EndComponentContainer>
+        )}
+
         <HeaderBody>
-          <Title id="header_title">{title}</Title>
+          {mobileBody || <Title id="header_title">{title}</Title>}
         </HeaderBody>
-        <EndComponentContainer>
-          {right && (
+
+        {mobileRight && (
+          <EndComponentContainer>
             <CircleButton
               id="mobile_header_right"
-              onClick={right.handler}
+              onClick={mobileRight.handler}
               dark={true}
             >
-              {right.icon()}
+              {mobileRight.icon()}
             </CircleButton>
-          )}
-        </EndComponentContainer>
+          </EndComponentContainer>
+        )}
       </HeaderContainer>
     )
   }

@@ -16,7 +16,7 @@ import {
   Loader
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLComment,
@@ -99,7 +99,7 @@ const StyledLabel = styled.label`
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
@@ -126,7 +126,7 @@ export const ActionPageWrapper = styled.div`
 const SearchResultText = styled.div`
   left: 268px;
   ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
     margin-top: 24px;
@@ -135,7 +135,7 @@ const SearchResultText = styled.div`
 const TotalResultText = styled.div`
   left: 268px;
   margin-top: 6px;
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.captionStyle};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
@@ -708,77 +708,83 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const { searchText, searchType } = match.params
     return (
       <>
-        <Header searchText={searchText} selectedSearchType={searchType} />
+        <Header
+          searchText={searchText}
+          selectedSearchType={searchType}
+          mobileSearchBar={true}
+        />
         <Container>
-          <HeaderContent>
-            <Query
-              query={SEARCH_EVENTS}
-              variables={{
-                locationIds: [this.getLocalLocationId()],
-                sort: SEARCH_RESULT_SORT,
-                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
-                registrationNumber:
-                  searchType === BRN_DRN_TEXT ? searchText : '',
-                contactNumber: searchType === PHONE_TEXT ? searchText : ''
-              }}
-            >
-              {({ loading, error, data }) => {
-                if (loading) {
-                  return (
-                    <Loader
-                      id="search_loader"
-                      marginPercent={35}
-                      spinnerDiameter={60}
-                      loadingText={intl.formatMessage(messages.searchingFor, {
-                        param: searchText
-                      })}
-                    />
-                  )
-                }
-                if (error) {
-                  Sentry.captureException(error)
+          <BodyContent>
+            {searchText && searchType && (
+              <Query
+                query={SEARCH_EVENTS}
+                variables={{
+                  locationIds: [this.getLocalLocationId()],
+                  sort: SEARCH_RESULT_SORT,
+                  trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                  registrationNumber:
+                    searchType === BRN_DRN_TEXT ? searchText : '',
+                  contactNumber: searchType === PHONE_TEXT ? searchText : ''
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      <Loader
+                        id="search_loader"
+                        marginPercent={35}
+                        spinnerDiameter={60}
+                        loadingText={intl.formatMessage(messages.searchingFor, {
+                          param: searchText
+                        })}
+                      />
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
 
+                    return (
+                      <ErrorText id="search-result-error-text">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  const transformedData = transformData(data, intl)
+                  const total = transformedData.length
                   return (
-                    <ErrorText id="search-result-error-text">
-                      {intl.formatMessage(messages.queryError)}
-                    </ErrorText>
+                    <>
+                      <SearchResultText>
+                        {intl.formatMessage(messages.searchResultFor, {
+                          total,
+                          param: searchText
+                        })}
+                      </SearchResultText>
+                      {total > 0 && (
+                        <>
+                          <TotalResultText>
+                            {intl.formatMessage(messages.totalResultText, {
+                              total
+                            })}
+                          </TotalResultText>
+                          <DataTable
+                            data={transformedData}
+                            zeroPagination={true}
+                            cellRenderer={this.renderCell}
+                            resultLabel={intl.formatMessage(
+                              messages.dataTableResults
+                            )}
+                            noResultText={intl.formatMessage(
+                              messages.dataTableNoResults
+                            )}
+                          />
+                        </>
+                      )}
+                    </>
                   )
-                }
-                const transformedData = transformData(data, intl)
-                const total = transformedData.length
-                return (
-                  <>
-                    <SearchResultText>
-                      {intl.formatMessage(messages.searchResultFor, {
-                        total,
-                        param: searchText
-                      })}
-                    </SearchResultText>
-                    {total > 0 && (
-                      <>
-                        <TotalResultText>
-                          {intl.formatMessage(messages.totalResultText, {
-                            total
-                          })}
-                        </TotalResultText>
-                        <DataTable
-                          data={transformedData}
-                          zeroPagination={true}
-                          cellRenderer={this.renderCell}
-                          resultLabel={intl.formatMessage(
-                            messages.dataTableResults
-                          )}
-                          noResultText={intl.formatMessage(
-                            messages.dataTableNoResults
-                          )}
-                        />
-                      </>
-                    )}
-                  </>
-                )
-              }}
-            </Query>
-          </HeaderContent>
+                }}
+              </Query>
+            )}
+          </BodyContent>
         </Container>
       </>
     )

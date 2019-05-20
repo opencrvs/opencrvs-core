@@ -1,4 +1,4 @@
-import { push, goBack as back } from 'react-router-redux'
+import { push, goBack as back, replace } from 'react-router-redux'
 import {
   SELECT_INFORMANT,
   HOME,
@@ -8,7 +8,9 @@ import {
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
-  WORK_QUEUE_TAB
+  REGISTRAR_HOME_TAB,
+  FIELD_AGENT_HOME_TAB,
+  SEARCH
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -29,22 +31,30 @@ type GoToTabAction = {
   type: typeof GO_TO_TAB
   payload: {
     tabRoute: string
-    draftId: string
+    applicationId: string
     tabId: string
     event: string
     fieldNameHash?: string
     historyState?: IDynamicValues
   }
 }
-export const GO_TO_WORK_QUEUE = 'navigation/GO_TO_WORK_QUEUE'
-type GoToWorkQueue = {
-  type: typeof GO_TO_WORK_QUEUE
+export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
+type GoToREGISTRAR_HOME = {
+  type: typeof GO_TO_REGISTRAR_HOME
   payload: {
     tabId: string
   }
 }
 
-export type Action = GoToTabAction | GoToWorkQueue
+export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
+type GoTo_FIELD_AGENT_HOME = {
+  type: typeof GO_TO_FIELD_AGENT_HOME
+  payload: {
+    tabId: string
+  }
+}
+
+export type Action = GoToTabAction | GoToREGISTRAR_HOME | GoTo_FIELD_AGENT_HOME
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -66,7 +76,7 @@ export function goToPerformance() {
 }
 
 export function goToSearchResult(searchText: string, searchType: string) {
-  return push(
+  return replace(
     formatUrl(SEARCH_RESULT, {
       searchText,
       searchType
@@ -74,9 +84,15 @@ export function goToSearchResult(searchText: string, searchType: string) {
   )
 }
 
-export function goToBirthRegistrationAsParent(draftId: string) {
+export function goToSearch() {
+  return push(SEARCH)
+}
+
+export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
-    formatUrl(DRAFT_BIRTH_PARENT_FORM, { draftId: draftId.toString() })
+    formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+      applicationId: applicationId.toString()
+    })
   )
 }
 
@@ -95,20 +111,29 @@ export function goToPrintCertificate(registrationId: string, event: string) {
   )
 }
 
-export function goToDeathRegistration(draftId: string) {
-  return push(formatUrl(DRAFT_DEATH_FORM, { draftId: draftId.toString() }))
+export function goToDeathRegistration(applicationId: string) {
+  return push(
+    formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
+  )
 }
 
-export function goToWorkQueueTab(tabId: string) {
+export function goToRegistrarHomeTab(tabId: string) {
   return {
-    type: GO_TO_WORK_QUEUE,
+    type: GO_TO_REGISTRAR_HOME,
+    payload: { tabId }
+  }
+}
+
+export function goToFieldAgentHomeTab(tabId: string) {
+  return {
+    type: GO_TO_FIELD_AGENT_HOME,
     payload: { tabId }
   }
 }
 
 export function goToTab(
   tabRoute: string,
-  draftId: string,
+  applicationId: string,
   tabId: string,
   event: string,
   fieldNameHash?: string,
@@ -116,7 +141,14 @@ export function goToTab(
 ) {
   return {
     type: GO_TO_TAB,
-    payload: { draftId, tabId, event, fieldNameHash, tabRoute, historyState }
+    payload: {
+      applicationId,
+      tabId,
+      event,
+      fieldNameHash,
+      tabRoute,
+      historyState
+    }
   }
 }
 
@@ -127,7 +159,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
     case GO_TO_TAB:
       const {
         fieldNameHash,
-        draftId,
+        applicationId,
         tabId,
         event,
         tabRoute,
@@ -138,7 +170,7 @@ export function navigationReducer(state: INavigationState, action: Action) {
         Cmd.action(
           push(
             formatUrl(tabRoute, {
-              draftId: draftId.toString(),
+              applicationId: applicationId.toString(),
               tabId,
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
@@ -146,11 +178,21 @@ export function navigationReducer(state: INavigationState, action: Action) {
           )
         )
       )
-    case GO_TO_WORK_QUEUE:
-      const { tabId: workQueueTabId } = action.payload
+    case GO_TO_REGISTRAR_HOME:
+      const { tabId: RegistrarHomeTabId } = action.payload
       return loop(
         state,
-        Cmd.action(push(formatUrl(WORK_QUEUE_TAB, { tabId: workQueueTabId })))
+        Cmd.action(
+          push(formatUrl(REGISTRAR_HOME_TAB, { tabId: RegistrarHomeTabId }))
+        )
+      )
+    case GO_TO_FIELD_AGENT_HOME:
+      const { tabId: FieldAgentHomeTabId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
+        )
       )
   }
 }

@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
 import * as ReactDOM from 'react-dom'
-import { Link } from '@opencrvs/components/lib/typography'
+import { Link } from '../typography'
 
 const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
   background: ${({ theme }) => theme.colors.white};
