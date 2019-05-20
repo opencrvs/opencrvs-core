@@ -8,14 +8,10 @@ import {
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
   PRINT_CERTIFICATE,
-<<<<<<< HEAD
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
-  SEARCH
-=======
-  WORK_QUEUE_TAB,
+  SEARCH,
   SETTINGS
->>>>>>> New Settings page
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'

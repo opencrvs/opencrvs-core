@@ -37,7 +37,7 @@ import {
   goToHome,
   goToPerformance,
   goToSearchResult,
-  goToSearch
+  goToSearch,
   goToSettings
 } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
