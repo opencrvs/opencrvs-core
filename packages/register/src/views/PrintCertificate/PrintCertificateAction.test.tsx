@@ -134,7 +134,7 @@ describe('when user wants to print certificate', async () => {
               registration: {
                 id: '6e10ee71-24c8-446a-a6b1-09c62330a975',
                 contact: null,
-                contactPhoneNumber: null,
+                contactPhoneNumber: '01712345678',
                 attachments: null,
                 status: [
                   {
@@ -609,7 +609,7 @@ describe('when user wants to print certificate', async () => {
                 registration: {
                   id: '6e10ee71-24c8-446a-a6b1-09c62330a975',
                   contact: null,
-                  contactPhoneNumber: null,
+                  contactPhoneNumber: '01712345678',
                   attachments: null,
                   status: [
                     {

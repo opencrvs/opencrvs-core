@@ -9,7 +9,9 @@ interface IProps {
 
 const HeaderContainer = styled.div`
   padding: 8px 16px;
+  max-height: 60px;
   display: flex;
+  flex-grow: 1;
   flex-direction: row;
   background: linear-gradient(
     180deg,

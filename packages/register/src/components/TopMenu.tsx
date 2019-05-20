@@ -3,7 +3,7 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Scope } from 'src/utils/authUtils'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
-import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getScope } from 'src/profile/profileSelectors'
 import styled from '../styled-components'
 import {
@@ -94,11 +94,6 @@ const BackButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   border-radius: 21px;
-  /* stylelint-disable */
-  ${ButtonIcon} {
-    /* stylelint-enable */
-    margin-left: 0em;
-  }
 `
 
 const BackButtonText = styled.span`

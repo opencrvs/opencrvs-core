@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistrationAsParent } from 'src/navigation'
-import { createDraft, storeDraft } from '../../drafts'
+import { createApplication, storeApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 
@@ -121,9 +121,9 @@ export const SelectInformant = connect(
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
       goToBirthRegistrationAsParent: () => {
-        const draft = createDraft(Event.BIRTH)
-        dispatch(storeDraft(draft))
-        dispatch(goToBirthRegistrationAsParent(draft.id))
+        const application = createApplication(Event.BIRTH)
+        dispatch(storeApplication(application))
+        dispatch(goToBirthRegistrationAsParent(application.id))
       }
     }
   }

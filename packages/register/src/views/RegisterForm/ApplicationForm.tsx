@@ -30,18 +30,18 @@ export class ApplicationFormView extends React.Component<IProps> {
 
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string; draftId: string }>
+  props: RouteComponentProps<{ tabId: string; applicationId: string }>
 ) {
   const { match } = props
-  const draft = state.drafts.drafts.find(
-    ({ id }) => id === match.params.draftId
+  const application = state.applicationsState.applications.find(
+    ({ id }) => id === match.params.applicationId
   )
 
-  if (!draft) {
-    throw new Error(`Draft "${match.params.draftId}" missing!`)
+  if (!application) {
+    throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
 
-  const event = draft.event
+  const event = application.event
 
   if (!event) {
     throw new Error(`Event is not specified in Draft`)
@@ -50,7 +50,7 @@ function mapStatetoProps(
   const registerForm = getRegisterForm(state)[event]
 
   return {
-    draft,
+    application,
     registerForm,
     tabRoute: tabRoute[event]
   }
