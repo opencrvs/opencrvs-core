@@ -10,7 +10,10 @@ import {
 import { Box } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import { withTheme } from 'styled-components'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLHumanName,
+  GQLBirthKeyFigures
+} from '@opencrvs/gateway/src/graphql/schema'
 import { getUserDetails } from 'src/profile/selectors'
 import { getUserLocation } from 'src/utils/userUtils'
 import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
@@ -86,23 +89,11 @@ const messages = defineMessages({
     description:
       'Live births registered within 45 days of actual birth label on graph'
   },
-  liveBirthsWithin45DaysDescription: {
-    id: 'performance.graph.liveBirthsWithin45DaysDescription',
-    defaultMessage: '142500 out of 204000',
-    description:
-      'Live births registered within 45 days of actual birth description on graph'
-  },
   liveBirthsWithin1yearLabel: {
     id: 'performance.graph.liveBirthsWithin1yearLabel',
     defaultMessage: 'Registrations within<br />1 year of birth',
     description:
       'Live births registered within 1 year of actual birth label on graph'
-  },
-  liveBirthsWithin1yearDescription: {
-    id: 'performance.graph.liveBirthsWithin1yearDescription',
-    defaultMessage: '61500 out of 204000',
-    description:
-      'Live births registered within 1 year of actual birth description on graph'
   },
   totalLiveBirthsLabel: {
     id: 'performance.graph.totalLiveBirthsLabel',
@@ -170,100 +161,6 @@ const messages = defineMessages({
   }
 })
 
-interface IData {
-  value: number
-  label: React.ReactNode
-  description?: string
-  total?: boolean
-  estimate?: boolean
-  categoricalData?: ICategoryDataPoint[]
-}
-
-const getData = (intl: InjectedIntl): IData[] => {
-  return [
-    {
-      value: 142500,
-      label: (
-        <FormattedHTMLMessage
-          id="graph.label1"
-          defaultMessage={intl.formatHTMLMessage(
-            messages.liveBirthsWithin45DaysLabel
-          )}
-        />
-      ),
-      description: intl.formatMessage(
-        messages.liveBirthsWithin45DaysDescription
-      ),
-      categoricalData: [
-        {
-          name: 'female',
-          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-          value: 48000,
-          icon: () => <Female />
-        },
-        {
-          name: 'male',
-          label: intl.formatMessage(messages.genderCategoryMaleLabel),
-          value: 56000,
-          icon: () => <Male />
-        }
-      ]
-    },
-    {
-      value: 61500,
-      label: (
-        <FormattedHTMLMessage
-          id="graph.label2"
-          defaultMessage={intl.formatHTMLMessage(
-            messages.liveBirthsWithin1yearLabel
-          )}
-        />
-      ),
-      description: intl.formatMessage(
-        messages.liveBirthsWithin1yearDescription
-      ),
-      categoricalData: [
-        {
-          name: 'female',
-          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-          value: 48000,
-          icon: () => <Female />
-        },
-        {
-          name: 'male',
-          label: intl.formatMessage(messages.genderCategoryMaleLabel),
-          value: 56000,
-          icon: () => <Male />
-        }
-      ]
-    },
-    {
-      value: 204000,
-      label: (
-        <FormattedHTMLMessage
-          id="graph.label3"
-          defaultMessage={intl.formatHTMLMessage(messages.totalLiveBirthsLabel)}
-        />
-      ),
-      total: true,
-      categoricalData: [
-        {
-          name: 'female',
-          label: intl.formatMessage(messages.genderCategoryFemaleLabel),
-          value: 92000,
-          icon: () => <Female />
-        },
-        {
-          name: 'male',
-          label: intl.formatMessage(messages.genderCategoryMaleLabel),
-          value: 112000,
-          icon: () => <Male />
-        }
-      ]
-    }
-  ]
-}
-
 const BoxTitle = styled.div`
   line-height: 25px;
   text-transform: capitalize !important;
@@ -319,13 +216,6 @@ const Label = styled.div`
     font-size: 13px;
   }
 `
-interface IHomeProps {
-  theme: ITheme
-  language: string
-  userDetails: IUserDetails
-}
-
-type FullProps = IHomeProps & InjectedIntlProps
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -337,6 +227,81 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
+interface IData {
+  percentage: number
+  value: number
+  label: React.ReactNode
+  total?: boolean
+  estimate?: boolean
+  description?: string
+  categoricalData?: ICategoryDataPoint[]
+}
+interface IHomeProps {
+  theme: ITheme
+  language: string
+  userDetails: IUserDetails
+}
+
+type FullProps = IHomeProps & InjectedIntlProps
+
+const getKeyFigureLabel = (type: string, intl: InjectedIntl): string => {
+  switch (type) {
+    case 'DAYS_0_TO_45':
+      return intl.formatHTMLMessage(messages.liveBirthsWithin45DaysLabel)
+    case 'DAYS_46_TO_365':
+      return intl.formatHTMLMessage(messages.liveBirthsWithin1yearLabel)
+    default:
+      return intl.formatHTMLMessage(messages.totalLiveBirthsLabel)
+  }
+}
+const getData = (
+  keyFigures: GQLBirthKeyFigures[],
+  intl: InjectedIntl
+): IData[] => {
+  return (
+    (keyFigures &&
+      keyFigures.map((keyFigureData, index) => {
+        return {
+          percentage: keyFigureData.value || 0,
+          value: keyFigureData.total || 0,
+          label: (
+            <FormattedHTMLMessage
+              id={`graph.label${index}`}
+              defaultMessage={
+                (keyFigureData.label &&
+                  getKeyFigureLabel(keyFigureData.label, intl)) ||
+                ''
+              }
+            />
+          ),
+          description: `${keyFigureData.total ||
+            0} out of estimated ${keyFigureData.estimate || 0}`,
+          total:
+            (keyFigureData.label && keyFigureData.label === 'DAYS_0_TO_365') ||
+            false,
+          categoricalData:
+            keyFigureData.categoricalData &&
+            keyFigureData.categoricalData.map(category => {
+              return {
+                name: (category && category.name) || '',
+                label: intl.formatMessage(
+                  (category &&
+                    category.name === 'female' &&
+                    messages.genderCategoryFemaleLabel) ||
+                    messages.genderCategoryMaleLabel
+                ),
+                value: (category && category.value) || 0,
+                icon: () =>
+                  (category && category.name === 'female' && <Female />) || (
+                    <Male />
+                  )
+              }
+            })
+        }
+      })) ||
+    []
+  )
+}
 class HomeView extends React.Component<FullProps> {
   render() {
     const { intl, language, userDetails, theme } = this.props
@@ -362,8 +327,8 @@ class HomeView extends React.Component<FullProps> {
             <Query
               query={FETCH_METRIC}
               variables={{
-                timeStart: '1527098400000',
-                timeEnd: '1556042400000',
+                timeStart: 1527098400000,
+                timeEnd: Date.now(),
                 locationId: userDetails && getUserLocation(userDetails, 'UNION')
               }}
             >
@@ -391,7 +356,13 @@ class HomeView extends React.Component<FullProps> {
                       <BoxTitle id="box_title">
                         {intl.formatMessage(messages.birthRegistrationBoxTitle)}
                       </BoxTitle>
-                      <Legend data={getData(intl)} smallestToLargest={false} />
+                      <Legend
+                        data={getData(
+                          data.fetchBirthRegistrationMetrics.keyFigures,
+                          intl
+                        )}
+                        smallestToLargest={false}
+                      />
                       <FooterText id="footer_text">
                         {intl.formatMessage(
                           messages.birthRegistrationBoxFooter

@@ -468,6 +468,7 @@ export interface GQLBirthKeyFigures {
   label?: string
   value?: number
   total?: number
+  estimate?: number
   categoricalData?: Array<GQLBirthKeyFiguresData | null>
 }
 
@@ -519,6 +520,7 @@ export interface GQLRegistrationSearchSet {
   registeredLocationId?: string
   reason?: string
   comment?: string
+  duplicates?: Array<string | null>
 }
 
 export interface GQLMutation {
@@ -1074,14 +1076,9 @@ export interface QueryToFetchBirthRegistrationMetricsResolver<
 
 export interface QueryToSearchEventsArgs {
   locationIds?: Array<string | null>
-  status?: string
-  searchContent?: string
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
-  eventType?: string
-  count?: number
-  skip?: number
   sort?: string
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
@@ -2162,6 +2159,7 @@ export interface GQLBirthKeyFiguresTypeResolver<TParent = any> {
   label?: BirthKeyFiguresToLabelResolver<TParent>
   value?: BirthKeyFiguresToValueResolver<TParent>
   total?: BirthKeyFiguresToTotalResolver<TParent>
+  estimate?: BirthKeyFiguresToEstimateResolver<TParent>
   categoricalData?: BirthKeyFiguresToCategoricalDataResolver<TParent>
 }
 
@@ -2174,6 +2172,13 @@ export interface BirthKeyFiguresToValueResolver<TParent = any, TResult = any> {
 }
 
 export interface BirthKeyFiguresToTotalResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthKeyFiguresToEstimateResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2287,6 +2292,7 @@ export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   >
   reason?: RegistrationSearchSetToReasonResolver<TParent>
   comment?: RegistrationSearchSetToCommentResolver<TParent>
+  duplicates?: RegistrationSearchSetToDuplicatesResolver<TParent>
 }
 
 export interface RegistrationSearchSetToStatusResolver<
@@ -2346,6 +2352,13 @@ export interface RegistrationSearchSetToReasonResolver<
 }
 
 export interface RegistrationSearchSetToCommentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {

@@ -26,6 +26,8 @@ export interface IListItemProps {
   icons?: JSX.Element[]
   actions?: IAction[]
   itemData: IDynamicValues
+  isBoxShadow?: boolean
+  isItemFullHeight?: boolean
   expandedCellRenderer?: (itemData: IDynamicValues, key: number) => JSX.Element
 }
 
@@ -38,9 +40,11 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 
-const Wrapper = styled.div.attrs<{ expanded?: boolean }>({})`
+const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
+  {}
+)`
   width: 100%;
-  margin-bottom: 1px;
+  margin-bottom: 8px;
   transition: border-top 300ms;
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 22px 0 rgba(0,0,0,0.23)` : ``};
@@ -48,8 +52,10 @@ const Wrapper = styled.div.attrs<{ expanded?: boolean }>({})`
   &:last-child {
     margin-bottom: 0;
   }
-  border-top: ${({ expanded, theme }) =>
-    expanded ? ` 4px solid ${theme.colors.expandedIndicator}` : `0`};
+  border-top: ${({ expanded, theme, isBoxShadow }) =>
+    expanded && !isBoxShadow
+      ? ` 4px solid ${theme.colors.expandedIndicator}`
+      : `0`};
 `
 const ExpandedCellContent = styled.div`
   animation: ${fadeIn} 500ms;
@@ -64,12 +70,18 @@ const ExpandedCellContainer = styled.div.attrs<{ expanded: boolean }>({})`
     animation: ${fadeIn} 500ms;
   }
 `
-
-const ListItemContainer = styled.li`
+const ListItemContainer = styled.li.attrs<{ isBoxShadow?: boolean }>({})`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
   margin-bottom: 1px;
+  box-shadow: ${({ isBoxShadow }) =>
+      isBoxShadow ? '0px 2px 6px ' : '0px 0px 0px'}
+    rgba(53, 67, 93, 0.32);
+  border-radius: ${({ isBoxShadow }) => (isBoxShadow ? '1px ' : '0px')};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    border-radius: 0px;
+  }
   cursor: pointer;
   &:last-child {
     margin-bottom: 0;
@@ -149,12 +161,14 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
       icons,
       index,
       actions,
-      itemData
+      itemData,
+      isBoxShadow,
+      isItemFullHeight
     } = this.props
     const { expanded } = this.state
     return (
-      <Wrapper key={index} expanded={expanded}>
-        <ListItemContainer key={index}>
+      <Wrapper key={index} expanded={expanded} isBoxShadow={isBoxShadow}>
+        <ListItemContainer key={index} isBoxShadow={isBoxShadow}>
           <ListContentContainer onClick={this.toggleExpanded}>
             <InfoDiv>
               {infoItems.map((data: IInfo, infoIndex) => (
@@ -180,6 +194,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
             </StatusDiv>
           </ListContentContainer>
           <ListItemAction
+            isFullHeight={isItemFullHeight}
             actions={actions || []}
             expanded={expanded}
             onExpand={

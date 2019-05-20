@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { setInitialDrafts } from 'src/drafts'
+import { setInitialApplications } from 'src/applications'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { getInitialDraftsLoaded } from 'src/drafts/selectors'
+import { getInitialApplicationsLoaded } from 'src/applications/selectors'
 import {
   getOfflineDataLoaded,
   getOfflineLoadingError
@@ -22,6 +22,7 @@ const languageFromProps = ({ language }: IPageProps) => language
 const StyledPage = styled.div.attrs<IPageProps>({})`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
+  justify-content: space-between;
   display: flex;
   flex-direction: column;
   * {
@@ -95,30 +96,20 @@ const StyledSpinner = styled(Spinner)`
 
 interface IPageProps {
   language?: string
-  initialDraftsLoaded: boolean
+  initialApplicationsLoaded: boolean
   offlineDataLoaded: boolean
   loadingError: boolean
 }
 
 interface IDispatchProps {
-  setInitialDrafts: () => void
+  setInitialApplications: () => void
   checkAuth: (urlValues: IURLParams) => void
   showConfigurationErrorNotification: () => void
 }
-interface IState {
-  loadingDataModal: boolean
-}
 
 class Component extends React.Component<
-  RouteComponentProps<{}> & IPageProps & IDispatchProps,
-  IState
+  RouteComponentProps<{}> & IPageProps & IDispatchProps
 > {
-  constructor(props: RouteComponentProps<{}> & IPageProps & IDispatchProps) {
-    super(props)
-    this.state = {
-      loadingDataModal: false
-    }
-  }
   componentWillReceiveProps(nextProps: RouteComponentProps<{}>) {
     const { hash } = nextProps.location
     const hashChanged = hash && hash !== this.props.location.hash
@@ -142,18 +133,17 @@ class Component extends React.Component<
   componentDidMount() {
     const values = parse(this.props.location.search)
     this.props.checkAuth(values)
-    this.props.setInitialDrafts()
+    this.props.setInitialApplications()
   }
 
-  closeLoadingModal = () => {
-    this.setState(state => ({
-      loadingDataModal: false
-    }))
-  }
   render() {
-    const { initialDraftsLoaded, offlineDataLoaded, children } = this.props
+    const {
+      initialApplicationsLoaded,
+      offlineDataLoaded,
+      children
+    } = this.props
 
-    if (initialDraftsLoaded && offlineDataLoaded) {
+    if (initialApplicationsLoaded && offlineDataLoaded) {
       return (
         <div>
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -168,14 +158,14 @@ class Component extends React.Component<
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
     language: getLanguage(store),
-    initialDraftsLoaded: getInitialDraftsLoaded(store),
+    initialApplicationsLoaded: getInitialApplicationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store)
   }
 }
 
 const mapDispatchToProps = {
-  setInitialDrafts,
+  setInitialApplications,
   checkAuth,
   showConfigurationErrorNotification
 }

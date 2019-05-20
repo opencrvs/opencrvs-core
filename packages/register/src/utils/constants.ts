@@ -18,6 +18,7 @@ export const DEATH = 'death'
 export const OFFLINE = 'offline'
 export const REJECTED = 'REJECTED'
 export const REJECT_REASON = 'reason'
+export const REJECT_COMMENTS = 'comment'
 export const DECLARED = 'DECLARED'
 export const LANG_EN = 'en'
 
@@ -29,3 +30,8 @@ export const SECURITY_PIN_INDEX = 'pin'
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'
 
 export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
+
+export const TRACKING_ID_TEXT = 'tracking-id'
+export const BRN_DRN_TEXT = 'brn-drn'
+export const PHONE_TEXT = 'phone'
+export const SEARCH_RESULT_SORT = 'DESC'

@@ -16,7 +16,6 @@ import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { conditionals } from 'src/forms/utils'
 import { paymentFormSection } from 'src/forms/certificate/fieldDefinitions/payment-section'
 import { certificatePreview } from 'src/forms/certificate/fieldDefinitions/preview-section'
-import { calculateDays, timeElapsed } from './calculatePrice'
 import { identityNameMapper } from 'src/forms/identity'
 
 describe('when user wants to print certificate', async () => {
@@ -135,7 +134,7 @@ describe('when user wants to print certificate', async () => {
               registration: {
                 id: '6e10ee71-24c8-446a-a6b1-09c62330a975',
                 contact: null,
-                contactPhoneNumber: null,
+                contactPhoneNumber: '01712345678',
                 attachments: null,
                 status: [
                   {
@@ -610,7 +609,7 @@ describe('when user wants to print certificate', async () => {
                 registration: {
                   id: '6e10ee71-24c8-446a-a6b1-09c62330a975',
                   contact: null,
-                  contactPhoneNumber: null,
+                  contactPhoneNumber: '01712345678',
                   attachments: null,
                   status: [
                     {
@@ -860,25 +859,6 @@ describe('when user wants to print certificate', async () => {
       expect(component.find(FormFieldGenerator).prop('fields')).toEqual(
         certificatePreview.fields
       )
-    })
-
-    it('timeElapsedInWords function returns required time duration in words', () => {
-      Date.now = jest.fn(() => new Date('2019-01-01'))
-
-      let days = calculateDays('1985-08-18')
-
-      let time = timeElapsed(days)
-      expect(time.value).toBe(33)
-      expect(time.unit).toBe('Year')
-      days = calculateDays('2018-12-16')
-      time = timeElapsed(days)
-      expect(time.value).toBe(16)
-      expect(time.unit).toBe('Day')
-
-      days = calculateDays('2018-10-16')
-      time = timeElapsed(days)
-      expect(time.value).toBe(2)
-      expect(time.unit).toBe('Month')
     })
 
     it('Should generate the PDF', () => {

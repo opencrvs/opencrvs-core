@@ -4,28 +4,28 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames,
-  wait
+  mockDeathApplicationDataWithoutFirstNames
 } from 'src/tests/util'
 import { RegisterForm } from './RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import {
-  createDraft,
-  createReviewDraft,
-  storeDraft,
-  setInitialDrafts,
+  createApplication,
+  createReviewApplication,
+  storeApplication,
+  setInitialApplications,
   IUserData,
   getCurrentUserID,
-  getDraftsOfCurrentUser,
-  writeDraftByUser
-} from 'src/drafts'
+  getApplicationsOfCurrentUser,
+  writeApplicationByUser
+} from 'src/applications'
 import { v4 as uuid } from 'uuid'
 
 import { createStore } from '../../store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   REVIEW_EVENT_PARENT_FORM_TAB,
-  DRAFT_DEATH_FORM_TAB
+  DRAFT_DEATH_FORM_TAB,
+  HOME
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -41,18 +41,18 @@ import { IUserDetails } from 'src/utils/userUtils'
 describe('when user logs in', async () => {
   // Some mock data
 
-  const draft1 = createDraft(Event.BIRTH)
-  const draft2 = createDraft(Event.DEATH)
-  const draft3 = createDraft(Event.BIRTH)
+  const draft1 = createApplication(Event.BIRTH)
+  const draft2 = createApplication(Event.DEATH)
+  const draft3 = createApplication(Event.BIRTH)
 
   const currentUserData: IUserData = {
     userID: 'shakib75',
-    drafts: [draft1, draft2]
+    applications: [draft1, draft2]
   }
 
   const anotherUserData: IUserData = {
     userID: 'mortaza',
-    drafts: [draft3]
+    applications: [draft3]
   }
 
   const currentUserDetails: IUserDetails = {
@@ -94,8 +94,8 @@ describe('when user logs in', async () => {
   })
 
   it('should read only the drafts of the currently logged-in user', async () => {
-    const details = await getDraftsOfCurrentUser()
-    const currentUserDrafts = (JSON.parse(details) as IUserData).drafts
+    const details = await getApplicationsOfCurrentUser()
+    const currentUserDrafts = (JSON.parse(details) as IUserData).applications
     expect(currentUserDrafts.length).toBe(2)
     expect(currentUserDrafts[0]).toEqual(draft1)
     expect(currentUserDrafts[1]).toEqual(draft2)
@@ -103,16 +103,16 @@ describe('when user logs in', async () => {
   })
 
   it("should save the draft inside the current user's array of drafts", async () => {
-    const draft4 = createDraft(Event.DEATH)
-    await writeDraftByUser({
+    const draft4 = createApplication(Event.DEATH)
+    await writeApplicationByUser({
       userID: currentUserData.userID,
-      initialDraftsLoaded: true,
-      drafts: [...currentUserData.drafts, draft4]
+      initialApplicationsLoaded: true,
+      applications: [...currentUserData.applications, draft4]
     })
 
     // Now, let's check if the new draft is added
-    const details = await getDraftsOfCurrentUser()
-    const currentUserDrafts = (JSON.parse(details) as IUserData).drafts
+    const details = await getApplicationsOfCurrentUser()
+    const currentUserDrafts = (JSON.parse(details) as IUserData).applications
     expect(currentUserDrafts.length).toBe(3)
     expect(currentUserDrafts.find(draft => draft.id === draft4.id)).toBeTruthy()
   })
@@ -132,8 +132,8 @@ describe('when there is no user-data saved', () => {
         }
       }
     )
-    const str = await getDraftsOfCurrentUser()
-    const drafts = (JSON.parse(str) as IUserData).drafts
+    const str = await getApplicationsOfCurrentUser()
+    const drafts = (JSON.parse(str) as IUserData).applications
     expect(drafts.length).toBe(0)
   })
 })
@@ -142,7 +142,7 @@ describe('when user is in the register form before initial draft load', () => {
   const { store, history } = createStore()
 
   const mock: any = jest.fn()
-  const draft = createDraft(Event.BIRTH)
+  const draft = createApplication(Event.BIRTH)
   const form = getRegisterForm(store.getState())[Event.BIRTH]
   it('throws error when draft not found after initial drafts load', () => {
     try {
@@ -153,7 +153,7 @@ describe('when user is in the register form before initial draft load', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
             params: { draftId: '', tabId: '' },
@@ -172,10 +172,10 @@ describe('when user is in the register form before initial draft load', () => {
 
 describe('when user is in the register form for birth event', async () => {
   const { store, history } = createStore()
-  const draft = createDraft(Event.BIRTH)
-  store.dispatch(storeDraft(draft))
-  store.dispatch(setInitialDrafts())
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.BIRTH)
+  store.dispatch(storeApplication(draft))
+  store.dispatch(setInitialApplications())
+  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
@@ -190,7 +190,7 @@ describe('when user is in the register form for birth event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'mother' },
@@ -228,9 +228,9 @@ describe('when user is in the register form for birth event', async () => {
 
 describe('when user is in the register form for death event', async () => {
   const { store, history } = createStore()
-  const draft = createDraft(Event.DEATH)
-  store.dispatch(setInitialDrafts())
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.DEATH)
+  store.dispatch(setInitialApplications())
+  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
@@ -245,7 +245,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'causeOfDeath' },
@@ -280,7 +280,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'deceased' },
@@ -304,7 +304,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'deceased' },
@@ -362,7 +362,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'deceased' },
@@ -480,7 +480,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'deceased' },
@@ -598,7 +598,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'informant' },
@@ -662,7 +662,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'deceased' },
@@ -731,7 +731,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'deceased' },
@@ -785,9 +785,9 @@ describe('when user is in the register form for death event', async () => {
 
 describe('when user is in the register form preview section', () => {
   const { store, history } = createStore()
-  const draft = createDraft(Event.BIRTH)
-  store.dispatch(setInitialDrafts())
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.BIRTH)
+  store.dispatch(setInitialApplications())
+  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
@@ -799,7 +799,7 @@ describe('when user is in the register form preview section', () => {
       history={history}
       staticContext={mock}
       registerForm={form}
-      draft={draft}
+      application={draft}
       tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
       match={{
         params: { draftId: draft.id, tabId: 'preview' },
@@ -848,9 +848,13 @@ describe('when user is in the register form preview section', () => {
   describe('User in the Preview section for submitting the Form', () => {
     beforeEach(async () => {
       // @ts-ignore
-      const nDraft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
-      store.dispatch(setInitialDrafts())
-      store.dispatch(storeDraft(nDraft))
+      const nApplication = createReviewApplication(
+        uuid(),
+        mockApplicationData,
+        Event.BIRTH
+      )
+      store.dispatch(setInitialApplications())
+      store.dispatch(storeApplication(nApplication))
 
       const nform = getRegisterForm(store.getState())[Event.BIRTH]
       const nTestComponent = createTestComponent(
@@ -859,10 +863,10 @@ describe('when user is in the register form preview section', () => {
           history={history}
           staticContext={mock}
           registerForm={nform}
-          draft={nDraft}
+          application={nApplication}
           tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
-            params: { draftId: nDraft.id, tabId: 'preview' },
+            params: { applicationId: nApplication.id, tabId: 'preview' },
             isExact: true,
             path: '',
             url: ''
@@ -916,13 +920,28 @@ describe('when user is in the register form preview section', () => {
         .simulate('click')
       component.update()
 
-      const previewBtn = component.find('#cancel-btn').hostNodes()
-      expect(previewBtn.length).toEqual(1)
+      const cancelBtn = component.find('#cancel-btn').hostNodes()
+      expect(cancelBtn.length).toEqual(1)
 
-      previewBtn.simulate('click')
+      cancelBtn.simulate('click')
       component.update()
 
-      expect(component.find('#cancel-btn').hostNodes().length).toEqual(0)
+      expect(component.find('#submit_confirm').hostNodes().length).toEqual(0)
+      expect(component.find('#submit_form').hostNodes().length).toEqual(1)
+
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      const confirmBtn = component.find('#submit_confirm').hostNodes()
+      expect(confirmBtn.length).toEqual(1)
+
+      confirmBtn.simulate('click')
+      component.update()
+
+      expect(history.location.pathname).toBe(HOME)
     })
   })
 })
@@ -932,9 +951,13 @@ describe('when user is in the register form review section', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
     // @ts-ignore
-    const draft = createReviewDraft(uuid(), mockApplicationData, Event.BIRTH)
-    store.dispatch(setInitialDrafts())
-    store.dispatch(storeDraft(draft))
+    const application = createReviewApplication(
+      uuid(),
+      mockApplicationData,
+      Event.BIRTH
+    )
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(application))
     const mock: any = jest.fn()
     const form = getReviewForm(store.getState()).birth
     const testComponent = createTestComponent(
@@ -944,13 +967,13 @@ describe('when user is in the register form review section', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        draft={draft}
+        application={application}
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: draft.id,
+            draftId: application.id,
             tabId: 'review',
-            event: draft.event.toLowerCase()
+            event: application.event.toLowerCase()
           },
           isExact: true,
           path: '',
@@ -990,9 +1013,9 @@ describe('when user is in the register form review section', () => {
 
 describe('when user is in the register form for death event', async () => {
   const { store, history } = createStore()
-  const draft = createDraft(Event.DEATH)
-  store.dispatch(setInitialDrafts())
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.DEATH)
+  store.dispatch(setInitialApplications())
+  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
@@ -1007,7 +1030,7 @@ describe('when user is in the register form for death event', async () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          draft={draft}
+          application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
             params: { draftId: draft.id, tabId: 'causeOfDeath' },
@@ -1036,9 +1059,9 @@ describe('when user is in the register form for death event', async () => {
 
 describe('When user is in Preview section death event', async () => {
   const { store, history } = createStore()
-  const draft = createDraft(Event.DEATH)
-  store.dispatch(setInitialDrafts())
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.DEATH)
+  store.dispatch(setInitialApplications())
+  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
   let deathDraft
   let deathForm: IForm
@@ -1048,14 +1071,14 @@ describe('When user is in Preview section death event', async () => {
   beforeEach(async () => {
     jest.clearAllMocks()
     // @ts-ignore
-    deathDraft = createReviewDraft(
+    deathDraft = createReviewApplication(
       uuid(),
       // @ts-ignore
       mockDeathApplicationData,
       Event.DEATH
     )
-    store.dispatch(setInitialDrafts())
-    store.dispatch(storeDraft(deathDraft))
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(deathDraft))
 
     deathForm = getRegisterForm(store.getState())[Event.DEATH]
     const nTestComponent = createTestComponent(
@@ -1064,7 +1087,7 @@ describe('When user is in Preview section death event', async () => {
         history={history}
         staticContext={mock}
         registerForm={deathForm}
-        draft={deathDraft}
+        application={deathDraft}
         tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
         match={{
           params: { draftId: deathDraft.id, tabId: 'preview' },
@@ -1112,8 +1135,13 @@ describe('When user is in Preview section death event', async () => {
       .hostNodes()
       .simulate('click')
 
-    const modalSubmitBtn = component.find('#submit_confirm').hostNodes()
-    expect(modalSubmitBtn.length).toEqual(1)
+    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    expect(confirmBtn.length).toEqual(1)
+
+    confirmBtn.simulate('click')
+    component.update()
+
+    expect(history.location.pathname).toBe(HOME)
   })
   it('Check if death location as hospital is parsed properly', () => {
     const hospitalLocatioMockDeathApplicationData = clone(
@@ -1148,9 +1176,9 @@ describe('When user is in Preview section death event', async () => {
 
 describe('When user is in Preview section death event in offline mode', async () => {
   const { store, history } = createStore()
-  const draft = createDraft(Event.DEATH)
-  store.dispatch(setInitialDrafts())
-  store.dispatch(storeDraft(draft))
+  const draft = createApplication(Event.DEATH)
+  store.dispatch(setInitialApplications())
+  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
   let deathDraft
   let deathForm: IForm
@@ -1164,14 +1192,14 @@ describe('When user is in Preview section death event in offline mode', async ()
     })
     jest.clearAllMocks()
     // @ts-ignore
-    deathDraft = createReviewDraft(
+    deathDraft = createReviewApplication(
       uuid(),
       // @ts-ignore
       mockDeathApplicationDataWithoutFirstNames,
       Event.DEATH
     )
-    store.dispatch(setInitialDrafts())
-    store.dispatch(storeDraft(deathDraft))
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(deathDraft))
 
     deathForm = getRegisterForm(store.getState())[Event.DEATH]
     const nTestComponent = createTestComponent(
@@ -1180,7 +1208,7 @@ describe('When user is in Preview section death event in offline mode', async ()
         history={history}
         staticContext={mock}
         registerForm={deathForm}
-        draft={deathDraft}
+        application={deathDraft}
         tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
         match={{
           params: { draftId: deathDraft.id, tabId: 'preview' },
@@ -1214,11 +1242,12 @@ describe('When user is in Preview section death event in offline mode', async ()
       .hostNodes()
       .simulate('click')
 
-    component
-      .find('#submit_confirm')
-      .hostNodes()
-      .simulate('click')
-    await wait()
-    expect(history.location.pathname).toContain('confirm')
+    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    expect(confirmBtn.length).toEqual(1)
+
+    confirmBtn.simulate('click')
+    component.update()
+
+    expect(history.location.pathname).toBe(HOME)
   })
 })

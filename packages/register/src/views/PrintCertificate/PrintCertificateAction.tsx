@@ -44,11 +44,11 @@ import {
 import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
 import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
 import {
-  storeDraft,
-  createReviewDraft,
-  IDraftsState,
-  IDraft
-} from '@opencrvs/register/src/drafts'
+  storeApplication,
+  createReviewApplication,
+  IApplicationsState,
+  IApplication
+} from '@opencrvs/register/src/applications'
 import { Dispatch } from 'redux'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
 import {
@@ -244,45 +244,45 @@ const messages = defineMessages({
     description: 'The label for next button'
   },
   serviceYear: {
-    id: 'register.workQueue.print.serviceYear',
+    id: 'print.certificate.serviceYear',
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
   },
   serviceMonth: {
-    id: 'register.workQueue.print.serviceMonth',
+    id: 'print.certificate.serviceMonth',
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
   },
   birthService: {
-    id: 'register.workQueue.print.birthService'
+    id: 'print.certificate.birthService'
   },
   deathService: {
-    id: 'register.workQueue.print.deathService'
+    id: 'print.certificate.deathService'
   },
   certificateHeader: {
-    id: 'register.work-queue.certificate.header'
+    id: 'print.certificate.header'
   },
   certificateSubHeader: {
-    id: 'register.work-queue.certificate.subheader'
+    id: 'print.certificate.subheader'
   },
   certificateIssuer: {
-    id: 'register.work-queue.certificate.issuer'
+    id: 'print.certificate.issuer'
   },
   certificatePaidAmount: {
-    id: 'register.work-queue.certificate.amount'
+    id: 'print.certificate.amount'
   },
   certificateService: {
-    id: 'register.work-queue.certificate.service'
+    id: 'print.certificate.service'
   },
   printCertificate: {
-    id: 'register.workQueue.print.printCertificate',
+    id: 'print.certificate.printCertificate',
     defaultMessage: 'Print certificate',
     description: 'The label for print certificate button'
   },
   finish: {
-    id: 'register.workQueue.print.finish',
+    id: 'print.certificate.finish',
     defaultMessage: 'Finish',
     description: 'The label for finish printing certificate button'
   },
@@ -398,12 +398,12 @@ type IProps = {
   registerForm: IForm
   userDetails: IUserDetails
   offlineResources: IOfflineDataState
-  draft: IDraft
+  draft: IApplication
 }
 
 type IFullProps = InjectedIntlProps &
   RouteComponentProps<{}> &
-  IProps & { dispatch: Dispatch; drafts: IDraftsState }
+  IProps & { dispatch: Dispatch; drafts: IApplicationsState }
 
 class PrintCertificateActionComponent extends React.Component<
   IFullProps,
@@ -971,7 +971,7 @@ class PrintCertificateActionComponent extends React.Component<
       registrationId,
       collectCertificateForm,
       paymentFormSection,
-      drafts: { drafts },
+      drafts: { applications: drafts },
       dispatch,
       offlineResources
     } = this.props
@@ -1075,7 +1075,7 @@ class PrintCertificateActionComponent extends React.Component<
                         form.fields.unshift(fatherDataDoesNotExist)
                       }
                     }
-                    const reviewDraft = createReviewDraft(
+                    const reviewDraft = createReviewApplication(
                       registrationId,
                       transData,
                       event
@@ -1084,7 +1084,7 @@ class PrintCertificateActionComponent extends React.Component<
                       draft => draft.id === registrationId
                     )
                     if (!draftExist) {
-                      dispatch(storeDraft(reviewDraft))
+                      dispatch(storeApplication(reviewDraft))
                     }
                     return (
                       <FormContainer>
@@ -1128,7 +1128,7 @@ class PrintCertificateActionComponent extends React.Component<
 }
 
 const getDraft = (
-  drafts: IDraft[],
+  drafts: IApplication[],
   registrationId: string,
   eventType: string
 ) =>
@@ -1163,7 +1163,11 @@ function mapStatetoProps(
 ) {
   const { registrationId, eventType } = props.match.params
 
-  const draft = getDraft(state.drafts.drafts, registrationId, eventType)
+  const draft = getDraft(
+    state.applicationsState.applications,
+    registrationId,
+    eventType
+  )
   const event = getEvent(draft.event)
 
   return {
@@ -1174,7 +1178,7 @@ function mapStatetoProps(
     certificatePreviewFormSection:
       state.printCertificateForm.certificatePreviewForm,
     draft,
-    drafts: state.drafts,
+    drafts: state.applicationsState,
     registerForm: state.registerForm.registerForm[event],
     collectCertificateForm: getCollectCertificateForm(event, state),
     userDetails: getUserDetails(state),

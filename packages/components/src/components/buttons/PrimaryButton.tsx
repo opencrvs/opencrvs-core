@@ -1,6 +1,5 @@
-import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
-import { Button, IButtonProps } from './Button'
+import styled from 'styled-components'
+import { Button } from './Button'
 
 export const PrimaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
@@ -10,7 +9,7 @@ export const PrimaryButton = styled(Button)`
   border-radius: 2px;
   ${({ theme }) => theme.fonts.capsFontStyle};
 
-  &:hover {
+  &:hover:enabled {
     background: linear-gradient(
       ${({ theme }) => theme.colors.hoverGradientDark},
       ${({ theme }) => theme.colors.primary}
@@ -21,9 +20,10 @@ export const PrimaryButton = styled(Button)`
     outline: none;
   }
 
-  &:active {
+  &:active:enabled {
+    outline: none;
     background: ${({ theme }) => theme.colors.primary};
-    padding: 0 32px;
+    padding: 0 3px;
     border: 3px solid ${({ theme }) => theme.colors.creamCan};
   }
 

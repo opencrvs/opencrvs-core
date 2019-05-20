@@ -41,6 +41,7 @@ const MenuContainer = styled.div`
 const UserInfo = styled.div`
   background: ${({ theme }) => theme.colors.white};
   padding: 30px 24px;
+  text-align: justify;
 `
 const UserName = styled.p`
   font-size: 20px;

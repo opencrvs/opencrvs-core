@@ -9,7 +9,8 @@ import {
   InputField,
   TextInput,
   PasswordInput,
-  THEME_MODE
+  THEME_MODE,
+  ErrorMessage
 } from '@opencrvs/components/lib/forms'
 
 import { stepOneFields } from './stepOneFields'
@@ -145,12 +146,6 @@ export const StyledButton = styled(Button)`
     text-decoration-color: ${({ theme }) => theme.colors.accentLight};
   }
 `
-export const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.danger};
-  padding: 2px ${({ theme }) => theme.grid.margin}px;
-  text-align: center;
-`
 
 export const FieldWrapper = styled.div`
   min-height: 6.5em;
@@ -245,14 +240,14 @@ export class StepOneForm extends React.Component<
         </LogoContainer>
         <Title>
           {submissionError && (
-            <ErrorText>
+            <ErrorMessage>
               {errorCode === ERROR_CODE_FIELD_MISSING &&
                 intl.formatMessage(messages.fieldMissing)}
               {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
                 intl.formatMessage(messages.submissionError)}
               {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
                 intl.formatMessage(messages.phoneNumberFormat)}
-            </ErrorText>
+            </ErrorMessage>
           )}
         </Title>
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>

@@ -11,11 +11,7 @@ import {
   StatusProgress,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
-import {
-  ISearchInputProps,
-  SearchInput,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ISearchInputProps, Spinner } from '@opencrvs/components/lib/interface'
 import {
   ColumnContentAlignment,
   GridTable
@@ -37,16 +33,15 @@ import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { Header } from 'src/components/interface/Header/Header'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction,
-  goToSearchResult
+  goToTab as goToTabAction
 } from 'src/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -63,6 +58,7 @@ import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToWorkQueueTab as goToWorkQueueTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
+import { sentenceCase } from 'src/utils/data-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -267,12 +263,13 @@ const messages = defineMessages({
 const Container = styled.div`
   z-index: 1;
   position: relative;
-  margin-top: -30px;
+  margin-top: 10px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
 `
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;
@@ -285,7 +282,7 @@ const StyledIconAction = styled(IconAction)`
     /* stylelint-enable */
     font-size: 28px;
     font-weight: 300;
-    margin: -2px 0 -2px 120px;
+    margin: -20px 0 0 0;
     line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
@@ -309,12 +306,13 @@ interface IBaseWorkQueueProps {
   goToWorkQueueTab: typeof goToWorkQueueTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
-  drafts: IDraft[]
-  goToSearchResult: typeof goToSearchResult
+  drafts: IApplication[]
 }
 
 interface IWorkQueueState {
-  currentPage: number
+  progressCurrentPage: number
+  reviewCurrentPage: number
+  updatesCurrentPage: number
 }
 
 type IWorkQueueProps = InjectedIntlProps &
@@ -340,7 +338,9 @@ export class WorkQueueView extends React.Component<
   constructor(props: IWorkQueueProps) {
     super(props)
     this.state = {
-      currentPage: 1
+      progressCurrentPage: 1,
+      reviewCurrentPage: 1,
+      updatesCurrentPage: 1
     }
   }
   userHasRegisterScope() {
@@ -433,7 +433,8 @@ export class WorkQueueView extends React.Component<
           event:
             (reg.registration &&
               reg.registration.type &&
-              reg.registration.type.toString()) ||
+              reg.registration.type.toString() &&
+              sentenceCase(reg.registration.type)) ||
             '',
           duplicates: (reg.registration && reg.registration.duplicates) || [],
           actions,
@@ -569,7 +570,8 @@ export class WorkQueueView extends React.Component<
           event:
             (reg.registration &&
               reg.registration.type &&
-              reg.registration.type.toString()) ||
+              reg.registration.type.toString() &&
+              sentenceCase(reg.registration.type)) ||
             '',
           duplicates: (reg.registration && reg.registration.duplicates) || [],
           actions,
@@ -620,7 +622,7 @@ export class WorkQueueView extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IDraft) => {
+    return this.props.drafts.map((draft: IApplication) => {
       let name
       let tabRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
@@ -675,7 +677,7 @@ export class WorkQueueView extends React.Component<
       ]
       return {
         id: draft.id,
-        event: (draft.event && draft.event.toUpperCase()) || '',
+        event: (draft.event && sentenceCase(draft.event)) || '',
         name: name || '',
         date_of_modification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||
@@ -686,36 +688,25 @@ export class WorkQueueView extends React.Component<
   }
 
   onPageChange = (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
+    if (this.props.tabId === TAB_ID.inProgress) {
+      this.setState({ progressCurrentPage: newPageNumber })
+    }
+    if (this.props.tabId === TAB_ID.readyForReview) {
+      this.setState({ reviewCurrentPage: newPageNumber })
+    }
+    if (this.props.tabId === TAB_ID.sentForUpdates) {
+      this.setState({ updatesCurrentPage: newPageNumber })
+    }
   }
 
   render() {
-    const { theme, intl, userDetails, language, tabId, drafts } = this.props
+    const { theme, intl, userDetails, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
 
-    let fullName = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
-      ) as GQLHumanName
-      fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    }
-
-    const role =
-      userDetails && userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
-        : ''
-
     return (
       <>
-        <HomeViewHeader
-          title={intl.formatMessage(messages.hello, {
-            fullName
-          })}
-          description={role}
-          id="home_view"
-        />
+        <Header />
         <Container>
           <HeaderContent>
             <StyledIconAction
@@ -723,12 +714,6 @@ export class WorkQueueView extends React.Component<
               icon={() => <StyledPlusIcon />}
               onClick={this.props.goToEvents}
               title={intl.formatMessage(messages.newRegistration)}
-            />
-            <SearchInput
-              placeholder={intl.formatMessage(messages.searchInputPlaceholder)}
-              buttonLabel={intl.formatMessage(messages.searchInputButtonTitle)}
-              onSubmit={this.props.goToSearchResult}
-              {...this.props}
             />
             <Query
               query={COUNT_REGISTRATION_QUERY}
@@ -839,10 +824,8 @@ export class WorkQueueView extends React.Component<
                   this.onPageChange(currentPage)
                 }}
                 pageSize={this.pageSize}
-                totalPages={Math.ceil(
-                  ((drafts && drafts.length) || 0) / this.pageSize
-                )}
-                initialPage={this.state.currentPage}
+                totalPages={drafts && drafts.length}
+                initialPage={this.state.progressCurrentPage}
               />
             )}
             {tabId === TAB_ID.readyForReview && (
@@ -852,7 +835,7 @@ export class WorkQueueView extends React.Component<
                   status: EVENT_STATUS.DECLARED,
                   locationIds: [registrarUnion],
                   count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize
+                  skip: (this.state.reviewCurrentPage - 1) * this.pageSize
                 }}
               >
                 {({ loading, error, data }) => {
@@ -940,12 +923,11 @@ export class WorkQueueView extends React.Component<
                         this.onPageChange(currentPage)
                       }}
                       pageSize={this.pageSize}
-                      totalPages={Math.ceil(
-                        ((data.listEventRegistrations &&
-                          data.listEventRegistrations.totalItems) ||
-                          0) / this.pageSize
-                      )}
-                      initialPage={this.state.currentPage}
+                      totalPages={
+                        data.listEventRegistrations &&
+                        data.listEventRegistrations.totalItems
+                      }
+                      initialPage={this.state.reviewCurrentPage}
                       expandable={true}
                     />
                   )
@@ -959,7 +941,7 @@ export class WorkQueueView extends React.Component<
                   status: EVENT_STATUS.REJECTED,
                   locationIds: [registrarUnion],
                   count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize
+                  skip: (this.state.updatesCurrentPage - 1) * this.pageSize
                 }}
               >
                 {({ loading, error, data }) => {
@@ -1031,12 +1013,11 @@ export class WorkQueueView extends React.Component<
                         this.onPageChange(currentPage)
                       }}
                       pageSize={this.pageSize}
-                      totalPages={Math.ceil(
-                        ((data.listEventRegistrations &&
-                          data.listEventRegistrations.totalItems) ||
-                          0) / this.pageSize
-                      )}
-                      initialPage={this.state.currentPage}
+                      totalPages={
+                        data.listEventRegistrations &&
+                        data.listEventRegistrations.totalItems
+                      }
+                      initialPage={this.state.updatesCurrentPage}
                       expandable={true}
                     />
                   )
@@ -1059,7 +1040,7 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
-    drafts: state.drafts.drafts
+    drafts: state.applicationsState.applications
   }
 }
 
@@ -1069,7 +1050,6 @@ export const WorkQueue = connect(
     goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
     goToWorkQueueTab: goToWorkQueueTabAction,
-    goToSearchResult,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }

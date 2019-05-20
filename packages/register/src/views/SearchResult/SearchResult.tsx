@@ -1,7 +1,4 @@
-import {
-  PrimaryButton,
-  SecondaryButton
-} from '@opencrvs/components/lib/buttons'
+import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import {
   Duplicate,
   Edit,
@@ -12,14 +9,11 @@ import {
   StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
-  ActionPage,
   ISearchInputProps,
-  ISelectGroupValue,
   ListItem,
   ListItemExpansion,
-  SearchInput,
-  SelectFieldType,
-  Spinner
+  Spinner,
+  Loader
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import { HeaderContent } from '@opencrvs/components/lib/layout'
@@ -41,8 +35,7 @@ import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToSearchResult
+  goToReviewDuplicate as goToReviewDuplicateAction
 } from 'src/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { getScope, getUserDetails } from 'src/profile/profileSelectors'
@@ -58,7 +51,12 @@ import {
   LANG_EN,
   LOCAL_DATE_FORMAT,
   REJECTED,
-  REJECT_REASON
+  REJECT_REASON,
+  REJECT_COMMENTS,
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT,
+  SEARCH_RESULT_SORT
 } from 'src/utils/constants'
 import {
   createNamesMap,
@@ -69,10 +67,8 @@ import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
+import { Header } from 'src/components/interface/Header/Header'
 
-const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
-`
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
   height: 70px;
@@ -127,6 +123,32 @@ export const ActionPageWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: scroll;
+`
+const SearchResultText = styled.div`
+  left: 268px;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 36px;
+  letter-spacing: 0.4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    left: 24px;
+    margin-top: 24px;
+  }
+`
+const TotalResultText = styled.div`
+  left: 268px;
+  margin-top: 6px;
+  font-family: ${({ theme }) => theme.fonts.lightFont};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 24px;
+  letter-spacing: 0.4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    left: 24px;
+  }
 `
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
@@ -188,9 +210,6 @@ const ExpansionContentContainer = styled.div`
   flex: 1;
   margin-left: 10px;
 `
-const StyledPrimaryButton = styled(PrimaryButton)`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-`
 
 const StyledSecondaryButton = styled(SecondaryButton)`
   border: solid 1px ${({ theme }) => theme.colors.disabledButton};
@@ -219,11 +238,11 @@ interface IBaseSearchResultProps {
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  goToSearchResult: typeof goToSearchResult
 }
 
 interface IMatchParams {
   searchText: string
+  searchType: string
 }
 
 type ISearchResultProps = InjectedIntlProps &
@@ -231,31 +250,7 @@ type ISearchResultProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
-
-interface ISearchResultState {
-  printCertificateModalVisible: boolean
-  regId: string | null
-  currentPage: number
-  sortBy?: string
-  eventType?: string
-  status?: string
-  searchContent?: string
-}
-export class SearchResultView extends React.Component<
-  ISearchResultProps,
-  ISearchResultState
-> {
-  state = {
-    printCertificateModalVisible: false,
-    regId: null,
-    currentPage: 1,
-    sortBy: 'asc',
-    eventType: '',
-    status: '',
-    searchContent: ''
-  }
-  pageSize = 10
-
+export class SearchResultView extends React.Component<ISearchResultProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'DECLARED':
@@ -399,6 +394,14 @@ export class SearchResultView extends React.Component<
               REJECT_REASON
             )) ||
           '',
+        rejectComments:
+          (status &&
+            status.type === REJECTED &&
+            extractCommentFragmentValue(
+              status.comments as GQLComment[],
+              REJECT_COMMENTS
+            )) ||
+          '',
         informantContactNumber: contactInfo && contactInfo.value
       }
     })
@@ -439,6 +442,7 @@ export class SearchResultView extends React.Component<
                   collectorName,
                   collectorType,
                   rejectReasons,
+                  rejectComments,
                   informantContactNumber
                 } = status
                 const type = status.type as string
@@ -489,10 +493,16 @@ export class SearchResultView extends React.Component<
                         />
                       </ValueContainer>
                       {rejectReasons && (
-                        <LabelValue
-                          label={intl.formatMessage(messages.rejectReason)}
-                          value={rejectReasons}
-                        />
+                        <>
+                          <LabelValue
+                            label={intl.formatMessage(messages.rejectReason)}
+                            value={rejectReasons}
+                          />
+                          <LabelValue
+                            label={intl.formatMessage(messages.rejectComments)}
+                            value={rejectComments}
+                          />
+                        </>
                       )}
                     </ExpansionContentContainer>
                   </ExpansionContainer>
@@ -532,16 +542,6 @@ export class SearchResultView extends React.Component<
         value: item.dod
       })
     }
-    info.push({
-      label: this.props.intl.formatMessage(messages.listItemDateOfApplication),
-      value: item.date_of_application
-    })
-    if (!applicationIsRegistered || !applicationIsCertified) {
-      info.push({
-        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
-        value: item.tracking_id
-      })
-    }
     if (applicationIsRegistered || applicationIsCertified) {
       info.push({
         label: this.props.intl.formatMessage(
@@ -549,6 +549,11 @@ export class SearchResultView extends React.Component<
           { event: item.event.toLowerCase() }
         ),
         value: item.registrationNumber
+      })
+    } else {
+      info.push({
+        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
+        value: item.tracking_id
       })
     }
 
@@ -605,15 +610,6 @@ export class SearchResultView extends React.Component<
           label: this.props.intl.formatMessage(messages.print),
           handler: () => this.props.goToPrintCertificate(item.id, item.event)
         })
-
-        expansionActions.push(
-          <StyledPrimaryButton
-            id={`printCertificate_${item.tracking_id}`}
-            onClick={() => this.props.goToPrintCertificate(item.id, item.event)}
-          >
-            {this.props.intl.formatMessage(messages.printCertificateBtnText)}
-          </StyledPrimaryButton>
-        )
       }
     }
 
@@ -634,22 +630,17 @@ export class SearchResultView extends React.Component<
               item.event.toLowerCase()
             )
         })
-
-        expansionActions.push(
-          <StyledPrimaryButton
-            id={`reviewAndRegisterBtn_${item.tracking_id}`}
-            onClick={() =>
-              this.props.gotoTab(
-                REVIEW_EVENT_PARENT_FORM_TAB,
-                item.id,
-                'review',
-                item.event.toLowerCase()
-              )
-            }
-          >
-            {this.props.intl.formatMessage(messages.reviewAndRegister)}
-          </StyledPrimaryButton>
-        )
+      } else if (applicationIsRejected) {
+        listItemActions.push({
+          label: this.props.intl.formatMessage(messages.reject),
+          handler: () =>
+            this.props.gotoTab(
+              REVIEW_EVENT_PARENT_FORM_TAB,
+              item.id,
+              'review',
+              item.event.toLowerCase()
+            )
+        })
       }
     }
 
@@ -663,16 +654,6 @@ export class SearchResultView extends React.Component<
         label: this.props.intl.formatMessage(messages.reviewDuplicates),
         handler: () => this.props.goToReviewDuplicate(item.id)
       })
-      expansionActions.push(
-        <StyledPrimaryButton
-          id={`reviewDuplicatesBtn_${item.tracking_id}`}
-          onClick={() => {
-            this.props.goToReviewDuplicate(item.id)
-          }}
-        >
-          {this.props.intl.formatMessage(messages.reviewDuplicates)}
-        </StyledPrimaryButton>
-      )
     }
     if (applicationIsRegistered) {
       expansionActions.push(
@@ -695,6 +676,8 @@ export class SearchResultView extends React.Component<
         key={key}
         itemData={{}}
         actions={listItemActions}
+        isBoxShadow={true}
+        isItemFullHeight={true}
         expandedCellRenderer={() => (
           <ListItemExpansion>
             {this.renderExpansionContent(item.id)}
@@ -729,205 +712,84 @@ export class SearchResultView extends React.Component<
 
     return identifier && identifier.id
   }
-  onPageChange = async (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
-  }
-  onSortChange = (sortBy: string) => {
-    this.setState({ sortBy })
-  }
-  onFilterChange = (
-    value: ISelectGroupValue,
-    changedValue: ISelectGroupValue
-  ) => {
-    this.setState({
-      eventType: this.state.eventType,
-      status: this.state.status,
-      ...changedValue
-    })
-  }
-
   render() {
-    const { intl, match, theme } = this.props
-    const searchParam = match.params.searchText
-    const sortBy = {
-      input: {
-        label: intl.formatMessage(messages.filtersSortBy)
-      },
-      selects: {
-        name: '',
-        options: [
-          {
-            name: 'createdAt',
-            options: [
-              {
-                value: 'asc',
-                label: intl.formatMessage(messages.filtersOldestToNewest)
-              },
-              {
-                value: 'desc',
-                label: intl.formatMessage(messages.filtersNewestToOldest)
-              }
-            ],
-            value: this.state.sortBy,
-            type: SelectFieldType.Date
-          }
-        ]
-      }
-    }
-    const filterBy = {
-      input: {
-        label: intl.formatMessage(messages.filtersFilterBy)
-      },
-      selects: {
-        name: '',
-        options: [
-          {
-            name: 'eventType',
-            options: [
-              {
-                value: '',
-                label: intl.formatMessage(messages.filtersAllEvents)
-              },
-              {
-                value: 'Birth',
-                label: intl.formatMessage(messages.filtersBirth)
-              },
-              {
-                value: 'Death',
-                label: intl.formatMessage(messages.filtersDeath)
-              },
-              {
-                value: 'Marriage',
-                label: intl.formatMessage(messages.filtersMarriage)
-              }
-            ],
-            value: this.state.eventType || ''
-          },
-          {
-            name: 'status',
-            options: [
-              {
-                value: '',
-                label: intl.formatMessage(messages.filtersAllStatuses)
-              },
-              {
-                value: 'DECLARED',
-                label: intl.formatMessage(messages.filtersApplication)
-              },
-              {
-                value: 'REGISTERED',
-                label: intl.formatMessage(messages.filtersRegistered)
-              },
-              {
-                value: 'CERTIFIED',
-                label: intl.formatMessage(messages.filtersCollected)
-              },
-              {
-                value: 'REJECTED',
-                label: intl.formatMessage(messages.filtersRejected)
-              }
-            ],
-            value: this.state.status || ''
-          }
-        ]
-      }
-    }
-
+    const { intl, match } = this.props
+    const { searchText, searchType } = match.params
     return (
-      <ActionPageWrapper>
-        <ActionPage
-          goBack={() => {
-            window.location.assign('/')
-          }}
-          title={intl.formatMessage(messages.title)}
-        >
-          <Container>
-            <HeaderContent>
-              <Query
-                query={SEARCH_EVENTS}
-                variables={{
-                  locationIds: [this.getLocalLocationId()],
-                  count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize,
-                  sort: this.state.sortBy,
-                  eventType: this.state.eventType,
-                  status: this.state.status,
-                  searchContent: searchParam
-                }}
-              >
-                {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      <StyledSpinner
-                        id="search-result-spinner"
-                        baseColor={theme.colors.background}
-                      />
-                    )
-                  }
-                  if (error) {
-                    console.log(`ERROR in QUERY ${JSON.stringify(error)}`)
-                    Sentry.captureException(error)
-
-                    return (
-                      <ErrorText id="search-result-error-text">
-                        {intl.formatMessage(messages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-                  const transformedData = transformData(data, intl)
+      <>
+        <Header searchText={searchText} selectedSearchType={searchType} />
+        <Container>
+          <HeaderContent>
+            <Query
+              query={SEARCH_EVENTS}
+              variables={{
+                locationIds: [this.getLocalLocationId()],
+                sort: SEARCH_RESULT_SORT,
+                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                registrationNumber:
+                  searchType === BRN_DRN_TEXT ? searchText : '',
+                contactNumber: searchType === PHONE_TEXT ? searchText : ''
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
                   return (
-                    <>
-                      <SearchInput
-                        id="search-input-text"
-                        searchValue={searchParam}
-                        placeholder={intl.formatMessage(
-                          messages.searchInputPlaceholder
-                        )}
-                        buttonLabel={intl.formatMessage(
-                          messages.searchInputButtonTitle
-                        )}
-                        onSubmit={this.props.goToSearchResult}
-                        {...this.props}
-                      />
-                      <DataTable
-                        data={transformedData}
-                        sortBy={sortBy}
-                        filterBy={filterBy}
-                        cellRenderer={this.renderCell}
-                        resultLabel={intl.formatMessage(
-                          messages.dataTableResults
-                        )}
-                        noResultText={intl.formatMessage(
-                          messages.dataTableNoResults
-                        )}
-                        onPageChange={(currentPage: number) => {
-                          this.onPageChange(currentPage)
-                        }}
-                        onSortChange={(value: ISelectGroupValue) =>
-                          this.onSortChange(value.createdAt)
-                        }
-                        onFilterChange={(
-                          value: ISelectGroupValue,
-                          changedValue: ISelectGroupValue
-                        ) => {
-                          this.onFilterChange(value, changedValue)
-                        }}
-                        pageSize={this.pageSize}
-                        totalPages={Math.ceil(
-                          ((data.listEventRegistrations &&
-                            data.listEventRegistrations.totalItems) ||
-                            0) / this.pageSize
-                        )}
-                        initialPage={this.state.currentPage}
-                      />
-                    </>
+                    <Loader
+                      id="search_loader"
+                      marginPercent={35}
+                      spinnerDiameter={60}
+                      loadingText={intl.formatMessage(messages.searchingFor, {
+                        param: searchText
+                      })}
+                    />
                   )
-                }}
-              </Query>
-            </HeaderContent>
-          </Container>
-        </ActionPage>
-      </ActionPageWrapper>
+                }
+                if (error) {
+                  Sentry.captureException(error)
+
+                  return (
+                    <ErrorText id="search-result-error-text">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
+                }
+                const transformedData = transformData(data, intl)
+                const total = transformedData.length
+                return (
+                  <>
+                    <SearchResultText>
+                      {intl.formatMessage(messages.searchResultFor, {
+                        total,
+                        param: searchText
+                      })}
+                    </SearchResultText>
+                    {total > 0 && (
+                      <>
+                        <TotalResultText>
+                          {intl.formatMessage(messages.totalResultText, {
+                            total
+                          })}
+                        </TotalResultText>
+                        <DataTable
+                          data={transformedData}
+                          zeroPagination={true}
+                          cellRenderer={this.renderCell}
+                          resultLabel={intl.formatMessage(
+                            messages.dataTableResults
+                          )}
+                          noResultText={intl.formatMessage(
+                            messages.dataTableNoResults
+                          )}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            </Query>
+          </HeaderContent>
+        </Container>
+      </>
     )
   }
 }
@@ -939,7 +801,6 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
-    goToSearchResult,
     gotoTab: goToTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction

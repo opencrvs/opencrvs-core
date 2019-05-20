@@ -4,11 +4,7 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { RouteComponentProps } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import {
-  goToEvents as goToEventsAction,
-  goToMyRecords as goToMyRecordsAction,
-  goToMyDrafts as goToMyDraftsAction
-} from 'src/navigation'
+import { goToEvents as goToEventsAction } from 'src/navigation'
 import { HomeViewHeader } from 'src/components/HomeViewHeader'
 import {
   Banner,
@@ -20,11 +16,7 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-import {
-  ActionList,
-  IconAction,
-  CountAction
-} from '@opencrvs/components/lib/buttons'
+import { ActionList, IconAction } from '@opencrvs/components/lib/buttons'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
@@ -137,6 +129,7 @@ const StyledActionList = styled(ActionList)`
 const StyledPlusIcon = styled(Plus)`
   display: flex;
   margin-left: -23px;
+  margin-top: -23px;
 `
 const StyledIconAction = styled(IconAction)`
   display: flex;
@@ -149,7 +142,7 @@ const StyledIconAction = styled(IconAction)`
     /* stylelint-enable */
     font-size: 28px;
     font-weight: 300;
-    margin: -2px 0 -2px 120px;
+    margin: -20px 0 0 0;
     line-height: 1.3em;
     color: ${({ theme }) => theme.colors.white};
   }
@@ -158,8 +151,6 @@ interface IHomeProps {
   language: string
   userDetails: IUserDetails
   goToEvents: typeof goToEventsAction
-  goToMyRecords: typeof goToMyRecordsAction
-  goToMyDrafts: typeof goToMyDraftsAction
   draftCount: string
 }
 
@@ -207,18 +198,6 @@ class HomeView extends React.Component<FullProps> {
                 count={10}
                 status={REJECTED_STATUS}
               />
-              <CountAction
-                id="saved_drafts"
-                count={this.props.draftCount}
-                onClick={this.props.goToMyDrafts}
-                title={intl.formatMessage(messages.savedDrafts)}
-              />
-              <CountAction
-                id="records"
-                count={'10'}
-                onClick={this.props.goToMyRecords}
-                title={intl.formatMessage(messages.records)}
-              />
               <SearchInput
                 placeholder={intl.formatMessage(messages.trackingId)}
                 buttonLabel={intl.formatMessage(
@@ -253,8 +232,9 @@ class HomeView extends React.Component<FullProps> {
 }
 
 const mapStateToProps = (store: IStoreState) => {
-  store.drafts.drafts = store.drafts.drafts || []
-  const draftCount = store.drafts.drafts.length.toString()
+  store.applicationsState.applications =
+    store.applicationsState.applications || []
+  const draftCount = store.applicationsState.applications.length.toString()
   return {
     draftCount,
     language: getLanguage(store),
@@ -264,8 +244,6 @@ const mapStateToProps = (store: IStoreState) => {
 export const Home = connect(
   mapStateToProps,
   {
-    goToEvents: goToEventsAction,
-    goToMyRecords: goToMyRecordsAction,
-    goToMyDrafts: goToMyDraftsAction
+    goToEvents: goToEventsAction
   }
 )(injectIntl(HomeView))
