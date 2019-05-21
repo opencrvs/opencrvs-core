@@ -43,8 +43,7 @@ const ErrorBox = styled.div`
   background: ${({ theme }) => theme.colors.error};
   height: 40px;
   width: 360px;
-  margin-top: -30px;
-  margin-bottom: -10px;
+  margin-top: -20px;
 `
 
 type IProps = InjectedIntlProps & { onComplete: () => void }

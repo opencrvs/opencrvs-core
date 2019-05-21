@@ -57,28 +57,12 @@ describe('when user is selecting the informant', () => {
       .simulate('click')
     await flushPromises()
     app.update()
-    for (let i = 0; i < 3; i++) {
+    for (let i = 1; i <= 8; i++) {
       app
-        .find('#keypad-1')
+        .find(`#keypad-${i % 2}`)
         .hostNodes()
         .simulate('click')
     }
-    app
-      .find('#keypad-2')
-      .hostNodes()
-      .simulate('click')
-    await flushPromises()
-    app.update()
-    for (let i = 0; i < 3; i++) {
-      app
-        .find('#keypad-1')
-        .hostNodes()
-        .simulate('click')
-    }
-    app
-      .find('#keypad-2')
-      .hostNodes()
-      .simulate('click')
     await flushPromises()
     app.update()
   })

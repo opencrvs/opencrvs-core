@@ -36,7 +36,7 @@ describe('Create PIN view', async () => {
 
     c.find('span#keypad-2').simulate('click')
     c.find('span#keypad-2').simulate('click')
-    c.find('span#keypad-2').simulate('click')
+    c.find('span#keypad-3').simulate('click')
     c.find('span#keypad-2').simulate('click')
 
     await new Promise(resolve => {
@@ -95,7 +95,7 @@ describe('Create PIN view', async () => {
     c.update()
 
     expect(c.find('div#error-text').text()).toBe(
-      'PIN cannot have 4 same digits.'
+      'PIN cannot have 4 same digits'
     )
   })
 
@@ -114,7 +114,7 @@ describe('Create PIN view', async () => {
     c.update()
 
     expect(c.find('div#error-text').text()).toBe(
-      'PIN contains sequential digits.'
+      'PIN cannot contain sequential digits'
     )
   })
 
