@@ -1,21 +1,23 @@
-import {
-  createTestApp,
-  mockOfflineData,
-  userDetails,
-  assign,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from 'src/tests/util'
-import { FIELD_AGENT_HOME_TAB } from 'src/navigation/routes'
+import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { Store } from 'redux'
-import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
-import { getOfflineDataSuccess } from 'src/offline/actions'
 import * as fetch from 'jest-fetch-mock'
+import { Store } from 'redux'
+import { getStorageApplicationsSuccess } from 'src/applications'
+import { FIELD_AGENT_HOME_TAB, HOME } from 'src/navigation/routes'
+import { getOfflineDataSuccess } from 'src/offline/actions'
 import { storage } from 'src/storage'
+import {
+  assign,
+  createTestApp,
+  currentUserApplications,
+  flushPromises,
+  getItem,
+  mockOfflineData,
+  setItem,
+  userDetails,
+  validToken
+} from 'src/tests/util'
 import * as CommonUtils from 'src/utils/commonUtils'
 import { FIELD_AGENT_ROLE } from 'src/utils/constants'
 
@@ -50,7 +52,7 @@ describe('when the home page loads for a field worker', () => {
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
 
-  describe('when Field Agent is in home view', () => {
+  describe('when Field Agent is in home view with no drafts', () => {
     const registerUserDetails = Object.assign({}, userDetails)
     registerUserDetails.role = FIELD_AGENT_ROLE
     beforeEach(async () => {
@@ -78,6 +80,9 @@ describe('when the home page loads for a field worker', () => {
       expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
       expect(app.find('#tab_updates').hostNodes()).toHaveLength(1)
     })
+    it('loads no grid table when there is no applications', () => {
+      expect(app.find('#no-record').hostNodes()).toHaveLength(1)
+    })
 
     describe('when user clicks the floating action button', () => {
       beforeEach(() => {
@@ -89,6 +94,36 @@ describe('when the home page loads for a field worker', () => {
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
       })
+    })
+  })
+
+  describe('when Field Agent is in home view with drafts', () => {
+    const registerUserDetails = Object.assign({}, userDetails)
+    registerUserDetails.role = FIELD_AGENT_ROLE
+    beforeEach(async () => {
+      store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+      store.dispatch(
+        getStorageApplicationsSuccess(JSON.stringify(currentUserApplications))
+      )
+      history.replace(HOME)
+      app.update()
+      app
+        .find('#createPinBtn')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      Array.apply(null, { length: 8 }).map(() => {
+        app
+          .find('#keypad-1')
+          .hostNodes()
+          .simulate('click')
+      })
+      await flushPromises()
+      app.update()
+    })
+    it('loads grid table when there is no applications', () => {
+      expect(app.find('#no-record').hostNodes()).toHaveLength(0)
     })
   })
 })
