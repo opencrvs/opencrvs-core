@@ -16,7 +16,7 @@ const Estimate = styled.div`
   height: 60px;
   width: 100%;
   box-sizing: border-box;
-  border: 2px dashed ${({ theme }) => theme.colors.accent};
+  border: 2px dashed ${({ theme }) => theme.colors.secondary};
   padding: 6px;
 `
 
@@ -65,9 +65,9 @@ export const Bar = withTheme((props: IBarChartProps & { theme: ITheme }) => {
     allTotalPoints.length > 0 ? sumOfTotalPoints : otherPointsValue
 
   const colours = [
-    theme.colors.chartPrimary,
-    theme.colors.chartSecondary,
-    theme.colors.chartTertiary
+    theme.colors.primary,
+    theme.colors.secondary,
+    theme.colors.tertiary
   ]
 
   if (estimatePoint) {

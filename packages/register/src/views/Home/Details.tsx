@@ -51,7 +51,7 @@ const HistoryWrapper = styled.div`
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   &:last-child {
     margin-bottom: 0;
   }
@@ -60,18 +60,17 @@ const StyledLabel = styled.label`
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 const Separator = styled.div`
   height: 20px;
   width: 1px;
   margin: 1px 8px;
-  background: ${({ theme }) => theme.colors.copyAlpha80};
+  background: ${({ theme }) => theme.colors.copy};
 `
 const ValueContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  line-height: 1.3em;
 `
 const StatusContainer = styled.div`
   flex: 1;

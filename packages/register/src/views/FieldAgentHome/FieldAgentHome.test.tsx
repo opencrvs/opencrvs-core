@@ -78,6 +78,18 @@ describe('when the home page loads for a field worker', () => {
       expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
       expect(app.find('#tab_updates').hostNodes()).toHaveLength(1)
     })
+
+    describe('when user clicks the floating action button', () => {
+      beforeEach(() => {
+        app
+          .find('#new_event_declaration')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('changes to new vital event screen', () => {
+        expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
   })
 })
 
@@ -130,10 +142,6 @@ describe('when the home page loads for a Local Registrar', () => {
         getStorageUserDetailsSuccess(JSON.stringify(registerUserDetails))
       )
       app.update()
-    })
-
-    it('new registration renders', () => {
-      expect(app.find('#new_registration').hostNodes()).toHaveLength(1)
     })
   })
 })

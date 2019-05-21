@@ -6,11 +6,10 @@ const ImageBase = styled(PrimaryButton.withComponent('label'))`
   width: auto;
   height: 48px;
   padding: 0 35px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   align-items: center;
   display: inline-flex;
   border: 0;
-  font-size: inherit;
   justify-content: space-between;
   cursor: pointer;
 `

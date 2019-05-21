@@ -16,46 +16,59 @@ import {
   FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 } from 'src/utils/constants'
 import styled from 'styled-components'
-import { Button, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
+import {
+  Button,
+  ICON_ALIGNMENT,
+  FloatingActionButton
+} from '@opencrvs/components/lib/buttons'
 import {
   StatusProgress,
   StatusOrange,
-  StatusRejected
+  StatusRejected,
+  PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
 import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
 import { REGISTRAR_HOME } from 'src/navigation/routes'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 50px;
+  height: 48px;
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
   justify-content: flex-start;
   align-items: center;
 `
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
-  color: ${({ theme }) => theme.colors.secondary};
-  font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
-  height: 50px;
-  font-size: 14px;
-  border-bottom: ${({ active }) => (active ? '3px solid' : '')}
-    ${({ theme }) => theme.colors.accentLight};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 0;
+  outline: none;
+  ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  & > div {
+    padding: 0 16px;
+  }
   :first-child > div {
     position: relative;
     padding-left: 0;
   }
-  & > div {
-    padding: 0 16px;
-  }
-  & div > div:first-child {
+  & div > div {
     margin-right: 8px;
   }
-
   &:focus {
     outline: 0;
   }
 `
+const FABContainer = styled.div`
+  position: absolute;
+  left: 85.33%;
+  right: 5.33%;
+  top: 85%;
+  bottom: 9.17%;
+`
+
 const messages = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
@@ -150,6 +163,13 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 })}
               </IconTab>
             </Topbar>
+            <FABContainer>
+              <FloatingActionButton
+                id="new_event_declaration"
+                onClick={this.props.goToEvents}
+                icon={() => <PlusTransparentWhite />}
+              />
+            </FABContainer>
           </>
         )}
         {userDetails && userDetails.role && !isFieldAgent && (

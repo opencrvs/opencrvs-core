@@ -14,25 +14,20 @@ const ViewHeadingContainer = styled.div`
 `
 
 const Breadcrumb = styled.div`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  letter-spacing: 2.14px;
-  font-size: 15px;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   text-transform: uppercase;
   margin-bottom: 20px;
 `
 
 const ViewTitle = styled.h2`
-  font-size: 32px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.h2Style};
   margin: 0;
-  font-weight: 100;
 `
 
 const ViewDescription = styled.p`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   margin: 0;
   margin-top: 5px;
-  font-size: 18px;
 `
 
 export function ViewHeading({

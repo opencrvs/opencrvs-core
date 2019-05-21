@@ -23,7 +23,7 @@ import {
   Phone,
   ArrowBack
 } from '@opencrvs/components/lib/icons'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
+import { IconButton } from '@opencrvs/components/lib/buttons'
 import { storage } from 'src/storage'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { connect } from 'react-redux'
@@ -41,6 +41,9 @@ import {
 } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
 import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
+import { Plus } from '@opencrvs/components/lib/icons'
+import styled from 'src/styled-components'
+import { goToEvents as goToEventsAction } from 'src/navigation'
 import { SEARCH } from 'src/navigation/routes'
 
 type IProps = InjectedIntlProps & {
@@ -49,6 +52,7 @@ type IProps = InjectedIntlProps & {
   language: string
   title?: string
   goToSearchResult: typeof goToSearchResult
+  goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
   searchText?: string
   selectedSearchType?: string
@@ -137,6 +141,14 @@ const messages = defineMessages({
   }
 })
 
+const StyledPrimaryButton = styled(IconButton)`
+  ${({ theme }) => theme.shadows.mistyShadow};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
+
 class HeaderComp extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
@@ -193,7 +205,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         iconHover: <LogoutBlue />,
         label: 'Logout',
         secondary: true,
-        onClick: this.toggleLogoutModal
+        onClick: this.logout
       }
     ]
     const userInfo = { name, role }
@@ -214,13 +226,6 @@ class HeaderComp extends React.Component<IProps, IState> {
   logout = () => {
     storage.removeItem(SCREEN_LOCK)
     this.props.redirectToAuthentication()
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal,
-      showMenu: false
-    }))
   }
 
   toggleMenu = () => {
@@ -290,6 +295,15 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const rightMenu = [
       {
+        element: (
+          <StyledPrimaryButton
+            key="newEvent"
+            onClick={this.props.goToEvents}
+            icon={() => <Plus />}
+          />
+        )
+      },
+      {
         element: this.renderSearchInput(this.props, true)
       },
       {
@@ -325,11 +339,6 @@ class HeaderComp extends React.Component<IProps, IState> {
           title={title}
           {...mobileHeaderActionProps}
         />
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.logout}
-        />
       </>
     )
   }
@@ -343,6 +352,7 @@ export const Header = connect(
   {
     redirectToAuthentication,
     goToSearchResult,
+    goToEvents: goToEventsAction,
     goToSearch
   }
 )(injectIntl<IProps>(HeaderComp))

@@ -6,7 +6,7 @@ import styled from '../styled-components'
 import { TopMenu } from './TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import ConnectivityStatus from './ConnectivityStatus'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 const HeaderWrapper = styled(Header)`
   display: block;
@@ -30,13 +30,13 @@ export class HomeViewHeader extends React.Component<IViewHeadingProps> {
     const { title, description, id } = this.props
     return (
       <HeaderWrapper>
-        <HeaderContent>
+        <BodyContent>
           <ConnectivityStatus />
           <TopMenu hideBackButton={true} />
           <StyledLogo />
           <ViewHeading {...{ title, description, id }} />
           {this.props.children}
-        </HeaderContent>
+        </BodyContent>
       </HeaderWrapper>
     )
   }

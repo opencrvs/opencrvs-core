@@ -50,7 +50,7 @@ const StyledSearchButton = styled(PrimaryButton)`
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};
@@ -73,11 +73,11 @@ const StyledInput = styled.input.attrs<ISearchInputProps>({})`
     error && touched ? theme.colors.error : theme.colors.disabled};
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
 
   &:focus {
-    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
+    border-bottom: solid 1px ${({ theme }) => theme.colors.secondary};
   }
 
   &::-webkit-input-placeholder {

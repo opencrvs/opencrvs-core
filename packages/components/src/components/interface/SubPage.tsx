@@ -7,7 +7,7 @@ import { Box } from './Box'
 const SubPageContainer = styled.div`
   width: 100%;
   height: 100vh;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 `
@@ -26,16 +26,14 @@ const BackButton = styled(Button)`
   width: 24px;
   height: 24px;
   padding: 0px;
-  background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
+  background: '#35495d00';
   justify-content: center;
   cursor: pointer;
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
 const MenuTitle = styled.span`
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 27px;
-  margin-left: 35px;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  margin-left: 30px;
 `
 const EmptyTitle = styled(MenuTitle)`
   color: ${({ theme }) => theme.colors.error};
@@ -45,7 +43,6 @@ const BodyContainer = styled(Box)`
   height: inherit;
   margin: auto;
   padding: 30px 0px 30px 65px;
-  font-size: 16px;
 `
 interface IProps {
   title?: string

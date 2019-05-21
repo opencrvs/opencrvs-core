@@ -1,124 +1,117 @@
 import { grid } from './grid'
 
 export interface IFonts {
-  boldFont: string
-  lightFont: string
+  bodyStyle: string
+  bodyBoldStyle: string
+  bigBodyStyle: string
   regularFont: string
-  defaultFontStyle: string
-  lightFontStyle: string
-  infoFontStyle: string
-  capsFontStyle: string
-  heavyFontStyle: string
-  h1FontStyle: string
-  h2FontStyle: string
-  h3FontStyle: string
+  semiBoldFont: string
+  bigBodyBoldStyle: string
+  heroStyle: string
+  h1Style: string
+  h2Style: string
+  h3Style: string
+  h4Style: string
   englishTextFont: string
+  subtitleStyle: string
+  captionStyle: string
+  buttonStyle: string
 }
 
 const countryFonts = {
   bgd: {
     bn: {
-      boldFontFamily: 'noto_sans_bengalibold',
-      lightFontFamily: 'noto_sans_bengalilight',
-      regularFontFamily: 'noto_sans_bengaliregular'
+      semiBoldFontFamily: 'noto_sans_bengali_semi_bold',
+      regularFontFamily: 'noto_sans_bengali_regular'
     },
     en: {
-      boldFontFamily: 'noto_sansbold',
-      lightFontFamily: 'noto_sanslight',
-      regularFontFamily: 'noto_sansregular'
+      semiBoldFontFamily: 'noto_sans_semi_bold',
+      regularFontFamily: 'noto_sans_regular'
     }
   },
   gbr: {
     en: {
-      boldFontFamily: 'noto_sansbold',
-      lightFontFamily: 'noto_sanslight',
-      regularFontFamily: 'noto_sansregular'
+      semiBoldFontFamily: 'noto_sans_semi_bold',
+      regularFontFamily: 'noto_sans_regular'
     }
   },
   za: {
     en: {
-      boldFontFamily: 'noto_sansbold',
-      lightFontFamily: 'noto_sanslight',
-      regularFontFamily: 'noto_sansregular'
+      semiBoldFontFamily: 'noto_sans_semi_bold',
+      regularFontFamily: 'noto_sans_regular'
     }
   }
 }
 
 export const fonts = (country: string, language: string): IFonts => ({
-  boldFont: countryFonts[country][language].boldFontFamily,
-  lightFont: countryFonts[country][language].lightFontFamily,
-  regularFont: countryFonts[country][language].regularFontFamily,
   englishTextFont: 'noto_sansregular',
-  defaultFontStyle: `font-family: ${
+  regularFont: countryFonts[country][language].regularFontFamily,
+  semiBoldFont: countryFonts[country][language].semiBoldFontFamily,
+  bigBodyBoldStyle: `font-family: ${
+    countryFonts[country][language].semiBoldFontFamily
+  };
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 27px;`,
+  bigBodyStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };
     font-weight: 400;
     font-size: 18px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 18px;
-    }
-    letter-spacing: 0.1px;`,
-  lightFontStyle: `font-family: ${
-    countryFonts[country][language].lightFontFamily
-  };
-    font-weight: 300;
+    font-weight: normal;
+    line-height: 27px;`,
+  bodyStyle: `font-family: ${countryFonts[country][language].regularFontFamily};
     font-size: 16px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 18px;
-    }
-    letter-spacing: 0.1px;`,
-  infoFontStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
+    font-weight: normal;
+    line-height: 24px;`,
+  bodyBoldStyle: `font-family: ${
+    countryFonts[country][language].semiBoldFontFamily
   };
-    font-weight: 300;
     font-size: 16px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 16px;
-    }
-    letter-spacing: 0.1px;`,
-
-  capsFontStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
+    line-height: 24px;
+    font-weight: normal;`,
+  subtitleStyle: `font-family: ${
+    countryFonts[country][language].semiBoldFontFamily
   };
-    font-weight: 300;
     font-size: 14px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 16px;
-    }
-    letter-spacing: 2.5px;
-    text-transform: uppercase;`,
-  heavyFontStyle: `font-family: ${
+    line-height: 21px;
+    font-weight: normal;
+    letter-spacing: 0.4px;`,
+  captionStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };
-      font-weight: 600;
-      font-size: 16px;
-      @media (max-width: ${grid.breakpoints.lg}px) {
-        font-size: 18px;
-      }
-      letter-spacing: 2.5px;
-      text-transform: uppercase;`,
-  h1FontStyle: `font-family: ${countryFonts[country][language].lightFontFamily};
-    font-weight: 300;
-    font-size: 30px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 32px;
-    }
-    letter-spacing: 0.1px;
-    text-transform: uppercase;`,
-  h2FontStyle: `font-family: ${countryFonts[country][language].lightFontFamily};
-    font-weight: 300;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: normal;
+    letter-spacing: 0.4px;`,
+  h4Style: `font-family: ${countryFonts[country][language].semiBoldFontFamily};
     font-size: 24px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 26px;
-    }
-    letter-spacing: 0.1px;
-    text-transform: uppercase;`,
-  h3FontStyle: `font-family: ${countryFonts[country][language].lightFontFamily};
-    font-weight: 300;
-    font-size: 20px;
-    @media (max-width: ${grid.breakpoints.lg}px) {
-      font-size: 22px;
-    }
-    letter-spacing: 0.1px;
+    font-weight: normal;
+    line-height: 36px;`,
+  h3Style: `font-family: ${countryFonts[country][language].regularFontFamily};
+    font-size: 27px;
+    line-height: 40px;
+    font-weight: normal;
+    letter-spacing: 0.25px;`,
+  h2Style: `font-family: ${countryFonts[country][language].regularFontFamily};
+    font-size: 36px;
+    font-weight: normal;
+    line-height: 54px;`,
+  h1Style: `font-family: ${countryFonts[country][language].regularFontFamily};
+    font-size: 48px;
+    font-weight: normal;
+    line-height: 72px;`,
+  heroStyle: `font-family: ${countryFonts[country][language].regularFontFamily};
+    font-size: 80px;
+    line-height: 120px;
+    font-weight: normal;
+    letter-spacing: -1.5px;`,
+  buttonStyle: `font-family: ${
+    countryFonts[country][language].semiBoldFontFamily
+  };
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: normal;
+    letter-spacing: 1px;
     text-transform: uppercase;`
 })

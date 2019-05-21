@@ -77,5 +77,4 @@ Cypress.Commands.add('selectOption', (selector, text, option) => {
 Cypress.Commands.add('logout', () => {
   cy.get('#sub-menu').click()
   cy.get('#Logout-menu-item').click()
-  cy.get('#logout_confirm').click()
 })

@@ -10,10 +10,9 @@ export type IInputLabel = {
 const styledInputLabel = styled.label.attrs<IInputLabel>({})
 
 const StyledInputLabel = styledInputLabel`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ color, disabled, theme }) =>
-    disabled ? theme.colors.disabled : color ? color : theme.colors.secondary} ;
+    disabled ? theme.colors.disabled : color ? color : theme.colors.copy} ;
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;

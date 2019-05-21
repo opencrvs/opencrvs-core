@@ -10,9 +10,8 @@ const FooterContainer = styled.section`
   flex-grow: 1;
   max-height: 54px;
   & > p {
-    font-size: 16px;
     color: ${({ theme }) => theme.colors.white};
-    font-family: ${({ theme }) => theme.fonts.regularFont};
+    ${({ theme }) => theme.fonts.captionStyle};
   }
   flex-direction: row;
   & a {
@@ -20,11 +19,7 @@ const FooterContainer = styled.section`
   }
   align-items: center;
   width: 100%;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.headerGradientDark} 0%,
-    ${({ theme }) => theme.colors.headerGradientLight} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
 `
 
 export class Footer extends React.Component {

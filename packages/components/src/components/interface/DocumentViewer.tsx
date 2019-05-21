@@ -21,12 +21,11 @@ const Icon = styled.div`
 `
 const TitleContainer = styled.div`
   width: 276px;
-  color: ${({ theme }) => theme.colors.secondary};
-  font-size: 18px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 const Title = styled.div`
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 const SelectContainer = styled.div`
   width: 70%;

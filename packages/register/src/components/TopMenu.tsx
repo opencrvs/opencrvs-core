@@ -17,7 +17,6 @@ import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
-import { LogoutConfirmation } from 'src/components/LogoutConfirmation'
 
 const messages = defineMessages({
   back: {
@@ -98,10 +97,8 @@ const BackButton = styled(PrimaryButton)`
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: 2px;
   margin-left: 14px;
 `
 
@@ -122,18 +119,6 @@ interface IState {
 type IFullProps = Props & InjectedIntlProps
 
 class TopMenuComponent extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps & IState) {
-    super(props)
-    this.state = {
-      showLogoutModal: false
-    }
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal
-    }))
-  }
   goToPerformance = () => {
     this.props.goToPerformance()
   }
@@ -169,7 +154,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
       {
         title: intl.formatMessage(messages.logout),
         key: 'logout',
-        onClick: this.toggleLogoutModal
+        onClick: this.props.redirectToAuthentication
       }
     ]
     if ((userScope && userScope.indexOf('performance')) !== -1) {
@@ -193,11 +178,6 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         <HamburgerMenu
           menuItems={menuItems}
           menuTitle={intl.formatMessage(messages.menu)}
-        />
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.props.redirectToAuthentication}
         />
       </TopMenuContainer>
     )

@@ -17,9 +17,7 @@ const Wrapper = styled.div`
 `
 const LabelText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
-  font-weight: 500;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 const ComponentWrapper = styled.span`
   flex-direction: column;

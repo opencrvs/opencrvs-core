@@ -296,57 +296,6 @@ describe('RegistrarHome tests', async () => {
         .text()
     ).toContain('In progress (1)')
   })
-  it('renders review and register button for user with register scope', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['123456789']
-          }
-        },
-        result: {
-          data: {
-            countEventRegistrations: {
-              declared: 10,
-              rejected: 5
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#new_registration')
-        .hostNodes()
-        .text()
-    ).toContain('New registration')
-  })
   it('check rejected applications count', async () => {
     const graphqlMock = [
       {
