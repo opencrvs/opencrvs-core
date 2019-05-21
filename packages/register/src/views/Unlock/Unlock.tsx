@@ -10,7 +10,6 @@ import { IUserDetails } from '../../utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from 'src/storage'
-import * as bcrypt from 'bcryptjs'
 import {
   SECURITY_PIN_INDEX,
   SECURITY_PIN_EXPIRED_AT
@@ -18,6 +17,7 @@ import {
 import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
+import { pinOps } from './ComparePINs'
 
 const messages = defineMessages({
   incorrect: {
@@ -153,7 +153,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.setState({
       showSpinner: true
     })
-    const pinMatched = await bcrypt.compare(pin, userPin)
+    const pinMatched = await pinOps.comparePins(pin, userPin)
     this.setState({
       showSpinner: false
     })
@@ -235,7 +235,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.props.redirectToAuthentication()
   }
   render() {
-    return this.state.showSpinner ? <SpinnerWrapper><Spinner id="hashingSpinner" /></SpinnerWrapper> : (
+    return this.state.showSpinner ? (
+      <SpinnerWrapper>
+        <Spinner id="hashingSpinner" />
+      </SpinnerWrapper>
+    ) : (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.logout} id="logout">
           <span>Logout</span>
