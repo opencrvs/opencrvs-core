@@ -8,6 +8,10 @@
     "color-no-hex": true,
     "color-named": "never",
     "no-descending-specificity": null,
-    "property-no-vendor-prefix": null
-  }
+    "property-no-vendor-prefix": null,
+    "opencrvs/no-font-styles": true
+  },
+  "plugins": [
+    "./no-font-styles.js"
+  ]
 }

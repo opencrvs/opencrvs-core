@@ -43,7 +43,7 @@ import { RejectRegistrationForm } from 'src/components/review/RejectRegistration
 import { getOfflineState } from 'src/offline/selectors'
 import { IOfflineDataState } from 'src/offline/reducer'
 import { CONFIRMATION_SCREEN, HOME } from 'src/navigation/routes'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 import {
   DECLARATION,
@@ -65,15 +65,15 @@ import { toggleDraftSavedNotification } from 'src/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
 import * as Sentry from '@sentry/browser'
-// @ts-ignore - typescript doesn't like importing the individual lodash modules but I need this for mocking
+// @ts-ignore - Required for mocking
 import * as debounce from 'lodash/debounce'
 
-const FormSectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+const FormSectionTitle = styled.h3`
+  ${({ theme }) => theme.fonts.h3Style};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FormActionSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   margin: 0px -25px;
 `
 const FormAction = styled.div`
@@ -84,7 +84,7 @@ const FormAction = styled.div`
   padding-left: 25px;
 `
 const FormActionDivider = styled.div`
-  border-bottom: 1px inset ${({ theme }) => theme.colors.blackAlpha20};
+  border-bottom: 1px inset ${({ theme }) => theme.colors.placeholder};
 `
 
 const FormPrimaryButton = styled(PrimaryButton)`
@@ -105,11 +105,9 @@ const BackButton = styled(PrimaryButton)`
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
   color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: 2px;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   margin-left: 14px;
 `
 
@@ -119,15 +117,12 @@ const DraftButtonContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
 `
-
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   padding: 25px;
   color: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  line-height: 24px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   margin: 30px -25px;
 `
 const CancelButton = styled.a`
@@ -228,8 +223,7 @@ const FormViewContainer = styled.div`
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
@@ -242,7 +236,6 @@ const ButtonSpinner = styled(InvertSpinner)`
 `
 
 const ConfirmBtn = styled(PrimaryButton)`
-  font-weight: bold;
   min-width: 150px;
   display: flex;
   align-items: center;
@@ -257,7 +250,7 @@ const ConfirmBtn = styled(PrimaryButton)`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
@@ -674,7 +667,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               />
             </ViewHeaderWithTabs>
             <FormContainer>
-              <HeaderContent>
+              <BodyContent>
                 <Swipeable
                   disabled={isReviewSection || !isMobileDevice()}
                   id="swipeable_block"
@@ -793,7 +786,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     </Box>
                   )}
                 </Swipeable>
-              </HeaderContent>
+              </BodyContent>
             </FormContainer>
             <ViewFooter>
               <FooterAction>

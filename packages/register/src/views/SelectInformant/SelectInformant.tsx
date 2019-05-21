@@ -9,7 +9,7 @@ import { ViewHeader } from '../../components/ViewHeader'
 import { goToBirthRegistrationAsParent } from 'src/navigation'
 import { createApplication, storeApplication } from 'src/applications'
 import { Event } from 'src/forms'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 export const messages = defineMessages({
   newBirthRegistration: {
@@ -84,7 +84,7 @@ export class SelectInformantView extends React.Component<
           id="select_informant_view"
         />
         <ActionList>
-          <HeaderContent>
+          <BodyContent>
             <Action
               id="select_parent_informant"
               title={intl.formatMessage(messages.parentInformantTitle)}
@@ -109,7 +109,7 @@ export class SelectInformantView extends React.Component<
               )}
               disabled
             />
-          </HeaderContent>
+          </BodyContent>
         </ActionList>
       </>
     )

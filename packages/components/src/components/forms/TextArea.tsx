@@ -11,10 +11,10 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
   min-height: 80px;
   border: 2px solid ${({ theme }) => theme.colors.secondary};
   &:focus {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.creamCan};
+    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.focus};
     outline: 0;
   }
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.secondary};
 

@@ -2,50 +2,18 @@ import * as React from 'react'
 
 export const Plus = (props: React.HTMLAttributes<SVGElement>) => (
   <svg
-    width={142}
-    height={142}
-    xmlnsXlink="http://www.w3.org/1999/xlink"
-    {...props}
+    width={24}
+    height={24}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <title>764AA7DC-2C55-4A5C-A80A-2BF48B4458E5</title>
-    <defs>
-      <rect id="plus_b" x={0} y={0} width={96} height={96} rx={1.27} />
-      <filter
-        x="-35.9%"
-        y="-35.9%"
-        width="171.9%"
-        height="171.9%"
-        filterUnits="objectBoundingBox"
-        id="plus_a"
-      >
-        <feOffset in="SourceAlpha" result="shadowOffsetOuter1" />
-        <feGaussianBlur
-          stdDeviation={11.5}
-          in="shadowOffsetOuter1"
-          result="shadowBlurOuter1"
-        />
-        <feColorMatrix
-          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.272588315 0"
-          in="shadowBlurOuter1"
-        />
-      </filter>
-    </defs>
-    <g fill="none" fillRule="evenodd">
-      <g transform="translate(23 23)">
-        <use fill="#000" filter="url(#plus_a)" xlinkHref="#plus_b" />
-        <use fill="#5E93ED" xlinkHref="#plus_b" />
-      </g>
-      <g transform="translate(56 56)" fill="#FFF" fillRule="nonzero">
-        <rect x={0.474} y={12.942} width={29.416} height={3.687} rx={1.844} />
-        <rect
-          transform="rotate(90 15.182 14.785)"
-          x={0.474}
-          y={12.942}
-          width={29.416}
-          height={3.687}
-          rx={1.844}
-        />
-      </g>
-    </g>
+    <path d="M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    <path
+      d="M12 4L12 20"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
   </svg>
 )

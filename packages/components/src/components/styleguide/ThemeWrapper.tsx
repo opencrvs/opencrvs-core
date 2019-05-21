@@ -18,8 +18,7 @@ const Wrapper = styled.div`
   background: #ebf1f3;
   /* stylelint-enable */
   padding: 2em;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 `
 

@@ -69,24 +69,20 @@ const ModalContent = styled.div`
   padding: 30px 30px 60px 30px;
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  font-size: 14px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.subtitleStyle};
   position: relative;
 `
 
 const Heading = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  font-size: 15px;
-  font-weight: bold;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 const Info = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   text-align: center;
-  font-size: 15px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 const StyledSpinner = styled(Spinner)`

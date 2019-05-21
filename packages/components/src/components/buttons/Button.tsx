@@ -9,14 +9,14 @@ export enum ICON_ALIGNMENT {
 const ButtonBase = styled.button`
   width: auto;
   height: 48px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
   border: 0;
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: inherit;
   cursor: pointer;
   justify-content: center;
   background: transparent;
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.disabled};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
@@ -24,7 +24,7 @@ const ButtonBase = styled.button`
 `
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: () => React.ReactNode
+  icon?: React.ReactNode | (() => React.ReactNode)
   align?: ICON_ALIGNMENT
 }
 
@@ -34,16 +34,17 @@ export function Button({
   align = ICON_ALIGNMENT.RIGHT,
   ...otherProps
 }: IButtonProps) {
+  icon = typeof icon === 'function' ? icon() : icon
   if (icon && children) {
     return (
       <ButtonBase {...otherProps}>
         <Wrapper>
           {icon && align === ICON_ALIGNMENT.LEFT && (
-            <LeftButtonIcon>{icon()}</LeftButtonIcon>
+            <LeftButtonIcon>{icon}</LeftButtonIcon>
           )}
           {children}
           {icon && align === ICON_ALIGNMENT.RIGHT && (
-            <RightButtonIcon>{icon()}</RightButtonIcon>
+            <RightButtonIcon>{icon}</RightButtonIcon>
           )}
         </Wrapper>
       </ButtonBase>
@@ -52,7 +53,7 @@ export function Button({
     return (
       <ButtonBase {...otherProps}>
         {' '}
-        <IconOnly>{icon()}</IconOnly>
+        <IconOnly>{icon}</IconOnly>
       </ButtonBase>
     )
   } else {
@@ -71,7 +72,7 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const CenterWrapper = styled.div`
-  padding: 0 32px;
+  padding: 0 20px;
   align-items: center;
   justify-content: center;
   display: inline-flex;
@@ -88,5 +89,6 @@ const RightButtonIcon = styled.div`
 `
 const IconOnly = styled.div`
   position: relative !important;
-  padding: 0 8px;
+  top: 4px;
+  left: 1px;
 `

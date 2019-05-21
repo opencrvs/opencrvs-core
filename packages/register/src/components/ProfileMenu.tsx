@@ -22,18 +22,14 @@ import { redirectToAuthentication } from 'src/profile/profileActions'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  font-size: 18px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   height: 27px;
-  line-height: 27px;
 `
 
 const UserRole = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  font-size: 12px;
   height: 24px;
-  line-height: 150%;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.captionStyle};
 `
 
 const messages = defineMessages({

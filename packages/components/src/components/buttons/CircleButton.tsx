@@ -12,7 +12,7 @@ export const CircleButton = styled.button.attrs<{ dark?: boolean }>({})`
   border-radius: 100%;
   &:hover {
     background-color: ${({ theme, dark }) =>
-      dark ? theme.colors.primary : theme.colors.buttonHoverColor};
+      dark ? theme.colors.primary : theme.colors.background};
   }
   &:active {
     background-color: transparent;

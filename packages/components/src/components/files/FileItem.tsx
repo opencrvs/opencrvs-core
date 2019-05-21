@@ -27,8 +27,7 @@ const Container = styled.div`
 `
 
 const Link = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-decoration: underline;
   cursor: pointer;
 `
@@ -38,15 +37,15 @@ const PreviewLink = styled(Link)`
 `
 
 const DeleteLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.danger};
+  color: ${({ theme }) => theme.colors.error};
   margin-left: 8px;
 `
 
 const FileContainer = styled.div`
   height: 75px;
-  border: 1px solid ${({ theme }) => theme.colors.accentLight};
+  border: 1px solid ${({ theme }) => theme.colors.secondary};
   border-radius: 1px;
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   flex: 1;
   display: flex;
@@ -64,8 +63,7 @@ const DeleteContainer = styled.div`
 `
 
 const MetadataContainer = styled.div`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
 
   display: flex;
@@ -99,7 +97,7 @@ class FileItemComponent extends React.Component<IProps> {
           </PreviewLink>
         </FileContainer>
         <DeleteContainer id={`${id}_delete_link`} onClick={onDelete}>
-          <Cross color={theme.colors.danger} />
+          <Cross color={theme.colors.error} />
           <DeleteLink>{deleteLabel ? deleteLabel : 'Delete'}</DeleteLink>
         </DeleteContainer>
       </Container>

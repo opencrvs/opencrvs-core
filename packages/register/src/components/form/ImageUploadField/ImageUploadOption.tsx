@@ -6,7 +6,7 @@ import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { FormFieldGenerator } from 'src/components/form'
 import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
 import { hasFormError } from 'src/forms/utils'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Jimp from 'jimp'
 import { ALLOWED_IMAGE_TYPE } from 'src/utils/constants'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
@@ -139,7 +139,7 @@ export class ImageUploadOptionClass extends React.Component<IFullProps, State> {
           backLabel={backLabel}
           goBack={this.props.toggleNestedSection}
         >
-          <HeaderContent>
+          <BodyContent>
             <FormContainer>
               <Box>
                 <FormFieldGenerator
@@ -165,7 +165,7 @@ export class ImageUploadOptionClass extends React.Component<IFullProps, State> {
                 )}
               </Box>
             </FormContainer>
-          </HeaderContent>
+          </BodyContent>
         </ActionPage>
       </OverlayContainer>
     )

@@ -35,11 +35,8 @@ const messages = defineMessages({
 })
 
 const PageWrapper = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  background: ${({ theme }) =>
-    `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
-      theme.colors.headerGradientLight
-    } 100%);`};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.gradients.gradientNightshade};
   height: 100vh;
   display: flex;
   flex-direction: column;
