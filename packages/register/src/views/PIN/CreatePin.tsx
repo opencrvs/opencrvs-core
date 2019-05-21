@@ -100,13 +100,21 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 
   render() {
-    const { pin, pinMatchError, pinHasSameDigits, pinHasSeqDigits, refresher } = this.state
+    const {
+      pin,
+      pinMatchError,
+      pinHasSameDigits,
+      pinHasSeqDigits,
+      refresher
+    } = this.state
     const { intl } = this.props
+
+    console.log(this.state)
 
     return (
       <Container>
         <PIN />
-        {pin === null && !pinHasSeqDigits && (
+        {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.createTitle)}
@@ -122,7 +130,7 @@ class CreatePinComponent extends React.Component<IProps> {
             <PINKeypad pin="" onComplete={this.firstPINEntry} />
           </>
         )}
-        {pinHasSeqDigits &&  (
+        {pinHasSeqDigits && (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.createTitle)}
@@ -139,7 +147,7 @@ class CreatePinComponent extends React.Component<IProps> {
             />
           </>
         )}
-        {pinHasSameDigits &&  (
+        {pinHasSameDigits && (
           <>
             <TitleText id="title-text">
               {intl.formatMessage(messages.createTitle)}
