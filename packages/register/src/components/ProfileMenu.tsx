@@ -18,7 +18,6 @@ import { IUserDetails } from 'src/utils/userUtils'
 import { getLanguage } from 'src/i18n/selectors'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { LogoutConfirmation } from './LogoutConfirmation'
 import { redirectToAuthentication } from 'src/profile/profileActions'
 
 const UserName = styled.div`
@@ -89,19 +88,6 @@ interface IState {
 type FullProps = IProps & InjectedIntlProps
 
 class ProfileMenuComponent extends React.Component<FullProps, IState> {
-  constructor(props: FullProps & IState) {
-    super(props)
-    this.state = {
-      showLogoutModal: false
-    }
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal
-    }))
-  }
-
   getMenuItems = (intl: InjectedIntl): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
@@ -112,9 +98,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     items.push({
       icon: <LogoutBlack />,
       label: intl.formatMessage(messages.logout),
-      handler: () => {
-        this.toggleLogoutModal()
-      }
+      handler: () => this.props.redirectToAuthentication()
     })
     return items
   }
@@ -161,12 +145,6 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
           toggleButton={<AvatarSmall />}
           menuHeader={this.getMenuHeader(intl, language, userDetails)}
           menuItems={this.getMenuItems(intl)}
-        />
-
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.props.redirectToAuthentication}
         />
       </>
     )
