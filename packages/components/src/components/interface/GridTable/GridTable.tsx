@@ -19,8 +19,8 @@ const TableHeader = styled.div`
 `
 
 const StyledBox = styled(Box)`
-  margin-top: 15px;
-  padding: 7px 0px 0px 0px;
+  margin: 15px 10px;
+  padding: 17px 0px 10px 0px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
