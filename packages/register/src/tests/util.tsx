@@ -322,7 +322,7 @@ export const mockApplicationData = {
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
     birthType: 'SINGLE',
-    multipleBirth: '1'
+    multipleBirth: 1
   },
   mother: {
     firstNames: 'স্পিভক',
