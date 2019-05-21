@@ -154,6 +154,6 @@ context('Birth Registration Integration Test', () => {
     //     cy.log('registrationNumberText: ', registrationNumberText)
     //     cy.get('#go_to_homepage_button').click()
     //   })
-    // })
+    // }) */
   })
 })
