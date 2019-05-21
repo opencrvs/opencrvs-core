@@ -14,6 +14,8 @@ const Container = styled.div`
   justify-content: center;
   ${({ theme }) => theme.gradients.gradientNightshade};
   height: 100vh;
+  width: 100%;
+  position: absolute;
   overflow-y: hidden;
   overflow-x: hidden;
 `

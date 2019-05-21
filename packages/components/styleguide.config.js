@@ -2,13 +2,22 @@ const { styles, theme } = require('./styleguide.styles')
 
 const path = require('path')
 
+function getWebpackConfig() {
+  const webpackConfig = require('react-scripts-ts/config/webpack.config.dev.js')
+  if (!webpackConfig.devServer) {
+    webpackConfig.devServer = {}
+  }
+  webpackConfig.devServer.disableHostCheck = true
+  return webpackConfig
+}
+
 module.exports = {
   components: 'src/components/**/*.{ts,tsx}',
   propsParser: require('react-docgen-typescript').parse,
   styleguideDir: './lib',
   assetsDir: './static',
   skipComponentsWithoutExample: true,
-  webpackConfig: require('react-scripts-ts/config/webpack.config.dev.js'),
+  webpackConfig: getWebpackConfig(),
   styleguideComponents: {
     Wrapper: path.join(__dirname, 'src/components/styleguide/ThemeWrapper')
   },
