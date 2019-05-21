@@ -38,7 +38,7 @@ interface IAppProps {
 }
 const MainSection = styled.section`
   flex-grow: 8;
-  margin-bottom: 48px;
+  padding-bottom: 48px;
 `
 export const store = createStore()
 
