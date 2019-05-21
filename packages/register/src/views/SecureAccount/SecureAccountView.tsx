@@ -9,6 +9,8 @@ const SecurePageContainer = styled.div`
   ${({ theme }) => theme.gradients.gradientNightshade};
   height: 100vh;
   text-align: center;
+  width: 100%;
+  position: absolute;
   color: ${({ theme }) => theme.colors.white};
 `
 const Wrapper = styled.div`
