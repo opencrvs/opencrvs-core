@@ -598,6 +598,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.button.savedDrafts': 'আমার সংরক্ষিত খসড়া গুলি',
     'register.home.button.records': 'আমার নথি গুলি',
     'register.home.buttons.trackingId': 'ট্র্যাকিং আইডি',
+    'register.home.header.typeTrackingId': 'ট্র্যাকিং আইডি',
     'register.home.logout': 'লগ আউট',
     'register.selectVitalEvent.registerNewEventDesc':
       'ইভেন্ট নির্বাচন দ্বারা শুরু করুন',
@@ -974,7 +975,6 @@ export const BENGALI_STATE: ILanguage = {
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
     'register.SearchResult.reject': 'হালনাগাদ',
     'register.SearchResult.rejectComments': 'মন্তব্য',
-    'register.home.header.typeTrackingId': 'ট্র্যাকিং আইডি',
     'register.home.header.typeBrnDrn': 'বিআরএন/ডিআরএন',
     'register.home.header.typePhone': 'ফোন নম্বর',
     'register.home.header.placeHolderTrackingId': 'ট্র্যাকিং আইডি প্রবেশ করান',

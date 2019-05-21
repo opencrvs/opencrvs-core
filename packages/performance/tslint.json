@@ -1,7 +1,7 @@
 {
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "linterOptions": {
-    "exclude": ["config/**/*.js", "node_modules/**/*.ts"]
+    "exclude": ["config/**/*.js", "node_modules/**/*.ts", "no-font-styles.js"]
   },
   "rules": {
     "ordered-imports": false,

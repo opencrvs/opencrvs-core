@@ -20,19 +20,18 @@ const StyledIcon = styled(Camera)`
   box-shadow: 0 0 4px 3px rgba(0, 0, 0, 0.1);
   height: 50px;
   width: 50px;
-  background-color: ${({ theme }) => theme.colors.accentLight};
+  background-color: ${({ theme }) => theme.colors.secondary};
 `
 const PhotoIconAction = styled(IconAction)`
   outline-style: dashed;
-  outline-color: ${({ theme }) => theme.colors.accentLight};
+  outline-color: ${({ theme }) => theme.colors.secondary};
   outline-width: 1px;
   min-height: 90px;
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
-    font-size: 18px;
+    ${({ theme }) => theme.fonts.bigBodyStyle};
     margin-left: 75px;
-    line-height: 24px;
   }
 `
 const FileViewer = styled.div`
@@ -40,7 +39,7 @@ const FileViewer = styled.div`
 `
 const FileViewerLabel = styled.label`
   color: ${({ theme }) => theme.colors.primary};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 const FileItemContainer = styled.div`
   margin-top: 12px;
@@ -163,15 +162,14 @@ class ImageUploadComponent extends React.Component<
           onClick={this.toggleNestedSection}
         />
 
-        {fileList &&
-          fileList.length > 0 && (
-            <FileViewer id="file_list_viewer">
-              <FileViewerLabel>
-                {intl.formatMessage(messages.uploadedList)}
-              </FileViewerLabel>
-              {fileList}
-            </FileViewer>
-          )}
+        {fileList && fileList.length > 0 && (
+          <FileViewer id="file_list_viewer">
+            <FileViewerLabel>
+              {intl.formatMessage(messages.uploadedList)}
+            </FileViewerLabel>
+            {fileList}
+          </FileViewer>
+        )}
 
         {this.state.showNestedOptionSection && (
           <ImageUploadOption

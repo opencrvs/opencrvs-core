@@ -1,12 +1,9 @@
 import {
-  ActionTitle,
   Button,
   IButtonProps,
-  IconAction,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import {
-  Plus,
   StatusOrange,
   StatusProgress,
   StatusRejected
@@ -17,7 +14,7 @@ import {
   GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLBirthRegistration,
@@ -38,7 +35,6 @@ import { IViewHeadingProps } from 'src/components/ViewHeading'
 import { IApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import {
-  goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToTab as goToTabAction
@@ -65,26 +61,29 @@ export interface IProps extends IButtonProps {
   disabled?: boolean
   id: string
 }
-export const IconTabs = styled.div`
+const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  position: relative;
-  white-space: nowrap;
-  border-bottom: 1px solid rgb(210, 210, 210);
-  margin-top: 50px;
+  height: 48px;
+  background: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.shadows.mistyShadow};
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `
 export const IconTab = styled(Button).attrs<IProps>({})`
-  color: ${({ theme }) => theme.colors.secondary};
-  font-weight: ${({ theme, active }) => (active ? 'bold' : theme.void)};
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
   margin-right: 50px;
   outline: none;
-  font-size: 16px;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & div {
     position: relative;
-    margin-right: 10px;
+
+    top: 2px;
+    margin-right: 6px;
   }
   &:focus {
     outline: 0;
@@ -147,11 +146,6 @@ const messages = defineMessages({
     id: 'register.registrarHome.description',
     defaultMessage: 'Review | Registration | Certification',
     description: 'The displayed description in the Work Queue header'
-  },
-  newRegistration: {
-    id: 'register.registrarHome.newRegistration',
-    defaultMessage: 'New registration',
-    description: 'The title of new registration button'
   },
   inProgress: {
     id: 'register.registrarHome.inProgress',
@@ -260,39 +254,13 @@ const messages = defineMessages({
     description: 'Label for action in work queue list item'
   }
 })
-const Container = styled.div`
-  z-index: 1;
-  position: relative;
-  margin-top: 10px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-`
-const StyledPlusIcon = styled(Plus)`
-  display: flex;
-  margin-left: -23px;
-  margin-top: -23px;
-`
-const StyledIconAction = styled(IconAction)`
-  display: flex;
-  min-height: 96px;
-  padding: 0 20px 0 0;
-  box-shadow: 0 0 12px 1px rgba(0, 0, 0, 0.22);
-  background-color: ${({ theme }) => theme.colors.accentLight};
-  /* stylelint-disable */
-  ${ActionTitle} {
-    /* stylelint-enable */
-    font-size: 28px;
-    font-weight: 300;
-    margin: -20px 0 0 0;
-    line-height: 1.3em;
-    color: ${({ theme }) => theme.colors.white};
-  }
-`
+
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
@@ -300,7 +268,6 @@ interface IBaseRegistrarHomeProps {
   theme: ITheme
   language: string
   scope: Scope
-  goToEvents: typeof goToEventsAction
   userDetails: IUserDetails
   gotoTab: typeof goToTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
@@ -707,325 +674,319 @@ export class RegistrarHomeView extends React.Component<
     return (
       <>
         <Header />
-        <Container>
-          <HeaderContent>
-            <StyledIconAction
-              id="new_registration"
-              icon={() => <StyledPlusIcon />}
-              onClick={this.props.goToEvents}
-              title={intl.formatMessage(messages.newRegistration)}
-            />
-            <Query
-              query={COUNT_REGISTRATION_QUERY}
-              variables={{
-                locationIds: [registrarUnion]
+        <Query
+          query={COUNT_REGISTRATION_QUERY}
+          variables={{
+            locationIds: [registrarUnion]
+          }}
+        >
+          {({ loading, error, data }) => {
+            if (loading) {
+              parentQueryLoading = true
+              return (
+                <StyledSpinner
+                  id="search-result-spinner"
+                  baseColor={theme.colors.background}
+                />
+              )
+            }
+            parentQueryLoading = false
+            if (error) {
+              Sentry.captureException(error)
+              return (
+                <ErrorText id="search-result-error-text-count">
+                  {intl.formatMessage(messages.queryError)}
+                </ErrorText>
+              )
+            }
+
+            return (
+              <>
+                <Topbar>
+                  <IconTab
+                    id={`tab_${TAB_ID.inProgress}`}
+                    key={TAB_ID.inProgress}
+                    active={tabId === TAB_ID.inProgress}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusProgress />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
+                    }
+                  >
+                    {intl.formatMessage(messages.inProgress)} (
+                    {(drafts && drafts.length) || 0})
+                  </IconTab>
+                  <IconTab
+                    id={`tab_${TAB_ID.readyForReview}`}
+                    key={TAB_ID.readyForReview}
+                    active={tabId === TAB_ID.readyForReview}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusOrange />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
+                    }
+                  >
+                    {intl.formatMessage(messages.readyForReview)} (
+                    {data.countEventRegistrations.declared})
+                  </IconTab>
+                  <IconTab
+                    id={`tab_${TAB_ID.sentForUpdates}`}
+                    key={TAB_ID.sentForUpdates}
+                    active={tabId === TAB_ID.sentForUpdates}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusRejected />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
+                    }
+                  >
+                    {intl.formatMessage(messages.sentForUpdates)} (
+                    {data.countEventRegistrations.rejected})
+                  </IconTab>
+                </Topbar>
+              </>
+            )
+          }}
+        </Query>
+        {tabId === TAB_ID.inProgress && (
+          <BodyContent>
+            <GridTable
+              content={this.transformDraftContent()}
+              columns={[
+                {
+                  label: this.props.intl.formatMessage(messages.listItemType),
+                  width: 15,
+                  key: 'event'
+                },
+                {
+                  label: this.props.intl.formatMessage(messages.listItemName),
+                  width: 35,
+                  key: 'name'
+                },
+                {
+                  label: this.props.intl.formatMessage(
+                    messages.listItemModificationDate
+                  ),
+                  width: 35,
+                  key: 'date_of_modification'
+                },
+                {
+                  label: this.props.intl.formatMessage(messages.listItemAction),
+                  width: 15,
+                  key: 'actions',
+                  isActionColumn: true,
+                  alignment: ColumnContentAlignment.CENTER
+                }
+              ]}
+              noResultText={intl.formatMessage(messages.dataTableNoResults)}
+              onPageChange={(currentPage: number) => {
+                this.onPageChange(currentPage)
               }}
-            >
-              {({ loading, error, data }) => {
-                if (loading) {
-                  parentQueryLoading = true
-                  return (
+              pageSize={this.pageSize}
+              totalPages={drafts && drafts.length}
+              initialPage={this.state.progressCurrentPage}
+            />
+          </BodyContent>
+        )}
+        {tabId === TAB_ID.readyForReview && (
+          <Query
+            query={FETCH_REGISTRATIONS_QUERY}
+            variables={{
+              status: EVENT_STATUS.DECLARED,
+              locationIds: [registrarUnion],
+              count: this.pageSize,
+              skip: (this.state.reviewCurrentPage - 1) * this.pageSize
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) {
+                return (
+                  (!parentQueryLoading && (
                     <StyledSpinner
                       id="search-result-spinner"
                       baseColor={theme.colors.background}
                     />
-                  )
-                }
-                parentQueryLoading = false
-                if (error) {
-                  Sentry.captureException(error)
-                  return (
-                    <ErrorText id="search-result-error-text-count">
-                      {intl.formatMessage(messages.queryError)}
-                    </ErrorText>
-                  )
-                }
-
-                return (
-                  <>
-                    <IconTabs>
-                      <IconTab
-                        id={`tab_${TAB_ID.inProgress}`}
-                        key={TAB_ID.inProgress}
-                        active={tabId === TAB_ID.inProgress}
-                        align={ICON_ALIGNMENT.LEFT}
-                        icon={() => <StatusProgress />}
-                        onClick={() =>
-                          this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
-                        }
-                      >
-                        {intl.formatMessage(messages.inProgress)} (
-                        {(drafts && drafts.length) || 0})
-                      </IconTab>
-                      <IconTab
-                        id={`tab_${TAB_ID.readyForReview}`}
-                        key={TAB_ID.readyForReview}
-                        active={tabId === TAB_ID.readyForReview}
-                        align={ICON_ALIGNMENT.LEFT}
-                        icon={() => <StatusOrange />}
-                        onClick={() =>
-                          this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
-                        }
-                      >
-                        {intl.formatMessage(messages.readyForReview)} (
-                        {data.countEventRegistrations.declared})
-                      </IconTab>
-                      <IconTab
-                        id={`tab_${TAB_ID.sentForUpdates}`}
-                        key={TAB_ID.sentForUpdates}
-                        active={tabId === TAB_ID.sentForUpdates}
-                        align={ICON_ALIGNMENT.LEFT}
-                        icon={() => <StatusRejected />}
-                        onClick={() =>
-                          this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
-                        }
-                      >
-                        {intl.formatMessage(messages.sentForUpdates)} (
-                        {data.countEventRegistrations.rejected})
-                      </IconTab>
-                    </IconTabs>
-                  </>
+                  )) ||
+                  null
                 )
-              }}
-            </Query>
-            {tabId === TAB_ID.inProgress && (
-              <GridTable
-                content={this.transformDraftContent()}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemType),
-                    width: 15,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemName),
-                    width: 35,
-                    key: 'name'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemModificationDate
-                    ),
-                    width: 35,
-                    key: 'date_of_modification'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemAction
-                    ),
-                    width: 15,
-                    key: 'actions',
-                    isActionColumn: true,
-                    alignment: ColumnContentAlignment.CENTER
-                  }
-                ]}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
-                onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
-                }}
-                pageSize={this.pageSize}
-                totalPages={drafts && drafts.length}
-                initialPage={this.state.progressCurrentPage}
-              />
-            )}
-            {tabId === TAB_ID.readyForReview && (
-              <Query
-                query={FETCH_REGISTRATIONS_QUERY}
-                variables={{
-                  status: EVENT_STATUS.DECLARED,
-                  locationIds: [registrarUnion],
-                  count: this.pageSize,
-                  skip: (this.state.reviewCurrentPage - 1) * this.pageSize
-                }}
-              >
-                {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      (!parentQueryLoading && (
-                        <StyledSpinner
-                          id="search-result-spinner"
-                          baseColor={theme.colors.background}
-                        />
-                      )) ||
-                      null
-                    )
-                  }
-                  if (error) {
-                    Sentry.captureException(error)
-                    return (
-                      <ErrorText id="search-result-error-text-review">
-                        {intl.formatMessage(messages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-                  return (
-                    <GridTable
-                      content={this.transformDeclaredContent(data)}
-                      columns={[
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemType
-                          ),
-                          width: 14,
-                          key: 'event'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemTrackingNumber
-                          ),
-                          width: 20,
-                          key: 'tracking_id'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemApplicationDate
-                          ),
-                          width: 23,
-                          key: 'application_time_elapsed'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemEventDate
-                          ),
-                          width: 23,
-                          key: 'event_time_elapsed'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemAction
-                          ),
-                          width: 20,
-                          key: 'actions',
-                          isActionColumn: true,
-                          alignment: ColumnContentAlignment.CENTER
-                        }
-                      ]}
-                      expandedContentRows={[
-                        {
-                          label: intl.formatMessage(messages.name),
-                          key: 'name'
-                        },
-                        {
-                          label: intl.formatMessage(messages.dob),
-                          displayForEvents: [Event.BIRTH],
-                          key: 'date_of_event'
-                        },
-                        {
-                          label: intl.formatMessage(messages.dod),
-                          displayForEvents: [Event.DEATH],
-                          key: 'date_of_event'
-                        }
-                      ]}
-                      noResultText={intl.formatMessage(
-                        messages.dataTableNoResults
-                      )}
-                      onPageChange={(currentPage: number) => {
-                        this.onPageChange(currentPage)
-                      }}
-                      pageSize={this.pageSize}
-                      totalPages={
-                        data.listEventRegistrations &&
-                        data.listEventRegistrations.totalItems
+              }
+              if (error) {
+                Sentry.captureException(error)
+                return (
+                  <ErrorText id="search-result-error-text-review">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
+              return (
+                <BodyContent>
+                  <GridTable
+                    content={this.transformDeclaredContent(data)}
+                    columns={[
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemType
+                        ),
+                        width: 14,
+                        key: 'event'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemTrackingNumber
+                        ),
+                        width: 20,
+                        key: 'tracking_id'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemApplicationDate
+                        ),
+                        width: 23,
+                        key: 'application_time_elapsed'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemEventDate
+                        ),
+                        width: 23,
+                        key: 'event_time_elapsed'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemAction
+                        ),
+                        width: 20,
+                        key: 'actions',
+                        isActionColumn: true,
+                        alignment: ColumnContentAlignment.CENTER
                       }
-                      initialPage={this.state.reviewCurrentPage}
-                      expandable={true}
-                    />
-                  )
-                }}
-              </Query>
-            )}
-            {tabId === TAB_ID.sentForUpdates && (
-              <Query
-                query={FETCH_REGISTRATIONS_QUERY}
-                variables={{
-                  status: EVENT_STATUS.REJECTED,
-                  locationIds: [registrarUnion],
-                  count: this.pageSize,
-                  skip: (this.state.updatesCurrentPage - 1) * this.pageSize
-                }}
-              >
-                {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      (!parentQueryLoading && (
-                        <StyledSpinner
-                          id="search-result-spinner"
-                          baseColor={theme.colors.background}
-                        />
-                      )) ||
-                      null
-                    )
-                  }
-                  if (error) {
-                    Sentry.captureException(error)
-                    return (
-                      <ErrorText id="search-result-error-text-reject">
-                        {intl.formatMessage(messages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-                  return (
-                    <GridTable
-                      content={this.transformRejectedContent(data)}
-                      columns={[
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemType
-                          ),
-                          width: 14,
-                          key: 'event'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemName
-                          ),
-                          width: 23,
-                          key: 'name'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemApplicantNumber
-                          ),
-                          width: 21,
-                          key: 'contact_number'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemUpdateDate
-                          ),
-                          width: 22,
-                          key: 'date_of_rejection'
-                        },
-                        {
-                          label: this.props.intl.formatMessage(
-                            messages.listItemAction
-                          ),
-                          width: 20,
-                          key: 'actions',
-                          isActionColumn: true,
-                          alignment: ColumnContentAlignment.CENTER
-                        }
-                      ]}
-                      noResultText={intl.formatMessage(
-                        messages.dataTableNoResults
-                      )}
-                      onPageChange={(currentPage: number) => {
-                        this.onPageChange(currentPage)
-                      }}
-                      pageSize={this.pageSize}
-                      totalPages={
-                        data.listEventRegistrations &&
-                        data.listEventRegistrations.totalItems
+                    ]}
+                    expandedContentRows={[
+                      {
+                        label: intl.formatMessage(messages.name),
+                        key: 'name'
+                      },
+                      {
+                        label: intl.formatMessage(messages.dob),
+                        displayForEvents: [Event.BIRTH],
+                        key: 'date_of_event'
+                      },
+                      {
+                        label: intl.formatMessage(messages.dod),
+                        displayForEvents: [Event.DEATH],
+                        key: 'date_of_event'
                       }
-                      initialPage={this.state.updatesCurrentPage}
-                      expandable={true}
+                    ]}
+                    noResultText={intl.formatMessage(
+                      messages.dataTableNoResults
+                    )}
+                    onPageChange={(currentPage: number) => {
+                      this.onPageChange(currentPage)
+                    }}
+                    pageSize={this.pageSize}
+                    totalPages={
+                      data.listEventRegistrations &&
+                      data.listEventRegistrations.totalItems
+                    }
+                    initialPage={this.state.reviewCurrentPage}
+                    expandable={true}
+                  />
+                </BodyContent>
+              )
+            }}
+          </Query>
+        )}
+        {tabId === TAB_ID.sentForUpdates && (
+          <Query
+            query={FETCH_REGISTRATIONS_QUERY}
+            variables={{
+              status: EVENT_STATUS.REJECTED,
+              locationIds: [registrarUnion],
+              count: this.pageSize,
+              skip: (this.state.updatesCurrentPage - 1) * this.pageSize
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) {
+                return (
+                  (!parentQueryLoading && (
+                    <StyledSpinner
+                      id="search-result-spinner"
+                      baseColor={theme.colors.background}
                     />
-                  )
-                }}
-              </Query>
-            )}
-          </HeaderContent>
-        </Container>
+                  )) ||
+                  null
+                )
+              }
+              if (error) {
+                Sentry.captureException(error)
+                return (
+                  <ErrorText id="search-result-error-text-reject">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
+              return (
+                <BodyContent>
+                  <GridTable
+                    content={this.transformRejectedContent(data)}
+                    columns={[
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemType
+                        ),
+                        width: 14,
+                        key: 'event'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemName
+                        ),
+                        width: 23,
+                        key: 'name'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemApplicantNumber
+                        ),
+                        width: 21,
+                        key: 'contact_number'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemUpdateDate
+                        ),
+                        width: 22,
+                        key: 'date_of_rejection'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemAction
+                        ),
+                        width: 20,
+                        key: 'actions',
+                        isActionColumn: true,
+                        alignment: ColumnContentAlignment.CENTER
+                      }
+                    ]}
+                    noResultText={intl.formatMessage(
+                      messages.dataTableNoResults
+                    )}
+                    onPageChange={(currentPage: number) => {
+                      this.onPageChange(currentPage)
+                    }}
+                    pageSize={this.pageSize}
+                    totalPages={
+                      data.listEventRegistrations &&
+                      data.listEventRegistrations.totalItems
+                    }
+                    initialPage={this.state.updatesCurrentPage}
+                    expandable={true}
+                  />
+                </BodyContent>
+              )
+            }}
+          </Query>
+        )}
       </>
     )
   }
@@ -1047,7 +1008,6 @@ function mapStateToProps(
 export const RegistrarHome = connect(
   mapStateToProps,
   {
-    goToEvents: goToEventsAction,
     gotoTab: goToTabAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,

@@ -35,9 +35,9 @@ export const VerticalBar = withTheme(
   (props: IVerticalBarProps & { theme: ITheme }) => {
     const { data, theme, xAxisLabel, yAxisLabel } = props
     const colours = [
-      theme.colors.chartPrimary,
-      theme.colors.chartSecondary,
-      theme.colors.chartTertiary
+      theme.colors.primary,
+      theme.colors.secondary,
+      theme.colors.tertiary
     ]
 
     return (
@@ -86,7 +86,7 @@ export const VerticalBar = withTheme(
             >
               <Label
                 fill={theme.colors.secondary}
-                fontFamily={theme.fonts.lightFont}
+                fontFamily={theme.fonts.regularFont}
                 offset={20}
                 value={xAxisLabel}
                 position="bottom"
@@ -95,7 +95,7 @@ export const VerticalBar = withTheme(
             <YAxis width={30} tickLine={false} axisLine={false} tick={false}>
               <Label
                 fill={theme.colors.secondary}
-                fontFamily={theme.fonts.lightFont}
+                fontFamily={theme.fonts.regularFont}
                 transform="rotate(-90)"
                 dy={-40}
                 offset={20}
@@ -107,7 +107,7 @@ export const VerticalBar = withTheme(
               vertical={false}
               horizontal={false}
               fillOpacity="0.05"
-              fill={theme.colors.accentLight}
+              fill={theme.colors.secondary}
             />
 
             <Bar dataKey="value">

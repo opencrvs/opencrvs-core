@@ -18,11 +18,7 @@ const HeaderContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.headerGradientDark} 0%,
-    ${({ theme }) => theme.colors.headerGradientLight} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
 `
 const HeaderLeft = styled.div`
   display: flex;

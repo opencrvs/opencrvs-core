@@ -18,8 +18,7 @@ const StyledPage = styled.div.attrs<IPage>({})`
   margin-top: -280px;
   * {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
@@ -29,20 +28,35 @@ const StyledPage = styled.div.attrs<IPage>({})`
   }
 
   @font-face {
-    font-family: ${({ theme }) => theme.fonts.regularFont};
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
     src:
-      url('/fonts/notosans-light-webfont-en.ttf')
+      url('/fonts/notosans-semibold-webfont-en.ttf')
       format('truetype');
-    font-style: normal;
   }
 
-
   @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${({ theme }) => theme.fonts.regularFont};
     src:
-      url('/fonts/notosans-light-webfont-${languageFromProps}.ttf')
+    url('/fonts/notosans-regular-webfont-en.ttf')
       format('truetype');
-    font-style: normal;
+  }
+
+  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
+    src:
+      url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
+      format('truetype');
+  }
+
+  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: ${({ theme }) => theme.fonts.regularFont};
+    src:
+      url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
+      format('truetype');
   }
 
 `

@@ -16,7 +16,7 @@ export interface IProps extends IButtonProps {
 
 export const Tab = styled(Button).attrs<IProps>({})`
   color: ${({ theme, active }) =>
-    active ? theme.colors.white : theme.colors.disabledTab};
+    active ? theme.colors.white : theme.colors.disabled};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   & div {
@@ -26,8 +26,9 @@ export const Tab = styled(Button).attrs<IProps>({})`
   &:disabled {
     background: transparent;
   }
-  font-family: ${({ theme, active }) =>
-    active ? theme.fonts.regularFont : theme.fonts.lightFont};
-  font-size: 18px;
-  ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  ${({ theme, active }) =>
+    active ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle};
+
+  ${({ theme, active }) =>
+    active ? `border-bottom: 3px solid ${theme.fonts.secondary}` : ''};
 `

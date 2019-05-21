@@ -9,14 +9,14 @@ export enum ICON_ALIGNMENT {
 const ButtonBase = styled.button`
   width: auto;
   height: 48px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
   border: 0;
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: inherit;
   cursor: pointer;
   justify-content: center;
   background: transparent;
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.disabled};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const CenterWrapper = styled.div`
-  padding: 0 32px;
+  padding: 0 20px;
   align-items: center;
   justify-content: center;
   display: inline-flex;
@@ -88,5 +88,6 @@ const RightButtonIcon = styled.div`
 `
 const IconOnly = styled.div`
   position: relative !important;
-  padding: 0 8px;
+  top: 4px;
+  left: 1px;
 `
