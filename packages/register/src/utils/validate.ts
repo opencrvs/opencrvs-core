@@ -60,11 +60,6 @@ export const messages = defineMessages({
     defaultMessage: 'Must be a valid date',
     description: 'The error message appears when the given date is not valid'
   },
-  dateNotToday: {
-    id: 'validations.dateNotToday',
-    defaultMessage: "Cannot be today's date.",
-    description: "The error message appears when the given date is today's date"
-  },
   isValidBirthDate: {
     id: 'validations.isValidBirthDate',
     defaultMessage: 'Must be a valid birth date',
