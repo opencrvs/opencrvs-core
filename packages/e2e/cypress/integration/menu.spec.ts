@@ -16,8 +16,8 @@ context('Menu', () => {
     cy.get('#ChangeLanguage-nested-menu').click()
     cy.get('#English-nested-menu-item')
       .contains('English')
-      .click()
+      .click() */
 
-    cy.get('#new_event_declaration').should('be.visible') */
+    cy.get('#new_event_declaration').should('be.visible')
   })
 })

@@ -11,7 +11,7 @@ context('Birth Registration Integration Test', () => {
     for (let i = 0; i < 8; i++) {
       cy.get('#keypad-1').click()
     }
-    /*  cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
+    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -124,7 +124,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     // MODAL
-    cy.get('#submit_confirm').click() */
+    cy.get('#submit_confirm').click()
     // APPLICATION SUBMITTED
     // cy.get('#tracking_id_viewer').then($track => {
     //   cy.wait(1000)
