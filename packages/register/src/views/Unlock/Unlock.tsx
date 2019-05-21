@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { PINKeypad } from '@opencrvs/components/lib/interface'
+import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { redirectToAuthentication } from 'src/profile/profileActions'
@@ -46,6 +46,16 @@ const PageWrapper = styled.div`
   position: absolute;
   width: 100%;
 `
+
+const SpinnerWrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
+
 const LogoutHeader = styled.a`
   float: right;
   color: ${({ theme }) => theme.colors.white};
@@ -68,6 +78,7 @@ interface IState {
   pin: string
   userPin: string
   resetKey: number
+  showSpinner: boolean
 }
 type ErrorState = {
   attempt: number
@@ -95,7 +106,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       errorMessage: '',
       pin: '',
       userPin: '',
-      resetKey: Date.now()
+      resetKey: Date.now(),
+      showSpinner: false
     }
   }
 
@@ -137,7 +149,14 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   onPinProvided = async (pin: string) => {
     const { intl } = this.props
     const { userPin } = this.state
-    const pinMatched = bcrypt.compareSync(pin, userPin)
+
+    this.setState({
+      showSpinner: true
+    })
+    const pinMatched = await bcrypt.compare(pin, userPin)
+    this.setState({
+      showSpinner: false
+    })
 
     if (this.state.attempt > MAX_ALLOWED_ATTEMPT) {
       return
@@ -212,10 +231,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   logout = () => {
     storage.removeItem(SCREEN_LOCK)
+    storage.removeItem(SECURITY_PIN_EXPIRED_AT)
     this.props.redirectToAuthentication()
   }
   render() {
-    return (
+    return this.state.showSpinner ? <SpinnerWrapper><Spinner id="hashingSpinner" /></SpinnerWrapper> : (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.logout} id="logout">
           <span>Logout</span>
