@@ -12,7 +12,8 @@ import {
   englishOnlyNameFormat,
   range,
   isValidBirthDate,
-  greaterThanZero
+  greaterThanZero,
+  maxLength
 } from 'src/utils/validate'
 import { conditionals } from '../../../utils'
 import {
@@ -366,7 +367,7 @@ export const childSection: IFormSection = {
       label: messages.multipleBirth,
       required: true,
       initialValue: '',
-      validate: [greaterThanZero],
+      validate: [greaterThanZero, maxLength(2)],
       mapping: {
         mutation: fieldValueSectionExchangeTransformer('mother'),
         query: sectionFieldExchangeTransformer('mother')
