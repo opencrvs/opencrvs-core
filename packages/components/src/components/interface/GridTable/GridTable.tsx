@@ -5,6 +5,7 @@ import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
+import { grid } from '../../grid'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -88,6 +89,7 @@ interface IGridTableProps {
 
 interface IGridTableState {
   currentPage: number
+  width: number
   expanded: string[]
 }
 
@@ -106,7 +108,20 @@ export class GridTable extends React.Component<
 > {
   state = {
     currentPage: this.props.initialPage || defaultConfiguration.initialPage,
+    width: window.innerWidth,
     expanded: []
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
   }
 
   renderActionBlock = (
@@ -197,7 +212,7 @@ export class GridTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       initialPage = defaultConfiguration.initialPage
     } = this.props
-    const { currentPage } = this.state
+    const { currentPage, width } = this.state
     const totalPages = this.props.totalPages
       ? this.props.totalPages
       : getTotalPageNumber(
@@ -206,7 +221,7 @@ export class GridTable extends React.Component<
         )
     return (
       <Wrapper>
-        {content.length > 0 && (
+        {content.length > 0 && width > grid.breakpoints.lg && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ContentWrapper
