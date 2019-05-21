@@ -23,16 +23,13 @@ const BackButton = styled(Button)`
   width: 24px;
   height: 24px;
   padding: 0px;
-  background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
+  background: '#35495d00';
   justify-content: center;
   cursor: pointer;
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
 const MenuTitle = styled.span`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 27px;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   margin-left: 35px;
 `
 const BodyContainer = styled(Box)`

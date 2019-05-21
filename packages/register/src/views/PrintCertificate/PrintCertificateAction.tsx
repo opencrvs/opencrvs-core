@@ -50,7 +50,7 @@ import {
   IApplication
 } from '@opencrvs/register/src/applications'
 import { Dispatch } from 'redux'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   fatherDataDoesNotExist,
   fatherDataExists
@@ -105,7 +105,7 @@ const StyledSpinner = styled(Spinner)`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
@@ -125,13 +125,11 @@ const Column = styled.div`
 `
 
 const ButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   padding: 25px;
   margin-bottom: 2px;
 `
-const StyledPrimaryButton = styled(PrimaryButton)`
-  font-weight: 600;
-`
+
 const StyledPrintIcon = styled(Print)`
   display: flex;
   margin: -13px;
@@ -147,15 +145,14 @@ const StyledIconAction = styled(IconAction)`
     padding: 0px;
   }
   h3 {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
     margin-left: 70px;
     color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
-    font-size: 16px;
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};
@@ -166,7 +163,6 @@ const StyledIconAction = styled(IconAction)`
   }
 `
 const ConfirmBtn = styled(PrimaryButton)`
-  font-weight: bold;
   min-width: 148px;
   padding: 15px 20px 15px 20px;
   span {
@@ -181,9 +177,8 @@ const ConfirmBtn = styled(PrimaryButton)`
 `
 
 const EditRegistration = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  border: solid 1px ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.primary} !important;
-  font-weight: bold;
   margin: 0px 20px;
   top: 3px;
   position: relative;
@@ -192,10 +187,10 @@ const EditRegistration = styled(SecondaryButton)`
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }) => theme.colors.disabled};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }) => theme.colors.background};
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -205,13 +200,12 @@ const EditRegistration = styled(SecondaryButton)`
 `
 
 const Info = styled.div`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 30px;
 `
 const B = styled.div`
   display: block;
-  line-height: 50px;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 const ButtonSpinner = styled(InvertSpinner)`
@@ -551,7 +545,7 @@ class PrintCertificateActionComponent extends React.Component<
       case COLLECT_CERTIFICATE:
         return (
           <ButtonContainer>
-            <StyledPrimaryButton
+            <PrimaryButton
               id="print-confirm-button"
               disabled={!enableConfirmButton}
               onClick={() => {
@@ -560,7 +554,7 @@ class PrintCertificateActionComponent extends React.Component<
               }}
             >
               {intl.formatMessage(messages.confirm)}
-            </StyledPrimaryButton>
+            </PrimaryButton>
           </ButtonContainer>
         )
       case PAYMENT:
@@ -585,7 +579,7 @@ class PrintCertificateActionComponent extends React.Component<
             </ButtonContainer>
 
             <ButtonContainer>
-              <StyledPrimaryButton
+              <PrimaryButton
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
                 onClick={() => {
@@ -594,7 +588,7 @@ class PrintCertificateActionComponent extends React.Component<
                 }}
               >
                 {intl.formatMessage(messages.next)}
-              </StyledPrimaryButton>
+              </PrimaryButton>
             </ButtonContainer>
           </>
         )
@@ -659,13 +653,13 @@ class PrintCertificateActionComponent extends React.Component<
             </ButtonContainer>
 
             <ButtonContainer>
-              <StyledPrimaryButton
+              <PrimaryButton
                 id="finish-printing-certificate"
                 disabled={!enableConfirmButton}
                 onClick={() => this.finishSubmission(certificateDetails)}
               >
                 {intl.formatMessage(messages.finish)}
-              </StyledPrimaryButton>
+              </PrimaryButton>
             </ButtonContainer>
           </>
         )
@@ -988,7 +982,7 @@ class PrintCertificateActionComponent extends React.Component<
             dispatch(goToHome())
           }}
         >
-          <HeaderContent>
+          <BodyContent>
             <QueryProvider
               event={event}
               action={Action.LOAD_CERTIFICATE_APPLICATION}
@@ -1120,7 +1114,7 @@ class PrintCertificateActionComponent extends React.Component<
                 }}
               </QueryContext.Consumer>
             </QueryProvider>
-          </HeaderContent>
+          </BodyContent>
         </ActionPage>
       </ActionPageWrapper>
     )

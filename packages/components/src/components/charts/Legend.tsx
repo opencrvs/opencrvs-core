@@ -27,7 +27,7 @@ const Column = styled.div`
 `
 
 const LegendItemBase = styled.div`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   &::after {
     content: ':';
@@ -42,20 +42,20 @@ const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
 const EstimateLegendItem = styled(LegendItemBase)`
   &::before {
     height: 8px;
-    border: 2px dotted ${({ theme }) => theme.colors.accent};
+    border: 2px dotted ${({ theme }) => theme.colors.secondary};
     background: transparent;
   }
 `
 
 const DataLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 1em;
   margin-bottom: auto;
 `
 const DataTitle = styled.h3.attrs<{ description?: string }>({})`
-  font-size: 20px;
-  color: ${({ theme }) => theme.colors.accent};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  color: ${({ theme }) => theme.colors.secondary};
   margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -64,7 +64,7 @@ const DataTitle = styled.h3.attrs<{ description?: string }>({})`
 `
 
 const DataDescription = styled.span`
-  font-size: 12px;
+  ${({ theme }) => theme.fonts.captionStyle};
 `
 const FooterContainer = styled.div`
   display: flex;
@@ -76,11 +76,11 @@ const FooterData = styled.div`
   flex-direction: column;
   flex: 1;
   display: flex;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FooterDataLabel = styled.span`
-  font-size: 12px;
+  ${({ theme }) => theme.fonts.captionStyle};
 `
 const FooterIconTitle = styled.div`
   margin-top: 5px;
@@ -166,9 +166,9 @@ export const Legend = withTheme(
     }
 
     const colours = [
-      theme.colors.chartPrimary,
-      theme.colors.chartSecondary,
-      theme.colors.chartTertiary
+      theme.colors.primary,
+      theme.colors.secondary,
+      theme.colors.tertiary
     ]
 
     return (

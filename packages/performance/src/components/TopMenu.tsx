@@ -90,7 +90,7 @@ const BackButton = styled(PrimaryButton)`
 `
 
 const BackButtonText = styled.span`
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;

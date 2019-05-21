@@ -11,7 +11,7 @@ interface IProps {
   id?: string
   show: boolean
   type?: NOTIFICATION_TYPE
-  callback?: ((event: React.MouseEvent<HTMLDivElement>) => void)
+  callback?: (event: React.MouseEvent<HTMLDivElement>) => void
   className?: string
 }
 
@@ -21,7 +21,7 @@ const easeIn = keyframes`
   to { bottom: 0; }
 `
 const NotificationContainer = styledNotification`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   position: fixed;
   left: 0;
   right: 0;
@@ -29,7 +29,7 @@ const NotificationContainer = styledNotification`
   height:100px;
   width: 100%;
   display:flex;
-  background: ${({ theme }) => theme.colors.accent};
+  background: ${({ theme }) => theme.colors.secondary};
   z-index: 1;
   justify-content: center;
   align-items: center;
@@ -61,7 +61,7 @@ const NotificationContainer = styledNotification`
 `
 
 const NotificationMessage = styled.div`
-  background: ${({ theme }) => theme.colors.copyAlpha80};
+  background: ${({ theme }) => theme.colors.placeholder};
   border-radius: 21px;
   padding: 5px 10px;
   margin: 5px;

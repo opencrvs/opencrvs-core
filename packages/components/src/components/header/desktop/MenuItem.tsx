@@ -11,8 +11,9 @@ export type IMenuItemContainerProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
 const Item = styled(Button).attrs<IMenuItemContainerProps>({})`
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   color: ${({ theme, selected }) =>
-    selected ? theme.colors.white : theme.colors.disabledTab};
+    selected ? theme.colors.white : theme.colors.disabled};
 `
 
 const ItemContainer = styled.div`

@@ -21,7 +21,7 @@ export const CustomizedXAxisTick = withTheme(
           x={0}
           y={10}
           dy={16}
-          fontFamily={theme.fonts.lightFont}
+          fontFamily={theme.fonts.regularFont}
           textAnchor="middle"
           fill={theme.colors.secondary}
         >
@@ -31,9 +31,9 @@ export const CustomizedXAxisTick = withTheme(
           x={0}
           y={31}
           dy={16}
-          fontFamily={theme.fonts.lightFont}
+          fontFamily={theme.fonts.regularFont}
           textAnchor="middle"
-          fill={theme.colors.accent}
+          fill={theme.colors.secondary}
         >
           {payload && `${Math.round((payload.value / totalValue) * 100)}%`}
         </text>
@@ -41,7 +41,7 @@ export const CustomizedXAxisTick = withTheme(
           x={0}
           y={52}
           dy={16}
-          fontFamily={theme.fonts.lightFont}
+          fontFamily={theme.fonts.regularFont}
           fontSize={12}
           textAnchor="middle"
           fill={theme.colors.copy}
@@ -60,7 +60,7 @@ export const CustomizedYAxisTick = withTheme(
       <g transform={`translate(${x},${y})`}>
         <text
           dy={8}
-          fontFamily={theme.fonts.lightFont}
+          fontFamily={theme.fonts.regularFont}
           textAnchor="end"
           height={22}
           fill={theme.colors.secondary}

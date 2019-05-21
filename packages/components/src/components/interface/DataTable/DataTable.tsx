@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const StyledList = styled.ul`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -25,11 +25,8 @@ const StyledList = styled.ul`
 `
 const ResultsText = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
-  font-weight: 500;
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin: 10px 0;
-  line-height: 22px;
 `
 
 type CustomSelectGroupProp = Omit<ISelectGroupProps, 'onChange' | 'values'>

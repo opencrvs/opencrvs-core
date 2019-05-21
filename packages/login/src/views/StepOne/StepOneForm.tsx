@@ -143,7 +143,7 @@ export const StyledButton = styled(Button)`
 
   :hover {
     text-decoration: underline;
-    text-decoration-color: ${({ theme }) => theme.colors.accentLight};
+    text-decoration-color: ${({ theme }) => theme.colors.secondary};
   }
 `
 

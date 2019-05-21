@@ -6,29 +6,26 @@ const ButtonStyled = styled.button`
   width: 56px;
   border-radius: 100%;
   background: ${({ theme }) => theme.colors.primary};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  ${({ theme }) => theme.shadows.mistyShadow};
   justify-content: center;
   outline: none;
   border: none;
   cursor: pointer;
   &:hover:enabled {
-    background: linear-gradient(
-      ${({ theme }) => theme.colors.hoverGradientDark},
-      ${({ theme }) => theme.colors.primary}
-    );
+    ${({ theme }) => theme.gradients.gradientSkyDark};
     color: ${({ theme }) => theme.colors.white};
   }
 
   &:active:enabled {
     background: ${({ theme }) => theme.colors.primary};
-    border: 3px solid ${({ theme }) => theme.colors.creamCan};
+    border: 3px solid ${({ theme }) => theme.colors.focus};
     outline: none;
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.disabledButton};
+    background-color: ${({ theme }) => theme.colors.disabled};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }) => theme.colors.placeholder};
   }
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

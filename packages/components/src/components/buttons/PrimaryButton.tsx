@@ -4,16 +4,13 @@ import { Button } from './Button'
 export const PrimaryButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  ${({ theme }) => theme.shadows.mistyShadow};
   justify-content: center;
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.capsFontStyle};
+  ${({ theme }) => theme.fonts.buttonStyle};
 
   &:hover:enabled {
-    background: linear-gradient(
-      ${({ theme }) => theme.colors.hoverGradientDark},
-      ${({ theme }) => theme.colors.primary}
-    );
+    ${({ theme }) => theme.gradients.gradientSkyDark};
     color: ${({ theme }) => theme.colors.white};
   }
   &:focus {
@@ -23,13 +20,12 @@ export const PrimaryButton = styled(Button)`
   &:active:enabled {
     outline: none;
     background: ${({ theme }) => theme.colors.primary};
-    padding: 0 3px;
-    border: 3px solid ${({ theme }) => theme.colors.creamCan};
+    border: 3px solid ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.disabledButton};
+    background: ${({ theme }) => theme.colors.disabled};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }) => theme.colors.placeholder};
   }
 `
