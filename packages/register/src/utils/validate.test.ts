@@ -427,8 +427,8 @@ describe('validate', () => {
     })
   })
 
-  describe("dateInPast. Checks if a given date is in the past", () => {
-    it("should not give an error message if the date is in the past", () => {
+  describe("dateInPast. Checks if a given birth date is in the past", () => {
+    it("should not give an error message if the birth date is in the past", () => {
       const todaysDate = new Date('1999-12-31')
       todaysDate.setHours(0, 0, 0)
       const today = todaysDate.toDateString()
@@ -438,14 +438,14 @@ describe('validate', () => {
       const todaysDate = new Date()
       todaysDate.setHours(0, 0, 0)
       const today = todaysDate.toDateString()
-      expect(dateInPast()(today)).toEqual({ message: messages.dateFormat })
+      expect(dateInPast()(today)).toEqual({ message: messages.isValidBirthDate })
     })
 
     it("should give an error message if the date is in the future", () => {
       const todaysDate = new Date(2040, 12, 12)
       todaysDate.setHours(0, 0, 0)
       const today = todaysDate.toDateString()
-      expect(dateInPast()(today)).toEqual({ message: messages.dateFormat })
+      expect(dateInPast()(today)).toEqual({ message: messages.isValidBirthDate })
     })
   })
 
@@ -687,7 +687,7 @@ describe('validate', () => {
     it('should give error message with date in future', () => {
       const futureDate = '2053-02-23'
       expect(dateInPast()(futureDate)).toEqual({
-        message: messages.dateFormat
+        message: messages.isValidBirthDate
       })
     })
   })
