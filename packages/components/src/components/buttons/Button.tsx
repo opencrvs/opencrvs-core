@@ -24,7 +24,7 @@ const ButtonBase = styled.button`
 `
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: () => React.ReactNode
+  icon?: React.ReactNode | (() => React.ReactNode)
   align?: ICON_ALIGNMENT
 }
 
@@ -34,16 +34,17 @@ export function Button({
   align = ICON_ALIGNMENT.RIGHT,
   ...otherProps
 }: IButtonProps) {
+  icon = typeof icon === 'function' ? icon() : icon
   if (icon && children) {
     return (
       <ButtonBase {...otherProps}>
         <Wrapper>
           {icon && align === ICON_ALIGNMENT.LEFT && (
-            <LeftButtonIcon>{icon()}</LeftButtonIcon>
+            <LeftButtonIcon>{icon}</LeftButtonIcon>
           )}
           {children}
           {icon && align === ICON_ALIGNMENT.RIGHT && (
-            <RightButtonIcon>{icon()}</RightButtonIcon>
+            <RightButtonIcon>{icon}</RightButtonIcon>
           )}
         </Wrapper>
       </ButtonBase>
@@ -52,7 +53,7 @@ export function Button({
     return (
       <ButtonBase {...otherProps}>
         {' '}
-        <IconOnly>{icon()}</IconOnly>
+        <IconOnly>{icon}</IconOnly>
       </ButtonBase>
     )
   } else {
