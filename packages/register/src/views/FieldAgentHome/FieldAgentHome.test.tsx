@@ -8,7 +8,7 @@ import {
   flushPromises,
   setItem
 } from 'src/tests/util'
-import { HOME } from 'src/navigation/routes'
+import { FIELD_AGENT_HOME_TAB } from 'src/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -55,7 +55,7 @@ describe('when the home page loads for a field worker', () => {
     registerUserDetails.role = FIELD_AGENT_ROLE
     beforeEach(async () => {
       store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-      history.replace(HOME)
+      history.replace(FIELD_AGENT_HOME_TAB)
       app.update()
       app
         .find('#createPinBtn')

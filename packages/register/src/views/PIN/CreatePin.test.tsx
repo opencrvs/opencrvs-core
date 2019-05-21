@@ -95,7 +95,7 @@ describe('Create PIN view', async () => {
     c.update()
 
     expect(c.find('div#error-text').text()).toBe(
-      'PIN cannot have 4 same digits'
+      'PIN cannot have same 4 digits'
     )
   })
 
