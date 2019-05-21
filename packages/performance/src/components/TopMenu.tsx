@@ -84,13 +84,13 @@ const BackButtonContainer = styled.div`
 const BackButton = styled(PrimaryButton)`
   width: 69px;
   height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
+
   justify-content: center;
   border-radius: 21px;
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-weight: bold;
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;
@@ -107,12 +107,9 @@ type Props = {
   languages: IntlState['languages']
 }
 
-interface IState {
-  showLogoutModal: boolean
-}
 type IFullProps = Props & InjectedIntlProps
 
-class TopMenuComponent extends React.Component<IFullProps, IState> {
+class TopMenuComponent extends React.Component<IFullProps> {
   goToRegister = () => {
     this.props.goToRegister()
   }
