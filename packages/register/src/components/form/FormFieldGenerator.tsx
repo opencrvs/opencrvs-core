@@ -264,6 +264,7 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           {...inputProps}
           value={inputProps.value as string}
+          onChange={e => onSetFieldValue(fieldDefinition.name, e.target.value)}
         />
       </InputField>
     )
