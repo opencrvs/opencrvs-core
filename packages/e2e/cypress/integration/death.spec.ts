@@ -8,7 +8,7 @@ context('Death Registration Integration Test', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn').click()
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 3; i++) {
       cy.get('#keypad-1').click()
     }
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
