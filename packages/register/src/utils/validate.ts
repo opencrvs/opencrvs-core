@@ -388,7 +388,7 @@ export const isDateInPast: Validation = (value: string) => {
   if (isDateNotInFuture(value) && isNotToday(value)) {
     return undefined
   } else {
-    return { message: messages.dateFormat }
+    return { message: messages.isValidBirthDate } // specific to DOB of parent/applicant
   }
 }
 

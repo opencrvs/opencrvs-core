@@ -417,10 +417,6 @@ export const motherSection: IFormSection = {
             dependencies: []
           },
           {
-            validator: dateInPast,
-            dependencies: []
-          },
-          {
             validator: dateGreaterThan,
             dependencies: ['motherBirthDate']
           }
