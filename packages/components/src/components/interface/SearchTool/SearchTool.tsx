@@ -10,6 +10,7 @@ const Wrapper = styled.form`
   ${({ theme }) => theme.fonts.bodyStyle};
   padding: 0px 10px;
   margin-bottom: 1px;
+  min-width: 400px;
   position: relative;
 `
 const SearchTextInput = styled.input`
