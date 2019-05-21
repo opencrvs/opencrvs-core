@@ -3,12 +3,10 @@ import styled from 'styled-components'
 import { IDataProps, DataRow } from './DataRow'
 
 const Container = styled.div`
-  margin-top: 52px;
+  margin-top: 48px;
 `
 const Title = styled.div`
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 36px;
+  ${({ theme }) => theme.fonts.h4Style};
   margin: 0 0 16px 8px;
 `
 interface IProps {

@@ -2,10 +2,10 @@ import styled from 'styled-components'
 import { Button } from './Button'
 
 export const LinkButton = styled(Button)`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
   height: auto;
-  color: ${({ theme }) => theme.colors.accent};
   text-decoration-line: underline;
   & div {
     padding: 0;
@@ -13,7 +13,7 @@ export const LinkButton = styled(Button)`
 
   &:active {
     outline: 0;
-    background-color: ${({ theme }) => theme.colors.creamCan};
+    background-color: ${({ theme }) => theme.colors.focus};
   }
 
   &:hover {

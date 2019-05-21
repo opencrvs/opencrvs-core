@@ -109,26 +109,25 @@ const messages = defineMessages({
 })
 
 const Container = styled.div`
-  color: ${({ theme }) => theme.colors.secondary};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.regularFont};
+  color: ${({ theme }) => theme.colors.primary};
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   padding: 40px 80px;
-  margin: 36px auto;
+  margin: 36px auto 0;
   width: 1156px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding: 0;
+    margin: 0;
+    padding: 24px 0;
     width: 100%;
     min-height: 100vh;
-    margin: 0;
+    margin-top: 0;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
 `
 
 const SettingsTitle = styled.div`
-  font-size: 48px;
-  font-weight: normal;
-  line-height: 150%;
+  ${({ theme }) => theme.fonts.h1Style};
   height: 72px;
   margin-left: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -158,7 +157,6 @@ const Right = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0;
     margin-left: 24px;
-    margin-top: 32px;
     & .desktop {
       display: none;
     }
@@ -249,7 +247,7 @@ class SettingsView extends React.Component<IProps> {
         items: [
           {
             label: intl.formatMessage(messages.label_password),
-            tip: 'Last change 4 days ago',
+            placeHolder: 'Last change 4 days ago',
             action: {
               label: intl.formatMessage(messages.action_change),
               disabled: true
@@ -257,7 +255,7 @@ class SettingsView extends React.Component<IProps> {
           },
           {
             label: intl.formatMessage(messages.label_pin),
-            tip: 'Last change 4 days ago',
+            placeHolder: 'Last change 4 days ago',
             action: {
               label: intl.formatMessage(messages.action_change),
               disabled: true

@@ -6,15 +6,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid rgb(193, 199, 201);
-  font-size: 18px;
-  font-feature-settings: 'pnum' on, 'lnum' on;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
   padding: 16px 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
   }
 `
 const DataContainer = styled.div`
+  ${({ theme }) => theme.fonts.bigBody};
   display: flex;
   flex-grow: 1;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -22,24 +21,21 @@ const DataContainer = styled.div`
   }
 `
 const Label = styled.label`
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   flex: 1;
-  font-weight: 600;
-  line-height: 26px;
 `
 const Value = styled.div`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   flex: 1;
-  line-height: 27px;
 `
 
-const Tip = styled.div`
+const PlaceHolder = styled.div`
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.placeholder};
   flex: 1;
-  color: rgb(112, 124, 128);
-  line-height: 24px;
-  font-size: 16px;
 `
 const Action = styled.div`
   width: auto;
-  font-size: 16px;
 `
 interface IAction {
   label: string
@@ -50,20 +46,20 @@ interface IAction {
 export interface IDataProps {
   label: string
   value?: string
-  tip?: string
+  placeHolder?: string
   action?: IAction
 }
 
 export class DataRow extends React.Component<IDataProps> {
   render() {
-    const { label, value, tip, action } = this.props
+    const { label, value, placeHolder, action } = this.props
 
     return (
       <Container>
         <DataContainer>
           <Label>{label}</Label>
           {value && <Value>{value}</Value>}
-          {tip && <Tip>{tip}</Tip>}
+          {placeHolder && <PlaceHolder>{placeHolder}</PlaceHolder>}
         </DataContainer>
         {action && (
           <Action>
