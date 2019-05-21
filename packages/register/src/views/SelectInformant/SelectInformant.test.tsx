@@ -49,6 +49,7 @@ describe('when user is selecting the informant', () => {
 
   beforeEach(async () => {
     history.replace(SELECT_INFORMANT)
+    await flushPromises()
     app.update()
     app
       .find('#createPinBtn')
@@ -56,12 +57,28 @@ describe('when user is selecting the informant', () => {
       .simulate('click')
     await flushPromises()
     app.update()
-    Array.apply(null, { length: 8 }).map(() => {
+    for (let i = 0; i < 3; i++) {
       app
         .find('#keypad-1')
         .hostNodes()
         .simulate('click')
-    })
+    }
+    app
+      .find('#keypad-2')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    app.update()
+    for (let i = 0; i < 3; i++) {
+      app
+        .find('#keypad-1')
+        .hostNodes()
+        .simulate('click')
+    }
+    app
+      .find('#keypad-2')
+      .hostNodes()
+      .simulate('click')
     await flushPromises()
     app.update()
   })

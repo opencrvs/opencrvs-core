@@ -109,8 +109,6 @@ class CreatePinComponent extends React.Component<IProps> {
     } = this.state
     const { intl } = this.props
 
-    console.log(this.state)
-
     return (
       <Container>
         <PIN />
