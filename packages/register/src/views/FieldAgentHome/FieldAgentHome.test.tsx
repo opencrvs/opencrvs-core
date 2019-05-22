@@ -8,7 +8,7 @@ import {
   flushPromises,
   setItem
 } from 'src/tests/util'
-import { HOME } from 'src/navigation/routes'
+import { FIELD_AGENT_HOME_TAB } from 'src/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -55,7 +55,7 @@ describe('when the home page loads for a field worker', () => {
     registerUserDetails.role = FIELD_AGENT_ROLE
     beforeEach(async () => {
       store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-      history.replace(HOME)
+      history.replace(FIELD_AGENT_HOME_TAB)
       app.update()
       app
         .find('#createPinBtn')
@@ -63,12 +63,12 @@ describe('when the home page loads for a field worker', () => {
         .simulate('click')
       await flushPromises()
       app.update()
-      Array.apply(null, { length: 8 }).map(() => {
+      for (let i = 1; i <= 8; i++) {
         app
-          .find('#keypad-1')
+          .find(`#keypad-${i % 2}`)
           .hostNodes()
           .simulate('click')
-      })
+      }
       await flushPromises()
       app.update()
     })
@@ -89,59 +89,6 @@ describe('when the home page loads for a field worker', () => {
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
       })
-    })
-  })
-})
-
-describe('when the home page loads for a Local Registrar', () => {
-  let app: ReactWrapper
-  let history: History
-  let store: Store
-
-  beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
-    const testApp = createTestApp()
-    app = testApp.app
-    await flushPromises()
-    app.update()
-    history = testApp.history
-    store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-  })
-
-  describe('when Local Registrar is in home view', () => {
-    const registerUserDetails = Object.assign({}, userDetails)
-    registerUserDetails.role = 'LOCAL_REGISTRAR'
-    beforeEach(async () => {
-      store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-      history.replace(HOME)
-      app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      Array.apply(null, { length: 8 }).map(() => {
-        app
-          .find('#keypad-1')
-          .hostNodes()
-          .simulate('click')
-      })
-      await flushPromises()
-      app.update()
-    })
-    beforeEach(async () => {
-      store.dispatch(
-        getStorageUserDetailsSuccess(JSON.stringify(registerUserDetails))
-      )
-      app.update()
     })
   })
 })

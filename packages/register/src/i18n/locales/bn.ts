@@ -1000,6 +1000,8 @@ export const BENGALI_STATE: ILanguage = {
     'label.password': 'পাসওয়ার্ড',
     'label.pin': 'পিন',
     'label.language': 'ভাষা',
-    'action.change': 'পরিবর্তন'
+    'action.change': 'পরিবর্তন',
+    'createPIN.pinSameDigitsError': 'পিন একই 4 ডিজিট থাকতে পারে না',
+    'createPIN.pinSeqDigitsError': 'পিন ক্রমিক সংখ্যা থাকতে পারে না'
   }
 }
