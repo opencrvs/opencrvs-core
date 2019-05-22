@@ -455,7 +455,8 @@ class FieldAgentHomeView extends React.Component<
                   {
                     label: this.props.intl.formatMessage(messages.listItemName),
                     width: 40,
-                    key: 'name'
+                    key: 'name',
+                    errorValue: 'No name provided'
                   },
                   {
                     label: this.props.intl.formatMessage(

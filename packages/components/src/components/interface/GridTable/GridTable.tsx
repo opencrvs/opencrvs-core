@@ -61,6 +61,10 @@ const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
 `
 
+const Error = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+`
+
 export enum ColumnContentAlignment {
   LEFT = 'left',
   RIGHT = 'right',
@@ -71,6 +75,7 @@ interface IGridPreference {
   label: string
   width: number
   key: string
+  errorValue?: string
   alignment?: ColumnContentAlignment
   isActionColumn?: boolean
 }
@@ -259,7 +264,9 @@ export class GridTable extends React.Component<
                           width={preference.width}
                           alignment={preference.alignment}
                         >
-                          {item[preference.key] as string}
+                          {(item[preference.key] as string) || (
+                            <Error>{preference.errorValue}</Error>
+                          )}
                         </ContentWrapper>
                       )
                     }
