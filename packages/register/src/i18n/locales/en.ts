@@ -989,6 +989,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'In progress',
     'register.registrarHome.readyForReview': 'Ready for review',
     'register.registrarHome.sentForUpdates': 'Sent for updates',
-    'register.registrarHome.action': 'Action'
+    'register.registrarHome.action': 'Action',
+    'createPIN.pinSameDigitsError': 'PIN cannot have same 4 digits',
+    'createPIN.pinSeqDigitsError': 'PIN cannot contain sequential digits'
   }
 }

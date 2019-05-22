@@ -987,6 +987,8 @@ export const BENGALI_STATE: ILanguage = {
       'পর্যালোচনার জন্য পাঠানো ({total})',
     'register.fieldAgentHome.requireUpdates': 'হালনাগাদ প্রয়োজন ({total})',
     'register.registrarHome.updateButton': 'হালনাগাদ',
-    'register.home.header.performanceTitle': 'কর্মদক্ষতা'
+    'register.home.header.performanceTitle': 'কর্মদক্ষতা',
+    'createPIN.pinSameDigitsError': 'পিন একই 4 ডিজিট থাকতে পারে না',
+    'createPIN.pinSeqDigitsError': 'পিন ক্রমিক সংখ্যা থাকতে পারে না'
   }
 }
