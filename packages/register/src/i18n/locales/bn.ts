@@ -982,7 +982,6 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.placeHolderPhone': 'ফোন নম্বর প্রবেশ করান',
     'register.home.header.defaultTitle': 'আবেদন',
     'register.home.header.applicationTitle': 'আবেদন',
-    'register.home.header.performanceTitle': 'কর্মদক্ষতা ব্যাবস্থাপনা',
     'register.details.status.dateLabel.draft.started': 'শুরু করা হয়েছে',
     'register.details.status.dateLabel.draft.updated': 'আপডেট করা হয়েছে',
     'register.detail.status.applicant.number': 'আবেদনকারীর মোবাইল নম্বর',
@@ -996,6 +995,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.sentForReview':
       'পর্যালোচনার জন্য পাঠানো ({total})',
     'register.fieldAgentHome.requireUpdates': 'হালনাগাদ প্রয়োজন ({total})',
-    'register.registrarHome.updateButton': 'হালনাগাদ'
+    'register.registrarHome.updateButton': 'হালনাগাদ',
+    'register.home.header.performanceTitle': 'কর্মদক্ষতা',
+    'createPIN.pinSameDigitsError': 'পিন একই 4 ডিজিট থাকতে পারে না',
+    'createPIN.pinSeqDigitsError': 'পিন ক্রমিক সংখ্যা থাকতে পারে না'
   }
 }
