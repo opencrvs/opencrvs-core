@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { SectionDrawer } from '@opencrvs/components/lib/interface'
 import styled from 'styled-components'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { getRegisterForm } from 'src/forms/register/application-selectors'
@@ -13,6 +13,7 @@ import {
   Delete,
   DraftSimple
 } from '@opencrvs/components/lib/icons'
+import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from 'src/forms/validation'
 import { goToTab } from 'src/navigation'
@@ -41,7 +42,6 @@ import {
 } from 'react-intl'
 import {
   PrimaryButton,
-  Button,
   IconAction,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
@@ -132,7 +132,7 @@ const messages = defineMessages({
 
 const DrawerContainer = styled.div`
   margin-bottom: 11px;
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 const SectionRow = styled.p`
   padding: 0 24px;
@@ -141,22 +141,22 @@ const SectionRow = styled.p`
   }
 `
 const SectionLabel = styled.label`
-  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  color: ${({ theme }) => theme.colors.copy};
   margin-right: 5px;
   &::after {
     content: ':';
   }
 `
 const SectionValue = styled.span`
-  font-weight: bold;
-  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
 `
 const NextButton = styled(PrimaryButton)`
   margin: 15px 25px 30px;
-  font-weight: bold;
 `
 const ButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   padding: 25px;
   margin-bottom: 2px;
 `
@@ -167,20 +167,19 @@ const RejectApplication = styled(IconAction)`
   padding: 0px;
   width: auto;
   div:first-of-type {
-    background: ${({ theme }) => theme.colors.rejectionIconColor};
+    background: ${({ theme }) => theme.colors.warning};
     padding: 15px 15px 10px;
     border-radius: 2px;
   }
   h3 {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
     margin-left: 70px;
     color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
-    font-size: 16px;
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};
@@ -190,27 +189,9 @@ const RejectApplication = styled(IconAction)`
     }
   }
 `
-const RegisterApplication = styled(PrimaryButton)`
-  font-weight: bold;
-  padding: 15px 35px 15px 20px;
-  div {
-    position: relative !important;
-    margin-right: 20px;
-    top: 2px;
-  }
-  &:disabled {
-    background: ${({ theme }) => theme.colors.disabledButton};
-    path {
-      stroke: ${({ theme }) => theme.colors.disabled};
-    }
-  }
-`
-const RequiredFieldLink = styled(Button)`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
-  text-decoration: underline;
-  padding: 0;
-  text-align: left;
+
+const RequiredFieldLink = styled(Link)`
+  color: ${({ theme }) => theme.colors.error};
 `
 const Row = styled.div`
   display: flex;
@@ -247,8 +228,8 @@ const DButtonContainer = styled(ButtonContainer)`
   background: transparent;
 `
 const DeleteApplication = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.error};
   text-decoration: underline;
   cursor: pointer;
   svg {
@@ -256,16 +237,14 @@ const DeleteApplication = styled.a`
   }
 `
 const SaveDraftText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   color: ${({ theme }) => theme.colors.secondary};
-  font-size: 14px;
   text-decoration: underline;
-  letter-spacing: 0px;
   margin-left: 14px;
 `
 
 const DraftButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.inputBackground};
+  background-color: ${({ theme }) => theme.colors.background};
   min-height: 83px;
   display: flex;
   justify-content: flex-start;
@@ -274,7 +253,7 @@ const DraftButtonContainer = styled.div`
   cursor: pointer;
 `
 interface IProps {
-  draft: IDraft
+  draft: IApplication
   registerForm: { [key: string]: IForm }
   tabRoute: string
   registerClickEvent?: () => void
@@ -378,7 +357,7 @@ export function renderSelectDynamicLabel(
 }
 
 const renderValue = (
-  draft: IDraft,
+  draft: IApplication,
   section: IFormSection,
   field: IFormField,
   intl: InjectedIntl,
@@ -420,7 +399,7 @@ const renderValue = (
 
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
-  draft: IDraft
+  draft: IApplication
 ) => {
   return formSections.reduce((sections, section: IFormSection) => {
     const errors = getValidationErrorsForForm(
@@ -453,7 +432,7 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IDraft): IDocumentViewerOptions => {
+const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
   const draftItemName = documentsSection.id
   const documentOptions: SelectComponentOptions[] = []
   const selectOptions: SelectComponentOptions[] = []
@@ -592,7 +571,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ).filter(errors => errors.length > 0).length
 
     const isRejected =
-      this.props.draft.status && this.props.draft.status === REJECTED
+      this.props.draft.registrationStatus &&
+      this.props.draft.registrationStatus === REJECTED
 
     return (
       <>
@@ -704,7 +684,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <Column>
             {!!registerClickEvent && (
               <ButtonContainer>
-                <RegisterApplication
+                <PrimaryButton
                   id="registerApplicationBtn"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
@@ -712,7 +692,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   disabled={!this.state.allSectionVisited}
                 >
                   {intl.formatMessage(messages.valueRegister)}
-                </RegisterApplication>
+                </PrimaryButton>
               </ButtonContainer>
             )}
 
@@ -730,7 +710,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             {!!submitClickEvent && (
               <ButtonContainer>
-                <RegisterApplication
+                <PrimaryButton
                   id="submit_form"
                   icon={() => <TickLarge />}
                   align={ICON_ALIGNMENT.LEFT}
@@ -742,7 +722,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       ? messages.valueRegister
                       : messages.valueSendForReview
                   )}
-                </RegisterApplication>
+                </PrimaryButton>
               </ButtonContainer>
             )}
 

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
-import { ButtonIcon, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import styled from '../styled-components'
 import {
   goBack as goBackAction,
@@ -15,7 +15,6 @@ import { IStoreState } from 'src/store'
 import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
-import { LogoutConfirmation } from './LogoutConfirmation'
 
 const messages = defineMessages({
   back: {
@@ -85,18 +84,13 @@ const BackButtonContainer = styled.div`
 const BackButton = styled(PrimaryButton)`
   width: 69px;
   height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
+
   justify-content: center;
   border-radius: 21px;
-  /* stylelint-disable */
-  ${ButtonIcon} {
-    /* stylelint-enable */
-    margin-left: 0em;
-  }
 `
 
 const BackButtonText = styled.span`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  font-weight: bold;
   text-transform: uppercase;
   font-size: 14px;
   letter-spacing: 2px;
@@ -113,24 +107,9 @@ type Props = {
   languages: IntlState['languages']
 }
 
-interface IState {
-  showLogoutModal: boolean
-}
 type IFullProps = Props & InjectedIntlProps
 
-class TopMenuComponent extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps & IState) {
-    super(props)
-    this.state = {
-      showLogoutModal: false
-    }
-  }
-
-  toggleLogoutModal = () => {
-    this.setState(state => ({
-      showLogoutModal: !state.showLogoutModal
-    }))
-  }
+class TopMenuComponent extends React.Component<IFullProps> {
   goToRegister = () => {
     this.props.goToRegister()
   }
@@ -166,7 +145,7 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
       {
         title: intl.formatMessage(messages.logout),
         key: 'logout',
-        onClick: this.toggleLogoutModal
+        onClick: this.props.redirectToAuthentication
       }
     ]
 
@@ -181,11 +160,6 @@ class TopMenuComponent extends React.Component<IFullProps, IState> {
         <HamburgerMenu
           menuItems={menuItems}
           menuTitle={intl.formatMessage(messages.menu)}
-        />
-        <LogoutConfirmation
-          show={this.state.showLogoutModal}
-          handleClose={this.toggleLogoutModal}
-          handleYes={this.props.redirectToAuthentication}
         />
       </TopMenuContainer>
     )

@@ -13,14 +13,12 @@ export interface IDesktopHeaderProps {
 
 const HeaderContainer = styled.div`
   padding: 8px 16px;
+  max-height: 60px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.headerGradientDark} 0%,
-    ${({ theme }) => theme.colors.headerGradientLight} 100%
-  );
+  align-items: center;
+  ${({ theme }) => theme.gradients.gradientNightshade};
 `
 const HeaderLeft = styled.div`
   display: flex;

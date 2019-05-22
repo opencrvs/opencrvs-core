@@ -6,17 +6,11 @@ export const Content = styled.section`
   width: 100%;
   height: 100%;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.defaultFontStyle};
-  letter-spacing: 0.5px;
-`
-
-export const HeaderContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  position: relative;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 export const BodyContent = styled.div`
   max-width: 940px;
   margin: auto;
+  position: relative;
 `

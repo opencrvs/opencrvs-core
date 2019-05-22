@@ -53,9 +53,7 @@ const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
     margin-bottom: 0;
   }
   border-top: ${({ expanded, theme, isBoxShadow }) =>
-    expanded && !isBoxShadow
-      ? ` 4px solid ${theme.colors.expandedIndicator}`
-      : `0`};
+    expanded && !isBoxShadow ? ` 4px solid ${theme.colors.primary}` : `0`};
 `
 const ExpandedCellContent = styled.div`
   animation: ${fadeIn} 500ms;
@@ -94,7 +92,7 @@ const ListContentContainer = styled.div`
   flex: 1;
   align-items: center;
   padding: 24px;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
 `
@@ -124,11 +122,11 @@ const IconsStatus = styled.div`
   height: 32px;
 `
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 function LabelValue({ label, value }: IInfo) {

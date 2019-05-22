@@ -72,6 +72,7 @@
       "prettier --write",
       "tslint",
       "stylelint",
+      "yarn extract:translations",
       "git add"
     ]
   },

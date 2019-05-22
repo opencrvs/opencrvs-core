@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Button } from '../../../buttons'
 import styled from 'styled-components'
+import { CircleButton } from '../../../buttons'
 
 interface IMenuAction {
   icon: () => React.ReactNode
@@ -8,35 +8,39 @@ interface IMenuAction {
 }
 export interface IMobileHeaderProps {
   id?: string
-  left?: IMenuAction
+  mobileLeft?: IMenuAction
   title: string
-  right?: IMenuAction
+  mobileBody?: JSX.Element
+  mobileRight?: IMenuAction
 }
 
 const HeaderContainer = styled.div`
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  background: linear-gradient(
-    180deg,
-    ${({ theme }) => theme.colors.headerGradientLight} 0%,
-    ${({ theme }) => theme.colors.headerGradientDark} 100%
-  );
+  ${({ theme }) => theme.gradients.gradientNightshade};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
 `
 
 const Title = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 18px;
-  line-height: 30px;
-  letter-spacing: 0.15px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.white};
+  align-self: center;
 `
 
 const HeaderBody = styled.div`
   margin: 0 16px;
   flex: 1;
   display: flex;
+  height: 40px;
+
+  form {
+    width: 100%;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
 `
 
 const EndComponentContainer = styled.div`
@@ -49,26 +53,36 @@ const EndComponentContainer = styled.div`
 `
 class MobileHeader extends React.Component<IMobileHeaderProps> {
   render() {
-    const { id, left, right, title } = this.props
+    const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
     return (
       <HeaderContainer id={id}>
-        <EndComponentContainer>
-          {left && (
-            <Button id="mobile_header_left" onClick={left.handler}>
-              {left.icon()}
-            </Button>
-          )}
-        </EndComponentContainer>
+        {mobileLeft && (
+          <EndComponentContainer>
+            <CircleButton
+              id="mobile_header_left"
+              onClick={mobileLeft.handler}
+              dark={true}
+            >
+              {mobileLeft.icon()}
+            </CircleButton>
+          </EndComponentContainer>
+        )}
+
         <HeaderBody>
-          <Title id="header_title">{title}</Title>
+          {mobileBody || <Title id="header_title">{title}</Title>}
         </HeaderBody>
-        <EndComponentContainer>
-          {right && (
-            <Button id="mobile_header_right" onClick={right.handler}>
-              {right.icon()}
-            </Button>
-          )}
-        </EndComponentContainer>
+
+        {mobileRight && (
+          <EndComponentContainer>
+            <CircleButton
+              id="mobile_header_right"
+              onClick={mobileRight.handler}
+              dark={true}
+            >
+              {mobileRight.icon()}
+            </CircleButton>
+          </EndComponentContainer>
+        )}
       </HeaderContainer>
     )
   }

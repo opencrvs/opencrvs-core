@@ -124,6 +124,7 @@ export interface IFieldInput {
 export type IFormFieldValue =
   | string
   | string[]
+  | number
   | boolean
   | IFileValue[]
   | { [key: string]: string }

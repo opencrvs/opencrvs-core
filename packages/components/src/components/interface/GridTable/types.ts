@@ -1,6 +1,12 @@
-import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
 import { IAction } from '../ListItem'
 export { IAction } from '../ListItem'
+
+enum GQLRegStatus {
+  DECLARED = 'DECLARED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED'
+}
 
 export interface IStatus {
   type: GQLRegStatus | null

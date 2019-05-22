@@ -4,16 +4,22 @@ import { Button, IButtonProps, ICON_ALIGNMENT } from './Button'
 import { PlusTransparent, MinusTransparent } from '../icons'
 
 const StyledButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.secondary};
   display: flex;
+  padding: 0 8px;
   flex: 1;
-  min-height: 50px;
+  background: ${({ theme }) => theme.colors.white};
   margin-bottom: 1px;
   &:last-child {
     margin-bottom: 0;
   }
   justify-content: center;
   align-items: center;
+  & > div {
+    top: 0;
+  }
+  border: none;
+  outline: none;
 `
 interface IExpansionButtonProps extends IButtonProps {
   expanded?: boolean
@@ -22,7 +28,6 @@ interface IExpansionButtonProps extends IButtonProps {
 export function ExpansionButton(props: IExpansionButtonProps) {
   return (
     <StyledButton
-      align={ICON_ALIGNMENT.LEFT}
       icon={() => {
         return props.expanded ? <MinusTransparent /> : <PlusTransparent />
       }}

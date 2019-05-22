@@ -168,14 +168,14 @@ const messages = defineMessages({
     description: 'A label for certified'
   },
   rejectLinkText: {
-    id: 'register.duplicates.details.reject',
+    id: 'register.duplicates.button.reject',
     defaultMessage: 'Reject',
     description: 'A label for reject link'
   }
 })
 
 const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
-  border-top: ${({ theme }) => ` 4px solid ${theme.colors.expandedIndicator}`};
+  border-top: ${({ theme }) => ` 4px solid ${theme.colors.primary}`};
   ${({ currentStatus }) =>
     currentStatus === 'rejected' ? `box-shadow: none` : ''}
 `
@@ -192,9 +192,8 @@ const DetailTextContainer = styled.div`
 
 const DetailText = styled.div`
   flex: 1;
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
-  font-size: 16px;
 `
 
 const DetailTextSplitContainer = styled(DetailText)`
@@ -204,9 +203,8 @@ const DetailTextSplitContainer = styled(DetailText)`
 `
 
 const Link = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.primary};
-  font-size: 16px;
   text-decoration: underline;
 `
 
@@ -229,8 +227,8 @@ const ListStatusContainer = styled.span`
 `
 
 const RejectApplication = styled.a`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.danger};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.error};
   text-decoration: underline;
   cursor: pointer;
   margin-left: 60px;

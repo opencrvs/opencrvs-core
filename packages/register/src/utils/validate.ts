@@ -448,7 +448,7 @@ const checkNameWords = (value: string, checker: Checker): boolean => {
 }
 
 const isLessOrEqual = (value: string, max: number) => {
-  return value && value.length <= max
+  return value && value.toString().length <= max
 }
 
 export const isValidBengaliName = (value: string): boolean => {

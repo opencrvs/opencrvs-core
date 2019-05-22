@@ -1,44 +1,61 @@
-export const colors = {
-  accent: '#4C68C1',
-  accentLight: '#5E93ED',
-  accentGradientDark: '#629FCC',
-  accentGradientLight: '#7DC1EA',
-  background: '#F4F4F4',
-  disabled: '#D2D2D2',
-  error: '#D53F3F',
-  headerGradientDark: '#42506B',
-  headerGradientLight: '#485F88',
-  placeholder: '#58727E',
-  primary: '#4C68C1',
-  secondary: '#35495D',
-  success: '#49B78D',
-  warning: '#EEB268',
-  copy: '#35495D',
-  copyAlpha80: '#35495D80',
-  hoverGradientDark: '#3C55A3 ',
-  inputBackground: '#F9F9F9',
+const colorDictionary = {
+  blackStormy: '#35495D',
+  blueDeepSea: '#4C68C1',
+  blueBabyBaby: '#5E93ED',
+  purpleDrafty: '#8049B7',
+  orangeAmber: '#F1B162',
+  redDanger: '#D53F3F',
+  greenPeaPea: '#49B78D',
+  blueCrystal: '#4A8AD7',
+  yellowFocus: '#EDC55E',
   white: '#FFFFFF',
   black: '#000000',
-  blackAlpha20: '#00000020',
-  danger: '#D53F3F',
-  cardGradientEnd: '#5E93ED',
-  chartPrimary: '#233A86',
-  chartSecondary: '#6575AA',
-  chartTertiary: '#a7b0cf',
-  chartAreaGradientStart: '#D8E5FD',
-  chartAreaGradientEnd: '#F7F9FE',
-  expandedIndicator: '#7C93EC',
-  expandedIndicatorSecondary: '#7C93EC',
-  imageContainerBackground: '#a8b8c3',
-  disabledButton: '#F4F4F4',
-  rejectionIconColor: '#cc755f',
-  saveDraftBtn: '#5391E8',
-  disabledTab: '#C4C9D4',
-  offlineBoxText: '#747987',
-  offlineBoxTitle: '#41485F',
-  seperatorBorder: '#f7f7f7',
-  creamCan: '#EDC55E',
-  dropdownHover: '#E5EEFC',
-  menuBackground: '#35495dcc',
-  menuBackgroundTransparent: '#35495d00'
+  blueHover: '#F2F6FE',
+  greyBlackMetal: '#373D3F',
+  greyRaven: '#555F61',
+  greyDarkSteel: '#83898F',
+  greySteel: '#A7B0B2',
+  greyGrey: '#C1C7C9',
+  greySmoky: '#DADEDF',
+  greyPearl: '#F2F3F4',
+  nightshadeDark: '#42506B',
+  nightshadeLight: '#485F88'
+}
+
+export const gradients = {
+  gradientNightshade:
+    'background: linear-gradient(180deg, #42506B 0%, #485F88 100%)',
+  gradientSkyDark:
+    'background: linear-gradient(180deg, #3C55A3 0%, #4C68C1 100%)',
+  gradientSkyLight:
+    'background: linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)'
+}
+
+export const shadows = {
+  mistyShadow: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
+  thickShadow: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
+}
+
+export const colors = {
+  primary: colorDictionary.blueDeepSea,
+  secondary: colorDictionary.blueBabyBaby,
+  tertiary: colorDictionary.blueCrystal,
+  error: colorDictionary.redDanger,
+  warning: colorDictionary.orangeAmber,
+  copy: colorDictionary.blackStormy,
+  placeholder: colorDictionary.greyDarkSteel,
+  background: colorDictionary.greyPearl,
+  disabled: colorDictionary.greySmoky,
+  success: colorDictionary.greenPeaPea,
+  white: colorDictionary.white,
+  black: colorDictionary.black,
+  focus: colorDictionary.yellowFocus,
+
+  // Exceptions - Try to use one of the above before creating exceptions
+  chartAreaGradientStart: colorDictionary.greySmoky,
+  chartAreaGradientEnd: colorDictionary.blueHover,
+  dropdownHover: colorDictionary.blueHover,
+  menuBackground: colorDictionary.blackStormy,
+  gradientDark: colorDictionary.nightshadeDark,
+  gradientLight: colorDictionary.nightshadeLight
 }

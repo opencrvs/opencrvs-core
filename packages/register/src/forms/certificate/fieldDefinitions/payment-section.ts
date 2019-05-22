@@ -8,34 +8,34 @@ import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({
   payment: {
-    id: 'register.workQueue.print.payment',
+    id: 'print.certificate.payment',
     defaultMessage: 'Payment',
     description: 'The title for payment section'
   },
   paymentMethod: {
-    id: 'register.workQueue.print.paymentMethod',
+    id: 'print.certificate.paymentMethod',
     defaultMessage: 'Payment method',
     description: 'The label for payment method select'
   },
   manualPaymentMethod: {
-    id: 'register.workQueue.print.manualPaymentMethod',
+    id: 'print.certificate.manualPaymentMethod',
     defaultMessage: 'Manual',
     description: 'The label for select option for manual payment method'
   },
   collectPayment: {
-    id: 'register.workQueue.print.collectPayment',
+    id: 'print.certificate.collectPayment',
     defaultMessage:
       'Please collect the payment, print the receipt and hand it over to the payee.',
     description: 'The label for collect payment paragraph'
   },
   service: {
-    id: 'register.workQueue.print.serviceMonth',
+    id: 'print.certificate.serviceMonth',
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
     description: 'The label for service paragraph'
   },
   paymentAmount: {
-    id: 'register.workQueue.print.paymentAmount',
+    id: 'print.certificate.paymentAmount',
     defaultMessage: '\u09F3 {paymentAmount}',
     description: 'The label for payment amount subsection'
   }

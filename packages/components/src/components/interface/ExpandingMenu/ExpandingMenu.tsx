@@ -5,7 +5,7 @@ import { Avatar } from '../../icons'
 const MenuMainWrapper = styled.div`
   @keyframes fadeIn {
     0% {
-      background: ${({ theme }) => theme.colors.menuBackgroundTransparent};
+      background: '#35495d00';
     }
     100% {
       background: ${({ theme }) => theme.colors.menuBackground};
@@ -13,8 +13,8 @@ const MenuMainWrapper = styled.div`
   }
   background: ${({ theme }) => theme.colors.menuBackground};
   width: 100%;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
   height: 100vh;
   z-index: 99999;
   animation: 300ms ease-out 0s 1 fadeIn;
@@ -44,13 +44,11 @@ const UserInfo = styled.div`
   text-align: justify;
 `
 const UserName = styled.p`
-  font-size: 20px;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   margin: 25px 0px 5px;
 `
 const Role = styled.p`
-  font-size: 15px;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.captionStyle};
   margin: 0px;
 `
 const MenuItems = styled.ul`
@@ -76,10 +74,10 @@ const MenuItem = styled.li`
   display: flex;
   align-items: center;
   padding: 10px 30px;
-  font-weight: bold;
   cursor: pointer;
+  ${({ theme }) => theme.fonts.subtitleStyle};
   &:hover {
-    color: ${({ theme }) => theme.colors.cardGradientEnd};
+    color: ${({ theme }) => theme.colors.secondary};
   }
   &:hover ${Icon} {
     display: none;

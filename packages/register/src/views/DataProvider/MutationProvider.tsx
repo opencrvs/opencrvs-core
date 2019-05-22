@@ -4,13 +4,13 @@ import { Event, Action, IForm } from 'src/forms'
 import { getBirthMutationMappings } from './birth/mutations'
 import { getDeathMutationMappings } from './death/mutations'
 import { Mutation } from 'react-apollo'
-import { IDraft } from 'src/drafts'
+import { IApplication } from 'src/applications'
 
 interface IMutationProviderProps {
   event: Event
   action: Action
   form?: IForm
-  draft?: IDraft
+  application?: IApplication
   payload?: any
   onCompleted: (data: any) => void
   onError?: (error: any) => void
@@ -29,10 +29,10 @@ export const MutationContext = React.createContext({
 })
 class MutationProviderComponent extends React.Component<IProps> {
   getMapping() {
-    const { event, action, payload, form, draft } = this.props
+    const { event, action, payload, form, application } = this.props
     return (
       MutationMapper[event] &&
-      MutationMapper[event](action, payload, form, draft)
+      MutationMapper[event](action, payload, form, application)
     )
   }
 

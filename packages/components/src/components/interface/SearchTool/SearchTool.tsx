@@ -1,12 +1,5 @@
 import * as React from 'react'
-import {
-  SearchBlue,
-  TrackingID,
-  BRN,
-  Phone,
-  ArrowDownBlue,
-  ClearText
-} from '../../icons'
+import { SearchBlue, ArrowDownBlue, ClearText } from '../../icons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -14,14 +7,16 @@ const Wrapper = styled.form`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 2px;
   display: flex;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  padding: 10px;
+  ${({ theme }) => theme.fonts.bodyStyle};
+  padding: 0px 10px;
+  margin-bottom: 1px;
+  min-width: 400px;
   position: relative;
 `
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 10px;
-  font-size: 18px;
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   flex-grow: 1;
   &:focus {
     outline: none;
@@ -62,15 +57,15 @@ const IconWrapper = styled.span`
   padding: 8px 16px;
 `
 const Label = styled.span`
-  font-weight: bold;
-  color: ${({ theme }) => theme.colors.secondary};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
-  background: ${({ theme }) => theme.colors.cardGradientEnd};
+  background: ${({ theme }) => theme.colors.secondary};
   border-radius: 2px;
   padding: 5px 10px;
   color: ${({ theme }) => theme.colors.white};
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.captionStyle};
   margin-right: 10px;
 `
 const DropDown = styled.div`
@@ -81,11 +76,12 @@ const DropDown = styled.div`
 const ClearTextIcon = styled(ClearText)`
   margin: 0 5px;
 `
-interface ISearchType {
+export interface ISearchType {
   label: string
   value: string
   icon: React.ReactNode
   isDefault?: boolean
+  placeHolderText: string
 }
 interface IState {
   dropDownIsVisible: boolean
@@ -93,45 +89,52 @@ interface IState {
   selectedSearchType: ISearchType
 }
 interface IProps {
-  searchHandler: (param: string) => void
+  searchTypeList: ISearchType[]
+  searchText?: string
+  selectedSearchType?: string
+  searchHandler: (searchText: string, searchType: string) => void
+  onClearText?: () => void
 }
-const SEARCH_TYPES = [
-  {
-    label: 'Tracking ID',
-    value: 'trackingid',
-    icon: <TrackingID />,
-    isDefault: true
-  },
-  { label: 'BRN/DRN', value: 'brn-drn', icon: <BRN /> },
-  { label: 'Phone no.', value: 'phone', icon: <Phone /> }
-]
-
 export class SearchTool extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
 
     this.state = {
       dropDownIsVisible: false,
-      searchParam: '',
+      searchParam: this.props.searchText ? this.props.searchText : '',
       selectedSearchType: this.getDefaultSearchType()
     }
   }
+
   getDefaultSearchType(): ISearchType {
+    if (this.props.selectedSearchType) {
+      return (
+        this.props.searchTypeList.find(
+          (item: ISearchType) => item.value === this.props.selectedSearchType
+        ) || this.props.searchTypeList[0]
+      )
+    }
+
     return (
-      SEARCH_TYPES.find((item: ISearchType) => item.isDefault === true) ||
-      SEARCH_TYPES[0]
+      this.props.searchTypeList.find(
+        (item: ISearchType) => item.isDefault === true
+      ) || this.props.searchTypeList[0]
     )
   }
   search = () => {
     return (
-      this.state.searchParam && this.props.searchHandler(this.state.searchParam)
+      this.state.searchParam &&
+      this.props.searchHandler(
+        this.state.searchParam,
+        this.state.selectedSearchType.value
+      )
     )
   }
   dropdown() {
     return (
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
-          {SEARCH_TYPES.map(item => {
+          {this.props.searchTypeList.map(item => {
             return (
               <DropDownItem
                 key={item.value}
@@ -168,20 +171,30 @@ export class SearchTool extends React.Component<IProps, IState> {
   onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ searchParam: event.target.value, dropDownIsVisible: false })
   }
+
+  onClearTextHandler = () => {
+    const { onClearText } = this.props
+    this.setState({ searchParam: '' })
+
+    if (onClearText) {
+      onClearText()
+    }
+  }
+
   render() {
-    const selectedCriteria = `Enter ${this.state.selectedSearchType.label}`
+    const { placeHolderText } = this.state.selectedSearchType
     return (
       <Wrapper action="javascript:void(0);" onSubmit={this.search}>
         <SearchBlue onClick={this.search} />
         <SearchTextInput
           id="searchText"
           type="text"
-          placeholder={selectedCriteria}
+          placeholder={placeHolderText}
           onChange={this.onChangeHandler}
           value={this.state.searchParam}
         />
         {this.state.searchParam && (
-          <ClearTextIcon onClick={() => this.setState({ searchParam: '' })} />
+          <ClearTextIcon onClick={this.onClearTextHandler} />
         )}
         <DropDown onClick={this.toggleDropdownDisplay}>
           <SelectedSearchCriteria>

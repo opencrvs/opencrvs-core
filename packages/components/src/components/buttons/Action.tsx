@@ -12,31 +12,35 @@ const ActionContainer = styled(Button)`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.white};
+  & div {
+    padding: 0;
+  }
   text-align: left;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 10px;
   &:last-child {
     margin-bottom: 0;
   }
+  button:focus {
+    outline: 0;
+  }
 `
 
 const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  font-size: 24px;
+  ${({ theme }) => theme.fonts.h4Style};
   margin: 0;
 `
 
 const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.bodyStyle};
   margin: 0;
   margin-top: 3px;
   strong {
-    font-family: ${({ theme }) => theme.fonts.boldFont};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
   }
 `
 

@@ -61,7 +61,7 @@ Cypress.Commands.add('login', (userType, options = {}) => {
     })
 
   // Wait for app to load so token can be stored
-  cy.wait(3000)
+  cy.wait(6000)
 })
 
 Cypress.Commands.add('selectOption', (selector, text, option) => {
@@ -77,5 +77,4 @@ Cypress.Commands.add('selectOption', (selector, text, option) => {
 Cypress.Commands.add('logout', () => {
   cy.get('#sub-menu').click()
   cy.get('#Logout-menu-item').click()
-  cy.get('#logout_confirm').click()
 })

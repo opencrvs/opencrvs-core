@@ -35,29 +35,13 @@ const SearchIconAndInput = styled.div`
   width: 100%;
 `
 
-const SearchButton = styled(PrimaryButton)`
-  align-items: center;
-  justify-content: center;
-  background: ${({ theme }) => theme.colors.secondary};
-  font-weight: bold;
-  margin: 0 5px;
-  &:hover {
-    background: linear-gradient(
-      ${({ theme }) => theme.colors.headerGradientDark},
-      ${({ theme }) => theme.colors.secondary}
-    );
-    color: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => theme.colors.white};
-  }
-`
-
 const SearchIcon = styled(Search)`
   margin-bottom: 5px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
     display: none;
   }
 `
-const StyledSearchButton = styled(SearchButton)`
+const StyledSearchButton = styled(PrimaryButton)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 20px;
     margin-bottom: 11px;
@@ -66,7 +50,7 @@ const StyledSearchButton = styled(SearchButton)`
   }
   &:disabled {
     div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabledButton};
+      background: ${({ theme }) => theme.colors.disabled};
     }
     g {
       fill: ${({ theme }) => theme.colors.disabled};
@@ -89,11 +73,11 @@ const StyledInput = styled.input.attrs<ISearchInputProps>({})`
     error && touched ? theme.colors.error : theme.colors.disabled};
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
 
   &:focus {
-    border-bottom: solid 1px ${({ theme }) => theme.colors.accent};
+    border-bottom: solid 1px ${({ theme }) => theme.colors.secondary};
   }
 
   &::-webkit-input-placeholder {

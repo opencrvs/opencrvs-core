@@ -7,6 +7,7 @@ export interface ICustomProps {
   focusInput?: boolean
   ignoreMediaQuery?: boolean
   hideBorder?: boolean
+  autocomplete?: boolean
 }
 
 export type ITextInputProps = ICustomProps &
@@ -19,9 +20,9 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.defaultFontStyle};
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.inputBackground};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.background};
 
   ${({ hideBorder, error, touched, theme }) =>
     hideBorder
@@ -34,16 +35,16 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
       }
       &:focus {
         box-shadow: 0 0 0px 2px ${
-          error && touched ? theme.colors.error : theme.colors.creamCan
+          error && touched ? theme.colors.error : theme.colors.focus
         };
       }
         `
       : `
       border: 2px solid ${
-        error && touched ? theme.colors.error : theme.colors.secondary
+        error && touched ? theme.colors.error : theme.colors.copy
       };
       &:focus {
-        box-shadow: 0 0 0px 3px ${theme.colors.creamCan};
+        box-shadow: 0 0 0px 3px ${theme.colors.focus};
       }
       `}
 
@@ -108,6 +109,12 @@ export class TextInput extends React.Component<ITextInputProps> {
   render() {
     const { focusInput, ...props } = this.props
 
-    return <StyledInput innerRef={this.$element} {...this.props} />
+    return (
+      <StyledInput
+        innerRef={this.$element}
+        {...this.props}
+        autocomplete={false}
+      />
+    )
   }
 }

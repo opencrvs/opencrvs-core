@@ -9,17 +9,14 @@ import {
   StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
-  ActionPage,
   ISearchInputProps,
-  ISelectGroupValue,
   ListItem,
   ListItemExpansion,
-  SearchInput,
   Spinner,
   Loader
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLComment,
@@ -38,8 +35,7 @@ import { IViewHeadingProps } from 'src/components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToSearchResult
+  goToReviewDuplicate as goToReviewDuplicateAction
 } from 'src/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
 import { getScope, getUserDetails } from 'src/profile/profileSelectors'
@@ -56,7 +52,11 @@ import {
   LOCAL_DATE_FORMAT,
   REJECTED,
   REJECT_REASON,
-  REJECT_COMMENTS
+  REJECT_COMMENTS,
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT,
+  SEARCH_RESULT_SORT
 } from 'src/utils/constants'
 import {
   createNamesMap,
@@ -67,6 +67,7 @@ import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToTab as goToTabAction } from '../../navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
+import { Header } from 'src/components/interface/Header/Header'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -81,7 +82,7 @@ const ExpansionSpinnerContainer = styled.div`
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
@@ -94,19 +95,18 @@ const Container = styled.div`
   }
 `
 const StyledLabel = styled.label`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin-right: 3px;
 `
 const StyledValue = styled.span`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-transform: capitalize !important;
 `
 const ValueContainer = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
-  line-height: 1.3em;
   & span:not(:last-child) {
-    border-right: 1px solid ${({ theme }) => theme.colors.copyAlpha80};
+    border-right: 1px solid ${({ theme }) => theme.colors.placeholder};
     margin-right: 10px;
     padding-right: 10px;
   }
@@ -125,13 +125,8 @@ export const ActionPageWrapper = styled.div`
 `
 const SearchResultText = styled.div`
   left: 268px;
-  margin-top: 30px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.secondary};
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 36px;
-  letter-spacing: 0.4px;
+  ${({ theme }) => theme.fonts.h4Style};
+  color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
     margin-top: 24px;
@@ -140,12 +135,8 @@ const SearchResultText = styled.div`
 const TotalResultText = styled.div`
   left: 268px;
   margin-top: 6px;
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  color: ${({ theme }) => theme.colors.secondary};
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 24px;
-  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.captionStyle};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
   }
@@ -200,7 +191,7 @@ const ExpansionContainer = styled.div`
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
@@ -212,18 +203,18 @@ const ExpansionContentContainer = styled.div`
 `
 
 const StyledSecondaryButton = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+  border: solid 1px ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.primary} !important;
-  font-weight: bold;
+  ${({ theme }) => theme.fonts.buttonStyle};
   svg {
     margin-right: 15px;
   }
   &:hover {
     background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabledButton};
+    border: solid 1px ${({ theme }) => theme.colors.disabled};
   }
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.inputBackground};
+    background-color: ${({ theme }) => theme.colors.background};
   }
 `
 const StatusIcon = styled.div`
@@ -238,11 +229,11 @@ interface IBaseSearchResultProps {
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  goToSearchResult: typeof goToSearchResult
 }
 
 interface IMatchParams {
   searchText: string
+  searchType: string
 }
 
 type ISearchResultProps = InjectedIntlProps &
@@ -250,31 +241,7 @@ type ISearchResultProps = InjectedIntlProps &
   ISearchInputProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
-
-interface ISearchResultState {
-  printCertificateModalVisible: boolean
-  regId: string | null
-  currentPage: number
-  sortBy?: string
-  eventType?: string
-  status?: string
-  searchContent?: string
-}
-export class SearchResultView extends React.Component<
-  ISearchResultProps,
-  ISearchResultState
-> {
-  state = {
-    printCertificateModalVisible: false,
-    regId: null,
-    currentPage: 1,
-    sortBy: 'asc',
-    eventType: '',
-    status: '',
-    searchContent: ''
-  }
-  pageSize = 10
-
+export class SearchResultView extends React.Component<ISearchResultProps> {
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
       case 'DECLARED':
@@ -736,46 +703,28 @@ export class SearchResultView extends React.Component<
 
     return identifier && identifier.id
   }
-  onPageChange = async (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
-  }
-  onSortChange = (sortBy: string) => {
-    this.setState({ sortBy })
-  }
-  onFilterChange = (
-    value: ISelectGroupValue,
-    changedValue: ISelectGroupValue
-  ) => {
-    this.setState({
-      eventType: this.state.eventType,
-      status: this.state.status,
-      ...changedValue
-    })
-  }
-
   render() {
     const { intl, match } = this.props
-    const searchParam = match.params.searchText
+    const { searchText, searchType } = match.params
     return (
-      <ActionPageWrapper>
-        <ActionPage
-          goBack={() => {
-            window.location.assign('/')
-          }}
-          title={intl.formatMessage(messages.title)}
-        >
-          <Container>
-            <HeaderContent>
+      <>
+        <Header
+          searchText={searchText}
+          selectedSearchType={searchType}
+          mobileSearchBar={true}
+        />
+        <Container>
+          <BodyContent>
+            {searchText && searchType && (
               <Query
                 query={SEARCH_EVENTS}
                 variables={{
                   locationIds: [this.getLocalLocationId()],
-                  count: this.pageSize,
-                  skip: (this.state.currentPage - 1) * this.pageSize,
-                  sort: this.state.sortBy,
-                  eventType: this.state.eventType,
-                  status: this.state.status,
-                  searchContent: searchParam
+                  sort: SEARCH_RESULT_SORT,
+                  trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                  registrationNumber:
+                    searchType === BRN_DRN_TEXT ? searchText : '',
+                  contactNumber: searchType === PHONE_TEXT ? searchText : ''
                 }}
               >
                 {({ loading, error, data }) => {
@@ -786,7 +735,7 @@ export class SearchResultView extends React.Component<
                         marginPercent={35}
                         spinnerDiameter={60}
                         loadingText={intl.formatMessage(messages.searchingFor, {
-                          param: searchParam
+                          param: searchText
                         })}
                       />
                     )
@@ -804,22 +753,10 @@ export class SearchResultView extends React.Component<
                   const total = transformedData.length
                   return (
                     <>
-                      <SearchInput
-                        id="search-input-text"
-                        searchValue={searchParam}
-                        placeholder={intl.formatMessage(
-                          messages.searchInputPlaceholder
-                        )}
-                        buttonLabel={intl.formatMessage(
-                          messages.searchInputButtonTitle
-                        )}
-                        onSubmit={this.props.goToSearchResult}
-                        {...this.props}
-                      />
                       <SearchResultText>
                         {intl.formatMessage(messages.searchResultFor, {
                           total,
-                          param: searchParam
+                          param: searchText
                         })}
                       </SearchResultText>
                       {total > 0 && (
@@ -846,10 +783,10 @@ export class SearchResultView extends React.Component<
                   )
                 }}
               </Query>
-            </HeaderContent>
-          </Container>
-        </ActionPage>
-      </ActionPageWrapper>
+            )}
+          </BodyContent>
+        </Container>
+      </>
     )
   }
 }
@@ -861,7 +798,6 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
-    goToSearchResult,
     gotoTab: goToTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction

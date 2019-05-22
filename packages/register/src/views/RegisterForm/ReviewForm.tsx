@@ -12,10 +12,10 @@ import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import {
-  storeDraft,
-  IDraft,
-  createReviewDraft
-} from '@opencrvs/register/src/drafts'
+  storeApplication,
+  IApplication,
+  createReviewApplication
+} from '@opencrvs/register/src/applications'
 import { Dispatch } from 'redux'
 import { getScope } from 'src/profile/profileSelectors'
 import { Scope } from '@opencrvs/register/src/utils/authUtils'
@@ -47,13 +47,13 @@ interface IReviewProps {
   scope: Scope
   event: Event
 }
-interface IDraftProp {
-  draft: IDraft | undefined
-  draftId: string
+interface IApplicationProp {
+  application: IApplication | undefined
+  applicationId: string
 }
 
 type IProps = IReviewProps &
-  IDraftProp &
+  IApplicationProp &
   IFormProps &
   InjectedIntlProps &
   RouteComponentProps<{}>
@@ -68,7 +68,7 @@ const StyledSpinner = styled(Spinner)`
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
@@ -78,7 +78,13 @@ export class ReviewFormView extends React.Component<IProps> {
     return this.props.scope && this.props.scope.includes('register')
   }
   render() {
-    const { intl, theme, draft, draftId, dispatch } = this.props
+    const {
+      intl,
+      theme,
+      application: application,
+      applicationId,
+      dispatch
+    } = this.props
     if (!this.userHasRegisterScope()) {
       return (
         <ErrorText id="review-unauthorized-error-text">
@@ -86,12 +92,12 @@ export class ReviewFormView extends React.Component<IProps> {
         </ErrorText>
       )
     }
-    if (!draft) {
+    if (!application) {
       return (
         <QueryProvider
           event={this.props.event}
           action={Action.LOAD_REVIEW_APPLICATION}
-          payload={{ id: this.props.draftId }}
+          payload={{ id: this.props.applicationId }}
         >
           <QueryContext.Consumer>
             {({ loading, error, data, dataKey }) => {
@@ -124,15 +130,15 @@ export class ReviewFormView extends React.Component<IProps> {
                   eventData.registration.status &&
                   eventData.registration.status[0].type) ||
                 ''
-              const reviewDraft = createReviewDraft(
-                draftId,
+              const reviewDraft = createReviewApplication(
+                applicationId,
                 transData,
                 this.props.event,
                 status
               )
-              dispatch(storeDraft(reviewDraft))
+              dispatch(storeApplication(reviewDraft))
 
-              return <RegisterForm {...this.props} draft={reviewDraft} />
+              return <RegisterForm {...this.props} application={reviewDraft} />
             }}
           </QueryContext.Consumer>
         </QueryProvider>
@@ -158,7 +164,7 @@ function mapStatetoProps(
   props: RouteComponentProps<{
     tabRoute: string
     tabId: string
-    draftId: string
+    applicationId: string
     event: string
   }>
 ) {
@@ -168,13 +174,13 @@ function mapStatetoProps(
   }
   const form = getReviewForm(state)[match.params.event.toLowerCase()]
 
-  const draft = state.drafts.drafts.find(
-    ({ id, review }) => id === match.params.draftId && review === true
+  const application = state.applicationsState.applications.find(
+    ({ id, review }) => id === match.params.applicationId && review === true
   )
   return {
-    draft,
+    application,
     scope: getScope(state),
-    draftId: match.params.draftId,
+    applicationId: match.params.applicationId,
     event: getEvent(match.params.event),
     registerForm: form,
     tabRoute: REVIEW_EVENT_PARENT_FORM_TAB,
@@ -182,6 +188,6 @@ function mapStatetoProps(
   }
 }
 
-export const ReviewForm = connect<IFormProps | IDraftProp>(mapStatetoProps)(
-  injectIntl(withTheme(ReviewFormView))
-)
+export const ReviewForm = connect<IFormProps | IApplicationProp>(
+  mapStatetoProps
+)(injectIntl(withTheme(ReviewFormView)))

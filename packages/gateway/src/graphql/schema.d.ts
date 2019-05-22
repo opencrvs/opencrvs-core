@@ -1076,14 +1076,9 @@ export interface QueryToFetchBirthRegistrationMetricsResolver<
 
 export interface QueryToSearchEventsArgs {
   locationIds?: Array<string | null>
-  status?: string
-  searchContent?: string
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
-  eventType?: string
-  count?: number
-  skip?: number
   sort?: string
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {

@@ -48,7 +48,7 @@ function CustomDot(props: ICustomDot) {
     <svg x={cx - 5.5} y={cy - 6} width={11} height={12}>
       <path
         d="M0 5.657L5.525 0l5.525 5.657-5.525 5.657z"
-        fill={theme.colors.chartPrimary}
+        fill={theme.colors.primary}
       />
     </svg>
   )
@@ -56,11 +56,7 @@ function CustomDot(props: ICustomDot) {
 
 export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
   const { data, theme, xAxisLabel, yAxisLabel } = props
-  const {
-    chartPrimary,
-    chartAreaGradientStart,
-    chartAreaGradientEnd
-  } = theme.colors
+  const { primary, chartAreaGradientStart, chartAreaGradientEnd } = theme.colors
 
   return (
     <Container>
@@ -107,7 +103,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           >
             <Label
               fill={theme.colors.secondary}
-              fontFamily={theme.fonts.lightFont}
+              fontFamily={theme.fonts.regularFont}
               offset={20}
               value={xAxisLabel}
               position="bottom"
@@ -125,7 +121,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
           >
             <Label
               fill={theme.colors.secondary}
-              fontFamily={theme.fonts.lightFont}
+              fontFamily={theme.fonts.regularFont}
               angle={-90}
               dy={20}
               offset={20}
@@ -137,7 +133,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             vertical={false}
             horizontal={false}
             fillOpacity="0.05"
-            fill={theme.colors.accentLight}
+            fill={theme.colors.secondary}
           />
 
           <Area
@@ -148,7 +144,7 @@ export const Line = withTheme((props: ILineProps & { theme: ITheme }) => {
             dataKey={(dataPoint: ILineDataPoint) =>
               Math.round((dataPoint.value / dataPoint.totalEstimate) * 100)
             }
-            stroke={chartPrimary}
+            stroke={primary}
             strokeWidth={1}
             fill="url(#colorLineArea)"
           />

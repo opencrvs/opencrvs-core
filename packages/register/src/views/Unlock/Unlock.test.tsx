@@ -133,15 +133,17 @@ describe('Logout Sequence', async () => {
     store
   )
 
-  it('Should Pop the Logout modal', () => {
+  it('Should logout', () => {
     testComponent.component
       .find('#logout')
       .hostNodes()
       .simulate('click')
     testComponent.component.update()
-    const modalIsDisplayed = testComponent.component
-      .find('#logout_confirm')
-      .hostNodes().length
-    expect(modalIsDisplayed).toBe(1)
+    setTimeout(() => {
+      const logoutComponent = testComponent.component
+        .find('#logout')
+        .hostNodes().length
+      expect(logoutComponent).toBe(0)
+    }, 1000)
   })
 })

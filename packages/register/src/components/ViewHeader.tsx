@@ -7,7 +7,7 @@ import { TopMenu } from '../components/TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import { ViewHeading, IViewHeadingProps } from '../components/ViewHeading'
 import ConnectivityStatus from './ConnectivityStatus'
-import { HeaderContent } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 const HeaderWarapper = styled(Header)`
   display: block;
@@ -34,13 +34,13 @@ export class ViewHeader extends React.Component<IViewHeadingProps> {
 
     return (
       <HeaderWarapper {...otherProps}>
-        <HeaderContent>
+        <BodyContent>
           <ConnectivityStatus />
           {hideBackButton && <Logo />}
           <TopMenu hideBackButton={hideBackButton} />
           <ViewHeading {...{ title, description, breadcrumb, id }} />
           {this.props.children}
-        </HeaderContent>
+        </BodyContent>
       </HeaderWarapper>
     )
   }

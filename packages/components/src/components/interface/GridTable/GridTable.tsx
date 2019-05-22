@@ -12,25 +12,21 @@ const Wrapper = styled.div`
 `
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.boldFont};
-  font-size: 16px;
+  ${({ theme }) => theme.fonts.captionStyle};
   margin: 60px 0 25px;
   padding: 0 25px;
-  line-height: 22px;
 `
 
 const StyledBox = styled(Box)`
   margin-top: 15px;
-  padding: 12px 0px 5px 0px;
+  padding: 7px 0px 0px 0px;
   color: ${({ theme }) => theme.colors.copy};
-  font-family: ${({ theme }) => theme.fonts.regularFont};
-  font-size: 16px;
-  line-height: 22px;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
-  font-family: ${({ theme }) => theme.fonts.lightFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `

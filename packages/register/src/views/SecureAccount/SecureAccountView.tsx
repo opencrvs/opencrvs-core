@@ -5,13 +5,12 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { CreatePin } from 'src/views/PIN/CreatePin'
 
 const SecurePageContainer = styled.div`
-  font-family: ${({ theme }) => theme.fonts.lightFont};
-  background: ${({ theme }) =>
-    `linear-gradient(180deg, ${theme.colors.headerGradientDark} 0%, ${
-      theme.colors.headerGradientLight
-    } 100%)`};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.gradients.gradientNightshade};
   height: 100vh;
   text-align: center;
+  width: 100%;
+  position: absolute;
   color: ${({ theme }) => theme.colors.white};
 `
 const Wrapper = styled.div`
@@ -27,8 +26,8 @@ const PinButton = styled(PrimaryButton)`
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.16);
   display: block;
 `
-const Bold = styled.b`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+const Bold = styled.span`
+  ${({ theme }) => theme.fonts.h4Style};
 `
 
 export class SecureAccount extends React.Component<{ onComplete: () => void }> {

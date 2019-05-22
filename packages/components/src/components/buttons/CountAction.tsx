@@ -11,6 +11,10 @@ const ActionContainer = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
   text-align: left;
   justify-content: flex-start;
+  & > div {
+    padding: 0;
+    justify-content: flex-start;
+  }
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 2px;
   &:last-child {
@@ -21,14 +25,14 @@ const ActionContainer = styled(Button)`
 const ActionTitle = styled.h3.attrs<{
   disabled?: boolean
 }>({})`
-  font-family: ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   margin-left: 11px;
 `
 
 const StyledStatus = styled.div`
-  font-family: ${({ theme }) => theme.fonts.boldFont};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   background-color: rgba(150, 150, 150, 0.1);
   border-radius: 17px;
   padding: 5px 13px 5px 7px;
