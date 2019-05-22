@@ -5,7 +5,11 @@ import { RouteComponentProps, Redirect } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { goToEvents as goToEventsAction } from 'src/navigation'
-import { ISearchInputProps } from '@opencrvs/components/lib/interface'
+import {
+  ISearchInputProps,
+  GridTable,
+  Spinner
+} from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '../../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { Header } from 'src/components/interface/Header/Header'
@@ -25,10 +29,17 @@ import {
   StatusProgress,
   StatusOrange,
   StatusRejected,
-  PlusTransparentWhite
+  PlusTransparentWhite,
+  StatusWaiting,
+  StatusSubmitted,
+  StatusPendingOffline,
+  StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
 import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import { sentenceCase } from 'src/utils/data-formatting'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -69,6 +80,11 @@ const FABContainer = styled.div`
   bottom: 9.17%;
 `
 
+// Might add a size prop to our Spinner lib component
+const SmallSpinner = styled(Spinner)`
+  width: 24px;
+  height: 24px;
+`
 const messages = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
@@ -84,6 +100,32 @@ const messages = defineMessages({
     id: 'register.fieldAgentHome.requireUpdates',
     defaultMessage: 'Require updates ({total})',
     description: 'The title of require updates tab'
+  },
+  dataTableNoResults: {
+    id: 'register.registrarHome.noResults',
+    defaultMessage: 'No result to display',
+    description:
+      'Text to display if the search return no results for the current filters'
+  },
+  listItemType: {
+    id: 'register.registrarHome.resultsType',
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item'
+  },
+  name: {
+    id: 'register.registrarHome.listItemName',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  submissionStatus: {
+    id: 'register.fieldAgentHome.tableHeader.submissionStatus',
+    defaultMessage: 'Submission status',
+    description: 'Label for table header of column Submission status'
+  },
+  indicator: {
+    id: 'register.fieldAgentHome.tableHeader.statusIndicator',
+    defaultMessage: 'Indicator',
+    description: 'Label for table header of colum Submission status indicator'
   }
 })
 interface IFieldAgentHomeProps {
@@ -92,6 +134,7 @@ interface IFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
+  applications: IApplication[]
 }
 
 interface IMatchParams {
@@ -109,6 +152,109 @@ const TAB_ID = {
   requireUpdates: FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 }
 class FieldAgentHomeView extends React.Component<FullProps> {
+  transformApplicationsContent = () => {
+    if (!this.props.applications || this.props.applications.length <= 0) {
+      return []
+    }
+    return this.props.applications
+      .filter(
+        (application: IApplication) =>
+          application.submissionStatus !==
+          SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      )
+      .map((draft: IApplication) => {
+        let name
+
+        if (draft.event && draft.event.toString() === 'birth') {
+          name =
+            (draft.data &&
+              draft.data.child &&
+              draft.data.child.familyNameEng &&
+              (!draft.data.child.firstNamesEng
+                ? ''
+                : draft.data.child.firstNamesEng + ' ') +
+                draft.data.child.familyNameEng) ||
+            (draft.data &&
+              draft.data.child &&
+              draft.data.child.familyName &&
+              (!draft.data.child.firstNames
+                ? ''
+                : draft.data.child.firstNames + ' ') +
+                draft.data.child.familyName) ||
+            ''
+        } else if (draft.event && draft.event.toString() === 'death') {
+          name =
+            (draft.data &&
+              draft.data.deceased &&
+              draft.data.deceased.familyNameEng &&
+              (!draft.data.deceased.firstNamesEng
+                ? ''
+                : draft.data.deceased.firstNamesEng + ' ') +
+                draft.data.deceased.familyNameEng) ||
+            (draft.data &&
+              draft.data.deceased &&
+              draft.data.deceased.familyName &&
+              (!draft.data.deceased.firstNames
+                ? ''
+                : draft.data.deceased.firstNames + ' ') +
+                draft.data.deceased.familyName) ||
+            ''
+        }
+
+        const { statusText, icon } = this.submissionStatusMap(
+          draft.submissionStatus || '',
+          navigator.onLine,
+          'DC5EDNG'
+        )
+
+        return {
+          id: draft.id,
+          event: (draft.event && sentenceCase(draft.event)) || '',
+          name: name || '',
+          submission_status: statusText || '',
+          status_indicator: icon ? icon() : null
+        }
+      })
+  }
+
+  submissionStatusMap = (status: string, online: boolean, id?: string) => {
+    let icon: () => React.ReactNode
+    let statusText: string
+    let overwriteStatusIfOffline: boolean = true
+
+    switch (status) {
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
+        icon = () => <SmallSpinner id="submission" />
+        statusText = 'Sending...'
+        break
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
+        overwriteStatusIfOffline = false
+        icon = () => <StatusSubmitted />
+        statusText = id || ''
+        break
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]:
+        overwriteStatusIfOffline = false
+        icon = () => <StatusFailed />
+        statusText = 'Failed to send'
+        break
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
+      default:
+        icon = () => <StatusWaiting id="submission" />
+        statusText = 'Waiting to send'
+        break
+    }
+
+    if (!online && overwriteStatusIfOffline) {
+      icon = () => <StatusPendingOffline />
+      statusText = 'Pending connection'
+    }
+
+    return {
+      icon,
+      statusText
+    }
+  }
+
   render() {
     const { userDetails, match, intl } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
@@ -163,6 +309,40 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 })}
               </IconTab>
             </Topbar>
+            {tabId === TAB_ID.sentForReview && (
+              <BodyContent>
+                <GridTable
+                  content={this.transformApplicationsContent()}
+                  columns={[
+                    {
+                      label: this.props.intl.formatMessage(
+                        messages.listItemType
+                      ),
+                      width: 15,
+                      key: 'event'
+                    },
+                    {
+                      width: 35,
+                      label: this.props.intl.formatMessage(messages.name),
+                      key: 'name'
+                    },
+                    {
+                      label: this.props.intl.formatMessage(
+                        messages.submissionStatus
+                      ),
+                      width: 45,
+                      key: 'submission_status'
+                    },
+                    {
+                      label: this.props.intl.formatMessage(messages.indicator),
+                      width: 5,
+                      key: 'status_indicator'
+                    }
+                  ]}
+                  noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                />
+              </BodyContent>
+            )}
             <FABContainer>
               <FloatingActionButton
                 id="new_event_declaration"
@@ -183,7 +363,8 @@ class FieldAgentHomeView extends React.Component<FullProps> {
 const mapStateToProps = (store: IStoreState) => {
   return {
     language: getLanguage(store),
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    applications: store.applicationsState.applications
   }
 }
 export const FieldAgentHome = connect(
