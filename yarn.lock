@@ -698,6 +698,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/json2csv@^4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@types/json2csv/-/json2csv-4.4.0.tgz#8e3b115a473ce4af4f850e194368059cc98e4f56"
+  integrity sha512-24S6hQGGsOZxTXbRyKvNaV5k882XTo9RX/LH6+RtVtimFNE2J0T/LWlru6BeEssByVA9/ZLif1PLk/8X8/qPCQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/json5@^0.0.29":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
@@ -814,9 +821,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-intl@^2.3.8":
+"@types/react-intl@^2.3.17", "@types/react-intl@^2.3.8":
   version "2.3.17"
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.17.tgz#e1fc6e46e8af58bdef9531259d509380a8a99e8e"
+  integrity sha512-FGd6J1GQ7zvl1GZ3BBev83B7nfak8dqoR2PZ+l5MoisKMpd4xOLhZJC1ugpmk3Rz5F85t6HbOg9mYqXW97BsNA==
 
 "@types/react-redux@^6.0.0", "@types/react-redux@^6.0.9":
   version "6.0.13"
@@ -852,6 +860,7 @@
 "@types/react-stickynode@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@types/react-stickynode/-/react-stickynode-1.4.0.tgz#7ba60ef8af1ab11a3371c68a4b028663996b7d50"
+  integrity sha512-oBz1zR9w1CWmTym42BtzINVzLolvnpK1AOmWcUDYJhp/YhPT1S06nXQsrIrCSM8jiTdQN8G9YYJHmd0vFQdffg==
   dependencies:
     "@types/react" "*"
 
@@ -6705,7 +6714,7 @@ hoist-non-react-statics@^2.3.1, hoist-non-react-statics@^2.5.0, hoist-non-react-
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
 
-hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.1.0:
+hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.1.0, hoist-non-react-statics@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.0.tgz#b09178f0122184fb95acf525daaecb4d8f45958b"
   dependencies:
@@ -11667,6 +11676,17 @@ react-intl@^2.4.0:
   resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.8.0.tgz#20b0c1f01d1292427768aa8ec9e51ab7e36503ba"
   dependencies:
     hoist-non-react-statics "^2.5.5"
+    intl-format-cache "^2.0.5"
+    intl-messageformat "^2.1.0"
+    intl-relativeformat "^2.1.0"
+    invariant "^2.1.1"
+
+react-intl@^2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.9.0.tgz#c97c5d17d4718f1575fdbd5a769f96018a3b1843"
+  integrity sha512-27jnDlb/d2A7mSJwrbOBnUgD+rPep+abmoJE511Tf8BnoONIAUehy/U1zZCHGO17mnOwMWxqN4qC0nW11cD6rA==
+  dependencies:
+    hoist-non-react-statics "^3.3.0"
     intl-format-cache "^2.0.5"
     intl-messageformat "^2.1.0"
     intl-relativeformat "^2.1.0"

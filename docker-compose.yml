@@ -5,31 +5,35 @@ services:
     image: jembi/ocrvs-register:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./Dockerfile-register
+      dockerfile: ./packages/register/Dockerfile
     restart: unless-stopped
 
   performance:
     image: jembi/ocrvs-performance:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./Dockerfile-performance
+      dockerfile: ./packages/performance/Dockerfile
     restart: unless-stopped
 
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./Dockerfile-login
+      dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
 
   styleguide:
     image: jembi/ocrvs-styleguide:${VERSION:-latest}
-    build: packages/components
+    build:
+      context: .
+      dockerfile: ./packages/components/Dockerfile
     restart: unless-stopped
 
   gateway:
     image: jembi/ocrvs-gateway:${VERSION:-latest}
-    build: packages/gateway
+    build:
+      context: .
+      dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
@@ -43,7 +47,9 @@ services:
   # User facing services
   workflow:
     image: jembi/ocrvs-workflow:${VERSION:-latest}
-    build: packages/workflow
+    build:
+      context: .
+      dockerfile: ./packages/workflow/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
@@ -57,7 +63,9 @@ services:
 
   search:
     image: jembi/ocrvs-search:${VERSION:-latest}
-    build: packages/search
+    build:
+      context: .
+      dockerfile: ./packages/search/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
@@ -69,7 +77,9 @@ services:
 
   metrics:
     image: jembi/ocrvs-metrics:${VERSION:-latest}
-    build: packages/metrics
+    build:
+      context: .
+      dockerfile: ./packages/metrics/Dockerfile
     restart: unless-stopped
     environment:
       - INFLUX_HOST=influxdb
@@ -81,7 +91,9 @@ services:
 
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
-    build: packages/auth
+    build:
+      context: .
+      dockerfile: ./packages/auth/Dockerfile
     restart: unless-stopped
     environment:
       - REDIS_HOST=redis
@@ -92,7 +104,9 @@ services:
 
   user-mgnt:
     image: jembi/ocrvs-user-mgnt:${VERSION:-latest}
-    build: packages/user-mgnt
+    build:
+      context: .
+      dockerfile: ./packages/user-mgnt/Dockerfile
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
@@ -100,7 +114,9 @@ services:
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
-    build: packages/notification
+    build:
+      context: .
+      dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
       - LANGUAGE=bn
@@ -108,7 +124,9 @@ services:
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
-    build: packages/resources
+    build:
+      context: .
+      dockerfile: ./packages/resources/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
