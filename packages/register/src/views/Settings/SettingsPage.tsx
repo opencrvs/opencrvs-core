@@ -9,6 +9,9 @@ import styled from 'src/styled-components'
 import { Header } from 'src/components/interface/Header/Header'
 import { AvatarLarge, Avatar } from '@opencrvs/components/lib/icons'
 import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { Select } from '@opencrvs/components/lib/forms'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 
 const messages = defineMessages({
   settings_title: {
@@ -76,6 +79,26 @@ const messages = defineMessages({
     defaultMessage: 'Change',
     description: 'Change action'
   },
+  change_language_messege: {
+    id: 'message.changeLanguage',
+    defaultMessage: 'Your prefered language that you want to use on OpenCRVS',
+    description: 'Change language message'
+  },
+  change_language_title: {
+    id: 'changeLanguage.title',
+    defaultMessage: 'Change language',
+    description: 'Change language tittle'
+  },
+  button_apply: {
+    id: 'button.apply',
+    defaultMessage: 'Apply',
+    description: 'Apply button label'
+  },
+  button_cancel: {
+    id: 'formFields.fetchButton.cancel',
+    defaultMessage: 'Cancel',
+    description: 'Cancel button label'
+  },
   FIELD_AGENT: {
     id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
@@ -110,7 +133,7 @@ const messages = defineMessages({
 
 const Container = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   padding: 40px 80px;
@@ -166,12 +189,49 @@ const Right = styled.div`
   }
 `
 
+const Message = styled.div`
+  margin-bottom: 16px;
+`
+const Label = styled.label`
+  margin-bottom: 8px;
+`
+const ApplyButton = styled(PrimaryButton)`
+  height: 40px;
+  & div {
+    padding: 0 8px;
+  }
+`
+const CancelButton = styled(TertiaryButton)`
+  height: 40px;
+  & div {
+    padding: 0;
+  }
+`
 type IProps = InjectedIntlProps & {
   language: string
   userDetails: IUserDetails
 }
 
-class SettingsView extends React.Component<IProps> {
+interface IState {
+  showLanguageSettings: boolean
+  selectedLanguage: string
+}
+
+class SettingsView extends React.Component<IProps, IState> {
+  constructor(props: IProps & IState) {
+    super(props)
+    this.state = {
+      showLanguageSettings: true,
+      selectedLanguage: 'en'
+    }
+  }
+
+  toggleLanguageSettingsModal = () => {
+    this.setState(state => ({
+      showLanguageSettings: !state.showLanguageSettings
+    }))
+  }
+
   render() {
     const { userDetails, intl } = this.props
     let bengaliName = ''
@@ -270,11 +330,17 @@ class SettingsView extends React.Component<IProps> {
             label: intl.formatMessage(messages.label_language),
             value: 'English',
             action: {
-              label: intl.formatMessage(messages.action_change)
+              label: intl.formatMessage(messages.action_change),
+              handler: this.toggleLanguageSettingsModal
             }
           }
         ]
       }
+    ]
+
+    const language = [
+      { value: 'bn', label: 'বাংলা' },
+      { value: 'en', label: 'English' }
     ]
     return (
       <>
@@ -295,6 +361,39 @@ class SettingsView extends React.Component<IProps> {
             </Right>
           </Content>
         </Container>
+        <ResponsiveModal
+          id="ChangeLanguage"
+          title={intl.formatMessage(messages.change_language_title)}
+          show={this.state.showLanguageSettings}
+          actions={[
+            <CancelButton
+              key="cancel"
+              id="modal_cancel"
+              onClick={this.toggleLanguageSettingsModal}
+            >
+              {intl.formatMessage(messages.button_cancel)}
+            </CancelButton>,
+            <ApplyButton key="apply" id="apply_change">
+              {intl.formatMessage(messages.button_apply)}
+            </ApplyButton>
+          ]}
+          handleClose={this.toggleLanguageSettingsModal}
+        >
+          <Message>
+            {intl.formatMessage(messages.change_language_messege)}
+          </Message>
+          <Label>{intl.formatMessage(messages.label_language)}</Label>
+          <Select
+            onChange={(val: string) => {
+              this.setState({
+                selectedLanguage: val
+              })
+            }}
+            value={this.state.selectedLanguage}
+            options={language}
+            placeholder=""
+          />
+        </ResponsiveModal>
       </>
     )
   }
