@@ -44,3 +44,30 @@ export const SEARCH_EVENTS = gql`
     }
   }
 `
+export const SEARCH_APPLICATIONS_USER_WISE = gql`
+  query($status: String, $userId: String, $sort: String) {
+    searchEvents(status: $status, userId: $userId, sort: $sort) {
+      totalItems
+      results {
+        id
+        type
+        registration {
+          dateOfApplication
+          status
+        }
+        ... on BirthEventSearchSet {
+          childName {
+            firstNames
+            familyName
+          }
+        }
+        ... on DeathEventSearchSet {
+          deceasedName {
+            firstNames
+            familyName
+          }
+        }
+      }
+    }
+  }
+`
