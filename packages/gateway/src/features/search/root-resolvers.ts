@@ -7,6 +7,8 @@ export const resolvers: GQLResolver = {
     async searchEvents(
       _,
       {
+        status,
+        userId,
         locationIds,
         trackingId,
         registrationNumber,
@@ -29,6 +31,12 @@ export const resolvers: GQLResolver = {
       }
       if (contactNumber) {
         searchCriteria.contactNumber = contactNumber
+      }
+      if (status) {
+        searchCriteria.status = status
+      }
+      if (userId) {
+        searchCriteria.createdBy = userId
       }
 
       const searchResult = await postSearch(authHeader, searchCriteria)

@@ -10,6 +10,7 @@ export interface ISearchQuery {
   event?: string
   status?: string
   applicationLocationId?: string
+  createdBy?: string
   from?: number
   size?: number
   sort?: SortOrder
