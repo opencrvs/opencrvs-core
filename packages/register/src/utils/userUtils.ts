@@ -24,6 +24,7 @@ export interface IUserDetails {
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
+  language?: string
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
@@ -62,6 +63,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
           })
       }
     })
+  userDetails.language = 'en'
   return userDetails
 }
 
