@@ -31,7 +31,8 @@ import {
   dateNotInFuture,
   dateFormatIsCorrect,
   numeric,
-  maxLength
+  maxLength,
+  dateInPast
 } from 'src/utils/validate'
 
 export interface IMotherSectionFormData {
@@ -360,7 +361,7 @@ export const motherSection: IFormSection = {
             dependencies: []
           },
           {
-            validator: dateNotInFuture,
+            validator: dateInPast,
             dependencies: []
           },
           {

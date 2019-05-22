@@ -21,7 +21,8 @@ import {
   dateGreaterThan,
   dateLessThan,
   dateNotInFuture,
-  dateFormatIsCorrect
+  dateFormatIsCorrect,
+  dateInPast
 } from './validate'
 
 describe('validate', () => {
@@ -424,6 +425,32 @@ describe('validate', () => {
       const validDate = '2011-08-12'
       const response = undefined
       expect(isValidBirthDate(validDate)).toEqual(response)
+    })
+  })
+
+  describe('dateInPast. Checks if a given birth date is in the past', () => {
+    it('should not give an error message if the birth date is in the past', () => {
+      const todaysDate = new Date('1999-12-31')
+      todaysDate.setHours(0, 0, 0)
+      const today = todaysDate.toDateString()
+      expect(dateInPast()(today)).toEqual(undefined)
+    })
+    it("should give an error message if the date is today's date", () => {
+      const todaysDate = new Date()
+      todaysDate.setHours(0, 0, 0)
+      const today = todaysDate.toDateString()
+      expect(dateInPast()(today)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
+    it('should give an error message if the date is in the future', () => {
+      const todaysDate = new Date(2040, 12, 12)
+      todaysDate.setHours(0, 0, 0)
+      const today = todaysDate.toDateString()
+      expect(dateInPast()(today)).toEqual({
+        message: messages.isValidBirthDate
+      })
     })
   })
 

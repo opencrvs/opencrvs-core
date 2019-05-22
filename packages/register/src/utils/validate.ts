@@ -390,6 +390,24 @@ export const dateNotInFuture: ValidationInitializer = (): Validation => (
   }
 }
 
+export const dateInPast: ValidationInitializer = (): Validation => (
+  value: string
+) => isDateInPast(value)
+
+export const isDateInPast: Validation = (value: string) => {
+  if (isDateNotInFuture(value) && dateNotToday(value)) {
+    return undefined
+  } else {
+    return { message: messages.isValidBirthDate } // specific to DOB of parent/applicant
+  }
+}
+
+export const dateNotToday = (date: string): boolean => {
+  const today = new Date().setHours(0, 0, 0, 0)
+  const day = new Date(date).setHours(0, 0, 0, 0)
+  return day !== today
+}
+
 export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
   value: string
 ) => dateFormat(value)
