@@ -12,6 +12,7 @@ import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { modifyUserDetails as modifyUserDetailsAction } from 'src/profile/profileActions'
 
 const messages = defineMessages({
   settings_title: {
@@ -210,6 +211,7 @@ const CancelButton = styled(TertiaryButton)`
 type IProps = InjectedIntlProps & {
   language: string
   userDetails: IUserDetails
+  modifyUserDetails: typeof modifyUserDetailsAction
 }
 
 interface IState {
@@ -218,11 +220,12 @@ interface IState {
 }
 
 class SettingsView extends React.Component<IProps, IState> {
+  languagePreference = this.props.userDetails.language || 'en'
   constructor(props: IProps & IState) {
     super(props)
     this.state = {
-      showLanguageSettings: true,
-      selectedLanguage: 'en'
+      showLanguageSettings: false,
+      selectedLanguage: this.languagePreference
     }
   }
 
@@ -230,6 +233,20 @@ class SettingsView extends React.Component<IProps, IState> {
     this.setState(state => ({
       showLanguageSettings: !state.showLanguageSettings
     }))
+  }
+
+  cancelLanguageSettings = () => {
+    this.setState(state => ({
+      selectedLanguage: this.languagePreference,
+      showLanguageSettings: !state.showLanguageSettings
+    }))
+  }
+
+  changeLanguage = () => {
+    this.props.userDetails.language = this.state.selectedLanguage
+    this.props.modifyUserDetails(this.props.userDetails)
+
+    this.toggleLanguageSettingsModal()
   }
 
   render() {
@@ -258,6 +275,10 @@ class SettingsView extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
+    const language = {
+      bn: 'বাংলা',
+      en: 'English'
+    }
 
     const sections = [
       {
@@ -328,19 +349,15 @@ class SettingsView extends React.Component<IProps, IState> {
         items: [
           {
             label: intl.formatMessage(messages.label_language),
-            value: 'English',
+            value: language[this.state.selectedLanguage],
             action: {
+              id: 'BtnChangeLanguage',
               label: intl.formatMessage(messages.action_change),
               handler: this.toggleLanguageSettingsModal
             }
           }
         ]
       }
-    ]
-
-    const language = [
-      { value: 'bn', label: 'বাংলা' },
-      { value: 'en', label: 'English' }
     ]
     return (
       <>
@@ -362,35 +379,43 @@ class SettingsView extends React.Component<IProps, IState> {
           </Content>
         </Container>
         <ResponsiveModal
-          id="ChangeLanguage"
+          id="ChangeLanguageModal"
           title={intl.formatMessage(messages.change_language_title)}
           show={this.state.showLanguageSettings}
           actions={[
             <CancelButton
               key="cancel"
               id="modal_cancel"
-              onClick={this.toggleLanguageSettingsModal}
+              onClick={this.cancelLanguageSettings}
             >
               {intl.formatMessage(messages.button_cancel)}
             </CancelButton>,
-            <ApplyButton key="apply" id="apply_change">
+            <ApplyButton
+              key="apply"
+              id="apply_change"
+              onClick={this.changeLanguage}
+            >
               {intl.formatMessage(messages.button_apply)}
             </ApplyButton>
           ]}
-          handleClose={this.toggleLanguageSettingsModal}
+          handleClose={this.cancelLanguageSettings}
         >
           <Message>
             {intl.formatMessage(messages.change_language_messege)}
           </Message>
           <Label>{intl.formatMessage(messages.label_language)}</Label>
           <Select
+            id="SelectLanguage"
             onChange={(val: string) => {
               this.setState({
                 selectedLanguage: val
               })
             }}
             value={this.state.selectedLanguage}
-            options={language}
+            options={[
+              { value: 'bn', label: 'বাংলা' },
+              { value: 'en', label: 'English' }
+            ]}
             placeholder=""
           />
         </ResponsiveModal>
@@ -404,5 +429,7 @@ export const SettingsPage = connect(
     language: store.i18n.language,
     userDetails: getUserDetails(store)
   }),
-  {}
+  {
+    modifyUserDetails: modifyUserDetailsAction
+  }
 )(injectIntl<IProps>(SettingsView))
