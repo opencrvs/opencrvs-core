@@ -90,6 +90,7 @@ interface IGridTableProps {
   totalPages?: number
   initialPage?: number
   expandable?: boolean
+  clickable?: boolean
 }
 
 interface IGridTableState {
@@ -209,6 +210,10 @@ export class GridTable extends React.Component<
     }
   }
 
+  getRowClickHandler = (itemRowClickHandler: IAction[]) => {
+    return itemRowClickHandler[0].handler
+  }
+
   render() {
     const {
       columns,
@@ -246,7 +251,14 @@ export class GridTable extends React.Component<
               <StyledBox key={index}>
                 <RowWrapper
                   expandable={this.props.expandable}
-                  onClick={() => this.toggleExpanded(item.id as string)}
+                  onClick={() =>
+                    (this.props.expandable &&
+                      this.toggleExpanded(item.id as string)) ||
+                    (this.props.clickable &&
+                      this.getRowClickHandler(
+                        item.rowClickHandler as IAction[]
+                      )())
+                  }
                 >
                   {columns.map((preference, indx) => {
                     if (preference.isActionColumn) {

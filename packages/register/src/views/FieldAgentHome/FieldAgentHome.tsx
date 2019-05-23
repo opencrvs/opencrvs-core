@@ -25,7 +25,8 @@ import { Header } from 'src/components/interface/Header/Header'
 import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
-  goToTab as goToTabAction
+  goToTab as goToTabAction,
+  goToApplicationDetails
 } from 'src/navigation'
 import { REGISTRAR_HOME } from 'src/navigation/routes'
 import { getUserDetails } from 'src/profile/profileSelectors'
@@ -364,7 +365,13 @@ class FieldAgentHomeView extends React.Component<
         name: name || '',
         date_of_modification:
           `Last updated ${lastModificationDate &&
-            moment(lastModificationDate).fromNow()}` || ''
+            moment(lastModificationDate).fromNow()}` || '',
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => goToApplicationDetails(draft.id)
+          }
+        ]
       }
     })
   }
@@ -474,6 +481,7 @@ class FieldAgentHomeView extends React.Component<
                 totalPages={applications && applications.length}
                 initialPage={this.state.progressCurrentPage}
                 expandable={false}
+                clickable={true}
               />
             )}
           </>

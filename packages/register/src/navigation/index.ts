@@ -88,6 +88,12 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
+export function goToApplicationDetails(applicationId: string) {
+  window.location.assign(
+    formatUrl('/details/:applicationId', { applicationId })
+  )
+}
+
 export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
