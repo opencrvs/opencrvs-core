@@ -19,6 +19,7 @@ const Item = styled(Button).attrs<IMenuItemContainerProps>({})`
 const ItemContainer = styled.div`
   position: relative;
   height: 100%;
+  margin-right: 8px;
 `
 
 const ItemSelector = styled(Selector)`

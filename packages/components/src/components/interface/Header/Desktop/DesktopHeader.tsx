@@ -13,7 +13,7 @@ export interface IDesktopHeaderProps {
 
 const HeaderContainer = styled.div`
   padding: 8px 16px;
-  max-height: 60px;
+  height: 64px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
