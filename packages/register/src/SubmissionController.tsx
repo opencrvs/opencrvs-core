@@ -66,17 +66,20 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
 
   onSuccess = (application: IApplication) => {
     console.log('Success')
-    // application.submissionStatus =
-    //   SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
-    // this.props.modifyApplication(application)
+    application.submissionStatus =
+      SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+    this.props.modifyApplication(application)
   }
 
   onError = (application: IApplication) => {
     console.log('Error')
-    // application.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
-    // this.props.modifyApplication(application)
+    application.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
+    this.props.modifyApplication(application)
   }
 
+  /**
+   *  Method used for testing perpose nly
+   */
   callQuery = () => {
     console.log(this.props.applications)
     console.log(this.props.registerForms)
@@ -115,7 +118,7 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
           key={index}
           event={application.event}
           form={registerForms[application.event]}
-          action={Action.REGISTER_APPLICATION}
+          action={Action.SUBMIT_FOR_REVIEW}
           application={application}
           onCompleted={() => this.onSuccess(application)}
           onError={() => this.onError(application)}
@@ -133,7 +136,8 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
   }
 
   render() {
-    return this.state.callGQL && this.callQuery()
+    // return this.state.callGQL && this.callQuery()
+    return this.state.callGQL && this.callMutation()
   }
 }
 
@@ -149,11 +153,9 @@ const mapStateToProps = (store: IStoreState) => {
     registerForms
   }
 }
-
 const mapDispatchToProps = {
   modifyApplication
 }
-
 export const SubmissionController = connect<IProp, DispatchProps>(
   mapStateToProps,
   mapDispatchToProps
