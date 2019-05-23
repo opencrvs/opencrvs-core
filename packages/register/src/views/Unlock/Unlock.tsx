@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
@@ -88,6 +89,8 @@ const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
+  pinkeyRef: any
+
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -214,6 +217,16 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     storage.removeItem(SCREEN_LOCK)
     this.props.redirectToAuthentication()
   }
+
+  componentDidUpdate = () => {
+    // @ts-ignore
+    ReactDOM.findDOMNode(this.pinkeyRef).focus()
+  }
+
+  componentDidMount = () => {
+    // @ts-ignore
+    ReactDOM.findDOMNode(this.pinkeyRef).focus()
+  }
   render() {
     return (
       <PageWrapper id="unlockPage">
@@ -227,6 +240,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
           {this.showErrorMessage()}
           <PINKeypad
+            // @ts-ignore
+            ref={elem => (this.pinkeyRef = elem)}
             onComplete={this.onPinProvided}
             pin={this.state.pin}
             key={this.state.resetKey}
