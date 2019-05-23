@@ -67,6 +67,10 @@ import { TickLarge } from '@opencrvs/components/lib/icons'
 import * as Sentry from '@sentry/browser'
 // @ts-ignore - Required for mocking
 import * as debounce from 'lodash/debounce'
+import {
+  eventDispatcher,
+  MUTATION_READY_TO_SUBMIT_EVENT
+} from 'src/SubmissionController'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -510,6 +514,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application.submissionStatus =
       SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
     this.props.modifyApplication(application)
+    eventDispatcher(MUTATION_READY_TO_SUBMIT_EVENT)
     this.props.history.push(HOME)
   }
 
@@ -808,7 +813,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <ConfirmBtn
                 key="submit"
                 id="submit_confirm"
-                // @ts-ignore
                 onClick={() => this.confirmSubmission(application)}
               >
                 <>
