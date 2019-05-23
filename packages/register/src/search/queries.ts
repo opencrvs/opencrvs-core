@@ -57,12 +57,14 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
         }
         ... on BirthEventSearchSet {
           childName {
+            use
             firstNames
             familyName
           }
         }
         ... on DeathEventSearchSet {
           deceasedName {
+            use
             firstNames
             familyName
           }
