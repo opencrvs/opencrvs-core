@@ -19,9 +19,6 @@ const StyledStatus = styled.span`
     color: ${({ theme }) => theme.colors.placeholder};
     text-transform: uppercase;
     margin-left: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.58px;
   }
 `
 

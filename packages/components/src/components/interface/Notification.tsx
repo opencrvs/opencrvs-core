@@ -61,12 +61,12 @@ const NotificationContainer = styledNotification`
 `
 
 const NotificationMessage = styled.div`
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
   background: ${({ theme }) => theme.colors.placeholder};
   border-radius: 21px;
   padding: 5px 10px;
   margin: 5px;
   color: ${({ theme }) => theme.colors.white};
-  font-weight: bold;
 `
 
 export class Notification extends React.Component<IProps> {
