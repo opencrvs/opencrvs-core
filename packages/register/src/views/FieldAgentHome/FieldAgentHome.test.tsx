@@ -80,6 +80,50 @@ describe('when the home page loads for a field worker', () => {
       expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
       expect(app.find('#tab_updates').hostNodes()).toHaveLength(1)
     })
+
+    it('redirect to in progress tab', async () => {
+      app
+        .find('#tab_progress')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      app.update()
+
+      expect(history.location.pathname).toContain('progress')
+    })
+    it('redirect to in review tab', async () => {
+      app
+        .find('#tab_review')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      app.update()
+
+      expect(history.location.pathname).toContain('review')
+    })
+    it('redirect to in update tab', async () => {
+      app
+        .find('#tab_updates')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      app.update()
+
+      expect(history.location.pathname).toContain('updates')
+    })
+
     it('loads no grid table when there is no applications', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
@@ -113,14 +157,34 @@ describe('when the home page loads for a field worker', () => {
         .simulate('click')
       await flushPromises()
       app.update()
-      Array.apply(null, { length: 8 }).map(() => {
+      for (let i = 1; i <= 8; i++) {
         app
-          .find('#keypad-1')
+          .find(`#keypad-${i % 2}`)
           .hostNodes()
           .simulate('click')
-      })
+      }
       await flushPromises()
       app.update()
+    })
+    it('shows count for application in corresponding tab', () => {
+      expect(
+        app
+          .find('#tab_progress')
+          .hostNodes()
+          .text()
+      ).toContain('In progress (3)')
+      expect(
+        app
+          .find('#tab_review')
+          .hostNodes()
+          .text()
+      ).toContain('Sent for review (1)')
+      expect(
+        app
+          .find('#tab_updates')
+          .hostNodes()
+          .text()
+      ).toContain('Require updates (1)')
     })
     it('loads grid table when there is no applications', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(0)
