@@ -4,7 +4,7 @@ import { History } from 'history'
 import * as fetch from 'jest-fetch-mock'
 import { Store } from 'redux'
 import { getStorageApplicationsSuccess } from 'src/applications'
-import { FIELD_AGENT_HOME_TAB, HOME } from 'src/navigation/routes'
+import { HOME } from 'src/navigation/routes'
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import { storage } from 'src/storage'
 import {
@@ -57,7 +57,7 @@ describe('when the home page loads for a field worker', () => {
     registerUserDetails.role = FIELD_AGENT_ROLE
     beforeEach(async () => {
       store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-      history.replace(FIELD_AGENT_HOME_TAB)
+      history.replace(HOME)
       app.update()
       app
         .find('#createPinBtn')
