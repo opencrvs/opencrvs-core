@@ -8,7 +8,8 @@ import { goToEvents as goToEventsAction } from 'src/navigation'
 import {
   ISearchInputProps,
   GridTable,
-  Spinner
+  Spinner,
+  ColumnContentAlignment
 } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '../../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
@@ -37,9 +38,16 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
 import { REGISTRAR_HOME } from 'src/navigation/routes'
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import {
+  IApplication,
+  SUBMISSION_STATUS,
+  deleteApplication
+} from 'src/applications'
 import { sentenceCase } from 'src/utils/data-formatting'
 import { BodyContent } from '@opencrvs/components/lib/layout'
+import { calculateDays } from '../PrintCertificate/calculatePrice'
+
+const APPLICATIONS_DAY_LIMIT = 7
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -122,10 +130,25 @@ const messages = defineMessages({
     defaultMessage: 'Submission status',
     description: 'Label for table header of column Submission status'
   },
-  indicator: {
-    id: 'register.fieldAgentHome.tableHeader.statusIndicator',
-    defaultMessage: 'Indicator',
-    description: 'Label for table header of colum Submission status indicator'
+  statusReadyToSubmit: {
+    id: 'register.fieldAgentHome.table.statusReadyToSubmit',
+    defaultMessage: 'Waiting to send',
+    description: 'Label for application status Ready to Submit'
+  },
+  statusSubmitting: {
+    id: 'register.fieldAgentHome.table.statusSubmitting',
+    defaultMessage: 'Sending...',
+    description: 'Label for application status Submitting'
+  },
+  statusFailed: {
+    id: 'register.fieldAgentHome.table.statusFailed',
+    defaultMessage: 'Failed to send',
+    description: 'Label for application status Failed'
+  },
+  statusPendingConnection: {
+    id: 'register.fieldAgentHome.table.statusPendingConnection',
+    defaultMessage: 'Pending connection',
+    description: 'Label for application status Pending Connection'
   }
 })
 interface IFieldAgentHomeProps {
@@ -134,6 +157,7 @@ interface IFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
+  deleteApplication: typeof deleteApplication
   applications: IApplication[]
 }
 
@@ -152,7 +176,7 @@ const TAB_ID = {
   requireUpdates: FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 }
 class FieldAgentHomeView extends React.Component<FullProps> {
-  transformApplicationsContent = () => {
+  transformApplicationsSentForReview = () => {
     if (!this.props.applications || this.props.applications.length <= 0) {
       return []
     }
@@ -162,7 +186,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
           application.submissionStatus !==
           SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       )
-      .map((draft: IApplication) => {
+      .map((draft: IApplication, index) => {
         let name
 
         if (draft.event && draft.event.toString() === 'birth') {
@@ -204,6 +228,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
         const { statusText, icon } = this.submissionStatusMap(
           draft.submissionStatus || '',
           navigator.onLine,
+          index,
           'DC5EDNG'
         )
 
@@ -212,20 +237,33 @@ class FieldAgentHomeView extends React.Component<FullProps> {
           event: (draft.event && sentenceCase(draft.event)) || '',
           name: name || '',
           submission_status: statusText || '',
-          status_indicator: icon ? icon() : null
+          status_indicator: icon ? [icon()] : null
         }
       })
   }
 
-  submissionStatusMap = (status: string, online: boolean, id?: string) => {
+  submissionStatusMap = (
+    status: string,
+    online: boolean,
+    index: number,
+    id?: string
+  ) => {
+    const { formatMessage } = this.props.intl
+    const {
+      statusReadyToSubmit,
+      statusSubmitting,
+      statusFailed,
+      statusPendingConnection
+    } = messages
+
     let icon: () => React.ReactNode
     let statusText: string
     let overwriteStatusIfOffline: boolean = true
 
     switch (status) {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
-        icon = () => <SmallSpinner id="submission" />
-        statusText = 'Sending...'
+        icon = () => <SmallSpinner id={`submitting${index}`} />
+        statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
         overwriteStatusIfOffline = false
@@ -235,24 +273,38 @@ class FieldAgentHomeView extends React.Component<FullProps> {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]:
         overwriteStatusIfOffline = false
         icon = () => <StatusFailed />
-        statusText = 'Failed to send'
+        statusText = formatMessage(statusFailed)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
       default:
-        icon = () => <StatusWaiting id="submission" />
-        statusText = 'Waiting to send'
+        icon = () => <StatusWaiting />
+        statusText = formatMessage(statusReadyToSubmit)
         break
     }
 
     if (!online && overwriteStatusIfOffline) {
       icon = () => <StatusPendingOffline />
-      statusText = 'Pending connection'
+      statusText = formatMessage(statusPendingConnection)
     }
 
     return {
       icon,
       statusText
     }
+  }
+
+  componentDidMount() {
+    this.props.applications
+      .filter(
+        (application: IApplication) =>
+          application.submissionStatus ===
+            SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] &&
+          application.modifiedOn &&
+          calculateDays(
+            new Date(application.modifiedOn).toISOString().split('T')[0]
+          ) > APPLICATIONS_DAY_LIMIT
+      )
+      .forEach(this.props.deleteApplication)
   }
 
   render() {
@@ -312,7 +364,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
             {tabId === TAB_ID.sentForReview && (
               <BodyContent>
                 <GridTable
-                  content={this.transformApplicationsContent()}
+                  content={this.transformApplicationsSentForReview()}
                   columns={[
                     {
                       label: this.props.intl.formatMessage(
@@ -330,12 +382,13 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                       label: this.props.intl.formatMessage(
                         messages.submissionStatus
                       ),
-                      width: 45,
+                      width: 47,
                       key: 'submission_status'
                     },
                     {
-                      label: this.props.intl.formatMessage(messages.indicator),
-                      width: 5,
+                      label: '',
+                      width: 3,
+                      alignment: ColumnContentAlignment.CENTER,
                       key: 'status_indicator'
                     }
                   ]}
@@ -371,6 +424,7 @@ export const FieldAgentHome = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
-    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction
+    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
+    deleteApplication
   }
 )(injectIntl(FieldAgentHomeView))

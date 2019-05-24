@@ -991,6 +991,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.sentForUpdates': 'Sent for updates',
     'register.registrarHome.action': 'Action',
     'register.fieldAgentHome.tableHeader.submissionStatus': 'Submission status',
-    'register.fieldAgentHome.tableHeader.statusIndicator': 'Indicator'
+    'register.fieldAgentHome.table.statusReadyToSubmit': 'Waiting to send',
+    'register.fieldAgentHome.table.statusSubmitting': 'Sending...',
+    'register.fieldAgentHome.table.statusFailed': 'Failed to send',
+    'register.fieldAgentHome.table.statusPendingConnection':
+      'Pending connection'
   }
 }

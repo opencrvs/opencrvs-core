@@ -989,6 +989,11 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.updateButton': 'হালনাগাদ',
     'register.home.header.performanceTitle': 'কর্মদক্ষতা',
     'register.fieldAgentHome.tableHeader.submissionStatus': 'জমা অবস্থা',
-    'register.fieldAgentHome.tableHeader.statusIndicator': 'সূচক'
+    'register.fieldAgentHome.table.statusReadyToSubmit':
+      'পাঠানোর জন্য অপেক্ষা করছে',
+    'register.fieldAgentHome.table.statusSubmitting': 'পাঠানো হচ্ছে...',
+    'register.fieldAgentHome.table.statusFailed': 'পাঠাতে ব্যর্থ',
+    'register.fieldAgentHome.table.statusPendingConnection':
+      'সংযোগের জন্য অপেক্ষা করছে'
   }
 }

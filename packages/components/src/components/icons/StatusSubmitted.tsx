@@ -10,5 +10,12 @@ export const StatusSubmitted = (props: React.HTMLAttributes<SVGElement>) => (
       stroke="#49B78D"
       strokeWidth={2}
     />
+    <path
+      d="M6 11.594L10.56 17 18 8"
+      stroke="#fff"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )

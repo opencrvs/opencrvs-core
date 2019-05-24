@@ -22,7 +22,7 @@ export interface IDynamicValues {
     | IAction[]
     | Array<string | null>
     | IStatus[]
-    | React.ReactNode
+    | React.ReactNode[]
     | null
 }
 
