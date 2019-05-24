@@ -80,18 +80,23 @@ export class PINKeypad extends React.Component<IProps, IState> {
     if (kc === 8 || kc === 46) {
       // delete or backspace
       this.setState({ pin: pin.length ? pin.slice(0, pin.length - 1) : '' })
-    } else if (kc === 13 && pin.length === 4) {
-      // enter/carriage-return
-      onComplete(pin)
     } else if (kc >= 48 && kc <= 57) {
       // '0' <= kc <= '9'
-      if (pin.length < 4) {
-        this.setState({ pin: pin + (kc - 48).toString() })
+      if (pin.length <= 3) {
+        const newPIN = pin + (kc - 48)
+        if (newPIN.length === 4) {
+          onComplete(newPIN)
+        }
+        this.setState({ pin: newPIN })
       }
     } else if (kc >= 96 && kc <= 105) {
       // numpad
-      if (pin.length < 4) {
-        this.setState({ pin: pin + (kc - 96).toString() })
+      if (pin.length <= 3) {
+        const newPIN = pin + (kc - 48)
+        if (newPIN.length === 4) {
+          onComplete(newPIN)
+        }
+        this.setState({ pin: newPIN })
       }
     }
   }

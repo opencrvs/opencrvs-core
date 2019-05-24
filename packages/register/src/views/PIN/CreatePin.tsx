@@ -174,8 +174,7 @@ class CreatePinComponent extends React.Component<IProps> {
               {intl.formatMessage(messages.pinSameDigitsError)}
             </ErrorBox>
             <PINKeypad
-              // @ts-ignore
-              ref={elem => (this.pinKeyRef = elem)}
+              ref={(elem: any) => (this.pinKeyRef = elem)}
               onComplete={this.firstPINEntry}
               key={refresher.toString()}
             />
@@ -191,8 +190,7 @@ class CreatePinComponent extends React.Component<IProps> {
             </DescriptionText>
 
             <PINKeypad
-              // @ts-ignore
-              ref={elem => (this.pinKeyRef = elem)}
+              ref={(elem: any) => (this.pinKeyRef = elem)}
               onComplete={this.secondPINEntry}
             />
           </>
@@ -201,19 +199,16 @@ class CreatePinComponent extends React.Component<IProps> {
     )
   }
 
-  componentDidUpdate = () => {
-    console.log('UPDATE')
-    const node = this.pinKeyRef && ReactDOM.findDOMNode(this.pinKeyRef)
+  componentDidUpdate = () => this.focusKeypad()
+
+  componentDidMount = () => this.focusKeypad()
+
+  focusKeypad = () => {
+    const node =
+      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
     if (node) {
-      // @ts-ignore
       node.focus()
     }
-  }
-
-  componentDidMount = () => {
-    console.log('MOUNT')
-    // @ts-ignore
-    ReactDOM.findDOMNode(this.pinKeyRef).focus()
   }
 }
 

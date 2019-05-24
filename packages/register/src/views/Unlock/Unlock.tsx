@@ -100,7 +100,7 @@ const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
-  pinkeyRef: any
+  pinKeyRef: any
 
   constructor(props: IFullProps) {
     super(props)
@@ -238,18 +238,18 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.props.redirectToAuthentication()
   }
 
-  componentDidUpdate = () => {
-    const node = this.pinkeyRef && ReactDOM.findDOMNode(this.pinkeyRef)
+  componentDidUpdate = () => this.focusKeypad()
+
+  componentDidMount = () => this.focusKeypad()
+
+  focusKeypad = () => {
+    const node =
+      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
     if (node) {
-      // @ts-ignore
       node.focus()
     }
   }
 
-  componentDidMount = () => {
-    // @ts-ignore
-    ReactDOM.findDOMNode(this.pinkeyRef).focus()
-  }
   render() {
     return this.state.showSpinner ? (
       <SpinnerWrapper>
@@ -267,8 +267,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
           {this.showErrorMessage()}
           <PINKeypad
-            // @ts-ignore
-            ref={elem => (this.pinkeyRef = elem)}
+            ref={(elem: any) => (this.pinKeyRef = elem)}
             onComplete={this.onPinProvided}
             pin={this.state.pin}
             key={this.state.resetKey}
