@@ -16,6 +16,8 @@ export interface ISearchCriteria {
   contactNumber?: string
   registrationNumber?: string
   sort?: string
+  from: number
+  size: number
 }
 
 export const searchTypeResolvers: GQLResolver = {

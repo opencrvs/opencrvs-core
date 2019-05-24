@@ -48,14 +48,18 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
   query(
     $status: String
     $userId: String
-    $sort: String
     $locationIds: [String]
+    $sort: String
+    $count: Int
+    $skip: Int
   ) {
     searchEvents(
       status: $status
       userId: $userId
-      sort: $sort
       locationIds: $locationIds
+      sort: $sort
+      count: $count
+      skip: $skip
     ) {
       totalItems
       results {

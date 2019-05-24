@@ -13,11 +13,15 @@ export const resolvers: GQLResolver = {
         trackingId,
         registrationNumber,
         contactNumber,
+        count = 10,
+        skip = 0,
         sort = 'desc'
       },
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
+        from: skip,
+        size: count,
         sort
       }
       if (locationIds) {

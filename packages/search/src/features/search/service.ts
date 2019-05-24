@@ -2,7 +2,7 @@ import { client } from 'src/elasticsearch/client'
 import { ISearchQuery, SortOrder } from './types'
 import { queryBuilder, EMPTY_STRING } from './utils'
 
-const DEFAULT_SIZE = 30
+const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {

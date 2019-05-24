@@ -1127,6 +1127,8 @@ export interface QueryToSearchEventsArgs {
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
+  count?: number
+  skip?: number
   sort?: string
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {

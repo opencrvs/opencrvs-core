@@ -205,6 +205,10 @@ interface IBaseFieldAgentHomeProps {
   applicationsReadyToSend: IApplication[]
 }
 
+interface IFieldAgentHomeState {
+  requireUpdatesPage: number
+}
+
 interface IMatchParams {
   tabId: string
 }
@@ -218,6 +222,7 @@ interface IFieldAgentHomeState {
   progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
+  requireUpdatesPage: number
 }
 
 const TAB_ID = {
@@ -236,9 +241,17 @@ class FieldAgentHomeView extends React.Component<
     this.state = {
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
-      updatesCurrentPage: 1
+      updatesCurrentPage: 1,
+      requireUpdatesPage: 1
     }
   }
+
+  onPageChange = (newPageNumber: number) => {
+    if (this.props.match.params.tabId === TAB_ID.requireUpdates) {
+      this.setState({ requireUpdatesPage: newPageNumber })
+    }
+  }
+
   transformRejectedContent = (data: GQLQuery) => {
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
@@ -391,7 +404,9 @@ class FieldAgentHomeView extends React.Component<
                 query={SEARCH_APPLICATIONS_USER_WISE}
                 variables={{
                   status: EVENT_STATUS.REJECTED,
-                  locationIds: [fieldAgentLocation]
+                  locationIds: [fieldAgentLocation],
+                  count: this.pageSize,
+                  skip: (this.state.requireUpdatesPage - 1) * this.pageSize
                 }}
               >
                 {({ loading, error, data }) => {
@@ -449,6 +464,14 @@ class FieldAgentHomeView extends React.Component<
                               }
                             ]}
                             noResultText={EMPTY_STRING}
+                            onPageChange={(currentPage: number) => {
+                              this.onPageChange(currentPage)
+                            }}
+                            pageSize={this.pageSize}
+                            totalPages={
+                              data.searchEvents && data.searchEvents.totalItems
+                            }
+                            initialPage={this.state.requireUpdatesPage}
                           />
                         </BodyContent>
                       )}
