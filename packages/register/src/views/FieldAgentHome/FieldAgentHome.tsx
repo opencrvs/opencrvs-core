@@ -8,7 +8,8 @@ import { Redirect, RouteComponentProps } from 'react-router'
 import {
   ISearchInputProps,
   GridTable,
-  Loader
+  Loader,
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import { IUserDetails, getUserLocation } from '../../utils/userUtils'
 import { getUserDetails } from 'src/profile/profileSelectors'
@@ -47,7 +48,10 @@ import { REGISTRAR_HOME } from 'src/navigation/routes'
 import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 import { SentForReview } from './SentForReview'
 import { Query } from 'react-apollo'
-import { SEARCH_APPLICATIONS_USER_WISE } from 'src/search/queries'
+import {
+  SEARCH_APPLICATIONS_USER_WISE,
+  COUNT_USER_WISE_APPLICATIONS
+} from 'src/search/queries'
 import { EVENT_STATUS } from '../RegistrarHome/RegistrarHome'
 import * as Sentry from '@sentry/browser'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -101,6 +105,9 @@ const FABContainer = styled.div`
   right: 5.33%;
   top: 85%;
   bottom: 9.17%;
+`
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
@@ -277,62 +284,98 @@ class FieldAgentHomeView extends React.Component<
       userDetails,
       match,
       intl,
-      applicationsReadyToSend
+      applicationsReadyToSend,
+      theme
     } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
     const isFieldAgent =
       userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
     const fieldAgentLocation =
       userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
+    let parentQueryLoading = false
     return (
       <>
         {isFieldAgent && (
           <>
-            <Header />
-            <Topbar id="top-bar">
-              <IconTab
-                id={`tab_${TAB_ID.inProgress}`}
-                key={TAB_ID.inProgress}
-                active={tabId === TAB_ID.inProgress}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusProgress />}
-                onClick={() =>
-                  this.props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+            <Query
+              query={COUNT_USER_WISE_APPLICATIONS}
+              variables={{
+                status: EVENT_STATUS.REJECTED,
+                locationIds: [fieldAgentLocation]
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  parentQueryLoading = true
+                  return (
+                    <StyledSpinner
+                      id="field-agent-home-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
                 }
-              >
-                {intl.formatMessage(messages.inProgress, {
-                  total: draftApplications.length
-                })}
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.sentForReview}`}
-                key={TAB_ID.sentForReview}
-                active={tabId === TAB_ID.sentForReview}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusOrange />}
-                onClick={() =>
-                  this.props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                if (error) {
+                  Sentry.captureException(error)
+                  return (
+                    <ErrorText id="field-agent-home_error">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
                 }
-              >
-                {intl.formatMessage(messages.sentForReview, {
-                  total: applicationsReadyToSend.length
-                })}
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.requireUpdates}`}
-                key={TAB_ID.requireUpdates}
-                active={tabId === TAB_ID.requireUpdates}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusRejected />}
-                onClick={() =>
-                  this.props.goToFieldAgentHomeTab(TAB_ID.requireUpdates)
-                }
-              >
-                {intl.formatMessage(messages.requireUpdates, {
-                  total: 1
-                })}
-              </IconTab>
-            </Topbar>
+                return (
+                  <>
+                    <Header />
+                    <Topbar id="top-bar">
+                      <IconTab
+                        id={`tab_${TAB_ID.inProgress}`}
+                        key={TAB_ID.inProgress}
+                        active={tabId === TAB_ID.inProgress}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusProgress />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+                        }
+                      >
+                        {intl.formatMessage(messages.inProgress, {
+                          total: draftApplications.length
+                        })}
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.sentForReview}`}
+                        key={TAB_ID.sentForReview}
+                        active={tabId === TAB_ID.sentForReview}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusOrange />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                        }
+                      >
+                        {intl.formatMessage(messages.sentForReview, {
+                          total: applicationsReadyToSend.length
+                        })}
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.requireUpdates}`}
+                        key={TAB_ID.requireUpdates}
+                        active={tabId === TAB_ID.requireUpdates}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusRejected />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(
+                            TAB_ID.requireUpdates
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.requireUpdates, {
+                          total: data.searchEvents.totalItems
+                        })}
+                      </IconTab>
+                    </Topbar>
+                  </>
+                )
+              }}
+            </Query>
+
             {tabId === TAB_ID.inProgress && (
               <InProgress draftApplications={draftApplications} />
             )}
@@ -342,6 +385,7 @@ class FieldAgentHomeView extends React.Component<
                 applicationsReadyToSend={applicationsReadyToSend}
               />
             )}
+
             {tabId === TAB_ID.requireUpdates && (
               <Query
                 query={SEARCH_APPLICATIONS_USER_WISE}
@@ -353,14 +397,18 @@ class FieldAgentHomeView extends React.Component<
                 {({ loading, error, data }) => {
                   if (loading) {
                     return (
-                      <Loader
-                        id="require_updates_loader"
-                        marginPercent={35}
-                        spinnerDiameter={60}
-                        loadingText={intl.formatMessage(
-                          messages.requireUpdatesLoading
+                      <>
+                        {!parentQueryLoading && (
+                          <Loader
+                            id="require_updates_loader"
+                            marginPercent={35}
+                            spinnerDiameter={60}
+                            loadingText={intl.formatMessage(
+                              messages.requireUpdatesLoading
+                            )}
+                          />
                         )}
-                      />
+                      </>
                     )
                   }
                   if (error) {
