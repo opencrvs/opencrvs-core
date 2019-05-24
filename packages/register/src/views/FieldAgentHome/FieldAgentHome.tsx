@@ -502,7 +502,7 @@ const mapStateToProps = (
   return {
     language: getLanguage(state),
     userDetails: getUserDetails(state),
-    tabId: (match && match.params && match.params.tabId) || 'review',
+    tabId: (match && match.params && match.params.tabId) || 'progress',
     applications: state.applicationsState.applications
   }
 }
