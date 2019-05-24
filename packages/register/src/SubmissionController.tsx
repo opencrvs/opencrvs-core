@@ -12,6 +12,7 @@ import {
   MutationContext,
   MutationProvider
 } from './views/DataProvider/MutationProvider'
+import { MutationCaller } from './views/DataProvider/MutationCaller'
 
 export const MUTATION_READY_TO_SUBMIT = 'mutation:readyToSubmit'
 const BROWSER_ONLINE = 'online'
@@ -36,7 +37,6 @@ type IProp = {
 }
 
 type FullProps = IProp & DispatchProps
-
 class SubmissionControllerElem extends React.Component<FullProps, IState> {
   constructor(prop: FullProps) {
     super(prop)
@@ -81,14 +81,15 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
     this.props.modifyApplication(application)
   }
 
-  callMutation = () => {
+  render() {
     const { applications, registerForms } = this.props
     const eligibleApplications = applications.filter(
       app => app.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT
     )
 
     return (
-      eligibleApplications.map((application: IApplication, key: number) => {
+      this.state.callGQL &&
+      (eligibleApplications.map((application: IApplication, key: number) => {
         return (
           application && (
             <MutationProvider
@@ -103,8 +104,7 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
               <MutationContext.Consumer>
                 {({ mutation, loading, data }) => {
                   if (!loading && !data) {
-                    // @ts-ignore
-                    mutation()
+                    return <MutationCaller mutation={mutation} />
                   }
                   return null
                 }}
@@ -112,12 +112,9 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
             </MutationProvider>
           )
         )
-      }) || null
+      }) ||
+        null)
     )
-  }
-
-  render() {
-    return this.state.callGQL && this.callMutation()
   }
 }
 
