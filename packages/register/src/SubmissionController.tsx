@@ -51,16 +51,13 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
 
   bindEventListener = () => {
     window.addEventListener(MUTATION_READY_TO_SUBMIT, () => {
-      console.log('MUTATION_READY_TO_SUBMIT')
       this.readyToSubmitHandler()
     })
     window.addEventListener(BROWSER_ONLINE, () => {
-      console.log('BROWSER_ONLINE')
       this.readyToSubmitHandler()
     })
     window.addEventListener(BROWSER_VISIBILITY, () => {
       if (document.visibilityState === 'visible') {
-        console.log('BROWSER_VISIBILITY')
         this.readyToSubmitHandler()
       }
     })
@@ -106,7 +103,6 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
               <MutationContext.Consumer>
                 {({ mutation, loading, data }) => {
                   if (!loading && !data) {
-                    console.log('Calling mutation', data)
                     // @ts-ignore
                     mutation()
                   }
