@@ -380,12 +380,6 @@ class FieldAgentHomeView extends React.Component<
     if (this.props.tabId === TAB_ID.inProgress) {
       this.setState({ progressCurrentPage: newPageNumber })
     }
-    if (this.props.tabId === TAB_ID.sentForReview) {
-      this.setState({ reviewCurrentPage: newPageNumber })
-    }
-    if (this.props.tabId === TAB_ID.requireUpdates) {
-      this.setState({ updatesCurrentPage: newPageNumber })
-    }
   }
 
   render() {
