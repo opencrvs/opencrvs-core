@@ -257,6 +257,7 @@ interface IBaseFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
+  goToApplicationDetails: typeof goToApplicationDetails
 }
 
 interface IMatchParams {
@@ -369,7 +370,7 @@ class FieldAgentHomeView extends React.Component<
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => goToApplicationDetails(draft.id)
+            handler: () => this.props.goToApplicationDetails(draft.id)
           }
         ]
       }
@@ -505,6 +506,7 @@ export const FieldAgentHome = connect(
   {
     goToTab: goToTabAction,
     goToEvents: goToEventsAction,
-    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction
+    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
+    goToApplicationDetails
   }
 )(injectIntl(FieldAgentHomeView))
