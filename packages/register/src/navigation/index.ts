@@ -10,7 +10,8 @@ import {
   PRINT_CERTIFICATE,
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
-  SEARCH
+  SEARCH,
+  APPLICATION_DETAIL
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -89,9 +90,7 @@ export function goToSearch() {
 }
 
 export function goToApplicationDetails(applicationId: string) {
-  window.location.assign(
-    formatUrl('/details/:applicationId', { applicationId })
-  )
+  window.location.assign(formatUrl(APPLICATION_DETAIL, { applicationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {
