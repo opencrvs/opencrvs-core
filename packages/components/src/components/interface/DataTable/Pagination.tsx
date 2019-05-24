@@ -90,7 +90,7 @@ export class Pagination extends React.Component<
           }}
           disabled={!this.canGoToPreviousPage()}
         >
-          <Previous />
+          <Previous id="prev" />
         </Icon>
         <PaginationLabel>
           <PageNumber>{currentPage}</PageNumber>
@@ -103,7 +103,7 @@ export class Pagination extends React.Component<
           }}
           disabled={!this.canGoToNextPage()}
         >
-          <Next />
+          <Next id="next" />
         </Icon>
       </PaginationContainer>
     )
