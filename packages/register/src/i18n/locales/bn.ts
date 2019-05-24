@@ -1025,6 +1025,15 @@ export const BENGALI_STATE: ILanguage = {
     'changeLanguage.title': 'ভাষা পরিবর্তন',
     'changeLanguage.success': 'ভাষা পরিবর্তিত হয়ে বাংলা হয়েছে',
     'message.changeLanguage': 'OpenCRVS-এ যে ভাষা আপনি ব্যাবহার করতে চান',
-    'button.apply': 'প্রয়োগ করুন'
+    'button.apply': 'প্রয়োগ করুন',
+    'register.fieldAgentHome.rejectedDays': '{text} প্রত্যাখ্যাত',
+    'register.fieldAgentHome.zeroUpdatesText':
+      'No applications require updates',
+    'register.fieldAgentHome.allUpdatesText':
+      'Great job! You have updated all applications',
+    'register.fieldAgentHome.requireUpdatesLoading':
+      'Checking your applications',
+    'register.fieldAgentHome.queryError':
+      'An error occured while loading applications'
   }
 }

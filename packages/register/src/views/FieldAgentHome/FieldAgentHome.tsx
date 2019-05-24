@@ -1,15 +1,3 @@
-import {
-  Button,
-  FloatingActionButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
-import {
-  PlusTransparentWhite,
-  StatusOrange,
-  StatusProgress,
-  StatusRejected
-} from '@opencrvs/components/lib/icons'
-import { ISearchInputProps } from '@opencrvs/components/lib/interface'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 
@@ -17,7 +5,13 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import {
+  ISearchInputProps,
+  GridTable,
+  Loader
+} from '@opencrvs/components/lib/interface'
+import { IUserDetails, getUserLocation } from '../../utils/userUtils'
+import { getUserDetails } from 'src/profile/profileSelectors'
 import { Header } from 'src/components/interface/Header/Header'
 import {
   goToEvents as goToEventsAction,
@@ -25,18 +19,48 @@ import {
   goToTab as goToTabAction,
   goToApplicationDetails
 } from 'src/navigation'
-import { REGISTRAR_HOME } from 'src/navigation/routes'
-import { getUserDetails } from 'src/profile/profileSelectors'
 import {
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  FIELD_AGENT_ROLE
+  FIELD_AGENT_ROLE,
+  LANG_EN,
+  EMPTY_STRING,
+  APPLICATION_DATE_FORMAT,
+  UNION_LOCATION_CODE
 } from 'src/utils/constants'
-import styled from 'styled-components'
-import { IUserDetails } from '../../utils/userUtils'
-import { SentForReview } from './SentForReview'
 import { InProgress } from './InProgress'
+import styled, { withTheme } from 'styled-components'
+import {
+  Button,
+  ICON_ALIGNMENT,
+  FloatingActionButton
+} from '@opencrvs/components/lib/buttons'
+import {
+  StatusProgress,
+  StatusOrange,
+  StatusRejected,
+  PlusTransparentWhite,
+  ApplicationsOrangeAmber
+} from '@opencrvs/components/lib/icons'
+import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import { SentForReview } from './SentForReview'
+import { Query } from 'react-apollo'
+import { SEARCH_APPLICATIONS_USER_WISE } from 'src/search/queries'
+import { EVENT_STATUS } from '../RegistrarHome/RegistrarHome'
+import * as Sentry from '@sentry/browser'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { BodyContent } from '@opencrvs/components/lib/layout'
+import {
+  GQLQuery,
+  GQLEventSearchSet,
+  GQLBirthEventSearchSet,
+  GQLHumanName,
+  GQLDeathEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
+import { createNamesMap } from 'src/utils/data-formatting'
+import * as moment from 'moment'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -78,6 +102,31 @@ const FABContainer = styled.div`
   top: 85%;
   bottom: 9.17%;
 `
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  text-align: center;
+  margin-top: 100px;
+`
+
+const ZeroUpdatesContainer = styled.div`
+  padding-top: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
+const ZeroUpdatesText = styled.span`
+  padding-top: 10px;
+  color: ${({ theme }) => theme.colors.blackStormy};
+  ${({ theme }) => theme.fonts.h4Style};
+`
+
+const AllUpdatesText = styled.span`
+  color: ${({ theme }) => theme.colors.blackStormy};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+`
+
 const messages = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
@@ -93,9 +142,50 @@ const messages = defineMessages({
     id: 'register.fieldAgentHome.requireUpdates',
     defaultMessage: 'Require updates ({total})',
     description: 'The title of require updates tab'
+  },
+  rejectedDays: {
+    id: 'register.fieldAgentHome.rejectedDays',
+    defaultMessage: 'Rejected {text}',
+    description: 'The title of rejected days of application'
+  },
+  listItemName: {
+    id: 'register.registrarHome.listItemName',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  listItemType: {
+    id: 'register.registrarHome.resultsType',
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item'
+  },
+  listItemUpdateDate: {
+    id: 'register.registrarHome.results.updateDate',
+    defaultMessage: 'Sent on',
+    description: 'Label for rejection date in work queue list item'
+  },
+  zeroUpdatesText: {
+    id: 'register.fieldAgentHome.zeroUpdatesText',
+    defaultMessage: 'No applications require updates',
+    description: 'The text when no rejected applications'
+  },
+  allUpdatesText: {
+    id: 'register.fieldAgentHome.allUpdatesText',
+    defaultMessage: 'Great job! You have updated all applications',
+    description: 'The text when all rejected applications updated'
+  },
+  requireUpdatesLoading: {
+    id: 'register.fieldAgentHome.requireUpdatesLoading',
+    defaultMessage: 'Checking your applications',
+    description: 'The text when all rejected applications are loading'
+  },
+  queryError: {
+    id: 'register.fieldAgentHome.queryError',
+    defaultMessage: 'An error occured while loading applications',
+    description: 'The text when error ocurred loading rejected applications'
   }
 })
 interface IBaseFieldAgentHomeProps {
+  theme: ITheme
   language: string
   userDetails: IUserDetails
   tabId: string
@@ -112,7 +202,7 @@ interface IMatchParams {
   tabId: string
 }
 
-type IFieldAgentHomeProps = IBaseFieldAgentHomeProps &
+type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
   InjectedIntlProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
@@ -130,17 +220,55 @@ const TAB_ID = {
 }
 
 class FieldAgentHomeView extends React.Component<
-  IFieldAgentHomeProps,
+  FieldAgentHomeProps,
   IFieldAgentHomeState
 > {
   pageSize = 10
-  constructor(props: IFieldAgentHomeProps) {
+  constructor(props: FieldAgentHomeProps) {
     super(props)
     this.state = {
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
       updatesCurrentPage: 1
     }
+  }
+  transformRejectedContent = (data: GQLQuery) => {
+    if (!data.searchEvents || !data.searchEvents.results) {
+      return []
+    }
+
+    return data.searchEvents.results.map((reg: GQLEventSearchSet) => {
+      let names
+      if (reg.registration && reg.type === 'Birth') {
+        const birthReg = reg as GQLBirthEventSearchSet
+        names = birthReg && (birthReg.childName as GQLHumanName[])
+      } else {
+        const deathReg = reg as GQLDeathEventSearchSet
+        names = deathReg && (deathReg.deceasedName as GQLHumanName[])
+      }
+      const daysOfRejection =
+        reg.registration &&
+        reg.registration.dateOfApplication &&
+        reg.registration.dateOfApplication &&
+        moment(
+          reg.registration.dateOfApplication,
+          APPLICATION_DATE_FORMAT
+        ).fromNow()
+
+      return {
+        id: reg.id,
+        event: reg.type as string,
+        name:
+          (createNamesMap(names)[this.props.intl.locale] as string) ||
+          (createNamesMap(names)[LANG_EN] as string),
+        days_of_rejection: this.props.intl.formatMessage(
+          messages.rejectedDays,
+          {
+            text: daysOfRejection
+          }
+        )
+      }
+    })
   }
 
   render() {
@@ -154,6 +282,8 @@ class FieldAgentHomeView extends React.Component<
     const tabId = match.params.tabId || TAB_ID.inProgress
     const isFieldAgent =
       userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
+    const fieldAgentLocation =
+      userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
     return (
       <>
         {isFieldAgent && (
@@ -212,6 +342,84 @@ class FieldAgentHomeView extends React.Component<
                 applicationsReadyToSend={applicationsReadyToSend}
               />
             )}
+            {tabId === TAB_ID.requireUpdates && (
+              <Query
+                query={SEARCH_APPLICATIONS_USER_WISE}
+                variables={{
+                  status: EVENT_STATUS.REJECTED,
+                  locationIds: [fieldAgentLocation]
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      <Loader
+                        id="require_updates_loader"
+                        marginPercent={35}
+                        spinnerDiameter={60}
+                        loadingText={intl.formatMessage(
+                          messages.requireUpdatesLoading
+                        )}
+                      />
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
+                    return (
+                      <ErrorText id="require_updates_loading_error">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <>
+                      {data && data.searchEvents.totalItems > 0 && (
+                        <BodyContent>
+                          <GridTable
+                            content={this.transformRejectedContent(data)}
+                            columns={[
+                              {
+                                label: this.props.intl.formatMessage(
+                                  messages.listItemType
+                                ),
+                                width: 30,
+                                key: 'event'
+                              },
+                              {
+                                label: this.props.intl.formatMessage(
+                                  messages.listItemName
+                                ),
+                                width: 30,
+                                key: 'name'
+                              },
+                              {
+                                label: this.props.intl.formatMessage(
+                                  messages.listItemUpdateDate
+                                ),
+                                width: 40,
+                                key: 'days_of_rejection'
+                              }
+                            ]}
+                            noResultText={EMPTY_STRING}
+                          />
+                        </BodyContent>
+                      )}
+                      {data && data.searchEvents.totalItems === 0 && (
+                        <ZeroUpdatesContainer>
+                          <ApplicationsOrangeAmber />
+                          <ZeroUpdatesText>
+                            {intl.formatMessage(messages.zeroUpdatesText)}
+                          </ZeroUpdatesText>
+                          <AllUpdatesText>
+                            {intl.formatMessage(messages.allUpdatesText)}
+                          </AllUpdatesText>
+                        </ZeroUpdatesContainer>
+                      )}
+                    </>
+                  )
+                }}
+              </Query>
+            )}
             <FABContainer>
               <FloatingActionButton
                 id="new_event_declaration"
@@ -266,4 +474,4 @@ export const FieldAgentHome = connect(
     goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
     goToApplicationDetails
   }
-)(injectIntl(FieldAgentHomeView))
+)(injectIntl(withTheme(FieldAgentHomeView)))
