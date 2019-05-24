@@ -6,6 +6,7 @@ import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import messages from './messages'
+import * as ReactDOM from 'react-dom'
 
 const Container = styled.div`
   display: flex;
@@ -51,6 +52,7 @@ const ErrorBox = styled.div`
 type IProps = InjectedIntlProps & { onComplete: () => void }
 
 class CreatePinComponent extends React.Component<IProps> {
+  pinKeyRef: any
   state = {
     pin: null,
     pinMatchError: false,
@@ -70,6 +72,12 @@ class CreatePinComponent extends React.Component<IProps> {
       })
     } else {
       this.setState({ pin, pinHasSameDigits: false, pinHasSeqDigits: false })
+      const node = this.pinKeyRef && ReactDOM.findDOMNode(this.pinKeyRef)
+      if (node) {
+        console.log('node is found')
+        // @ts-ignore
+        node.focus()
+      }
     }
   }
 
@@ -101,6 +109,7 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 
   render() {
+    console.log('RENDER')
     const {
       pin,
       pinMatchError,
@@ -126,7 +135,12 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.pinMatchError)}
               </ErrorBox>
             )}
-            <PINKeypad pin="" onComplete={this.firstPINEntry} />
+            <PINKeypad
+              // @ts-ignore
+              ref={elem => (this.pinKeyRef = elem)}
+              pin=""
+              onComplete={this.firstPINEntry}
+            />
           </>
         )}
         {pinHasSeqDigits && (
@@ -141,6 +155,8 @@ class CreatePinComponent extends React.Component<IProps> {
               {intl.formatMessage(messages.pinSequentialDigitsError)}
             </ErrorBox>
             <PINKeypad
+              // @ts-ignore
+              ref={elem => (this.pinkeyRef = elem)}
               onComplete={this.firstPINEntry}
               key={refresher.toString()}
             />
@@ -158,6 +174,8 @@ class CreatePinComponent extends React.Component<IProps> {
               {intl.formatMessage(messages.pinSameDigitsError)}
             </ErrorBox>
             <PINKeypad
+              // @ts-ignore
+              ref={elem => (this.pinKeyRef = elem)}
               onComplete={this.firstPINEntry}
               key={refresher.toString()}
             />
@@ -171,11 +189,31 @@ class CreatePinComponent extends React.Component<IProps> {
             <DescriptionText id="description-text">
               {intl.formatMessage(messages.reEnterDescription)}
             </DescriptionText>
-            <PINKeypad onComplete={this.secondPINEntry} />
+
+            <PINKeypad
+              // @ts-ignore
+              ref={elem => (this.pinKeyRef = elem)}
+              onComplete={this.secondPINEntry}
+            />
           </>
         )}
       </Container>
     )
+  }
+
+  componentDidUpdate = () => {
+    console.log('UPDATE')
+    const node = this.pinKeyRef && ReactDOM.findDOMNode(this.pinKeyRef)
+    if (node) {
+      // @ts-ignore
+      node.focus()
+    }
+  }
+
+  componentDidMount = () => {
+    console.log('MOUNT')
+    // @ts-ignore
+    ReactDOM.findDOMNode(this.pinKeyRef).focus()
   }
 }
 

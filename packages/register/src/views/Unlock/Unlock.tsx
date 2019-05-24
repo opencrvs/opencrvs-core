@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
@@ -99,6 +100,8 @@ const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
+  pinkeyRef: any
+
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -234,6 +237,19 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     storage.removeItem(SECURITY_PIN_EXPIRED_AT)
     this.props.redirectToAuthentication()
   }
+
+  componentDidUpdate = () => {
+    const node = this.pinkeyRef && ReactDOM.findDOMNode(this.pinkeyRef)
+    if (node) {
+      // @ts-ignore
+      node.focus()
+    }
+  }
+
+  componentDidMount = () => {
+    // @ts-ignore
+    ReactDOM.findDOMNode(this.pinkeyRef).focus()
+  }
   render() {
     return this.state.showSpinner ? (
       <SpinnerWrapper>
@@ -251,6 +267,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
           {this.showErrorMessage()}
           <PINKeypad
+            // @ts-ignore
+            ref={elem => (this.pinkeyRef = elem)}
             onComplete={this.onPinProvided}
             pin={this.state.pin}
             key={this.state.resetKey}
