@@ -19,8 +19,8 @@ const TableHeader = styled.div`
 `
 
 const StyledBox = styled(Box)`
+  padding: 0px;
   margin: 15px 10px;
-  padding: 17px 0px 10px 0px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
@@ -35,7 +35,7 @@ const ErrorText = styled.div`
 const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   width: 100%;
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
-  padding: 0 24px;
+  padding: 16px 16px;
 `
 
 const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
@@ -246,6 +246,7 @@ export class GridTable extends React.Component<
             return (
               <StyledBox key={index}>
                 <RowWrapper
+                  id={'row_' + index}
                   expandable={this.props.expandable}
                   onClick={() =>
                     (this.props.expandable &&
@@ -281,14 +282,16 @@ export class GridTable extends React.Component<
                   })}
                 </RowWrapper>
 
-                <ExpandedSectionContainer expanded={expanded}>
-                  {expanded && (
-                    <ExpansionContentInfo
-                      data={item}
-                      preference={this.props.expandedContentRows}
-                    />
-                  )}
-                </ExpandedSectionContainer>
+                {this.props.expandable && (
+                  <ExpandedSectionContainer expanded={expanded}>
+                    {expanded && (
+                      <ExpansionContentInfo
+                        data={item}
+                        preference={this.props.expandedContentRows}
+                      />
+                    )}
+                  </ExpandedSectionContainer>
+                )}
               </StyledBox>
             )
           }
