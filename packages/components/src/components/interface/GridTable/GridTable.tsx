@@ -94,7 +94,6 @@ interface IGridTableProps {
 }
 
 interface IGridTableState {
-  currentPage: number
   width: number
   expanded: string[]
 }
@@ -113,7 +112,6 @@ export class GridTable extends React.Component<
   IGridTableState
 > {
   state = {
-    currentPage: this.props.initialPage || defaultConfiguration.initialPage,
     width: window.innerWidth,
     expanded: []
   }
@@ -205,8 +203,6 @@ export class GridTable extends React.Component<
   onPageChange = (currentPage: number) => {
     if (this.props.onPageChange) {
       this.props.onPageChange(currentPage)
-    } else {
-      this.setState({ currentPage })
     }
   }
 
@@ -222,7 +218,7 @@ export class GridTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       initialPage = defaultConfiguration.initialPage
     } = this.props
-    const { currentPage, width } = this.state
+    const { width } = this.state
     const totalPages = this.props.totalPages
       ? this.props.totalPages
       : getTotalPageNumber(
@@ -244,7 +240,7 @@ export class GridTable extends React.Component<
             ))}
           </TableHeader>
         )}
-        {this.getDisplayItems(currentPage, pageSize, content).map(
+        {this.getDisplayItems(initialPage, pageSize, content).map(
           (item, index) => {
             const expanded = this.showExpandedSection(item.id as string)
             return (
