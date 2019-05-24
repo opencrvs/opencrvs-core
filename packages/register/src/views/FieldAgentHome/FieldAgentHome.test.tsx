@@ -172,7 +172,9 @@ describe('when the home page loads for a field worker', () => {
           .find('#tab_progress')
           .hostNodes()
           .text()
-      ).toContain('In progress (3)')
+      ).toContain(
+        `In progress (${currentUserApplications.applications.length})`
+      )
       expect(
         app
           .find('#tab_review')
@@ -188,6 +190,51 @@ describe('when the home page loads for a field worker', () => {
     })
     it('loads grid table when there is no applications', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(0)
+    })
+  })
+
+  describe('Pagination', () => {
+    const registerUserDetails = Object.assign({}, userDetails)
+    registerUserDetails.role = FIELD_AGENT_ROLE
+    beforeEach(async () => {
+      store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+      store.dispatch(
+        getStorageApplicationsSuccess(JSON.stringify(currentUserApplications))
+      )
+      history.replace(HOME)
+      app.update()
+      app
+        .find('#createPinBtn')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      app.update()
+      for (let i = 1; i <= 8; i++) {
+        app
+          .find(`#keypad-${i % 2}`)
+          .hostNodes()
+          .simulate('click')
+      }
+      await flushPromises()
+      app.update()
+    })
+
+    it('The pagination block will be visible', () => {
+      expect(app.find('#pagination').hostNodes()).toHaveLength(1)
+    })
+    it('The next page will view valid number of items', () => {
+      app
+        .find('#next')
+        .hostNodes()
+        .simulate('click')
+      app.update()
+
+      expect(
+        app
+          .find('#pagination')
+          .hostNodes()
+          .text()
+      ).toContain('2/')
     })
   })
 })
