@@ -90,7 +90,7 @@ export function goToSearch() {
 }
 
 export function goToApplicationDetails(applicationId: string) {
-  window.location.assign(formatUrl(APPLICATION_DETAIL, { applicationId }))
+  return push(formatUrl(APPLICATION_DETAIL, { applicationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {
