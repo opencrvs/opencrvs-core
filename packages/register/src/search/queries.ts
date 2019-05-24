@@ -83,3 +83,11 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
     }
   }
 `
+
+export const COUNT_USER_WISE_APPLICATIONS = gql`
+  query($status: String, $userId: String, $locationIds: [String]) {
+    searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
+      totalItems
+    }
+  }
+`
