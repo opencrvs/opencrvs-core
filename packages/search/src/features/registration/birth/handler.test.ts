@@ -4,7 +4,8 @@ import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
   searchComposition,
-  updateComposition
+  updateComposition,
+  searchByCompositionId
 } from 'src/elasticsearch/dbhelper'
 import { createServer } from 'src/index'
 import {
@@ -117,6 +118,7 @@ describe('Verify handlers', () => {
     it('should return status code 200 if the composition indexed correctly', async () => {
       indexComposition.mockReturnValue({})
       searchComposition.mockReturnValue(mockSearchResponse)
+      searchByCompositionId.mockReturnValue(mockSearchResponse)
       updateComposition.mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse)],

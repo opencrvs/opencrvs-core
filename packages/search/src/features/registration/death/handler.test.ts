@@ -2,11 +2,13 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
 import { createServer } from 'src/index'
+import { searchByCompositionId } from 'src/elasticsearch/dbhelper'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockDeathRejectionTaskBundle,
-  mockDeathRejectionTaskBundleWithoutCompositionReference
+  mockDeathRejectionTaskBundleWithoutCompositionReference,
+  mockSearchResponse
 } from 'src/test/utils'
 
 jest.mock('src/elasticsearch/dbhelper.ts')
@@ -59,6 +61,7 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       indexComposition.mockReturnValue({})
+      searchByCompositionId.mockReturnValue(mockSearchResponse)
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',

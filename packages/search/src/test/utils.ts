@@ -1799,7 +1799,9 @@ export const mockSearchResponse = {
           motherFirstNamesLocal: 'চট্টগ্রাম',
           motherFamilyNameLocal: 'সরকার',
           motherDoB: '1960-02-01',
-          motherIdentifier: '22123123123123123'
+          motherIdentifier: '22123123123123123',
+          createdBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+          updatedBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
         }
       }
     ]
