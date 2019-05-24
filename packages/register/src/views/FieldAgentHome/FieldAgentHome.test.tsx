@@ -188,8 +188,18 @@ describe('when the home page loads for a field worker', () => {
           .text()
       ).toContain('Require updates (1)')
     })
-    it('loads grid table when there is no applications', () => {
+    it('loads grid table', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(0)
+    })
+    it('redirect to details page', async () => {
+      expect(app.find('#row_0').hostNodes()).toHaveLength(1)
+
+      app
+        .find('#row_0')
+        .hostNodes()
+        .simulate('click')
+
+      expect(history.location.pathname).toContain('details')
     })
   })
 
@@ -219,10 +229,10 @@ describe('when the home page loads for a field worker', () => {
       app.update()
     })
 
-    it('The pagination block will be visible', () => {
+    it('the pagination block will be visible', () => {
       expect(app.find('#pagination').hostNodes()).toHaveLength(1)
     })
-    it('The next page will view valid number of items', () => {
+    it('the next page will view valid number of items', () => {
       app
         .find('#next')
         .hostNodes()
