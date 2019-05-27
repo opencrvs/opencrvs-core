@@ -59,9 +59,9 @@ export class App extends React.Component<IAppProps> {
                   <ConnectedRouter history={this.props.history}>
                     <ScrollToTop>
                       <SessionExpireConfirmation />
+                      <SubmissionController />
                       <NotificationComponent>
                         <Page>
-                          <SubmissionController />
                           <MainSection>
                             <ProtectedPage>
                               <Switch>
