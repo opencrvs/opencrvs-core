@@ -15,7 +15,8 @@ import {
   mockBirthRejectionTaskBundleWithoutCompositionReference,
   mockCompositionEntry,
   mockCompositionResponse,
-  mockSearchResponse
+  mockSearchResponse,
+  mockSearchResponseWithoutCreatedBy
 } from 'src/test/utils'
 
 jest.mock('src/elasticsearch/dbhelper.ts')
@@ -119,6 +120,35 @@ describe('Verify handlers', () => {
       indexComposition.mockReturnValue({})
       searchComposition.mockReturnValue(mockSearchResponse)
       searchByCompositionId.mockReturnValue(mockSearchResponse)
+      updateComposition.mockReturnValue({})
+      fetch.mockResponses(
+        [JSON.stringify(mockCompositionResponse)],
+        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify(mockCompositionEntry)],
+        [JSON.stringify({})]
+      )
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:search-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/new-declaration',
+        payload: mockBirthFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return status code 200 if the composition indexed correctly', async () => {
+      indexComposition.mockReturnValue({})
+      searchComposition.mockReturnValue(mockSearchResponseWithoutCreatedBy)
+      searchByCompositionId.mockReturnValue(mockSearchResponseWithoutCreatedBy)
       updateComposition.mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse)],

@@ -1808,6 +1808,34 @@ export const mockSearchResponse = {
   }
 }
 
+export const mockSearchResponseWithoutCreatedBy = {
+  hits: {
+    total: 2,
+    max_score: 2.7509375,
+    hits: [
+      {
+        _index: 'ocrvs',
+        _type: 'compositions',
+        _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
+        _score: 2.7509375,
+        _source: {
+          childFirstNames: '',
+          childFamilyName: 'sarkar',
+          childFirstNamesLocal: 'test',
+          childFamilyNameLocal: 'সরকার',
+          childDoB: '1990-02-01',
+          motherFirstNames: '',
+          motherFamilyName: 'sarkar',
+          motherFirstNamesLocal: 'চট্টগ্রাম',
+          motherFamilyNameLocal: 'সরকার',
+          motherDoB: '1960-02-01',
+          motherIdentifier: '22123123123123123'
+        }
+      }
+    ]
+  }
+}
+
 export const mockCompositionBody = {
   childFirstNames: '',
   childFamilyName: 'sarkar',

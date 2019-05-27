@@ -1,7 +1,8 @@
 import {
   indexComposition,
   updateComposition,
-  searchComposition
+  searchComposition,
+  searchByCompositionId
 } from 'src/elasticsearch/dbhelper'
 import { mockCompositionBody } from 'src/test/utils'
 import { client } from 'src/elasticsearch/client'
@@ -46,6 +47,12 @@ describe('elasticsearch db helper', async () => {
 
   it('should perform search for composition', async () => {
     searchComposition(mockCompositionBody)
+    expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
+    expect(searchSpy).toBeCalled()
+  })
+
+  it('should perform search by compostion id', async () => {
+    searchByCompositionId('r1324-sd6k2-12121-1212')
     expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
     expect(searchSpy).toBeCalled()
   })
