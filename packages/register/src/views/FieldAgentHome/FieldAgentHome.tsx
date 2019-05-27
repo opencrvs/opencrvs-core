@@ -286,7 +286,13 @@ class FieldAgentHomeView extends React.Component<
           {
             text: daysOfRejection
           }
-        )
+        ),
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToEvents()
+          }
+        ]
       }
     })
   }
@@ -437,7 +443,7 @@ class FieldAgentHomeView extends React.Component<
                   return (
                     <>
                       {data && data.searchEvents.totalItems > 0 && (
-                        <BodyContent>
+                        <BodyContent id="require_updates_list">
                           <GridTable
                             content={this.transformRejectedContent(data)}
                             columns={[
@@ -452,14 +458,14 @@ class FieldAgentHomeView extends React.Component<
                                 label: this.props.intl.formatMessage(
                                   messages.listItemName
                                 ),
-                                width: 30,
+                                width: 40,
                                 key: 'name'
                               },
                               {
                                 label: this.props.intl.formatMessage(
                                   messages.listItemUpdateDate
                                 ),
-                                width: 40,
+                                width: 30,
                                 key: 'days_of_rejection'
                               }
                             ]}
@@ -472,6 +478,7 @@ class FieldAgentHomeView extends React.Component<
                               data.searchEvents && data.searchEvents.totalItems
                             }
                             initialPage={this.state.requireUpdatesPage}
+                            clickable={true}
                           />
                         </BodyContent>
                       )}
