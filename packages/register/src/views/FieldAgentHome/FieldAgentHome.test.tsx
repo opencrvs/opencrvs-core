@@ -1,10 +1,8 @@
 import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
-import * as React from 'react'
 import {
   createTestComponent,
   mockApplicationData,
-  currentUserApplications,
-  validToken
+  currentUserApplications
 } from 'src/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -13,10 +11,6 @@ import { Store } from 'redux'
 import { getStorageApplicationsSuccess } from 'src/applications'
 import { HOME } from 'src/navigation/routes'
 import { getOfflineDataSuccess } from 'src/offline/actions'
-
-import { queries } from 'src/profile/queries'
-import { merge } from 'lodash'
-import { mockUserResponse } from 'src/tests/util'
 import { storage } from 'src/storage'
 import { createStore } from 'src/store'
 import { checkAuth } from 'src/profile/profileActions'
@@ -27,6 +21,7 @@ import {
   SEARCH_APPLICATIONS_USER_WISE
 } from 'src/search/queries'
 import { FieldAgentHome } from './FieldAgentHome'
+import { ReactWrapper } from 'enzyme'
 import * as uuid from 'uuid'
 import { SUBMISSION_STATUS, storeApplication } from 'src/applications'
 import { Event } from 'src/forms'
@@ -106,7 +101,6 @@ describe('FieldAgentHome tests', async () => {
     expect(app.find('#field-agent-home-spinner').hostNodes()).toHaveLength(1)
   })
 
-<<<<<<< HEAD
   describe('when Field Agent is in home view with no drafts', () => {
     const registerUserDetails = Object.assign({}, userDetails)
     registerUserDetails.role = FIELD_AGENT_ROLE
@@ -125,19 +119,6 @@ describe('FieldAgentHome tests', async () => {
           .find(`#keypad-${i % 2}`)
           .hostNodes()
           .simulate('click')
-=======
-  it('renders error text when an error occurs', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_USER_WISE_APPLICATIONS,
-          variables: {
-            status: EVENT_STATUS.REJECTED,
-            locationIds: ['123456789']
-          }
-        },
-        error: new Error('boom')
->>>>>>> 5b2ae858... Test cases for FieldAgentHome updates tab
       }
     ]
 
@@ -191,7 +172,6 @@ describe('FieldAgentHome tests', async () => {
       setTimeout(resolve, 100)
     })
 
-<<<<<<< HEAD
     it('redirect to in progress tab', async () => {
       app
         .find('#tab_progress')
@@ -249,36 +229,6 @@ describe('FieldAgentHome tests', async () => {
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
       })
-=======
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(app.find('#top-bar').hostNodes()).toHaveLength(1)
-    expect(app.find('#tab_progress').hostNodes()).toHaveLength(1)
-    expect(app.find('#tab_review').hostNodes()).toHaveLength(1)
-    expect(app.find('#tab_updates').hostNodes()).toHaveLength(1)
-  })
-
-  it('when user clicks the floating action button', async () => {
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <FieldAgentHome
-        match={{
-          params: {
-            tabId: 'progress'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      [countQueryGraphqlMock]
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
->>>>>>> 5b2ae858... Test cases for FieldAgentHome updates tab
     })
 
     testComponent.component.update()
