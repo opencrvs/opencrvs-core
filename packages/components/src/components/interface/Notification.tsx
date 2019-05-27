@@ -61,12 +61,24 @@ const NotificationContainer = styledNotification`
 `
 
 const NotificationMessage = styled.div`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  background: ${({ theme }) => theme.colors.placeholder};
-  border-radius: 21px;
-  padding: 5px 10px;
-  margin: 5px;
+  position: relative;
+  ${({ theme }) => theme.fonts.bodyStyle};
+  padding: 8px 16px;
+  margin: 8px;
   color: ${({ theme }) => theme.colors.white};
+  min-width: 160px;
+`
+
+const RoundBack = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background: ${({ theme }) => theme.colors.copy};
+  opacity: 0.576851;
+  border-radius: 19px;
 `
 
 export class Notification extends React.Component<IProps> {
@@ -85,7 +97,10 @@ export class Notification extends React.Component<IProps> {
           (callback ? ' clickable' : '')
         }
       >
-        <NotificationMessage>{children}</NotificationMessage>
+        <NotificationMessage>
+          {children}
+          <RoundBack />
+        </NotificationMessage>
       </NotificationContainer>
     )
   }
