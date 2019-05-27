@@ -31,6 +31,8 @@ import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { RegistrarHome } from './views/RegistrarHome/RegistrarHome'
 import { FieldAgentHome } from './views/FieldAgentHome/FieldAgentHome'
 import { Footer } from '@opencrvs/components/lib/interface/'
+import { SettingsPage } from './views/Settings/SettingsPage'
+
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
@@ -137,6 +139,10 @@ export class App extends React.Component<IAppProps> {
                                 <ProtectedRoute
                                   path={routes.PRINT_CERTIFICATE}
                                   component={PrintCertificateAction}
+                                />
+                                <ProtectedRoute
+                                  path={routes.SETTINGS}
+                                  component={SettingsPage}
                                 />
                                 <ProtectedRoute
                                   path={routes.APPLICATION_DETAIL}
