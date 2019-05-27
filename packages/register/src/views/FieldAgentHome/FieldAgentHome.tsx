@@ -173,12 +173,31 @@ type FullProps = IFieldAgentHomeProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
 
+interface IState {
+  sentForReviewPageNo: number
+}
+
 const TAB_ID = {
   inProgress: FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   sentForReview: FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   requireUpdates: FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 }
-class FieldAgentHomeView extends React.Component<FullProps> {
+class FieldAgentHomeView extends React.Component<FullProps, IState> {
+  pageSize: number
+  sentForReviewCount: number
+
+  constructor(props: FullProps) {
+    super(props)
+
+    this.pageSize = 10
+    this.state = { sentForReviewPageNo: 1 }
+    this.sentForReviewCount = this.props.applications.filter(
+      application =>
+        application.submissionStatus !==
+        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    ).length
+  }
+
   transformApplicationsSentForReview = () => {
     if (!this.props.applications || this.props.applications.length <= 0) {
       return []
@@ -310,6 +329,17 @@ class FieldAgentHomeView extends React.Component<FullProps> {
       .forEach(this.props.deleteApplication)
   }
 
+  onPageChange = (pageNumber: number) => {
+    const { tabId } = this.props.match.params
+    switch (tabId) {
+      case TAB_ID.sentForReview:
+        this.setState({ sentForReviewPageNo: pageNumber })
+        break
+      default:
+        break
+    }
+  }
+
   render() {
     const { userDetails, match, intl } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
@@ -346,7 +376,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 }
               >
                 {intl.formatMessage(messages.sentForReview, {
-                  total: 1
+                  total: this.sentForReviewCount
                 })}
               </IconTab>
               <IconTab
@@ -400,6 +430,9 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                     }
                   ]}
                   noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                  totalPages={this.sentForReviewCount}
+                  onPageChange={this.onPageChange}
+                  pageSize={this.pageSize}
                 />
               </BodyContent>
             )}
