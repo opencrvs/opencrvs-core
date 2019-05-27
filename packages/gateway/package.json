@@ -15,6 +15,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
+    "@opencrvs/commons": "^1.0.0-alpha.6",
     "@types/glob": "^5.0.35",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "^8.0.1",
