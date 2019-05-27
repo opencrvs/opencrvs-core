@@ -27,6 +27,13 @@ import resendSmsHandler, {
 import getPlugins from './config/plugins'
 
 import * as database from './database'
+import verifyTokenHandler, {
+  reqVerifyTokenSchema,
+  resVerifyTokenSchema
+} from './features/verifyToken/handler'
+import invalidateTokenHandler, {
+  reqInvalidateTokenSchema
+} from './features/invalidateToken/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -109,6 +116,44 @@ export async function createServer() {
       },
       response: {
         schema: resRefreshSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "token": "" }' http://localhost:4040/verifyToken
+  server.route({
+    method: 'POST',
+    path: '/verifyToken',
+    handler: verifyTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Check if a token is marked as invalid or not',
+      notes:
+        'Check if this token is part of the invalid token list that is stored in redis',
+      validate: {
+        payload: reqVerifyTokenSchema
+      },
+      response: {
+        schema: resVerifyTokenSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "token": "" }' http://localhost:4040/invalidateToken
+  server.route({
+    method: 'POST',
+    path: '/invalidateToken',
+    handler: invalidateTokenHandler,
+    options: {
+      tags: ['api'],
+      description: 'Marks token as invalid until it expires',
+      notes:
+        'Adds a token to the invalid tokens stored in Redis, these are stored as individual key value pairs to that we can set their expiry TTL individually',
+      validate: {
+        payload: reqInvalidateTokenSchema
+      },
+      response: {
+        schema: false
       }
     }
   })
