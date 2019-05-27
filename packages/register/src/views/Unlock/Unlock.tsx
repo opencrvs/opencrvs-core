@@ -18,7 +18,7 @@ import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { pinOps } from './ComparePINs'
-import * as ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom'
 
 const messages = defineMessages({
   incorrect: {

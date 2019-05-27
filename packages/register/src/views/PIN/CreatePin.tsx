@@ -6,7 +6,7 @@ import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import messages from './messages'
-import * as ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom'
 
 const Container = styled.div`
   display: flex;
@@ -129,7 +129,11 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.pinMatchError)}
               </ErrorBox>
             )}
-            <PINKeypad pin="" ref={(elem: any) => (this.pinKeyRef = elem)} onComplete={this.firstPINEntry} />
+            <PINKeypad
+              pin=""
+              ref={(elem: any) => (this.pinKeyRef = elem)}
+              onComplete={this.firstPINEntry}
+            />
           </>
         )}
         {pinHasSeqDigits && (
