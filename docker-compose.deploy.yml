@@ -98,7 +98,7 @@ services:
   register:
     configs:
       - source: register-config.{{ts}}
-        target: /usr/src/app/packages/register/build/config.js
+        target: /usr/share/nginx/html/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -114,7 +114,7 @@ services:
   performance:
     configs:
       - source: performance-config.{{ts}}
-        target: /usr/src/app/packages/performance/build/config.js
+        target: /usr/share/nginx/html/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -139,7 +139,7 @@ services:
   login:
     configs:
       - source: login-config.{{ts}}
-        target: /usr/src/app/packages/login/build/config.js
+        target: /usr/share/nginx/html/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
