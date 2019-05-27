@@ -5,31 +5,35 @@ services:
     image: jembi/ocrvs-register:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./Dockerfile-register
+      dockerfile: ./packages/register/Dockerfile
     restart: unless-stopped
 
   performance:
     image: jembi/ocrvs-performance:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./Dockerfile-performance
+      dockerfile: ./packages/performance/Dockerfile
     restart: unless-stopped
 
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./Dockerfile-login
+      dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
 
   styleguide:
     image: jembi/ocrvs-styleguide:${VERSION:-latest}
-    build: packages/components
+    build:
+      context: .
+      dockerfile: ./packages/components/Dockerfile
     restart: unless-stopped
 
   gateway:
     image: jembi/ocrvs-gateway:${VERSION:-latest}
-    build: packages/gateway
+    build:
+      context: .
+      dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
@@ -38,10 +42,14 @@ services:
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - COUNTRY=bgd
+      - AUTH_URL=http://auth:4040
 
+  # User facing services
   workflow:
     image: jembi/ocrvs-workflow:${VERSION:-latest}
-    build: packages/workflow
+    build:
+      context: .
+      dockerfile: ./packages/workflow/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
@@ -50,29 +58,42 @@ services:
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=bgd
+      - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
 
   search:
     image: jembi/ocrvs-search:${VERSION:-latest}
-    build: packages/search
+    build:
+      context: .
+      dockerfile: ./packages/search/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
+      - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
 
   metrics:
     image: jembi/ocrvs-metrics:${VERSION:-latest}
-    build: packages/metrics
+    build:
+      context: .
+      dockerfile: ./packages/metrics/Dockerfile
     restart: unless-stopped
     environment:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
+      - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
+  # END User facing services
 
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
-    build: packages/auth
+    build:
+      context: .
+      dockerfile: ./packages/auth/Dockerfile
     restart: unless-stopped
     environment:
       - REDIS_HOST=redis
@@ -83,23 +104,32 @@ services:
 
   user-mgnt:
     image: jembi/ocrvs-user-mgnt:${VERSION:-latest}
-    build: packages/user-mgnt
+    build:
+      context: .
+      dockerfile: ./packages/user-mgnt/Dockerfile
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
+      - AUTH_URL=http://auth:4040
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
-    build: packages/notification
+    build:
+      context: .
+      dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
       - LANGUAGE=bn
+      - AUTH_URL=http://auth:4040
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
-    build: packages/resources
+    build:
+      context: .
+      dockerfile: ./packages/resources/Dockerfile
     restart: unless-stopped
     environment:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://hearth:3447/fhir
       - ADMINISTRATIVE_STRUCTURE_URL=http://174.136.37.245:8090/gen
+      - AUTH_URL=http://auth:4040

@@ -1,10 +1,11 @@
 {
   "name": "@opencrvs/components",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "private": true,
   "dependencies": {
     "@types/react-intl": "^2.3.17",
     "@types/react-select": "^2.0.2",
+    "@types/react-stickynode": "^1.4.0",
     "css-animation": "^1.4.1",
     "rc-menu": "^7.4.13",
     "react": "^16.3.2",

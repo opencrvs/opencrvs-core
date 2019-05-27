@@ -1,13 +1,19 @@
 // tslint:disable-next-line no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
+import * as Hapi from 'hapi'
 import * as DotEnv from 'dotenv'
 import { getPlugins } from 'src/config/plugins'
 import { getServer } from 'src/config/server'
 import { getLogger } from 'src/utils/logger'
 import { getRoutes } from 'src/config/routes'
-import { CERT_PUBLIC_KEY_PATH } from 'src/constants'
+import {
+  CERT_PUBLIC_KEY_PATH,
+  CHECK_INVALID_TOKEN,
+  AUTH_URL
+} from 'src/constants'
 import { readFileSync } from 'fs'
+import { validateFunc } from '@opencrvs/commons'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
@@ -32,10 +38,8 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
     },
-    validate: (payload: any, request: any) => ({
-      isValid: true,
-      credentials: payload
-    })
+    validate: (payload: any, request: Hapi.Request) =>
+      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
   })
 
   server.auth.default('jwt')

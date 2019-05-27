@@ -34,7 +34,7 @@ import {
   StatusWaiting,
   StatusSubmitted,
   StatusPendingOffline,
-  StatusFailed
+  StatusFailed24 as StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
 import { REGISTRAR_HOME } from 'src/navigation/routes'

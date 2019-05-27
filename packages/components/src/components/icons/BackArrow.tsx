@@ -12,16 +12,16 @@ export const BackArrow = (props: React.HTMLAttributes<SVGElement>) => (
     <path
       d="M20 12H4"
       stroke="#4C68C1"
-      stroke-width={2}
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M10 18L4 12L10 6"
       stroke="#4C68C1"
-      stroke-width={2}
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )

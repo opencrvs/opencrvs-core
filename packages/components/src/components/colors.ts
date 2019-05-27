@@ -13,7 +13,7 @@ const colorDictionary = {
   blueHover: '#F2F6FE',
   greyBlackMetal: '#373D3F',
   greyRaven: '#555F61',
-  greyDarkSteel: '#83898F',
+  greyDarkSteel: '#707C80',
   greySteel: '#A7B0B2',
   greyGrey: '#C1C7C9',
   greySmoky: '#DADEDF',
@@ -40,7 +40,7 @@ export const shadows = {
 export const colors = {
   primary: colorDictionary.blueDeepSea,
   secondary: colorDictionary.blueBabyBaby,
-  tertiary: colorDictionary.blueCrystal,
+  tertiary: colorDictionary.blueDeepSea,
   error: colorDictionary.redDanger,
   warning: colorDictionary.orangeAmber,
   copy: colorDictionary.blackStormy,
@@ -59,5 +59,9 @@ export const colors = {
   menuBackground: colorDictionary.blackStormy,
   gradientDark: colorDictionary.nightshadeDark,
   gradientLight: colorDictionary.nightshadeLight,
-  secondaryLabel: colorDictionary.darkSteel
+  secondaryLabel: colorDictionary.darkSteel,
+
+  // Dividers
+  dividerLight: colorDictionary.greyPearl,
+  dividerDark: colorDictionary.greyGrey
 }

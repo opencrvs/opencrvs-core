@@ -43,7 +43,6 @@ const StyledStatus = styled.div`
   & span {
     text-transform: uppercase;
     margin-left: 5px;
-    font-size: 13px;
     color: ${({ theme }) => theme.colors.primary};
   }
 `

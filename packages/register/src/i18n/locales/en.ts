@@ -983,6 +983,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.defaultTitle': 'Applications',
     'register.home.header.applicationTitle': 'Applications',
     'register.home.header.performanceTitle': 'Performance',
+    'register.details.status.dateLabel.draft.started': 'Started on',
+    'register.details.status.dateLabel.draft.updated': 'Updated on',
+    'register.detail.status.applicant.number': 'Applicant contact number',
+    'register.detail.subpage.emptyTitle': 'No name provided',
+    'register.detail.subpag.buttons.retry': 'Retry',
+    'register.details.status.dateLabel.draft.failed': 'Failed to send on',
+    'register.detail.status.failedMessage':
+      'This is some messaging on advicing the user on what to do... in the event of a failed applicaton.',
     'register.fieldAgentHome.inProgress': 'In progress ({total})',
     'register.fieldAgentHome.sentForReview': 'Sent for review ({total})',
     'register.fieldAgentHome.requireUpdates': 'Require updates ({total})',
@@ -995,6 +1003,22 @@ export const ENGLISH_STATE: ILanguage = {
     'register.fieldAgentHome.table.statusSubmitting': 'Sending...',
     'register.fieldAgentHome.table.statusFailed': 'Failed to send',
     'register.fieldAgentHome.table.statusPendingConnection':
-      'Pending connection'
+      'Pending connection',
+    'settings.title': 'Settings',
+    'profile.title': 'Profile',
+    'security.title': 'Security',
+    'account.title': 'Account',
+    'system.title': 'System',
+    'label.nameEN': 'English name',
+    'label.nameBN': 'Bangla name',
+    'label.phone': 'Phone number',
+    'label.role': 'Role',
+    'label.password': 'Password',
+    'label.pin': 'PIN',
+    'label.language': 'Language',
+    'action.change': 'Change',
+    'register.workQueue.list.buttons.update': 'Update',
+    'createPIN.pinSameDigitsError': 'PIN cannot have same 4 digits',
+    'createPIN.pinSeqDigitsError': 'PIN cannot contain sequential digits'
   }
 }

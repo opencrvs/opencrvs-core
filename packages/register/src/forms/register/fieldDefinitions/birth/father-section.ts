@@ -30,7 +30,8 @@ import {
   dateNotInFuture,
   dateFormatIsCorrect,
   maxLength,
-  numeric
+  numeric,
+  dateInPast
 } from 'src/utils/validate'
 
 export interface IFatherSectionFormData {
@@ -403,7 +404,7 @@ export const fatherSection: IFormSection = {
             dependencies: []
           },
           {
-            validator: dateNotInFuture,
+            validator: dateInPast,
             dependencies: []
           },
           {
