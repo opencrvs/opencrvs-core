@@ -121,12 +121,16 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
 const mapStateToProps = (store: IStoreState) => {
   const registerForms: Array<{ [key: string]: IForm }> = []
 
-  store.applicationsState.applications.map(application => {
-    registerForms[application.event] = getRegisterForm(store)[application.event]
-  })
+  if (store.applicationsState.applications) {
+    store.applicationsState.applications.map(application => {
+      registerForms[application.event] = getRegisterForm(store)[
+        application.event
+      ]
+    })
+  }
 
   return {
-    applications: store.applicationsState.applications,
+    applications: store.applicationsState.applications || [],
     registerForms
   }
 }
