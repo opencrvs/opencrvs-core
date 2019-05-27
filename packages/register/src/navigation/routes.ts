@@ -27,3 +27,5 @@ export const REGISTRAR_HOME = '/registrar-home'
 export const REGISTRAR_HOME_TAB = '/registrar-home/:tabId'
 export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
+
+export const APPLICATION_DETAIL = '/details/:applicationId'

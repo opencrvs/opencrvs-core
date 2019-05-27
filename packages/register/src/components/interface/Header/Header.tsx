@@ -333,7 +333,6 @@ class HeaderComp extends React.Component<IProps, IState> {
         }
 
     return (
-
       <>
         <AppHeader
           menuItems={menuItems}
@@ -343,7 +342,6 @@ class HeaderComp extends React.Component<IProps, IState> {
           {...mobileHeaderActionProps}
         />
       </>
-
     )
   }
 }

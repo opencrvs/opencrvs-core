@@ -26,6 +26,7 @@ import { SessionExpireConfirmation } from './components/SessionExpireConfirmatio
 import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
 import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { Details } from 'src/views/Home/Details'
 import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { RegistrarHome } from './views/RegistrarHome/RegistrarHome'
 import { FieldAgentHome } from './views/FieldAgentHome/FieldAgentHome'
@@ -139,10 +140,13 @@ export class App extends React.Component<IAppProps> {
                                   path={routes.PRINT_CERTIFICATE}
                                   component={PrintCertificateAction}
                                 />
-                                />
                                 <ProtectedRoute
                                   path={routes.SETTINGS}
                                   component={SettingsPage}
+                                />
+                                <ProtectedRoute
+                                  path={routes.APPLICATION_DETAIL}
+                                  component={Details}
                                 />
                               </Switch>
                             </ProtectedPage>
