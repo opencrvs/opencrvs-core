@@ -9,7 +9,11 @@ import styled from 'src/styled-components'
 import { Header } from 'src/components/interface/Header/Header'
 import { AvatarLarge, Avatar } from '@opencrvs/components/lib/icons'
 import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import {
+  ResponsiveModal,
+  NOTIFICATION_TYPE,
+  Notification
+} from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { modifyUserDetails as modifyUserDetailsAction } from 'src/profile/profileActions'
@@ -88,7 +92,12 @@ const messages = defineMessages({
   change_language_title: {
     id: 'changeLanguage.title',
     defaultMessage: 'Change language',
-    description: 'Change language tittle'
+    description: 'Change language title'
+  },
+  change_language_success_message: {
+    id: 'changeLanguage.success',
+    defaultMessage: 'Language updted to English',
+    description: 'Change language success'
   },
   button_apply: {
     id: 'button.apply',
@@ -217,6 +226,7 @@ type IProps = InjectedIntlProps & {
 interface IState {
   showLanguageSettings: boolean
   selectedLanguage: string
+  showSuccessNotification: boolean
 }
 
 class SettingsView extends React.Component<IProps, IState> {
@@ -225,6 +235,7 @@ class SettingsView extends React.Component<IProps, IState> {
     super(props)
     this.state = {
       showLanguageSettings: false,
+      showSuccessNotification: false,
       selectedLanguage: this.languagePreference
     }
   }
@@ -232,6 +243,12 @@ class SettingsView extends React.Component<IProps, IState> {
   toggleLanguageSettingsModal = () => {
     this.setState(state => ({
       showLanguageSettings: !state.showLanguageSettings
+    }))
+  }
+
+  toggleSuccessNotification = () => {
+    this.setState(state => ({
+      showSuccessNotification: !state.showSuccessNotification
     }))
   }
 
@@ -247,6 +264,7 @@ class SettingsView extends React.Component<IProps, IState> {
     this.props.modifyUserDetails(this.props.userDetails)
 
     this.toggleLanguageSettingsModal()
+    this.toggleSuccessNotification()
   }
 
   render() {
@@ -275,6 +293,7 @@ class SettingsView extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
+
     const language = {
       bn: 'বাংলা',
       en: 'English'
@@ -419,6 +438,13 @@ class SettingsView extends React.Component<IProps, IState> {
             placeholder=""
           />
         </ResponsiveModal>
+        <Notification
+          type={NOTIFICATION_TYPE.SUCCESS}
+          show={this.state.showSuccessNotification}
+          callback={this.toggleSuccessNotification}
+        >
+          {intl.formatMessage(messages.change_language_success_message)}
+        </Notification>
       </>
     )
   }

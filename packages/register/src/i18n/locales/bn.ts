@@ -1016,6 +1016,7 @@ export const BENGALI_STATE: ILanguage = {
     'createPIN.pinSameDigitsError': 'পিন একই 4 ডিজিট থাকতে পারে না',
     'createPIN.pinSeqDigitsError': 'পিন ক্রমিক সংখ্যা থাকতে পারে না',
     'changeLanguage.title': 'ভাষা পরিবর্তন',
+    'changeLanguage.success': 'ভাষা পরিবর্তিত হয়ে বাংলা হয়েছে',
     'message.changeLanguage': 'OpenCRVS-এ যে ভাষা আপনি ব্যাবহার করতে চান',
     'button.apply': 'প্রয়োগ করুন'
   }
