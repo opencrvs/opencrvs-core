@@ -378,6 +378,106 @@ describe('FieldAgentHome tests', async () => {
     expect(window.location.href).toContain(
       'details/613da949-db8c-49ad-94b4-631ab0b7503e'
     )
+  })
+
+  it('when user clicks the sent for review tab', async () => {
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <FieldAgentHome
+        match={{
+          params: {
+            tabId: 'progress'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      [countQueryGraphqlMock]
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    testComponent.component
+      .find('#tab_review')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+
+    testComponent.component.update()
+    expect(window.location.href).toContain('field-agent-home/review')
+  })
+
+  it('when user clicks the sent for updates tab', async () => {
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <FieldAgentHome
+        match={{
+          params: {
+            tabId: 'progress'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      [countQueryGraphqlMock]
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    testComponent.component
+      .find('#tab_updates')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+
+    testComponent.component.update()
+    expect(window.location.href).toContain('field-agent-home/updates')
+  })
+
+  it('when user clicks the sent for inprogress tab', async () => {
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <FieldAgentHome
+        match={{
+          params: {
+            tabId: 'review'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      [countQueryGraphqlMock]
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    testComponent.component
+      .find('#tab_progress')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+
+    testComponent.component.update()
+    expect(window.location.href).toContain('field-agent-home/progress')
+  })
 
   describe('when user is in sent for review tab', () => {
     let component: ReactWrapper

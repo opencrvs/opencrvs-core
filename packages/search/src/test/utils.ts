@@ -1837,17 +1837,22 @@ export const mockSearchResponseWithoutCreatedBy = {
 }
 
 export const mockCompositionBody = {
-  childFirstNames: '',
+  childFirstNames: 'hasan',
   childFamilyName: 'sarkar',
   childFirstNamesLocal: 'test',
   childFamilyNameLocal: 'সরকার',
   childDoB: '1990-02-01',
-  motherFirstNames: '',
+  gender: 'male',
+  motherFirstNames: 'anninda',
   motherFamilyName: 'sarkar',
   motherFirstNamesLocal: 'চট্টগ্রাম',
   motherFamilyNameLocal: 'সরকার',
+  fatherFirstNames: 'raihan',
+  fatherFamilyName: 'khilzee',
+  fatherDoB: '1960-02-01',
   motherDoB: '1960-02-01',
-  motherIdentifier: '22123123123123123'
+  motherIdentifier: '22123123123123123',
+  fatherIdentifier: '221211111113123123'
 }
 
 export const mockCompositionEntry = {
