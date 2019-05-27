@@ -29,7 +29,7 @@ COPY packages/gateway packages/gateway
 COPY packages/commons packages/commons
 
 # Build for production.
-RUN cd packages/register; yarn build --production
+RUN cd packages/components; yarn build && cd ../register; yarn build --production
 
 # Add nginx build stage that only copies out the built webapp
 FROM nginx
