@@ -10,7 +10,6 @@ const ImageBase = styled(PrimaryButton.withComponent('label'))`
   align-items: center;
   display: inline-flex;
   border: 0;
-  font-size: inherit;
   justify-content: space-between;
   cursor: pointer;
 `

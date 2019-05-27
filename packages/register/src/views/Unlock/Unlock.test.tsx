@@ -1,22 +1,44 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent, flushPromises } from 'src/tests/util'
 import { createStore } from 'src/store'
 import { Unlock } from './Unlock'
 import { storage } from 'src/storage'
+import { pinOps } from './ComparePINs'
+import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
-  backSpaceElem.simulate('click')
   backSpaceElem.update()
+  backSpaceElem.simulate('click')
+  backSpaceElem.simulate('click')
+  backSpaceElem.simulate('click')
+  backSpaceElem.simulate('click')
 }
 
 describe('Unlock page loads Properly', () => {
-  storage.getItem = jest.fn(
-    () => '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82'
+  // mock indexeddb
+  const indexedDB = {
+    USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
+    USER_DATA: JSON.stringify([
+      {
+        userID: 'shakib75',
+        userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
+        drafts: []
+      }
+    ]),
+    screenLock: undefined,
+    USER_ID: 'shakib75',
+    locked_time: undefined
+  }
+
+  storage.getItem = jest.fn(async (key: string) =>
+    Promise.resolve(indexedDB[key])
+  )
+
+  storage.setItem = jest.fn(
+    async (key: string, value: string) => (indexedDB[key] = value)
   )
 
   const { store } = createStore()
@@ -44,6 +66,17 @@ describe('Unlock page loads Properly', () => {
       .length
     expect(errorElem).toBe(0)
   })
+})
+
+describe('For wrong inputs', async () => {
+  const { store } = createStore()
+  const testComponent = createTestComponent(
+    <Unlock onCorrectPinMatch={() => null} />,
+    store
+  )
+
+  // These tests are only for wrong inputs, so this mock fn only returns a promise of false
+  pinOps.comparePins = jest.fn(async (pin1, pin2) => Promise.resolve(false))
 
   it('Should Display Incorrect error message', async () => {
     clearPassword(testComponent.component)
@@ -60,16 +93,19 @@ describe('Unlock page loads Properly', () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Incorrect pin. Please try again')
-    }, 100)
+    }, 1000)
   })
 
   it('Should display the Last try message', async () => {
+    await flushPromises()
+    testComponent.component.update()
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    clearPassword(testComponent.component)
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     clearPassword(testComponent.component)
@@ -77,6 +113,8 @@ describe('Unlock page loads Properly', () => {
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     setTimeout(() => {
@@ -85,16 +123,17 @@ describe('Unlock page loads Properly', () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Last Try')
-    }, 100)
+    }, 1000)
   })
 
   it('Should display Locked Message', async () => {
-    clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     setTimeout(() => {
@@ -106,13 +145,34 @@ describe('Unlock page loads Properly', () => {
     }, 1000)
   })
 
-  it('Should display Locked Message', async () => {
-    clearPassword(testComponent.component)
+  it('Should not accept any attempt during timeout', async () => {
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
+
+    await flushPromises()
+    testComponent.component.update()
+
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Locked')
+    }, 1000)
+  })
+
+  it('Should not accept correct pin while locked', async () => {
+    clearPassword(testComponent.component)
+    const numberElem = testComponent.component.find('#keypad-0').hostNodes()
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+    numberElem.simulate('click')
+
+    await flushPromises()
     testComponent.component.update()
 
     setTimeout(() => {
@@ -132,18 +192,21 @@ describe('Logout Sequence', async () => {
     <Unlock onCorrectPinMatch={() => redirect} />,
     store
   )
+  const indexeddb = {
+    SCREEN_LOCK: true,
+    SECURITY_PIN_EXPIRED_AT: 1234
+  }
+  storage.removeItem = jest.fn((key: string) => {
+    delete indexeddb[key]
+  })
 
-  it('Should logout', () => {
+  it('should clear lock-related indexeddb entries upon logout', () => {
     testComponent.component
       .find('#logout')
       .hostNodes()
       .simulate('click')
     testComponent.component.update()
-    setTimeout(() => {
-      const logoutComponent = testComponent.component
-        .find('#logout')
-        .hostNodes().length
-      expect(logoutComponent).toBe(0)
-    }, 1000)
+    expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
+    expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
   })
 })
