@@ -198,8 +198,6 @@ class CreatePinComponent extends React.Component<IProps> {
     const node =
       this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
     if (node) {
-      // @ts-ignore
-      console.log('NODE FOUND')
       node.focus()
     }
   }
