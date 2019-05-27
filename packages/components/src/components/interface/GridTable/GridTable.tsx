@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   width: 100%;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0 auto;
+    margin: 24px 16px 0 16px;
     width: calc(100% - 32px);
   }
 `
@@ -27,7 +27,7 @@ const TableHeader = styled.div`
 `
 
 const StyledBox = styled(Box)`
-  margin-top: 15px;
+  margin-top: 8px;
   padding: 7px 0px 0px 0px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};

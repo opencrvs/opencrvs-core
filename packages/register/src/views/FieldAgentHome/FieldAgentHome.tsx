@@ -46,6 +46,7 @@ import {
 import { sentenceCase } from 'src/utils/data-formatting'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { calculateDays } from '../PrintCertificate/calculatePrice'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -231,7 +232,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
           draft.submissionStatus || '',
           navigator.onLine,
           index,
-          'DC5EDNG'
+          'DC5EDNG' // Later to be replaced by draft.trackingId ?
         )
 
         return {
@@ -385,7 +386,11 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                         messages.submissionStatus
                       ),
                       width: 37,
-                      key: 'submission_status'
+                      key: 'submission_status',
+                      color: getTheme(
+                        window.config.COUNTRY,
+                        window.config.LANGUAGE
+                      ).colors.secondaryLabel
                     },
                     {
                       label: '',
