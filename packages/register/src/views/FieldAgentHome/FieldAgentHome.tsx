@@ -55,6 +55,7 @@ const Topbar = styled.div`
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
+  overflow-x: auto;
   justify-content: flex-start;
   align-items: center;
 `
@@ -64,6 +65,7 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
+  flex-shrink: 0;
   outline: none;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & > div {
@@ -374,7 +376,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                       key: 'event'
                     },
                     {
-                      width: 35,
+                      width: 45,
                       label: this.props.intl.formatMessage(messages.name),
                       key: 'name'
                     },
@@ -382,7 +384,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                       label: this.props.intl.formatMessage(
                         messages.submissionStatus
                       ),
-                      width: 47,
+                      width: 37,
                       key: 'submission_status'
                     },
                     {
