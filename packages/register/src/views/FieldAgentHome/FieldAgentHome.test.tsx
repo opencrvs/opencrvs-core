@@ -58,7 +58,7 @@ const countQueryGraphqlMock = {
   result: {
     data: {
       searchEvents: {
-        totalItems: 4
+        totalItems: 1
       }
     }
   }
@@ -306,6 +306,78 @@ describe('FieldAgentHome tests', async () => {
     const app = testComponent.component
     expect(app.find('#require_updates_list').hostNodes()).toHaveLength(1)
   })
+
+  it('render application details page after clicking require for updates applications', async () => {
+    const requireUpdatesMock = {
+      request: {
+        query: SEARCH_APPLICATIONS_USER_WISE,
+        variables: {
+          status: EVENT_STATUS.REJECTED,
+          locationIds: ['123456789'],
+          count: 10,
+          skip: 0
+        }
+      },
+      result: {
+        data: {
+          searchEvents: {
+            totalItems: 1,
+            results: [
+              {
+                id: '613da949-db8c-49ad-94b4-631ab0b7503e',
+                type: 'Birth',
+                registration: {
+                  dateOfApplication: '2019-05-22T10:22:21.840Z',
+                  status: 'REJECTED'
+                },
+                childName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <FieldAgentHome
+        match={{
+          params: {
+            tabId: 'updates'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      [countQueryGraphqlMock, requireUpdatesMock]
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    testComponent.component
+      .find('#row_0')
+      .hostNodes()
+      .simulate('click')
+
+    expect(window.location.href).toContain(
+      'details/613da949-db8c-49ad-94b4-631ab0b7503e'
+    )
 
   describe('when user is in sent for review tab', () => {
     let component: ReactWrapper
