@@ -41,13 +41,17 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
+const RowWrapper = styled.div.attrs<{
+  expandable?: boolean
+  clickable?: boolean
+}>({})`
   width: 100%;
-  cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
   padding: 0 24px;
   display: flex;
   align-items: center;
   min-height: 64px;
+  cursor: ${({ expandable, clickable }) =>
+    expandable || clickable ? 'pointer' : 'default'};
 `
 
 const ContentWrapper = styled.span.attrs<{
@@ -260,6 +264,7 @@ export class GridTable extends React.Component<
                 <RowWrapper
                   id={'row_' + index}
                   expandable={this.props.expandable}
+                  clickable={this.props.clickable}
                   onClick={() =>
                     (this.props.expandable &&
                       this.toggleExpanded(item.id as string)) ||
