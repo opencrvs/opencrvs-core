@@ -18,6 +18,7 @@ import * as moment from 'moment'
 import { SCREEN_LOCK } from 'src/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { pinOps } from './ComparePINs'
+import * as ReactDOM from 'react-dom'
 
 const messages = defineMessages({
   incorrect: {
@@ -99,6 +100,8 @@ const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
+  pinKeyRef: any
+
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -234,6 +237,19 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     storage.removeItem(SECURITY_PIN_EXPIRED_AT)
     this.props.redirectToAuthentication()
   }
+
+  componentDidUpdate = () => this.focusKeypad()
+
+  componentDidMount = () => this.focusKeypad()
+
+  focusKeypad = () => {
+    const node =
+      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
+    if (node) {
+      node.focus()
+    }
+  }
+
   render() {
     return this.state.showSpinner ? (
       <SpinnerWrapper>
@@ -251,6 +267,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
           {this.showErrorMessage()}
           <PINKeypad
+            ref={(elem: any) => (this.pinKeyRef = elem)}
             onComplete={this.onPinProvided}
             pin={this.state.pin}
             key={this.state.resetKey}

@@ -3,8 +3,10 @@ import styled from 'styled-components'
 import { Backspace } from '../icons/Backspace'
 
 interface IProps {
+  id?: string
   onComplete: (pin: string) => void
   pin?: string
+  ref?: any
 }
 
 interface IState {
@@ -71,10 +73,38 @@ export class PINKeypad extends React.Component<IProps, IState> {
     })
   }
 
+  keyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const { pin } = this.state
+    const { onComplete } = this.props
+    const kc = e.keyCode
+    if (kc === 8 || kc === 46) {
+      // delete or backspace
+      this.setState({ pin: pin.length ? pin.slice(0, pin.length - 1) : '' })
+    } else if (kc >= 48 && kc <= 57) {
+      // '0' <= kc <= '9'
+      if (pin.length <= 3) {
+        const newPIN = pin + (kc - 48)
+        if (newPIN.length === 4) {
+          onComplete(newPIN)
+        }
+        this.setState({ pin: newPIN })
+      }
+    } else if (kc >= 96 && kc <= 105) {
+      // numpad
+      if (pin.length <= 3) {
+        const newPIN = pin + (kc - 48)
+        if (newPIN.length === 4) {
+          onComplete(newPIN)
+        }
+        this.setState({ pin: newPIN })
+      }
+    }
+  }
+
   render() {
     const { pin } = this.state
     return (
-      <Container>
+      <Container tabIndex={0} onKeyDown={this.keyDown} {...this.props}>
         <div>
           {new Array(pin.length).fill('').map((e, i) => (
             <DotFilled key={`dot-filled-${i}`} />
