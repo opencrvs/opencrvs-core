@@ -5,6 +5,7 @@ export interface IInvertSpinner {
   id: string
   baseColor?: string
   className?: string
+  size?: string
 }
 
 const styledSpinner = styled.div.attrs<IInvertSpinner>({})
@@ -12,8 +13,8 @@ const styledSpinner = styled.div.attrs<IInvertSpinner>({})
 const StyledSpinner = styledSpinner`
   font-size: 10px;
   text-indent: -9999em;
-  width: 6em;
-  height: 6em;
+  width: ${({ size }) => (size ? size : '6em')};
+  height: ${({ size }) => (size ? size : '6em')};
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.white};
   background: -moz-linear-gradient(left, ${({ theme }) =>
@@ -78,9 +79,14 @@ const StyledSpinner = styledSpinner`
 
 export class InvertSpinner extends React.Component<IInvertSpinner> {
   render() {
-    const { children, id, className, baseColor } = this.props
+    const { children, id, className, baseColor, size } = this.props
     return (
-      <StyledSpinner id={id} className={className} baseColor={baseColor}>
+      <StyledSpinner
+        id={id}
+        className={className}
+        baseColor={baseColor}
+        size={size}
+      >
         {children}
       </StyledSpinner>
     )
