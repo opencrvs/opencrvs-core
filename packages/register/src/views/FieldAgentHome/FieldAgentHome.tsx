@@ -100,11 +100,12 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   }
 `
 const FABContainer = styled.div`
-  position: absolute;
-  left: 85.33%;
-  right: 5.33%;
-  top: 85%;
-  bottom: 9.17%;
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -422,7 +423,7 @@ class FieldAgentHomeView extends React.Component<
                         {!parentQueryLoading && (
                           <Loader
                             id="require_updates_loader"
-                            marginPercent={35}
+                            marginPercent={20}
                             spinnerDiameter={60}
                             loadingText={intl.formatMessage(
                               messages.requireUpdatesLoading
