@@ -1027,13 +1027,11 @@ export const BENGALI_STATE: ILanguage = {
     'message.changeLanguage': 'OpenCRVS-এ যে ভাষা আপনি ব্যাবহার করতে চান',
     'button.apply': 'প্রয়োগ করুন',
     'register.fieldAgentHome.rejectedDays': '{text} প্রত্যাখ্যাত',
-    'register.fieldAgentHome.zeroUpdatesText':
-      'No applications require updates',
+    'register.fieldAgentHome.zeroUpdatesText': 'হালনাগাদের জন্য কোন আবেদন নেই',
     'register.fieldAgentHome.allUpdatesText':
-      'Great job! You have updated all applications',
+      'অভিনন্দন! আপনি সব আবেদন হালনাগাদ করেছেন',
     'register.fieldAgentHome.requireUpdatesLoading':
-      'Checking your applications',
-    'register.fieldAgentHome.queryError':
-      'An error occured while loading applications'
+      'আপনার  আবেদন চেক করা হচ্ছে ',
+    'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে '
   }
 }
