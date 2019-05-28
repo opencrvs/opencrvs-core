@@ -9,8 +9,8 @@ export interface IState {
 }
 
 interface IProps {
-  processing: number
-  total: number
+  processingText: string
+  outboxText: string
 }
 const NotificationBar = styled.div`
   padding: 8px 16px;
@@ -36,9 +36,9 @@ const ExpandableOverlay = styled.div.attrs<{ show: boolean }>({})`
 const Left = styled.span`
   display: flex;
   align-items: center;
-  & > svg {
-    margin: 16px;
-  }
+`
+const Text = styled.span`
+  margin-left: 16px;
 `
 
 export class ExpandableNotification extends React.Component<IProps, IState> {
@@ -54,6 +54,7 @@ export class ExpandableNotification extends React.Component<IProps, IState> {
     }))
   }
   render() {
+    const { processingText, outboxText, children } = this.props
     return (
       <>
         <NotificationBar onClick={this.handleClick}>
@@ -61,12 +62,12 @@ export class ExpandableNotification extends React.Component<IProps, IState> {
             {this.state.expand ? (
               <>
                 <Outbox />
-                <span>Outbox({this.props.total})</span>
+                <Text>{outboxText}</Text>
               </>
             ) : (
               <>
-                <Spinner id="InvertSpinner" size="24px" />
-                <span> {this.props.processing} application processing...</span>
+                <InvertSpinner id="InvertSpinner" size="24px" />
+                <Text>{processingText}</Text>
               </>
             )}
           </Left>
@@ -77,13 +78,9 @@ export class ExpandableNotification extends React.Component<IProps, IState> {
           />
         </NotificationBar>
         <ExpandableOverlay show={this.state.expand}>
-          {this.props.children}
+          {children}
         </ExpandableOverlay>
       </>
     )
   }
 }
-
-const Spinner = styled(InvertSpinner)`
-  margin-right: 16px;
-`
