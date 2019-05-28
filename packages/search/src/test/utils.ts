@@ -1,3 +1,5 @@
+import { IBirthCompositionBody } from 'src/elasticsearch/utils'
+
 export const mockBirthFhirBundle = {
   resourceType: 'Bundle',
   type: 'document',
@@ -1603,7 +1605,7 @@ export const mockDeathFhirBundleWithoutCompositionId = {
   }
 }
 
-export const mockComposition = {
+export const mockComposition: fhir.Composition = {
   identifier: {
     system: 'urn:ietf:rfc:3986',
     value: '{{urn_uuid}}'
@@ -1650,7 +1652,10 @@ export const mockComposition = {
         ],
         text: 'Child details'
       },
-      text: '',
+      text: {
+        status: '',
+        div: ''
+      },
       entry: [
         {
           reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
@@ -1672,7 +1677,10 @@ export const mockComposition = {
         ],
         text: "Mother's details"
       },
-      text: '',
+      text: {
+        status: '',
+        div: ''
+      },
       entry: [
         {
           reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
@@ -1691,7 +1699,10 @@ export const mockComposition = {
         ],
         text: "Father's details"
       },
-      text: '',
+      text: {
+        status: '',
+        div: ''
+      },
       entry: [
         {
           reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
@@ -1710,7 +1721,10 @@ export const mockComposition = {
         ],
         text: "Informant's details"
       },
-      text: '',
+      text: {
+        status: '',
+        div: ''
+      },
       entry: [
         {
           reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
@@ -1729,7 +1743,10 @@ export const mockComposition = {
         ],
         text: 'Birth encounter'
       },
-      text: '',
+      text: {
+        status: '',
+        div: ''
+      },
       entry: [
         {
           reference: 'urn:uuid:xxx' // reference to Encounter resource contained below, the encounter may have zero or more observations attached to it
@@ -1748,7 +1765,10 @@ export const mockComposition = {
         ],
         text: 'Supporting documents'
       },
-      text: '',
+      text: {
+        status: '',
+        div: ''
+      },
       entry: [
         {
           reference: 'DocumentReference/xxx' // reference to a DocumentReference resource contained below
@@ -1806,7 +1826,7 @@ export const mockSearchResponse = {
   }
 }
 
-export const mockCompositionBody = {
+export const mockCompositionBody: IBirthCompositionBody = {
   childFirstNames: '',
   childFamilyName: 'sarkar',
   childFirstNamesLocal: 'test',

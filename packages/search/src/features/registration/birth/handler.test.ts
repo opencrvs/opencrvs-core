@@ -47,7 +47,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the event data is updated with task', async () => {
-      updateComposition.mockReturnValue({})
+      ;(updateComposition as jest.Mock).mockReturnValue({})
 
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
@@ -87,9 +87,9 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 500 when composition has no ID', async () => {
-      indexComposition.mockReturnValue({})
-      searchComposition.mockReturnValue(mockSearchResponse)
-      updateComposition.mockReturnValue({})
+      ;(indexComposition as jest.Mock).mockReturnValue({})
+      ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResponse)
+      ;(updateComposition as jest.Mock).mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse)],
         [JSON.stringify(mockCompositionEntry)],
@@ -115,9 +115,9 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchComposition.mockReturnValue(mockSearchResponse)
-      updateComposition.mockReturnValue({})
+      ;(indexComposition as jest.Mock).mockReturnValue({})
+      ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResponse)
+      ;(updateComposition as jest.Mock).mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse)],
         [JSON.stringify(mockCompositionEntry)],
