@@ -161,7 +161,7 @@ interface IFieldAgentHomeProps {
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   deleteApplication: typeof deleteApplication
-  applications: IApplication[]
+  applicationsReadyToSend: IApplication[]
 }
 
 interface IMatchParams {
@@ -184,31 +184,23 @@ const TAB_ID = {
 }
 class FieldAgentHomeView extends React.Component<FullProps, IState> {
   pageSize: number
-  sentForReviewCount: number
 
   constructor(props: FullProps) {
     super(props)
 
     this.pageSize = 10
     this.state = { sentForReviewPageNo: 1 }
-    this.sentForReviewCount = this.props.applications.filter(
-      application =>
-        application.submissionStatus !==
-        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-    ).length
   }
 
-  transformApplicationsSentForReview = () => {
-    if (!this.props.applications || this.props.applications.length <= 0) {
+  transformApplicationsReadyToSend = () => {
+    if (
+      !this.props.applicationsReadyToSend ||
+      this.props.applicationsReadyToSend.length <= 0
+    ) {
       return []
     }
-    return this.props.applications
-      .filter(
-        (application: IApplication) =>
-          application.submissionStatus !==
-          SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      )
-      .map((draft: IApplication, index) => {
+    return this.props.applicationsReadyToSend.map(
+      (draft: IApplication, index) => {
         let name
 
         if (draft.event && draft.event.toString() === 'birth') {
@@ -261,7 +253,8 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
           submission_status: statusText || '',
           status_indicator: icon ? [icon()] : null
         }
-      })
+      }
+    )
   }
 
   submissionStatusMap = (
@@ -281,31 +274,37 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
     let icon: () => React.ReactNode
     let statusText: string
     let overwriteStatusIfOffline: boolean = true
+    let iconId: string
 
     switch (status) {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
-        icon = () => <SmallSpinner id={`submitting${index}`} />
+        iconId = `submitting${index}`
+        icon = () => <SmallSpinner id={iconId} key={iconId} />
         statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
         overwriteStatusIfOffline = false
-        icon = () => <StatusSubmitted />
+        iconId = `submitted${index}`
+        icon = () => <StatusSubmitted id={iconId} key={iconId} />
         statusText = id || ''
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]:
         overwriteStatusIfOffline = false
-        icon = () => <StatusFailed />
+        iconId = `failed${index}`
+        icon = () => <StatusFailed id={iconId} key={iconId} />
         statusText = formatMessage(statusFailed)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
       default:
-        icon = () => <StatusWaiting />
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusReadyToSubmit)
         break
     }
 
     if (!online && overwriteStatusIfOffline) {
-      icon = () => <StatusPendingOffline />
+      iconId = `offline${index}`
+      icon = () => <StatusPendingOffline id={iconId} key={iconId} />
       statusText = formatMessage(statusPendingConnection)
     }
 
@@ -316,7 +315,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
   }
 
   componentDidMount() {
-    this.props.applications
+    this.props.applicationsReadyToSend
       .filter(
         (application: IApplication) =>
           application.submissionStatus ===
@@ -341,7 +340,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
   }
 
   render() {
-    const { userDetails, match, intl } = this.props
+    const { userDetails, match, intl, applicationsReadyToSend } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
     const isFieldAgent =
       userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
@@ -376,7 +375,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
                 }
               >
                 {intl.formatMessage(messages.sentForReview, {
-                  total: this.sentForReviewCount
+                  total: applicationsReadyToSend.length
                 })}
               </IconTab>
               <IconTab
@@ -397,7 +396,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
             {tabId === TAB_ID.sentForReview && (
               <BodyContent>
                 <GridTable
-                  content={this.transformApplicationsSentForReview()}
+                  content={this.transformApplicationsReadyToSend()}
                   columns={[
                     {
                       label: this.props.intl.formatMessage(
@@ -430,7 +429,9 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
                     }
                   ]}
                   noResultText={intl.formatMessage(messages.dataTableNoResults)}
-                  totalPages={this.sentForReviewCount}
+                  totalPages={
+                    applicationsReadyToSend && applicationsReadyToSend.length
+                  }
                   onPageChange={this.onPageChange}
                   pageSize={this.pageSize}
                 />
@@ -457,7 +458,11 @@ const mapStateToProps = (store: IStoreState) => {
   return {
     language: getLanguage(store),
     userDetails: getUserDetails(store),
-    applications: store.applicationsState.applications
+    applicationsReadyToSend: store.applicationsState.applications.filter(
+      (application: IApplication) =>
+        application.submissionStatus !==
+        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    )
   }
 }
 export const FieldAgentHome = connect(
