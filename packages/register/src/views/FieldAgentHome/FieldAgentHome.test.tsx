@@ -100,6 +100,7 @@ describe('when the home page loads for a field worker', () => {
 
     describe('when user is in sent for review tab', () => {
       let component: ReactWrapper
+
       beforeEach(() => {
         component = createTestComponent(
           // @ts-ignore
@@ -161,6 +162,23 @@ describe('when the home page loads for a field worker', () => {
         expect(component.find('#submitting1').hostNodes()).toHaveLength(1)
         expect(component.find('#submitted2').hostNodes()).toHaveLength(1)
         expect(component.find('#failed3').hostNodes()).toHaveLength(1)
+      })
+
+      it('when offline renders pending submission status', () => {
+        Object.defineProperty(window.navigator, 'onLine', { value: false })
+
+        const readyApplication = {
+          id: uuid(),
+          data: mockApplicationData,
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
+        }
+
+        store.dispatch(storeApplication(readyApplication))
+
+        component.update()
+
+        expect(component.find('#offline0').hostNodes()).toHaveLength(1)
       })
     })
   })
