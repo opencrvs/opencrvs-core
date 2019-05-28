@@ -997,6 +997,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.requireUpdates': 'হালনাগাদ প্রয়োজন ({total})',
     'register.registrarHome.updateButton': 'হালনাগাদ',
     'register.home.header.performanceTitle': 'কর্মদক্ষতা',
+    'register.registrarHome.notificationToast.processingText':
+      '{num} টি আবেদন প্রক্রিয়াধীন...',
+    'register.registrarHome.notificationToast.outboxText': 'আউটবক্স({num})',
     'settings.title': 'সেটিংস',
     'profile.title': 'প্রোফাইল',
     'security.title': 'নিরাপত্তা',

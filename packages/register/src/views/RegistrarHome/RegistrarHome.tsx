@@ -55,6 +55,7 @@ import styled, { withTheme } from 'styled-components'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
 import { sentenceCase } from 'src/utils/data-formatting'
+import NotificationToast from './NotificatoinToast'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -987,10 +988,12 @@ export class RegistrarHomeView extends React.Component<
             }}
           </Query>
         )}
+        <NotificationToast />
       </>
     )
   }
 }
+
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string }>

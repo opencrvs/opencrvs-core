@@ -998,6 +998,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.readyForReview': 'Ready for review',
     'register.registrarHome.sentForUpdates': 'Sent for updates',
     'register.registrarHome.action': 'Action',
+    'register.registrarHome.notificationToast.processingText':
+      '{num} application processing...',
+    'register.registrarHome.notificationToast.outboxText': 'Outbox({num})',
     'settings.title': 'Settings',
     'profile.title': 'Profile',
     'security.title': 'Security',
