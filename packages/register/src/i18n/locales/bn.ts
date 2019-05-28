@@ -1004,6 +1004,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.table.statusFailed': 'পাঠাতে ব্যর্থ',
     'register.fieldAgentHome.table.statusPendingConnection':
       'সংযোগের জন্য অপেক্ষা করছে',
+    'register.registrarHome.notificationToast.processingText':
+      '{num} টি আবেদন প্রক্রিয়াধীন...',
+    'register.registrarHome.notificationToast.outboxText': 'আউটবক্স({num})',
     'settings.title': 'সেটিংস',
     'profile.title': 'প্রোফাইল',
     'security.title': 'নিরাপত্তা',

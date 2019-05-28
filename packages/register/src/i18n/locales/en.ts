@@ -1004,6 +1004,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.fieldAgentHome.table.statusFailed': 'Failed to send',
     'register.fieldAgentHome.table.statusPendingConnection':
       'Pending connection',
+    'register.registrarHome.notificationToast.processingText':
+      '{num} application processing...',
+    'register.registrarHome.notificationToast.outboxText': 'Outbox({num})',
     'settings.title': 'Settings',
     'profile.title': 'Profile',
     'security.title': 'Security',
