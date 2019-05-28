@@ -3,6 +3,7 @@ import { readPoints } from '../../../influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
+import { mocked } from 'ts-jest/utils'
 
 jest.mock('../../../influxdb/client.ts')
 
@@ -49,7 +50,7 @@ describe('verify metrics handler', () => {
 
   it('returns ok for valid request', async () => {
     fetch.mockResponse(JSON.stringify(mockLocation))
-    readPoints.mockImplementation(() => {
+    mocked(readPoints).mockImplementation(() => {
       return [
         {
           total: 28334,
@@ -88,7 +89,7 @@ describe('verify metrics handler', () => {
 
   it('returns empty keyfigure if no matching data found', async () => {
     fetch.mockResponse(JSON.stringify(mockLocation))
-    readPoints.mockImplementation(() => {
+    mocked(readPoints).mockImplementation(() => {
       return null
     })
 

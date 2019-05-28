@@ -8,8 +8,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
-    "test": "jest --coverage && yarn test:compilation",
-    "test:watch": "jest --watch --coverage",
+    "test": "jest --silent && yarn test:compilation",
+    "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit"
@@ -44,12 +44,13 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.13",
     "cross-env": "^5.2.0",
-    "jest": "23.6.0",
+    "jest": "24.8.0",
     "jest-fetch-mock": "^1.7.4",
     "nodemon": "^1.17.5",
     "prettier": "^1.13.5",
-    "ts-jest": "^22.4.6",
+    "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1"
   },
   "lint-staged": {

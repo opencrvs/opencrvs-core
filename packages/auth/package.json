@@ -8,7 +8,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
     "start:prod": "ts-node src/index.ts",
-    "test": "jest --coverage && yarn test:compilation",
+    "test": "jest --silent && yarn test:compilation",
     "test:watch": "jest --watch",
     "precommit": "lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
@@ -43,15 +43,16 @@
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
+    "@types/jest": "^24.0.13",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "cross-env": "^5.2.0",
-    "jest": "23.6.0",
+    "jest": "24.8.0",
     "jest-fetch-mock": "^1.6.5",
     "nodemon": "^1.17.5",
     "prettier": "^1.15.2",
     "redis-mock": "^0.27.0",
-    "ts-jest": "^22.4.6",
+    "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1"
   },
   "lint-staged": {

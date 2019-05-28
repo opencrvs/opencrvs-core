@@ -1,6 +1,5 @@
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
-import * as redis from 'redis-mock'
 
 import { IDatabaseConnector } from '../src/database'
 
@@ -17,7 +16,7 @@ const mock: IDatabaseConnector = {
     const keyExists = !!database[key]
     delete database[key]
     return keyExists ? 1 : 0
-  } ,
+  },
   // tslint:disable-next-line no-empty
   start: () => {},
   // tslint:disable-next-line no-empty

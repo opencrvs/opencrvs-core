@@ -4,7 +4,6 @@ import {
   removeDuplicatesFromComposition
 } from './utils'
 import { mockFhirBundle, mockComposition } from '../../utils/testUtils'
-import * as fetch from 'jest-fetch-mock'
 import { ITemplatedBundle } from '../registration/fhir-builders'
 import { clone } from 'lodash'
 

@@ -973,7 +973,7 @@ describe('Registration type resolvers', () => {
       let error
       // @ts-ignore
       try {
-        const role = await typeResolvers.User.role(mockUser)
+        await typeResolvers.User.role(mockUser)
       } catch (e) {
         error = e
       }
@@ -990,7 +990,7 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns null when there is no user extension in task', async () => {
-      const mock = fetch.mockResponseOnce(JSON.stringify({}))
+      fetch.mockResponseOnce(JSON.stringify({}))
       // @ts-ignore
       const user = await typeResolvers.RegWorkflow.user({
         resourceType: 'Task',
@@ -1030,7 +1030,7 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns an array of duplicates', async () => {
-      const mock = fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
 
       // @ts-ignore
       const duplicates = await typeResolvers.Registration.duplicates(mockTask)

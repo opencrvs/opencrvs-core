@@ -21,7 +21,7 @@ describe('Notification root resolvers', () => {
       // @ts-ignore
       const result = await resolvers.Mutation.createNotification(
         {},
-        { createAt: new Date() }
+        { details: new Date() }
       )
 
       expect(result).toBeDefined()

@@ -24,7 +24,8 @@
     // `@types/react-native` to fake types for `react-primitives`.
     // React Native and Webpack both define a global `require`
     // differently, so there's a conflict.
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["jest"]
   },
   "exclude": [
     "node_modules",

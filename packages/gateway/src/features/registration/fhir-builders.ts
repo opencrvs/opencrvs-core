@@ -2449,6 +2449,7 @@ export async function updateFHIRTaskBundle(
 
 export interface ITemplatedComposition extends fhir.Composition {
   section: fhir.CompositionSection[]
+  [key: string]: any
 }
 
 export interface ICompositionBundleEntry extends fhir.BundleEntry {
