@@ -267,6 +267,7 @@ class FieldAgentHomeView extends React.Component<
         const deathReg = reg as GQLDeathEventSearchSet
         names = deathReg && (deathReg.deceasedName as GQLHumanName[])
       }
+      moment.locale(this.props.intl.locale)
       const daysOfRejection =
         reg.registration &&
         reg.registration.dateOfApplication &&
