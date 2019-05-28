@@ -414,7 +414,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
                       label: this.props.intl.formatMessage(
                         messages.submissionStatus
                       ),
-                      width: 37,
+                      width: 35,
                       key: 'submission_status',
                       color: getTheme(
                         window.config.COUNTRY,
@@ -423,7 +423,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
                     },
                     {
                       label: '',
-                      width: 3,
+                      width: 5,
                       alignment: ColumnContentAlignment.CENTER,
                       key: 'status_indicator'
                     }
@@ -434,6 +434,7 @@ class FieldAgentHomeView extends React.Component<FullProps, IState> {
                   }
                   onPageChange={this.onPageChange}
                   pageSize={this.pageSize}
+                  initialPage={this.state.sentForReviewPageNo}
                 />
               </BodyContent>
             )}
@@ -458,11 +459,14 @@ const mapStateToProps = (store: IStoreState) => {
   return {
     language: getLanguage(store),
     userDetails: getUserDetails(store),
-    applicationsReadyToSend: store.applicationsState.applications.filter(
-      (application: IApplication) =>
-        application.submissionStatus !==
-        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-    )
+    applicationsReadyToSend:
+      (store.applicationsState.applications &&
+        store.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus !==
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      []
   }
 }
 export const FieldAgentHome = connect(

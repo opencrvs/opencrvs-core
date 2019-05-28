@@ -46,7 +46,7 @@ const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   padding: 0 24px;
   display: flex;
   align-items: center;
-  min-height: 64px;
+  min-height: 56px;
 `
 
 const ContentWrapper = styled.span.attrs<{
