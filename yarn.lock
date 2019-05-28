@@ -1058,6 +1058,11 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
 
+"@types/mockingoose@^2.11.0":
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/@types/mockingoose/-/mockingoose-2.11.0.tgz#6d1dc5721873add45fbb84e1dddde2284c8fe1b4"
+  integrity sha512-o9JNtYctnzfCnvxFp+cyvE5PkevKVRiFt+jW3KFnEC8DC2B/igNuwhFyImJH1j9z3Fv5UeQovEAEhIgpI9wpMg==
+
 "@types/mongodb@*":
   version "3.1.22"
   resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.1.22.tgz#66f96c7acbf7135ce6295a8d6c26f1d97388a84b"
@@ -10006,6 +10011,11 @@ mkdirp@0.5.1, mkdirp@0.5.x, mkdirp@0.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+mockingoose@^2.13.0:
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/mockingoose/-/mockingoose-2.13.0.tgz#888838c31850953340f7490a02a8f190fea023ce"
+  integrity sha512-3G6nyNks+kot29NOAIm2eyUh+A7cgwoNHVhQcgOyXn/XLieXeJAM+wxHlvn9vfmaSCoQW975ptQxnr0dJCW8lg==
 
 modify-values@^1.0.0:
   version "1.0.1"

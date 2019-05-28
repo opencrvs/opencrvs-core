@@ -20,7 +20,7 @@ describe('Database connector', () => {
     const promise = start()
     await wait(1)
     expect(spy).toHaveBeenCalled()
-    jest.spyOn(mongoose, 'connect').mockResolvedValueOnce('hello!')
+    jest.spyOn(mongoose, 'connect').mockResolvedValueOnce(mongoose)
     await promise
   })
   it('attaches loggers to database events', async () => {
