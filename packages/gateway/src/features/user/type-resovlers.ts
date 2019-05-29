@@ -40,12 +40,10 @@ export const userTypeResolvers: GQLResolver = {
       )
     },
     async catchmentArea(userModel: IUserModelData, _, authHeader) {
-      return (
-        (userModel.catchmentAreaIds &&
-          userModel.catchmentAreaIds.map(async (areaId: string) => {
-            return await fetchFHIR(`/Location/${areaId}`, authHeader)
-          })) ||
-        []
+      return await Promise.all(
+        userModel.catchmentAreaIds.map((areaId: string) => {
+          return fetchFHIR(`/Location/${areaId}`, authHeader)
+        })
       )
     }
   }
