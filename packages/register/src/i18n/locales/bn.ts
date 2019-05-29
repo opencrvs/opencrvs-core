@@ -643,6 +643,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.searchInput.placeholder':
       'একটি রেকর্ডের অনুসন্ধান করুন',
     'register.registrarHome.searchButton': 'অনুসন্ধান',
+    'register.registrarHome.printButton': 'মুদ্রণ',
     'register.workQueue.selects.sort.item0': 'পুরোনো থেকে নতুন',
     'register.workQueue.selects.sort.item1': 'নতুন থেকে পুরোনো ',
     'register.workQueue.labels.statuses.all': 'সব অবস্থা',
@@ -679,6 +680,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'চলমান',
     'register.registrarHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
     'register.registrarHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
+    'register.registrarHome.readyToPrint': 'মুদ্রণের জন্য প্রস্তুত',
     'register.registrarHome.results.eventDate': 'ঘটনা তারিখ',
     'register.registrarHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
