@@ -12,9 +12,11 @@ import { withTheme } from 'styled-components'
 import { Button } from '@opencrvs/components/lib/buttons'
 import styled from 'src/styled-components'
 import { RouteComponentProps } from 'react-router'
+import { goToSysAdminHomeTab as goToSysAdminHomeTabAction } from 'src/navigation'
 
 const Tab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
+  outline: none;
   ${({ theme }) => theme.fonts.subtitleStyle};
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
 `
@@ -66,6 +68,7 @@ type IProps = {
   language: string
   userDetails: IUserDetails
   theme: ITheme
+  goToSysAdminHomeTab: typeof goToSysAdminHomeTabAction
 }
 
 interface IMatchParams {
@@ -76,7 +79,7 @@ type IFulProps = IProps & InjectedIntlProps & RouteComponentProps<IMatchParams>
 
 class SysAdminHomeView extends React.Component<IFulProps> {
   render() {
-    const { match, intl } = this.props
+    const { match, intl, goToSysAdminHomeTab } = this.props
     const tabId = match.params.tabId || TAB_ID.users
     return (
       <>
@@ -86,6 +89,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
             id={`tab_${TAB_ID.overView}`}
             key={TAB_ID.overView}
             active={tabId === TAB_ID.overView}
+            onClick={() => goToSysAdminHomeTab(TAB_ID.overView)}
           >
             {intl.formatMessage(messages.overviewTab)}
           </Tab>
@@ -93,6 +97,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
             id={`tab_${TAB_ID.offices}`}
             key={TAB_ID.offices}
             active={tabId === TAB_ID.offices}
+            onClick={() => goToSysAdminHomeTab(TAB_ID.offices)}
           >
             {intl.formatMessage(messages.officesTab)}
           </Tab>
@@ -100,6 +105,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
             id={`tab_${TAB_ID.users}`}
             key={TAB_ID.users}
             active={tabId === TAB_ID.users}
+            onClick={() => goToSysAdminHomeTab(TAB_ID.users)}
           >
             {intl.formatMessage(messages.usersTab)}
           </Tab>
@@ -107,6 +113,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
             id={`tab_${TAB_ID.devices}`}
             key={TAB_ID.devices}
             active={tabId === TAB_ID.devices}
+            onClick={() => goToSysAdminHomeTab(TAB_ID.devices)}
           >
             {intl.formatMessage(messages.devicesTab)}
           </Tab>
@@ -114,6 +121,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
             id={`tab_${TAB_ID.network}`}
             key={TAB_ID.network}
             active={tabId === TAB_ID.network}
+            onClick={() => goToSysAdminHomeTab(TAB_ID.network)}
           >
             {intl.formatMessage(messages.networkTab)}
           </Tab>
@@ -121,6 +129,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
             id={`tab_${TAB_ID.config}`}
             key={TAB_ID.config}
             active={tabId === TAB_ID.config}
+            onClick={() => goToSysAdminHomeTab(TAB_ID.config)}
           >
             {intl.formatMessage(messages.configTab)}
           </Tab>
@@ -136,6 +145,9 @@ const mapStateToProps = (store: IStoreState) => {
     userDetails: getUserDetails(store)
   }
 }
-export const SysAdminHome = connect(mapStateToProps)(
-  withTheme(injectIntl(SysAdminHomeView))
-)
+export const SysAdminHome = connect(
+  mapStateToProps,
+  {
+    goToSysAdminHomeTab: goToSysAdminHomeTabAction
+  }
+)(withTheme(injectIntl(SysAdminHomeView)))
