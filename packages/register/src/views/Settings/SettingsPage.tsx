@@ -230,7 +230,7 @@ interface IState {
 }
 
 class SettingsView extends React.Component<IProps, IState> {
-  languagePreference = this.props.userDetails.language || 'en'
+  languagePreference = this.props.userDetails.language
   constructor(props: IProps & IState) {
     super(props)
     this.state = {

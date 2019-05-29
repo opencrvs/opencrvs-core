@@ -14,8 +14,12 @@ import {
 } from 'src/offline/selectors'
 import { parse } from 'querystring'
 import { IURLParams } from '../utils/authUtils'
+import { storage } from 'src/storage'
 import { checkAuth } from '../profile/profileActions'
 import { showConfigurationErrorNotification } from '../notification/actions'
+import { changeLanguage } from 'src/i18n/actions'
+import { Ii18n } from 'src/type/i18n'
+import { USER_DETAILS } from 'src/utils/userUtils'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -87,6 +91,7 @@ interface IDispatchProps {
   setInitialApplications: () => void
   checkAuth: (urlValues: IURLParams) => void
   showConfigurationErrorNotification: () => void
+  changeLanguage: (values: Ii18n) => void
 }
 
 class Component extends React.Component<
@@ -112,10 +117,18 @@ class Component extends React.Component<
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const values = parse(this.props.location.search)
-    this.props.checkAuth(values)
+    await this.props.checkAuth(values)
     this.props.setInitialApplications()
+
+    const userDetails = JSON.parse(
+      (await storage.getItem(USER_DETAILS)) || '{}'
+    )
+
+    this.props.changeLanguage({
+      language: userDetails.language || window.config.LANGUAGE
+    })
   }
 
   render() {
@@ -149,7 +162,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
 const mapDispatchToProps = {
   setInitialApplications,
   checkAuth,
-  showConfigurationErrorNotification
+  showConfigurationErrorNotification,
+  changeLanguage
 }
 
 export const Page = withRouter(

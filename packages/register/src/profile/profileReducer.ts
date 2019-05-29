@@ -139,7 +139,7 @@ export const profileReducer: LoopReducer<
             Cmd.run(() => storeUserDetails(details)),
             Cmd.action(
               changeLanguageActions.changeLanguage({
-                language: details.language || 'en'
+                language: details.language
               })
             )
           ])
