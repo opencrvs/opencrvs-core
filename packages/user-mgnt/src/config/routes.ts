@@ -8,6 +8,7 @@ import getUserMobile, {
   responseSchema as resMobileSchema
 } from 'src/features/getUserMobile/handler'
 import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
+import getUser from 'src/features/getUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -80,6 +81,26 @@ export const getRoutes = () => {
           payload: searchSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/getUser',
+      handler: getUser,
+      config: {
+        tags: ['api'],
+        description: 'Retrieves a user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE
+          ]
+        },
+        validate: {
+          payload: userIdSchema
+        }
       }
     }
   ]

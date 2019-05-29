@@ -8,6 +8,8 @@ interface IVerifyPayload {
   mobile?: string
   role?: string
   active?: boolean
+  primaryOfficeId?: string
+  locationId?: string
   count: number
   skip: number
   sortOrder: string
@@ -22,6 +24,8 @@ export default async function searchUsers(
     mobile,
     role,
     active,
+    primaryOfficeId,
+    locationId,
     count,
     skip,
     sortOrder
@@ -35,6 +39,12 @@ export default async function searchUsers(
   }
   if (role) {
     criteria = { ...criteria, role }
+  }
+  if (primaryOfficeId) {
+    criteria = { ...criteria, primaryOfficeId }
+  }
+  if (locationId) {
+    criteria = { ...criteria, catchmentAreaIds: locationId }
   }
   if (active !== undefined) {
     criteria = { ...criteria, active }
@@ -58,6 +68,8 @@ export const searchSchema = Joi.object({
   mobile: Joi.string().optional(),
   role: Joi.string().optional(),
   active: Joi.boolean().optional(),
+  primaryOfficeId: Joi.string().optional(),
+  locationId: Joi.string().optional(),
   count: Joi.number()
     .min(0)
     .required(),
