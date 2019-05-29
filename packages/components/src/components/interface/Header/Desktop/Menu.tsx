@@ -15,7 +15,7 @@ interface IProps {
 
 const MenuContainer = styled.div`
   align-self: center;
-  margin: -2px 0 0 16px;
+  margin-left: 16px;
   display: flex;
 `
 

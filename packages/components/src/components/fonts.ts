@@ -75,8 +75,7 @@ export const fonts = (country: string, language: string): IFonts => ({
   };
     font-size: 14px;
     line-height: 21px;
-    font-weight: normal;
-    letter-spacing: 0.4px;`,
+    font-weight: normal;`,
   captionStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };

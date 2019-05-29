@@ -4,21 +4,26 @@ WORKDIR /usr/src/app
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
-# Install all dependencies of the current project.
+# Install npm dependencies first (so they may be cached if dependencies don't change)
 COPY package.json package.json
-# TODO yarn.lock is not being created locally when using yarn workspaces...
-# COPY yarn.lock yarn.lock
+COPY packages/notification/package.json packages/notification/package.json
+COPY packages/commons/package.json packages/commons/package.json
+COPY yarn.lock yarn.lock
 RUN yarn install
 
-# add project src files
-COPY . .
+# Copy package source
+COPY packages/notification packages/notification
+
+# Copy dependant package(s) source
+COPY packages/commons packages/commons
 
 # set environment
-ENV AUTH_PORT=2020
-ENV AUTH_HOST=0.0.0.0
+ENV PORT=2020
+ENV HOST=0.0.0.0
 # TODO change this for production
 ENV NODE_ENV=DEVELOPMENT
 
 EXPOSE 2020
+WORKDIR /usr/src/app/packages/notification
 
 CMD yarn start:prod

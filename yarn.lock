@@ -703,6 +703,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/json2csv@^4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@types/json2csv/-/json2csv-4.4.0.tgz#8e3b115a473ce4af4f850e194368059cc98e4f56"
+  integrity sha512-24S6hQGGsOZxTXbRyKvNaV5k882XTo9RX/LH6+RtVtimFNE2J0T/LWlru6BeEssByVA9/ZLif1PLk/8X8/qPCQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/json5@^0.0.29":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
@@ -786,6 +793,13 @@
 "@types/node-fetch@^2.1.2", "@types/node-fetch@^2.1.4":
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.1.6.tgz#4326288b49f352a142f03c63526ebce0f4c50877"
+  dependencies:
+    "@types/node" "*"
+
+"@types/node-fetch@^2.3.3":
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.3.3.tgz#eb9c2a0ce8e9424ebe0c0cbe6f1e8ea7576c1310"
+  integrity sha512-MIplfRxrDTsIbOLGyFqNWTmxho5Fs710Kul35tEcaqkx9He86mGbSCDvILL0LCMfmm+oJ8tDg51crE9+pJGgiQ==
   dependencies:
     "@types/node" "*"
 
@@ -2975,6 +2989,14 @@ catbox-memory@3.x.x:
   resolved "https://registry.yarnpkg.com/catbox-memory/-/catbox-memory-3.1.4.tgz#114fd6da3b2630a5db2ff246db9ff2226148c2b0"
   dependencies:
     big-time "2.x.x"
+    boom "7.x.x"
+    hoek "6.x.x"
+
+catbox-memory@4.x.x:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/catbox-memory/-/catbox-memory-4.0.1.tgz#3371ae0dd91bbf5d9dd88dcab5332470354cbd1f"
+  integrity sha512-ZmqNiLsYCIu9qvBJ/MQbznDV2bFH5gFiH67TgIJgSSffJFtTXArT+MM3AvJQlby9NSkLHOX4eH/uuUqnch/Ldw==
+  dependencies:
     boom "7.x.x"
     hoek "6.x.x"
 
@@ -6526,6 +6548,30 @@ hapi@^17.4.0, hapi@^17.5.1, hapi@^17.8.1:
     teamwork "3.x.x"
     topo "3.x.x"
 
+hapi@^18.1.0:
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/hapi/-/hapi-18.1.0.tgz#98a2a5a8f37a41eb196bdad9727f66b1fbca5fec"
+  integrity sha512-nSU1VLyTAgp7P5gy47QzJIP2JAb+wOFvJIV3gnL0lFj/mD+HuTXhyUsDYXjF/dhADMVXVEz31z6SUHBJhtsvGA==
+  dependencies:
+    accept "3.x.x"
+    ammo "3.x.x"
+    boom "7.x.x"
+    bounce "1.x.x"
+    call "5.x.x"
+    catbox "10.x.x"
+    catbox-memory "4.x.x"
+    heavy "6.x.x"
+    hoek "6.x.x"
+    joi "14.x.x"
+    mimos "4.x.x"
+    podium "3.x.x"
+    shot "4.x.x"
+    somever "2.x.x"
+    statehood "6.x.x"
+    subtext "6.x.x"
+    teamwork "3.x.x"
+    topo "3.x.x"
+
 hapijs-status-monitor@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/hapijs-status-monitor/-/hapijs-status-monitor-0.6.0.tgz#6462add3d925cacb5abe8158b81806b128b3a769"
@@ -7844,6 +7890,14 @@ jest-fetch-mock@^1.6.5, jest-fetch-mock@^1.6.6, jest-fetch-mock@^1.7.4:
 jest-fetch-mock@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/jest-fetch-mock/-/jest-fetch-mock-2.1.1.tgz#fa9c5fdd228fb0d073456658831ae89cec9543e6"
+  dependencies:
+    cross-fetch "^2.2.2"
+    promise-polyfill "^7.1.1"
+
+jest-fetch-mock@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/jest-fetch-mock/-/jest-fetch-mock-2.1.2.tgz#1260b347918e3931c4ec743ceaf60433da661bd0"
+  integrity sha512-tcSR4Lh2bWLe1+0w/IwvNxeDocMI/6yIA2bijZ0fyWxC4kQ18lckQ1n7Yd40NKuisGmcGBRFPandRXrW/ti/Bw==
   dependencies:
     cross-fetch "^2.2.2"
     promise-polyfill "^7.1.1"
@@ -9802,6 +9856,11 @@ node-fetch@^1.0.1:
 node-fetch@^2.1.2, node-fetch@^2.2.1, node-fetch@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
+
+node-fetch@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.5.0.tgz#8028c49fc1191bba56a07adc6e2a954644a48501"
+  integrity sha512-YuZKluhWGJwCcUu4RlZstdAxr8bFfOVHakc1mplwHkk8J+tqM1Y5yraYvIUpeX8aY7+crCwiELJq7Vl0o0LWXw==
 
 node-forge@0.7.5:
   version "0.7.5"
@@ -12083,10 +12142,6 @@ redent@^2.0.0:
 redis-commands@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/redis-commands/-/redis-commands-1.4.0.tgz#52f9cf99153efcce56a8f86af986bd04e988602f"
-
-redis-mock@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/redis-mock/-/redis-mock-0.27.0.tgz#a9de1650cf62146cafbc35a2e2f2fadc197828e0"
 
 redis-parser@^2.6.0:
   version "2.6.0"

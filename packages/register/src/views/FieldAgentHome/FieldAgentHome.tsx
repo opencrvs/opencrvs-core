@@ -39,6 +39,7 @@ import {
 import { sentenceCase } from 'src/utils/data-formatting'
 import styled from 'styled-components'
 import { IUserDetails } from '../../utils/userUtils'
+import { SentForReview } from './SentForReview'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -46,6 +47,7 @@ const Topbar = styled.div`
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
+  overflow-x: auto;
   justify-content: flex-start;
   align-items: center;
 `
@@ -55,6 +57,7 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
+  flex-shrink: 0;
   outline: none;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & > div {
@@ -78,7 +81,6 @@ const FABContainer = styled.div`
   top: 85%;
   bottom: 9.17%;
 `
-
 const messages = defineMessages({
   name: {
     id: 'register.registrarHome.listItemName',
@@ -258,6 +260,7 @@ interface IBaseFieldAgentHomeProps {
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToApplicationDetails: typeof goToApplicationDetails
+  applicationsReadyToSend: IApplication[]
 }
 
 interface IMatchParams {
@@ -384,7 +387,13 @@ class FieldAgentHomeView extends React.Component<
   }
 
   render() {
-    const { applications, userDetails, match, intl } = this.props
+    const {
+      applications,
+      userDetails,
+      match,
+      intl,
+      applicationsReadyToSend
+    } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
     const isFieldAgent =
       userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
@@ -419,7 +428,7 @@ class FieldAgentHomeView extends React.Component<
                 }
               >
                 {intl.formatMessage(messages.sentForReview, {
-                  total: 1
+                  total: applicationsReadyToSend.length
                 })}
               </IconTab>
               <IconTab
@@ -437,6 +446,11 @@ class FieldAgentHomeView extends React.Component<
                 })}
               </IconTab>
             </Topbar>
+            {tabId === TAB_ID.sentForReview && (
+              <SentForReview
+                applicationsReadyToSend={applicationsReadyToSend}
+              />
+            )}
             <FABContainer>
               <FloatingActionButton
                 id="new_event_declaration"
@@ -498,9 +512,18 @@ const mapStateToProps = (
     language: getLanguage(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'progress',
-    applications: state.applicationsState.applications
+    applications: state.applicationsState.applications,
+    applicationsReadyToSend:
+      (state.applicationsState.applications &&
+        state.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus !==
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      []
   }
 }
+
 export const FieldAgentHome = connect(
   mapStateToProps,
   {

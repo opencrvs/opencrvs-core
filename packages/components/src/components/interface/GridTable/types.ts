@@ -17,7 +17,13 @@ export interface IStatus {
 }
 
 export interface IDynamicValues {
-  [key: string]: string | IAction[] | Array<string | null> | IStatus[] | null
+  [key: string]:
+    | string
+    | IAction[]
+    | Array<string | null>
+    | IStatus[]
+    | React.ReactNode[]
+    | null
 }
 
 export interface IExpandedContentPreference {

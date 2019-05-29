@@ -33,9 +33,9 @@ coverage:
         paths:
           - packages/user-mgnt
         threshold: 0.5
-      validation:
+      commons:
         paths:
-          - packages/validation
+          - packages/commons
         threshold: 0.5
       workflow:
         paths:

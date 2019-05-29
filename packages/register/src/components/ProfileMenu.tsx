@@ -19,6 +19,7 @@ import { getLanguage } from 'src/i18n/selectors'
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { redirectToAuthentication } from 'src/profile/profileActions'
+import { goToSettings } from 'src/navigation'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -79,6 +80,7 @@ interface IProps {
   language: string
   userDetails: IUserDetails
   redirectToAuthentication: typeof redirectToAuthentication
+  goToSettings: typeof goToSettings
 }
 
 interface IState {
@@ -93,7 +95,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     items.push({
       icon: <SettingsBlack />,
       label: intl.formatMessage(messages.settings),
-      handler: () => alert('Settings')
+      handler: this.props.goToSettings
     })
     items.push({
       icon: <LogoutBlack />,
@@ -161,6 +163,7 @@ const mapStateToProps = (store: IStoreState) => {
 export const ProfileMenu = connect(
   mapStateToProps,
   {
-    redirectToAuthentication
+    redirectToAuthentication,
+    goToSettings
   }
 )(injectIntl(ProfileMenuComponent))

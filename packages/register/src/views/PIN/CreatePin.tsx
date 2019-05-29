@@ -6,6 +6,7 @@ import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import messages from './messages'
+import * as ReactDOM from 'react-dom'
 
 const Container = styled.div`
   display: flex;
@@ -51,6 +52,8 @@ const ErrorBox = styled.div`
 type IProps = InjectedIntlProps & { onComplete: () => void }
 
 class CreatePinComponent extends React.Component<IProps> {
+  pinKeyRef: any
+
   state = {
     pin: null,
     pinMatchError: false,
@@ -126,7 +129,11 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.pinMatchError)}
               </ErrorBox>
             )}
-            <PINKeypad pin="" onComplete={this.firstPINEntry} />
+            <PINKeypad
+              pin=""
+              ref={(elem: any) => (this.pinKeyRef = elem)}
+              onComplete={this.firstPINEntry}
+            />
           </>
         )}
         {pinHasSeqDigits && (
@@ -158,6 +165,7 @@ class CreatePinComponent extends React.Component<IProps> {
               {intl.formatMessage(messages.pinSameDigitsError)}
             </ErrorBox>
             <PINKeypad
+              ref={(elem: any) => (this.pinKeyRef = elem)}
               onComplete={this.firstPINEntry}
               key={refresher.toString()}
             />
@@ -171,11 +179,27 @@ class CreatePinComponent extends React.Component<IProps> {
             <DescriptionText id="description-text">
               {intl.formatMessage(messages.reEnterDescription)}
             </DescriptionText>
-            <PINKeypad onComplete={this.secondPINEntry} />
+
+            <PINKeypad
+              ref={(elem: any) => (this.pinKeyRef = elem)}
+              onComplete={this.secondPINEntry}
+            />
           </>
         )}
       </Container>
     )
+  }
+
+  componentDidUpdate = () => this.focusKeypad()
+
+  componentDidMount = () => this.focusKeypad()
+
+  focusKeypad = () => {
+    const node =
+      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
+    if (node) {
+      node.focus()
+    }
   }
 }
 
