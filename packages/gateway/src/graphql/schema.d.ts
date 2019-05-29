@@ -456,6 +456,7 @@ export interface GQLEventRegResultSet {
 export interface GQLRegistrationCount {
   declared?: number
   rejected?: number
+  accepted?: number
 }
 
 export interface GQLBirthRegistrationMetrics {
@@ -2112,6 +2113,7 @@ export interface EventRegResultSetToTotalItemsResolver<
 export interface GQLRegistrationCountTypeResolver<TParent = any> {
   declared?: RegistrationCountToDeclaredResolver<TParent>
   rejected?: RegistrationCountToRejectedResolver<TParent>
+  accepted?: RegistrationCountToAcceptedResolver<TParent>
 }
 
 export interface RegistrationCountToDeclaredResolver<
@@ -2122,6 +2124,13 @@ export interface RegistrationCountToDeclaredResolver<
 }
 
 export interface RegistrationCountToRejectedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationCountToAcceptedResolver<
   TParent = any,
   TResult = any
 > {
