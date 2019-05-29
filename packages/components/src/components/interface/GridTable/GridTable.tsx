@@ -9,16 +9,25 @@ export { IAction } from './types'
 
 const Wrapper = styled.div`
   width: 100%;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 24px 16px 0 16px;
+    width: calc(100% - 32px);
+  }
 `
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.captionStyle};
   margin: 60px 0 25px;
   padding: 0 25px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 const StyledBox = styled(Box)`
-  margin-top: 15px;
+  margin-top: 8px;
   padding: 7px 0px 0px 0px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -35,15 +44,21 @@ const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   width: 100%;
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
   padding: 0 24px;
+  display: flex;
+  align-items: center;
+  min-height: 56px;
 `
 
-const ContentWrapper = styled.span.attrs<{ width: number; alignment?: string }>(
-  {}
-)`
+const ContentWrapper = styled.span.attrs<{
+  width: number
+  alignment?: string
+  color?: string
+}>({})`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
+  ${({ color }) => color && `color: ${color};`}
 `
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
@@ -72,6 +87,7 @@ interface IGridPreference {
   key: string
   alignment?: ColumnContentAlignment
   isActionColumn?: boolean
+  color?: string
 }
 
 interface IGridTableProps {
@@ -243,6 +259,7 @@ export class GridTable extends React.Component<
                           key={indx}
                           width={preference.width}
                           alignment={preference.alignment}
+                          color={preference.color}
                         >
                           {item[preference.key] as string}
                         </ContentWrapper>
