@@ -818,19 +818,29 @@ describe('markBirthAsCertifiedHandler handler', () => {
       })
     )
     const testCertificateFhirBundle = cloneDeep(testFhirBundleWithIds)
-    testCertificateFhirBundle.entry[1].resource.identifier.push({
-      system: 'http://opencrvs.org/specs/id/birth-registration-number',
-      value: '12345678'
-    })
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCertificateFhirBundle,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
+    if (
+      testCertificateFhirBundle &&
+      testCertificateFhirBundle.entry &&
+      testCertificateFhirBundle.entry[1] &&
+      testCertificateFhirBundle.entry[1].resource &&
+      testCertificateFhirBundle.entry[1].resource.identifier
+    ) {
+      const identifiers = testCertificateFhirBundle.entry[1].resource
+        .identifier as fhir.Identifier[]
+      identifiers.push({
+        system: 'http://opencrvs.org/specs/id/birth-registration-number',
+        value: '12345678'
+      })
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testCertificateFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    }
   })
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
@@ -854,19 +864,29 @@ describe('markBirthAsCertifiedHandler handler', () => {
       })
     )
     const testCertificateFhirBundle = cloneDeep(testFhirBundleWithIdsForDeath)
-    testCertificateFhirBundle.entry[1].resource.identifier.push({
-      system: 'http://opencrvs.org/specs/id/death-registration-number',
-      value: '12345678'
-    })
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCertificateFhirBundle,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
+    if (
+      testCertificateFhirBundle &&
+      testCertificateFhirBundle.entry &&
+      testCertificateFhirBundle.entry[1] &&
+      testCertificateFhirBundle.entry[1].resource &&
+      testCertificateFhirBundle.entry[1].resource.identifier
+    ) {
+      const identifiers = testCertificateFhirBundle.entry[1].resource
+        .identifier as fhir.Identifier[]
+      identifiers.push({
+        system: 'http://opencrvs.org/specs/id/death-registration-number',
+        value: '12345678'
+      })
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testCertificateFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    }
   })
 })
 

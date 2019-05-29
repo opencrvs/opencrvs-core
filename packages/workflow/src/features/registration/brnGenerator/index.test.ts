@@ -122,22 +122,37 @@ describe('Verify generateBirthRegistrationNumber', () => {
       system: `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id`,
       value: birthTrackingId
     }
-    testFhirBundle.entry[1].resource.identifier.push(identifier)
-
-    const brn = await generateRegistrationNumber(
-      testFhirBundle.entry[1].resource,
-      practitioner
-    )
-    expect(brn).toBeDefined()
-    expect(brn).toMatch(
-      new RegExp(
-        `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+    if (
+      testFhirBundle &&
+      testFhirBundle.entry &&
+      testFhirBundle.entry[1] &&
+      testFhirBundle.entry[1].resource &&
+      testFhirBundle.entry[1].resource.identifier
+    ) {
+      const identifierArray = testFhirBundle.entry[1].resource
+        .identifier as fhir.Identifier[]
+      identifierArray.push(identifier)
+      const testTask = testFhirBundle.entry[1].resource as fhir.Task
+      const brn = await generateRegistrationNumber(testTask, practitioner)
+      expect(brn).toBeDefined()
+      expect(brn).toMatch(
+        new RegExp(
+          `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+        )
       )
-    )
+    }
   })
   it('Throws error for default BRN generator', async () => {
-    expect(
-      generateRegistrationNumber(testFhirBundle, practitioner, 'default')
-    ).rejects.toThrowError('Default BRN generator has not been impleted yet')
+    if (
+      testFhirBundle &&
+      testFhirBundle.entry &&
+      testFhirBundle.entry[1] &&
+      testFhirBundle.entry[1].resource
+    ) {
+      const testTask = testFhirBundle.entry[1].resource as fhir.Task
+      expect(
+        generateRegistrationNumber(testTask, practitioner, 'default')
+      ).rejects.toThrowError('Default BRN generator has not been impleted yet')
+    }
   })
 })

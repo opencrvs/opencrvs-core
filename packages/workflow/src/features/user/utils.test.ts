@@ -9,7 +9,6 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetch from 'jest-fetch-mock'
 import { logger } from '../../logger'
-import { testFhirBundle } from 'src/test/utils'
 
 describe('Verify getLoggedInPractitionerResource', () => {
   it('Returns Location properly', async () => {
@@ -122,7 +121,7 @@ describe('Verify getUserMobile', () => {
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    getUserMobile(testFhirBundle, { Authorization: 'bearer acd ' })
+    getUserMobile('XXX', { Authorization: 'bearer acd ' })
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to retrieve mobile for error : Error: Mock Error'
     )

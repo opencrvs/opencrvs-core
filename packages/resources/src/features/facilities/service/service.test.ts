@@ -1,6 +1,8 @@
 import { getFacilities } from './service'
 import * as fetch from 'jest-fetch-mock'
 
+const fetchAny = fetch as any
+
 const crvsOfficeBundle = JSON.stringify({
   resourceType: 'Bundle',
   id: '43801bd0-1f9b-4cc7-9eaa-624ead896de8',
@@ -270,8 +272,8 @@ const healthFacilityBundle = JSON.stringify({
 describe('facilities service', () => {
   describe('getFacilities()', () => {
     it('returns facilities in a simplified format', async () => {
-      fetch.once(crvsOfficeBundle)
-      fetch.once(healthFacilityBundle)
+      fetchAny.once(crvsOfficeBundle)
+      fetchAny.once(healthFacilityBundle)
       const facilities = await getFacilities()
       expect(facilities.data).toBeDefined()
       expect(facilities.data).toEqual({
@@ -311,7 +313,7 @@ describe('facilities service', () => {
     })
 
     it('throw an error when the fetch fails', async () => {
-      fetch.mockRejectOnce(new Error('boom'))
+      fetchAny.mockRejectOnce(new Error('boom'))
       expect(getFacilities()).rejects.toThrowError('boom')
     })
   })

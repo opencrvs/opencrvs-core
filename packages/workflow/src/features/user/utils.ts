@@ -147,7 +147,6 @@ export async function getPractitionerLocations(
   const roleResponse = await getFromFhir(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
-
   const roleEntry = roleResponse.entry[0].resource
   if (!roleEntry || !roleEntry.location) {
     throw new Error('PractitionerRole has no locations associated')
