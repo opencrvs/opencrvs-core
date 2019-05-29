@@ -169,6 +169,11 @@ const messages = defineMessages({
     defaultMessage: 'Ready to print',
     description: 'The title of ready to print tab'
   },
+  registrationNumber: {
+    id: 'register.registrarHome.registrationNumber',
+    defaultMessage: 'Registration no.',
+    description: 'The heading of registration no. column'
+  },
   FIELD_AGENT: {
     id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
@@ -223,6 +228,11 @@ const messages = defineMessages({
     id: 'register.registrarHome.results.updateDate',
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item'
+  },
+  listItemRegisteredDate: {
+    id: 'register.registrarHome.results.registeredDate',
+    defaultMessage: 'Application registered',
+    description: 'Label for date of registration in work queue list item'
   },
   listItemModificationDate: {
     id: 'register.registrarHome.results.modificationDate',
@@ -284,6 +294,7 @@ interface IBaseRegistrarHomeProps {
   gotoTab: typeof goToTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
+  goToPrintCertificate: typeof goToPrintCertificateAction
   tabId: string
   drafts: IApplication[]
 }
@@ -678,6 +689,7 @@ export class RegistrarHomeView extends React.Component<
 
     return data.listEventRegistrations.results.map(
       (reg: GQLEventRegistration) => {
+        console.log(reg)
         let names
         let contactPhoneNumber
         if (reg.registration && reg.registration.type === 'BIRTH') {
@@ -712,35 +724,8 @@ export class RegistrarHomeView extends React.Component<
         const actions = [] as IAction[]
         actions.push({
           label: this.props.intl.formatMessage(messages.print),
-          // tslint:disable-next-line: no-empty
-          handler: () => {}
+          handler: () => this.props.goToPrintCertificate(reg.id, reg.registration && reg.registration.type || 'BIRTH')
         })
-        // if (this.userHasRegisterScope()) {
-        //   if (
-        //     reg.registration &&
-        //     reg.registration.duplicates &&
-        //     reg.registration.duplicates.length > 0
-        //   ) {
-        //     actions.push({
-        //       label: this.props.intl.formatMessage(messages.reviewDuplicates),
-        //       handler: () => this.props.goToReviewDuplicate(reg.id)
-        //     })
-        //   } else {
-        //     actions.push({
-        //       label: this.props.intl.formatMessage(messages.update),
-        //       handler: () =>
-        //         this.props.gotoTab(
-        //           REVIEW_EVENT_PARENT_FORM_TAB,
-        //           reg.id,
-        //           'review',
-        //           (reg.registration &&
-        //             reg.registration.type &&
-        //             reg.registration.type.toLowerCase()) ||
-        //             ''
-        //         )
-        //     })
-        //   }
-        // }
         const lang = 'en'
         return {
           id: reg.id,
@@ -749,7 +734,7 @@ export class RegistrarHomeView extends React.Component<
             /* tslint:disable:no-string-literal */
             (names && (createNamesMap(names)['bn'] as string)) ||
             '',
-          date_of_rejection:
+          date_of_registration:
             reg.registration &&
             reg.registration.status &&
             reg.registration.status[0] &&
@@ -760,6 +745,8 @@ export class RegistrarHomeView extends React.Component<
               reg.registration.status[0].timestamp.toString(),
               'YYYY-MM-DD'
             ).fromNow(),
+            // TODO: fix the following line to assign the actual BRN/DRN
+            registrationNumber: (reg.registration && reg.registration.trackingId) || 'BRN/DRN',
           contact_number: contactPhoneNumber || '',
           event:
             (reg.registration &&
@@ -861,7 +848,7 @@ export class RegistrarHomeView extends React.Component<
               )
             }
 
-            console.log('DATA', data)
+            // console.log('DATA', data)
 
             return (
               <>
@@ -1194,6 +1181,8 @@ export class RegistrarHomeView extends React.Component<
                   </ErrorText>
                 )
               }
+              // const printData = this.transformPrintContent(data)
+              // console.log(printData)
               return (
                 <BodyContent>
                   <GridTable
@@ -1215,17 +1204,17 @@ export class RegistrarHomeView extends React.Component<
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemApplicantNumber
+                          messages.listItemRegisteredDate
                         ),
-                        width: 21,
-                        key: 'contact_number'
+                        width: 22,
+                        key: 'date_of_registration'
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemUpdateDate
+                          messages.registrationNumber
                         ),
-                        width: 22,
-                        key: 'date_of_rejection'
+                        width: 21,
+                        key: 'registrationNumber'
                       },
                       {
                         label: this.props.intl.formatMessage(
