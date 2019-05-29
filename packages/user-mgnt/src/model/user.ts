@@ -19,10 +19,19 @@ interface IUser {
   active: boolean
   creationDate: number
 }
+const UserNameSchema = new Schema(
+  {
+    use: String,
+    given: [String],
+    family: [String]
+  },
+  { _id: false }
+)
+
 export interface IUserModel extends IUser, Document {}
 
 const userSchema = new Schema({
-  name: [Schema.Types.Mixed],
+  name: [UserNameSchema],
   email: String,
   mobile: String,
   passwordHash: { type: String, required: true },
