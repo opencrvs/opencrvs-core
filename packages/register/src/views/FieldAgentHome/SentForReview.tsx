@@ -276,11 +276,11 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}
-          totalPages={applicationsReadyToSend && applicationsReadyToSend.length}
+          totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
-          initialPage={this.state.sentForReviewPageNo}
           clickable={true}
+          currentPage={this.state.sentForReviewPageNo}
         />
       </BodyContent>
     )

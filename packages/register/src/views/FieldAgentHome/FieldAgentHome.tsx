@@ -461,7 +461,8 @@ class FieldAgentHomeView extends React.Component<
                                   messages.listItemName
                                 ),
                                 width: 40,
-                                key: 'name'
+                                key: 'name',
+                                color: theme.colors.secondaryLabel
                               },
                               {
                                 label: this.props.intl.formatMessage(
@@ -476,7 +477,9 @@ class FieldAgentHomeView extends React.Component<
                               this.onPageChange(currentPage)
                             }}
                             pageSize={this.pageSize}
-                            totalItems={data.searchEvents.totalItems}
+                            totalItems={
+                              data.searchEvents && data.searchEvents.totalItems
+                            }
                             currentPage={this.state.requireUpdatesPage}
                             clickable={true}
                           />
