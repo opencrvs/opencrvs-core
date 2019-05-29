@@ -29,3 +29,6 @@ export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
 
 export const APPLICATION_DETAIL = '/details/:applicationId'
+
+export const SYS_ADMIN_HOME = '/sys-admin-home'
+export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
