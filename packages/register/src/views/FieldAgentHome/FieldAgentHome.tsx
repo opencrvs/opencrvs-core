@@ -476,10 +476,8 @@ class FieldAgentHomeView extends React.Component<
                               this.onPageChange(currentPage)
                             }}
                             pageSize={this.pageSize}
-                            totalPages={Math.ceil(
-                              data.searchEvents.totalItems / this.pageSize
-                            )}
-                            initialPage={this.state.requireUpdatesPage}
+                            totalItems={data.searchEvents.totalItems}
+                            currentPage={this.state.requireUpdatesPage}
                             clickable={true}
                           />
                         </BodyContent>

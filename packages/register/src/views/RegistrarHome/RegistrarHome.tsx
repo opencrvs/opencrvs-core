@@ -783,8 +783,8 @@ export class RegistrarHomeView extends React.Component<
                 this.onPageChange(currentPage)
               }}
               pageSize={this.pageSize}
-              totalPages={drafts && drafts.length}
-              initialPage={this.state.progressCurrentPage}
+              totalItems={drafts && drafts.length}
+              currentPage={this.state.progressCurrentPage}
             />
           </BodyContent>
         )}
@@ -884,11 +884,11 @@ export class RegistrarHomeView extends React.Component<
                       this.onPageChange(currentPage)
                     }}
                     pageSize={this.pageSize}
-                    totalPages={
+                    totalItems={
                       data.listEventRegistrations &&
                       data.listEventRegistrations.totalItems
                     }
-                    initialPage={this.state.reviewCurrentPage}
+                    currentPage={this.state.reviewCurrentPage}
                     expandable={true}
                   />
                 </BodyContent>
@@ -976,11 +976,11 @@ export class RegistrarHomeView extends React.Component<
                       this.onPageChange(currentPage)
                     }}
                     pageSize={this.pageSize}
-                    totalPages={
+                    totalItems={
                       data.listEventRegistrations &&
                       data.listEventRegistrations.totalItems
                     }
-                    initialPage={this.state.updatesCurrentPage}
+                    currentPage={this.state.updatesCurrentPage}
                     expandable={true}
                   />
                 </BodyContent>

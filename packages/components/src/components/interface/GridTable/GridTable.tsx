@@ -103,8 +103,8 @@ interface IGridTableProps {
   noResultText: string
   onPageChange?: (currentPage: number) => void
   pageSize?: number
-  totalPages?: number
-  initialPage?: number
+  totalItems: number
+  currentPage?: number
   expandable?: boolean
   clickable?: boolean
 }
@@ -116,7 +116,7 @@ interface IGridTableState {
 
 const defaultConfiguration = {
   pageSize: 10,
-  initialPage: 1
+  currentPage: 1
 }
 
 const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
@@ -232,15 +232,10 @@ export class GridTable extends React.Component<
       content,
       noResultText,
       pageSize = defaultConfiguration.pageSize,
-      initialPage = defaultConfiguration.initialPage
+      currentPage = defaultConfiguration.currentPage
     } = this.props
     const { width } = this.state
-    const totalPages = this.props.totalPages
-      ? this.props.totalPages
-      : getTotalPageNumber(
-          content.length,
-          this.props.pageSize || defaultConfiguration.pageSize
-        )
+    const totalItems = this.props.totalItems || 0
     return (
       <Wrapper>
         {content.length > 0 && width > grid.breakpoints.lg && (
@@ -256,7 +251,7 @@ export class GridTable extends React.Component<
             ))}
           </TableHeader>
         )}
-        {this.getDisplayItems(initialPage, pageSize, content).map(
+        {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
             const expanded = this.showExpandedSection(item.id as string)
             return (
@@ -315,10 +310,10 @@ export class GridTable extends React.Component<
           }
         )}
 
-        {totalPages > pageSize && (
+        {totalItems > pageSize && (
           <Pagination
-            initialPage={initialPage}
-            totalPages={Math.ceil(totalPages / pageSize)}
+            initialPage={currentPage}
+            totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}
