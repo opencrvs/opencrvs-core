@@ -4,7 +4,6 @@ import {
   FATHER_CODE,
   CHILD_CODE
 } from 'src/features/fhir/templates'
-import * as fetch from 'jest-fetch-mock'
 import {
   mockPatient,
   mockDocumentReference,
@@ -20,6 +19,9 @@ import {
   mockErrorComposition
 } from 'src/utils/testUtils'
 import { clone } from 'lodash'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()

@@ -1,5 +1,7 @@
 import { referenceApi } from './referenceApi'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 import * as nock from 'nock'
 

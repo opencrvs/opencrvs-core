@@ -7,8 +7,11 @@ import {
 } from './utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
 import { logger } from '../../logger'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify getLoggedInPractitionerResource', () => {
   it('Returns Location properly', async () => {

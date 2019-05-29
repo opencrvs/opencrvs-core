@@ -2,8 +2,10 @@ import { createServer } from '../../..'
 import { readPoints } from '../../../influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
 import { mocked } from 'ts-jest/utils'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 jest.mock('../../../influxdb/client.ts')
 

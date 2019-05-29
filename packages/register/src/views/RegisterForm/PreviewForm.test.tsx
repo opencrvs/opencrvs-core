@@ -21,13 +21,16 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
 import { Event } from 'src/forms'
 import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import * as CommonUtils from 'src/utils/commonUtils'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 interface IPersonDetails {
   [key: string]: any

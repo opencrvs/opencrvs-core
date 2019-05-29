@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs'
-import * as fetch from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
@@ -16,6 +15,10 @@ import {
   mockCompositionResponse,
   mockSearchResponse
 } from 'src/test/utils'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 jest.mock('src/elasticsearch/dbhelper.ts')
 

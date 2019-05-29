@@ -1,6 +1,8 @@
 import { logger } from '../../../logger'
-import * as fetch from 'jest-fetch-mock'
 import { getUserMobile, convertToLocal } from './'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
   it('gets mobile number exists', async () => {

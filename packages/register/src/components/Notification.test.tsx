@@ -10,11 +10,13 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
 import { storage } from 'src/storage'
 import * as actions from 'src/notification/actions'
 import * as i18nActions from 'src/i18n/actions'
 import * as CommonUtils from 'src/utils/commonUtils'
+
+const fetch = fetchAny as any
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()

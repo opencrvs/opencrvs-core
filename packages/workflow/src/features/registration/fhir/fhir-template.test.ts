@@ -1,4 +1,3 @@
-import * as fetch from 'jest-fetch-mock'
 import {
   selectOrCreateTaskRefResource,
   findPersonEntry,
@@ -7,6 +6,10 @@ import {
 import { OPENCRVS_SPECIFICATION_URL, MOTHER_SECTION_CODE } from './constants'
 import { testFhirBundle } from 'src/test/utils'
 import { cloneDeep } from 'lodash'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify fhir templates', () => {
   describe('SelectOrCreateTaskRefResource', () => {

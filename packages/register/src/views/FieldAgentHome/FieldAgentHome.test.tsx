@@ -14,10 +14,12 @@ import { History } from 'history'
 import { Store } from 'redux'
 import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
 import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
 import * as CommonUtils from 'src/utils/commonUtils'
 import { FIELD_AGENT_ROLE } from 'src/utils/constants'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()

@@ -1,7 +1,9 @@
 import { generateBirthRegPoint } from './pointGenerator'
-import * as fetch from 'jest-fetch-mock'
 import { testPayload } from './testUtils'
 import { cloneDeep } from 'lodash'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {

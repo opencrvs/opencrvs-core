@@ -11,7 +11,10 @@ import {
   testFhirTaskBundle
 } from 'src/test/utils'
 import { modifyTaskBundle } from './fhir-bundle-modifier'
-import * as fetch from 'jest-fetch-mock'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify handler', () => {
   it('modifyTaskBundle returns correct bundle', async () => {

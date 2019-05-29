@@ -6,9 +6,12 @@ import {
 } from './utils'
 import { setTrackingId } from './fhir/fhir-bundle-modifier'
 import { logger } from '../../logger'
-import * as fetch from 'jest-fetch-mock'
 import { testFhirBundle, testFhirBundleWithIdsForDeath } from 'src/test/utils'
 import { Events } from '../events/handler'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
   it('Generates proper birth tracking id successfully', async () => {

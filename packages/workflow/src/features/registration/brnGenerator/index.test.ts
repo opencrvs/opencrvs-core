@@ -1,7 +1,10 @@
 import { generateRegistrationNumber } from './index'
 import { testFhirBundle } from 'src/test/utils'
-import * as fetch from 'jest-fetch-mock'
 import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify generateBirthRegistrationNumber', () => {
   const practitioner = {

@@ -10,7 +10,10 @@ import {
 } from './fhir-utils'
 import { setTrackingId, pushRN } from './fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
-import * as fetch from 'jest-fetch-mock'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify getSharedContactMsisdn', () => {
   it('Returned shared contact number properly', async () => {

@@ -1,6 +1,5 @@
 import { typeResolvers } from 'src/features/registration/type-resovlers'
 import { DECEASED_CODE } from 'src/features/fhir/templates'
-import * as fetch from 'jest-fetch-mock'
 import {
   mockDeathComposition,
   mockPatient,
@@ -8,6 +7,9 @@ import {
   mockRelatedPerson,
   mockLocation
 } from 'src/utils/testUtils'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()

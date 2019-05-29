@@ -1,5 +1,7 @@
 import { searchTypeResolvers } from './type-resovlers'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()

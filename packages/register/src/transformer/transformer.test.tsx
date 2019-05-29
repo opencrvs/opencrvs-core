@@ -16,7 +16,6 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
 import { v4 as uuid } from 'uuid'
 import { draftToGqlTransformer } from 'src/transformer'
@@ -24,6 +23,9 @@ import { getRegisterForm } from '@opencrvs/register/src/forms/register/applicati
 import { getOfflineDataSuccess } from 'src/offline/actions'
 import { Event, IForm } from '@opencrvs/register/src/forms'
 import { clone } from 'lodash'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 interface IPersonDetails {
   [key: string]: any

@@ -1,7 +1,7 @@
 import { getLocations } from './service'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
 
-const fetchAny = fetch as any
+const fetch = fetchAny as any
 
 const locationBundle = JSON.stringify({
   resourceType: 'Bundle',
@@ -349,7 +349,7 @@ const locationBundle = JSON.stringify({
 describe('admin service', () => {
   describe('getLocations()', () => {
     it('returns locations in a simplified format', async () => {
-      fetchAny.once(locationBundle)
+      fetch.once(locationBundle)
       const locations = await getLocations()
       expect(locations.data).toBeDefined()
       expect(locations.data).toEqual({
@@ -397,7 +397,7 @@ describe('admin service', () => {
     })
 
     it('throw an error when the fetch fails', async () => {
-      fetchAny.mockRejectOnce(new Error('boom'))
+      fetch.mockRejectOnce(new Error('boom'))
       expect(getLocations()).rejects.toThrowError('boom')
     })
   })
