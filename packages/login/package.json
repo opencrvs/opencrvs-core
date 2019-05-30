@@ -20,7 +20,7 @@
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-redux": "next",
-    "react-scripts-ts": "2.16.0",
+    "react-scripts": "^3.0.1",
     "redux": "^4.0.1",
     "redux-form": "^7.4.2",
     "redux-loop": "^4.4.1",
@@ -29,15 +29,15 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "BROWSER=none PORT=3020 react-scripts-ts start",
-    "build": "react-scripts-ts build && yarn gen:sw",
+    "start": "BROWSER=none PORT=3020 react-scripts start",
+    "build": "react-scripts build && yarn gen:sw",
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test": "PORT=3020 react-scripts-ts test --env=jsdom --modulePaths=src/ --silent && yarn test:compilation",
+    "test": "PORT=3020 react-scripts test --env=jsdom --modulePaths=src/ && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "eject": "react-scripts-ts eject",
+    "eject": "react-scripts eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3020 build",
     "test:compilation": "tsc --noEmit"
@@ -91,5 +91,17 @@
       "html"
     ]
   },
-  "description": "The login application for OpenCRVS"
+  "description": "The login application for OpenCRVS",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

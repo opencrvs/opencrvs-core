@@ -40,7 +40,7 @@
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-redux": "next",
-    "react-scripts-ts": "2.16.0",
+    "react-scripts": "^3.0.1",
     "react-stickynode": "^2.0.1",
     "react-swipeable": "^4.3.0",
     "redux": "^4.0.1",
@@ -51,15 +51,15 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "BROWSER=none PORT=3000 react-scripts-ts start",
-    "build": "react-scripts-ts --max_old_space_size=4096 build && yarn gen:sw",
+    "start": "BROWSER=none PORT=3000 react-scripts start",
+    "build": "react-scripts --max_old_space_size=4096 build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test": "PORT=3000 react-scripts-ts test --env=jsdom --modulePaths=src/ --silent && yarn test:compilation",
-    "test:watch": "PORT=3000 react-scripts-ts test --env=jsdom --modulePaths=src/ --watch",
+    "test": "PORT=3000 react-scripts test --env=jsdom --modulePaths=src/ && yarn test:compilation",
+    "test:watch": "PORT=3000 react-scripts test --env=jsdom --modulePaths=src/ --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "eject": "react-scripts-ts eject",
+    "eject": "react-scripts eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
@@ -91,7 +91,7 @@
     "chalk": "^2.4.1",
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
-    "jest": "24.8.0",
+    "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
     "json2csv": "^4.3.2",
     "nock": "^10.0.6",
@@ -118,9 +118,18 @@
       "lcov",
       "text",
       "html"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
     ],
-    "moduleNameMapper": {
-      "^src(.*)$": "<rootDir>/src$1"
-    }
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

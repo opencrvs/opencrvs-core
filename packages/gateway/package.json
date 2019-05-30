@@ -63,7 +63,7 @@
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "graphql-schema-typescript": "^1.2.7",
-    "jest": "24.8.0",
+    "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
     "lab": "^15.1.2",
     "lab-transform-typescript": "^3.0.1",

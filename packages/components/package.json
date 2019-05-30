@@ -48,7 +48,6 @@
     "dotenv": "^6.1.0",
     "lint-staged": "^7.1.0",
     "prettier": "^1.15.2",
-    "react-scripts-ts": "^2.16.0",
     "rimraf": "^2.6.2",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",
