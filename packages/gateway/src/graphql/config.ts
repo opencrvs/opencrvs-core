@@ -10,6 +10,8 @@ import { typeResolvers } from 'src/features/registration/type-resovlers'
 import { resolvers as searchRootResolvers } from 'src/features/search/root-resolvers'
 import { searchTypeResolvers } from 'src/features/search/type-resovlers'
 import { userTypeResolvers } from 'src/features/user/type-resovlers'
+import { resolvers as roleRootResolvers } from 'src/features/role/root-resolvers'
+import { roleTypeResolvers } from 'src/features/role/type-resovlers'
 
 export const getExecutableSchema = (schemaPath: string) => {
   const typeDefs = importSchema(schemaPath)
@@ -26,7 +28,9 @@ export const getExecutableSchema = (schemaPath: string) => {
       metricsRootResolvers as IResolvers,
       typeResolvers as IResolvers,
       searchRootResolvers as IResolvers,
-      searchTypeResolvers as IResolvers
+      searchTypeResolvers as IResolvers,
+      roleRootResolvers as IResolvers,
+      roleTypeResolvers as IResolvers
     ]
   })
 }
