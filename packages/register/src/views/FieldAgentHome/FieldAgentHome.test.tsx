@@ -271,7 +271,7 @@ describe('when the home page loads for a field worker', () => {
           .find('#tab_review')
           .hostNodes()
           .text()
-      ).toContain('Sent for review (1)')
+      ).toContain('Sent for review (0)')
       expect(
         app
           .find('#tab_updates')
