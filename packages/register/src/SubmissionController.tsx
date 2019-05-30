@@ -1,3 +1,4 @@
+import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import {
@@ -8,66 +9,22 @@ import {
 import { Action, IForm } from './forms'
 import { getRegisterForm } from './forms/register/application-selectors'
 import { IStoreState } from './store'
-import {
-  MutationContext,
-  MutationProvider
-} from './views/DataProvider/MutationProvider'
-import { MutationCaller } from './views/DataProvider/MutationCaller'
-
-export const MUTATION_READY_TO_SUBMIT = 'mutation:readyToSubmit'
-const BROWSER_ONLINE = 'online'
-const BROWSER_VISIBILITY = 'visibilitychange'
-
-export const eventDispatcher = window.dispatchEvent
-
-export const MUTATION_READY_TO_SUBMIT_EVENT = new Event(
-  MUTATION_READY_TO_SUBMIT
-)
-
-interface IState {
-  callGQL: boolean
-}
+import { createClient } from './utils/apolloClient'
+import { getMutationMapping } from './views/DataProvider/MutationProvider'
 
 type DispatchProps = {
   modifyApplication: typeof modifyApplication
 }
 type IProp = {
+  client: ApolloClient<{}>
   applications: IApplication[]
   registerForms: Array<{ [key: string]: IForm }>
 }
 
 type FullProps = IProp & DispatchProps
-class SubmissionControllerElem extends React.Component<FullProps, IState> {
+class SubmissionControllerElem extends React.Component<FullProps> {
   constructor(prop: FullProps) {
     super(prop)
-    this.state = {
-      callGQL: false
-    }
-  }
-
-  componentDidMount = () => {
-    this.bindEventListener()
-  }
-
-  bindEventListener = () => {
-    window.addEventListener(MUTATION_READY_TO_SUBMIT, () => {
-      this.readyToSubmitHandler()
-    })
-    window.addEventListener(BROWSER_ONLINE, () => {
-      this.readyToSubmitHandler()
-    })
-    window.addEventListener(BROWSER_VISIBILITY, () => {
-      if (document.visibilityState === 'visible') {
-        this.readyToSubmitHandler()
-      }
-    })
-  }
-
-  readyToSubmitHandler = () => {
-    if (!navigator.onLine) {
-      return
-    }
-    this.setState({ callGQL: true })
   }
 
   onSuccess = (application: IApplication) => {
@@ -82,39 +39,31 @@ class SubmissionControllerElem extends React.Component<FullProps, IState> {
   }
 
   render() {
-    const { applications, registerForms } = this.props
-    const eligibleApplications = applications.filter(
+    const { applications, registerForms, client } = this.props
+    const application = applications.find(
       app => app.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT
     )
+    if (application && navigator.onLine.toString() === 'POK') {
+      console.log(application)
+      const result = getMutationMapping(
+        application.event,
+        Action.SUBMIT_FOR_REVIEW,
+        null,
+        registerForms[application.event],
+        application
+      )
+      const { mutation, variables } = result || {
+        mutation: null,
+        variables: null
+      }
 
-    return (
-      this.state.callGQL &&
-      (eligibleApplications.map((application: IApplication, key: number) => {
-        return (
-          application && (
-            <MutationProvider
-              key={key}
-              event={application.event}
-              form={registerForms[application.event]}
-              action={Action.SUBMIT_FOR_REVIEW}
-              application={application}
-              onCompleted={() => this.onSuccess(application)}
-              onError={() => this.onError(application)}
-            >
-              <MutationContext.Consumer>
-                {({ mutation, loading, data }) => {
-                  if (!loading && !data) {
-                    return <MutationCaller mutation={mutation} />
-                  }
-                  return null
-                }}
-              </MutationContext.Consumer>
-            </MutationProvider>
-          )
-        )
-      }) ||
-        null)
-    )
+      client
+        .mutate({ mutation, variables })
+        .then(() => this.onSuccess(application))
+        .catch(() => this.onError(application))
+    }
+
+    return null
   }
 }
 
@@ -130,6 +79,8 @@ const mapStateToProps = (store: IStoreState) => {
   }
 
   return {
+    // @ts-ignore
+    client: createClient(store),
     applications: store.applicationsState.applications || [],
     registerForms
   }
