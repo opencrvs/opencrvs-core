@@ -41,6 +41,7 @@ describe('createUser handler', () => {
 
   beforeEach(async () => {
     server = await createServer()
+    fetch.resetMocks()
   })
 
   it('creates and saves fhir resources and adds user using mongoose', async () => {
@@ -60,6 +61,94 @@ describe('createUser handler', () => {
       }
     })
 
+    const expectedPractitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ system: 'NID', value: '1234' }],
+      telecom: [
+        { system: 'phone', value: '+880123445568' },
+        { system: 'email', value: 'j.doe@gmail.com' }
+      ],
+      name: [{ use: 'en', given: ['John', 'William'], family: 'Doe' }]
+    }
+
+    const expectedPractitionerROle = {
+      resourceType: 'PractitionerRole',
+      practitioner: { reference: 'Practitioner/123' },
+      code: [
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/roles',
+              code: 'LOCAL_REGISTRAR'
+            }
+          ]
+        },
+        {
+          coding: [
+            { system: 'http://opencrvs.org/specs/types', code: 'SOME_TYPE' }
+          ]
+        }
+      ],
+      location: [{ reference: 'Location/321' }]
+    }
+
+    expect(fetch.mock.calls.length).toBe(2)
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
+      expectedPractitioner
+    )
+    expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual(
+      expectedPractitionerROle
+    )
+
+    expect(spy).toBeCalled()
     expect(res.statusCode).toBe(201)
+  })
+
+  it('return an error if practitioner id not returned', async () => {
+    fetch.mockResponseOnce('', { status: 201 })
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createUser',
+      payload: mockUser,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(fetch.mock.calls.length).toBe(1)
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('return an error if a fetch fails', async () => {
+    fetch.mockReject(new Error('boom'))
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createUser',
+      payload: mockUser,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(fetch.mock.calls.length).toBe(1)
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('return an error if a fetch return a error code', async () => {
+    fetch.mockResponseOnce('', { status: 404 })
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createUser',
+      payload: mockUser,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(fetch.mock.calls.length).toBe(1)
+    expect(res.statusCode).toBe(500)
   })
 })

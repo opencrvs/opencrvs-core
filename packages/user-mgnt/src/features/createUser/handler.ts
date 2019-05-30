@@ -22,12 +22,8 @@ export default async function createUser(
   const role = createFhirPractitionerRole(user, practitionerId)
   await postFhir('123', role)
 
-  console.log(practitioner, role)
-
   // save user in user-mgnt data store
   await User.create(user)
-
-  console.log('HERE?')
 
   return h.response().code(201)
 }
