@@ -6,7 +6,9 @@ import {
   validToken,
   getItem,
   flushPromises,
-  setItem
+  setItem,
+  createTestComponent,
+  mockApplicationData
 } from 'src/tests/util'
 import { FIELD_AGENT_HOME_TAB } from 'src/navigation/routes'
 import { ReactWrapper } from 'enzyme'
@@ -18,6 +20,11 @@ import * as fetch from 'jest-fetch-mock'
 import { storage } from 'src/storage'
 import * as CommonUtils from 'src/utils/commonUtils'
 import { FIELD_AGENT_ROLE } from 'src/utils/constants'
+import { FieldAgentHome } from './FieldAgentHome'
+import * as React from 'react'
+import { storeApplication, SUBMISSION_STATUS } from 'src/applications'
+import * as uuid from 'uuid'
+import { Event } from 'src/forms'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
@@ -88,6 +95,90 @@ describe('when the home page loads for a field worker', () => {
       })
       it('changes to new vital event screen', () => {
         expect(app.find('#select_birth_event').hostNodes()).toHaveLength(1)
+      })
+    })
+
+    describe('when user is in sent for review tab', () => {
+      let component: ReactWrapper
+
+      beforeEach(() => {
+        component = createTestComponent(
+          // @ts-ignore
+          <FieldAgentHome
+            match={{
+              params: {
+                tabId: 'review'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
+          store
+        ).component
+      })
+
+      it('renders no records text when no data in grid table', () => {
+        expect(component.find('#no-record').hostNodes()).toHaveLength(1)
+      })
+
+      it('when online renders submission status', () => {
+        const readyApplication = {
+          id: uuid(),
+          data: mockApplicationData,
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
+        }
+
+        const submittingApplication = {
+          id: uuid(),
+          data: mockApplicationData,
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]
+        }
+
+        const submittedApplication = {
+          id: uuid(),
+          data: mockApplicationData,
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+        }
+
+        const failedApplication = {
+          id: uuid(),
+          data: mockApplicationData,
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
+        }
+
+        store.dispatch(storeApplication(readyApplication))
+        store.dispatch(storeApplication(submittingApplication))
+        store.dispatch(storeApplication(submittedApplication))
+        store.dispatch(storeApplication(failedApplication))
+
+        component.update()
+
+        expect(component.find('#waiting0').hostNodes()).toHaveLength(1)
+        expect(component.find('#submitting1').hostNodes()).toHaveLength(1)
+        expect(component.find('#submitted2').hostNodes()).toHaveLength(1)
+        expect(component.find('#failed3').hostNodes()).toHaveLength(1)
+      })
+
+      it('when offline renders pending submission status', () => {
+        Object.defineProperty(window.navigator, 'onLine', { value: false })
+
+        const readyApplication = {
+          id: uuid(),
+          data: mockApplicationData,
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
+        }
+
+        store.dispatch(storeApplication(readyApplication))
+
+        component.update()
+
+        expect(component.find('#offline0').hostNodes()).toHaveLength(1)
       })
     })
   })

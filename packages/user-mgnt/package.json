@@ -10,6 +10,7 @@
     "start:prod": "ts-node src/index.ts",
     "test": "jest --coverage && yarn test:compilation",
     "test:watch": "jest --watch --coverage",
+    "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
     "populate": "ts-node resources/populate.ts",
     "test:compilation": "tsc --noEmit"
@@ -70,6 +71,12 @@
       "json",
       "node"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ]
   }
 }
