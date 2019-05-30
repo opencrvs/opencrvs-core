@@ -672,6 +672,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.labels.results.registrationNumber': 'নিবন্ধন নম্বর',
     'register.registrarHome.results.trackingId': 'ট্র্যাকিং আইডি',
     'register.searchResult.results.trackingId': 'ট্র্যাকিং আইডি',
+    'register.registrarHome.registrationNumber': 'নিবন্ধন নম্বর',
+    'register.registrarHome.results.registeredDate': 'নিবন্ধনের তারিখ',
     'register.registrarHome.results.applicationDate': 'আবেদন পাঠানো',
     'register.registrarHome.results.updateDate': 'পাঠানো',
     'register.registrarHome.results.modificationDate': 'শেষ সম্পাদনা',

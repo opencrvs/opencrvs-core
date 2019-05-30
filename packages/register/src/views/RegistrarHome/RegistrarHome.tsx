@@ -724,7 +724,11 @@ export class RegistrarHomeView extends React.Component<
         const actions = [] as IAction[]
         actions.push({
           label: this.props.intl.formatMessage(messages.print),
-          handler: () => this.props.goToPrintCertificate(reg.id, reg.registration && reg.registration.type || 'BIRTH')
+          handler: () =>
+            this.props.goToPrintCertificate(
+              reg.id,
+              (reg.registration && reg.registration.type) || 'BIRTH'
+            )
         })
         const lang = 'en'
         return {
@@ -745,8 +749,9 @@ export class RegistrarHomeView extends React.Component<
               reg.registration.status[0].timestamp.toString(),
               'YYYY-MM-DD'
             ).fromNow(),
-            // TODO: fix the following line to assign the actual BRN/DRN
-            registrationNumber: (reg.registration && reg.registration.trackingId) || 'BRN/DRN',
+          registrationNumber:
+            (reg.registration && reg.registration.registrationNumber) ||
+            'BRN/DRN',
           contact_number: contactPhoneNumber || '',
           event:
             (reg.registration &&
@@ -771,7 +776,6 @@ export class RegistrarHomeView extends React.Component<
                         ] as string)) ||
                       (status &&
                         status.user &&
-                        /* tslint:disable:no-string-literal */
                         (createNamesMap(status.user.name as GQLHumanName[])[
                           'default'
                         ] as string)) ||
@@ -848,8 +852,6 @@ export class RegistrarHomeView extends React.Component<
               )
             }
 
-            // console.log('DATA', data)
-
             return (
               <>
                 <Topbar>
@@ -903,7 +905,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyToPrint)} (
-                    {data.countEventRegistrations.rejected})
+                    {data.countEventRegistrations.registered})
                   </IconTab>
                 </Topbar>
               </>
@@ -1181,8 +1183,7 @@ export class RegistrarHomeView extends React.Component<
                   </ErrorText>
                 )
               }
-              // const printData = this.transformPrintContent(data)
-              // console.log(printData)
+
               return (
                 <BodyContent>
                   <GridTable

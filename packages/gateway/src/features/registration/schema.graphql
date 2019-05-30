@@ -338,7 +338,7 @@ type EventRegResultSet {
 type RegistrationCount {
   declared: Int
   rejected: Int
-  accepted: Int
+  registered: Int
 }
 
 type Query {

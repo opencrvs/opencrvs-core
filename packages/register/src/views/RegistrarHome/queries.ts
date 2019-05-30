@@ -5,6 +5,7 @@ export const COUNT_REGISTRATION_QUERY = gql`
     countEventRegistrations(locationIds: $locationIds) {
       declared
       rejected
+      registered
     }
   }
 `
@@ -22,6 +23,7 @@ export const FETCH_REGISTRATIONS_QUERY = gql`
         registration {
           type
           trackingId
+          registrationNumber
           contactPhoneNumber
           status {
             user {
