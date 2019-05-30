@@ -3,17 +3,21 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
 
-import { AUTH_HOST, AUTH_PORT, CERT_PUBLIC_KEY_PATH } from './constants'
+import {
+  AUTH_HOST,
+  AUTH_PORT,
+  CERT_PUBLIC_KEY_PATH
+} from '@user-mgnt/constants'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
-} from './features/verifyPassword/handler'
+} from '@user-mgnt/features/verifyPassword/handler'
 import getUserMobile, {
   requestSchema as userIdSchema,
   responseSchema as resMobileSchema
-} from './features/getUserMobile/handler'
-import getPlugins from './config/plugins'
-import * as database from './database'
+} from '@user-mgnt/features/getUserMobile/handler'
+import getPlugins from '@user-mgnt/config/plugins'
+import * as database from '@user-mgnt/database'
 import { readFileSync } from 'fs'
 
 const enum RouteScope {

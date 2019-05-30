@@ -3,11 +3,14 @@ import {
   generateDeathTrackingId,
   convertStringToASCII,
   sendEventNotification
-} from './utils'
-import { setTrackingId } from './fhir/fhir-bundle-modifier'
-import { logger } from '../../logger'
-import { testFhirBundle, testFhirBundleWithIdsForDeath } from 'src/test/utils'
-import { Events } from '../events/handler'
+} from '@workflow/features/registration/utils'
+import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { logger } from '@workflow/logger'
+import {
+  testFhirBundle,
+  testFhirBundleWithIdsForDeath
+} from '@workflow/test/utils'
+import { Events } from '@workflow/features/events/handler'
 
 import * as fetchAny from 'jest-fetch-mock'
 

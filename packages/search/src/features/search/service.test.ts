@@ -1,5 +1,5 @@
-import { searchComposition } from './service'
-import { client } from 'src/elasticsearch/client'
+import { searchComposition } from '@search/features/search/service'
+import { client } from '@search/elasticsearch/client'
 
 describe('elasticsearch db helper', async () => {
   it('should index a composition with proper configuration', async () => {

@@ -1,15 +1,18 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
-import { createServer } from 'src/index'
+import {
+  indexComposition,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
+import { createServer } from '@search/index'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockDeathRejectionTaskBundle,
   mockDeathRejectionTaskBundleWithoutCompositionReference
-} from 'src/test/utils'
+} from '@search/test/utils'
 
-jest.mock('src/elasticsearch/dbhelper.ts')
+jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('Verify handlers', () => {
   let server: any

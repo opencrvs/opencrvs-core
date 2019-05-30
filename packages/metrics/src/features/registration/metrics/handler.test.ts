@@ -1,5 +1,5 @@
-import { createServer } from '../../..'
-import { readPoints } from '../../../influxdb/client'
+import { createServer } from '@metrics/index'
+import { readPoints } from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { mocked } from 'ts-jest/utils'
@@ -7,7 +7,7 @@ import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
 
-jest.mock('../../../influxdb/client.ts')
+jest.mock('@metrics/influxdb/client.ts')
 
 const mockLocation = {
   resourceType: 'Location',

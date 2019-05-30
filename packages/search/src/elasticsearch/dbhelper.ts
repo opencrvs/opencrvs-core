@@ -1,6 +1,6 @@
-import { client } from 'src/elasticsearch/client'
-import { buildQuery, ICompositionBody } from 'src/elasticsearch/utils'
-import { logger } from 'src/logger'
+import { client } from '@search/elasticsearch/client'
+import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
+import { logger } from '@search/logger'
 
 export const indexComposition = async (
   compositionIdentifier: string,

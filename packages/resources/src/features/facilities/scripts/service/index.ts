@@ -1,7 +1,10 @@
 import { Response } from 'node-fetch'
-import { ORG_URL } from '../../../../constants'
-import { getLocationIDByDescription, sendToFhir } from '../../../utils/bn'
-import { ILocation } from '../../../utils/bn'
+import { ORG_URL } from '@resources/constants'
+import {
+  getLocationIDByDescription,
+  sendToFhir
+} from '@resources/features/utils/bn'
+import { ILocation } from '@resources/features/utils/bn'
 
 interface IDGHSFacility {
   division: string

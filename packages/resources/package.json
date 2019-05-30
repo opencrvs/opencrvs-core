@@ -6,24 +6,24 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
-    "test": "jest --silent && yarn test:compilation",
+    "test": "jest  --silent --noStackTrace && yarn test:compilation",
     "test:compilation": "tsc --noEmit",
-    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
-    "start:prod": "ts-node src/index.ts",
-    "save:locations": "ts-node src/features/administrative/scripts/assign-admin-structure-to-locations.ts",
-    "assign:geo-data": "ts-node src/features/administrative/scripts/assign-geodata-to-locations.ts",
-    "generate:csv": "ts-node src/features/administrative/scripts/generate-csv-files.ts",
-    "update:locations": "ts-node src/features/administrative/scripts/update-location-data.ts",
-    "prep:facilities": "ts-node src/features/facilities/scripts/prepare-source-facilities.ts",
-    "save:facilities": "ts-node src/features/facilities/scripts/assign-facilities-to-locations.ts",
-    "prep:employees": "ts-node src/features/employees/scripts/prepare-source-employees.ts",
-    "save:employees": "ts-node src/features/employees/scripts/assign-employees-to-practitioners.ts",
-    "save:testLocations": "ts-node src/tests/loadTestData.ts",
-    "save:testEmployees": "ts-node src/tests/loadTestEmployees.ts",
+    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
+    "save:locations": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/assign-admin-structure-to-locations.ts",
+    "assign:geo-data": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/assign-geodata-to-locations.ts",
+    "generate:csv": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/generate-csv-files.ts",
+    "update:locations": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/update-location-data.ts",
+    "prep:facilities": "ts-node -r tsconfig-paths/register src/features/facilities/scripts/prepare-source-facilities.ts",
+    "save:facilities": "ts-node -r tsconfig-paths/register src/features/facilities/scripts/assign-facilities-to-locations.ts",
+    "prep:employees": "ts-node -r tsconfig-paths/register src/features/employees/scripts/prepare-source-employees.ts",
+    "save:employees": "ts-node -r tsconfig-paths/register src/features/employees/scripts/assign-employees-to-practitioners.ts",
+    "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
+    "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts",
     "save:testData": "yarn prep:employees && yarn save:testLocations && yarn save:testEmployees",
-    "prep:statistics": "ts-node src/features/administrative/scripts/prepare-statistical-data.ts",
-    "save:statistics": "ts-node src/features/administrative/scripts/add-statistical-data.ts",
-    "update:statistics": "ts-node src/features/administrative/scripts/update-statistical-data.ts",
+    "prep:statistics": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/prepare-statistical-data.ts",
+    "save:statistics": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/add-statistical-data.ts",
+    "update:statistics": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/update-statistical-data.ts",
     "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations && yarn prep:facilities && yarn save:facilities && yarn prep:employees && yarn save:employees && yarn prep:statistics && yarn save:statistics && yarn update:statistics"
   },
   "devDependencies": {
@@ -58,7 +58,7 @@
   "dependencies": {
     "@types/chalk": "^2.2.0",
     "@types/hapi": "^17.8.2",
-    "@types/hapi-auth-jwt2": "^8.0.1",
+    "@types/hapi-auth-jwt2": "8.0.1",
     "@types/joi": "^14.0.0",
     "@types/lodash": "^4.14.117",
     "@types/uuid": "^3.4.4",
@@ -70,7 +70,7 @@
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.8.1",
-    "hapi-auth-jwt2": "^8.1.0",
+    "hapi-auth-jwt2": "8.1.0",
     "jest-fetch-mock": "^2.1.2",
     "joi": "^14.0.6",
     "lodash": "^4.17.11",
@@ -97,6 +97,9 @@
     "modulePaths": [
       "<rootDir>"
     ],
+    "moduleNameMapper": {
+      "@resources/(.*)": "<rootDir>/src/$1"
+    },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
       "./test/setupJest.ts"

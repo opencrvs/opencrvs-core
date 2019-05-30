@@ -1,4 +1,4 @@
-import { resolvers } from './root-resolvers'
+import { resolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

@@ -1,4 +1,4 @@
-import User from '../../model/user'
+import User from '@user-mgnt/model/user'
 import { createServer } from '../..'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'

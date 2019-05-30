@@ -2,11 +2,11 @@ import {
   indexComposition,
   updateComposition,
   searchComposition
-} from 'src/elasticsearch/dbhelper'
-import { mockCompositionBody } from 'src/test/utils'
-import { client } from 'src/elasticsearch/client'
-import { logger } from 'src/logger'
-import { IBirthCompositionBody } from 'src/elasticsearch/utils'
+} from '@search/elasticsearch/dbhelper'
+import { mockCompositionBody } from '@search/test/utils'
+import { client } from '@search/elasticsearch/client'
+import { logger } from '@search/logger'
+import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 
 describe('elasticsearch db helper', () => {
   beforeAll(() => {

@@ -1,6 +1,6 @@
-import { BRN_GENERATOR_CODE } from 'src/constants'
-import { generateBdRegistrationNumber } from './bdRegistrationNumberGenerator'
-import { generateDefaultRegistrationNumber } from './defaultRegistrationNumberGenerator'
+import { BRN_GENERATOR_CODE } from '@workflow/constants'
+import { generateBdRegistrationNumber } from '@workflow/features/registration/brnGenerator/bdRegistrationNumberGenerator'
+import { generateDefaultRegistrationNumber } from '@workflow/features/registration/brnGenerator/defaultRegistrationNumberGenerator'
 
 enum GENERATOR_CODE {
   BD = 'bd'

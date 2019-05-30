@@ -1,12 +1,12 @@
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle
-} from 'src/features/registration/fhir-builders'
+} from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   FHIR_OBSERVATION_CATEGORY_URL
-} from 'src/features/fhir/constants'
+} from '@gateway/features/fhir/constants'
 
 import {
   BIRTH_TYPE_CODE,
@@ -17,8 +17,8 @@ import {
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
-} from 'src/features/fhir/templates'
-import { EVENT_TYPE } from 'src/features/fhir/constants'
+} from '@gateway/features/fhir/templates'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(

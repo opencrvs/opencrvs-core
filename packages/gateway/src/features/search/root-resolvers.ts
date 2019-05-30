@@ -1,6 +1,6 @@
-import { GQLResolver } from 'src/graphql/schema'
-import { postSearch } from 'src/features/fhir/utils'
-import { ISearchCriteria } from './type-resovlers'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { postSearch } from '@gateway/features/fhir/utils'
+import { ISearchCriteria } from '@gateway/features/search/type-resovlers'
 
 export const resolvers: GQLResolver = {
   Query: {

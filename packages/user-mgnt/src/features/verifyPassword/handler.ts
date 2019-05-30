@@ -2,8 +2,8 @@ import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
 
-import User, { IUserModel } from 'src/model/user'
-import { generatePasswordHash } from 'src/utils/password'
+import User, { IUserModel } from '@user-mgnt/model/user'
+import { generatePasswordHash } from '@user-mgnt/utils/password'
 
 interface IVerifyPayload {
   mobile: string

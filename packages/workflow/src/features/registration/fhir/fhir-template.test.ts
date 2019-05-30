@@ -2,9 +2,12 @@ import {
   selectOrCreateTaskRefResource,
   findPersonEntry,
   getTaskResource
-} from './fhir-template'
-import { OPENCRVS_SPECIFICATION_URL, MOTHER_SECTION_CODE } from './constants'
-import { testFhirBundle } from 'src/test/utils'
+} from '@workflow/features/registration/fhir/fhir-template'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  MOTHER_SECTION_CODE
+} from '@workflow/features/registration/fhir/constants'
+import { testFhirBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'

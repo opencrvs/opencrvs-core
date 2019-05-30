@@ -2,7 +2,7 @@ import {
   findCompositionSection,
   findExtension,
   fetchFHIR
-} from 'src/features/fhir/utils'
+} from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
   FATHER_CODE,
@@ -24,15 +24,15 @@ import {
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
   CERTIFICATE_DOCS_CODE
-} from 'src/features/fhir/templates'
-import { GQLResolver } from 'src/graphql/schema'
+} from '@gateway/features/fhir/templates'
+import { GQLResolver } from '@gateway/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL
-} from 'src/features/fhir/constants'
-import { ITemplatedComposition } from './fhir-builders'
+} from '@gateway/features/fhir/constants'
+import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {

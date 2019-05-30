@@ -1,4 +1,4 @@
-import { readPoints } from 'src/influxdb/client'
+import { readPoints } from '@metrics/influxdb/client'
 import {
   ageIntervals,
   calculateInterval,
@@ -6,7 +6,7 @@ import {
   fetchEstimateByLocation,
   IPoint,
   LABEL_FOMRAT
-} from 'src/features/registration/metrics/utils'
+} from '@metrics/features/registration/metrics/utils'
 import * as moment from 'moment'
 import { IAuthHeader } from '..'
 import {
@@ -15,7 +15,7 @@ import {
   WITHIN_45_DAYS,
   WITHIN_45_DAYS_TO_1_YEAR,
   WITHIN_1_YEAR
-} from './constants'
+} from '@metrics/features/registration/metrics/constants'
 
 interface IGroupedByGender {
   total: number

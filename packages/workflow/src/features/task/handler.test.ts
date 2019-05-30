@@ -11,7 +11,7 @@ import {
   officeMock,
   testFhirTaskBundle,
   testFhirBundleWithIdsForDeath
-} from '../../test/utils'
+} from '@workflow/test/utils'
 
 import * as fetchAny from 'jest-fetch-mock'
 

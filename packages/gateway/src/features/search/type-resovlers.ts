@@ -1,4 +1,4 @@
-import { GQLResolver } from 'src/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 interface ISearchEventDataTemplate {
   _type: string

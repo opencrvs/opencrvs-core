@@ -1,5 +1,5 @@
-import { logger } from 'src/logger'
-import { sendSMS } from './service'
+import { logger } from '@notification/logger'
+import { sendSMS } from '@notification/features/sms/service'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

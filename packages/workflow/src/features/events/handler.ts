@@ -3,19 +3,19 @@ import {
   createRegistrationHandler,
   markEventAsRegisteredHandler,
   markEventAsCertifiedHandler
-} from '../registration/handler'
+} from '@workflow/features/registration/handler'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber
-} from '../registration/fhir/fhir-utils'
-import updateTaskHandler from '../task/handler'
-import { HEARTH_URL, OPENHIM_URL } from 'src/constants'
+} from '@workflow/features/registration/fhir/fhir-utils'
+import updateTaskHandler from '@workflow/features/task/handler'
+import { HEARTH_URL, OPENHIM_URL } from '@workflow/constants'
 import fetch, { RequestInit } from 'node-fetch'
-import { logger } from 'src/logger'
-import { isUserAuthorized } from './auth'
-import { EVENT_TYPE } from '../registration/fhir/constants'
-import { getEventType } from '../registration/utils'
-import { hasRegisterScope } from 'src/utils/authUtils'
+import { logger } from '@workflow/logger'
+import { isUserAuthorized } from '@workflow/features/events/auth'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import { getEventType } from '@workflow/features/registration/utils'
+import { hasRegisterScope } from '@workflow/utils/authUtils'
 
 export enum Events {
   BIRTH_NEW_DEC = '/events/birth/new-declaration',

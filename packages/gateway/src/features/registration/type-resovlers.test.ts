@@ -1,9 +1,9 @@
-import { typeResolvers } from 'src/features/registration/type-resovlers'
+import { typeResolvers } from '@gateway/features/registration/type-resovlers'
 import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE
-} from 'src/features/fhir/templates'
+} from '@gateway/features/fhir/templates'
 import {
   mockPatient,
   mockDocumentReference,
@@ -17,7 +17,7 @@ import {
   mockCertificateComposition,
   mockCertificate,
   mockErrorComposition
-} from 'src/utils/testUtils'
+} from '@gateway/utils/testUtils'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 

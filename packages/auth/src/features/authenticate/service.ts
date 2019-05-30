@@ -4,12 +4,12 @@ import {
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
   CONFIG_TOKEN_EXPIRY_SECONDS
-} from 'src/constants'
+} from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
-import { get, set } from 'src/database'
+import { get, set } from '@auth/database'
 import * as t from 'io-ts'
 import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 

@@ -1,4 +1,4 @@
-import { IFilter } from './types'
+import { IFilter } from '@search/features/search/types'
 const SEARCHABLE_FIELDS = [
   'childFirstNames',
   'childFamilyName',

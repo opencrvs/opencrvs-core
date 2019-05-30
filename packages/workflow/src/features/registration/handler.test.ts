@@ -16,7 +16,7 @@ import {
   motherMock,
   compositionMock,
   testDeathFhirBundle
-} from '../../test/utils'
+} from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'

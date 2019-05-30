@@ -1,8 +1,8 @@
-import { detectDuplicates, buildQuery } from 'src/elasticsearch/utils'
-import { mockSearchResponse, mockCompositionBody } from 'src/test/utils'
-import { searchComposition } from 'src/elasticsearch/dbhelper'
+import { detectDuplicates, buildQuery } from '@search/elasticsearch/utils'
+import { mockSearchResponse, mockCompositionBody } from '@search/test/utils'
+import { searchComposition } from '@search/elasticsearch/dbhelper'
 
-jest.mock('src/elasticsearch/dbhelper.ts')
+jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('elastic search utils', () => {
   it('should return an array of duplicate identifiers for a composition', async () => {

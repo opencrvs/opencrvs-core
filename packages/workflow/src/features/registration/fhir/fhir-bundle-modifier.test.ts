@@ -6,8 +6,11 @@ import {
   setupLastRegUser,
   setupLastRegLocation,
   setupAuthorOnNotes
-} from './fhir-bundle-modifier'
-import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
 import {
   testFhirBundle,
   testDeathFhirBundle,
@@ -17,7 +20,7 @@ import {
   upazilaMock,
   unionMock,
   officeMock
-} from '../../../test/utils'
+} from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'

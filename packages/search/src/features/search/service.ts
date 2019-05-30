@@ -1,6 +1,6 @@
-import { client } from 'src/elasticsearch/client'
-import { ISearchQuery, SortOrder } from './types'
-import { queryBuilder, EMPTY_STRING } from './utils'
+import { client } from '@search/elasticsearch/client'
+import { ISearchQuery, SortOrder } from '@search/features/search/types'
+import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'

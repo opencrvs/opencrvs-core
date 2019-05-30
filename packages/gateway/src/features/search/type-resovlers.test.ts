@@ -1,4 +1,4 @@
-import { searchTypeResolvers } from './type-resovlers'
+import { searchTypeResolvers } from '@gateway/features/search/type-resovlers'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

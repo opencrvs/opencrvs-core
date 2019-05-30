@@ -1,5 +1,5 @@
-import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
-import { EVENT_TYPE } from 'src/features/fhir/constants'
+import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(

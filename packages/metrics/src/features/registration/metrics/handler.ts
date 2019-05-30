@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
 import { regByAge, regWithin45d, fetchKeyFigures } from './metricsGenerator'
-import { logger } from 'src/logger'
+import { logger } from '@metrics/logger'
 import { internal } from 'boom'
 import { TIME_FROM, TIME_TO, LOCATION_ID } from './constants'
 import { IAuthHeader } from '..'

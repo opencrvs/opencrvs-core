@@ -1,6 +1,6 @@
-import { generateRegistrationNumber } from './index'
-import { testFhirBundle } from 'src/test/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
+import { generateRegistrationNumber } from '@workflow/features/registration/brnGenerator/index'
+import { testFhirBundle } from '@workflow/test/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 
 import * as fetchAny from 'jest-fetch-mock'
 

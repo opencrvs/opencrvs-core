@@ -8,8 +8,8 @@ import {
   getSectionBySectionCode,
   getRegLastLocation,
   fetchParentLocationByLocationID
-} from './fhirUtils'
-import { getAgeInDays } from './utils'
+} from '@metrics/features/registration/fhirUtils'
+import { getAgeInDays } from '@metrics/features/registration/utils'
 
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,

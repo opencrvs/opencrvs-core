@@ -2,11 +2,11 @@
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as DotEnv from 'dotenv'
-import { getPlugins } from 'src/config/plugins'
-import { getServer } from 'src/config/server'
-import { getLogger } from 'src/utils/logger'
-import { getRoutes } from 'src/config/routes'
-import { CERT_PUBLIC_KEY_PATH } from 'src/constants'
+import { getPlugins } from '@gateway/config/plugins'
+import { getServer } from '@gateway/config/server'
+import { getLogger } from '@gateway/utils/logger'
+import { getRoutes } from '@gateway/config/routes'
+import { CERT_PUBLIC_KEY_PATH } from '@gateway/constants'
 import { readFileSync } from 'fs'
 
 DotEnv.config({

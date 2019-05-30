@@ -6,9 +6,9 @@
   "license": "NONE",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
-    "start:prod": "ts-node src/index.ts",
-    "test": "jest --silent && yarn test:compilation",
+    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
+    "test": "jest --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "precommit": "lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
@@ -53,7 +53,8 @@
     "prettier": "^1.15.2",
     "redis-mock": "^0.27.0",
     "ts-jest": "^24.0.2",
-    "ts-node": "^6.1.1"
+    "ts-node": "^6.1.1",
+    "tsconfig-paths": "^3.8.0"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
@@ -74,6 +75,9 @@
     "modulePaths": [
       "<rootDir>"
     ],
+    "moduleNameMapper": {
+      "@auth/(.*)": "<rootDir>/src/$1"
+    },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
       "./test/setupJest.ts"

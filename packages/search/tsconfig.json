@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
-    "paths": {
-      "src/*": ["./src/*"]
-    },
+    "baseUrl": "./src",
+    "paths": { "@search/*": ["./*"] },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",

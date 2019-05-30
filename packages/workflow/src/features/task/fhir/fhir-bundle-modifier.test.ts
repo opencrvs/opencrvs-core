@@ -9,8 +9,8 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle
-} from 'src/test/utils'
-import { modifyTaskBundle } from './fhir-bundle-modifier'
+} from '@workflow/test/utils'
+import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
 
 import * as fetchAny from 'jest-fetch-mock'
 

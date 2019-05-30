@@ -1,4 +1,4 @@
-import { resolvers } from './root-resolvers'
+import { resolvers } from '@gateway/features/registration/root-resolvers'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 

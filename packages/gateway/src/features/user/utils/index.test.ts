@@ -1,5 +1,5 @@
-import { logger } from '../../../logger'
-import { getUserMobile, convertToLocal } from './'
+import { logger } from '@gateway/logger'
+import { getUserMobile, convertToLocal } from '@gateway/features/user/utils/'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

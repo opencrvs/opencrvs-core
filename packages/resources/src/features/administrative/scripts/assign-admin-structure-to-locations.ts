@@ -2,11 +2,11 @@ import {
   fetchAndComposeLocations,
   getLocationsByParentDivisions,
   generateLocationResource
-} from './service'
+} from '@resources/features/administrative/scripts/service'
 import chalk from 'chalk'
 import * as fs from 'fs'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
-import { ILocation } from 'src/features/utils/bn'
+import { ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
+import { ILocation } from '@resources/features/utils/bn'
 
 export default async function importAdminStructure() {
   let divisions: fhir.Location[]

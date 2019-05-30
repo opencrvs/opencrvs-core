@@ -1,4 +1,4 @@
-import { testFhirBundle, testFhirTaskBundle } from 'src/test/utils'
+import { testFhirBundle, testFhirTaskBundle } from '@workflow/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
@@ -7,8 +7,11 @@ import {
   getBirthRegistrationNumber,
   getRegStatusCode,
   getPaperFormID
-} from './fhir-utils'
-import { setTrackingId, pushRN } from './fhir-bundle-modifier'
+} from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  setTrackingId,
+  pushRN
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'

@@ -1,4 +1,4 @@
-import User from '../../model/user'
+import User from '@user-mgnt/model/user'
 import { createServer } from '../..'
 import mockingoose from 'mockingoose'
 

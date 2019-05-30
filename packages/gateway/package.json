@@ -3,9 +3,9 @@
   "version": "1.0.0-alpha.6",
   "description": "OpenCRVS API Gateway with GraphQL",
   "scripts": {
-    "start": "concurrently \"nodemon --exec ts-node -- src/index.ts\" \"yarn gen:types:watch\"",
-    "start:prod": "ts-node src/index.ts",
-    "test": "jest --silent && yarn test:compilation",
+    "start": "concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\"",
+    "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
+    "test": "jest --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
@@ -17,7 +17,7 @@
   "dependencies": {
     "@types/glob": "^5.0.35",
     "@types/hapi": "^17.0.12",
-    "@types/hapi-auth-jwt2": "^8.0.1",
+    "@types/hapi-auth-jwt2": "8.0.1",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
     "@types/node-fetch": "^2.3.4",
@@ -35,7 +35,7 @@
     "graphql-import": "^0.5.2",
     "graphql-tools": "^3.0.1",
     "hapi": "^17.4.0",
-    "hapi-auth-jwt2": "^8.1.0",
+    "hapi-auth-jwt2": "8.1.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapijs-status-monitor": "^0.6.0",
     "joi": "^14.0.6",
@@ -74,6 +74,7 @@
     "pretty-quick": "^1.4.1",
     "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1",
+    "tsconfig-paths": "^3.8.0",
     "tslint": "^5.4.3",
     "tslint-config-prettier": "^1.12.0",
     "typescript": "^3.0.1",
@@ -117,6 +118,9 @@
     "modulePaths": [
       "<rootDir>"
     ],
+    "moduleNameMapper": {
+      "@gateway/(.*)": "<rootDir>/src/$1"
+    },
     "coverageReporters": [
       "json",
       "lcov",

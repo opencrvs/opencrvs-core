@@ -1,4 +1,4 @@
-import { getLocations } from './service'
+import { getLocations } from '@resources/features/administrative/service/service'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

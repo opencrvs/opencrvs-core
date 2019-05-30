@@ -1,7 +1,10 @@
 import { v4 as uuid } from 'uuid'
-import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
-import { getFromFhir } from './fhir-utils'
-import { getEventType } from '../utils'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
+import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { getEventType } from '@workflow/features/registration/utils'
 
 export const INFORMANT_CODE = 'informant-details'
 

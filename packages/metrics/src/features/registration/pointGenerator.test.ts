@@ -1,5 +1,5 @@
-import { generateBirthRegPoint } from './pointGenerator'
-import { testPayload } from './testUtils'
+import { generateBirthRegPoint } from '@metrics/features/registration/pointGenerator'
+import { testPayload } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 

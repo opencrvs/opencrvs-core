@@ -1,8 +1,8 @@
 import {
   addDuplicatesToComposition,
   createDuplicatesTemplate
-} from 'src/features/fhir/fhir-utils'
-import { mockComposition } from 'src/test/utils'
+} from '@search/features/fhir/fhir-utils'
+import { mockComposition } from '@search/test/utils'
 
 describe('fhir utils', () => {
   it('should add duplicates to relatesTo property of compostion', () => {

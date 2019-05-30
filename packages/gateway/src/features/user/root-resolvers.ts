@@ -1,7 +1,7 @@
-import { COUNTRY } from 'src/constants'
-import { GQLResolver } from 'src/graphql/schema'
-import { fetchFHIR } from 'src/features/fhir/utils'
-import { getUserMobile, convertToLocal } from './utils'
+import { COUNTRY } from '@gateway/constants'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { getUserMobile, convertToLocal } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {

@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
-import { ADMIN_STRUCTURE_SOURCE, GEO_JSON_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE, GEO_JSON_SOURCE } from '@resources/constants'
 import { checkDuplicate, getFromFhir } from '../../utils/bn'
 import { Feature, GeoJsonProperties } from 'geojson'
 

@@ -1,4 +1,4 @@
-import { IBirthCompositionBody } from 'src/elasticsearch/utils'
+import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 
 export const mockBirthFhirBundle = {
   resourceType: 'Bundle',

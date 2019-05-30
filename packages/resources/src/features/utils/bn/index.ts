@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { FHIR_URL } from '../../../constants'
+import { FHIR_URL } from '@resources/constants'
 
 type ISupportedType =
   | fhir.Practitioner

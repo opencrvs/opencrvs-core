@@ -1,6 +1,6 @@
-import { searchComposition } from 'src/elasticsearch/dbhelper'
+import { searchComposition } from '@search/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
-import { MATCH_SCORE_THRESHOLD } from 'src/constants'
+import { MATCH_SCORE_THRESHOLD } from '@search/constants'
 
 export const enum EVENT {
   BIRTH = 'Birth',

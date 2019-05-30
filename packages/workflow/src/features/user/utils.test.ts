@@ -4,10 +4,10 @@ import {
   getLoggedInPractitionerPrimaryLocation,
   getPrimaryLocationFromLocationList,
   getPractitionerRef
-} from './utils'
+} from '@workflow/features/user/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { logger } from '../../logger'
+import { logger } from '@workflow/logger'
 
 import * as fetchAny from 'jest-fetch-mock'
 

@@ -1,13 +1,16 @@
 import * as moment from 'moment'
-import { IBirthKeyFigures, IEstimation } from './metricsGenerator'
+import {
+  IBirthKeyFigures,
+  IEstimation
+} from '@metrics/features/registration/metrics/metricsGenerator'
 import {
   MALE,
   FEMALE,
   OPENCRVS_SPECIFICATION_URL,
   CRUD_BIRTH_RATE_SEC,
   TOTAL_POPULATION_SEC
-} from './constants'
-import { fetchFHIR } from '../fhirUtils'
+} from '@metrics/features/registration/metrics/constants'
+import { fetchFHIR } from '@metrics/features/registration/fhirUtils'
 import { IAuthHeader } from '..'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'

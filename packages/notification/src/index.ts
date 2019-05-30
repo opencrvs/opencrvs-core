@@ -6,10 +6,10 @@ require('dotenv').config({
 // tslint:enable no-var-requires
 
 import * as Hapi from 'hapi'
-import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from './constants'
-import getPlugins from './config/plugins'
+import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from '@notification/constants'
+import getPlugins from '@notification/config/plugins'
 import { readFileSync } from 'fs'
-import getRoutes from './config/routes'
+import getRoutes from '@notification/config/routes'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

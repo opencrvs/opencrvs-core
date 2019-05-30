@@ -1,8 +1,12 @@
 import fetch, { Response } from 'node-fetch'
-import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '../../../../constants'
-import { sendToFhir, IOISFLocation, ILocation } from '../../../utils/bn'
+import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '@resources/constants'
+import {
+  sendToFhir,
+  IOISFLocation,
+  ILocation
+} from '@resources/features/utils/bn'
 import chalk from 'chalk'
-import { titleCase } from '../../../utils/bn'
+import { titleCase } from '@resources/features/utils/bn'
 
 const composeFhirLocation = (
   location: IOISFLocation,
@@ -130,8 +134,15 @@ export function generateLocationResource(
     fhirLocation.physicalType &&
     fhirLocation.physicalType.coding &&
     fhirLocation.physicalType.coding[0].display
-  loc.jurisdictionType =
-    fhirLocation.identifier && fhirLocation.identifier[2].value
+  if (
+    fhirLocation &&
+    fhirLocation.identifier &&
+    fhirLocation.identifier[2] &&
+    fhirLocation.identifier[2].value
+  ) {
+    loc.jurisdictionType =
+      fhirLocation.identifier && fhirLocation.identifier[2].value
+  }
   loc.type =
     fhirLocation.type &&
     fhirLocation.type.coding &&

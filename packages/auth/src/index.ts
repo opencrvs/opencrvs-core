@@ -7,26 +7,26 @@ require('dotenv').config({
 
 import * as Hapi from 'hapi'
 
-import { AUTH_HOST, AUTH_PORT } from './constants'
+import { AUTH_HOST, AUTH_PORT } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
-} from './features/authenticate/handler'
+} from '@auth/features/authenticate/handler'
 import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
   responseSchma as resVerifySchema
-} from './features/verifyCode/handler'
+} from '@auth/features/verifyCode/handler'
 import refreshTokenHandler, {
   requestSchema as reqRefreshSchema,
   responseSchma as resRefreshSchema
-} from './features/refresh/handler'
+} from '@auth/features/refresh/handler'
 import resendSmsHandler, {
   requestSchema as reqResendSmsSchema,
   responseSchma as resResendSmsSchema
-} from './features/resend/handler'
-import getPlugins from './config/plugins'
+} from '@auth/features/resend/handler'
+import getPlugins from '@auth/config/plugins'
 
-import * as database from './database'
+import * as database from '@auth/database'
 
 export async function createServer() {
   const server = new Hapi.Server({

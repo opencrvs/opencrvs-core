@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from 'src/index'
-import { searchComposition } from './service'
-import { mockSearchResult } from 'src/test/utils'
+import { createServer } from '@search/index'
+import { searchComposition } from '@search/features/search/service'
+import { mockSearchResult } from '@search/test/utils'
 
 jest.mock('./service.ts')
 

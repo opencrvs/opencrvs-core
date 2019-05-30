@@ -2,23 +2,29 @@ import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   getEventType
-} from '../utils'
-import { getRegStatusCode } from './fhir-utils'
+} from '@workflow/features/registration/utils'
+import { getRegStatusCode } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
   getPractitionerUnionLocation,
   getPractitionerRef
-} from 'src/features/user/utils'
-import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
-import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
-import { ITokenPayload, getTokenPayload } from 'src/utils/authUtils.ts'
+} from '@workflow/features/user/utils'
+import {
+  selectOrCreateTaskRefResource,
+  getTaskResource
+} from '@workflow/features/registration/fhir/fhir-template'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
+import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
 import {
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   REG_STATUS_CERTIFIED
-} from './constants'
-import { generateRegistrationNumber } from '../brnGenerator'
+} from '@workflow/features/registration/fhir/constants'
+import { generateRegistrationNumber } from '@workflow/features/registration/brnGenerator'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
