@@ -2,7 +2,6 @@ import User, { IUserModel } from '../../model/user'
 import { createServer } from '../..'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { DocumentQuery } from 'mongoose'
 
 let server: any
 

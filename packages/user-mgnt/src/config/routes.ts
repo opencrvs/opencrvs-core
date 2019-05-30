@@ -9,6 +9,7 @@ import getUserMobile, {
 } from 'src/features/getUserMobile/handler'
 import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
 import getUser from 'src/features/getUser/handler'
+import getRoles, { searchRoleSchema } from 'src/features/getRoles/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -101,6 +102,24 @@ export const getRoutes = () => {
         validate: {
           payload: userIdSchema
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/getRoles',
+      handler: getRoles,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.SYSTEM,
+            // TODO: need to remove this once system role token is there
+            RouteScope.REGISTER
+          ]
+        },
+        validate: {
+          payload: searchRoleSchema
+        },
+        tags: ['api']
       }
     }
   ]
