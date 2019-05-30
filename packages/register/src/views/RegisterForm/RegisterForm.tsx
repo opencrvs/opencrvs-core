@@ -34,10 +34,6 @@ import { IOfflineDataState } from 'src/offline/reducer'
 import { getOfflineState } from 'src/offline/selectors'
 import { getScope } from 'src/profile/profileSelectors'
 import { IStoreState } from 'src/store'
-import {
-  eventDispatcher,
-  MUTATION_READY_TO_SUBMIT_EVENT
-} from 'src/SubmissionController'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
 import {
@@ -511,7 +507,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application.submissionStatus =
       SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
     this.props.modifyApplication(application)
-    eventDispatcher(MUTATION_READY_TO_SUBMIT_EVENT)
     this.props.history.push(HOME)
   }
 
