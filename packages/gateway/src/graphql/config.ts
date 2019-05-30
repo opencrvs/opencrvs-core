@@ -9,6 +9,7 @@ import { resolvers as metricsRootResolvers } from 'src/features/metrics/root-res
 import { typeResolvers } from 'src/features/registration/type-resovlers'
 import { resolvers as searchRootResolvers } from 'src/features/search/root-resolvers'
 import { searchTypeResolvers } from 'src/features/search/type-resovlers'
+import { userTypeResolvers } from 'src/features/user/type-resovlers'
 
 export const getExecutableSchema = (schemaPath: string) => {
   const typeDefs = importSchema(schemaPath)
@@ -21,6 +22,7 @@ export const getExecutableSchema = (schemaPath: string) => {
       registrationRootResolvers as IResolvers,
       locationRootResolvers as IResolvers,
       userRootResolvers as IResolvers,
+      userTypeResolvers as IResolvers,
       metricsRootResolvers as IResolvers,
       typeResolvers as IResolvers,
       searchRootResolvers as IResolvers,
