@@ -8,7 +8,7 @@ import * as actions from 'src/notification/actions'
 import { storage } from 'src/storage'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
-import { SubmissionController } from './SubmissionControllerApp'
+import { SubmissionController } from './SubmissionController'
 
 storage.configStorage('OpenCRVS')
 
