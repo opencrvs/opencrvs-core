@@ -28,7 +28,8 @@ import {
   LANG_EN,
   EMPTY_STRING,
   APPLICATION_DATE_FORMAT,
-  UNION_LOCATION_CODE
+  UNION_LOCATION_CODE,
+  SYS_ADMIN_ROLE
 } from 'src/utils/constants'
 import { InProgress } from './InProgress'
 import styled, { withTheme } from 'styled-components'
@@ -44,7 +45,7 @@ import {
   PlusTransparentWhite,
   ApplicationsOrangeAmber
 } from '@opencrvs/components/lib/icons'
-import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { REGISTRAR_HOME, SYS_ADMIN_HOME } from 'src/navigation/routes'
 import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 import { SentForReview } from './SentForReview'
 import { Query } from 'react-apollo'
@@ -308,6 +309,8 @@ class FieldAgentHomeView extends React.Component<
     const fieldAgentLocation =
       userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
     let parentQueryLoading = false
+    const isSysadmin =
+      userDetails && userDetails.name && userDetails.role === SYS_ADMIN_ROLE
     return (
       <>
         {isFieldAgent && (
@@ -504,9 +507,12 @@ class FieldAgentHomeView extends React.Component<
             </FABContainer>
           </>
         )}
-        {userDetails && userDetails.role && !isFieldAgent && (
-          <Redirect to={REGISTRAR_HOME} />
-        )}
+        {isSysadmin && <Redirect to={SYS_ADMIN_HOME} />}
+        {!isSysadmin &&
+          !isFieldAgent &&
+          userDetails &&
+          userDetails.role &&
+          !isFieldAgent && <Redirect to={REGISTRAR_HOME} />}
       </>
     )
   }

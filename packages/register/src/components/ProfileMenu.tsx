@@ -34,6 +34,11 @@ const UserRole = styled.div`
 `
 
 const messages = defineMessages({
+  sysadmin: {
+    id: 'register.home.header.sysadmin',
+    defaultMessage: 'Sysadmin',
+    description: 'The description for Sysadmin role'
+  },
   settings: {
     id: 'menu.items.settings',
     defaultMessage: 'Settings',

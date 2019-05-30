@@ -71,6 +71,11 @@ const messages = defineMessages({
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
+  sysadmin: {
+    id: 'register.home.header.sysadmin',
+    defaultMessage: 'Sysadmin',
+    description: 'The description for Sysadmin role'
+  },
   REGISTRATION_CLERK: {
     id: 'register.home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',

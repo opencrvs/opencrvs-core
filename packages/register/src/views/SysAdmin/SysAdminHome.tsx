@@ -13,6 +13,7 @@ import { Button } from '@opencrvs/components/lib/buttons'
 import styled from 'src/styled-components'
 import { RouteComponentProps } from 'react-router'
 import { goToSysAdminHomeTab as goToSysAdminHomeTabAction } from 'src/navigation'
+import { SYS_ADMIN_ROLE } from 'src/utils/constants'
 
 const Tab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
@@ -79,61 +80,67 @@ type IFulProps = IProps & InjectedIntlProps & RouteComponentProps<IMatchParams>
 
 class SysAdminHomeView extends React.Component<IFulProps> {
   render() {
-    const { match, intl, goToSysAdminHomeTab } = this.props
+    const { match, intl, goToSysAdminHomeTab, userDetails } = this.props
     const tabId = match.params.tabId || TAB_ID.users
+    const isSysadmin =
+      userDetails && userDetails.name && userDetails.role === SYS_ADMIN_ROLE
     return (
       <>
-        <Header />
-        <TopBar>
-          <Tab
-            id={`tab_${TAB_ID.overView}`}
-            key={TAB_ID.overView}
-            active={tabId === TAB_ID.overView}
-            onClick={() => goToSysAdminHomeTab(TAB_ID.overView)}
-          >
-            {intl.formatMessage(messages.overviewTab)}
-          </Tab>
-          <Tab
-            id={`tab_${TAB_ID.offices}`}
-            key={TAB_ID.offices}
-            active={tabId === TAB_ID.offices}
-            onClick={() => goToSysAdminHomeTab(TAB_ID.offices)}
-          >
-            {intl.formatMessage(messages.officesTab)}
-          </Tab>
-          <Tab
-            id={`tab_${TAB_ID.users}`}
-            key={TAB_ID.users}
-            active={tabId === TAB_ID.users}
-            onClick={() => goToSysAdminHomeTab(TAB_ID.users)}
-          >
-            {intl.formatMessage(messages.usersTab)}
-          </Tab>
-          <Tab
-            id={`tab_${TAB_ID.devices}`}
-            key={TAB_ID.devices}
-            active={tabId === TAB_ID.devices}
-            onClick={() => goToSysAdminHomeTab(TAB_ID.devices)}
-          >
-            {intl.formatMessage(messages.devicesTab)}
-          </Tab>
-          <Tab
-            id={`tab_${TAB_ID.network}`}
-            key={TAB_ID.network}
-            active={tabId === TAB_ID.network}
-            onClick={() => goToSysAdminHomeTab(TAB_ID.network)}
-          >
-            {intl.formatMessage(messages.networkTab)}
-          </Tab>
-          <Tab
-            id={`tab_${TAB_ID.config}`}
-            key={TAB_ID.config}
-            active={tabId === TAB_ID.config}
-            onClick={() => goToSysAdminHomeTab(TAB_ID.config)}
-          >
-            {intl.formatMessage(messages.configTab)}
-          </Tab>
-        </TopBar>
+        {isSysadmin && (
+          <>
+            <Header />
+            <TopBar>
+              <Tab
+                id={`tab_${TAB_ID.overView}`}
+                key={TAB_ID.overView}
+                active={tabId === TAB_ID.overView}
+                onClick={() => goToSysAdminHomeTab(TAB_ID.overView)}
+              >
+                {intl.formatMessage(messages.overviewTab)}
+              </Tab>
+              <Tab
+                id={`tab_${TAB_ID.offices}`}
+                key={TAB_ID.offices}
+                active={tabId === TAB_ID.offices}
+                onClick={() => goToSysAdminHomeTab(TAB_ID.offices)}
+              >
+                {intl.formatMessage(messages.officesTab)}
+              </Tab>
+              <Tab
+                id={`tab_${TAB_ID.users}`}
+                key={TAB_ID.users}
+                active={tabId === TAB_ID.users}
+                onClick={() => goToSysAdminHomeTab(TAB_ID.users)}
+              >
+                {intl.formatMessage(messages.usersTab)}
+              </Tab>
+              <Tab
+                id={`tab_${TAB_ID.devices}`}
+                key={TAB_ID.devices}
+                active={tabId === TAB_ID.devices}
+                onClick={() => goToSysAdminHomeTab(TAB_ID.devices)}
+              >
+                {intl.formatMessage(messages.devicesTab)}
+              </Tab>
+              <Tab
+                id={`tab_${TAB_ID.network}`}
+                key={TAB_ID.network}
+                active={tabId === TAB_ID.network}
+                onClick={() => goToSysAdminHomeTab(TAB_ID.network)}
+              >
+                {intl.formatMessage(messages.networkTab)}
+              </Tab>
+              <Tab
+                id={`tab_${TAB_ID.config}`}
+                key={TAB_ID.config}
+                active={tabId === TAB_ID.config}
+                onClick={() => goToSysAdminHomeTab(TAB_ID.config)}
+              >
+                {intl.formatMessage(messages.configTab)}
+              </Tab>
+            </TopBar>
+          </>
+        )}
       </>
     )
   }
