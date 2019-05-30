@@ -9,6 +9,7 @@ import getUserMobile, {
 } from 'src/features/getUserMobile/handler'
 import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
 import getUser from 'src/features/getUser/handler'
+import createUser from 'src/features/createUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -100,6 +101,18 @@ export const getRoutes = () => {
         },
         validate: {
           payload: userIdSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createUser',
+      handler: createUser,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new user',
+        auth: {
+          scope: [RouteScope.SYSTEM]
         }
       }
     }

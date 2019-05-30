@@ -3,6 +3,7 @@ import * as Joi from 'joi'
 import fetch from 'node-fetch'
 
 import User, { IUser } from 'src/model/user'
+import { FHIR_URL } from 'src/constants'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -21,8 +22,12 @@ export default async function createUser(
   const role = createFhirPractitionerRole(user, practitionerId)
   await postFhir('123', role)
 
+  console.log(practitioner, role)
+
   // save user in user-mgnt data store
-  User.create(user)
+  await User.create(user)
+
+  console.log('HERE?')
 
   return h.response().code(201)
 }
@@ -77,7 +82,7 @@ const createFhirPractitionerRole = (
 }
 
 const postFhir = async (token: string, resource: fhir.Resource) => {
-  const res = await fetch(``, {
+  const res = await fetch(`${FHIR_URL}/${resource.resourceType}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/fhir+json',

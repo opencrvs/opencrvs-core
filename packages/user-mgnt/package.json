@@ -33,6 +33,7 @@
     "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "^8.1.0",
+    "jest-fetch-mock": "^2.1.2",
     "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.1.5",
