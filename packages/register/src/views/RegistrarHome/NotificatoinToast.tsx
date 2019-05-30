@@ -2,6 +2,7 @@ import * as React from 'react'
 import { ExpandableNotification } from '@opencrvs/components/lib/interface'
 import styled from 'src/styled-components'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import Outbox from './Outbox'
 
 const messages = defineMessages({
   processingText: {
@@ -30,7 +31,7 @@ const NotificationToast = (props: InjectedIntlProps) => (
         num: 2
       })}
     >
-      <h2>Hello from the outbox!</h2>
+      <Outbox />
     </ExpandableNotification>
   </ExpandableNotificationContainer>
 )
