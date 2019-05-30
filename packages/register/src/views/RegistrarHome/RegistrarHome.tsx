@@ -689,7 +689,6 @@ export class RegistrarHomeView extends React.Component<
 
     return data.listEventRegistrations.results.map(
       (reg: GQLEventRegistration) => {
-        console.log(reg)
         let names
         let contactPhoneNumber
         if (reg.registration && reg.registration.type === 'BIRTH') {
@@ -1240,6 +1239,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                     initialPage={this.state.updatesCurrentPage}
                     expandable={true}
+                    arrowExpansionButtons={true}
                   />
                 </BodyContent>
               )

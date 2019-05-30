@@ -100,6 +100,7 @@ interface IGridTableProps {
   totalPages?: number
   initialPage?: number
   expandable?: boolean
+  arrowExpansionButtons?: boolean
 }
 
 interface IGridTableState {
@@ -147,6 +148,7 @@ export class GridTable extends React.Component<
             }
             id="ListItemAction"
             onExpand={() => this.toggleExpanded(itemId)}
+            arrowExpansionButtons={this.props.arrowExpansionButtons}
           />
         </ActionWrapper>
       )

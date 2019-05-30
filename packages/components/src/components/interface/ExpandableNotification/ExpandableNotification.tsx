@@ -1,8 +1,9 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { Button } from '../../buttons'
 import { InvertSpinner } from '../InvertSpinner'
 import { KeyboardArrowUp, KeyboardArrowDown, Outbox } from '../../icons'
+import { colors } from '../../colors'
 
 export interface IState {
   expand: boolean
@@ -73,7 +74,11 @@ export class ExpandableNotification extends React.Component<IProps, IState> {
           </Left>
           <Button
             icon={() =>
-              this.state.expand ? <KeyboardArrowDown /> : <KeyboardArrowUp />
+              this.state.expand ? (
+                <KeyboardArrowDown color={colors.white} />
+              ) : (
+                <KeyboardArrowUp color={colors.white} />
+              )
             }
           />
         </NotificationBar>
