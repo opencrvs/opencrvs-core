@@ -9,9 +9,11 @@ import {
   ISearchInputProps,
   GridTable,
   Loader,
-  Spinner
+  Spinner,
+  TopBar
 } from '@opencrvs/components/lib/interface'
 import { IUserDetails, getUserLocation } from '../../utils/userUtils'
+
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { Header } from 'src/components/interface/Header/Header'
 import {
@@ -67,16 +69,6 @@ import {
 import { createNamesMap } from 'src/utils/data-formatting'
 import * as moment from 'moment'
 
-const Topbar = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 48px;
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  display: flex;
-  overflow-x: auto;
-  justify-content: flex-start;
-  align-items: center;
-`
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
@@ -343,7 +335,7 @@ class FieldAgentHomeView extends React.Component<
                 return (
                   <>
                     <Header />
-                    <Topbar id="top-bar">
+                    <TopBar id="top-bar">
                       <IconTab
                         id={`tab_${TAB_ID.inProgress}`}
                         key={TAB_ID.inProgress}
@@ -388,7 +380,7 @@ class FieldAgentHomeView extends React.Component<
                           total: data.searchEvents.totalItems
                         })}
                       </IconTab>
-                    </Topbar>
+                    </TopBar>
                   </>
                 )
               }}
