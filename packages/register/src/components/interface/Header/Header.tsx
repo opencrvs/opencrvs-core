@@ -21,7 +21,9 @@ import {
   TrackingID,
   BRN,
   Phone,
-  ArrowBack
+  ArrowBack,
+  SystemBlack,
+  SystemBlue
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
 import { storage } from 'src/storage'
@@ -155,6 +157,21 @@ const messages = defineMessages({
     id: 'register.home.header.systemTitle',
     defaultMessage: 'System',
     description: 'System title'
+  },
+  settingsTitle: {
+    id: 'register.home.header.settingsTitle',
+    defaultMessage: 'Settings',
+    description: 'settings title'
+  },
+  helpTitle: {
+    id: 'register.home.header.helpTitle',
+    defaultMessage: 'Help',
+    description: 'Help title'
+  },
+  logoutTitle: {
+    id: 'register.home.header.logoutTitle',
+    defaultMessage: 'Logout',
+    description: 'logout title'
   }
 })
 
@@ -196,31 +213,31 @@ class HeaderComp extends React.Component<IProps, IState> {
       {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
-        label: 'Applications',
+        label: this.props.intl.formatMessage(messages.applicationTitle),
         onClick: goToHome
       },
       {
         icon: <StatsBlack />,
         iconHover: <StatsBlue />,
-        label: 'Performance',
+        label: this.props.intl.formatMessage(messages.performanceTitle),
         onClick: goToPerformance
       },
       {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
-        label: 'Settings',
+        label: this.props.intl.formatMessage(messages.settingsTitle),
         onClick: this.props.goToSettings
       },
       {
         icon: <HelpBlack />,
         iconHover: <HelpBlue />,
-        label: 'Help',
+        label: this.props.intl.formatMessage(messages.helpTitle),
         onClick: () => alert('Help!')
       },
       {
         icon: <LogoutBlack />,
         iconHover: <LogoutBlue />,
-        label: 'Logout',
+        label: this.props.intl.formatMessage(messages.logoutTitle),
         secondary: true,
         onClick: this.logout
       }
@@ -233,21 +250,27 @@ class HeaderComp extends React.Component<IProps, IState> {
     ) {
       menuItems = [
         {
+          icon: <SystemBlack />,
+          iconHover: <SystemBlue />,
+          label: this.props.intl.formatMessage(messages.systemTitle),
+          onClick: goToHome
+        },
+        {
           icon: <SettingsBlack />,
           iconHover: <SettingsBlue />,
-          label: 'Settings',
+          label: this.props.intl.formatMessage(messages.settingsTitle),
           onClick: this.props.goToSettings
         },
         {
           icon: <HelpBlack />,
           iconHover: <HelpBlue />,
-          label: 'Help',
+          label: this.props.intl.formatMessage(messages.helpTitle),
           onClick: () => alert('Help!')
         },
         {
           icon: <LogoutBlack />,
           iconHover: <LogoutBlue />,
-          label: 'Logout',
+          label: this.props.intl.formatMessage(messages.logoutTitle),
           secondary: true,
           onClick: this.logout
         }
