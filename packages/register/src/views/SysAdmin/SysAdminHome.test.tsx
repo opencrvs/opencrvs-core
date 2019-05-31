@@ -10,7 +10,7 @@ import { mockUserResponse } from 'src/tests/util'
 import { storage } from 'src/storage'
 import { createStore } from 'src/store'
 import { checkAuth } from 'src/profile/profileActions'
-import { SYS_ADMIN_ROLE } from 'src/utils/constants'
+import { SYS_ADMIN_ROLES } from 'src/utils/constants'
 import { SysAdminHome } from './SysAdminHome'
 
 const getItem = window.localStorage.getItem as jest.Mock
@@ -29,7 +29,7 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: SYS_ADMIN_ROLE
+      role: SYS_ADMIN_ROLES[0]
     }
   }
 }

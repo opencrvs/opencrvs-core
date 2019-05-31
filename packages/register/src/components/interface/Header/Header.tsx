@@ -45,7 +45,7 @@ import {
   TRACKING_ID_TEXT,
   BRN_DRN_TEXT,
   PHONE_TEXT,
-  SYS_ADMIN_ROLE
+  SYS_ADMIN_ROLES
 } from 'src/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
@@ -76,8 +76,8 @@ const messages = defineMessages({
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
-  sysadmin: {
-    id: 'register.home.header.sysadmin',
+  SYSADMIN: {
+    id: 'register.home.header.SYSADMIN',
     defaultMessage: 'Sysadmin',
     description: 'The description for Sysadmin role'
   },
@@ -226,7 +226,11 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (userDetails && userDetails.role === SYS_ADMIN_ROLE) {
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
       menuItems = [
         {
           icon: <SettingsBlack />,
@@ -336,7 +340,11 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (userDetails && userDetails.role === SYS_ADMIN_ROLE) {
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
       menuItems = [
         {
           key: 'sysadmin',

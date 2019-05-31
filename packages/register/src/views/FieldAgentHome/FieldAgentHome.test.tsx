@@ -11,7 +11,7 @@ import { mockUserResponse } from 'src/tests/util'
 import { storage } from 'src/storage'
 import { createStore } from 'src/store'
 import { checkAuth } from 'src/profile/profileActions'
-import { FIELD_AGENT_ROLE } from 'src/utils/constants'
+import { FIELD_AGENT_ROLES } from 'src/utils/constants'
 import { EVENT_STATUS } from '../RegistrarHome/RegistrarHome'
 import {
   COUNT_USER_WISE_APPLICATIONS,
@@ -39,7 +39,7 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: FIELD_AGENT_ROLE
+      role: FIELD_AGENT_ROLES[0]
     }
   }
 }

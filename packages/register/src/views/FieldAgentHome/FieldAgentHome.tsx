@@ -26,12 +26,13 @@ import {
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  FIELD_AGENT_ROLE,
   LANG_EN,
   EMPTY_STRING,
   APPLICATION_DATE_FORMAT,
   UNION_LOCATION_CODE,
-  SYS_ADMIN_ROLE
+  FIELD_AGENT_ROLES,
+  SYS_ADMIN_ROLES,
+  REGISTRAR_ROLES
 } from 'src/utils/constants'
 import { InProgress } from './InProgress'
 import styled, { withTheme } from 'styled-components'
@@ -296,16 +297,13 @@ class FieldAgentHomeView extends React.Component<
       theme
     } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
-    const isFieldAgent =
-      userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
     const fieldAgentLocation =
       userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
     let parentQueryLoading = false
-    const isSysadmin =
-      userDetails && userDetails.name && userDetails.role === SYS_ADMIN_ROLE
+    const role = userDetails && userDetails.role
     return (
       <>
-        {isFieldAgent && (
+        {role && FIELD_AGENT_ROLES.includes(role) && (
           <>
             <Query
               query={COUNT_USER_WISE_APPLICATIONS}
@@ -499,12 +497,12 @@ class FieldAgentHomeView extends React.Component<
             </FABContainer>
           </>
         )}
-        {isSysadmin && <Redirect to={SYS_ADMIN_HOME} />}
-        {!isSysadmin &&
-          !isFieldAgent &&
-          userDetails &&
-          userDetails.role &&
-          !isFieldAgent && <Redirect to={REGISTRAR_HOME} />}
+        {role && SYS_ADMIN_ROLES.includes(role) && (
+          <Redirect to={SYS_ADMIN_HOME} />
+        )}
+        {role && REGISTRAR_ROLES.includes(role) && (
+          <Redirect to={REGISTRAR_HOME} />
+        )}
       </>
     )
   }

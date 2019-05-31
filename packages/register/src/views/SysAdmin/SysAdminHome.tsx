@@ -13,7 +13,7 @@ import { Button } from '@opencrvs/components/lib/buttons'
 import styled from 'src/styled-components'
 import { RouteComponentProps } from 'react-router'
 import { goToSysAdminHomeTab as goToSysAdminHomeTabAction } from 'src/navigation'
-import { SYS_ADMIN_ROLE } from 'src/utils/constants'
+import { SYS_ADMIN_ROLES } from 'src/utils/constants'
 
 const Tab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
@@ -87,11 +87,10 @@ class SysAdminHomeView extends React.Component<IFulProps> {
   render() {
     const { match, intl, goToSysAdminHomeTab, userDetails } = this.props
     const tabId = match.params.tabId || TAB_ID.users
-    const isSysadmin =
-      userDetails && userDetails.name && userDetails.role === SYS_ADMIN_ROLE
+    const role = userDetails && userDetails.role
     return (
       <>
-        {isSysadmin && (
+        {role && SYS_ADMIN_ROLES.includes(role) && (
           <>
             <Header title={intl.formatMessage(messages.systemTitle)} />
             <TopBar>
