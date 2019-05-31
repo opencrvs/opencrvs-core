@@ -52,6 +52,11 @@ const messages = defineMessages({
     id: 'register.sysAdminHome.config',
     defaultMessage: 'Config',
     description: 'The title of config tab'
+  },
+  systemTitle: {
+    id: 'register.home.header.systemTitle',
+    defaultMessage: 'System',
+    description: 'System title'
   }
 })
 
@@ -88,7 +93,7 @@ class SysAdminHomeView extends React.Component<IFulProps> {
       <>
         {isSysadmin && (
           <>
-            <Header />
+            <Header title={intl.formatMessage(messages.systemTitle)} />
             <TopBar>
               <Tab
                 id={`tab_${TAB_ID.overView}`}

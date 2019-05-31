@@ -1039,6 +1039,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.sysAdminHome.users': 'ইউজারস',
     'register.sysAdminHome.devices': 'ডিভাইসেস',
     'register.sysAdminHome.config': 'কনফিগ',
-    'register.home.header.sysadmin': 'সিস এডমিন '
+    'register.home.header.sysadmin': 'সিস এডমিন ',
+    'register.home.header.systemTitle': 'সিস্টেম'
   }
 }

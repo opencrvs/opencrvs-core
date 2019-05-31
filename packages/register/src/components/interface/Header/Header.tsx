@@ -41,7 +41,12 @@ import {
   goToSettings
 } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
-import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
+import {
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT,
+  SYS_ADMIN_ROLE
+} from 'src/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { goToEvents as goToEventsAction } from 'src/navigation'
@@ -145,6 +150,11 @@ const messages = defineMessages({
     id: 'register.home.header.performanceTitle',
     defaultMessage: 'Performance',
     description: 'Performance title'
+  },
+  systemTitle: {
+    id: 'register.home.header.systemTitle',
+    defaultMessage: 'System',
+    description: 'System title'
   }
 })
 
@@ -182,7 +192,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         ? intl.formatMessage(messages[userDetails.role])
         : ''
 
-    const menuItems = [
+    let menuItems = [
       {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
@@ -215,6 +225,31 @@ class HeaderComp extends React.Component<IProps, IState> {
         onClick: this.logout
       }
     ]
+
+    if (userDetails && userDetails.role === SYS_ADMIN_ROLE) {
+      menuItems = [
+        {
+          icon: <SettingsBlack />,
+          iconHover: <SettingsBlue />,
+          label: 'Settings',
+          onClick: this.props.goToSettings
+        },
+        {
+          icon: <HelpBlack />,
+          iconHover: <HelpBlue />,
+          label: 'Help',
+          onClick: () => alert('Help!')
+        },
+        {
+          icon: <LogoutBlack />,
+          iconHover: <LogoutBlue />,
+          label: 'Logout',
+          secondary: true,
+          onClick: this.logout
+        }
+      ]
+    }
+
     const userInfo = { name, role }
 
     return (
@@ -283,9 +318,10 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, userDetails } = this.props
     const title = this.props.title || intl.formatMessage(messages.defaultTitle)
-    const menuItems = [
+
+    let menuItems = [
       {
         key: 'application',
         title: intl.formatMessage(messages.applicationTitle),
@@ -299,6 +335,17 @@ class HeaderComp extends React.Component<IProps, IState> {
         selected: false
       }
     ]
+
+    if (userDetails && userDetails.role === SYS_ADMIN_ROLE) {
+      menuItems = [
+        {
+          key: 'sysadmin',
+          title: intl.formatMessage(messages.systemTitle),
+          onClick: goToHome,
+          selected: true
+        }
+      ]
+    }
 
     const rightMenu = [
       {
