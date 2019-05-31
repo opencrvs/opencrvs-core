@@ -25,6 +25,7 @@ export interface GQLQuery {
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
+  searchUsers?: GQLSearchUserResult
   fetchBirthRegistrationMetrics?: GQLBirthRegistrationMetrics
   searchEvents?: GQLEventSearchResultSet
 }
@@ -310,10 +311,14 @@ export enum GQLRegStatus {
 export interface GQLUser {
   id: string
   userMgntUserID?: string
+  practitionerId?: string
   name?: Array<GQLHumanName | null>
+  username?: string
+  mobile?: string
   role?: string
+  email?: string
+  active?: boolean
   primaryOffice?: GQLLocation
-  currentLocation?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
 }
 
@@ -456,6 +461,11 @@ export interface GQLEventRegResultSet {
 export interface GQLRegistrationCount {
   declared?: number
   rejected?: number
+}
+
+export interface GQLSearchUserResult {
+  results?: Array<GQLUser | null>
+  totalItems?: number
 }
 
 export interface GQLBirthRegistrationMetrics {
@@ -682,9 +692,12 @@ export interface GQLRegWorkflowInput {
 
 export interface GQLUserInput {
   name?: Array<GQLHumanNameInput | null>
+  username?: string
+  mobile?: string
   role?: string
+  email?: string
+  active?: boolean
   primaryOffice?: GQLLocationInput
-  currentLocation?: GQLLocationInput
   catchmentArea?: Array<GQLLocationInput | null>
 }
 
@@ -792,6 +805,7 @@ export interface GQLResolver {
   DeathRegResultSet?: GQLDeathRegResultSetTypeResolver
   EventRegResultSet?: GQLEventRegResultSetTypeResolver
   RegistrationCount?: GQLRegistrationCountTypeResolver
+  SearchUserResult?: GQLSearchUserResultTypeResolver
   BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
   BirthKeyFigures?: GQLBirthKeyFiguresTypeResolver
   BirthKeyFiguresData?: GQLBirthKeyFiguresDataTypeResolver
@@ -825,6 +839,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
+  searchUsers?: QueryToSearchUsersResolver<TParent>
   fetchBirthRegistrationMetrics?: QueryToFetchBirthRegistrationMetricsResolver<
     TParent
   >
@@ -1052,6 +1067,26 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToSearchUsersArgs {
+  username?: string
+  mobile?: string
+  active?: boolean
+  role?: string
+  primaryOfficeId?: string
+  locationId?: string
+  count?: number
+  skip?: number
+  sort?: string
+}
+export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToSearchUsersArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -1808,10 +1843,14 @@ export interface RegWorkflowToOfficeResolver<TParent = any, TResult = any> {
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
   userMgntUserID?: UserToUserMgntUserIDResolver<TParent>
+  practitionerId?: UserToPractitionerIdResolver<TParent>
   name?: UserToNameResolver<TParent>
+  username?: UserToUsernameResolver<TParent>
+  mobile?: UserToMobileResolver<TParent>
   role?: UserToRoleResolver<TParent>
+  email?: UserToEmailResolver<TParent>
+  active?: UserToActiveResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
-  currentLocation?: UserToCurrentLocationResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
 }
 
@@ -1823,7 +1862,19 @@ export interface UserToUserMgntUserIDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface UserToPractitionerIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface UserToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToUsernameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToMobileResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1831,11 +1882,15 @@ export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
+export interface UserToEmailResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToCurrentLocationResolver<TParent = any, TResult = any> {
+export interface UserToActiveResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2122,6 +2177,25 @@ export interface RegistrationCountToDeclaredResolver<
 }
 
 export interface RegistrationCountToRejectedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSearchUserResultTypeResolver<TParent = any> {
+  results?: SearchUserResultToResultsResolver<TParent>
+  totalItems?: SearchUserResultToTotalItemsResolver<TParent>
+}
+
+export interface SearchUserResultToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchUserResultToTotalItemsResolver<
   TParent = any,
   TResult = any
 > {
