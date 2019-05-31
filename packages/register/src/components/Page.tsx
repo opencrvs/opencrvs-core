@@ -126,9 +126,11 @@ class Component extends React.Component<
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
 
-    this.props.changeLanguage({
-      language: userDetails.language || window.config.LANGUAGE
-    })
+    if (userDetails.language) {
+      this.props.changeLanguage({
+        language: userDetails.language
+      })
+    }
   }
 
   render() {

@@ -44,7 +44,7 @@ const Header = styled.div`
   align-items: center;
   padding: 0 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+    ${({ theme }) => theme.shadows.mistyShadow};
     margin-bottom: 16px;
   }
 `

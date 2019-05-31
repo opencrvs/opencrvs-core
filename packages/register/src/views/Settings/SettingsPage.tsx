@@ -274,9 +274,8 @@ class SettingsView extends React.Component<IProps, IState> {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName) => storedName.use === 'bn'
       ) as GQLHumanName
-      bengaliName = `${String(nameObj.firstNames)} ${String(
-        nameObj.familyName
-      )}`
+      bengaliName =
+        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
     }
 
     let englishName = ''
@@ -284,9 +283,8 @@ class SettingsView extends React.Component<IProps, IState> {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName) => storedName.use === 'en'
       ) as GQLHumanName
-      englishName = `${String(nameObj.firstNames)} ${String(
-        nameObj.familyName
-      )}`
+      englishName =
+        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
     }
 
     const role =
