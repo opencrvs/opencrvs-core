@@ -143,9 +143,9 @@ const messages = defineMessages({
 
 const Container = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   padding: 40px 80px;
   margin: 36px auto 0;
   width: 1156px;
