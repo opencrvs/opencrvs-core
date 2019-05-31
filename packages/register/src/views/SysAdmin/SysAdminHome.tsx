@@ -18,8 +18,19 @@ import { SYS_ADMIN_ROLES } from 'src/utils/constants'
 const Tab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
   outline: none;
+  flex-shrink: 0;
   ${({ theme }) => theme.fonts.subtitleStyle};
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  padding: 0 16px;
+  & > div {
+    padding: 0px 8px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 0 8px;
+    & > div {
+      padding: 0px 4px;
+    }
+  }
 `
 
 const messages = defineMessages({

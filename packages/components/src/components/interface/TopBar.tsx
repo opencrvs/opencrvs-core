@@ -7,6 +7,7 @@ const TopBarWrapper = styled.div`
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
+  overflow-x: auto;
   justify-content: flex-start;
   align-items: center;
 `
