@@ -43,7 +43,8 @@ export class SubmissionController {
   private subscribeToStore = () => {
     let application
     this.store.subscribe(() => {
-      this.applications = this.store.getState().applicationsState.applications
+      this.applications =
+        this.store.getState().applicationsState.applications || []
       this.applications.map(app => {
         this.registerForms[app.event] = getRegisterForm(this.store.getState())[
           app.event
