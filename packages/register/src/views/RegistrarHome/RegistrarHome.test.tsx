@@ -1,17 +1,26 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { queries } from 'src/profile/queries'
+import { createTestComponent } from '@register/tests/util'
+import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { mockUserResponse } from 'src/tests/util'
-import { storage } from 'src/storage'
-import { createStore } from 'src/store'
-import { RegistrarHome, EVENT_STATUS } from './RegistrarHome'
+import { mockUserResponse } from '@register/tests/util'
+import { storage } from '@register/storage'
+import { createStore } from '@register/store'
+import {
+  RegistrarHome,
+  EVENT_STATUS
+} from '@register/views/RegistrarHome/RegistrarHome'
 import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
-import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
-import { checkAuth } from 'src/profile/profileActions'
-import { storeApplication, createReviewApplication } from 'src/applications'
-import { Event } from 'src/forms'
+import {
+  COUNT_REGISTRATION_QUERY,
+  FETCH_REGISTRATIONS_QUERY
+} from '@register/views/RegistrarHome/queries'
+import { checkAuth } from '@register/profile/profileActions'
+import {
+  storeApplication,
+  createReviewApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import * as moment from 'moment'
 
 const registerScopeToken =

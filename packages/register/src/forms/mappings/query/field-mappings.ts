@@ -3,7 +3,7 @@ import {
   IFormData,
   IAttachment,
   IFormFieldQueryMapFunction
-} from '../..'
+} from '@register/forms'
 import {
   GQLHumanName,
   GQLAddress,

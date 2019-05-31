@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Header } from '@opencrvs/components/lib/interface'
 

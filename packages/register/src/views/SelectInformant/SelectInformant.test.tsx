@@ -6,14 +6,14 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
-import { SELECT_INFORMANT } from 'src/navigation/routes'
+} from '@register/tests/util'
+import { SELECT_INFORMANT } from '@register/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import { storage } from 'src/storage'
-import * as CommonUtils from 'src/utils/commonUtils'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import { storage } from '@register/storage'
+import * as CommonUtils from '@register/utils/commonUtils'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

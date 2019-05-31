@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from 'src/store'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import { IStoreState } from '@register/store'
+import { redirectToAuthentication } from '@register/profile/profileActions'
 
 const StyledModal = styled(Modal)`
   z-index: 4;

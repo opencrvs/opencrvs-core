@@ -31,20 +31,20 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
+import { IViewHeadingProps } from '@register/components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction
-} from 'src/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { getScope, getUserDetails } from 'src/profile/profileSelectors'
-import { messages as rejectionMessages } from 'src/review/reject-registration'
-import { messages } from 'src/search/messages'
-import { SEARCH_EVENTS } from 'src/search/queries'
-import { transformData } from 'src/search/transformer'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
+} from '@register/navigation'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { getScope, getUserDetails } from '@register/profile/profileSelectors'
+import { messages as rejectionMessages } from '@register/review/reject-registration'
+import { messages } from '@register/search/messages'
+import { SEARCH_EVENTS } from '@register/search/queries'
+import { transformData } from '@register/search/transformer'
+import { IStoreState } from '@register/store'
+import { Scope } from '@register/utils/authUtils'
 import {
   CERTIFICATE_DATE_FORMAT,
   DECLARED,
@@ -57,17 +57,21 @@ import {
   BRN_DRN_TEXT,
   PHONE_TEXT,
   SEARCH_RESULT_SORT
-} from 'src/utils/constants'
+} from '@register/utils/constants'
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
+} from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
+import {
+  IGQLLocation,
+  IIdentifier,
+  IUserDetails
+} from '@register/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
-import { goToTab as goToTabAction } from '../../navigation'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { Header } from 'src/components/interface/Header/Header'
+import { goToTab as goToTabAction } from '@register/navigation'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
+import { Header } from '@register/components/interface/Header/Header'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;

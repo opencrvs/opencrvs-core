@@ -6,10 +6,10 @@ import {
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
   DYNAMIC_LIST
-} from 'src/forms'
-import { birthFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
-import { birthAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
-import { diffDoB } from 'src/forms/utils'
+} from '@register/forms'
+import { birthFieldToAttachmentTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
+import { diffDoB } from '@register/forms/utils'
 
 const messages = defineMessages({
   documentsTab: {

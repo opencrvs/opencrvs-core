@@ -1,5 +1,5 @@
-import { IntlState } from './reducer'
-import { IStoreState } from '../store'
+import { IntlState } from '@register/i18n/reducer'
+import { IStoreState } from '@register/store'
 
 const getPartialState = (store: IStoreState): IntlState => store.i18n
 

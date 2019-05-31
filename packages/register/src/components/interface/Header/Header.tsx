@@ -24,13 +24,13 @@ import {
   ArrowBack
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
-import { storage } from 'src/storage'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { storage } from '@register/storage'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { connect } from 'react-redux'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IUserDetails } from '../../../utils/userUtils'
-import { redirectToAuthentication } from 'src/profile/profileActions'
-import { IStoreState } from 'src/store'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IUserDetails } from '@register/utils/userUtils'
+import { redirectToAuthentication } from '@register/profile/profileActions'
+import { IStoreState } from '@register/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import {
@@ -38,13 +38,17 @@ import {
   goToPerformance,
   goToSearchResult,
   goToSearch
-} from 'src/navigation'
-import { ProfileMenu } from 'src/components/ProfileMenu'
-import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
+} from '@register/navigation'
+import { ProfileMenu } from '@register/components/ProfileMenu'
+import {
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT
+} from '@register/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
-import styled from 'src/styled-components'
-import { goToEvents as goToEventsAction } from 'src/navigation'
-import { SEARCH } from 'src/navigation/routes'
+import styled from '@register/styled-components'
+import { goToEvents as goToEventsAction } from '@register/navigation'
+import { SEARCH } from '@register/navigation/routes'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails

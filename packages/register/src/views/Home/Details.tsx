@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
   goToTab as goToTabAction,
   goToHome as goToHomeAction
-} from 'src/navigation'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { IUserDetails } from 'src/utils/userUtils'
+} from '@register/navigation'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { IUserDetails } from '@register/utils/userUtils'
 import {
   StatusProgress,
   StatusOrange,
@@ -19,13 +19,13 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { getDraftApplicantFullName } from 'src/utils/draftUtils'
+import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import styled, { withTheme } from 'styled-components'
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
+} from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 import {
   GQLHumanName,
   GQLQuery,
@@ -38,11 +38,15 @@ import { Event } from '@opencrvs/register/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM
-} from 'src/navigation/routes'
+} from '@register/navigation/routes'
 import { Query } from 'react-apollo'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
 import * as Sentry from '@sentry/browser'
-import { REJECTED, REJECT_REASON, REJECT_COMMENTS } from 'src/utils/constants'
+import {
+  REJECTED,
+  REJECT_REASON,
+  REJECT_COMMENTS
+} from '@register/utils/constants'
 import { ITheme } from '@opencrvs/components/lib/theme'
 
 const HistoryWrapper = styled.div`

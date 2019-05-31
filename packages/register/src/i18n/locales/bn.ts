@@ -1,4 +1,4 @@
-import { ILanguage } from '../reducer'
+import { ILanguage } from '@register/i18n/reducer'
 
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',

@@ -2,8 +2,8 @@ import * as fs from 'fs'
 import * as glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { ENGLISH_STATE } from './i18n/locales/en'
-import { BENGALI_STATE } from './i18n/locales/bn'
+import { ENGLISH_STATE } from '@register/i18n/locales/en'
+import { BENGALI_STATE } from '@register/i18n/locales/bn'
 import { Parser } from 'json2csv'
 
 interface ITranslationCSVItem {

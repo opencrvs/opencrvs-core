@@ -3,7 +3,7 @@ import {
   ViewType,
   SELECT_WITH_OPTIONS,
   PARAGRAPH
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
 
 const messages = defineMessages({

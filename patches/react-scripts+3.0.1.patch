@@ -1,0 +1,1164 @@
+diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
+index 8f70442..c3d9b4f 100644
+--- a/node_modules/react-scripts/config/webpack.config.js
++++ b/node_modules/react-scripts/config/webpack.config.js
+@@ -6,77 +6,79 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ // @remove-on-eject-end
+-'use strict';
++'use strict'
+ 
+-const fs = require('fs');
+-const isWsl = require('is-wsl');
+-const path = require('path');
+-const webpack = require('webpack');
+-const resolve = require('resolve');
+-const PnpWebpackPlugin = require('pnp-webpack-plugin');
+-const HtmlWebpackPlugin = require('html-webpack-plugin');
+-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
+-const TerserPlugin = require('terser-webpack-plugin');
+-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+-const safePostCssParser = require('postcss-safe-parser');
+-const ManifestPlugin = require('webpack-manifest-plugin');
+-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+-const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
+-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
+-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+-const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
+-const paths = require('./paths');
+-const modules = require('./modules');
+-const getClientEnvironment = require('./env');
+-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
+-const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
+-const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
++const fs = require('fs')
++const isWsl = require('is-wsl')
++const path = require('path')
++const webpack = require('webpack')
++const resolve = require('resolve')
++const PnpWebpackPlugin = require('pnp-webpack-plugin')
++const HtmlWebpackPlugin = require('html-webpack-plugin')
++const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
++const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
++const TerserPlugin = require('terser-webpack-plugin')
++const MiniCssExtractPlugin = require('mini-css-extract-plugin')
++const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
++const safePostCssParser = require('postcss-safe-parser')
++const ManifestPlugin = require('webpack-manifest-plugin')
++const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
++const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
++const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
++const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
++const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent')
++const paths = require('./paths')
++const modules = require('./modules')
++const getClientEnvironment = require('./env')
++const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
++const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin')
++const typescriptFormatter = require('react-dev-utils/typescriptFormatter')
+ // @remove-on-eject-begin
+-const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
++const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier')
+ // @remove-on-eject-end
+-const postcssNormalize = require('postcss-normalize');
++const postcssNormalize = require('postcss-normalize')
++// Get the app's `package.json`.
++const appPackageJson = require(paths.appPackageJson)
+ 
+ // Source maps are resource heavy and can cause out of memory issue for large source files.
+-const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
++const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
+ // Some apps do not need the benefits of saving a web request, so not inlining the chunk
+ // makes for a smoother build process.
+-const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
++const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false'
+ 
+ // Check if TypeScript is setup
+-const useTypeScript = fs.existsSync(paths.appTsConfig);
++const useTypeScript = fs.existsSync(paths.appTsConfig)
+ 
+ // style files regexes
+-const cssRegex = /\.css$/;
+-const cssModuleRegex = /\.module\.css$/;
+-const sassRegex = /\.(scss|sass)$/;
+-const sassModuleRegex = /\.module\.(scss|sass)$/;
++const cssRegex = /\.css$/
++const cssModuleRegex = /\.module\.css$/
++const sassRegex = /\.(scss|sass)$/
++const sassModuleRegex = /\.module\.(scss|sass)$/
+ 
+ // This is the production and development configuration.
+ // It is focused on developer experience, fast rebuilds, and a minimal bundle.
+ module.exports = function(webpackEnv) {
+-  const isEnvDevelopment = webpackEnv === 'development';
+-  const isEnvProduction = webpackEnv === 'production';
++  const isEnvDevelopment = webpackEnv === 'development'
++  const isEnvProduction = webpackEnv === 'production'
+ 
+   // Webpack uses `publicPath` to determine where the app is being served from.
+   // It requires a trailing slash, or the file assets will get an incorrect path.
+   // In development, we always serve from the root. This makes config easier.
+   const publicPath = isEnvProduction
+     ? paths.servedPath
+-    : isEnvDevelopment && '/';
++    : isEnvDevelopment && '/'
+   // Some apps do not use client-side routing with pushState.
+   // For these, "homepage" can be set to "." to enable relative asset paths.
+-  const shouldUseRelativeAssetPaths = publicPath === './';
++  const shouldUseRelativeAssetPaths = publicPath === './'
+ 
+   // `publicUrl` is just like `publicPath`, but we will provide it to our app
+   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
+   // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
+   const publicUrl = isEnvProduction
+     ? publicPath.slice(0, -1)
+-    : isEnvDevelopment && '';
++    : isEnvDevelopment && ''
+   // Get environment variables to inject into our app.
+-  const env = getClientEnvironment(publicUrl);
++  const env = getClientEnvironment(publicUrl)
+ 
+   // common function to get style loaders
+   const getStyleLoaders = (cssOptions, preProcessor) => {
+@@ -84,11 +86,11 @@ module.exports = function(webpackEnv) {
+       isEnvDevelopment && require.resolve('style-loader'),
+       isEnvProduction && {
+         loader: MiniCssExtractPlugin.loader,
+-        options: shouldUseRelativeAssetPaths ? { publicPath: '../../' } : {},
++        options: shouldUseRelativeAssetPaths ? { publicPath: '../../' } : {}
+       },
+       {
+         loader: require.resolve('css-loader'),
+-        options: cssOptions,
++        options: cssOptions
+       },
+       {
+         // Options for PostCSS as we reference these options twice
+@@ -103,29 +105,29 @@ module.exports = function(webpackEnv) {
+             require('postcss-flexbugs-fixes'),
+             require('postcss-preset-env')({
+               autoprefixer: {
+-                flexbox: 'no-2009',
++                flexbox: 'no-2009'
+               },
+-              stage: 3,
++              stage: 3
+             }),
+             // Adds PostCSS Normalize as the reset css with default options,
+             // so that it honors browserslist config in package.json
+             // which in turn let's users customize the target behavior as per their needs.
+-            postcssNormalize(),
++            postcssNormalize()
+           ],
+-          sourceMap: isEnvProduction && shouldUseSourceMap,
+-        },
+-      },
+-    ].filter(Boolean);
++          sourceMap: isEnvProduction && shouldUseSourceMap
++        }
++      }
++    ].filter(Boolean)
+     if (preProcessor) {
+       loaders.push({
+         loader: require.resolve(preProcessor),
+         options: {
+-          sourceMap: isEnvProduction && shouldUseSourceMap,
+-        },
+-      });
++          sourceMap: isEnvProduction && shouldUseSourceMap
++        }
++      })
+     }
+-    return loaders;
+-  };
++    return loaders
++  }
+ 
+   return {
+     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
+@@ -152,7 +154,7 @@ module.exports = function(webpackEnv) {
+       isEnvDevelopment &&
+         require.resolve('react-dev-utils/webpackHotDevClient'),
+       // Finally, this is your app's code:
+-      paths.appIndexJs,
++      paths.appIndexJs
+       // We include the app code last so that if there is a runtime error during
+       // initialization, it doesn't blow up the WebpackDevServer client, and
+       // changing JS code would still trigger a refresh.
+@@ -183,7 +185,7 @@ module.exports = function(webpackEnv) {
+               .relative(paths.appSrc, info.absoluteResourcePath)
+               .replace(/\\/g, '/')
+         : isEnvDevelopment &&
+-          (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
++          (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'))
+     },
+     optimization: {
+       minimize: isEnvProduction,
+@@ -197,7 +199,7 @@ module.exports = function(webpackEnv) {
+               // into invalid ecma 5 code. This is why the 'compress' and 'output'
+               // sections only apply transformations that are ecma 5 safe
+               // https://github.com/facebook/create-react-app/pull/4234
+-              ecma: 8,
++              ecma: 8
+             },
+             compress: {
+               ecma: 5,
+@@ -211,18 +213,18 @@ module.exports = function(webpackEnv) {
+               // https://github.com/facebook/create-react-app/issues/5250
+               // Pending futher investigation:
+               // https://github.com/terser-js/terser/issues/120
+-              inline: 2,
++              inline: 2
+             },
+             mangle: {
+-              safari10: true,
++              safari10: true
+             },
+             output: {
+               ecma: 5,
+               comments: false,
+               // Turned on because emoji and regex is not minified properly using default
+               // https://github.com/facebook/create-react-app/issues/2488
+-              ascii_only: true,
+-            },
++              ascii_only: true
++            }
+           },
+           // Use multi-process parallel running to improve the build speed
+           // Default number of concurrent runs: os.cpus().length - 1
+@@ -231,7 +233,7 @@ module.exports = function(webpackEnv) {
+           parallel: !isWsl,
+           // Enable file caching
+           cache: true,
+-          sourceMap: shouldUseSourceMap,
++          sourceMap: shouldUseSourceMap
+         }),
+         // This is only used in production mode
+         new OptimizeCSSAssetsPlugin({
+@@ -244,22 +246,22 @@ module.exports = function(webpackEnv) {
+                   inline: false,
+                   // `annotation: true` appends the sourceMappingURL to the end of
+                   // the css file, helping the browser find the sourcemap
+-                  annotation: true,
++                  annotation: true
+                 }
+-              : false,
+-          },
+-        }),
++              : false
++          }
++        })
+       ],
+       // Automatically split vendor and commons
+       // https://twitter.com/wSokra/status/969633336732905474
+       // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
+       splitChunks: {
+         chunks: 'all',
+-        name: false,
++        name: false
+       },
+       // Keep the runtime chunk separated to enable long term caching
+       // https://twitter.com/wSokra/status/969679223278505985
+-      runtimeChunk: true,
++      runtimeChunk: true
+     },
+     resolve: {
+       // This allows you to set a fallback for where Webpack should look for modules.
+@@ -281,7 +283,7 @@ module.exports = function(webpackEnv) {
+       alias: {
+         // Support React Native Web
+         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
+-        'react-native': 'react-native-web',
++        'react-native': 'react-native-web'
+       },
+       plugins: [
+         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
+@@ -292,15 +294,15 @@ module.exports = function(webpackEnv) {
+         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
+         // please link the files into your node_modules/ and let module-resolution kick in.
+         // Make sure your source files are compiled, as they will not be processed in any way.
+-        new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+-      ],
++        new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson])
++      ]
+     },
+     resolveLoader: {
+       plugins: [
+         // Also related to Plug'n'Play, but this time it tells Webpack to load its loaders
+         // from the current package.
+-        PnpWebpackPlugin.moduleLoader(module),
+-      ],
++        PnpWebpackPlugin.moduleLoader(module)
++      ]
+     },
+     module: {
+       strictExportPresence: true,
+@@ -319,17 +321,20 @@ module.exports = function(webpackEnv) {
+                 formatter: require.resolve('react-dev-utils/eslintFormatter'),
+                 eslintPath: require.resolve('eslint'),
+                 // @remove-on-eject-begin
+-                baseConfig: {
+-                  extends: [require.resolve('eslint-config-react-app')],
+-                },
++                baseConfig:
++                  appPackageJson.eslintConfig &&
++                  appPackageJson.eslintConfig.extends &&
++                  appPackageJson.eslintConfig.extends.includes('react-app')
++                    ? appPackageJson.eslintConfig
++                    : { extends: [require.resolve('eslint-config-react-app')] },
+                 ignore: false,
+-                useEslintrc: false,
++                useEslintrc: false
+                 // @remove-on-eject-end
+               },
+-              loader: require.resolve('eslint-loader'),
+-            },
++              loader: require.resolve('eslint-loader')
++            }
+           ],
+-          include: paths.appSrc,
++          include: paths.appSrc
+         },
+         {
+           // "oneOf" will traverse all following loaders until one will
+@@ -344,8 +349,8 @@ module.exports = function(webpackEnv) {
+               loader: require.resolve('url-loader'),
+               options: {
+                 limit: 10000,
+-                name: 'static/media/[name].[hash:8].[ext]',
+-              },
++                name: 'static/media/[name].[hash:8].[ext]'
++              }
+             },
+             // Process application JS with Babel.
+             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
+@@ -374,7 +379,7 @@ module.exports = function(webpackEnv) {
+                     'babel-plugin-named-asset-import',
+                     'babel-preset-react-app',
+                     'react-dev-utils',
+-                    'react-scripts',
++                    'react-scripts'
+                   ]
+                 ),
+                 // @remove-on-eject-end
+@@ -384,19 +389,19 @@ module.exports = function(webpackEnv) {
+                     {
+                       loaderMap: {
+                         svg: {
+-                          ReactComponent: '@svgr/webpack?-svgo,+ref![path]',
+-                        },
+-                      },
+-                    },
+-                  ],
++                          ReactComponent: '@svgr/webpack?-svgo,+ref![path]'
++                        }
++                      }
++                    }
++                  ]
+                 ],
+                 // This is a feature of `babel-loader` for webpack (not Babel itself).
+                 // It enables caching results in ./node_modules/.cache/babel-loader/
+                 // directory for faster rebuilds.
+                 cacheDirectory: true,
+                 cacheCompression: isEnvProduction,
+-                compact: isEnvProduction,
+-              },
++                compact: isEnvProduction
++              }
+             },
+             // Process any JS outside of the app with Babel.
+             // Unlike the application JS, we only compile the standard ES features.
+@@ -411,8 +416,8 @@ module.exports = function(webpackEnv) {
+                 presets: [
+                   [
+                     require.resolve('babel-preset-react-app/dependencies'),
+-                    { helpers: true },
+-                  ],
++                    { helpers: true }
++                  ]
+                 ],
+                 cacheDirectory: true,
+                 cacheCompression: isEnvProduction,
+@@ -425,7 +430,7 @@ module.exports = function(webpackEnv) {
+                     'babel-plugin-named-asset-import',
+                     'babel-preset-react-app',
+                     'react-dev-utils',
+-                    'react-scripts',
++                    'react-scripts'
+                   ]
+                 ),
+                 // @remove-on-eject-end
+@@ -433,8 +438,8 @@ module.exports = function(webpackEnv) {
+                 // because it was compiled. Thus, we don't want the browser
+                 // debugger to show the original code. Instead, the code
+                 // being evaluated would be much more helpful.
+-                sourceMaps: false,
+-              },
++                sourceMaps: false
++              }
+             },
+             // "postcss" loader applies autoprefixer to our CSS.
+             // "css" loader resolves paths in CSS and adds assets as dependencies.
+@@ -448,13 +453,13 @@ module.exports = function(webpackEnv) {
+               exclude: cssModuleRegex,
+               use: getStyleLoaders({
+                 importLoaders: 1,
+-                sourceMap: isEnvProduction && shouldUseSourceMap,
++                sourceMap: isEnvProduction && shouldUseSourceMap
+               }),
+               // Don't consider CSS imports dead code even if the
+               // containing package claims to have no side effects.
+               // Remove this when webpack adds a warning or an error for this.
+               // See https://github.com/webpack/webpack/issues/6571
+-              sideEffects: true,
++              sideEffects: true
+             },
+             // Adds support for CSS Modules (https://github.com/css-modules/css-modules)
+             // using the extension .module.css
+@@ -464,8 +469,8 @@ module.exports = function(webpackEnv) {
+                 importLoaders: 1,
+                 sourceMap: isEnvProduction && shouldUseSourceMap,
+                 modules: true,
+-                getLocalIdent: getCSSModuleLocalIdent,
+-              }),
++                getLocalIdent: getCSSModuleLocalIdent
++              })
+             },
+             // Opt-in support for SASS (using .scss or .sass extensions).
+             // By default we support SASS Modules with the
+@@ -476,7 +481,7 @@ module.exports = function(webpackEnv) {
+               use: getStyleLoaders(
+                 {
+                   importLoaders: 2,
+-                  sourceMap: isEnvProduction && shouldUseSourceMap,
++                  sourceMap: isEnvProduction && shouldUseSourceMap
+                 },
+                 'sass-loader'
+               ),
+@@ -484,7 +489,7 @@ module.exports = function(webpackEnv) {
+               // containing package claims to have no side effects.
+               // Remove this when webpack adds a warning or an error for this.
+               // See https://github.com/webpack/webpack/issues/6571
+-              sideEffects: true,
++              sideEffects: true
+             },
+             // Adds support for CSS Modules, but using SASS
+             // using the extension .module.scss or .module.sass
+@@ -495,10 +500,10 @@ module.exports = function(webpackEnv) {
+                   importLoaders: 2,
+                   sourceMap: isEnvProduction && shouldUseSourceMap,
+                   modules: true,
+-                  getLocalIdent: getCSSModuleLocalIdent,
++                  getLocalIdent: getCSSModuleLocalIdent
+                 },
+                 'sass-loader'
+-              ),
++              )
+             },
+             // "file" loader makes sure those assets get served by WebpackDevServer.
+             // When you `import` an asset, you get its (virtual) filename.
+@@ -513,14 +518,14 @@ module.exports = function(webpackEnv) {
+               // by webpacks internal loaders.
+               exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+               options: {
+-                name: 'static/media/[name].[hash:8].[ext]',
+-              },
+-            },
++                name: 'static/media/[name].[hash:8].[ext]'
++              }
++            }
+             // ** STOP ** Are you adding a new loader?
+             // Make sure to add the new loader(s) before the "file" loader.
+-          ],
+-        },
+-      ],
++          ]
++        }
++      ]
+     },
+     plugins: [
+       // Generates an `index.html` file with the <script> injected.
+@@ -529,7 +534,7 @@ module.exports = function(webpackEnv) {
+           {},
+           {
+             inject: true,
+-            template: paths.appHtml,
++            template: paths.appHtml
+           },
+           isEnvProduction
+             ? {
+@@ -543,8 +548,8 @@ module.exports = function(webpackEnv) {
+                   keepClosingSlash: true,
+                   minifyJS: true,
+                   minifyCSS: true,
+-                  minifyURLs: true,
+-                },
++                  minifyURLs: true
++                }
+               }
+             : undefined
+         )
+@@ -587,7 +592,7 @@ module.exports = function(webpackEnv) {
+           // Options similar to the same options in webpackOptions.output
+           // both options are optional
+           filename: 'static/css/[name].[contenthash:8].css',
+-          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
++          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
+         }),
+       // Generate a manifest file which contains a mapping of all asset filenames
+       // to their corresponding output file so that tools can pick it up without
+@@ -597,14 +602,14 @@ module.exports = function(webpackEnv) {
+         publicPath: publicPath,
+         generate: (seed, files) => {
+           const manifestFiles = files.reduce(function(manifest, file) {
+-            manifest[file.name] = file.path;
+-            return manifest;
+-          }, seed);
++            manifest[file.name] = file.path
++            return manifest
++          }, seed)
+ 
+           return {
+-            files: manifestFiles,
+-          };
+-        },
++            files: manifestFiles
++          }
++        }
+       }),
+       // Moment.js is an extremely popular library that bundles large locale files
+       // by default due to how Webpack interprets its code. This is a practical
+@@ -625,14 +630,14 @@ module.exports = function(webpackEnv) {
+             new RegExp('^/_'),
+             // Exclude URLs containing a dot, as they're likely a resource in
+             // public/ and not a SPA route
+-            new RegExp('/[^/]+\\.[^/]+$'),
+-          ],
++            new RegExp('/[^/]+\\.[^/]+$')
++          ]
+         }),
+       // TypeScript type checking
+       useTypeScript &&
+         new ForkTsCheckerWebpackPlugin({
+           typescript: resolve.sync('typescript', {
+-            basedir: paths.appNodeModules,
++            basedir: paths.appNodeModules
+           }),
+           async: isEnvDevelopment,
+           useTypescriptIncrementalApi: true,
+@@ -649,13 +654,13 @@ module.exports = function(webpackEnv) {
+             '!**/__tests__/**',
+             '!**/?(*.)(spec|test).*',
+             '!**/src/setupProxy.*',
+-            '!**/src/setupTests.*',
++            '!**/src/setupTests.*'
+           ],
+           watch: paths.appSrc,
+           silent: true,
+           // The formatter is invoked directly in WebpackDevServerUtils during development
+-          formatter: isEnvProduction ? typescriptFormatter : undefined,
+-        }),
++          formatter: isEnvProduction ? typescriptFormatter : undefined
++        })
+     ].filter(Boolean),
+     // Some libraries import Node modules but don't use them in the browser.
+     // Tell Webpack to provide empty mocks for them so importing them works.
+@@ -667,10 +672,10 @@ module.exports = function(webpackEnv) {
+       http2: 'empty',
+       net: 'empty',
+       tls: 'empty',
+-      child_process: 'empty',
++      child_process: 'empty'
+     },
+     // Turn off performance processing because we utilize
+     // our own hints via the FileSizeReporter
+-    performance: false,
+-  };
+-};
++    performance: false
++  }
++}
+diff --git a/node_modules/react-scripts/scripts/eject.js b/node_modules/react-scripts/scripts/eject.js
+index 746451e..5ea6eb7 100644
+--- a/node_modules/react-scripts/scripts/eject.js
++++ b/node_modules/react-scripts/scripts/eject.js
+@@ -5,36 +5,36 @@
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+-'use strict';
++'use strict'
+ 
+ // Makes the script crash on unhandled rejections instead of silently
+ // ignoring them. In the future, promise rejections that are not handled will
+ // terminate the Node.js process with a non-zero exit code.
+ process.on('unhandledRejection', err => {
+-  throw err;
+-});
+-
+-const fs = require('fs-extra');
+-const path = require('path');
+-const execSync = require('child_process').execSync;
+-const chalk = require('react-dev-utils/chalk');
+-const paths = require('../config/paths');
+-const createJestConfig = require('./utils/createJestConfig');
+-const inquirer = require('react-dev-utils/inquirer');
+-const spawnSync = require('react-dev-utils/crossSpawn').sync;
+-const os = require('os');
+-
+-const green = chalk.green;
+-const cyan = chalk.cyan;
++  throw err
++})
++
++const fs = require('fs-extra')
++const path = require('path')
++const execSync = require('child_process').execSync
++const chalk = require('react-dev-utils/chalk')
++const paths = require('../config/paths')
++const createJestConfig = require('./utils/createJestConfig')
++const inquirer = require('react-dev-utils/inquirer')
++const spawnSync = require('react-dev-utils/crossSpawn').sync
++const os = require('os')
++
++const green = chalk.green
++const cyan = chalk.cyan
+ 
+ function getGitStatus() {
+   try {
+     let stdout = execSync(`git status --porcelain`, {
+-      stdio: ['pipe', 'pipe', 'ignore'],
+-    }).toString();
+-    return stdout.trim();
++      stdio: ['pipe', 'pipe', 'ignore']
++    }).toString()
++    return stdout.trim()
+   } catch (e) {
+-    return '';
++    return ''
+   }
+ }
+ 
+@@ -44,13 +44,13 @@ function tryGitAdd(appPath) {
+       'git',
+       ['add', path.join(appPath, 'config'), path.join(appPath, 'scripts')],
+       {
+-        stdio: 'inherit',
++        stdio: 'inherit'
+       }
+-    );
++    )
+ 
+-    return true;
++    return true
+   } catch (e) {
+-    return false;
++    return false
+   }
+ }
+ 
+@@ -59,23 +59,23 @@ console.log(
+     'NOTE: Create React App 2+ supports TypeScript, Sass, CSS Modules and more without ejecting: ' +
+       'https://reactjs.org/blog/2018/10/01/create-react-app-v2.html'
+   )
+-);
+-console.log();
++)
++console.log()
+ 
+ inquirer
+   .prompt({
+     type: 'confirm',
+     name: 'shouldEject',
+     message: 'Are you sure you want to eject? This action is permanent.',
+-    default: false,
++    default: false
+   })
+   .then(answer => {
+     if (!answer.shouldEject) {
+-      console.log(cyan('Close one! Eject aborted.'));
+-      return;
++      console.log(cyan('Close one! Eject aborted.'))
++      return
+     }
+ 
+-    const gitStatus = getGitStatus();
++    const gitStatus = getGitStatus()
+     if (gitStatus) {
+       console.error(
+         chalk.red(
+@@ -90,14 +90,14 @@ inquirer
+           chalk.red(
+             'Remove untracked files, stash or commit any changes, and try again.'
+           )
+-      );
+-      process.exit(1);
++      )
++      process.exit(1)
+     }
+ 
+-    console.log('Ejecting...');
++    console.log('Ejecting...')
+ 
+-    const ownPath = paths.ownPath;
+-    const appPath = paths.appPath;
++    const ownPath = paths.ownPath
++    const appPath = paths.appPath
+ 
+     function verifyAbsent(file) {
+       if (fs.existsSync(path.join(appPath, file))) {
+@@ -106,12 +106,12 @@ inquirer
+             'continue as you would lose all the changes in that file or directory. ' +
+             'Please move or delete it (maybe make a copy for backup) and run this ' +
+             'command again.'
+-        );
+-        process.exit(1);
++        )
++        process.exit(1)
+       }
+     }
+ 
+-    const folders = ['config', 'config/jest', 'scripts'];
++    const folders = ['config', 'config/jest', 'scripts']
+ 
+     // Make shallow array of files paths
+     const files = folders.reduce((files, folder) => {
+@@ -122,33 +122,33 @@ inquirer
+           .map(file => path.join(ownPath, folder, file))
+           // omit dirs from file list
+           .filter(file => fs.lstatSync(file).isFile())
+-      );
+-    }, []);
++      )
++    }, [])
+ 
+     // Ensure that the app folder is clean and we won't override any files
+-    folders.forEach(verifyAbsent);
+-    files.forEach(verifyAbsent);
++    folders.forEach(verifyAbsent)
++    files.forEach(verifyAbsent)
+ 
+     // Prepare Jest config early in case it throws
+     const jestConfig = createJestConfig(
+       filePath => path.posix.join('<rootDir>', filePath),
+       null,
+       true
+-    );
++    )
+ 
+-    console.log();
+-    console.log(cyan(`Copying files into ${appPath}`));
++    console.log()
++    console.log(cyan(`Copying files into ${appPath}`))
+ 
+     folders.forEach(folder => {
+-      fs.mkdirSync(path.join(appPath, folder));
+-    });
++      fs.mkdirSync(path.join(appPath, folder))
++    })
+ 
+     files.forEach(file => {
+-      let content = fs.readFileSync(file, 'utf8');
++      let content = fs.readFileSync(file, 'utf8')
+ 
+       // Skip flagged files
+       if (content.match(/\/\/ @remove-file-on-eject/)) {
+-        return;
++        return
+       }
+       content =
+         content
+@@ -162,97 +162,99 @@ inquirer
+             /-- @remove-on-eject-begin([\s\S]*?)-- @remove-on-eject-end/gm,
+             ''
+           )
+-          .trim() + '\n';
+-      console.log(`  Adding ${cyan(file.replace(ownPath, ''))} to the project`);
+-      fs.writeFileSync(file.replace(ownPath, appPath), content);
+-    });
+-    console.log();
++          .trim() + '\n'
++      console.log(`  Adding ${cyan(file.replace(ownPath, ''))} to the project`)
++      fs.writeFileSync(file.replace(ownPath, appPath), content)
++    })
++    console.log()
+ 
+-    const ownPackage = require(path.join(ownPath, 'package.json'));
+-    const appPackage = require(path.join(appPath, 'package.json'));
++    const ownPackage = require(path.join(ownPath, 'package.json'))
++    const appPackage = require(path.join(appPath, 'package.json'))
+ 
+-    console.log(cyan('Updating the dependencies'));
+-    const ownPackageName = ownPackage.name;
++    console.log(cyan('Updating the dependencies'))
++    const ownPackageName = ownPackage.name
+     if (appPackage.devDependencies) {
+       // We used to put react-scripts in devDependencies
+       if (appPackage.devDependencies[ownPackageName]) {
+-        console.log(`  Removing ${cyan(ownPackageName)} from devDependencies`);
+-        delete appPackage.devDependencies[ownPackageName];
++        console.log(`  Removing ${cyan(ownPackageName)} from devDependencies`)
++        delete appPackage.devDependencies[ownPackageName]
+       }
+     }
+-    appPackage.dependencies = appPackage.dependencies || {};
++    appPackage.dependencies = appPackage.dependencies || {}
+     if (appPackage.dependencies[ownPackageName]) {
+-      console.log(`  Removing ${cyan(ownPackageName)} from dependencies`);
+-      delete appPackage.dependencies[ownPackageName];
++      console.log(`  Removing ${cyan(ownPackageName)} from dependencies`)
++      delete appPackage.dependencies[ownPackageName]
+     }
+     Object.keys(ownPackage.dependencies).forEach(key => {
+       // For some reason optionalDependencies end up in dependencies after install
+       if (ownPackage.optionalDependencies[key]) {
+-        return;
++        return
+       }
+-      console.log(`  Adding ${cyan(key)} to dependencies`);
+-      appPackage.dependencies[key] = ownPackage.dependencies[key];
+-    });
++      console.log(`  Adding ${cyan(key)} to dependencies`)
++      appPackage.dependencies[key] = ownPackage.dependencies[key]
++    })
+     // Sort the deps
+-    const unsortedDependencies = appPackage.dependencies;
+-    appPackage.dependencies = {};
++    const unsortedDependencies = appPackage.dependencies
++    appPackage.dependencies = {}
+     Object.keys(unsortedDependencies)
+       .sort()
+       .forEach(key => {
+-        appPackage.dependencies[key] = unsortedDependencies[key];
+-      });
+-    console.log();
++        appPackage.dependencies[key] = unsortedDependencies[key]
++      })
++    console.log()
+ 
+-    console.log(cyan('Updating the scripts'));
+-    delete appPackage.scripts['eject'];
++    console.log(cyan('Updating the scripts'))
++    delete appPackage.scripts['eject']
+     Object.keys(appPackage.scripts).forEach(key => {
+       Object.keys(ownPackage.bin).forEach(binKey => {
+-        const regex = new RegExp(binKey + ' (\\w+)', 'g');
++        const regex = new RegExp(binKey + ' (\\w+)', 'g')
+         if (!regex.test(appPackage.scripts[key])) {
+-          return;
++          return
+         }
+         appPackage.scripts[key] = appPackage.scripts[key].replace(
+           regex,
+           'node scripts/$1.js'
+-        );
++        )
+         console.log(
+           `  Replacing ${cyan(`"${binKey} ${key}"`)} with ${cyan(
+             `"node scripts/${key}.js"`
+           )}`
+-        );
+-      });
+-    });
++        )
++      })
++    })
+ 
+-    console.log();
+-    console.log(cyan('Configuring package.json'));
++    console.log()
++    console.log(cyan('Configuring package.json'))
+     // Add Jest config
+-    console.log(`  Adding ${cyan('Jest')} configuration`);
+-    appPackage.jest = jestConfig;
++    console.log(`  Adding ${cyan('Jest')} configuration`)
++    appPackage.jest = jestConfig
+ 
+     // Add Babel config
+-    console.log(`  Adding ${cyan('Babel')} preset`);
++    console.log(`  Adding ${cyan('Babel')} preset`)
+     appPackage.babel = {
+-      presets: ['react-app'],
+-    };
++      presets: ['react-app']
++    }
+ 
+     // Add ESlint config
+-    console.log(`  Adding ${cyan('ESLint')} configuration`);
+-    appPackage.eslintConfig = {
+-      extends: 'react-app',
+-    };
++    if (!appPackage.eslintConfig) {
++      console.log(`  Adding ${cyan('ESLint')} configuration`)
++      appPackage.eslintConfig = {
++        extends: 'react-app'
++      }
++    }
+ 
+     fs.writeFileSync(
+       path.join(appPath, 'package.json'),
+       JSON.stringify(appPackage, null, 2) + os.EOL
+-    );
+-    console.log();
++    )
++    console.log()
+ 
+     if (fs.existsSync(paths.appTypeDeclarations)) {
+       try {
+         // Read app declarations file
+-        let content = fs.readFileSync(paths.appTypeDeclarations, 'utf8');
++        let content = fs.readFileSync(paths.appTypeDeclarations, 'utf8')
+         const ownContent =
+-          fs.readFileSync(paths.ownTypeDeclarations, 'utf8').trim() + os.EOL;
++          fs.readFileSync(paths.ownTypeDeclarations, 'utf8').trim() + os.EOL
+ 
+         // Remove react-scripts reference since they're getting a copy of the types in their project
+         content =
+@@ -262,12 +264,12 @@ inquirer
+               /^\s*\/\/\/\s*<reference\s+types.+?"react-scripts".*\/>.*(?:\n|$)/gm,
+               ''
+             )
+-            .trim() + os.EOL;
++            .trim() + os.EOL
+ 
+         fs.writeFileSync(
+           paths.appTypeDeclarations,
+           (ownContent + os.EOL + content).trim() + os.EOL
+-        );
++        )
+       } catch (e) {
+         // It's not essential that this succeeds, the TypeScript user should
+         // be able to re-create these types with ease.
+@@ -279,9 +281,9 @@ inquirer
+       try {
+         // remove react-scripts and react-scripts binaries from app node_modules
+         Object.keys(ownPackage.bin).forEach(binKey => {
+-          fs.removeSync(path.join(appPath, 'node_modules', '.bin', binKey));
+-        });
+-        fs.removeSync(ownPath);
++          fs.removeSync(path.join(appPath, 'node_modules', '.bin', binKey))
++        })
++        fs.removeSync(ownPath)
+       } catch (e) {
+         // It's not essential that this succeeds
+       }
+@@ -293,47 +295,47 @@ inquirer
+         'node_modules',
+         '.bin',
+         'react-scripts.cmd'
+-      );
+-      let windowsCmdFileContent;
++      )
++      let windowsCmdFileContent
+       if (process.platform === 'win32') {
+         // https://github.com/facebook/create-react-app/pull/3806#issuecomment-357781035
+         // Yarn is diligent about cleaning up after itself, but this causes the react-scripts.cmd file
+         // to be deleted while it is running. This trips Windows up after the eject completes.
+         // We'll read the batch file and later "write it back" to match npm behavior.
+         try {
+-          windowsCmdFileContent = fs.readFileSync(windowsCmdFilePath);
++          windowsCmdFileContent = fs.readFileSync(windowsCmdFilePath)
+         } catch (err) {
+           // If this fails we're not worse off than if we didn't try to fix it.
+         }
+       }
+ 
+-      console.log(cyan('Running yarn...'));
+-      spawnSync('yarnpkg', ['--cwd', process.cwd()], { stdio: 'inherit' });
++      console.log(cyan('Running yarn...'))
++      spawnSync('yarnpkg', ['--cwd', process.cwd()], { stdio: 'inherit' })
+ 
+       if (windowsCmdFileContent && !fs.existsSync(windowsCmdFilePath)) {
+         try {
+-          fs.writeFileSync(windowsCmdFilePath, windowsCmdFileContent);
++          fs.writeFileSync(windowsCmdFilePath, windowsCmdFileContent)
+         } catch (err) {
+           // If this fails we're not worse off than if we didn't try to fix it.
+         }
+       }
+     } else {
+-      console.log(cyan('Running npm install...'));
++      console.log(cyan('Running npm install...'))
+       spawnSync('npm', ['install', '--loglevel', 'error'], {
+-        stdio: 'inherit',
+-      });
++        stdio: 'inherit'
++      })
+     }
+-    console.log(green('Ejected successfully!'));
+-    console.log();
++    console.log(green('Ejected successfully!'))
++    console.log()
+ 
+     if (tryGitAdd(appPath)) {
+-      console.log(cyan('Staged ejected files for commit.'));
+-      console.log();
++      console.log(cyan('Staged ejected files for commit.'))
++      console.log()
+     }
+ 
+     console.log(
+       green('Please consider sharing why you ejected in this survey:')
+-    );
+-    console.log(green('  http://goo.gl/forms/Bi6CZjk1EqsdelXk1'));
+-    console.log();
+-  });
++    )
++    console.log(green('  http://goo.gl/forms/Bi6CZjk1EqsdelXk1'))
++    console.log()
++  })
+diff --git a/node_modules/react-scripts/scripts/utils/createJestConfig.js b/node_modules/react-scripts/scripts/utils/createJestConfig.js
+index d2c7882..327f831 100644
+--- a/node_modules/react-scripts/scripts/utils/createJestConfig.js
++++ b/node_modules/react-scripts/scripts/utils/createJestConfig.js
+@@ -5,22 +5,22 @@
+  * This source code is licensed under the MIT license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+-'use strict';
++'use strict'
+ 
+-const fs = require('fs');
+-const chalk = require('react-dev-utils/chalk');
+-const paths = require('../../config/paths');
+-const modules = require('../../config/modules');
++const fs = require('fs')
++const chalk = require('react-dev-utils/chalk')
++const paths = require('../../config/paths')
++const modules = require('../../config/modules')
+ 
+ module.exports = (resolve, rootDir, isEjecting) => {
+   // Use this instead of `paths.testsSetup` to avoid putting
+   // an absolute filename into configuration after ejecting.
+-  const setupTestsMatches = paths.testsSetup.match(/src[/\\]setupTests\.(.+)/);
++  const setupTestsMatches = paths.testsSetup.match(/src[/\\]setupTests\.(.+)/)
+   const setupTestsFileExtension =
+-    (setupTestsMatches && setupTestsMatches[1]) || 'js';
++    (setupTestsMatches && setupTestsMatches[1]) || 'js'
+   const setupTestsFile = fs.existsSync(paths.testsSetup)
+     ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
+-    : undefined;
++    : undefined
+ 
+   const config = {
+     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
+@@ -28,13 +28,13 @@ module.exports = (resolve, rootDir, isEjecting) => {
+     setupFiles: [
+       isEjecting
+         ? 'react-app-polyfill/jsdom'
+-        : require.resolve('react-app-polyfill/jsdom'),
++        : require.resolve('react-app-polyfill/jsdom')
+     ],
+ 
+     setupFilesAfterEnv: setupTestsFile ? [setupTestsFile] : [],
+     testMatch: [
+       '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+-      '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}',
++      '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}'
+     ],
+     testEnvironment: 'jest-environment-jsdom-fourteen',
+     transform: {
+@@ -44,29 +44,29 @@ module.exports = (resolve, rootDir, isEjecting) => {
+       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
+       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
+         'config/jest/fileTransform.js'
+-      ),
++      )
+     },
+     transformIgnorePatterns: [
+       '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
+-      '^.+\\.module\\.(css|sass|scss)$',
++      '^.+\\.module\\.(css|sass|scss)$'
+     ],
+     modulePaths: modules.additionalModulePaths || [],
+     moduleNameMapper: {
+       '^react-native$': 'react-native-web',
+-      '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
++      '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy'
+     },
+     moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
+       ext => !ext.includes('mjs')
+     ),
+     watchPlugins: [
+       'jest-watch-typeahead/filename',
+-      'jest-watch-typeahead/testname',
+-    ],
+-  };
++      'jest-watch-typeahead/testname'
++    ]
++  }
+   if (rootDir) {
+-    config.rootDir = rootDir;
++    config.rootDir = rootDir
+   }
+-  const overrides = Object.assign({}, require(paths.appPackageJson).jest);
++  const overrides = Object.assign({}, require(paths.appPackageJson).jest)
+   const supportedKeys = [
+     'collectCoverageFrom',
+     'coverageReporters',
+@@ -74,22 +74,30 @@ module.exports = (resolve, rootDir, isEjecting) => {
+     'extraGlobals',
+     'globalSetup',
+     'globalTeardown',
++    'moduleNameMapper',
+     'resetMocks',
+     'resetModules',
+     'snapshotSerializers',
+-    'watchPathIgnorePatterns',
+-  ];
++    'watchPathIgnorePatterns'
++  ]
++  const mergedKeys = ['moduleNameMapper']
+   if (overrides) {
+     supportedKeys.forEach(key => {
+       if (overrides.hasOwnProperty(key)) {
+-        config[key] = overrides[key];
+-        delete overrides[key];
++        config[key] = overrides[key]
++        if (mergedKeys.includes(key)) {
++          // Allow overrides[key] to override internal configuration
++          config[key] = Object.assign(config[key], overrides[key])
++        } else {
++          config[key] = overrides[key]
++        }
++        delete overrides[key]
+       }
+-    });
+-    const unsupportedKeys = Object.keys(overrides);
++    })
++    const unsupportedKeys = Object.keys(overrides)
+     if (unsupportedKeys.length) {
+       const isOverridingSetupFile =
+-        unsupportedKeys.indexOf('setupFilesAfterEnv') > -1;
++        unsupportedKeys.indexOf('setupFilesAfterEnv') > -1
+ 
+       if (isOverridingSetupFile) {
+         console.error(
+@@ -101,7 +109,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
+               chalk.bold('src/setupTests.js') +
+               '.\nThis file will be loaded automatically.\n'
+           )
+-        );
++        )
+       } else {
+         console.error(
+           chalk.red(
+@@ -123,11 +131,11 @@ module.exports = (resolve, rootDir, isEjecting) => {
+               'You may also file an issue with Create React App to discuss ' +
+               'supporting more options out of the box.\n'
+           )
+-        );
++        )
+       }
+ 
+-      process.exit(1);
++      process.exit(1)
+     }
+   }
+-  return config;
+-};
++  return config
++}

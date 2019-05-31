@@ -1,4 +1,4 @@
-import { Validation, ValidationInitializer } from '../utils/validate'
+import { Validation, ValidationInitializer } from '@register/utils/validate'
 import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,

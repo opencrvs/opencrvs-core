@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { createTestComponent } from '../../tests/util'
-import { CreatePin } from './CreatePin'
-import { createStore } from 'src/store'
+import { createTestComponent } from '@register/tests/util'
+import { CreatePin } from '@register/views/PIN/CreatePin'
+import { createStore } from '@register/store'
 import { storage } from '@opencrvs/register/src/storage'
 import { ReactWrapper } from 'enzyme'
 

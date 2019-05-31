@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import { IconAction } from '@opencrvs/components/lib/buttons'
 import { Camera } from '@opencrvs/components/lib/icons'
 import { IActionProps } from '@opencrvs/components/lib/buttons/Action'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { FileItem } from '@opencrvs/components/lib/files'
-import { IFormSection, IFileValue } from 'src/forms'
-import { ImageUploadOption } from './ImageUploadOption'
-import { ImagePreview } from './ImagePreview'
+import { IFormSection, IFileValue } from '@register/forms'
+import { ImageUploadOption } from '@register/components/form/ImageUploadField/ImageUploadOption'
+import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
 
 const Container = styled.div`
   width: 100%;

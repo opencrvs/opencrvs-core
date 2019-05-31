@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from 'src/tests/util'
-import { createStore } from 'src/store'
-import { Unlock } from './Unlock'
-import { storage } from 'src/storage'
-import { pinOps } from './ComparePINs'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
-import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
+import { createTestComponent, flushPromises } from '@register/tests/util'
+import { createStore } from '@register/store'
+import { Unlock } from '@register/views/Unlock/Unlock'
+import { storage } from '@register/storage'
+import { pinOps } from '@register/views/Unlock/ComparePINs'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
+import { SECURITY_PIN_EXPIRED_AT } from '@register/utils/constants'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()

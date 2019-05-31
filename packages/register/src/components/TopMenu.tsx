@@ -1,21 +1,21 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Scope } from 'src/utils/authUtils'
+import { Scope } from '@register/utils/authUtils'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { getScope } from 'src/profile/profileSelectors'
-import styled from '../styled-components'
+import { getScope } from '@register/profile/profileSelectors'
+import styled from '@register/styled-components'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
   goToPerformance as goToPerformanceAction
-} from 'src/navigation'
-import { redirectToAuthentication } from 'src/profile/profileActions'
-import { getLanguages } from 'src/i18n/selectors'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
+} from '@register/navigation'
+import { redirectToAuthentication } from '@register/profile/profileActions'
+import { getLanguages } from '@register/i18n/selectors'
+import { IStoreState } from '@register/store'
+import { IntlState } from '@register/i18n/reducer'
+import { changeLanguage as changeLanguageAction } from '@register/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 
 const messages = defineMessages({

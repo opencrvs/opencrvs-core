@@ -7,8 +7,8 @@ import {
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { InjectedIntl } from 'react-intl'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
+import { createNamesMap } from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 
 export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
   const { locale } = intl

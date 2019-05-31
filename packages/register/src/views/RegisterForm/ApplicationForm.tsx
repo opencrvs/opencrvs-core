@@ -12,8 +12,8 @@ import {
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
-import { Event } from 'src/forms'
-import { Scope } from 'src/utils/authUtils'
+import { Event } from '@register/forms'
+import { Scope } from '@register/utils/authUtils'
 
 type IProps = IFormProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>

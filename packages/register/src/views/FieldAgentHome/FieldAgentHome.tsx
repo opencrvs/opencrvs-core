@@ -4,18 +4,18 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { goToEvents as goToEventsAction } from 'src/navigation'
+import { goToEvents as goToEventsAction } from '@register/navigation'
 import { ISearchInputProps } from '@opencrvs/components/lib/interface'
-import { IUserDetails } from '../../utils/userUtils'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { Header } from 'src/components/interface/Header/Header'
+import { IUserDetails } from '@register/utils/userUtils'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { Header } from '@register/components/interface/Header/Header'
 import {
   FIELD_AGENT_ROLE,
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
-} from 'src/utils/constants'
-import styled from 'styled-components'
+} from '@register/utils/constants'
+import styled from '@register/styled-components'
 import {
   Button,
   ICON_ALIGNMENT,
@@ -27,8 +27,8 @@ import {
   StatusRejected,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
-import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
-import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '@register/navigation'
+import { REGISTRAR_HOME } from '@register/navigation/routes'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;

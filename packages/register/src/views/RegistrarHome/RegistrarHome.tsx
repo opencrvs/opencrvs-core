@@ -30,31 +30,34 @@ import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { Header } from 'src/components/interface/Header/Header'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IApplication } from 'src/applications'
-import { Event } from 'src/forms'
+import { Header } from '@register/components/interface/Header/Header'
+import { IViewHeadingProps } from '@register/components/ViewHeading'
+import { IApplication } from '@register/applications'
+import { Event } from '@register/forms'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToTab as goToTabAction
-} from 'src/navigation'
+} from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB
-} from 'src/navigation/routes'
-import { getScope, getUserDetails } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
-import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
+} from '@register/navigation/routes'
+import { getScope, getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { Scope } from '@register/utils/authUtils'
+import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from '@register/utils/constants'
+import { createNamesMap } from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
+import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
-import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
-import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
-import { sentenceCase } from 'src/utils/data-formatting'
+import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
+import {
+  COUNT_REGISTRATION_QUERY,
+  FETCH_REGISTRATIONS_QUERY
+} from '@register/views/RegistrarHome/queries'
+import { sentenceCase } from '@register/utils/data-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean

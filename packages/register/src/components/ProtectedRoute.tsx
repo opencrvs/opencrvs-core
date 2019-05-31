@@ -6,8 +6,8 @@ import {
   withRouter
 } from 'react-router'
 import { connect } from 'react-redux'
-import { IStoreState } from '../store'
-import { getAuthenticated } from '../profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { getAuthenticated } from '@register/profile/profileSelectors'
 
 export interface IProps {
   authenticated: boolean

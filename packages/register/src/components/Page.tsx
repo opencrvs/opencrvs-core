@@ -1,21 +1,21 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { setInitialApplications } from 'src/applications'
+import { setInitialApplications } from '@register/applications'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { getInitialApplicationsLoaded } from 'src/applications/selectors'
+import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 import {
   getOfflineDataLoaded,
   getOfflineLoadingError
-} from 'src/offline/selectors'
+} from '@register/offline/selectors'
 import { parse } from 'querystring'
-import { IURLParams } from '../utils/authUtils'
-import { checkAuth } from '../profile/profileActions'
-import { showConfigurationErrorNotification } from '../notification/actions'
+import { IURLParams } from '@register/utils/authUtils'
+import { checkAuth } from '@register/profile/profileActions'
+import { showConfigurationErrorNotification } from '@register/notification/actions'
 
 const languageFromProps = ({ language }: IPageProps) => language
 

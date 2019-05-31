@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { Event, Action } from 'src/forms'
-import { getBirthQueryMappings } from './birth/queries'
-import { getDeathQueryMappings } from './death/queries'
+import { Event, Action } from '@register/forms'
+import { getBirthQueryMappings } from '@register/views/DataProvider/birth/queries'
+import { getDeathQueryMappings } from '@register/views/DataProvider/death/queries'
 import { Query } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
 

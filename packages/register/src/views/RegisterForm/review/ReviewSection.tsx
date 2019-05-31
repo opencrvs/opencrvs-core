@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { SectionDrawer } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
-import { IApplication } from 'src/applications'
+import styled from '@register/styled-components'
+import { IApplication } from '@register/applications'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { getRegisterForm } from 'src/forms/register/application-selectors'
-import { EditConfirmation } from './EditConfirmation'
-import { getConditionalActionsForField } from 'src/forms/utils'
+import { IStoreState } from '@register/store'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
+import { getConditionalActionsForField } from '@register/forms/utils'
 import {
   TickLarge,
   CrossLarge,
@@ -15,24 +15,24 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from 'src/forms/validation'
-import { goToTab } from 'src/navigation'
+import { getValidationErrorsForForm } from '@register/forms/validation'
+import { goToTab } from '@register/navigation'
 import {
   DocumentViewer,
   IDocumentViewerOptions
 } from '@opencrvs/components/lib/interface'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
-import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
-import { getOfflineState } from 'src/offline/selectors'
+import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
+import { getScope } from '@register/profile/profileSelectors'
+import { Scope } from '@register/utils/authUtils'
+import { getOfflineState } from '@register/offline/selectors'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { getLanguage } from 'src/i18n/selectors'
+} from '@register/offline/reducer'
+import { getLanguage } from '@register/i18n/selectors'
 import {
   defineMessages,
   InjectedIntlProps,
@@ -62,10 +62,10 @@ import {
   DATE,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField
-} from 'src/forms'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { getFieldLabel } from 'src/forms/utils'
-import { REJECTED } from 'src/utils/constants'
+} from '@register/forms'
+import { formatLongDate } from '@register/utils/date-formatting'
+import { getFieldLabel } from '@register/forms/utils'
+import { REJECTED } from '@register/utils/constants'
 
 const messages = defineMessages({
   valueYes: {

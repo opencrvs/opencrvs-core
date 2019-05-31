@@ -1,23 +1,23 @@
 import * as React from 'react'
 import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import styled from '@register/styled-components'
+import { redirectToAuthentication } from '@register/profile/profileActions'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IUserDetails } from '../../utils/userUtils'
+import { IStoreState } from '@register/store'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IUserDetails } from '@register/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { storage } from 'src/storage'
+import { storage } from '@register/storage'
 import {
   SECURITY_PIN_INDEX,
   SECURITY_PIN_EXPIRED_AT
-} from 'src/utils/constants'
+} from '@register/utils/constants'
 import * as moment from 'moment'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
-import { pinOps } from './ComparePINs'
+import { pinOps } from '@register/views/Unlock/ComparePINs'
 
 const messages = defineMessages({
   incorrect: {

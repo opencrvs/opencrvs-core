@@ -11,9 +11,9 @@ import {
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
   SEARCH
-} from 'src/navigation/routes'
+} from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken } from 'src/utils/authUtils'
+import { getToken } from '@register/utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any

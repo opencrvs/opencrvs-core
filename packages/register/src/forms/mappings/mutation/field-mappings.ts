@@ -1,4 +1,9 @@
-import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
+import {
+  IFormField,
+  IFormData,
+  IFormFieldValue,
+  IAttachment
+} from '@register/forms'
 
 export const fieldToNameTransformer = (
   language: string,

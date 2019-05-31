@@ -6,27 +6,27 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
+} from '@register/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB,
   HOME
-} from 'src/navigation/routes'
+} from '@register/navigation/routes'
 import {
   storeApplication,
   IApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
+} from '@register/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import { storage } from 'src/storage'
-import { Event } from 'src/forms'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import { storage } from '@register/storage'
+import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
-import * as CommonUtils from 'src/utils/commonUtils'
+import * as CommonUtils from '@register/utils/commonUtils'
 
 import * as fetchAny from 'jest-fetch-mock'
 

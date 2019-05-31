@@ -4,17 +4,17 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   TEXT
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
-import { maxLength, match } from 'src/utils/validate'
-import { conditionals } from 'src/forms/utils'
+import { maxLength, match } from '@register/utils/validate'
+import { conditionals } from '@register/forms/utils'
 import {
   sectionFieldToBundleFieldTransformer,
   ignoreFieldTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
-import { bundleFieldToSectionFieldTransformer } from 'src/forms/mappings/query/field-mappings'
-import { hasCaseOfDeathSectionTransformer } from './mappings/query/cause-of-death-mappings'
-import { REGEXP_BLOCK_ALPHA_NUMERIC_DOT } from 'src/utils/constants'
+} from '@register/forms/mappings/mutation/field-mappings'
+import { bundleFieldToSectionFieldTransformer } from '@register/forms/mappings/query/field-mappings'
+import { hasCaseOfDeathSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/cause-of-death-mappings'
+import { REGEXP_BLOCK_ALPHA_NUMERIC_DOT } from '@register/utils/constants'
 
 const messages = defineMessages({
   causeOfDeathTab: {

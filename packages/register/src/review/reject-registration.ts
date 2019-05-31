@@ -1,5 +1,5 @@
 import { defineMessages } from 'react-intl'
-import { CHECKBOX_GROUP, TEXTAREA, IFormField } from 'src/forms'
+import { CHECKBOX_GROUP, TEXTAREA, IFormField } from '@register/forms'
 
 export const messages = defineMessages({
   rejectionForm: {

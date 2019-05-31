@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Chip } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
+import styled from '@register/styled-components'
 import {
   StatusGray,
   StatusOrange,
@@ -12,10 +12,10 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { goToTab as goToTabAction } from 'src/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { goToTab as goToTabAction } from '@register/navigation'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
 import Moment from 'react-moment'
-import { getRejectionReasonDisplayValue } from 'src/views/SearchResult/SearchResult'
+import { getRejectionReasonDisplayValue } from '@register/views/SearchResult/SearchResult'
 
 export enum Event {
   BIRTH = 'BIRTH',

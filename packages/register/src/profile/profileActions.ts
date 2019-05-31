@@ -1,5 +1,5 @@
 import { RouterAction } from 'react-router-redux'
-import { IURLParams } from '../utils/authUtils'
+import { IURLParams } from '@register/utils/authUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH'

@@ -1,4 +1,4 @@
-import { generateAndPrintCertificate } from './generatePDF'
+import { generateAndPrintCertificate } from '@register/views/PrintCertificate/generatePDF'
 
 describe('When invokeing PDF generate Library', () => {
   it.only('Should Show print prompt', () => {

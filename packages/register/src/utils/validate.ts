@@ -10,8 +10,11 @@ import {
   BIRTH_REGISTRATION_NUMBER,
   DEATH_REGISTRATION_NUMBER,
   PASSPORT
-} from 'src/forms/identity'
-import { REGEXP_ALPHA_NUMERIC, REGEXP_BLOCK_ALPHA_NUMERIC } from './constants'
+} from '@register/forms/identity'
+import {
+  REGEXP_ALPHA_NUMERIC,
+  REGEXP_BLOCK_ALPHA_NUMERIC
+} from '@register/utils/constants'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor

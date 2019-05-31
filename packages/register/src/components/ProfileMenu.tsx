@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import {
   injectIntl,
   InjectedIntlProps,
@@ -13,12 +13,12 @@ import {
   LogoutBlack,
   AvatarSmall
 } from '@opencrvs/components/lib/icons'
-import { IStoreState } from 'src/store'
-import { IUserDetails } from 'src/utils/userUtils'
-import { getLanguage } from 'src/i18n/selectors'
-import { getUserDetails } from 'src/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { IUserDetails } from '@register/utils/userUtils'
+import { getLanguage } from '@register/i18n/selectors'
+import { getUserDetails } from '@register/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import { redirectToAuthentication } from '@register/profile/profileActions'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};

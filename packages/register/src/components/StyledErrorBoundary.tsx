@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from 'src/store'
+import { IStoreState } from '@register/store'
 
 const ErrorContainer = styled.div`
   display: flex;

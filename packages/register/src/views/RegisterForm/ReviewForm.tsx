@@ -17,16 +17,16 @@ import {
   createReviewApplication
 } from '@opencrvs/register/src/applications'
 import { Dispatch } from 'redux'
-import { getScope } from 'src/profile/profileSelectors'
+import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@opencrvs/register/src/utils/authUtils'
-import { gqlToDraftTransformer } from 'src/transformer'
-import { IFormData, Event, Action } from 'src/forms'
+import { gqlToDraftTransformer } from '@register/transformer'
+import { IFormData, Event, Action } from '@register/forms'
 import {
   QueryProvider,
   QueryContext
-} from 'src/views/DataProvider/QueryProvider'
+} from '@register/views/DataProvider/QueryProvider'
 import * as Sentry from '@sentry/browser'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
 
 const messages = defineMessages({
   queryError: {

@@ -1,7 +1,7 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import * as actions from './actions'
-import { ENGLISH_STATE } from './locales/en'
-import { BENGALI_STATE } from './locales/bn'
+import * as actions from '@register/i18n/actions'
+import { ENGLISH_STATE } from '@register/i18n/locales/en'
+import { BENGALI_STATE } from '@register/i18n/locales/bn'
 
 export interface IntlMessages {
   [key: string]: string

@@ -1,8 +1,8 @@
 import {
   GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
   getDeathQueryMappings
-} from './queries'
-import { Action } from 'src/forms'
+} from '@register/views/DataProvider/death/queries'
+import { Action } from '@register/forms'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {

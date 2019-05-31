@@ -1,4 +1,4 @@
-import { pinOps } from './ComparePINs'
+import { pinOps } from '@register/views/Unlock/ComparePINs'
 import * as bcrypt from 'bcryptjs'
 
 describe('Compare two PINs', () => {

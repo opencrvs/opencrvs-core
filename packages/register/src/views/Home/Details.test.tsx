@@ -1,21 +1,21 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { mockUserResponse } from 'src/tests/util'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { queries } from 'src/profile/queries'
+import { createTestComponent } from '@register/tests/util'
+import { mockUserResponse } from '@register/tests/util'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
+import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { storage } from 'src/storage'
-import { createStore } from 'src/store'
-import { validToken } from 'src/tests/util'
-import { checkAuth } from 'src/profile/profileActions'
-import { Details } from 'src/views/Home/Details'
+import { storage } from '@register/storage'
+import { createStore } from '@register/store'
+import { validToken } from '@register/tests/util'
+import { checkAuth } from '@register/profile/profileActions'
+import { Details } from '@register/views/Home/Details'
 import {
   createApplication,
   storeApplication,
   modifyApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
-import { Event } from 'src/forms'
+} from '@register/applications'
+import { Event } from '@register/forms'
 
 const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()

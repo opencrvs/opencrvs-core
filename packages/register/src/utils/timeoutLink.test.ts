@@ -1,4 +1,4 @@
-import TimeoutLink from './timeoutLink'
+import TimeoutLink from '@register/utils/timeoutLink'
 import gql from 'graphql-tag'
 import {
   ApolloLink,

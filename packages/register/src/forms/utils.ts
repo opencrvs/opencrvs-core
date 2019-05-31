@@ -22,16 +22,16 @@ import {
   ILoaderButton,
   IFieldInput,
   IQuery
-} from './'
+} from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
-import { getValidationErrorsForForm } from 'src/forms/validation'
+import { getValidationErrorsForForm } from '@register/forms/validation'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { Validation } from 'src/utils/validate'
+} from '@register/offline/reducer'
+import { Validation } from '@register/utils/validate'
 import * as moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 

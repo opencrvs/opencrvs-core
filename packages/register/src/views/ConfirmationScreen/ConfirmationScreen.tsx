@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
+import styled from '@register/styled-components'
 import {
   OffLineCircled,
   Rejected,
@@ -14,10 +14,10 @@ import {
   FooterPrimaryButton
 } from '@opencrvs/register/src/components/interface/footer'
 import { RouteComponentProps } from 'react-router'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { DECLARATION, REJECTION, BIRTH, OFFLINE } from 'src/utils/constants'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { IStoreState } from '@register/store'
+import { IntlState } from '@register/i18n/reducer'
+import { DECLARATION, REJECTION, BIRTH, OFFLINE } from '@register/utils/constants'
+import { HomeViewHeader } from '@register/components/HomeViewHeader'
 
 const messages = defineMessages({
   backButton: {

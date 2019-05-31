@@ -15,7 +15,7 @@ import {
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification
-} from 'src/notification/actions'
+} from '@register/notification/actions'
 
 type NotificationProps = {
   language?: string

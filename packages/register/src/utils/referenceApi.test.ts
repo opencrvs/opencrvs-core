@@ -1,4 +1,4 @@
-import { referenceApi } from './referenceApi'
+import { referenceApi } from '@register/utils/referenceApi'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

@@ -10,11 +10,11 @@ import {
   DraftSimple
 } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from '../../styled-components'
+import styled from '@register/styled-components'
 import {
   goToTab as goToTabAction,
   goBack as goBackAction
-} from '../../navigation'
+} from '@register/navigation'
 import {
   IForm,
   IFormSection,
@@ -22,27 +22,30 @@ import {
   IFormSectionData,
   Event,
   Action
-} from '../../forms'
-import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
-import { IStoreState } from 'src/store'
+} from '@register/forms'
+import {
+  FormFieldGenerator,
+  ViewHeaderWithTabs
+} from '@register/components/form'
+import { IStoreState } from '@register/store'
 import {
   IApplication,
   modifyApplication,
   deleteApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
+} from '@register/applications'
 import {
   FooterAction,
   FooterPrimaryButton,
   ViewFooter
-} from 'src/components/interface/footer'
-import { StickyFormTabs } from './StickyFormTabs'
-import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
+} from '@register/components/interface/footer'
+import { StickyFormTabs } from '@register/views/RegisterForm/StickyFormTabs'
+import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { merge, isUndefined, isNull } from 'lodash'
-import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
-import { getOfflineState } from 'src/offline/selectors'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { CONFIRMATION_SCREEN, HOME } from 'src/navigation/routes'
+import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
+import { getOfflineState } from '@register/offline/selectors'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { CONFIRMATION_SCREEN, HOME } from '@register/navigation/routes'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 
 import {
@@ -52,16 +55,16 @@ import {
   REGISTERED,
   DUPLICATION,
   OFFLINE
-} from 'src/utils/constants'
+} from '@register/utils/constants'
 
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
-import { isMobileDevice } from 'src/utils/commonUtils'
+import { getScope } from '@register/profile/profileSelectors'
+import { Scope } from '@register/utils/authUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
 import {
   MutationProvider,
   MutationContext
-} from '../DataProvider/MutationProvider'
-import { toggleDraftSavedNotification } from 'src/notification/actions'
+} from '@register/views/DataProvider/MutationProvider'
+import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { InvertSpinner } from '@opencrvs/components/lib/interface'
 import { TickLarge } from '@opencrvs/components/lib/icons'
 import * as Sentry from '@sentry/browser'

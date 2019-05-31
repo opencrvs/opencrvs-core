@@ -1,5 +1,5 @@
-import { IOfflineDataState } from './reducer'
-import { IStoreState } from '../store'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { IStoreState } from '@register/store'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline

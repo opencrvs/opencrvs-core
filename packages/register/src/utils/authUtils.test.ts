@@ -1,4 +1,4 @@
-import { getTokenPayload, getToken } from './authUtils'
+import { getTokenPayload, getToken } from '@register/utils/authUtils'
 
 describe('authUtils tests', () => {
   describe('getAuthorizedToken', () => {

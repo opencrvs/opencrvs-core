@@ -1,9 +1,9 @@
-import { IFormData, Event } from '../forms'
-import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
-import { storage } from 'src/storage'
+import { IFormData, Event } from '@register/forms'
+import { GO_TO_TAB, Action as NavigationAction } from '@register/navigation'
+import { storage } from '@register/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails } from '@register/utils/userUtils'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'

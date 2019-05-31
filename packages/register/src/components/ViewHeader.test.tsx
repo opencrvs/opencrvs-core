@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { createShallowRenderedComponent } from '../tests/util'
-import { ViewHeader } from './ViewHeader'
+import { createShallowRenderedComponent } from '@register/tests/util'
+import { ViewHeader } from '@register/components/ViewHeader'
 
 describe('view header component', () => {
   const testComponent = createShallowRenderedComponent(

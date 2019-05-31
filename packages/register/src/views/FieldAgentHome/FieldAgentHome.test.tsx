@@ -7,16 +7,16 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
-import { FIELD_AGENT_HOME_TAB } from 'src/navigation/routes'
+} from '@register/tests/util'
+import { FIELD_AGENT_HOME_TAB } from '@register/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import { storage } from 'src/storage'
-import * as CommonUtils from 'src/utils/commonUtils'
-import { FIELD_AGENT_ROLE } from 'src/utils/constants'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import { storage } from '@register/storage'
+import * as CommonUtils from '@register/utils/commonUtils'
+import { FIELD_AGENT_ROLE } from '@register/utils/constants'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

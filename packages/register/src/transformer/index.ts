@@ -1,5 +1,5 @@
-import { IForm, IFormData } from '../forms'
-import { getConditionalActionsForField } from '../forms/utils'
+import { IForm, IFormData } from '@register/forms'
+import { getConditionalActionsForField } from '@register/forms/utils'
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
