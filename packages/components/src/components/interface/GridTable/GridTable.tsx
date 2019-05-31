@@ -1,11 +1,10 @@
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
-import { grid } from '../../grid'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -29,7 +28,7 @@ const TableHeader = styled.div`
 
 const StyledBox = styled(Box)`
   margin-top: 8px;
-  padding: 7px 0px 0px 0px;
+  padding: 0;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
@@ -47,7 +46,7 @@ const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
   padding: 0 24px;
   display: flex;
   align-items: center;
-  min-height: 56px;
+  min-height: 64px;
 `
 
 const ContentWrapper = styled.span.attrs<{
@@ -63,10 +62,6 @@ const ContentWrapper = styled.span.attrs<{
 `
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
-`
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
 `
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   margin-top: 5px;
