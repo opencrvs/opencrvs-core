@@ -38,59 +38,63 @@ const nameObj = {
 }
 
 const demoUserData = {
-  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+  id: 'a7b89ee5-ea81-44ba-a1be-56af4744ddb1',
   registration: {
-    trackingId: 'B111111',
-    contactPhoneNumber: '01622688231',
     type: 'BIRTH',
+    trackingId: 'BQ1PJD6',
+    registrationNumber: null,
+    contactPhoneNumber: '01711111111',
     status: [
       {
-        timestamp: '2018-12-07T13:11:49.380Z',
         user: {
-          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           name: [
             {
               use: 'en',
-              firstNames: 'Mohammad',
-              familyName: 'Ashraful'
+              firstNames: 'Shakib',
+              familyName: 'Al Hasan',
+              __typename: 'HumanName'
             },
             {
               use: 'bn',
               firstNames: '',
-              familyName: ''
+              familyName: '',
+              __typename: 'HumanName'
             }
           ],
-          role: 'LOCAL_REGISTRAR'
+          role: 'FIELD_AGENT',
+          __typename: 'User'
         },
         location: {
-          id: '123',
-          name: 'Kaliganj Union Sub Center',
-          alias: ['']
+          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+          name: 'Moktarpur',
+          alias: ['মোক্তারপুর'],
+          __typename: 'Location'
         },
         office: {
-          id: '123',
-          name: 'Kaliganj Union Sub Center',
-          alias: [''],
+          name: 'Moktarpur Union Parishad',
+          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
           address: {
-            district: '7876',
-            state: 'iuyiuy'
-          }
+            district: 'Gazipur',
+            state: 'Dhaka',
+            __typename: 'Address'
+          },
+          __typename: 'Location'
         },
-        type: 'REGISTERED'
-      }
-    ]
-  },
-  child: {
-    name: [
-      {
-        use: 'bn',
-        firstNames: '',
-        familyName: 'অনিক'
+        type: 'DECLARED',
+        timestamp: '2019-05-16T09:18:07.165Z',
+        __typename: 'RegWorkflow'
       }
     ],
-    birthDate: '2010-10-10'
+    __typename: 'Registration'
   },
-  createdAt: '2018-05-23T14:44:58+02:00'
+  createdAt: '2019-05-16T09:18:06.776Z',
+  child: {
+    name: null,
+    birthDate: null,
+    __typename: 'Person'
+  },
+  __typename: 'BirthRegistration'
 }
 const userData: any = []
 for (let i = 0; i < 14; i++) {
@@ -191,7 +195,8 @@ describe('RegistrarHome tests', async () => {
           data: {
             countEventRegistrations: {
               declared: 10,
-              rejected: 5
+              rejected: 5,
+              registered: 0
             }
           }
         }
@@ -259,7 +264,8 @@ describe('RegistrarHome tests', async () => {
           data: {
             countEventRegistrations: {
               declared: 10,
-              rejected: 5
+              rejected: 5,
+              registered: 0
             }
           }
         }
@@ -309,7 +315,8 @@ describe('RegistrarHome tests', async () => {
           data: {
             countEventRegistrations: {
               declared: 10,
-              rejected: 5
+              rejected: 5,
+              registered: 0
             }
           }
         }
@@ -346,9 +353,10 @@ describe('RegistrarHome tests', async () => {
         .hostNodes()
         .text()
     ).toContain('Sent for updates (5)')
+    app.unmount()
   })
   it('renders all items returned from graphql query in ready for reivew', async () => {
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = jest.fn(() => 1559239200000)
     const graphqlMock = [
       {
         request: {
@@ -366,128 +374,125 @@ describe('RegistrarHome tests', async () => {
               totalItems: 2,
               results: [
                 {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  id: 'a7b89ee5-ea81-44ba-a1be-56af4744ddb1',
                   registration: {
-                    trackingId: 'B111111',
-                    contactPhoneNumber: '01622688231',
                     type: 'BIRTH',
+                    trackingId: 'BQ1PJD6',
+                    registrationNumber: null,
+                    contactPhoneNumber: '01711111111',
                     status: [
                       {
-                        timestamp: '2018-12-07T13:11:49.380Z',
                         user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
                           name: [
                             {
                               use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
+                              firstNames: 'Shakib',
+                              familyName: 'Al Hasan',
+                              __typename: 'HumanName'
                             },
                             {
                               use: 'bn',
                               firstNames: '',
-                              familyName: ''
+                              familyName: '',
+                              __typename: 'HumanName'
                             }
                           ],
-                          role: 'LOCAL_REGISTRAR'
+                          role: 'FIELD_AGENT',
+                          __typename: 'User'
                         },
                         location: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
+                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+                          name: 'Moktarpur',
+                          alias: ['মোক্তারপুর'],
+                          __typename: 'Location'
                         },
                         office: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: [''],
+                          name: 'Moktarpur Union Parishad',
+                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
                           address: {
-                            district: '7876',
-                            state: 'iuyiuy'
-                          }
+                            district: 'Gazipur',
+                            state: 'Dhaka',
+                            __typename: 'Address'
+                          },
+                          __typename: 'Location'
                         },
-                        type: 'REGISTERED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: 'অনিক'
+                        type: 'DECLARED',
+                        timestamp: '2019-05-16T09:18:07.165Z',
+                        __typename: 'RegWorkflow'
                       }
                     ],
-                    birthDate: '2010-10-10'
+                    __typename: 'Registration'
                   },
-                  createdAt: '2018-05-23T14:44:58+02:00'
+                  createdAt: '2019-05-16T09:18:06.776Z',
+                  child: {
+                    name: null,
+                    birthDate: null,
+                    __typename: 'Person'
+                  },
+                  __typename: 'BirthRegistration'
                 },
                 {
-                  id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+                  id: 'fea93e6f-b168-4059-805a-edcb1783b025',
                   registration: {
-                    trackingId: 'B222222',
-                    contactPhoneNumber: null,
-                    type: 'DEATH',
+                    type: 'BIRTH',
+                    trackingId: 'BOH0836',
+                    registrationNumber: null,
+                    contactPhoneNumber: '01711111111',
                     status: [
                       {
-                        timestamp: '2018-12-07T13:11:49.380Z',
                         user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
                           name: [
                             {
                               use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
+                              firstNames: 'Shakib',
+                              familyName: 'Al Hasan',
+                              __typename: 'HumanName'
                             },
                             {
                               use: 'bn',
                               firstNames: '',
-                              familyName: ''
+                              familyName: '',
+                              __typename: 'HumanName'
                             }
                           ],
-                          role: 'LOCAL_REGISTRAR'
+                          role: 'FIELD_AGENT',
+                          __typename: 'User'
                         },
                         location: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
+                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+                          name: 'Moktarpur',
+                          alias: ['মোক্তারপুর'],
+                          __typename: 'Location'
                         },
                         office: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: [''],
+                          name: 'Moktarpur Union Parishad',
+                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
                           address: {
-                            district: '7876',
-                            state: 'iuyiuy'
-                          }
+                            district: 'Gazipur',
+                            state: 'Dhaka',
+                            __typename: 'Address'
+                          },
+                          __typename: 'Location'
                         },
-                        type: 'REGISTERED'
-                      }
-                    ]
-                  },
-                  deceased: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: 'মাসুম'
+                        type: 'DECLARED',
+                        timestamp: '2019-05-16T09:24:38.930Z',
+                        __typename: 'RegWorkflow'
                       }
                     ],
-                    deceased: {
-                      deathDate: '2010-10-10'
-                    }
+                    __typename: 'Registration'
                   },
-                  informant: {
-                    individual: {
-                      telecom: [
-                        {
-                          system: 'phone',
-                          value: '01622688231'
-                        }
-                      ]
-                    }
+                  createdAt: '2019-05-16T09:24:38.511Z',
+                  child: {
+                    name: null,
+                    birthDate: null,
+                    __typename: 'Person'
                   },
-                  createdAt: '2018-05-23T14:44:58+02:00'
+                  __typename: 'BirthRegistration'
                 }
-              ]
+              ],
+              __typename: 'EventRegResultSet'
             }
           }
         }
@@ -509,20 +514,20 @@ describe('RegistrarHome tests', async () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
 
-    expect(data.length).toBe(2)
-    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].event_time_elapsed).toBe('8 years ago')
-    expect(data[0].application_time_elapsed).toBe('10 months ago')
-    expect(data[0].tracking_id).toBe('B111111')
+    const data = testComponent.component.find(GridTable).prop('content')
+    expect(data).toHaveLength(2)
+    expect(data[0].id).toBe('a7b89ee5-ea81-44ba-a1be-56af4744ddb1')
+    expect(data[0].application_time_elapsed).toBe('15 days ago')
+    expect(data[0].tracking_id).toBe('BQ1PJD6')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
 
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in rejected tab', async () => {
-    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
+    // TODO: Discuss with Yeasin about how he used moment.js in this scenario
+    // const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const graphqlMock = [
       {
         request: {
@@ -540,126 +545,122 @@ describe('RegistrarHome tests', async () => {
               totalItems: 2,
               results: [
                 {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  id: 'a7b89ee5-ea81-44ba-a1be-56af4744ddb1',
                   registration: {
-                    trackingId: 'B111111',
-                    contactPhoneNumber: '01622688231',
                     type: 'BIRTH',
+                    trackingId: 'BQ1PJD6',
+                    registrationNumber: null,
+                    contactPhoneNumber: '01711111111',
                     status: [
                       {
-                        timestamp: TIME_STAMP,
                         user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
                           name: [
                             {
                               use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
+                              firstNames: 'Shakib',
+                              familyName: 'Al Hasan',
+                              __typename: 'HumanName'
                             },
                             {
                               use: 'bn',
                               firstNames: '',
-                              familyName: ''
+                              familyName: '',
+                              __typename: 'HumanName'
                             }
                           ],
-                          role: 'LOCAL_REGISTRAR'
+                          role: 'FIELD_AGENT',
+                          __typename: 'User'
                         },
                         location: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
+                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+                          name: 'Moktarpur',
+                          alias: ['মোক্তারপুর'],
+                          __typename: 'Location'
                         },
                         office: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: [''],
+                          name: 'Moktarpur Union Parishad',
+                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
                           address: {
-                            district: '7876',
-                            state: 'iuyiuy'
-                          }
+                            district: 'Gazipur',
+                            state: 'Dhaka',
+                            __typename: 'Address'
+                          },
+                          __typename: 'Location'
                         },
-                        type: 'REGISTERED'
-                      }
-                    ]
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: 'অনিক'
+                        type: 'DECLARED',
+                        timestamp: '2019-05-16T09:18:07.165Z',
+                        __typename: 'RegWorkflow'
                       }
                     ],
-                    birthDate: '2010-10-10'
+                    __typename: 'Registration'
                   },
-                  createdAt: '2018-05-23T14:44:58+02:00'
+                  createdAt: '2019-05-16T09:18:06.776Z',
+                  child: {
+                    name: null,
+                    birthDate: null,
+                    __typename: 'Person'
+                  },
+                  __typename: 'BirthRegistration'
                 },
                 {
-                  id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+                  id: 'fea93e6f-b168-4059-805a-edcb1783b025',
                   registration: {
-                    trackingId: 'B222222',
-                    contactPhoneNumber: null,
-                    type: 'DEATH',
+                    type: 'BIRTH',
+                    trackingId: 'BOH0836',
+                    registrationNumber: null,
+                    contactPhoneNumber: '01711111111',
                     status: [
                       {
-                        timestamp: '2018-12-07T13:11:49.380Z',
                         user: {
-                          id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
                           name: [
                             {
                               use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
+                              firstNames: 'Shakib',
+                              familyName: 'Al Hasan',
+                              __typename: 'HumanName'
                             },
                             {
                               use: 'bn',
                               firstNames: '',
-                              familyName: ''
+                              familyName: '',
+                              __typename: 'HumanName'
                             }
                           ],
-                          role: 'LOCAL_REGISTRAR'
+                          role: 'FIELD_AGENT',
+                          __typename: 'User'
                         },
                         location: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: ['']
+                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+                          name: 'Moktarpur',
+                          alias: ['মোক্তারপুর'],
+                          __typename: 'Location'
                         },
                         office: {
-                          id: '123',
-                          name: 'Kaliganj Union Sub Center',
-                          alias: [''],
+                          name: 'Moktarpur Union Parishad',
+                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
                           address: {
-                            district: '7876',
-                            state: 'iuyiuy'
-                          }
+                            district: 'Gazipur',
+                            state: 'Dhaka',
+                            __typename: 'Address'
+                          },
+                          __typename: 'Location'
                         },
-                        type: 'REGISTERED'
-                      }
-                    ]
-                  },
-                  deceased: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: '',
-                        familyName: 'মাসুম'
+                        type: 'DECLARED',
+                        timestamp: '2019-05-16T09:24:38.930Z',
+                        __typename: 'RegWorkflow'
                       }
                     ],
-                    deceased: {
-                      deathDate: '2010-10-10'
-                    }
+                    __typename: 'Registration'
                   },
-                  informant: {
-                    individual: {
-                      telecom: [
-                        {
-                          system: 'phone',
-                          value: '01622688231'
-                        }
-                      ]
-                    }
+                  createdAt: '2019-05-16T09:24:38.511Z',
+                  child: {
+                    name: null,
+                    birthDate: null,
+                    __typename: 'Person'
                   },
-                  createdAt: '2018-05-23T14:44:58+02:00'
+                  __typename: 'BirthRegistration'
                 }
               ]
             }
@@ -680,20 +681,17 @@ describe('RegistrarHome tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 2000)
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_REJECTION = moment(
-      TIME_STAMP,
-      'YYYY-MM-DD'
-    ).fromNow()
+    const EXPECTED_DATE_OF_REJECTION = '15 days ago'
 
     expect(data.length).toBe(2)
-    expect(data[1].id).toBe('cc66d69c-7f0a-4047-9283-f066571830f1')
-    expect(data[1].contact_number).toBe('01622688231')
+    expect(data[1].id).toBe('fea93e6f-b168-4059-805a-edcb1783b025')
+    expect(data[1].contact_number).toBe('01711111111')
     expect(data[1].date_of_rejection).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[1].event).toBe('Death')
+    expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
 
     testComponent.component.unmount()

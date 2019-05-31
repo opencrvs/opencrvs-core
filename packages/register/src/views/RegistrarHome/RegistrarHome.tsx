@@ -1151,7 +1151,6 @@ export class RegistrarHomeView extends React.Component<
             }}
           </Query>
         )}
-        <NotificationToast />
         {tabId === TAB_ID.readyToPrint && (
           <Query
             query={FETCH_REGISTRATIONS_QUERY}
@@ -1246,6 +1245,7 @@ export class RegistrarHomeView extends React.Component<
             }}
           </Query>
         )}
+        <NotificationToast />
       </>
     )
   }
