@@ -29,6 +29,8 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
 import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import { SentForReview } from './SentForReview'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -36,6 +38,7 @@ const Topbar = styled.div`
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
+  overflow-x: auto;
   justify-content: flex-start;
   align-items: center;
 `
@@ -45,6 +48,7 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
+  flex-shrink: 0;
   outline: none;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & > div {
@@ -68,7 +72,6 @@ const FABContainer = styled.div`
   top: 85%;
   bottom: 9.17%;
 `
-
 const messages = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
@@ -92,6 +95,7 @@ interface IFieldAgentHomeProps {
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
+  applicationsReadyToSend: IApplication[]
 }
 
 interface IMatchParams {
@@ -110,7 +114,7 @@ const TAB_ID = {
 }
 class FieldAgentHomeView extends React.Component<FullProps> {
   render() {
-    const { userDetails, match, intl } = this.props
+    const { userDetails, match, intl, applicationsReadyToSend } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
     const isFieldAgent =
       userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
@@ -145,7 +149,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 }
               >
                 {intl.formatMessage(messages.sentForReview, {
-                  total: 1
+                  total: applicationsReadyToSend.length
                 })}
               </IconTab>
               <IconTab
@@ -163,6 +167,11 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 })}
               </IconTab>
             </Topbar>
+            {tabId === TAB_ID.sentForReview && (
+              <SentForReview
+                applicationsReadyToSend={applicationsReadyToSend}
+              />
+            )}
             <FABContainer>
               <FloatingActionButton
                 id="new_event_declaration"
@@ -183,9 +192,18 @@ class FieldAgentHomeView extends React.Component<FullProps> {
 const mapStateToProps = (store: IStoreState) => {
   return {
     language: getLanguage(store),
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    applicationsReadyToSend:
+      (store.applicationsState.applications &&
+        store.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus !==
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      []
   }
 }
+
 export const FieldAgentHome = connect(
   mapStateToProps,
   {

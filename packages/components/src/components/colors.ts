@@ -19,7 +19,8 @@ const colorDictionary = {
   greySmoky: '#DADEDF',
   greyPearl: '#F2F3F4',
   nightshadeDark: '#42506B',
-  nightshadeLight: '#485F88'
+  nightshadeLight: '#485F88',
+  darkSteel: '#707C80'
 }
 
 export const gradients = {
@@ -58,6 +59,7 @@ export const colors = {
   menuBackground: colorDictionary.blackStormy,
   gradientDark: colorDictionary.nightshadeDark,
   gradientLight: colorDictionary.nightshadeLight,
+  secondaryLabel: colorDictionary.darkSteel,
 
   // Dividers
   dividerLight: colorDictionary.greyPearl,

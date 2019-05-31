@@ -998,6 +998,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.readyForReview': 'Ready for review',
     'register.registrarHome.sentForUpdates': 'Sent for updates',
     'register.registrarHome.action': 'Action',
+    'register.fieldAgentHome.tableHeader.submissionStatus': 'Submission status',
+    'register.fieldAgentHome.table.statusReadyToSubmit': 'Waiting to send',
+    'register.fieldAgentHome.table.statusSubmitting': 'Sending...',
+    'register.fieldAgentHome.table.statusFailed': 'Failed to send',
+    'register.fieldAgentHome.table.statusPendingConnection':
+      'Pending connection',
     'register.registrarHome.notificationToast.processingText':
       '{num} application processing...',
     'register.registrarHome.notificationToast.outboxText': 'Outbox({num})',
