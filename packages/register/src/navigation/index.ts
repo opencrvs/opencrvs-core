@@ -11,6 +11,7 @@ import {
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
   SEARCH,
+  APPLICATION_DETAIL,
   SETTINGS
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
@@ -87,6 +88,10 @@ export function goToSearchResult(searchText: string, searchType: string) {
 
 export function goToSearch() {
   return push(SEARCH)
+}
+
+export function goToApplicationDetails(applicationId: string) {
+  return push(formatUrl(APPLICATION_DETAIL, { applicationId }))
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {
