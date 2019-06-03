@@ -5,7 +5,7 @@ import {
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT,
   CERTIFICATE_DATE_FORMAT
 } from '@register/utils/constants'
-import * as moment from 'moment'
+import moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import { Event } from '@register/forms'

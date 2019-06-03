@@ -24,7 +24,7 @@ import {
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
-import * as moment from 'moment'
+import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'

@@ -1,5 +1,5 @@
 import { Event } from '@register/forms'
-import * as moment from 'moment'
+import moment from 'moment'
 
 const MONTH_IN_DAYS: number = 30
 const YEAR_IN_DAYS: number = 365

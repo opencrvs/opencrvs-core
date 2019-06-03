@@ -25,7 +25,7 @@ import {
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
-import * as moment from 'moment'
+import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
@@ -68,7 +68,7 @@ import {
   IIdentifier,
   IUserDetails
 } from '@register/utils/userUtils'
-import styled, { withTheme } from 'styled-components'
+import styled from '@register/styled-components'
 import { goToTab as goToTabAction } from '@register/navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'

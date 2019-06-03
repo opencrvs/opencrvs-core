@@ -32,7 +32,7 @@ import {
   ILocation
 } from '@register/offline/reducer'
 import { Validation } from '@register/utils/validate'
-import * as moment from 'moment'
+import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 interface IRange {

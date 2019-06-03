@@ -14,7 +14,7 @@ import {
   SECURITY_PIN_INDEX,
   SECURITY_PIN_EXPIRED_AT
 } from '@register/utils/constants'
-import * as moment from 'moment'
+import moment from 'moment'
 import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { pinOps } from '@register/views/Unlock/ComparePINs'
