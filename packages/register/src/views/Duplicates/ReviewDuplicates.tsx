@@ -490,10 +490,13 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               )
             }
 
-            const gqlVars = duplicateIds.reduce((vars, id, i) => {
-              vars[`duplicate${i}Id`] = id
-              return vars
-            }, {})
+            const gqlVars = duplicateIds.reduce(
+              (vars: { [key: string]: string }, id, i) => {
+                vars[`duplicate${i}Id`] = id
+                return vars
+              },
+              {}
+            )
             return (
               <Query
                 query={createDuplicateDetailsQuery(duplicateIds)}
@@ -569,9 +572,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: this.state.selectedCompositionID,
             reason: 'duplicate'
           }}
-          onCompleted={data => this.successfulRejection(data.markEventAsVoided)}
+          onCompleted={(data: any) =>
+            this.successfulRejection(data.markEventAsVoided)
+          }
         >
-          {submitEventAsRejected => {
+          {(submitEventAsRejected: any) => {
             return (
               <Modal
                 title={intl.formatMessage(messages.rejectDescription)}
@@ -608,11 +613,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId,
             duplicateId: this.state.selectedCompositionID
           }}
-          onCompleted={data =>
+          onCompleted={(data: any) =>
             this.successfulDuplicateRemoval(data.notADuplicate)
           }
         >
-          {(submitNotADuplicateMutation, { data }) => {
+          {(submitNotADuplicateMutation: any, { data }: { data?: any }) => {
             return (
               <NotDuplicateConfirmation
                 handleYes={() => submitNotADuplicateMutation()}

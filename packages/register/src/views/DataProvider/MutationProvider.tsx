@@ -49,7 +49,10 @@ class MutationProviderComponent extends React.Component<IProps> {
         onCompleted={data => onCompleted(data[eventMutationMapping.dataKey])}
         onError={onError}
       >
-        {(submitMutation, { loading, data }) => {
+        {(
+          submitMutation: any,
+          { loading, data }: { loading: any; data?: any }
+        ) => {
           return (
             <MutationContext.Provider
               // @ts-ignore

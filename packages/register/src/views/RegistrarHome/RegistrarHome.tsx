@@ -272,8 +272,8 @@ const ErrorText = styled.div`
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   language: string
-  scope: Scope
-  userDetails: IUserDetails
+  scope: Scope | null
+  userDetails: IUserDetails | null
   gotoTab: typeof goToTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
@@ -326,7 +326,8 @@ export class RegistrarHomeView extends React.Component<
     }
 
     return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
+      (registration: GQLEventRegistration | null) => {
+        const reg = registration as GQLEventRegistration
         const lang = 'bn'
         let dateOfEvent
         let names: GQLHumanName[] = []
@@ -460,7 +461,8 @@ export class RegistrarHomeView extends React.Component<
     }
 
     return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
+      (registration: GQLEventRegistration | null) => {
+        const reg = registration as GQLEventRegistration
         let names
         let contactPhoneNumber
         if (reg.registration && reg.registration.type === 'BIRTH') {

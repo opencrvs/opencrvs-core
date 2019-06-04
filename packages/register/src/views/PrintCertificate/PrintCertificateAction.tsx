@@ -395,7 +395,7 @@ type IProps = {
   paymentFormSection: IFormSection
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   offlineResources: IOfflineDataState
   draft: IApplication
 }
@@ -934,7 +934,10 @@ class PrintCertificateActionComponent extends React.Component<
 
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
       ) as GQLHumanName
       fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
     }
@@ -1132,6 +1135,7 @@ const getDraft = (
   eventType: string
 ) =>
   drafts.find(draftItem => draftItem.id === registrationId) || {
+    id: '',
     data: {},
     event: getEvent(eventType)
   }

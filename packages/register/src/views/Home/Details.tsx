@@ -108,8 +108,8 @@ interface IDetailProps {
   theme: ITheme
   language: string
   applicationId: string
-  draft: IApplication
-  userDetails: IUserDetails
+  draft: IApplication | null
+  userDetails: IUserDetails | null
   goToTab: typeof goToTabAction
   goToHome: typeof goToHomeAction
 }
@@ -376,8 +376,11 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
     let action: React.ReactElement
-    if (draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]) {
-      if (draft.modifiedOn) {
+    if (
+      draft &&
+      draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    ) {
+      if (draft.modifiedOn && userDetails) {
         history.push(
           generateHistoryEntry(
             DraftStatus.DRAFT_MODIFIED,
@@ -396,23 +399,25 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           )
         )
       }
-      history.push(
-        generateHistoryEntry(
-          DraftStatus.DRAFT_STARTED,
-          userDetails.name as GQLHumanName[],
-          (draft.savedOn && new Date(draft.savedOn).toString()) || '',
-          userDetails && userDetails.role
-            ? this.props.intl.formatMessage(
-                messages[userDetails.role as string]
-              )
-            : '',
-          (userDetails &&
-            userDetails.primaryOffice &&
-            userDetails.primaryOffice.name) ||
-            '',
-          this.props.language
+      if (userDetails) {
+        history.push(
+          generateHistoryEntry(
+            DraftStatus.DRAFT_STARTED,
+            userDetails.name as GQLHumanName[],
+            (draft.savedOn && new Date(draft.savedOn).toString()) || '',
+            userDetails && userDetails.role
+              ? this.props.intl.formatMessage(
+                  messages[userDetails.role as string]
+                )
+              : '',
+            (userDetails &&
+              userDetails.primaryOffice &&
+              userDetails.primaryOffice.name) ||
+              '',
+            this.props.language
+          )
         )
-      )
+      }
       const tabRoute =
         draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
       action = (
@@ -431,22 +436,17 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         </ActionButton>
       )
     } else {
-      history.push(
-        generateHistoryEntry(
-          DraftStatus.FAILED,
-          null,
-          (draft.modifiedOn && new Date(draft.modifiedOn).toString()) || '',
-          '',
-          ''
-        )
-      )
+      history.push(generateHistoryEntry(DraftStatus.FAILED, null, '', '', ''))
       action = (
         <ActionButton id="failed_retry" disabled>
           {this.props.intl.formatMessage(messages.retry)}
         </ActionButton>
       )
     }
-    const title = getDraftApplicantFullName(draft, this.props.language)
+    let title: string = ''
+    if (draft) {
+      title = getDraftApplicantFullName(draft, this.props.language)
+    }
     return {
       title: title !== '' ? title : undefined,
       history,
