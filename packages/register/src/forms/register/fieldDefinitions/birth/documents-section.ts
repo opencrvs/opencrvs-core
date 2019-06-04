@@ -11,7 +11,9 @@ import { birthFieldToAttachmentTransformer } from '@register/forms/register/fiel
 import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
 import { diffDoB } from '@register/forms/utils'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   documentsTab: {
     id: 'register.form.tabs.documentsTab',
     defaultMessage: 'Documents',

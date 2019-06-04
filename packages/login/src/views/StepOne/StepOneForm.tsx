@@ -22,7 +22,9 @@ import {
   ERROR_CODE_INVALID_CREDENTIALS,
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '../../utils/authUtils'
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
     defaultMessage: 'Login',

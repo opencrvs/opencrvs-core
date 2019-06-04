@@ -67,7 +67,9 @@ interface IState {
   showLogoutModal: boolean
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   FIELD_AGENT: {
     id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',

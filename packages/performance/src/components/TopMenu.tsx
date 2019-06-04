@@ -16,7 +16,9 @@ import { IntlState } from 'src/i18n/reducer'
 import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

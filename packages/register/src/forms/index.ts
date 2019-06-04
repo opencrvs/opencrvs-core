@@ -34,7 +34,9 @@ export const FETCH_BUTTON = 'FETCH_BUTTON'
 import { defineMessages } from 'react-intl'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   otherOption: {
     id: 'formFields.otherOption',
     defaultMessage: 'Other',

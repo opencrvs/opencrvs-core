@@ -70,7 +70,9 @@ import {
   transformInformantData
 } from '@register/forms/register/queries/person'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   applicantTab: {
     id: 'register.form.tabs.applicantTab',
     defaultMessage: 'Applicant',

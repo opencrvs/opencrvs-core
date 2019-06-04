@@ -132,7 +132,9 @@ interface IHistoryData {
   action?: React.ReactElement
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   workflowStatusDateDraftStarted: {
     id: 'register.details.status.dateLabel.draft.started',
     defaultMessage: 'Started on',

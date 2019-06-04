@@ -217,7 +217,9 @@ const ButtonSpinner = styled(InvertSpinner)`
   top: 0px !important;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   queryError: {
     id: 'print.certificate.queryError',
     defaultMessage:

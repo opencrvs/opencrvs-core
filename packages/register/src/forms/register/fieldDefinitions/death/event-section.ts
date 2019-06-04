@@ -38,7 +38,9 @@ import {
 import { setRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/event-mappings'
 import { getRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/event-mappings'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   deathEventTab: {
     id: 'register.form.tabs.deathEventTab',
     defaultMessage: 'Event',

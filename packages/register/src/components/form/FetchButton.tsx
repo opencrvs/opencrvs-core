@@ -12,7 +12,9 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/register/src/forms'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

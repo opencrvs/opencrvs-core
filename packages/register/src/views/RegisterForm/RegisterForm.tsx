@@ -134,7 +134,9 @@ const CancelButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
 `
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newBirthRegistration: {
     id: 'register.form.newBirthRegistration',
     defaultMessage: 'New birth application',

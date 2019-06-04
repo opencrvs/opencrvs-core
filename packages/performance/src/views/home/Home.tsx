@@ -32,7 +32,9 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { ITheme } from  '@register/styledComponents'
 import { FETCH_METRIC } from './queries'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   logoutActionTitle: {
     id: 'register.home.logout',
     defaultMessage: 'Log out',

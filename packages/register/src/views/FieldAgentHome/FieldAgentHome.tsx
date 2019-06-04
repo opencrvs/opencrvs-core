@@ -69,7 +69,9 @@ const FABContainer = styled.div`
   bottom: 9.17%;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
     defaultMessage: 'In progress ({total})',

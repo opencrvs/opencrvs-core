@@ -32,7 +32,9 @@ const UserRole = styled.div`
   ${({ theme }) => theme.fonts.captionStyle};
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   settings: {
     id: 'menu.items.settings',
     defaultMessage: 'Settings',

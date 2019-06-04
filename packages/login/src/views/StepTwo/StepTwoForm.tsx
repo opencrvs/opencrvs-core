@@ -28,7 +28,9 @@ import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
 
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
     defaultMessage: 'Verify your mobile',

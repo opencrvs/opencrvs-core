@@ -6,7 +6,9 @@ import {
 } from '@register/forms'
 import { defineMessages } from 'react-intl'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   payment: {
     id: 'print.certificate.payment',
     defaultMessage: 'Payment',

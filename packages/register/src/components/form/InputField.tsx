@@ -5,7 +5,9 @@ import { Omit } from '@opencrvs/register/src/utils'
 
 import { InputField as InputFieldComponent } from '@opencrvs/components/lib/forms'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   optionalLabel: {
     id: 'formFields.optionalLabel',
     defaultMessage: 'Optional',

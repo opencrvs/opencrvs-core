@@ -40,7 +40,9 @@ const UploadErrorSec = styled.div`
   margin-top: 10px;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   uploadError: {
     id: 'imageUploadOption.upload.error',
     defaultMessage: 'Must be in JPEG/JPG/PNG format',

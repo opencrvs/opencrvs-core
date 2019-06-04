@@ -44,7 +44,9 @@ const FileViewerLabel = styled.label`
 const FileItemContainer = styled.div`
   margin-top: 12px;
 `
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

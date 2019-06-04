@@ -10,7 +10,9 @@ import { createApplication, storeApplication } from '@register/applications'
 import { Event } from '@register/forms'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New vital event application',

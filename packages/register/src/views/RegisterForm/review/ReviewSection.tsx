@@ -67,7 +67,9 @@ import { formatLongDate } from '@register/utils/date-formatting'
 import { getFieldLabel } from '@register/forms/utils'
 import { REJECTED } from '@register/utils/constants'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   valueYes: {
     id: 'register.form.valueYes',
     defaultMessage: 'Yes',

@@ -10,7 +10,9 @@ const PreviewButton = styled.a`
   cursor: pointer;
 `
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   preview: {
     id: 'review.edit.modal.preview',
     defaultMessage: 'Back to Preview',

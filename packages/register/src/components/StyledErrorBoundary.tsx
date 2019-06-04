@@ -33,7 +33,9 @@ const GoToHomepage = styled(Button)`
   margin-top: 60px;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   errorCodeUnauthorized: {
     id: 'error.code',
     defaultMessage: '401',

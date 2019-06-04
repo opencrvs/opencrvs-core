@@ -7,7 +7,9 @@ import * as actions from '../../login/actions'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 import { REGISTER_APP, PERFORMANCE_APP } from '../../navigation/routes'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registerAppTitle: {
     id: 'login.manager.registerAppTitle',
     defaultMessage: 'OpenCRVS Homepage',

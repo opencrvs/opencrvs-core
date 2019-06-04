@@ -69,7 +69,9 @@ import {
   FETCH_REGISTRATION
 } from '@register/forms/register/queries/registration'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   motherTab: {
     id: 'register.form.tabs.motherTab',
     defaultMessage: 'Mother',

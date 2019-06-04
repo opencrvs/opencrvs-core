@@ -1,6 +1,8 @@
 import { defineMessages } from 'react-intl'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   educationAttainmentNone: {
     id: 'formFields.educationAttainmentNone',
     defaultMessage: 'No schooling',

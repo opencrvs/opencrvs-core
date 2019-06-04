@@ -47,7 +47,9 @@ export interface IChildSectionFormData {
 }
 import { IFormSection } from '@register/forms/index'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   childTab: {
     id: 'register.form.tabs.childTab',
     defaultMessage: 'Child',

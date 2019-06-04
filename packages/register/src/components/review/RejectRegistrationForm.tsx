@@ -16,7 +16,9 @@ import {
   MutationContext
 } from '@register/views/DataProvider/MutationProvider'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

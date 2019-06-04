@@ -11,7 +11,9 @@ import { deathFieldToAttachmentTransformer } from '@register/forms/register/fiel
 import { deathAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
 import { defineMessages } from 'react-intl'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   documentsTab: {
     id: 'register.form.tabs.documentsTab',
     defaultMessage: 'Documents',

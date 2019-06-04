@@ -19,7 +19,9 @@ import { IntlState } from '@register/i18n/reducer'
 import { DECLARATION, REJECTION, BIRTH, OFFLINE } from '@register/utils/constants'
 import { HomeViewHeader } from '@register/components/HomeViewHeader'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   backButton: {
     id: 'register.confirmationScreen.buttons.back',
     defaultMessage: 'Back to homescreen',

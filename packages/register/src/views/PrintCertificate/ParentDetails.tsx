@@ -5,7 +5,9 @@ import { countries } from '@register/forms/countries'
 import { identityNameMapper } from '@register/forms/identity'
 import { formatLongDate } from '@register/utils/date-formatting'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   firstName: {
     id: 'certificate.parent.details.label.firstName',
     defaultMessage: 'First Name(s)',

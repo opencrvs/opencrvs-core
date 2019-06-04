@@ -18,7 +18,9 @@ import {
 } from '@register/forms/identity'
 import { validIDNumber } from '@register/utils/validate'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   certificateCollectionTitle: {
     id: 'register.workQueue.title.certificateCollection',
     defaultMessage: 'Certificate Collection',

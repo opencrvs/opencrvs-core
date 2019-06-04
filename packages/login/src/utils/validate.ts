@@ -8,7 +8,9 @@ export interface IValidationResult {
 
 export type Validation = (value: string) => IValidationResult | undefined
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   required: {
     id: 'validations.required',
     defaultMessage: 'Required',

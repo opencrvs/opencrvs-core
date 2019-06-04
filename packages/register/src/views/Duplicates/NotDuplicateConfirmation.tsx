@@ -12,7 +12,9 @@ const ConfirmButton = styled.a`
 const StyledModal = styled(Modal)`
   z-index: 4;
 `
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   noButton: {
     id: 'register.duplicates.notDuplicate.modal.back',
     defaultMessage: 'Back',

@@ -34,7 +34,9 @@ type DispatchProps = {
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newContentAvailable: {
     id: 'register.notification.newContentAvailable',
     defaultMessage: "We've made some updates, click here to refresh.",

@@ -348,13 +348,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         practitionerName:
           (status &&
             status.user &&
-            // @ts-ignore
             (createNamesMap(status.user.name as GQLHumanName[])[
               this.props.language
             ] as string)) ||
           (status &&
             status.user &&
-            // @ts-ignore
             (createNamesMap(status.user.name as GQLHumanName[])[
               ''
             ] as string)) ||

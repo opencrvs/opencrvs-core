@@ -12,7 +12,9 @@ import { eventSection } from '@register/forms/register/fieldDefinitions/death/ev
 import { causeOfDeathSection } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 import { documentsSection as deathDocumentsSection } from '@register/forms/register/fieldDefinitions/death/documents-section'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   reviewTab: {
     id: 'review.form.tabs.reviewTab',
     defaultMessage: 'Review',

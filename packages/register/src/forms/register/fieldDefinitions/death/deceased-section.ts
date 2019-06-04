@@ -56,7 +56,9 @@ import {
   transformPersonData
 } from '@opencrvs/register/src/forms/register/queries/person'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   deceasedTab: {
     id: 'register.form.tabs.deceasedTab',
     defaultMessage: 'Deceased',

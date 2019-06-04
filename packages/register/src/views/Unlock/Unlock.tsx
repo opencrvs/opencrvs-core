@@ -19,7 +19,9 @@ import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { pinOps } from '@register/views/Unlock/ComparePINs'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   incorrect: {
     id: 'unlockApp.incorrectPin',
     defaultMessage: 'Incorrect pin. Please try again'

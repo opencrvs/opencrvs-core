@@ -20,7 +20,9 @@ import {
 import { setRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/registration-mappings'
 import { getRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/registration-mappings'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registrationTab: {
     id: 'register.form.tabs.registrationTab',
     defaultMessage: 'Registration',

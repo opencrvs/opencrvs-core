@@ -75,7 +75,9 @@ import {
   getDateOfMarriageLabel
 } from '@register/forms/register/fieldDefinitions/birth/staticLabel'
 
-export const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   fatherTab: {
     id: 'register.form.tabs.fatherTab',
     defaultMessage: 'Father',

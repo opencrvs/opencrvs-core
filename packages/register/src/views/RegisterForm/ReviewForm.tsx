@@ -28,7 +28,9 @@ import {
 import * as Sentry from '@sentry/browser'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   queryError: {
     id: 'review.birthRegistration.queryError',
     defaultMessage: 'An error occurred while fetching birth registration',

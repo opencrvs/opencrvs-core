@@ -10,7 +10,9 @@ import { redirectToAuthentication } from '@register/profile/profileActions'
 const StyledModal = styled(Modal)`
   z-index: 4;
 `
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   loginButton: {
     id: 'login.stepOneTitle',
     defaultMessage: 'Login',

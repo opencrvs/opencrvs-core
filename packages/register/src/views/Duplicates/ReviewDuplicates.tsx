@@ -38,7 +38,9 @@ interface IMatchParams {
   applicationId: string
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   title: {
     id: 'register.duplicates.title',
     defaultMessage: 'Possible duplicates found',
