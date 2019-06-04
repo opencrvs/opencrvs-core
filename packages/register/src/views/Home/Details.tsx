@@ -632,7 +632,15 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
               id: this.props.applicationId
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (error) {
                 Sentry.captureException(error)
                 throw error

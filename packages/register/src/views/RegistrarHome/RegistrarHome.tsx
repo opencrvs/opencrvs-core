@@ -685,7 +685,15 @@ export class RegistrarHomeView extends React.Component<
             locationIds: [registrarUnion]
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
             if (loading) {
               parentQueryLoading = true
               return (
@@ -802,7 +810,15 @@ export class RegistrarHomeView extends React.Component<
               skip: (this.state.reviewCurrentPage - 1) * this.pageSize
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (loading) {
                 return (
                   (!parentQueryLoading && (
@@ -910,7 +926,15 @@ export class RegistrarHomeView extends React.Component<
               skip: (this.state.updatesCurrentPage - 1) * this.pageSize
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (loading) {
                 return (
                   (!parentQueryLoading && (

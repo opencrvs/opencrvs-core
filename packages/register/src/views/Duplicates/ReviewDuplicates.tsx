@@ -448,7 +448,15 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
             if (loading) {
               return <StyledSpinner id="review-duplicates-spinner" />
             }
@@ -495,6 +503,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   loading: loadingDetails,
                   error: errorDetails,
                   data: dataDetails
+                }: {
+                  loading: any
+                  error?: any
+                  data: any
                 }) => {
                   if (loadingDetails) {
                     return <StyledSpinner id="review-duplicates-spinner" />

@@ -40,7 +40,15 @@ class QueryProviderComponent extends React.Component<IProps> {
         query={eventQueryMapping.query}
         variables={this.props.payload || {}}
       >
-        {({ loading, error, data }) => {
+        {({
+          loading,
+          error,
+          data
+        }: {
+          loading: any
+          error?: any
+          data: any
+        }) => {
           if (error) {
             Sentry.captureException(error)
           }

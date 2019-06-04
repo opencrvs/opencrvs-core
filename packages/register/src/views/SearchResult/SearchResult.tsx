@@ -68,7 +68,7 @@ import {
   IIdentifier,
   IUserDetails
 } from '@register/utils/userUtils'
-import styled from '@register/styledComponents'
+import styled, { withTheme } from '@register/styledComponents'
 import { goToTab as goToTabAction } from '@register/navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
@@ -227,9 +227,9 @@ const StatusIcon = styled.div`
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope
+  scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   gotoTab: typeof goToTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
@@ -411,7 +411,15 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
             id
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
             const { intl, language } = this.props
             moment.locale(language)
             if (error) {
@@ -573,7 +581,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           reasons &&
           reasons
             .reduce(
-              (prev, curr) => [
+              (prev: string[], curr) => [
                 ...prev,
                 this.props.intl.formatMessage(
                   getRejectionReasonDisplayValue(curr)
@@ -731,7 +739,15 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   contactNumber: searchType === PHONE_TEXT ? searchText : ''
                 }}
               >
-                {({ loading, error, data }) => {
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: any
+                  error?: any
+                  data: any
+                }) => {
                   if (loading) {
                     return (
                       <Loader

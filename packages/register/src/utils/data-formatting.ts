@@ -1,7 +1,11 @@
 import { GQLHumanName, GQLComment } from '@opencrvs/gateway/src/graphql/schema'
 
-export const createNamesMap = (names: GQLHumanName[]) =>
-  names.filter(Boolean).reduce((prevNamesMap, name) => {
+interface INamesMap {
+  [key: string]: string
+}
+
+export const createNamesMap = (names: GQLHumanName[]): INamesMap =>
+  names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
     if (!name.use) {
       /* eslint-disable no-string-literal */
       prevNamesMap['default'] = `${name.firstNames} ${

@@ -29,7 +29,7 @@ import { Male, Female } from '@opencrvs/components/lib/icons'
 import { Query } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { ITheme } from  '@register/styledComponents'
+import { ITheme } from '@register/styledComponents'
 import { FETCH_METRIC } from './queries'
 
 const messages: {
@@ -328,7 +328,15 @@ class HomeView extends React.Component<FullProps> {
                 locationId: userDetails && getUserLocation(userDetails, 'UNION')
               }}
             >
-              {({ loading, error, data }) => {
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: any
+                error?: any
+                data: any
+              }) => {
                 if (loading) {
                   return (
                     <StyledSpinner
