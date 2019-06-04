@@ -1,4 +1,5 @@
-import ApolloClient from 'apollo-client'
+import ApolloClient, { ApolloError } from 'apollo-client'
+import * as Sentry from '@sentry/browser'
 import {
   IApplication,
   modifyApplication,
@@ -11,7 +12,6 @@ import { createClient } from './utils/apolloClient'
 import { getMutationMapping } from './views/DataProvider/MutationProvider'
 
 const INTERVAL_TIME = 5000
-const ALLOWED_STATUS_CODE = [503, 408]
 const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_SUBMIT.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
@@ -22,6 +22,7 @@ export class SubmissionController {
   private client: ApolloClient<{}>
   private registerForms: { [key: string]: IForm }
   private syncRunning: boolean = false
+  private syncCount: number = 0
 
   constructor(store: AppStore) {
     this.store = store
@@ -47,21 +48,27 @@ export class SubmissionController {
   }
 
   private sync = async () => {
-    console.debug('Starting sync...')
+    this.syncCount++
+    console.debug(`[${this.syncCount}] Starting sync...`)
     if (!navigator.onLine || this.syncRunning) {
-      console.debug('Sync exiting early (offline or already syncing)')
+      console.debug(
+        `[${this.syncCount}] Sync exiting early (offline or already syncing)`
+      )
       return
     }
 
     this.syncRunning = true
 
     const applications = this.getSubmitableApplications()
+    console.debug(
+      `[${this.syncCount}] Syncing ${applications.length} applications`
+    )
     for (const application of applications) {
       await this.callMutation(application)
     }
 
     this.syncRunning = false
-    console.debug('Finish sync.')
+    console.debug(`[${this.syncCount}] Finish sync.`)
   }
 
   private callMutation = async (application: IApplication | undefined) => {
@@ -88,7 +95,7 @@ export class SubmissionController {
       await this.client.mutate({ mutation, variables })
       this.onSuccess(application)
     } catch (exception) {
-      this.onError(application, exception.networkError.statusCode)
+      this.onError(application, exception)
     }
   }
 
@@ -98,11 +105,15 @@ export class SubmissionController {
     this.store.dispatch(modifyApplication(application))
   }
 
-  // TODO: fix error detection when network is out
-  private onError = (application: IApplication, httpCode: number) => {
-    const status = ALLOWED_STATUS_CODE.includes(httpCode)
-      ? SUBMISSION_STATUS.FAILED_NETWORK
-      : SUBMISSION_STATUS.FAILED
+  private onError = (application: IApplication, error: ApolloError) => {
+    let status
+    if (error.networkError) {
+      status = SUBMISSION_STATUS.FAILED_NETWORK
+    } else {
+      status = SUBMISSION_STATUS.FAILED
+      Sentry.captureException(error)
+    }
+
     application.submissionStatus = status
     this.store.dispatch(modifyApplication(application))
   }
