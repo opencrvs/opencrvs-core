@@ -3,6 +3,7 @@
   "version": "1.0.0-alpha.6",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^5.2.1",
     "@opencrvs/components": "^1.0.0-alpha.6",
     "@sentry/browser": "^4.6.3",
     "@types/history": "^4.6.2",
@@ -14,8 +15,6 @@
     "history": "^4.7.2",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
-    "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-intl": "^2.4.0",
@@ -30,7 +29,6 @@
     "styled-components": "^3.3.3"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3020 react-scripts start",
     "build": "react-scripts build && yarn gen:sw",

@@ -9,7 +9,7 @@ import {
 } from '@register/forms'
 import { injectIntl } from 'react-intl'
 import { ParentDetails } from '@register/views/PrintCertificate/ParentDetails'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 
 const RadioGroupWrapper = styled.div`
   > div > span {

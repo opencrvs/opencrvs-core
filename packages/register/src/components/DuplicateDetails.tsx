@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Chip } from '@opencrvs/components/lib/interface'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import {
   StatusGray,
   StatusOrange,

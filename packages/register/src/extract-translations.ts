@@ -32,7 +32,7 @@ function buildTranslationsCSVData(
     const translation: ITranslationCSVItem = {
       Translation_Key: key,
       Value: translations[key],
-      // tslint:disable-next-line:no-string-literal
+      // eslint-disable-line no-string-literal
       Description: source[key]['description']
     }
     data.push(translation)
@@ -44,7 +44,7 @@ async function extractMessages() {
   let results: any[] = []
   const pattern = 'src/**/*.@(tsx|ts)'
   try {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-line no-console
     console.log(`${chalk.yellow('Checking translations in application ...')}`)
     glob(pattern, (err: any, files) => {
       if (err) {
@@ -72,7 +72,7 @@ async function extractMessages() {
       Object.keys(reactIntlSource).forEach(key => {
         if (!englishTranslations.hasOwnProperty(key)) {
           missingKeys = true
-          // tslint:disable-next-line:no-console
+          // eslint-disable-line no-console
           console.log(
             `${chalk.red(
               `No translation key exists for message id: ${chalk.white(
@@ -83,7 +83,7 @@ async function extractMessages() {
         }
         if (!bengaliTranslations.hasOwnProperty(key)) {
           missingKeys = true
-          // tslint:disable-next-line:no-console
+          // eslint-disable-line no-console
           console.log(
             `${chalk.redBright(
               `No translation key exists for message id: ${chalk.white(
@@ -95,7 +95,7 @@ async function extractMessages() {
       })
 
       if (missingKeys) {
-        // tslint:disable-next-line:no-console
+        // eslint-disable-line no-console
         console.log(
           `${chalk.red('WARNING: ')}${chalk.yellow(
             'Fix missing keys in locale files first.'
@@ -118,7 +118,7 @@ async function extractMessages() {
       fs.writeFileSync(`src/i18n/locales/en.csv`, englishLanguageCSV)
     })
   } catch (err) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-line no-console
     console.log(err)
     process.exit(1)
     return

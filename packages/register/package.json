@@ -3,6 +3,7 @@
   "version": "1.0.0-alpha.6",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^5.2.1",
     "@opencrvs/components": "^1.0.0-alpha.6",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
@@ -28,9 +29,7 @@
     "lodash": "^4.17.10",
     "logrocket": "^0.6.19",
     "moment": "^2.22.2",
-    "patch-package": "^6.1.2",
     "pdfmake": "^0.1.40",
-    "postinstall-postinstall": "^2.0.0",
     "query-string": "^6.1.0",
     "react": "^16.3.2",
     "react-apollo": "^2.1.4",
@@ -52,18 +51,18 @@
     "xregexp": "^4.2.0"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "precommit": "lint-staged",
-    "start": "BROWSER=none PORT=3000 react-scripts start",
-    "build": "react-scripts --max_old_space_size=4096 build && yarn gen:sw",
+    "start": "BROWSER=none PORT=3000 craco start",
+    "build": "craco --max_old_space_size=4096 build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-register",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-register ocrvs-register",
-    "test": "PORT=3000 react-scripts test --env=jsdom --modulePaths=src/ && yarn test:compilation",
-    "test:watch": "PORT=3000 react-scripts test --env=jsdom --modulePaths=src/ --watch",
+    "test": "PORT=3000 craco test --env=jsdom --modulePaths=src/ && yarn test:compilation",
+    "test:watch": "PORT=3000 craco test --env=jsdom --modulePaths=src/ --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "eject": "react-scripts eject",
+    "eject": "craco eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
+    "lint:ts": "eslint './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' src/extract-translations.ts"
@@ -71,7 +70,7 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "eslint",
+      "yarn lint:ts",
       "stylelint",
       "yarn extract:translations",
       "git add"
@@ -97,7 +96,6 @@
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
     "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-jsx-a11y": "^6.2.1",
@@ -133,80 +131,6 @@
     ],
     "moduleNameMapper": {
       "@register/(.*)": "<rootDir>/src/$1"
-    }
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "project": "./tsconfig.json"
-    },
-    "extends": [
-      "airbnb",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended",
-      "prettier/@typescript-eslint",
-      "prettier/react"
-    ],
-    "plugins": [
-      "prettier",
-      "@typescript-eslint",
-      "react"
-    ],
-    "settings": {
-      "react": {
-        "version": "detect"
-      }
-    },
-    "env": {
-      "es6": true,
-      "browser": true,
-      "node": true,
-      "jest": true
-    },
-    "globals": {
-      "page": true
-    },
-    "rules": {
-      "no-console": "off",
-      "no-return-assign": "off",
-      "import/no-extraneous-dependencies": "off",
-      "import/no-unresolved": "off",
-      "import/prefer-default-export": "off",
-      "jsx-a11y/label-has-for": "off",
-      "jsx-a11y/label-has-associated-control": "off",
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/explicit-member-accessibility": "off",
-      "react/no-unescaped-entities": "off",
-      "react/destructuring-assignment": "off",
-      "react/jsx-filename-extension": [
-        1,
-        {
-          "extensions": [
-            ".tsx"
-          ]
-        }
-      ],
-      "react/boolean-prop-naming": "off",
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "react/sort-comp": "off",
-      "react/sort-prop-types": "off"
     }
   }
 }

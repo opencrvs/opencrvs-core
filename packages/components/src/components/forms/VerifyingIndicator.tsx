@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled, { withTheme } from '@register/styledComponents'
 import { ITheme } from 'src/components/theme'
 
 const StyledSpan = styled.span`

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { PIN } from '@opencrvs/components/lib/icons'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'

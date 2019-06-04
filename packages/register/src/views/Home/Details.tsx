@@ -20,7 +20,7 @@ import {
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
-import styled, { withTheme } from 'styled-components'
+import styled, { withTheme } from '@register/styledComponents'
 import {
   createNamesMap,
   extractCommentFragmentValue
@@ -47,7 +47,7 @@ import {
   REJECT_REASON,
   REJECT_COMMENTS
 } from '@register/utils/constants'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { ITheme } from '@register/styledComponents'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px;

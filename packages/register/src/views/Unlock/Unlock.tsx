@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
@@ -87,7 +87,7 @@ type ErrorState = {
 type IFullState = IState & ErrorState
 
 type Props = {
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
 }
 type IFullProps = Props &
@@ -129,6 +129,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       (userDetails &&
         userDetails.name &&
         (userDetails.name.find(
+          // @ts-ignore
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
       {}

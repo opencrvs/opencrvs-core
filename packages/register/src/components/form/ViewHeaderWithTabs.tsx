@@ -1,5 +1,5 @@
 import { Tabs } from '@opencrvs/components/lib/interface'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { ViewHeader } from '@register/components/ViewHeader'
 
 export const ViewHeaderWithTabs = styled(ViewHeader)`

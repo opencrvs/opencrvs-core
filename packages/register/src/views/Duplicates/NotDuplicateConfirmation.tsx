@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 

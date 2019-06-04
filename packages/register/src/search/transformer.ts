@@ -33,9 +33,9 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
       id: reg.id,
       name:
         (createNamesMap(names)[lang] as string) ||
-        /* tslint:disable:no-string-literal */
+        /* eslint-disable no-string-literal */
         (createNamesMap(names)['default'] as string) ||
-        /* tslint:enable:no-string-literal */
+        /* eslint-enable no-string-literal */
         '',
       dob:
         (birthReg &&

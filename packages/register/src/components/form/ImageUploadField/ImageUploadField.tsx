@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { IconAction } from '@opencrvs/components/lib/buttons'
 import { Camera } from '@opencrvs/components/lib/icons'
 import { IActionProps } from '@opencrvs/components/lib/buttons/Action'

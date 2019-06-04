@@ -8,7 +8,7 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { Mutation } from 'react-apollo'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { SEARCH_RESULT } from '@register/navigation/routes'
 import { DuplicateDetails, Action } from '@register/components/DuplicateDetails'

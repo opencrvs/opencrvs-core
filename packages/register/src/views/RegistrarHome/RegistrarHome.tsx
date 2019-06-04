@@ -15,7 +15,7 @@ import {
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { ITheme } from '@register/styledComponents'
 import {
   GQLBirthRegistration,
   GQLDeathRegistration,
@@ -51,7 +51,7 @@ import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from '@register/utils/constants
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-import styled, { withTheme } from 'styled-components'
+import styled, { withTheme } from '@register/styledComponents'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
 import {
   COUNT_REGISTRATION_QUERY,
@@ -381,9 +381,9 @@ export class RegistrarHomeView extends React.Component<
           id: reg.id,
           name:
             (createNamesMap(names)[lang] as string) ||
-            /* tslint:disable:no-string-literal */
+            /* eslint-disable no-string-literal */
             (createNamesMap(names)['default'] as string) ||
-            /* tslint:enable:no-string-literal */
+            /* eslint-enable no-string-literal */
             '',
           date_of_event:
             (dateOfEvent &&
@@ -423,11 +423,11 @@ export class RegistrarHomeView extends React.Component<
                         ] as string)) ||
                       (status &&
                         status.user &&
-                        /* tslint:disable:no-string-literal */
+                        /* eslint-disable no-string-literal */
                         (createNamesMap(status.user.name as GQLHumanName[])[
                           'default'
                         ] as string)) ||
-                      /* tslint:enable:no-string-literal */
+                      /* eslint-enable no-string-literal */
                       '',
                     timestamp:
                       (status && formatLongDate(status.timestamp, locale)) ||
@@ -522,7 +522,7 @@ export class RegistrarHomeView extends React.Component<
           id: reg.id,
           name:
             (names && (createNamesMap(names)[lang] as string)) ||
-            /* tslint:disable:no-string-literal */
+            /* eslint-disable no-string-literal */
             (names && (createNamesMap(names)['bn'] as string)) ||
             '',
           date_of_rejection:
@@ -560,11 +560,11 @@ export class RegistrarHomeView extends React.Component<
                         ] as string)) ||
                       (status &&
                         status.user &&
-                        /* tslint:disable:no-string-literal */
+                        /* eslint-disable no-string-literal */
                         (createNamesMap(status.user.name as GQLHumanName[])[
                           'default'
                         ] as string)) ||
-                      /* tslint:enable:no-string-literal */
+                      /* eslint-enable no-string-literal */
                       '',
                     timestamp:
                       (status && formatLongDate(status.timestamp, locale)) ||

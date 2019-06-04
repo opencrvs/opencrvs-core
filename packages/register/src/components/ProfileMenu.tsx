@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import {
   injectIntl,
   InjectedIntlProps,

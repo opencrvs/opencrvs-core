@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'

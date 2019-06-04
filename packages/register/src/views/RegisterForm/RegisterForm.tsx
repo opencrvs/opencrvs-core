@@ -10,7 +10,7 @@ import {
   DraftSimple
 } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import {
   goToTab as goToTabAction,
   goBack as goBackAction

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { SectionDrawer } from '@opencrvs/components/lib/interface'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { IApplication } from '@register/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'

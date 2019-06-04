@@ -46,7 +46,7 @@ import {
   PHONE_TEXT
 } from '@register/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { goToEvents as goToEventsAction } from '@register/navigation'
 import { SEARCH } from '@register/navigation/routes'
 

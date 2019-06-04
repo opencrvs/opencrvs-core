@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { countries } from '@register/forms/countries'
 import { identityNameMapper } from '@register/forms/identity'

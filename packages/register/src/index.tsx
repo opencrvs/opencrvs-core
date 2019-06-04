@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { injectGlobal } from 'styled-components'
+import { injectGlobal } from '@register/styledComponents'
 import { App } from '@register/App'
 import registerServiceWorker from '@register/registerServiceWorker'
 import { createStore } from '@register/store'
@@ -12,7 +12,7 @@ import * as LogRocket from 'logrocket'
 storage.configStorage('OpenCRVS')
 
 // Injecting global styles for the body tag - used only once
-// tslint:disable-next-line
+// eslint-disable-line
 injectGlobal`
   body {
     margin: 0;

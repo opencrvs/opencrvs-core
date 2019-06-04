@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'

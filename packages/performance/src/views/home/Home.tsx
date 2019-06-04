@@ -29,7 +29,7 @@ import { Male, Female } from '@opencrvs/components/lib/icons'
 import { Query } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { ITheme } from  '@register/styledComponents'
 import { FETCH_METRIC } from './queries'
 
 const messages = defineMessages({

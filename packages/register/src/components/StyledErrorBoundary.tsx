@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'

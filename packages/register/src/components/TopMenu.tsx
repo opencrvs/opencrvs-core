@@ -5,7 +5,7 @@ import { Scope } from '@register/utils/authUtils'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getScope } from '@register/profile/profileSelectors'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,

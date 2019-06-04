@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
 import * as Sentry from '@sentry/browser'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Shield } from '@opencrvs/components/lib/icons'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { CreatePin } from '@register/views/PIN/CreatePin'
 

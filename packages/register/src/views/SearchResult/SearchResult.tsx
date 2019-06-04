@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { ITheme } from '@register/styledComponents'
 import {
   GQLComment,
   GQLDeathRegistration,
@@ -68,7 +68,7 @@ import {
   IIdentifier,
   IUserDetails
 } from '@register/utils/userUtils'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { goToTab as goToTabAction } from '@register/navigation'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
@@ -348,11 +348,13 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         practitionerName:
           (status &&
             status.user &&
+            // @ts-ignore
             (createNamesMap(status.user.name as GQLHumanName[])[
               this.props.language
             ] as string)) ||
           (status &&
             status.user &&
+            // @ts-ignore
             (createNamesMap(status.user.name as GQLHumanName[])[
               ''
             ] as string)) ||

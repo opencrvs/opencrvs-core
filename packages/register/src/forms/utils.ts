@@ -307,7 +307,7 @@ export const getConditionalActionsForField = (
 
   return field.conditionals
     .filter(conditional =>
-      /* tslint:disable-next-line: no-eval */
+      /* eslint-disable-line  no-eval */
       eval(conditional.expression)
     )
     .map((conditional: IConditional) => conditional.action)

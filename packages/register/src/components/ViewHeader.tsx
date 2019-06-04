@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { TopMenu } from '@register/components/TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
 import {

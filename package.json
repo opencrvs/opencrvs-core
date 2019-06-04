@@ -9,7 +9,6 @@
     }
   },
   "scripts": {
-    "postinstall": "patch-package",
     "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore integration start",
     "start:prod": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore integration start:prod",
     "dev": "yarn dev:secrets:gen && concurrently \"yarn run start\" \"yarn run compose\"",
@@ -42,8 +41,6 @@
     "prettier": "^1.15.2"
   },
   "dependencies": {
-    "opener": "^1.5.1",
-    "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0"
+    "opener": "^1.5.1"
   }
 }

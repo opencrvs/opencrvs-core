@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import { IFileValue } from '@register/forms'
 import { ActionPage } from '@opencrvs/components/lib/interface'
 import { OverlayContainer } from '@register/components/form/ImageUploadField/ImageUploadOption'

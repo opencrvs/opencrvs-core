@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
+import styled, { withTheme } from '@register/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   RegisterForm,
   IFormProps
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { ITheme } from '@register/styledComponents'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'

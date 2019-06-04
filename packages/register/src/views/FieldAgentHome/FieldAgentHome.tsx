@@ -15,7 +15,7 @@ import {
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 } from '@register/utils/constants'
-import styled from '@register/styled-components'
+import styled from '@register/styledComponents'
 import {
   Button,
   ICON_ALIGNMENT,
