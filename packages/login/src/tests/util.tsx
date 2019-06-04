@@ -8,9 +8,9 @@ import { addLocaleData } from 'react-intl'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-import { App, store } from '../App'
-import { IStoreState, createStore } from '../store'
-import { IntlContainer } from '../i18n/components/I18nContainer'
+import { App, store } from '@login/App'
+import { IStoreState, createStore } from '@login/store'
+import { IntlContainer } from '@login/i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
 addLocaleData([...en])

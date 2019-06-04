@@ -6,10 +6,10 @@ import {
   withRouter
 } from 'react-router'
 import { connect } from 'react-redux'
-import { IStoreState } from '../store'
-import { getAuthenticated } from 'src/profile/selectors'
-import { checkAuth } from 'src/profile/actions'
-import { IURLParams } from '../utils/authUtils'
+import { IStoreState } from '@performance/store'
+import { getAuthenticated } from '@performance/profile/selectors'
+import { checkAuth } from '@performance/profile/actions'
+import { IURLParams } from '@performance/utils/authUtils'
 import { parse } from 'querystring'
 
 export interface IProps {
@@ -40,7 +40,10 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter<Props>(
-  connect<IProps, IDispatchProps>(mapStateToProps, {
-    checkAuth
-  })(ProtectedRouteWrapper)
+  connect<IProps, IDispatchProps>(
+    mapStateToProps,
+    {
+      checkAuth
+    }
+  )(ProtectedRouteWrapper)
 )

@@ -46,7 +46,9 @@ class MutationProviderComponent extends React.Component<IProps> {
       <Mutation
         mutation={eventMutationMapping.mutation}
         variables={eventMutationMapping.variables || null}
-        onCompleted={data => onCompleted(data[eventMutationMapping.dataKey])}
+        onCompleted={(data: any) =>
+          onCompleted(data[eventMutationMapping.dataKey])
+        }
         onError={onError}
       >
         {(

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux'
-import { getLanguage } from '../i18n/selectors'
-import { Page, IPage } from './Page'
-import { IStoreState } from '../store'
+import { getLanguage } from '@login/i18n/selectors'
+import { Page, IPage } from '@login/common/Page'
+import { IStoreState } from '@login/store'
 import { withRouter } from 'react-router'
-import { DarkPage } from './DarkPage'
+import { DarkPage } from '@login/common/DarkPage'
 
 const mapStateToProps = (store: IStoreState): IPage => {
   return {

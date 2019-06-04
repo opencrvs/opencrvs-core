@@ -11,7 +11,7 @@ import {
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
-import { stepTwoFields } from './stepTwoFields'
+import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
 
 import {
   Title,
@@ -21,10 +21,10 @@ import {
   LogoContainer,
   StyledButton,
   FieldWrapper
-} from '../StepOne/StepOneForm'
+} from '@login/views/StepOne/StepOneForm'
 
-import { IVerifyCodeNumbers } from '../../login/actions'
-import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
+import { IVerifyCodeNumbers } from '@login/login/actions'
+import { Ii18nReduxFormFieldProps } from '@login/utils/fieldUtils'
 
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 

@@ -13,8 +13,8 @@ import {
   routerMiddleware,
   RouterState
 } from 'react-router-redux'
-import { profileReducer, ProfileState } from './profile/reducer'
-import { intlReducer, IntlState } from './i18n/reducer'
+import { profileReducer, ProfileState } from '@performance/profile/reducer'
+import { intlReducer, IntlState } from '@performance/i18n/reducer'
 import * as Sentry from '@sentry/browser'
 import * as createSentryMiddleware from 'redux-sentry-middleware'
 

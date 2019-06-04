@@ -3,8 +3,8 @@ import * as ReactDOM from 'react-dom'
 import { injectGlobal } from 'styled-components'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
-import { App } from './App'
-import registerServiceWorker from './registerServiceWorker'
+import { App } from '@login/App'
+import registerServiceWorker from '@login/registerServiceWorker'
 
 // Injecting global styles for the body tag - used only once
 // tslint:disable-next-line

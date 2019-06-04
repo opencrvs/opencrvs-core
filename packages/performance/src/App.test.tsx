@@ -1,10 +1,14 @@
-import { createTestApp, mockUserResponse, userDetails } from './tests/util'
+import {
+  createTestApp,
+  mockUserResponse,
+  userDetails
+} from '@performance/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
-import { storage } from 'src/storage'
-import { queries } from 'src/profile/queries'
+import { storage } from '@performance/storage'
+import { queries } from '@performance/profile/queries'
 import { setInitialUserDetails } from '@opencrvs/performance/src/profile/actions'
-import { goToRegister as goToRegisterAction } from 'src/navigation'
+import { goToRegister as goToRegisterAction } from '@performance/navigation'
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()

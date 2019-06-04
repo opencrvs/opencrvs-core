@@ -1,10 +1,10 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import { push } from 'react-router-redux'
-import * as actions from './actions'
-import { authApi } from '../utils/authApi'
-import * as routes from '../navigation/routes'
-import { ITokenPayload, getTokenPayload } from '../utils/authUtils'
-import { REGISTER_APP } from '../navigation/routes'
+import * as actions from '@login/login/actions'
+import { authApi } from '@login/utils/authApi'
+import * as routes from '@login/navigation/routes'
+import { ITokenPayload, getTokenPayload } from '@login/utils/authUtils'
+import { REGISTER_APP } from '@login/navigation/routes'
 
 export type LoginState = {
   submitting: boolean

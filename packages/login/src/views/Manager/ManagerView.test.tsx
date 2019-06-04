@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { ManagerViewContainer } from './ManagerView'
-import { createTestComponent, wait } from '../../tests/util'
+import { ManagerViewContainer } from '@login/views/Manager/ManagerView'
+import { createTestComponent, wait } from '@login/tests/util'
 
 describe('Manager view', () => {
   describe('Step Two Container test', () => {

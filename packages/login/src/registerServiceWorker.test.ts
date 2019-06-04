@@ -1,4 +1,4 @@
-import register from './registerServiceWorker'
+import register from '@login/registerServiceWorker'
 
 describe('registerServiceWorker module', () => {
   beforeEach(() => {

@@ -2,9 +2,9 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
-import { App } from './App'
-import { createStore } from './store'
-import { injectGlobal } from './styled-components'
+import { App } from '@performance/App'
+import { createStore } from '@performance/store'
+import { injectGlobal } from '@performance/styledComponents'
 
 // Injecting global styles for the body tag - used only once
 // tslint:disable-next-line

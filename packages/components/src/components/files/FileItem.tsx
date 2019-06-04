@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { withTheme } from '@register/styledComponents'
+import styled, { withTheme } from 'styled-components'
 import { Cross } from '../icons'
 import Uploaded from '../icons/Uploaded'
 import { ITheme } from '../theme'

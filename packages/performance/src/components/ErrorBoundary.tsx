@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
-import styled from 'styled-components'
+import styled from '@performance/styledComponents'
 
 const ErrorMessage = styled.h1`
   text-align: center;

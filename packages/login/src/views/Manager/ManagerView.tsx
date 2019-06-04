@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import * as actions from '../../login/actions'
+import * as actions from '@login/login/actions'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
-import { REGISTER_APP, PERFORMANCE_APP } from '../../navigation/routes'
+import { REGISTER_APP, PERFORMANCE_APP } from '@login/navigation/routes'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

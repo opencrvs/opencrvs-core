@@ -371,6 +371,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           (rec.registration &&
             rec.registration.status &&
             rec.registration.status
+              // @ts-ignore
               .map((status: GQLRegWorkflow, index: number) => {
                 let reasonString = ''
                 if (status.comments) {

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "paths": { "@components/*": ["src/*"] },
     "outDir": "lib/",
     "module": "commonjs",
     "target": "es6",

@@ -1,5 +1,5 @@
-import * as actions from './actions'
-import { initialState, languages } from './reducer'
+import * as actions from '@performance/i18n/actions'
+import { initialState, languages } from '@performance/i18n/reducer'
 import { createStore } from '@opencrvs/performance/src/store'
 const action = {
   type: actions.CHANGE_LANGUAGE,

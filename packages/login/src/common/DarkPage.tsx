@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
-import { IPage } from './Page'
+import { IPage } from '@login/common/Page'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getTheme } from '@opencrvs/components/lib/theme'
 

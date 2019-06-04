@@ -10,8 +10,16 @@
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
     "@types/redux-sentry-middleware": "^0.0.1",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "axios": "^0.18.0",
     "country-data": "^0.0.31",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.13.0",
     "history": "^4.7.2",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
@@ -30,23 +38,24 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "BROWSER=none PORT=3020 react-scripts start",
-    "build": "react-scripts build && yarn gen:sw",
+    "start": "BROWSER=none PORT=3020 craco start",
+    "build": "craco build && yarn gen:sw",
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:5000 --name ocrvs-login ocrvs-login",
-    "test": "PORT=3020 react-scripts test --env=jsdom --modulePaths=src/ && yarn test:compilation",
+    "test": "PORT=3020 craco test --env=jsdom --modulePaths=src/ && yarn test:compilation",
     "test:watch": "yarn test -- --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "eject": "react-scripts eject",
+    "eject": "craco eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
+    "lint:ts": "eslint './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3020 build",
     "test:compilation": "tsc --noEmit"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
       "prettier --write",
-      "tslint",
+      "yarn lint:ts",
       "stylelint",
       "git add"
     ]
@@ -92,17 +101,7 @@
       "html"
     ]
   },
-  "description": "The login application for OpenCRVS",
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "moduleNameMapper": {
+    "@login/(.*)": "<rootDir>/src/$1"
   }
 }

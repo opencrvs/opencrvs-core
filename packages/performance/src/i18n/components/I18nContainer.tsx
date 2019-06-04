@@ -3,9 +3,9 @@ import { addLocaleData, IntlProvider } from 'react-intl'
 import * as en from 'react-intl/locale-data/en'
 import * as bn from 'react-intl/locale-data/bn'
 
-import { getLanguage, getMessages } from '../selectors'
-import { IStoreState } from '../../store'
-import { IntlMessages } from '../reducer'
+import { getLanguage, getMessages } from '@performance/i18n/selectors'
+import { IStoreState } from '@performance/store'
+import { IntlMessages } from '@performance/i18n/reducer'
 
 addLocaleData([...en, ...bn])
 

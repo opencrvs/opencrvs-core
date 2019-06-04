@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { withTheme } from '@register/styledComponents'
+import styled, { withTheme } from 'styled-components'
 import { IDataPoint } from './datapoint'
 import { ITheme } from '../theme'
 

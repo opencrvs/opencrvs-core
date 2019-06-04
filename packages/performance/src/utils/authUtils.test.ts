@@ -1,4 +1,8 @@
-import { getTokenPayload, getToken, storeToken } from './authUtils'
+import {
+  getTokenPayload,
+  getToken,
+  storeToken
+} from '@performance/utils/authUtils'
 
 describe('authUtils tests', () => {
   describe('getAuthorizedToken', () => {

@@ -8,19 +8,19 @@ import {
   defineMessages
 } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
-import { withTheme } from 'styled-components'
+import styled from '@performance/styledComponents'
+import { withTheme } from '@performance/styledComponents'
 import {
   GQLHumanName,
   GQLBirthKeyFigures
 } from '@opencrvs/gateway/src/graphql/schema'
-import { getUserDetails } from 'src/profile/selectors'
-import { getUserLocation } from 'src/utils/userUtils'
-import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
-import { IUserDetails } from 'src/utils/userUtils'
-import { Page } from 'src/components/Page'
-import { IStoreState } from '@opencrvs/performance/src/store'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { getUserDetails } from '@performance/profile/selectors'
+import { getUserLocation } from '@performance/utils/userUtils'
+import { getLanguage } from '@performance/i18n/selectors'
+import { IUserDetails } from '@performance/utils/userUtils'
+import { Page } from '@performance/components/Page'
+import { IStoreState } from '@performance/store'
+import { HomeViewHeader } from '@performance/components/HomeViewHeader'
 
 import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
 import { ICategoryDataPoint } from '@opencrvs/components/lib/charts/datapoint'
@@ -29,8 +29,8 @@ import { Male, Female } from '@opencrvs/components/lib/icons'
 import { Query } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { ITheme } from '@register/styledComponents'
-import { FETCH_METRIC } from './queries'
+import { ITheme } from '@performance/styledComponents'
+import { FETCH_METRIC } from '@performance/views/home/queries'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

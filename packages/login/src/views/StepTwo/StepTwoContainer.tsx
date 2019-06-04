@@ -1,15 +1,19 @@
 import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
-import { IProps, IDispatchProps, StepTwoForm } from './StepTwoForm'
-import { IStoreState } from '../../store'
+import {
+  IProps,
+  IDispatchProps,
+  StepTwoForm
+} from '@login/views/StepTwo/StepTwoForm'
+import { IStoreState } from '@login/store'
 
-import * as actions from '../../login/actions'
+import * as actions from '@login/login/actions'
 import {
   getSubmissionError,
   getResentSMS,
   getsubmitting
-} from '../../login/selectors'
+} from '@login/login/selectors'
 
 const FORM_NAME = 'STEP_TWO'
 

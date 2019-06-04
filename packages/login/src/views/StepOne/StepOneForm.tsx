@@ -13,15 +13,15 @@ import {
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
 
-import { stepOneFields } from './stepOneFields'
+import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 
-import { IAuthenticationData } from '../../utils/authApi'
+import { IAuthenticationData } from '@login/utils/authApi'
 import { Logo } from '@opencrvs/components/lib/icons'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_INVALID_CREDENTIALS,
   ERROR_CODE_PHONE_NUMBER_VALIDATE
-} from '../../utils/authUtils'
+} from '@login/utils/authUtils'
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
