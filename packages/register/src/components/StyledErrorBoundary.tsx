@@ -88,8 +88,8 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
     const { intl } = this.props
     if (this.state.error) {
       if (
-        location.hostname !== 'localhost' &&
-        location.hostname !== '127.0.0.1'
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1'
       ) {
         Sentry.showReportDialog()
       }
@@ -111,7 +111,10 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
           <ErrorMessage>
             {intl.formatMessage(messages.errorDescription2)}
           </ErrorMessage>
-          <GoToHomepage id="GoToHomepage" onClick={() => (location.href = '/')}>
+          <GoToHomepage
+            id="GoToHomepage"
+            onClick={() => (window.location.href = '/')}
+          >
             {intl.formatMessage(messages.goToHomepage)}
           </GoToHomepage>
         </ErrorContainer>

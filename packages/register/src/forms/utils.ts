@@ -41,6 +41,18 @@ interface IRange {
   value: string
 }
 
+export const internationaliseOptions = (
+  intl: InjectedIntl,
+  options: Array<ISelectOption | IRadioOption | ICheckboxOption>
+) => {
+  return options.map(opt => {
+    return {
+      ...opt,
+      label: intl.formatMessage(opt.label)
+    }
+  })
+}
+
 export const internationaliseFieldObject = (
   intl: InjectedIntl,
   field: IFormField
@@ -74,18 +86,6 @@ export const internationaliseFieldObject = (
   }
 
   return base as Ii18nFormField
-}
-
-export const internationaliseOptions = (
-  intl: InjectedIntl,
-  options: Array<ISelectOption | IRadioOption | ICheckboxOption>
-) => {
-  return options.map(opt => {
-    return {
-      ...opt,
-      label: intl.formatMessage(opt.label)
-    }
-  })
 }
 
 export const generateOptions = (
@@ -269,6 +269,17 @@ export function isCityLocation(
   }
 }
 
+export function getInputValues(
+  inputs: IFieldInput[],
+  values: IFormSectionData
+): IDynamicValues {
+  const variables = {}
+  inputs.forEach((input: IFieldInput) => {
+    variables[input.name] = values[input.valueField]
+  })
+  return variables
+}
+
 export function getQueryData(
   field: ILoaderButton,
   values: IFormSectionData
@@ -283,17 +294,6 @@ export function getQueryData(
   const variables = getInputValues(queryData.inputs, values)
   queryData.variables = variables
   return queryData
-}
-
-export function getInputValues(
-  inputs: IFieldInput[],
-  values: IFormSectionData
-): IDynamicValues {
-  const variables = {}
-  inputs.forEach((input: IFieldInput) => {
-    variables[input.name] = values[input.valueField]
-  })
-  return variables
 }
 
 export const getConditionalActionsForField = (

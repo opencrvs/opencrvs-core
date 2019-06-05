@@ -267,7 +267,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const onClearText = () => {
       if (desktop && window.location.pathname.includes(SEARCH)) {
-        history.back()
+        window.history.back()
       }
     }
 
@@ -323,7 +323,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       ? {
           mobileLeft: {
             icon: () => <ArrowBack />,
-            handler: () => history.back()
+            handler: () => window.history.back()
           },
           mobileBody: this.renderSearchInput(this.props)
         }

@@ -22,7 +22,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 

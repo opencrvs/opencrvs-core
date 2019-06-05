@@ -22,8 +22,8 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       if (
-        location.hostname !== 'localhost' &&
-        location.hostname !== '127.0.0.1'
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1'
       ) {
         Sentry.showReportDialog()
       }
