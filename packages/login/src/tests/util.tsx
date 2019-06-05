@@ -2,7 +2,7 @@ import * as React from 'react'
 import { mount, configure, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import * as Adapter from 'enzyme-adapter-react-16'
-import * as en from 'react-intl/locale-data/en'
+import en from 'react-intl/locale-data/en'
 import { ThemeProvider } from 'styled-components'
 import { addLocaleData } from 'react-intl'
 

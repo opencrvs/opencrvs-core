@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { addLocaleData, IntlProvider } from 'react-intl'
-import * as en from 'react-intl/locale-data/en'
-import * as bn from 'react-intl/locale-data/bn'
+import en from 'react-intl/locale-data/en'
+import bn from 'react-intl/locale-data/bn'
 
 import { getLanguage, getMessages } from '@register/i18n/selectors'
 import { IStoreState } from '@register/store'
