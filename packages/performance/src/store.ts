@@ -16,7 +16,7 @@ import {
 import { profileReducer, ProfileState } from '@performance/profile/reducer'
 import { intlReducer, IntlState } from '@performance/i18n/reducer'
 import * as Sentry from '@sentry/browser'
-import * as createSentryMiddleware from 'redux-sentry-middleware'
+import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {
   profile: ProfileState

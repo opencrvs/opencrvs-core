@@ -43,7 +43,7 @@ import {
   printReducer
 } from '@register/forms/certificate/printReducer'
 import * as Sentry from '@sentry/browser'
-import * as createSentryMiddleware from 'redux-sentry-middleware'
+import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {
   profile: ProfileState
