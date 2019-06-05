@@ -38,6 +38,7 @@ import {
   eventLocationIDQueryTransformer,
   eventLocationQueryTransformer
 } from '@register/forms/mappings/query/field-mappings'
+import { IFormSection } from '@register/forms/index'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -45,7 +46,6 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
-import { IFormSection } from '@register/forms/index'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

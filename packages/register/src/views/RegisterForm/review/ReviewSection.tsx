@@ -1,12 +1,19 @@
 import * as React from 'react'
-import { SectionDrawer } from '@opencrvs/components/lib/interface'
+import {
+  SectionDrawer,
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import { IApplication } from '@register/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
-import { getConditionalActionsForField } from '@register/forms/utils'
+import {
+  getConditionalActionsForField,
+  getFieldLabel
+} from '@register/forms/utils'
 import {
   TickLarge,
   CrossLarge,
@@ -17,10 +24,7 @@ import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { goToTab } from '@register/navigation'
-import {
-  DocumentViewer,
-  IDocumentViewerOptions
-} from '@opencrvs/components/lib/interface'
+
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
 import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
 import { getScope } from '@register/profile/profileSelectors'
@@ -64,7 +68,7 @@ import {
   IDynamicFormField
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
-import { getFieldLabel } from '@register/forms/utils'
+
 import { REJECTED } from '@register/utils/constants'
 
 const messages: {

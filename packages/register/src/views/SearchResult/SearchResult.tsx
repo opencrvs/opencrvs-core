@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import { ITheme } from '@register/styledComponents'
+import styled, { ITheme, withTheme } from '@register/styledComponents'
 import {
   GQLComment,
   GQLDeathRegistration,
@@ -35,7 +35,8 @@ import { IViewHeadingProps } from '@register/components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToTab as goToTabAction
 } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
@@ -68,8 +69,7 @@ import {
   IIdentifier,
   IUserDetails
 } from '@register/utils/userUtils'
-import styled, { withTheme } from '@register/styledComponents'
-import { goToTab as goToTabAction } from '@register/navigation'
+
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
 

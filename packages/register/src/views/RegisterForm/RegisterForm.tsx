@@ -2,12 +2,13 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import * as Swipeable from 'react-swipeable'
-import { Box, Modal } from '@opencrvs/components/lib/interface'
+import { Box, Modal, InvertSpinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowForward,
   ArrowBack,
-  DraftSimple
+  DraftSimple,
+  TickLarge
 } from '@opencrvs/components/lib/icons'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '@register/styledComponents'
@@ -65,8 +66,7 @@ import {
   MutationContext
 } from '@register/views/DataProvider/MutationProvider'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
-import { InvertSpinner } from '@opencrvs/components/lib/interface'
-import { TickLarge } from '@opencrvs/components/lib/icons'
+
 import * as Sentry from '@sentry/browser'
 // @ts-ignore - Required for mocking
 import * as debounce from 'lodash/debounce'
@@ -474,7 +474,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   successfullyRegistered = (response: string) => {
     const {
       history,
-      application: application,
+      application,
       application: { event }
     } = this.props
     const personData =

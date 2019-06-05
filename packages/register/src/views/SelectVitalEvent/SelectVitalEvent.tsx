@@ -4,7 +4,10 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
 import { ViewHeader } from '@register/components/ViewHeader'
-import { goToBirthRegistration, goToDeathRegistration } from '@register/navigation'
+import {
+  goToBirthRegistration,
+  goToDeathRegistration
+} from '@register/navigation'
 import { Dispatch } from 'redux'
 import { createApplication, storeApplication } from '@register/applications'
 import { Event } from '@register/forms'

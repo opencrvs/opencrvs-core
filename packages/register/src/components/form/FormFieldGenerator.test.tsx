@@ -17,6 +17,8 @@ import {
 import { countries } from '@register/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 
+import { messages as addressMessages } from '@register/forms/address'
+
 export interface IMotherSectionFormData {
   firstName: string
 }
@@ -28,8 +30,6 @@ const offlineResources = {
   offlineDataLoaded: true,
   loadingError: false
 }
-
-import { messages as addressMessages } from '@register/forms/address'
 
 describe('form component', () => {
   const { store } = createStore()

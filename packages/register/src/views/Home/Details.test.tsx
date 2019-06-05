@@ -1,12 +1,16 @@
 import * as React from 'react'
-import { createTestComponent } from '@register/tests/util'
-import { mockUserResponse } from '@register/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  validToken
+} from '@register/tests/util'
+
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
-import { validToken } from '@register/tests/util'
+
 import { checkAuth } from '@register/profile/profileActions'
 import { Details } from '@register/views/Home/Details'
 import {

@@ -1,8 +1,8 @@
 import * as React from 'react'
 
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
-import { RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router'
+
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'

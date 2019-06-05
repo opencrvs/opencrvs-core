@@ -2,7 +2,8 @@ import { defineMessages } from 'react-intl'
 import {
   messages as identityMessages,
   birthIdentityOptions,
-  identityTypeMapper
+  identityTypeMapper,
+  identityNameMapper
 } from '@register/forms/identity'
 import {
   getMotherDateOfBirthLabel,
@@ -34,16 +35,12 @@ import {
   maxLength,
   dateInPast
 } from '@register/utils/validate'
-
-export interface IMotherSectionFormData {
-  firstName: string
-}
 import { IFormSection } from '@register/forms/index'
 import { messages as addressMessages } from '@register/forms/address'
 import { countries } from '@register/forms/countries'
 import { conditionals } from '@register/forms/utils'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
-import { identityNameMapper } from '@register/forms/identity'
+
 import {
   fieldToNameTransformer,
   fieldToArrayTransformer,
@@ -68,6 +65,10 @@ import {
   transformRegistrationData,
   FETCH_REGISTRATION
 } from '@register/forms/register/queries/registration'
+
+export interface IMotherSectionFormData {
+  firstName: string
+}
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

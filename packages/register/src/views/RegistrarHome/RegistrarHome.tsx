@@ -37,8 +37,9 @@ import { Event } from '@register/forms'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction
-, goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
+  goToTab as goToTabAction,
+  goToRegistrarHomeTab as goToRegistrarHomeTabAction
+} from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
@@ -48,16 +49,14 @@ import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import { Scope } from '@register/utils/authUtils'
 import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from '@register/utils/constants'
-import { createNamesMap } from '@register/utils/data-formatting'
+import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-
 
 import {
   COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATIONS_QUERY
 } from '@register/views/RegistrarHome/queries'
-import { sentenceCase } from '@register/utils/data-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean

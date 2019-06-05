@@ -16,7 +16,12 @@ import {
 import { RouteComponentProps } from 'react-router'
 import { IStoreState } from '@register/store'
 import { IntlState } from '@register/i18n/reducer'
-import { DECLARATION, REJECTION, BIRTH, OFFLINE } from '@register/utils/constants'
+import {
+  DECLARATION,
+  REJECTION,
+  BIRTH,
+  OFFLINE
+} from '@register/utils/constants'
 import { HomeViewHeader } from '@register/components/HomeViewHeader'
 
 const messages: {

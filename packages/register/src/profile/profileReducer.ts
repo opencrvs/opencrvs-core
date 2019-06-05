@@ -1,7 +1,13 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@register/profile/profileActions'
 import { storage } from '@register/storage'
-import { USER_DETAILS } from '@register/utils/userUtils'
+import {
+  USER_DETAILS,
+  IUserDetails,
+  getUserDetails,
+  storeUserDetails,
+  removeUserDetails
+} from '@register/utils/userUtils'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -10,12 +16,7 @@ import {
   isTokenStillValid,
   removeToken
 } from '@register/utils/authUtils'
-import {
-  IUserDetails,
-  getUserDetails,
-  storeUserDetails,
-  removeUserDetails
-} from '@register/utils/userUtils'
+
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from '@register/profile/queries'

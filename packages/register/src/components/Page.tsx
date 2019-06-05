@@ -1,8 +1,8 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { setInitialApplications } from '@register/applications'

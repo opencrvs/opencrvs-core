@@ -23,7 +23,7 @@ export const extractCommentFragmentValue = (
   comments: GQLComment[],
   fragmentItem: string
 ): string => {
-  let fragmentValue: string = ''
+  let fragmentValue = ''
 
   for (const comment of comments) {
     if (comment.comment) {

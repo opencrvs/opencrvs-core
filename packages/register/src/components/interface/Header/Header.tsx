@@ -21,7 +21,8 @@ import {
   TrackingID,
   BRN,
   Phone,
-  ArrowBack
+  ArrowBack,
+  Plus
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
 import { storage } from '@register/storage'
@@ -37,7 +38,8 @@ import {
   goToHome,
   goToPerformance,
   goToSearchResult,
-  goToSearch
+  goToSearch,
+  goToEvents as goToEventsAction
 } from '@register/navigation'
 import { ProfileMenu } from '@register/components/ProfileMenu'
 import {
@@ -45,9 +47,9 @@ import {
   BRN_DRN_TEXT,
   PHONE_TEXT
 } from '@register/utils/constants'
-import { Plus } from '@opencrvs/components/lib/icons'
+
 import styled from '@register/styledComponents'
-import { goToEvents as goToEventsAction } from '@register/navigation'
+
 import { SEARCH } from '@register/navigation/routes'
 
 type IProps = InjectedIntlProps & {

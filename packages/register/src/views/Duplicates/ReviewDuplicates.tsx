@@ -7,7 +7,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
-import { Mutation } from 'react-apollo'
+import { Mutation, Query } from 'react-apollo'
 import styled from '@register/styledComponents'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { SEARCH_RESULT } from '@register/navigation/routes'
@@ -15,9 +15,12 @@ import { DuplicateDetails, Action } from '@register/components/DuplicateDetails'
 import { Event } from '@register/forms'
 import { NotDuplicateConfirmation } from '@register/views/Duplicates/NotDuplicateConfirmation'
 import { RouteComponentProps } from 'react-router'
-import { Query } from 'react-apollo'
+
 import gql from 'graphql-tag'
-import { createNamesMap } from '@register/utils/data-formatting'
+import {
+  createNamesMap,
+  extractCommentFragmentValue
+} from '@register/utils/data-formatting'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import {
@@ -32,7 +35,6 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from '@register/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
-import { extractCommentFragmentValue } from '@register/utils/data-formatting'
 
 interface IMatchParams {
   applicationId: string

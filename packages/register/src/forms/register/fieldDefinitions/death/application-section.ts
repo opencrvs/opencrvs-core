@@ -19,7 +19,8 @@ import {
   validIDNumber,
   numeric,
   maxLength,
-  isDateInPast
+  isDateInPast,
+  phoneNumberFormat
 } from '@register/utils/validate'
 import { countries } from '@register/forms/countries'
 import {
@@ -31,7 +32,7 @@ import {
 import { messages as addressMessages } from '@register/forms/address'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import { conditionals } from '@register/forms/utils'
-import { phoneNumberFormat } from '@register/utils/validate'
+
 import {
   fieldValueSectionExchangeTransformer,
   fieldToAddressTransformer,

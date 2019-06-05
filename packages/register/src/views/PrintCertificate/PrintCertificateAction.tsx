@@ -1,7 +1,12 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-import { Spinner, InvertSpinner } from '@opencrvs/components/lib/interface'
+import {
+  ActionPage,
+  Box,
+  Spinner,
+  InvertSpinner
+} from '@opencrvs/components/lib/interface'
+
 import {
   InjectedIntlProps,
   injectIntl,
@@ -30,7 +35,7 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { hasFormError } from '@register/forms/utils'
 import { calculatePrice } from '@register/views/PrintCertificate/calculatePrice'
-import { Print } from '@opencrvs/components/lib/icons'
+import { Print, TickLarge, Edit } from '@opencrvs/components/lib/icons'
 import moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
@@ -41,8 +46,12 @@ import {
   CertificateDetails,
   generateAndPrintCertificate
 } from '@register/views/PrintCertificate/generatePDF'
-import { CERTIFICATE_DATE_FORMAT } from '@register/utils/constants'
-import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
+import {
+  CERTIFICATE_DATE_FORMAT,
+  CERTIFICATION,
+  COMPLETION
+} from '@register/utils/constants'
+
 import {
   storeApplication,
   createReviewApplication,
@@ -73,7 +82,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@register/utils/userUtils'
 import { RouteComponentProps } from 'react-router'
 import { goToHome } from '@register/navigation'
-import { CERTIFICATION, COMPLETION } from '@register/utils/constants'
+
 import { CONFIRMATION_SCREEN } from '@register/navigation/routes'
 import {
   IOfflineDataState,

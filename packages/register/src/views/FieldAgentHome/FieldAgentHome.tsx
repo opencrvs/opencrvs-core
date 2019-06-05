@@ -4,7 +4,10 @@ import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { goToEvents as goToEventsAction } from '@register/navigation'
+import {
+  goToEvents as goToEventsAction,
+  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
+} from '@register/navigation'
 import { ISearchInputProps } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '@register/utils/userUtils'
 import { getUserDetails } from '@register/profile/profileSelectors'
@@ -27,7 +30,7 @@ import {
   StatusRejected,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
-import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '@register/navigation'
+
 import { REGISTRAR_HOME } from '@register/navigation/routes'
 
 const Topbar = styled.div`

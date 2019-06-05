@@ -24,7 +24,8 @@ import {
 } from '@register/forms/mappings/mutation/field-mappings'
 import {
   fieldToDeceasedDateTransformation,
-  eventLocationMutationTransformer
+  eventLocationMutationTransformer,
+  setRegistrationSectionTransformer
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/event-mappings'
 import {
   eventLocationIDQueryTransformer,
@@ -33,10 +34,9 @@ import {
 } from '@register/forms/mappings/query/field-mappings'
 import {
   deceasedDateToFieldTransformation,
-  deathPlaceToFieldTransformer
+  deathPlaceToFieldTransformer,
+  getRegistrationSectionTransformer
 } from '@register/forms/register/fieldDefinitions/death/mappings/query/event-mappings'
-import { setRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/event-mappings'
-import { getRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/event-mappings'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import styled, { withTheme } from '@register/styledComponents'
+import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   RegisterForm,
   IFormProps
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
-import { ITheme } from '@register/styledComponents'
+
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -80,13 +80,7 @@ export class ReviewFormView extends React.Component<IProps> {
     return this.props.scope && this.props.scope.includes('register')
   }
   render() {
-    const {
-      intl,
-      theme,
-      application: application,
-      applicationId,
-      dispatch
-    } = this.props
+    const { intl, theme, application, applicationId, dispatch } = this.props
     if (!this.userHasRegisterScope()) {
       return (
         <ErrorText id="review-unauthorized-error-text">

@@ -4,7 +4,8 @@ import { countries } from '@register/forms/countries'
 import {
   messages as identityMessages,
   birthIdentityOptions,
-  identityTypeMapper
+  identityTypeMapper,
+  identityNameMapper
 } from '@register/forms/identity'
 import { messages as maritalStatusMessages } from '@register/forms/maritalStatus'
 import { messages as educationMessages } from '@register/forms/education'
@@ -34,13 +35,6 @@ import {
   dateInPast
 } from '@register/utils/validate'
 
-export interface IFatherSectionFormData {
-  firstName: string
-  foo: string
-  bar: string
-  baz: string
-}
-import { identityNameMapper } from '@register/forms/identity'
 import { IFormSection } from '@register/forms/index'
 import { conditionals } from '@register/forms/utils'
 import {
@@ -74,6 +68,13 @@ import {
   getFatherDateOfBirthLabel,
   getDateOfMarriageLabel
 } from '@register/forms/register/fieldDefinitions/birth/staticLabel'
+
+export interface IFatherSectionFormData {
+  firstName: string
+  foo: string
+  bar: string
+  baz: string
+}
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

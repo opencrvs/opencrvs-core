@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { IInputFieldProps } from '@opencrvs/components/lib/forms'
+import {
+  IInputFieldProps,
+  InputField as InputFieldComponent
+} from '@opencrvs/components/lib/forms'
 import { Omit } from '@opencrvs/register/src/utils'
-
-import { InputField as InputFieldComponent } from '@opencrvs/components/lib/forms'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor

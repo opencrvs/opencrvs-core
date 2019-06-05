@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { createTestComponent } from '@register/tests/util'
+import { createTestComponent, mockUserResponse } from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { mockUserResponse } from '@register/tests/util'
+
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import {
