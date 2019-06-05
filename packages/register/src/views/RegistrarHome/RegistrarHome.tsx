@@ -15,7 +15,7 @@ import {
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import { ITheme } from '@register/styledComponents'
+import styled, { ITheme, withTheme } from '@register/styledComponents'
 import {
   GQLBirthRegistration,
   GQLDeathRegistration,
@@ -38,7 +38,7 @@ import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToTab as goToTabAction
-} from '@register/navigation'
+, goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
@@ -51,8 +51,8 @@ import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from '@register/utils/constants
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-import styled, { withTheme } from '@register/styledComponents'
-import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
+
+
 import {
   COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATIONS_QUERY
