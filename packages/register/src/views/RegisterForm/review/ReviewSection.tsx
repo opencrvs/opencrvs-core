@@ -268,7 +268,7 @@ interface IProps {
   saveDraftClickEvent?: () => void
   deleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
-  scope: Scope
+  scope: Scope | null
   offlineResources: IOfflineDataState
   language: string
 }
@@ -537,7 +537,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    if (this.props.scope) {
+      return this.props.scope && this.props.scope.includes('register')
+    } else {
+      return false
+    }
   }
 
   render() {
@@ -573,7 +577,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const numberOfErrors = flatten(
+      // @ts-ignore
       Object.values(errorsOnFields).map(Object.values)
+      // @ts-ignore
     ).filter(errors => errors.length > 0).length
 
     const isRejected =
@@ -615,6 +621,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       )
                       .map((field: IFormField, key: number) => {
                         const errorsOnField =
+                          // @ts-ignore
                           errorsOnFields[section.id][field.name]
 
                         return (

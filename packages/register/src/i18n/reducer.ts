@@ -37,9 +37,9 @@ const getNextMessages = (language: string): IntlMessages => {
   return languages[language].messages
 }
 
-export const intlReducer: LoopReducer<IntlState, actions.Action> = (
+export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: actions.Action
+  action: any
 ): IntlState | Loop<IntlState, actions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:

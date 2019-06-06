@@ -44,6 +44,7 @@ export const dayRange: IDayRange = {
     [Event.BIRTH]: ranges,
     [Event.DEATH]: ranges
   },
+  // @ts-ignore
   getValue
 }
 

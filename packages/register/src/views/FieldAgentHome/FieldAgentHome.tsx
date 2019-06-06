@@ -93,7 +93,7 @@ const messages: {
 })
 interface IFieldAgentHomeProps {
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction

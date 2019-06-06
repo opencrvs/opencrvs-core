@@ -312,10 +312,13 @@ type Props = {
   offlineResources: IOfflineDataState
 }
 
-type FullProps = IFormProps &
+export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
+    tabId: string
+    applicationId: string
+  }>
 
 type State = {
   showSubmitModal: boolean
@@ -908,7 +911,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
-function replaceInitialValues(fields: IFormField[], sectionValues: object) {
+function replaceInitialValues(fields: IFormField[], sectionValues: any) {
   return fields.map(field => ({
     ...field,
     initialValue:
@@ -971,7 +974,12 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(
+export const RegisterForm = connect<
+  Props,
+  DispatchProps,
+  FullProps,
+  IStoreState
+>(
   mapStateToProps,
   {
     modifyApplication,
@@ -979,7 +987,7 @@ export const RegisterForm = connect<Props, DispatchProps>(
     goToTab: goToTabAction,
     goBack: goBackAction,
     toggleDraftSavedNotification,
-    handleSubmit: values => {
+    handleSubmit: (values: any) => {
       console.log(values)
     }
   }

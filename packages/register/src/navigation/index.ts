@@ -154,7 +154,7 @@ export function goToTab(
 
 export type INavigationState = undefined
 
-export function navigationReducer(state: INavigationState, action: Action) {
+export function navigationReducer(state: INavigationState, action: any) {
   switch (action.type) {
     case GO_TO_TAB:
       const {

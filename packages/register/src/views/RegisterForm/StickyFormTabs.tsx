@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as Sticky from 'react-stickynode'
+import Sticky from 'react-stickynode'
 import { IFormSection } from '@register/forms'
 import styled from '@register/styledComponents'
 import { FormTabs } from '@register/components/form'

@@ -723,11 +723,11 @@ class PrintCertificateActionComponent extends React.Component<
     let names
     let eventDateTime
     if (event === Event.BIRTH) {
-      names = data.child.name as Array<{ [key: string]: {} }>
+      names = data.child.name as ICertDetail[]
       eventDateTime = data.child.birthDate
     }
     if (event === Event.DEATH) {
-      names = data.deceased.name as Array<{ [key: string]: {} }>
+      names = data.deceased.name as ICertDetail[]
       eventDateTime = (data.deceased.deceased as { [key: string]: string })
         .deathDate
     }
@@ -758,11 +758,11 @@ class PrintCertificateActionComponent extends React.Component<
     let names
     let eventDateTime
     if (event === Event.BIRTH) {
-      names = data.child.name as Array<{ [key: string]: {} }>
+      names = data.child.name as ICertDetail[]
       eventDateTime = data.child.birthDate
     }
     if (event === Event.DEATH) {
-      names = data.deceased.name as Array<{ [key: string]: {} }>
+      names = data.deceased.name as ICertDetail[]
       eventDateTime = data.deceased.deceased.deathDate
     }
 

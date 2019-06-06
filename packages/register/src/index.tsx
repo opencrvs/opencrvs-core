@@ -53,8 +53,10 @@ if (
 }
 
 function onNewConentAvailable(waitingSW: ServiceWorker | null) {
-  const action = actions.showNewContentAvailableNotification(waitingSW)
-  store.dispatch(action)
+  if (waitingSW) {
+    const action = actions.showNewContentAvailableNotification(waitingSW)
+    store.dispatch(action)
+  }
 }
 
 function onBackGroundSync() {

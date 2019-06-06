@@ -100,8 +100,12 @@ const certificateDefinitionText = {
   }
 }
 
+interface IDefinitionMap {
+  [key: string]: any
+}
+
 const moneyReceiptDefinitionText = (event: string, intl: InjectedIntl) => {
-  const definitionMap = {
+  const definitionMap: IDefinitionMap = {
     [Event.BIRTH]: {
       EVENT: intl.formatMessage(messages.birth),
       DOE: intl.formatMessage(messages.dob)
@@ -242,7 +246,7 @@ export function generateMoneyReceipt(
       }
     }
   }
-
+  // @ts-ignore
   const font = fonts[language]
   pdfMake.vfs = pdfFonts.pdfMake.vfs
   const generatedPDF = pdfMake.createPdf(docDefinition, null, font)
@@ -257,6 +261,7 @@ function getCertificateObject(certificateDetails: CertificateDetails) {
   const dateBn = moment().format(CERTIFICATE_DATE_FORMAT)
   const NOT_FOUND = 'Not Found'
   const EVENT = certificateDetails ? certificateDetails.event : Event.BIRTH
+  // @ts-ignore
   const certificateDynamicText = certificateDefinitionText[EVENT]
 
   const data: CertificateDetails = {

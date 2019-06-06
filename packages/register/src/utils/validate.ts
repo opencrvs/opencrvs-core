@@ -545,9 +545,10 @@ export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
 }
 
 export const range: RangeValidation = (min: number, max: number) => (
-  value: string
+  value: IFormFieldValue
 ) => {
-  return isValueWithinRange(min, max)(parseFloat(value))
+  const cast = value as string
+  return isValueWithinRange(min, max)(parseFloat(cast))
     ? undefined
     : { message: messages.range, props: { min, max } }
 }

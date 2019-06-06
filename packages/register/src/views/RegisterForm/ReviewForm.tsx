@@ -5,7 +5,7 @@ import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   RegisterForm,
-  IFormProps
+  FullProps
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 
 import { IStoreState } from '@opencrvs/register/src/store'
@@ -46,7 +46,7 @@ const messages: {
 interface IReviewProps {
   theme: ITheme
   dispatch: Dispatch
-  scope: Scope
+  scope: Scope | null
   event: Event
 }
 interface IApplicationProp {
@@ -56,7 +56,7 @@ interface IApplicationProp {
 
 type IProps = IReviewProps &
   IApplicationProp &
-  IFormProps &
+  FullProps &
   InjectedIntlProps &
   RouteComponentProps<{}>
 
@@ -114,7 +114,7 @@ export class ReviewFormView extends React.Component<IProps> {
                   </ErrorText>
                 )
               }
-
+              // @ts-ignore
               const eventData = data && data[dataKey]
               const transData: IFormData = gqlToDraftTransformer(
                 this.props.registerForm,
@@ -155,6 +155,10 @@ function getEvent(eventType: string) {
   }
 }
 
+interface IReviewFormState {
+  [key: string]: any
+}
+
 function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{
@@ -168,7 +172,10 @@ function mapStatetoProps(
   if (!match.params.event) {
     throw new Error('Event is not provided as path param')
   }
-  const form = getReviewForm(state)[match.params.event.toLowerCase()]
+  const reviewFormState: IReviewFormState = getReviewForm(
+    state
+  ) as IReviewFormState
+  const form = reviewFormState[match.params.event.toLowerCase()]
 
   const application = state.applicationsState.applications.find(
     ({ id, review }) => id === match.params.applicationId && review === true
@@ -184,6 +191,6 @@ function mapStatetoProps(
   }
 }
 
-export const ReviewForm = connect<IFormProps | IApplicationProp>(
-  mapStatetoProps
-)(injectIntl(withTheme(ReviewFormView)))
+export const ReviewForm = connect<any, {}, any, IStoreState>(mapStatetoProps)(
+  injectIntl(withTheme(ReviewFormView))
+)

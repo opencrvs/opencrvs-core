@@ -16,11 +16,12 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
     return []
   }
 
-  return data.searchEvents.results.map((reg: GQLEventSearchSet) => {
+  return data.searchEvents.results.map((reg: GQLEventSearchSet | null) => {
     let birthReg
     let deathReg
     let names
-    if (reg.registration && reg.type === 'Birth') {
+    const assignedReg = reg as GQLEventSearchSet
+    if (assignedReg.registration && assignedReg.type === 'Birth') {
       birthReg = reg as GQLBirthEventSearchSet
       names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
     } else {
@@ -28,9 +29,11 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
       names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
     }
     const lang = 'bn'
-    const status = reg.registration && (reg.registration.status as GQLRegStatus)
+    const status =
+      assignedReg.registration &&
+      (assignedReg.registration.status as GQLRegStatus)
     return {
-      id: reg.id,
+      id: assignedReg.id,
       name:
         (createNamesMap(names)[lang] as string) ||
         /* eslint-disable no-string-literal */
@@ -48,20 +51,24 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
           formatLongDate(deathReg.dateOfDeath, locale)) ||
         '',
       registrationNumber:
-        (reg.registration && reg.registration.registrationNumber) || '',
-      trackingId: (reg.registration && reg.registration.trackingId) || '',
-      event: reg.type,
+        (assignedReg.registration &&
+          assignedReg.registration.registrationNumber) ||
+        '',
+      trackingId:
+        (assignedReg.registration && assignedReg.registration.trackingId) || '',
+      event: assignedReg.type,
       declarationStatus: status,
-      duplicates: reg.registration && reg.registration.duplicates,
+      duplicates:
+        assignedReg.registration && assignedReg.registration.duplicates,
       rejectionReasons:
         (status === 'REJECTED' &&
-          reg.registration &&
-          reg.registration.reason) ||
+          assignedReg.registration &&
+          assignedReg.registration.reason) ||
         '',
       rejectionComment:
         (status === 'REJECTED' &&
-          reg.registration &&
-          reg.registration.comment) ||
+          assignedReg.registration &&
+          assignedReg.registration.comment) ||
         ''
     }
   })

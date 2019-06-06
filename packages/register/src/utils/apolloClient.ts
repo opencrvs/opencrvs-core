@@ -1,5 +1,6 @@
 import ApolloClient from 'apollo-client'
 import { setContext } from 'apollo-link-context'
+import { ApolloLink } from 'apollo-link'
 import { createHttpLink } from 'apollo-link-http'
 import {
   InMemoryCache,
@@ -43,7 +44,7 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
     }
   })
 
-  const timeoutLink = new TimeoutLink()
+  const timeoutLink = new TimeoutLink() as ApolloLink
   /*
   Use IntrospectionFragmentMatcher to remove the warning of using inteface in GraphQL Query
   This change is suggested in the following link:

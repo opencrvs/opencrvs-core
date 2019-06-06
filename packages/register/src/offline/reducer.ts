@@ -71,11 +71,8 @@ export const initialState: IOfflineDataState = {
   loadingError: false,
   healthFacilityFilterLocation: ''
 }
-
-export const offlineDataReducer: LoopReducer<
-  IOfflineDataState,
-  actions.Action | i18nActions.Action
-> = (
+// TODO: Union type actions.Action | i18nActions.Action stopped working after upgrade.  Temp replacement of any
+export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
   state: IOfflineDataState = initialState,
   action: actions.Action
 ):
