@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
-import { TEST_SOURCE } from '@resources/features/utils/bn'constants'
-import { sendToFhir } from '@resources/features/utils/bn'features/utils/bn'
+import { TEST_SOURCE } from '@resources/constants'
+import { sendToFhir } from '@resources/features/utils/bn'
 import { Response } from 'node-fetch'
 
 // tslint:disable-next-line:no-console
