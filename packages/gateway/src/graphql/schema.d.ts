@@ -28,6 +28,7 @@ export interface GQLQuery {
   searchUsers?: GQLSearchUserResult
   fetchBirthRegistrationMetrics?: GQLBirthRegistrationMetrics
   searchEvents?: GQLEventSearchResultSet
+  getRoles?: Array<GQLRole | null>
 }
 
 export type GQLDate = any
@@ -533,6 +534,14 @@ export interface GQLRegistrationSearchSet {
   duplicates?: Array<string | null>
 }
 
+export interface GQLRole {
+  id: string
+  title?: string
+  value?: string
+  types?: Array<string | null>
+  active?: boolean
+}
+
 export interface GQLMutation {
   createNotification: GQLNotification
   voidNotification?: GQLNotification
@@ -817,6 +826,7 @@ export interface GQLResolver {
   }
 
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
+  Role?: GQLRoleTypeResolver
   Mutation?: GQLMutationTypeResolver
   Dummy?: GQLDummyTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -844,6 +854,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
     TParent
   >
   searchEvents?: QueryToSearchEventsResolver<TParent>
+  getRoles?: QueryToGetRolesResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -1120,6 +1131,23 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToSearchEventsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetRolesArgs {
+  title?: string
+  value?: string
+  type?: string
+  active?: boolean
+  sortBy?: string
+  sortOrder?: string
+}
+export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetRolesArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2436,6 +2464,34 @@ export interface RegistrationSearchSetToDuplicatesResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRoleTypeResolver<TParent = any> {
+  id?: RoleToIdResolver<TParent>
+  title?: RoleToTitleResolver<TParent>
+  value?: RoleToValueResolver<TParent>
+  types?: RoleToTypesResolver<TParent>
+  active?: RoleToActiveResolver<TParent>
+}
+
+export interface RoleToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToTitleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToValueResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToTypesResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToActiveResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

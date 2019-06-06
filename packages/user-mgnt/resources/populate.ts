@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose'
 
 import User from '../src/model/user'
+import Role from '../src/model/role'
 import { generateSaltedHash } from '../src/utils/password'
 import { MONGO_URL } from '../src/constants'
 mongoose.connect(MONGO_URL)
@@ -328,7 +329,7 @@ const registrationClerk4 = new User({
   ]
 })
 
-const testUsers = [
+const users = [
   fieldAgent,
   fieldAgent2,
   fieldAgent3,
@@ -344,11 +345,70 @@ const testUsers = [
   stateRegistrar,
   nationalRegistrar
 ]
+User.collection.insertMany(users)
+
+const fieldAgentRole = new Role({
+  title: 'Field Agent',
+  value: 'FIELD_AGENT',
+  types: ['Hospital', 'CHA'],
+  active: true
+})
+
+const regitstrationAgentRole = new Role({
+  title: 'Registration Agent',
+  value: 'REGISTRATION_CLERK',
+  types: ['Entrepeneur', 'Data entry clerk'],
+  active: true
+})
+
+const regitstrarRole = new Role({
+  title: 'Registrar',
+  value: 'LOCAL_REGISTRAR',
+  types: ['Secretary', 'Chairman', 'Mayor'],
+  active: true
+})
+
+const sysAdminLocalRole = new Role({
+  title: 'System admin (local)',
+  value: 'LOCAL_SYSTEM_ADMIN',
+  types: ['System admin (local)'],
+  active: true
+})
+
+const sysAdminNationalRole = new Role({
+  title: 'System admin (national)',
+  value: 'LOCAL_SYSTEM_NATIONAL',
+  types: ['System admin (national)'],
+  active: true
+})
+
+const performanceOversightRole = new Role({
+  title: 'Performance Oversight',
+  value: 'PERFORMANCE_OVERSIGHT',
+  types: ['Cabinet Division', 'BBS'],
+  active: true
+})
+
+const performanceMgntRole = new Role({
+  title: 'Performance Management',
+  value: 'PERFORMANCE_MANAGEMENT',
+  types: ['Health Division', 'ORG Division'],
+  active: true
+})
+
+const roles = [
+  fieldAgentRole,
+  regitstrationAgentRole,
+  regitstrarRole,
+  sysAdminLocalRole,
+  sysAdminNationalRole,
+  performanceOversightRole,
+  performanceMgntRole
+]
 
 function onInsert(err: any, values: any) {
   if (!err) {
     mongoose.disconnect()
   }
 }
-
-User.collection.insertMany(testUsers, onInsert)
+Role.collection.insertMany(roles, onInsert)
