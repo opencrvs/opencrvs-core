@@ -7,7 +7,16 @@ export interface IntlMessages {
   [key: string]: string
 }
 
-const languages = {
+export interface ILanguage {
+  lang: string
+  messages: IntlMessages
+}
+
+export interface ILanguageState {
+  [key: string]: ILanguage
+}
+
+export const languages: ILanguageState = {
   en: ENGLISH_STATE,
   bn: BENGALI_STATE
 }
@@ -15,7 +24,7 @@ const languages = {
 export type IntlState = {
   language: string
   messages: IntlMessages
-  languages: typeof languages
+  languages: ILanguageState
 }
 
 export const initialState: IntlState = {
@@ -28,9 +37,9 @@ const getNextMessages = (language: string): IntlMessages => {
   return languages[language].messages
 }
 
-export const intlReducer: LoopReducer<IntlState, actions.Action> = (
+export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: actions.Action
+  action: any
 ): IntlState | Loop<IntlState, actions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:

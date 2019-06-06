@@ -4,7 +4,8 @@ import { reduxForm } from 'redux-form'
 import {
   IProps,
   IDispatchProps,
-  StepTwoForm
+  StepTwoForm,
+  FullProps
 } from '@login/views/StepTwo/StepTwoForm'
 import { IStoreState } from '@login/store'
 
@@ -27,16 +28,21 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 
-const mapDispatchToProps = {
+const mapDispatchToProps: IDispatchProps = {
   submitAction: actions.verifyCode,
   onResendSMS: actions.resendSMS
 }
 
 const stepTwoForm = reduxForm({
   form: FORM_NAME
-})(injectIntl(StepTwoForm))
+})(injectIntl(StepTwoForm) as any)
 
-export const StepTwoContainer = connect<IProps, IDispatchProps>(
+export const StepTwoContainer = connect<
+  IProps,
+  IDispatchProps,
+  FullProps,
+  IStoreState
+>(
   mapStateToProps,
   mapDispatchToProps
-)(stepTwoForm)
+)(stepTwoForm) as any

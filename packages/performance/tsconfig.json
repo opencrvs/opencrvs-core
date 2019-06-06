@@ -21,7 +21,8 @@
     "jsx": "preserve"
   },
   "include": [
-    "src"
+    "src",
+    "typings"
   ],
   "extends": "./tsconfig.paths.json"
 }

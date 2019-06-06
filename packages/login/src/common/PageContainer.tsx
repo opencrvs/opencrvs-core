@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { getLanguage } from '@login/i18n/selectors'
 import { Page, IPage } from '@login/common/Page'
 import { IStoreState } from '@login/store'
-import { withRouter } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router'
 import { DarkPage } from '@login/common/DarkPage'
 
 const mapStateToProps = (store: IStoreState): IPage => {
@@ -13,9 +13,13 @@ const mapStateToProps = (store: IStoreState): IPage => {
 }
 
 export const PageContainer = withRouter(
-  connect<IPage, {}>(mapStateToProps)(Page)
-)
+  connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
+    mapStateToProps
+  )(Page)
+) as any
 
 export const DarkPageContainer = withRouter(
-  connect<IPage, {}>(mapStateToProps)(DarkPage)
-)
+  connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
+    mapStateToProps
+  )(DarkPage)
+) as any

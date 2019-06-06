@@ -1,4 +1,4 @@
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 import * as Sentry from '@sentry/browser'
 
 export const ERROR_CODE_TOO_MANY_ATTEMPTS = 429

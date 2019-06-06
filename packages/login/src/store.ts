@@ -35,10 +35,11 @@ export interface IStoreState {
   i18n: IntlState
 }
 
+// @ts-ignore
 const formRed: LoopReducer<FormStateMap, FormAction> = (
   state: FormStateMap,
   action: FormAction
-) => formReducer(state, action)
+) => formReducer(state as FormStateMap, action)
 
 const reducers = combineReducers<IStoreState>({
   login: loginReducer,

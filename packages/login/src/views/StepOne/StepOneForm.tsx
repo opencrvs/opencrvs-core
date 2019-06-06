@@ -164,6 +164,10 @@ export interface IDispatchProps {
 
 type IStepOneForm = IProps & IDispatchProps
 
+export type FullProps = InjectedIntlProps &
+  InjectedFormProps<IAuthenticationData, IStepOneForm> &
+  IStepOneForm
+
 const mobileField = stepOneFields.mobile
 const passwordField = stepOneFields.password
 
@@ -220,11 +224,7 @@ const Password = injectIntl((props: Props) => {
   )
 })
 
-export class StepOneForm extends React.Component<
-  InjectedIntlProps &
-    InjectedFormProps<IAuthenticationData, IStepOneForm> &
-    IStepOneForm
-> {
+export class StepOneForm extends React.Component<FullProps> {
   render() {
     const {
       intl,

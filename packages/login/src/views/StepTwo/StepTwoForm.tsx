@@ -97,6 +97,10 @@ export interface IDispatchProps {
 }
 
 type IStepTwoForm = IProps & IDispatchProps
+
+export type FullProps = InjectedIntlProps &
+  InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
+  IStepTwoForm
 const CodeInput = injectIntl(
   (
     props: WrappedFieldProps & {
@@ -127,11 +131,7 @@ const CodeInput = injectIntl(
   }
 )
 
-export class StepTwoForm extends React.Component<
-  InjectedIntlProps &
-    InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
-    IStepTwoForm
-> {
+export class StepTwoForm extends React.Component<FullProps> {
   render() {
     const {
       intl,

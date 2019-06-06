@@ -57,7 +57,14 @@ export const messages: {
 
 const fallbackCountry = window.config.COUNTRY
 
-const mobilePhonePatternTable = {
+interface IMobilePhonePattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+}
+
+const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
   gbr: {
     pattern: /^07[0-9]{9,10}$/,
     example: '07123456789',
