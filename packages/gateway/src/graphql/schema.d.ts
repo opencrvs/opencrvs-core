@@ -536,7 +536,7 @@ export interface GQLRegistrationSearchSet {
 export interface GQLMutation {
   createNotification: GQLNotification
   voidNotification?: GQLNotification
-  createBirthRegistration: string
+  createBirthRegistration: GQLCreatedIds
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsRegistered: string
@@ -731,6 +731,12 @@ export interface GQLPaymentInput {
   date?: GQLDate
 }
 
+export interface GQLCreatedIds {
+  compositionId?: string
+  trackingId?: string
+  registrationNumber?: string
+}
+
 export interface GQLDeathRegistrationInput {
   _fhirIDMap?: GQLMap
   registration?: GQLRegistrationInput
@@ -818,6 +824,7 @@ export interface GQLResolver {
 
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   Mutation?: GQLMutationTypeResolver
+  CreatedIds?: GQLCreatedIdsTypeResolver
   Dummy?: GQLDummyTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
@@ -2672,6 +2679,30 @@ export interface MutationToMarkDeathAsCertifiedResolver<
     context: any,
     info: GraphQLResolveInfo
   ): TResult
+}
+
+export interface GQLCreatedIdsTypeResolver<TParent = any> {
+  compositionId?: CreatedIdsToCompositionIdResolver<TParent>
+  trackingId?: CreatedIdsToTrackingIdResolver<TParent>
+  registrationNumber?: CreatedIdsToRegistrationNumberResolver<TParent>
+}
+
+export interface CreatedIdsToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CreatedIdsToRegistrationNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface GQLDummyTypeResolver<TParent = any> {

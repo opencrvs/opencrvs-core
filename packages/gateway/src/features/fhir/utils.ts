@@ -745,12 +745,13 @@ export const getMetrics = (
     })
 }
 
-export async function getTrackingIdFromResponse(
+export async function getDeclarationIdsFromResponse(
   resBody: fhir.Bundle,
   authHeader: IAuthHeader
 ) {
+  const compositionId = getIDFromResponse(resBody)
   const compositionBundle = await fetchFHIR(
-    `/Composition/${getIDFromResponse(resBody)}`,
+    `/Composition/${compositionId}`,
     authHeader
   )
   if (!compositionBundle || !compositionBundle.identifier) {
@@ -758,10 +759,10 @@ export async function getTrackingIdFromResponse(
       'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
     )
   }
-  return compositionBundle.identifier.value
+  return { trackingId: compositionBundle.identifier.value, compositionId }
 }
 
-export async function getRegistrationNumberFromResponse(
+export async function getRegistrationIdsFromResponse(
   resBody: fhir.Bundle,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
@@ -773,11 +774,12 @@ export async function getRegistrationNumberFromResponse(
   } else if (eventType === EVENT_TYPE.DEATH) {
     registrationNumber = DEATH_REG_NO
   }
+  const compositionId = getIDFromResponse(resBody)
   let path
   if (isTaskResponse(resBody)) {
-    path = `/Task/${getIDFromResponse(resBody)}`
+    path = `/Task/${compositionId}`
   } else {
-    path = `/Task?focus=Composition/${getIDFromResponse(resBody)}`
+    path = `/Task?focus=Composition/${compositionId}`
   }
   const taskBundle = await fetchFHIR(path, authHeader)
   let taskResource
@@ -800,7 +802,7 @@ export async function getRegistrationNumberFromResponse(
       'getRegistrationNumberFromResponse: Task does not have any registration identifier'
     )
   }
-  return regIdentifier.value
+  return { registrationNumber: regIdentifier.value, compositionId }
 }
 
 export function getIDFromResponse(resBody: fhir.Bundle): string {

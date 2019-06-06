@@ -340,6 +340,12 @@ type RegistrationCount {
   rejected: Int
 }
 
+type CreatedIds {
+  compositionId: String
+  trackingId: String
+  registrationNumber: String
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
@@ -378,7 +384,7 @@ type Query {
 
 type Mutation {
   # BIRTH
-  createBirthRegistration(details: BirthRegistrationInput!): ID!
+  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(
