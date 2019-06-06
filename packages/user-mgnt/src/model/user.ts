@@ -16,7 +16,7 @@ export interface IUser {
   username: string
   identifiers?: IIdentifier[]
   email?: string
-  mobile?: string
+  mobile: string
   passwordHash: string
   salt: string
   role?: string

@@ -4,12 +4,14 @@ import fetch from 'node-fetch'
 
 import User, { IUser } from 'src/model/user'
 import { FHIR_URL } from 'src/constants'
+import { generateSaltedHash } from 'src/utils/password'
+import { logger } from 'src/logger'
 
 export default async function createUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const user = request.payload as IUser
+  const user = request.payload as IUser & { password: string }
 
   // construct Practitioner resource and save them
   const practitioner = createFhirPractitioner(user)
@@ -22,8 +24,21 @@ export default async function createUser(
   const role = createFhirPractitionerRole(user, practitionerId)
   await postFhir('123', role)
 
+  if (user.password) {
+    const { hash, salt } = generateSaltedHash(user.password)
+    user.salt = salt
+    user.passwordHash = hash
+    delete user.password
+  }
+  user.practitionerId = practitionerId
+
   // save user in user-mgnt data store
-  await User.create(user)
+  try {
+    await User.create(user)
+  } catch (err) {
+    logger.error(err)
+    return h.response().code(400)
+  }
 
   return h.response().code(201)
 }
@@ -93,7 +108,10 @@ const postFhir = async (token: string, resource: fhir.Resource) => {
 
   const savedResourceLocation = res.headers.get('Location')
   if (savedResourceLocation) {
-    return savedResourceLocation.split('/')[1]
+    const pathParts = savedResourceLocation.split('/')
+    const index = pathParts.indexOf(resource.resourceType || '')
+    // the identifier is after the resourceType
+    return pathParts[index + 1]
   }
 
   return null

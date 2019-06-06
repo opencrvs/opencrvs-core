@@ -16,7 +16,7 @@ const token = jwt.sign(
 )
 
 // @ts-ignore
-const mockUser: IUser = {
+const mockUser: IUser & { password: string } = {
   name: [
     {
       use: 'en',
@@ -33,7 +33,8 @@ const mockUser: IUser = {
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
-  deviceId: 'D444'
+  deviceId: 'D444',
+  password: 'test'
 }
 
 describe('createUser handler', () => {
@@ -50,7 +51,7 @@ describe('createUser handler', () => {
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
 
-    const spy = jest.spyOn(User, 'create').mockResolvedValue({})
+    const spy = jest.spyOn(User, 'create').mockResolvedValueOnce({})
 
     const res = await server.server.inject({
       method: 'POST',
@@ -150,5 +151,27 @@ describe('createUser handler', () => {
 
     expect(fetch.mock.calls.length).toBe(1)
     expect(res.statusCode).toBe(500)
+  })
+
+  it('returns an error if the user object is invalid', async () => {
+    fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
+
+    const copyMockUser = Object.assign({}, mockUser)
+    delete copyMockUser.password
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createUser',
+      payload: copyMockUser,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(fetch.mock.calls.length).toBe(2)
+    expect(res.statusCode).toBe(400)
   })
 })

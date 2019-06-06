@@ -112,7 +112,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [RouteScope.SYSTEM]
+          scope: [RouteScope.SYSTEM, RouteScope.REGISTER]
         }
       }
     }
