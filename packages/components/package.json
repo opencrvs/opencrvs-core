@@ -5,6 +5,8 @@
   "dependencies": {
     "@types/react-intl": "^2.3.17",
     "@types/react-select": "^2.0.2",
+    "@types/react-stickynode": "^1.4.0",
+    "babel-loader": "^8.0.6",
     "css-animation": "^1.4.1",
     "rc-menu": "^7.4.13",
     "react": "^16.3.2",
@@ -16,7 +18,10 @@
     "react-stickynode": "^2.1.1",
     "react-styleguidist": "^7.0.13",
     "recharts": "^1.4.0",
-    "styled-components": "^3.3.3"
+    "source-map-loader": "^0.2.4",
+    "styled-components": "^3.3.3",
+    "ts-loader": "^6.0.2",
+    "tsconfig-paths-webpack-plugin": "^3.2.0"
   },
   "scripts": {
     "precommit": "lint-staged",
@@ -26,7 +31,8 @@
     "build": "yarn clean && tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "test": "yarn test:compilation",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "eject": "react-scripts-ts eject"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
@@ -37,7 +43,7 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^22.2.3",
     "@types/lodash": "^4.14.126",
     "@types/node": "^10.12.5",
     "@types/react": "^16.3.14",
@@ -48,6 +54,7 @@
     "dotenv": "^6.1.0",
     "lint-staged": "^7.1.0",
     "prettier": "^1.15.2",
+    "react-scripts-ts": "2.16.0",
     "rimraf": "^2.6.2",
     "stylelint": "^9.5.0",
     "stylelint-config-recommended": "^2.1.0",
