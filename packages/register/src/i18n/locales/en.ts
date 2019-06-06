@@ -1022,6 +1022,11 @@ export const ENGLISH_STATE: ILanguage = {
     'action.change': 'Change',
     'register.workQueue.list.buttons.update': 'Update',
     'createPIN.pinSameDigitsError': 'PIN cannot have same 4 digits',
-    'createPIN.pinSeqDigitsError': 'PIN cannot contain sequential digits'
+    'createPIN.pinSeqDigitsError': 'PIN cannot contain sequential digits',
+    'changeLanguage.title': 'Change language',
+    'changeLanguage.success': 'Language updted to English',
+    'message.changeLanguage':
+      'Your prefered language that you want to use on OpenCRVS',
+    'button.apply': 'Apply'
   }
 }
