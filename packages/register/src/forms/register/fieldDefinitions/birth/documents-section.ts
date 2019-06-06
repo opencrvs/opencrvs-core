@@ -188,7 +188,7 @@ export const documentsSection: IFormSection = {
   title: messages.documentsTitle,
   fields: [
     {
-      name: 'image_uploader',
+      name: 'imageUploader',
       type: IMAGE_UPLOADER_WITH_OPTIONS,
       label: messages.uploadImage,
       initialValue: '',

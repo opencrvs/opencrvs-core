@@ -522,9 +522,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     item: { [key: string]: string & Array<{ [key: string]: string }> },
     key: number
   ): JSX.Element => {
-    const applicationIsRegistered = item.declaration_status === 'REGISTERED'
-    const applicationIsCertified = item.declaration_status === 'CERTIFIED'
-    const applicationIsRejected = item.declaration_status === 'REJECTED'
+    const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
+    const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
+    const applicationIsRejected = item.declarationStatus === 'REJECTED'
     const info = []
     const status = []
     const icons = []
@@ -556,7 +556,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     } else {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
-        value: item.tracking_id
+        value: item.trackingId
       })
     }
 
@@ -565,13 +565,13 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       label: this.getEventLabel(item.event)
     })
     status.push({
-      icon: this.getDeclarationStatusIcon(item.declaration_status),
-      label: this.getDeclarationStatusLabel(item.declaration_status)
+      icon: this.getDeclarationStatusIcon(item.declarationStatus),
+      label: this.getDeclarationStatusLabel(item.declarationStatus)
     })
 
-    if (applicationIsRejected && item.rejection_reasons) {
-      const reasons = item.rejection_reasons.split(',')
-      const rejectComment = item.rejection_comment
+    if (applicationIsRejected && item.rejectionReasons) {
+      const reasons = item.rejectionReasons.split(',')
+      const rejectComment = item.rejectionComment
 
       info.push({
         label: this.props.intl.formatMessage(
@@ -661,7 +661,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     if (applicationIsRegistered) {
       expansionActions.push(
         <StyledSecondaryButton
-          id={`editBtn_${item.tracking_id}`}
+          id={`editBtn_${item.trackingId}`}
           disabled={true}
         >
           <Edit />

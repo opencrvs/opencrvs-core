@@ -22,7 +22,7 @@ storage.setItem = jest.fn()
 jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 

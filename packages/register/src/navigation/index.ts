@@ -39,7 +39,7 @@ type GoToTabAction = {
   }
 }
 export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
-type GoToREGISTRAR_HOME = {
+type GoToRegistrarHome = {
   type: typeof GO_TO_REGISTRAR_HOME
   payload: {
     tabId: string
@@ -47,14 +47,14 @@ type GoToREGISTRAR_HOME = {
 }
 
 export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
-type GoTo_FIELD_AGENT_HOME = {
+type GoToFieldAgentHome = {
   type: typeof GO_TO_FIELD_AGENT_HOME
   payload: {
     tabId: string
   }
 }
 
-export type Action = GoToTabAction | GoToREGISTRAR_HOME | GoTo_FIELD_AGENT_HOME
+export type Action = GoToTabAction | GoToRegistrarHome | GoToFieldAgentHome
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)

@@ -69,7 +69,7 @@ class Component extends React.Component<
       this.props.waitingSW.postMessage('skipWaiting')
     }
     this.props.hideNewContentAvailableNotification()
-    location.reload()
+    window.location.reload()
   }
 
   hideBackgroundSyncedNotification = () => {

@@ -480,7 +480,7 @@ export const mockDeathApplicationData = {
     causeOfDeathCode: ''
   },
   documents: {
-    image_uploader: [
+    imageUploader: [
       {
         data: 'base64-data',
         type: 'image/jpeg',
@@ -808,7 +808,7 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     causeOfDeathCode: ''
   },
   documents: {
-    image_uploader: [
+    imageUploader: [
       {
         data: 'base64-data',
         type: 'image/jpeg',

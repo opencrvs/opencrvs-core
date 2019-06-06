@@ -35,7 +35,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -144,7 +144,7 @@ describe('when draft data is transformed to graphql', () => {
       father: fatherDetails,
       mother: motherDetails,
       registration: registrationDetails,
-      documents: { image_uploader: '' }
+      documents: { imageUploader: '' }
     }
 
     customDraft = {
@@ -182,7 +182,7 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       expect(draftToGqlTransformer(form, data).eventLocation.type).toBe(
@@ -197,7 +197,7 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       expect(
@@ -214,7 +214,7 @@ describe('when draft data is transformed to graphql', () => {
         father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       expect(draftToGqlTransformer(form, data).father).toBeUndefined()

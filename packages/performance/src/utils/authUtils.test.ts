@@ -46,7 +46,7 @@ describe('authUtils tests', () => {
 
     describe('when token is in url', () => {
       afterEach(() => {
-        history.replaceState({}, '', '/')
+        window.history.replaceState({}, '', '/')
       })
       describe("when it's valid", () => {
         const token =

@@ -33,7 +33,7 @@ storage.setItem = jest.fn()
 jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -355,12 +355,12 @@ describe('when user has starts a new application', () => {
         app.update()
       })
       it('image upload field is rendered', () => {
-        expect(app.find('#image_uploader').hostNodes()).toHaveLength(1)
+        expect(app.find('#imageUploader').hostNodes()).toHaveLength(1)
       })
       describe('when user clicks image upload field', () => {
         beforeEach(async () => {
           app
-            .find('#image_uploader')
+            .find('#imageUploader')
             .hostNodes()
             .simulate('click')
 

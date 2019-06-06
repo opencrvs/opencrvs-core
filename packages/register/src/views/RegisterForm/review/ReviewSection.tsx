@@ -445,8 +445,8 @@ const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
 
   const uploadedDocuments =
     draft.data[draftItemName] &&
-    isArray(draft.data[draftItemName].image_uploader)
-      ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
+    isArray(draft.data[draftItemName].imageUploader)
+      ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
       : []
 
   uploadedDocuments.map(document => {

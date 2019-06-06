@@ -160,6 +160,14 @@ function writeApplication(
   return { type: WRITE_APPLICATION, payload: { application } }
 }
 
+export async function getCurrentUserID(): Promise<string> {
+  const userDetails = await storage.getItem('USER_DETAILS')
+  if (!userDetails) {
+    return ''
+  }
+  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
+}
+
 export async function getApplicationsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
@@ -213,14 +221,6 @@ export async function writeApplicationByUser(
     })
   }
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
-}
-
-export async function getCurrentUserID(): Promise<string> {
-  const userDetails = await storage.getItem('USER_DETAILS')
-  if (!userDetails) {
-    return ''
-  }
-  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
 }
 
 export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (

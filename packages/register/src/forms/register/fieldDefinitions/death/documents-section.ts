@@ -136,7 +136,7 @@ export const documentsSection: IFormSection = {
   optional: true,
   fields: [
     {
-      name: 'image_uploader',
+      name: 'imageUploader',
       type: IMAGE_UPLOADER_WITH_OPTIONS,
       label: messages.uploadImage,
       required: false,

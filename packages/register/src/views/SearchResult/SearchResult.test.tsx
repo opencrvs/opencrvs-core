@@ -217,12 +217,12 @@ describe('SearchResult tests', async () => {
         dob: '',
         dod: '01-01-2007',
         registrationNumber: '',
-        tracking_id: 'DW0UTHR',
+        trackingId: 'DW0UTHR',
         event: 'Death',
-        declaration_status: 'DECLARED',
+        declarationStatus: 'DECLARED',
         duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-        rejection_reasons: '',
-        rejection_comment: ''
+        rejectionReasons: '',
+        rejectionComment: ''
       },
       {
         id: 'c7e83060-4db9-4057-8b14-71841243b05f',
@@ -230,12 +230,12 @@ describe('SearchResult tests', async () => {
         dob: '',
         dod: '01-01-2010',
         registrationNumber: '',
-        tracking_id: 'DXMJPYA',
+        trackingId: 'DXMJPYA',
         event: 'Death',
-        declaration_status: 'REJECTED',
+        declarationStatus: 'REJECTED',
         duplicates: null,
-        rejection_reasons: '',
-        rejection_comment: ''
+        rejectionReasons: '',
+        rejectionComment: ''
       },
       {
         id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
@@ -244,11 +244,11 @@ describe('SearchResult tests', async () => {
         dod: '',
         registrationNumber: '2019333494BQRZWDR2',
         duplicates: null,
-        tracking_id: 'BQRZWDR',
+        trackingId: 'BQRZWDR',
         event: 'Birth',
-        declaration_status: 'REGISTERED',
-        rejection_reasons: '',
-        rejection_comment: ''
+        declarationStatus: 'REGISTERED',
+        rejectionReasons: '',
+        rejectionComment: ''
       },
       {
         id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
@@ -257,11 +257,11 @@ describe('SearchResult tests', async () => {
         dod: '',
         registrationNumber: '2019333494B3DBJMP5',
         duplicates: null,
-        tracking_id: 'B3DBJMP',
+        trackingId: 'B3DBJMP',
         event: 'Birth',
-        declaration_status: 'CERTIFIED',
-        rejection_reasons: '',
-        rejection_comment: ''
+        declarationStatus: 'CERTIFIED',
+        rejectionReasons: '',
+        rejectionComment: ''
       }
     ])
 

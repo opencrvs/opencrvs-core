@@ -30,6 +30,7 @@ function buildTranslationsCSVData(
   const data: ITranslationCSVItem[] = []
   Object.keys(source).forEach(key => {
     const translation: ITranslationCSVItem = {
+      // eslint-disable-next-line @typescript-eslint/camelcase
       Translation_Key: key,
       Value: translations[key],
       // eslint-disable-line no-string-literal

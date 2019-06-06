@@ -49,16 +49,16 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
         '',
       registrationNumber:
         (reg.registration && reg.registration.registrationNumber) || '',
-      tracking_id: (reg.registration && reg.registration.trackingId) || '',
+      trackingId: (reg.registration && reg.registration.trackingId) || '',
       event: reg.type,
-      declaration_status: status,
+      declarationStatus: status,
       duplicates: reg.registration && reg.registration.duplicates,
-      rejection_reasons:
+      rejectionReasons:
         (status === 'REJECTED' &&
           reg.registration &&
           reg.registration.reason) ||
         '',
-      rejection_comment:
+      rejectionComment:
         (status === 'REJECTED' &&
           reg.registration &&
           reg.registration.comment) ||

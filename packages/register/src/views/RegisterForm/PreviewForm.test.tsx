@@ -41,7 +41,7 @@ storage.setItem = jest.fn()
 jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -153,7 +153,7 @@ describe('when user is previewing the form data', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       customDraft = {
@@ -383,7 +383,7 @@ describe('when user is previewing the form data', () => {
         mother: motherDetails,
         registration: registrationDetails,
         documents: {
-          image_uploader: [
+          imageUploader: [
             {
               data: 'base64-data',
               type: 'image/jpeg',
@@ -661,7 +661,7 @@ describe('when user is previewing the form data', () => {
         causeOfDeath: causeOfDeathDetails,
         registration: registrationDetails,
         documents: {
-          image_uploader: [
+          imageUploader: [
             {
               data: 'base64-data',
               type: 'image/jpeg',

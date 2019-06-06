@@ -24,7 +24,7 @@ function flushPromises() {
 }
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 

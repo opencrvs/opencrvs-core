@@ -40,16 +40,16 @@ const messages: {
   },
   boxHeaderDesc: {
     id: 'register.confirmationScreen.boxHeaderDesc',
-    defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.} 
-    duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.} 
-    certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.} 
+    defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}
+    duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.}
+    certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.}
     offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
-    defaultMessage: `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:} 
+    defaultMessage: `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:}
     duplication {{eventType, select, birth {Birth} death {Death}} Registration Number:} rejection {Tracking number:} certificate {} offline {Tracking number:}} `,
     description:
       'The tracking section title that appear on the confirmation screen'
@@ -57,10 +57,10 @@ const messages: {
   trackingSectionDesc: {
     id: 'register.confirmationScreen.trackingSectionDesc',
     defaultMessage: `{event, select, certificate {Certificates have been collected from your jurisdiction.}
-    declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.} 
+    declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
     duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
-    rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.} 
+    rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.}
     offline {The informant will receive the tracking ID number via SMS when the application has been sent for review.}} `,
     description:
       'The tracking section description that appear on the confirmation screen'
@@ -261,7 +261,7 @@ class ConfirmationScreenView extends React.Component<
           <FooterAction>
             <FooterPrimaryButton
               id="go_to_homepage_button"
-              onClick={() => (location.href = '/')}
+              onClick={() => (window.location.href = '/')}
             >
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
@@ -270,7 +270,7 @@ class ConfirmationScreenView extends React.Component<
             <FooterAction>
               <FooterPrimaryButton
                 id="go_to_new_declaration"
-                onClick={() => (location.href = '/')}
+                onClick={() => (window.location.href = '/')}
               >
                 {intl.formatMessage(messages.newButton)}
               </FooterPrimaryButton>
