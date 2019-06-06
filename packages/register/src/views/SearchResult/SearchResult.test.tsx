@@ -40,11 +40,13 @@ mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', async () => {
+  const { store } = createStore()
+
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
-  const { store } = createStore()
+
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore

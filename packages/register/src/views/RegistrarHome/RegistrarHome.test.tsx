@@ -522,9 +522,9 @@ describe('RegistrarHome tests', async () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].event_time_elapsed).toBe('8 years ago')
-    expect(data[0].application_time_elapsed).toBe('10 months ago')
-    expect(data[0].tracking_id).toBe('B111111')
+    expect(data[0].eventTimeElapsed).toBe('8 years ago')
+    expect(data[0].applicationTimeElapsed).toBe('10 months ago')
+    expect(data[0].trackingId).toBe('B111111')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
 
@@ -700,8 +700,8 @@ describe('RegistrarHome tests', async () => {
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('cc66d69c-7f0a-4047-9283-f066571830f1')
-    expect(data[1].contact_number).toBe('01622688231')
-    expect(data[1].date_of_rejection).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].contactNumber).toBe('01622688231')
+    expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
 
@@ -757,7 +757,7 @@ describe('RegistrarHome tests', async () => {
 
     expect(data[1].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[1].name).toBe('Anik')
-    expect(data[1].date_of_modification).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
 

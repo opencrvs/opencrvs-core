@@ -30,6 +30,7 @@ describe('Unlock page loads Properly', () => {
     ]),
     screenLock: undefined,
     USER_ID: 'shakib75',
+    // eslint-disable-next-line @typescript-eslint/camelcase
     locked_time: undefined
   }
 

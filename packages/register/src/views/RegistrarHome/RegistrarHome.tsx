@@ -387,21 +387,21 @@ export class RegistrarHomeView extends React.Component<
             (createNamesMap(names)['default'] as string) ||
             /* eslint-enable no-string-literal */
             '',
-          date_of_event:
+          dateOfEvent:
             (dateOfEvent &&
               moment(dateOfEvent.toString(), 'YYYY-MM-DD').format(
                 CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
               )) ||
             '',
-          event_time_elapsed:
+          eventTimeElapsed:
             (dateOfEvent &&
               moment(dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
             '',
-          application_time_elapsed:
+          applicationTimeElapsed:
             (reg.createdAt &&
               moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
             '',
-          tracking_id: (reg.registration && reg.registration.trackingId) || '',
+          trackingId: (reg.registration && reg.registration.trackingId) || '',
           event:
             (reg.registration &&
               reg.registration.type &&
@@ -528,7 +528,7 @@ export class RegistrarHomeView extends React.Component<
             /* eslint-disable no-string-literal */
             (names && (createNamesMap(names)['bn'] as string)) ||
             '',
-          date_of_rejection:
+          dateOfRejection:
             reg.registration &&
             reg.registration.status &&
             reg.registration.status[0] &&
@@ -539,7 +539,7 @@ export class RegistrarHomeView extends React.Component<
               reg.registration.status[0].timestamp.toString(),
               'YYYY-MM-DD'
             ).fromNow(),
-          contact_number: contactPhoneNumber || '',
+          contactNumber: contactPhoneNumber || '',
           event:
             (reg.registration &&
               reg.registration.type &&
@@ -652,7 +652,7 @@ export class RegistrarHomeView extends React.Component<
         id: draft.id,
         event: (draft.event && sentenceCase(draft.event)) || '',
         name: name || '',
-        date_of_modification:
+        dateOfModification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||
           '',
         actions
@@ -781,7 +781,7 @@ export class RegistrarHomeView extends React.Component<
                     messages.listItemModificationDate
                   ),
                   width: 35,
-                  key: 'date_of_modification'
+                  key: 'dateOfModification'
                 },
                 {
                   label: this.props.intl.formatMessage(messages.listItemAction),
@@ -856,21 +856,21 @@ export class RegistrarHomeView extends React.Component<
                           messages.listItemTrackingNumber
                         ),
                         width: 20,
-                        key: 'tracking_id'
+                        key: 'trackingId'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemApplicationDate
                         ),
                         width: 23,
-                        key: 'application_time_elapsed'
+                        key: 'applicationTimeElapsed'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemEventDate
                         ),
                         width: 23,
-                        key: 'event_time_elapsed'
+                        key: 'eventTimeElapsed'
                       },
                       {
                         label: this.props.intl.formatMessage(
@@ -890,12 +890,12 @@ export class RegistrarHomeView extends React.Component<
                       {
                         label: intl.formatMessage(messages.dob),
                         displayForEvents: [Event.BIRTH],
-                        key: 'date_of_event'
+                        key: 'dateOfEvent'
                       },
                       {
                         label: intl.formatMessage(messages.dod),
                         displayForEvents: [Event.DEATH],
-                        key: 'date_of_event'
+                        key: 'dateOfEvent'
                       }
                     ]}
                     noResultText={intl.formatMessage(
@@ -979,14 +979,14 @@ export class RegistrarHomeView extends React.Component<
                           messages.listItemApplicantNumber
                         ),
                         width: 21,
-                        key: 'contact_number'
+                        key: 'contactNumber'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemUpdateDate
                         ),
                         width: 22,
-                        key: 'date_of_rejection'
+                        key: 'dateOfRejection'
                       },
                       {
                         label: this.props.intl.formatMessage(

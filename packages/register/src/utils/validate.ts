@@ -251,6 +251,10 @@ export const minLength = (min: number) => (value: string) => {
     : undefined
 }
 
+const isLessOrEqual = (value: string, max: number) => {
+  return value && value.toString().length <= max
+}
+
 export const maxLength: MaxLengthValidation = (max: number) => (
   value: IFormFieldValue
 ) => {
@@ -428,9 +432,11 @@ export const dateNotInFuture: ValidationInitializer = (): Validation => (
   }
 }
 
-export const dateInPast: ValidationInitializer = (): Validation => (
-  value: IFormFieldValue
-) => isDateInPast(value)
+export const dateNotToday = (date: string): boolean => {
+  const today = new Date().setHours(0, 0, 0, 0)
+  const day = new Date(date).setHours(0, 0, 0, 0)
+  return day !== today
+}
 
 export const isDateInPast: Validation = (value: IFormFieldValue) => {
   const cast = value as string
@@ -441,11 +447,9 @@ export const isDateInPast: Validation = (value: IFormFieldValue) => {
   }
 }
 
-export const dateNotToday = (date: string): boolean => {
-  const today = new Date().setHours(0, 0, 0, 0)
-  const day = new Date(date).setHours(0, 0, 0, 0)
-  return day !== today
-}
+export const dateInPast: ValidationInitializer = (): Validation => (
+  value: IFormFieldValue
+) => isDateInPast(value)
 
 export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
   value: IFormFieldValue
@@ -502,10 +506,6 @@ const checkNameWords = (value: string, checker: Checker): boolean => {
 
   const parts: string[] = trimmedValue.split(/\s+/)
   return parts.every(checker)
-}
-
-const isLessOrEqual = (value: string, max: number) => {
-  return value && value.toString().length <= max
 }
 
 export const isValidBengaliName = (value: string): boolean => {

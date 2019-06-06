@@ -1138,6 +1138,16 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
+const getEvent = (eventType: string | undefined) => {
+  switch (eventType && eventType.toLowerCase()) {
+    case 'birth':
+    default:
+      return Event.BIRTH
+    case 'death':
+      return Event.DEATH
+  }
+}
+
 const getDraft = (
   drafts: IApplication[],
   registrationId: string,
@@ -1148,16 +1158,6 @@ const getDraft = (
     data: {},
     event: getEvent(eventType)
   }
-
-const getEvent = (eventType: string | undefined) => {
-  switch (eventType && eventType.toLowerCase()) {
-    case 'birth':
-    default:
-      return Event.BIRTH
-    case 'death':
-      return Event.DEATH
-  }
-}
 
 const getCollectCertificateForm = (event: Event, state: IStoreState) => {
   switch (event) {
