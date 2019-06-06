@@ -21,6 +21,6 @@ const mapStateToProps = (store: IStoreState): StateProps => {
   }
 }
 
-export const I18nContainer = connect<StateProps, {}>(mapStateToProps)(
-  IntlProvider
-)
+export const I18nContainer = connect<StateProps, {}, StateProps, IStoreState>(
+  mapStateToProps
+)(IntlProvider) as any

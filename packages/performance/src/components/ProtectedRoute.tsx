@@ -21,6 +21,8 @@ interface IDispatchProps {
 
 type Props = RouteProps & RouteComponentProps<{}>
 
+type FullProps = IProps & IDispatchProps & Props
+
 class ProtectedRouteWrapper extends Route<IProps & IDispatchProps & Props> {
   public componentDidMount() {
     const values = parse(this.props.location.search)
@@ -40,10 +42,10 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter<Props>(
-  connect<IProps, IDispatchProps>(
+  connect<IProps, IDispatchProps, any, IStoreState>(
     mapStateToProps,
     {
       checkAuth
     }
   )(ProtectedRouteWrapper)
-)
+) as any

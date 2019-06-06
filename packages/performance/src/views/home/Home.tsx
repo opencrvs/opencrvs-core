@@ -7,17 +7,15 @@ import {
   FormattedHTMLMessage,
   defineMessages
 } from 'react-intl'
-import { Box } from '@opencrvs/components/lib/interface'
-import styled from '@performance/styledComponents'
-import { withTheme } from '@performance/styledComponents'
+import { Box, Spinner } from '@opencrvs/components/lib/interface'
+import styled, { withTheme, ITheme } from '@performance/styledComponents'
 import {
   GQLHumanName,
   GQLBirthKeyFigures
 } from '@opencrvs/gateway/src/graphql/schema'
 import { getUserDetails } from '@performance/profile/selectors'
-import { getUserLocation } from '@performance/utils/userUtils'
+import { getUserLocation, IUserDetails } from '@performance/utils/userUtils'
 import { getLanguage } from '@performance/i18n/selectors'
-import { IUserDetails } from '@performance/utils/userUtils'
 import { Page } from '@performance/components/Page'
 import { IStoreState } from '@performance/store'
 import { HomeViewHeader } from '@performance/components/HomeViewHeader'
@@ -28,8 +26,6 @@ import { Male, Female } from '@opencrvs/components/lib/icons'
 
 import { Query } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
-import { Spinner } from '@opencrvs/components/lib/interface'
-import { ITheme } from '@performance/styledComponents'
 import { FETCH_METRIC } from '@performance/views/home/queries'
 
 const messages: {
@@ -235,7 +231,7 @@ interface IData {
 interface IHomeProps {
   theme: ITheme
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
 }
 
 type FullProps = IHomeProps & InjectedIntlProps
@@ -303,8 +299,12 @@ class HomeView extends React.Component<FullProps> {
     const { intl, language, userDetails, theme } = this.props
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
       ) as GQLHumanName
+
       const fullName = `${String(nameObj.firstNames)} ${String(
         nameObj.familyName
       )}`
