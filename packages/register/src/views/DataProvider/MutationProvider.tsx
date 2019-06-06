@@ -22,6 +22,19 @@ const MutationMapper = {
   [Event.DEATH]: getDeathMutationMappings
 }
 
+export const getMutationMapping = (
+  event: Event,
+  action: Action,
+  payload?: any,
+  form?: IForm,
+  application?: IApplication
+) => {
+  return (
+    MutationMapper[event] &&
+    MutationMapper[event](action, payload, form, application)
+  )
+}
+
 export const MutationContext = React.createContext({
   mutation: {},
   loading: false,
@@ -30,10 +43,7 @@ export const MutationContext = React.createContext({
 class MutationProviderComponent extends React.Component<IProps> {
   getMapping() {
     const { event, action, payload, form, application } = this.props
-    return (
-      MutationMapper[event] &&
-      MutationMapper[event](action, payload, form, application)
-    )
+    return getMutationMapping(event, action, payload, form, application)
   }
 
   render() {
