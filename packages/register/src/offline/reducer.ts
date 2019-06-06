@@ -91,12 +91,13 @@ export const offlineDataReducer: LoopReducer<
           loadingError: true,
           locations: tempData.locations
         },
-        Cmd.run<
-          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
-        >(referenceApi.loadFacilities, {
-          successActionCreator: actions.facilitiesLoaded,
-          failActionCreator: actions.facilitiesFailed
-        })
+        Cmd.run<actions.FacilitiesFailedAction, actions.FacilitiesLoadedAction>(
+          referenceApi.loadFacilities,
+          {
+            successActionCreator: actions.facilitiesLoaded,
+            failActionCreator: actions.facilitiesFailed
+          }
+        )
       )
     case actions.FACILITIES_FAILED:
       locationLanguageState = formatLocationLanguageState(
@@ -124,12 +125,13 @@ export const offlineDataReducer: LoopReducer<
           loadingError: false,
           locations: action.payload
         },
-        Cmd.run<
-          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
-        >(referenceApi.loadFacilities, {
-          successActionCreator: actions.facilitiesLoaded,
-          failActionCreator: actions.facilitiesFailed
-        })
+        Cmd.run<actions.FacilitiesFailedAction, actions.FacilitiesLoadedAction>(
+          referenceApi.loadFacilities,
+          {
+            successActionCreator: actions.facilitiesLoaded,
+            failActionCreator: actions.facilitiesFailed
+          }
+        )
       )
     case actions.FACILITIES_LOADED:
       const facilities = filterLocations(
@@ -173,8 +175,8 @@ export const offlineDataReducer: LoopReducer<
           )
         },
         Cmd.run<
-          | actions.IGetOfflineDataSuccessAction
-          | actions.IGetOfflineDataFailedAction
+          actions.IGetOfflineDataFailedAction,
+          actions.IGetOfflineDataSuccessAction
         >(storage.getItem, {
           successActionCreator: actions.getOfflineDataSuccess,
           failActionCreator: actions.getOfflineDataFailed,
@@ -211,12 +213,13 @@ export const offlineDataReducer: LoopReducer<
           {
             ...state
           },
-          Cmd.run<
-            actions.LocationsLoadedAction | actions.LocationsFailedAction
-          >(referenceApi.loadLocations, {
-            successActionCreator: actions.locationsLoaded,
-            failActionCreator: actions.locationsFailed
-          })
+          Cmd.run<actions.LocationsFailedAction, actions.LocationsLoadedAction>(
+            referenceApi.loadLocations,
+            {
+              successActionCreator: actions.locationsLoaded,
+              failActionCreator: actions.locationsFailed
+            }
+          )
         )
       }
 

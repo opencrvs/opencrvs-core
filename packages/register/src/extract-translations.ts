@@ -1,5 +1,6 @@
+/* eslint-disable */
 import * as fs from 'fs'
-import * as glob from 'glob'
+import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
 import { ENGLISH_STATE } from '@register/i18n/locales/en'
@@ -57,7 +58,7 @@ async function extractMessages() {
         res = main(contents)
         results = results.concat(res)
       })
-      const reactIntlSource = {}
+      const reactIntlSource: IReactIntlSource = {}
 
       results.forEach(r => {
         reactIntlSource[r.id] = {

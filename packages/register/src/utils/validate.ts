@@ -23,6 +23,11 @@ export interface IValidationResult {
   props?: { [key: string]: MessageValue }
 }
 
+export type RangeValidation = (
+  min: number,
+  max: number
+) => (value: IFormFieldValue) => IValidationResult | undefined
+
 export type MaxLengthValidation = (
   customisation: number
 ) => (value: IFormFieldValue) => IValidationResult | undefined
@@ -539,7 +544,9 @@ export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
     : { message: messages.englishOnlyNameFormat }
 }
 
-export const range = (min: number, max: number) => (value: string) => {
+export const range: RangeValidation = (min: number, max: number) => (
+  value: string
+) => {
   return isValueWithinRange(min, max)(parseFloat(value))
     ? undefined
     : { message: messages.range, props: { min, max } }

@@ -81,19 +81,25 @@ type IProps = {
 }
 type IFullProps = IActionProps & InjectedIntlProps & IProps
 
-type IFullFileValues = IFileValue & {
+interface IFullFileValues extends IFileValue {
   title: string
   description: string
 }
+
+interface ITempFullFileValues extends IFileValue {
+  title?: string
+  description?: string
+}
 /* feels weired may need to change a bit */
-function augmentFile(file: IFullFileValues): IFullFileValues {
+function augmentFile(file: IFileValue): IFullFileValues {
+  const augmentedFile: ITempFullFileValues = file
   if (file.optionValues) {
-    file.title = file.optionValues[0].toString()
+    augmentedFile.title = file.optionValues[0].toString()
     if (file.optionValues.length > 1) {
-      file.description = file.optionValues[1].toString()
+      augmentedFile.description = file.optionValues[1].toString()
     }
   }
-  return file
+  return augmentedFile as IFullFileValues
 }
 class ImageUploadComponent extends React.Component<
   IFullProps,
@@ -140,12 +146,13 @@ class ImageUploadComponent extends React.Component<
     const { title, optionSection, files, intl } = this.props
     const fileList =
       files &&
-      files.map((file: IFullFileValues, index: number) => {
+      files.map((file: IFileValue, index: number) => {
+        const augmentedFile: IFullFileValues = augmentFile(file)
         return (
           <FileItemContainer key={index}>
             <FileItem
               id={`file_item_${index}`}
-              file={augmentFile(file)}
+              file={augmentedFile}
               deleteLabel={intl.formatMessage(messages.delete)}
               onDelete={() => this.onDelete(index)}
               previewLabel={intl.formatMessage(messages.preview)}

@@ -130,7 +130,7 @@ export type IFormFieldValue =
   | IFileValue[]
   | { [key: string]: string }
 
-export type IFileValue = {
+export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
   data: string

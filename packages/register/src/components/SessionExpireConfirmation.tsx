@@ -67,9 +67,14 @@ const mapStateToProps = (store: IStoreState) => {
   }
 }
 
-export const SessionExpireConfirmation = connect<SessionExpireProps, IProps>(
+export const SessionExpireConfirmation = connect<
+  SessionExpireProps,
+  IProps,
+  SessionExpireProps & IProps,
+  IStoreState
+>(
   mapStateToProps,
   {
     redirectToAuthentication
   }
-)(injectIntl(SessionExpireComponent))
+)(injectIntl(SessionExpireComponent)) as any

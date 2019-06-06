@@ -204,8 +204,12 @@ export const getFieldOptions = (
   }
 }
 
+interface INested {
+  [key: string]: any
+}
+
 const getNestedValue = (obj: object, key: string) => {
-  return key.split('.').reduce((res, k) => res[k] || '', obj)
+  return key.split('.').reduce((res: INested, k) => res[k] || '', obj)
 }
 
 const betweenRange = (range: IRange, check: number) =>
@@ -216,10 +220,10 @@ export const getFieldOptionsByValueMapper = (
   values: IFormSectionData | IFormData,
   valueMapper: IDynamicValueMapper
 ) => {
-  const dependencyVal = getNestedValue(
+  const dependencyVal = (getNestedValue(
     values,
     field.dynamicItems.dependency
-  ) as string
+  ) as unknown) as string
 
   const firstKey = Object.keys(field.dynamicItems.items)[0]
 
@@ -269,11 +273,15 @@ export function isCityLocation(
   }
 }
 
+interface IVars {
+  [key: string]: any
+}
+
 export function getInputValues(
   inputs: IFieldInput[],
   values: IFormSectionData
 ): IDynamicValues {
-  const variables = {}
+  const variables: IVars = {}
   inputs.forEach((input: IFieldInput) => {
     variables[input.name] = values[input.valueField]
   })

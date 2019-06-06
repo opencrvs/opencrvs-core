@@ -31,7 +31,7 @@
     "react-scripts": "^3.0.1",
     "redux": "^4.0.1",
     "redux-form": "^7.4.2",
-    "redux-loop": "^4.4.1",
+    "redux-loop": "^5.0.0",
     "redux-sentry-middleware": "^0.0.15",
     "styled-components": "^3.3.3"
   },

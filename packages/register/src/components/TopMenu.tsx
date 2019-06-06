@@ -112,7 +112,7 @@ type Props = {
   changeLanguage: typeof changeLanguageAction
   redirectToAuthentication: typeof redirectToAuthentication
   languages: IntlState['languages']
-  userScope: Scope
+  userScope: Scope | null
 }
 
 interface IState {

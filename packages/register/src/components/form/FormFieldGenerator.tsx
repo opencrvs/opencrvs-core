@@ -350,6 +350,10 @@ type Props = IFormSectionProps &
   FormikProps<IFormSectionData> &
   InjectedIntlProps
 
+interface IQueryData {
+  [key: string]: any
+}
+
 class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
     const userChangedForm = !isEqual(nextProps.values, this.props.values)
@@ -491,7 +495,7 @@ class FormSectionComponent extends React.Component<Props> {
                       sections: [section]
                     } as IForm
 
-                    const queryData = {}
+                    const queryData: IQueryData = {}
                     queryData[this.props.id] = response
 
                     const transformedData = gqlToDraftTransformer(

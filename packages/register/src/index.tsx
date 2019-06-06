@@ -52,7 +52,7 @@ if (
   })
 }
 
-function onNewConentAvailable(waitingSW: ServiceWorker) {
+function onNewConentAvailable(waitingSW: ServiceWorker | null) {
   const action = actions.showNewContentAvailableNotification(waitingSW)
   store.dispatch(action)
 }

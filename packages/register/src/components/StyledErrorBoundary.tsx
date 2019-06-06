@@ -70,10 +70,14 @@ const messages: {
 
 type IFullProps = InjectedIntlProps
 
+interface IErrorInfo extends React.ErrorInfo {
+  [key: string]: string
+}
+
 class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   state = { error: null, authError: false }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: IErrorInfo) {
     this.setState({ error, authError: error.message === '401' })
 
     Sentry.withScope(scope => {

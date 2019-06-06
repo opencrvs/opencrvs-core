@@ -32,5 +32,7 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter(
-  connect<IProps, {}>(mapStateToProps)(ProtectedRouteWrapper)
-)
+  connect<IProps, {}, IProps, IStoreState>(mapStateToProps)(
+    ProtectedRouteWrapper
+  )
+) as any

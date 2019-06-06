@@ -79,7 +79,7 @@ const messages: {
 
 interface IProps {
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
 }
 
@@ -108,19 +108,21 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   getMenuHeader = (
     intl: InjectedIntl,
     language: string,
-    userDetails: IUserDetails
+    userDetails: IUserDetails | null
   ): JSX.Element => {
     let userName
     let userRole
 
-    if (userDetails) {
-      const nameObj =
-        userDetails.name &&
-        (userDetails.name.find(
-          (storedName: GQLHumanName) => storedName.use === language
-        ) as GQLHumanName)
-      userName =
-        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
+      ) as GQLHumanName
+
+      userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+
       userRole =
         userDetails.role &&
         intl.formatMessage(messages[userDetails.role as string])

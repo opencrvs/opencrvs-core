@@ -298,8 +298,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state
         },
         Cmd.run<
-          | IGetStorageApplicationsSuccessAction
-          | IGetStorageApplicationsFailedAction
+          IGetStorageApplicationsFailedAction,
+          IGetStorageApplicationsSuccessAction
         >(getApplicationsOfCurrentUser, {
           successActionCreator: getStorageApplicationsSuccess,
           failActionCreator: getStorageApplicationsFailed,

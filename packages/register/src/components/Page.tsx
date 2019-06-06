@@ -153,8 +153,8 @@ const mapDispatchToProps = {
 }
 
 export const Page = withRouter(
-  connect<IPageProps, IDispatchProps>(
+  connect<IPageProps, IDispatchProps, IPageProps, IStoreState>(
     mapStateToProps,
     mapDispatchToProps
   )(Component)
-)
+) as any

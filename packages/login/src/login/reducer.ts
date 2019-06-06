@@ -42,8 +42,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           stepOneDetails: action.payload
         },
         Cmd.run<
-          | actions.AuthenticateResponseAction
-          | actions.AuthenticationFailedAction
+          actions.AuthenticationFailedAction,
+          actions.AuthenticateResponseAction
         >(authApi.authenticate, {
           successActionCreator: actions.completeAuthentication,
           failActionCreator: actions.failAuthentication,
@@ -84,13 +84,14 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submissionError: false,
           resentSMS: false
         },
-        Cmd.run<
-          actions.ResendSMSCompleteAction | actions.ResendSMSFailedAction
-        >(authApi.resendSMS, {
-          successActionCreator: actions.completeSMSResend,
-          failActionCreator: actions.failSMSResend,
-          args: [state.authenticationDetails.nonce]
-        })
+        Cmd.run<actions.ResendSMSFailedAction, actions.ResendSMSCompleteAction>(
+          authApi.resendSMS,
+          {
+            successActionCreator: actions.completeSMSResend,
+            failActionCreator: actions.failSMSResend,
+            args: [state.authenticationDetails.nonce]
+          }
+        )
       )
     case actions.RESEND_SMS_FAILED:
       return { ...state, resentSMS: false, submissionError: true }
@@ -114,7 +115,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false
         },
         Cmd.run<
-          actions.VerifyCodeCompleteAction | actions.VerifyCodeFailedAction
+          actions.VerifyCodeFailedAction,
+          actions.VerifyCodeCompleteAction
         >(authApi.verifyCode, {
           successActionCreator: actions.completeVerifyCode,
           failActionCreator: actions.failVerifyCode,

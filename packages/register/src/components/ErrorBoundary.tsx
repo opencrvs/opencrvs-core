@@ -6,10 +6,14 @@ const ErrorMessage = styled.h1`
   text-align: center;
 `
 
+interface IErrorInfo extends React.ErrorInfo {
+  [key: string]: string
+}
+
 export class ErrorBoundary extends React.Component {
   state = { error: null }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: IErrorInfo) {
     this.setState({ error })
     Sentry.withScope(scope => {
       Object.keys(errorInfo).forEach(key => {

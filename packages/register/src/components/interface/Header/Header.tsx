@@ -53,7 +53,7 @@ import styled from '@register/styledComponents'
 import { SEARCH } from '@register/navigation/routes'
 
 type IProps = InjectedIntlProps & {
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
   title?: string
@@ -171,9 +171,12 @@ class HeaderComp extends React.Component<IProps, IState> {
     const { userDetails, language, intl } = this.props
 
     let name = ''
-    if (userDetails && userDetails.name) {
+    if (userDetails && userDetails.name && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
       ) as GQLHumanName
       name = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
     }

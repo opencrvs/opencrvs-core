@@ -15738,10 +15738,10 @@ redux-form@^7.4.2:
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
 
-redux-loop@^4.4.1:
-  version "4.5.4"
-  resolved "https://registry.yarnpkg.com/redux-loop/-/redux-loop-4.5.4.tgz#4c87f5eb0a726a39af3d391641eba27dd91f7126"
-  integrity sha512-4DU7W7koaPWY3PwfVFYCBdi+12yYFTohaU2ajMgdKe4yPX7ZJJB6h2idjRuyr+usMNt7ewm6Y22u5e8qhy25yw==
+redux-loop@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/redux-loop/-/redux-loop-5.0.0.tgz#439982a001244c32e24b30619479bd887471c4d8"
+  integrity sha512-q6CCux5XRLZJ9jaceET4nyViJkUy6+JFI4RDBH667T8lI3pG/npbQKjEx4uZEpL8dYUrkeCrwdc1CtEzQ0EzjQ==
 
 redux-mock-store@^1.5.3:
   version "1.5.3"

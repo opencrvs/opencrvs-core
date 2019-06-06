@@ -158,7 +158,7 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps>(
+  connect<NotificationProps, DispatchProps, NotificationProps, IStoreState>(
     mapStateToProps,
     {
       hideNewContentAvailableNotification,
@@ -167,4 +167,4 @@ export const NotificationComponent = withRouter(
       toggleDraftSavedNotification
     }
   )(injectIntl(Component))
-)
+) as any

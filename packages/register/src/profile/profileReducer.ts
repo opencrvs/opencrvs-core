@@ -130,8 +130,8 @@ export const profileReducer: LoopReducer<
           ...state
         },
         Cmd.run<
-          | actions.IGetStorageUserDetailsSuccessAction
-          | actions.IGetStorageUserDetailsFailedAction
+          actions.IGetStorageUserDetailsFailedAction,
+          actions.IGetStorageUserDetailsSuccessAction
         >(storage.getItem, {
           successActionCreator: actions.getStorageUserDetailsSuccess,
           failActionCreator: actions.getStorageUserDetailsFailed,
