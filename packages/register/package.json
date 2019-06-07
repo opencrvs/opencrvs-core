@@ -30,7 +30,9 @@
     "lodash": "^4.17.10",
     "logrocket": "^0.6.19",
     "moment": "^2.22.2",
+    "patch-package": "^6.1.2",
     "pdfmake": "^0.1.40",
+    "postinstall-postinstall": "^2.0.0",
     "query-string": "^6.1.0",
     "react": "^16.3.2",
     "react-apollo": "^2.1.4",
@@ -52,6 +54,7 @@
     "xregexp": "^4.2.0"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 craco start",
     "build": "craco --max_old_space_size=4096 build && yarn gen:sw",
