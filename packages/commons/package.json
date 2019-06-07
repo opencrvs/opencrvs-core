@@ -1,0 +1,55 @@
+{
+  "name": "@opencrvs/commons",
+  "version": "1.0.0-alpha.6",
+  "description": "OpenCRVS common modules and utils",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "jest --coverage && yarn test:compilation",
+    "test:watch": "jest --watch --coverage",
+    "test:compilation": "tsc --noEmit"
+  },
+  "license": "NONE",
+  "private": true,
+  "dependencies": {
+    "@types/node-fetch": "^2.3.3",
+    "hapi": "^18.1.0",
+    "node-fetch": "^2.5.0",
+    "typescript": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.1.1",
+    "jest": "24.7.1",
+    "jest-fetch-mock": "^2.1.2",
+    "ts-jest": "^24.0.2"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,graphql}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "setupFiles": [
+      "./test/setupJest.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "testEnvironment": "node"
+  }
+}

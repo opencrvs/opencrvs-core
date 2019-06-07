@@ -10,11 +10,13 @@
     "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "jest  --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
+    "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "lint-staged",
     "populate": "ts-node -r tsconfig-paths/register resources/populate.ts",
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
+    "@opencrvs/commons": "^1.0.0-alpha.6",
     "@types/boom": "^7.2.0",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",
@@ -76,6 +78,12 @@
       "json",
       "node"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ]
   }
 }

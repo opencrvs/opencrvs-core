@@ -10,7 +10,9 @@ import {
   PRINT_CERTIFICATE,
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
-  SEARCH
+  SEARCH,
+  APPLICATION_DETAIL,
+  SETTINGS
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -88,6 +90,10 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
+export function goToApplicationDetails(applicationId: string) {
+  return push(formatUrl(APPLICATION_DETAIL, { applicationId }))
+}
+
 export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
@@ -129,6 +135,10 @@ export function goToFieldAgentHomeTab(tabId: string) {
     type: GO_TO_FIELD_AGENT_HOME,
     payload: { tabId }
   }
+}
+
+export function goToSettings() {
+  return push(SETTINGS)
 }
 
 export function goToTab(

@@ -8,6 +8,7 @@ import * as actions from '@register/notification/actions'
 import { storage } from '@register/storage'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
+import { SubmissionController } from './SubmissionController'
 
 storage.configStorage('OpenCRVS')
 
@@ -78,3 +79,4 @@ ReactDOM.render(
 )
 
 registerServiceWorker(onNewConentAvailable)
+new SubmissionController(store).start()

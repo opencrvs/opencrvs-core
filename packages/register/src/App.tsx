@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'react-router-redux'
+import { Footer } from '@opencrvs/components/lib/interface/'
+import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
-import { ApolloProvider } from 'react-apollo'
 import { History } from 'history'
+import * as React from 'react'
+import { ApolloProvider } from 'react-apollo'
+import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import styled, { ThemeProvider } from '@register/styledComponents'
 import { I18nContainer } from '@register/i18n/components/I18nContainer'
-import { getTheme } from '@opencrvs/components/lib/theme'
 import { createStore, AppStore } from '@register/store'
 import { ProtectedRoute } from '@register/components/ProtectedRoute'
 import * as routes from '@register/navigation/routes'
@@ -30,7 +30,8 @@ import { Details } from '@register/views/Home/Details'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
 import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
-import { Footer } from '@opencrvs/components/lib/interface/'
+import { ConnectedRouter } from 'react-router-redux'
+
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
@@ -137,6 +138,10 @@ export class App extends React.Component<IAppProps> {
                                 <ProtectedRoute
                                   path={routes.PRINT_CERTIFICATE}
                                   component={PrintCertificateAction}
+                                />
+                                <ProtectedRoute
+                                  path={routes.SETTINGS}
+                                  component={SettingsPage}
                                 />
                                 <ProtectedRoute
                                   path={routes.APPLICATION_DETAIL}

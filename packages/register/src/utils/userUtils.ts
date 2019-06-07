@@ -25,11 +25,14 @@ export interface IUserDetails {
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
+  language: string
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
   const { catchmentArea, primaryOffice, name, role, userMgntUserID } = user
-  const userDetails: IUserDetails = {}
+  const userDetails: IUserDetails = {
+    language: window.config.LANGUAGE
+  }
   if (userMgntUserID) {
     userDetails.userMgntUserID = userMgntUserID
   }

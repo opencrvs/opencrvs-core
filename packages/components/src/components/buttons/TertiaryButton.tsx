@@ -14,7 +14,7 @@ export const TertiaryButton = styled(Button)`
   & div {
     padding: 0 8px;
   }
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.tertiary};
   &:disabled {
     background: ${({ theme }) => theme.colors.disabled};
   }

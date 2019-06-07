@@ -5,11 +5,16 @@ import * as Swipeable from 'react-swipeable'
 import { Box, Modal, InvertSpinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
-  ArrowForward,
   ArrowBack,
+  ArrowForward,
   DraftSimple,
   TickLarge
 } from '@opencrvs/components/lib/icons'
+import { BodyContent } from '@opencrvs/components/lib/layout'
+import * as Sentry from '@sentry/browser'
+import { isNull, isUndefined, merge } from 'lodash'
+// @ts-ignore - Required for mocking
+import * as debounce from 'lodash/debounce'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '@register/styledComponents'
 import {
@@ -30,9 +35,9 @@ import {
 } from '@register/components/form'
 import { IStoreState } from '@register/store'
 import {
+  deleteApplication,
   IApplication,
   modifyApplication,
-  deleteApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
 import {
@@ -42,22 +47,18 @@ import {
 } from '@register/components/interface/footer'
 import { StickyFormTabs } from '@register/views/RegisterForm/StickyFormTabs'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import { getOfflineState } from '@register/offline/selectors'
 import { IOfflineDataState } from '@register/offline/reducer'
 import { CONFIRMATION_SCREEN, HOME } from '@register/navigation/routes'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-
 import {
   DECLARATION,
-  REJECTION,
-  REGISTRATION,
-  REGISTERED,
   DUPLICATION,
-  OFFLINE
+  OFFLINE,
+  REGISTERED,
+  REGISTRATION,
+  REJECTION
 } from '@register/utils/constants'
-
 import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
@@ -66,10 +67,6 @@ import {
   MutationContext
 } from '@register/views/DataProvider/MutationProvider'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
-
-import * as Sentry from '@sentry/browser'
-// @ts-ignore - Required for mocking
-import * as debounce from 'lodash/debounce'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -816,7 +813,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <ConfirmBtn
                 key="submit"
                 id="submit_confirm"
-                // @ts-ignore
                 onClick={() => this.confirmSubmission(application)}
               >
                 <>

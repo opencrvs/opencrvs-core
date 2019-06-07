@@ -39,6 +39,7 @@ import {
   goToPerformance,
   goToSearchResult,
   goToSearch,
+  goToSettings,
   goToEvents as goToEventsAction
 } from '@register/navigation'
 import { ProfileMenu } from '@register/components/ProfileMenu'
@@ -47,9 +48,7 @@ import {
   BRN_DRN_TEXT,
   PHONE_TEXT
 } from '@register/utils/constants'
-
 import styled from '@register/styledComponents'
-
 import { SEARCH } from '@register/navigation/routes'
 
 type IProps = InjectedIntlProps & {
@@ -60,6 +59,7 @@ type IProps = InjectedIntlProps & {
   goToSearchResult: typeof goToSearchResult
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
+  goToSettings: typeof goToSettings
   searchText?: string
   selectedSearchType?: string
   mobileSearchBar?: boolean
@@ -203,7 +203,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
         label: 'Settings',
-        onClick: () => alert('Settings')
+        onClick: this.props.goToSettings
       },
       {
         icon: <HelpBlack />,
@@ -363,7 +363,8 @@ export const Header = connect(
   {
     redirectToAuthentication,
     goToSearchResult,
-    goToEvents: goToEventsAction,
-    goToSearch
+    goToSearch,
+    goToSettings,
+    goToEvents: goToEventsAction
   }
 )(injectIntl<IProps>(HeaderComp))

@@ -2,10 +2,12 @@ import { RouterAction } from 'react-router-redux'
 import { IURLParams } from '@register/utils/authUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
+import { IUserDetails } from 'src/utils/userUtils'
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH'
 export const REDIRECT_TO_AUTHENTICATION = 'PROFILE/REDIRECT_TO_AUTHENTICATION'
 export const FETCH_USER_DETAILS = 'PROFILE/FETCH_USER_DETAILS'
 export const SET_USER_DETAILS = 'PROFILE/SET_USER_DETAILS'
+export const MODIFY_USER_DETAILS = 'PROFILE/MODIFY_USER_DETAILS'
 export const SET_INITIAL_USER_DETAILS = 'PROFILE/SET_INITIAL_USER_DETAILS'
 export const GET_USER_DETAILS_SUCCESS = 'PROFILE/GET_USER_DETAILS_SUCCESS'
 export const GET_USER_DETAILS_FAILED = 'PROFILE/GET_USER_DETAILS_FAILED'
@@ -22,6 +24,11 @@ type CheckAuthAction = {
 type SetUserDetailsAction = {
   type: typeof SET_USER_DETAILS
   payload: ApolloQueryResult<GQLQuery>
+}
+
+type ModifyUserDetailsAction = {
+  type: typeof MODIFY_USER_DETAILS
+  payload: IUserDetails
 }
 
 export type IGetStorageUserDetailsSuccessAction = {
@@ -45,6 +52,7 @@ export type Action =
   | ISetInitialUserDetails
   | IGetStorageUserDetailsSuccessAction
   | IGetStorageUserDetailsFailedAction
+  | ModifyUserDetailsAction
 
 export const checkAuth = (payload: IURLParams): CheckAuthAction => ({
   type: CHECK_AUTH,
@@ -57,7 +65,12 @@ export const setUserDetails = (
   type: SET_USER_DETAILS,
   payload
 })
-
+export const modifyUserDetails = (
+  payload: IUserDetails
+): ModifyUserDetailsAction => ({
+  type: MODIFY_USER_DETAILS,
+  payload
+})
 export const setInitialUserDetails = (): ISetInitialUserDetails => ({
   type: SET_INITIAL_USER_DETAILS
 })

@@ -2,7 +2,6 @@ import * as React from 'react'
 import styled from '@register/styledComponents'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { setInitialApplications } from '@register/applications'
@@ -16,6 +15,10 @@ import { parse } from 'querystring'
 import { IURLParams } from '@register/utils/authUtils'
 import { checkAuth } from '@register/profile/profileActions'
 import { showConfigurationErrorNotification } from '@register/notification/actions'
+import { storage } from '@register/storage'
+import { changeLanguage } from '@register/i18n/actions'
+import { Ii18n } from '@register/type/i18n'
+import { USER_DETAILS } from '@register/utils/userUtils'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -87,6 +90,7 @@ interface IDispatchProps {
   setInitialApplications: () => void
   checkAuth: (urlValues: IURLParams) => void
   showConfigurationErrorNotification: () => void
+  changeLanguage: (values: Ii18n) => void
 }
 
 class Component extends React.Component<
@@ -112,10 +116,18 @@ class Component extends React.Component<
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const values = parse(this.props.location.search)
-    this.props.checkAuth(values)
+    await this.props.checkAuth(values)
     this.props.setInitialApplications()
+
+    const userDetails = JSON.parse(
+      (await storage.getItem(USER_DETAILS)) || '{}'
+    )
+
+    this.props.changeLanguage({
+      language: userDetails.language || window.config.LANGUAGE
+    })
   }
 
   render() {
@@ -149,7 +161,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
 const mapDispatchToProps = {
   setInitialApplications,
   checkAuth,
-  showConfigurationErrorNotification
+  showConfigurationErrorNotification,
+  changeLanguage
 }
 
 export const Page = withRouter(

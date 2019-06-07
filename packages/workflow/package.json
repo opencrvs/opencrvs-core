@@ -15,6 +15,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
+    "@opencrvs/commons": "^1.0.0-alpha.6",
     "@types/boom": "^7.2.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",

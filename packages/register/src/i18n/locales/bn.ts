@@ -997,7 +997,34 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.requireUpdates': 'হালনাগাদ প্রয়োজন ({total})',
     'register.registrarHome.updateButton': 'হালনাগাদ',
     'register.home.header.performanceTitle': 'কর্মদক্ষতা',
+    'register.fieldAgentHome.tableHeader.submissionStatus': 'জমা অবস্থা',
+    'register.fieldAgentHome.table.statusReadyToSubmit':
+      'পাঠানোর জন্য অপেক্ষা করছে',
+    'register.fieldAgentHome.table.statusSubmitting': 'পাঠানো হচ্ছে...',
+    'register.fieldAgentHome.table.statusFailed': 'পাঠাতে ব্যর্থ',
+    'register.fieldAgentHome.table.statusPendingConnection':
+      'সংযোগের জন্য অপেক্ষা করছে',
+    'register.registrarHome.notificationToast.processingText':
+      '{num} টি আবেদন প্রক্রিয়াধীন...',
+    'register.registrarHome.notificationToast.outboxText': 'আউটবক্স({num})',
+    'settings.title': 'সেটিংস',
+    'profile.title': 'প্রোফাইল',
+    'security.title': 'নিরাপত্তা',
+    'account.title': 'অ্যাকাউন্ট',
+    'system.title': 'সিস্টেম',
+    'label.nameEN': 'ইংরেজি নাম',
+    'label.nameBN': 'বাংলার নাম',
+    'label.phone': 'ফোন নম্বর',
+    'label.role': 'দায়িত্ব',
+    'label.password': 'পাসওয়ার্ড',
+    'label.pin': 'পিন',
+    'label.language': 'ভাষা',
+    'action.change': 'পরিবর্তন',
     'createPIN.pinSameDigitsError': 'পিন একই 4 ডিজিট থাকতে পারে না',
-    'createPIN.pinSeqDigitsError': 'পিন ক্রমিক সংখ্যা থাকতে পারে না'
+    'createPIN.pinSeqDigitsError': 'পিন ক্রমিক সংখ্যা থাকতে পারে না',
+    'changeLanguage.title': 'ভাষা পরিবর্তন',
+    'changeLanguage.success': 'ভাষা পরিবর্তিত হয়ে বাংলা হয়েছে',
+    'message.changeLanguage': 'OpenCRVS-এ যে ভাষা আপনি ব্যাবহার করতে চান',
+    'button.apply': 'প্রয়োগ করুন'
   }
 }

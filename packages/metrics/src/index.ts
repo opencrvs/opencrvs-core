@@ -2,12 +2,19 @@
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
-import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from './constants'
+import {
+  HOST,
+  PORT,
+  CERT_PUBLIC_KEY_PATH,
+  CHECK_INVALID_TOKEN,
+  AUTH_URL
+} from './constants'
 import getPlugins from './config/plugins'
 import { getRoutes } from './config/routes'
 import { readFileSync } from 'fs'
 import { influx } from './influxdb/client'
 import { INFLUX_DB, INFLUX_HOST, INFLUX_PORT } from './influxdb/constants'
+import { validateFunc } from '@opencrvs/commons'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -29,10 +36,8 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:metrics-user'
     },
-    validate: (payload: any, request: any) => ({
-      isValid: true,
-      credentials: payload
-    })
+    validate: (payload: any, request: Hapi.Request) =>
+      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
   })
 
   server.auth.default('jwt')

@@ -8,6 +8,7 @@ export interface IDatabaseConnector {
   stop: () => void
   start: () => void
   set: (key: string, value: string) => Promise<void>
+  setex: (key: string, ttl: number, value: string) => Promise<void>
   get: (key: string) => Promise<string | null>
   del: (key: string) => Promise<number>
 }
@@ -31,9 +32,8 @@ export const get = (key: string) =>
 export const set = (key: string, value: string) =>
   promisify(redisClient.set).bind(redisClient)(key, value)
 
+export const setex = (key: string, ttl: number, value: string) =>
+  promisify(redisClient.setex).bind(redisClient)(key, ttl, value)
+
 export const del = (key: string) =>
   promisify(redisClient.del).bind(redisClient)(key)
-
-export const connector: IDatabaseConnector = { set, get, del, stop, start }
-
-export default connector

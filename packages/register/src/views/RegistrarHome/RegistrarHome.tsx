@@ -52,11 +52,11 @@ import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from '@register/utils/constants
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-
 import {
   COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATIONS_QUERY
 } from '@register/views/RegistrarHome/queries'
+import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -1017,10 +1017,12 @@ export class RegistrarHomeView extends React.Component<
             }}
           </Query>
         )}
+        <NotificationToast />
       </>
     )
   }
 }
+
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string }>

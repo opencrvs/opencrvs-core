@@ -87,7 +87,7 @@ const RightButtonIcon = styled.div`
   margin-left: 20px;
 `
 const IconOnly = styled.div`
-  position: relative !important;
-  top: 4px;
-  left: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `

@@ -1,6 +1,5 @@
 import { importSchema } from 'graphql-import'
 import { makeExecutableSchema, IResolvers } from 'graphql-tools'
-
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
@@ -9,6 +8,9 @@ import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/roo
 import { typeResolvers } from '@gateway/features/registration/type-resovlers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resovlers'
+import { userTypeResolvers } from '@gateway/features/user/type-resovlers'
+import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
+import { roleTypeResolvers } from '@gateway/features/role/type-resovlers'
 
 export const getExecutableSchema = (schemaPath: string) => {
   const typeDefs = importSchema(schemaPath)
@@ -21,10 +23,13 @@ export const getExecutableSchema = (schemaPath: string) => {
       registrationRootResolvers as IResolvers,
       locationRootResolvers as IResolvers,
       userRootResolvers as IResolvers,
+      userTypeResolvers as IResolvers,
       metricsRootResolvers as IResolvers,
       typeResolvers as IResolvers,
       searchRootResolvers as IResolvers,
-      searchTypeResolvers as IResolvers
+      searchTypeResolvers as IResolvers,
+      roleRootResolvers as IResolvers,
+      roleTypeResolvers as IResolvers
     ]
   })
 }

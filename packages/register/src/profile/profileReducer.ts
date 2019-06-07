@@ -21,6 +21,7 @@ import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from '@register/profile/queries'
 import * as offlineActions from '@register/offline/actions'
+import * as changeLanguageActions from '@register/i18n/actions'
 
 export type ProfileState = {
   authenticated: boolean
@@ -38,13 +39,16 @@ export const initialState: ProfileState = {
 
 export const profileReducer: LoopReducer<
   ProfileState,
-  actions.Action | offlineActions.Action
+  actions.Action | offlineActions.Action | changeLanguageActions.Action
 > = (
   state: ProfileState = initialState,
-  action: actions.Action | offlineActions.Action
+  action: actions.Action | offlineActions.Action | changeLanguageActions.Action
 ):
   | ProfileState
-  | Loop<ProfileState, actions.Action | offlineActions.Action> => {
+  | Loop<
+      ProfileState,
+      actions.Action | offlineActions.Action | changeLanguageActions.Action
+    > => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
@@ -116,6 +120,29 @@ export const profileReducer: LoopReducer<
           Cmd.list([
             Cmd.run(() => storeUserDetails(userDetails)),
             Cmd.action(offlineActions.setOfflineData(userDetails))
+          ])
+        )
+      } else {
+        return {
+          ...state,
+          userDetailsFetched: false
+        }
+      }
+    case actions.MODIFY_USER_DETAILS:
+      const details: IUserDetails = action.payload
+
+      if (details) {
+        return loop(
+          {
+            ...state
+          },
+          Cmd.list([
+            Cmd.run(() => storeUserDetails(details)),
+            Cmd.action(
+              changeLanguageActions.changeLanguage({
+                language: details.language
+              })
+            )
           ])
         )
       } else {

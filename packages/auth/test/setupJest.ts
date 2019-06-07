@@ -8,19 +8,24 @@ jest.setMock('node-fetch', { default: fetch })
 const database: { [key: string]: string } = {}
 
 const mock: IDatabaseConnector = {
-  set: async (key, value) => {
+  set: jest.fn().mockImplementation(async (key, value) => {
     database[key] = value
-  },
-  get: async key => database[key] || null,
-  del: async key => {
+  }),
+  setex: jest.fn().mockImplementation(async (key, ttl, value) => {
+    database[key] = value
+  }),
+  get: jest.fn().mockImplementation(async key => {
+    return database[key] || null
+  }),
+  del: jest.fn().mockImplementation(async key => {
     const keyExists = !!database[key]
     delete database[key]
     return keyExists ? 1 : 0
-  },
+  }),
   // tslint:disable-next-line no-empty
-  start: () => {},
+  start: jest.fn(),
   // tslint:disable-next-line no-empty
-  stop: () => {}
+  stop: jest.fn()
 }
 
 jest.setMock('src/database', mock)

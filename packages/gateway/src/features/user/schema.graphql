@@ -12,22 +12,45 @@ type UserIdentifier { # -> identifier
 
 input UserInput {
   name: [HumanNameInput]
+  username: String
+  mobile: String
   role: String
+  email: String
+  active: Boolean
   primaryOffice: LocationInput
-  currentLocation: LocationInput
   catchmentArea: [LocationInput]
 }
 
 type User {
   id: ID!
   userMgntUserID: ID
+  practitionerId: String
   name: [HumanName] # -> .name
+  username: String
+  mobile: String
   role: String
+  email: String
+  active: Boolean
   primaryOffice: Location
-  currentLocation: Location
   catchmentArea: [Location]
+}
+
+type SearchUserResult {
+  results: [User]
+  totalItems: Int
 }
 
 type Query {
   getUser(userId: String): User
+  searchUsers(
+    username: String
+    mobile: String
+    active: Boolean
+    role: String
+    primaryOfficeId: String
+    locationId: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchUserResult
 }

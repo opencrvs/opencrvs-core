@@ -6,6 +6,7 @@
 # import Query.* from '../features/user/schema.graphql'
 # import Query.* from '../features/metrics/schema.graphql'
 # import Query.* from '../features/search/schema.graphql'
+# import Query.* from '../features/role/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO

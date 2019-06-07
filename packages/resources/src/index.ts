@@ -8,8 +8,11 @@ import getPlugins from '@resources/config/plugins'
 import {
   RESOURCES_HOST,
   RESOURCES_PORT,
-  CERT_PUBLIC_KEY_PATH
+  CERT_PUBLIC_KEY_PATH,
+  CHECK_INVALID_TOKEN,
+  AUTH_URL
 } from '@resources/constants'
+import { validateFunc } from '@opencrvs/commons'
 
 import locationsHandler from '@resources/features/administrative/handler'
 import facilitiesHandler from '@resources/features/facilities/handler'
@@ -34,10 +37,8 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:resources-user'
     },
-    validate: (payload: any, request: any) => ({
-      isValid: true,
-      credentials: payload
-    })
+    validate: (payload: any, request: Hapi.Request) =>
+      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
   })
 
   server.auth.default('jwt')

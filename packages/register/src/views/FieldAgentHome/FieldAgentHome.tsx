@@ -1,37 +1,41 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { RouteComponentProps, Redirect } from 'react-router'
+import {
+  Button,
+  FloatingActionButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
+import {
+  PlusTransparentWhite,
+  StatusOrange,
+  StatusProgress,
+  StatusRejected
+} from '@opencrvs/components/lib/icons'
+import { ISearchInputProps } from '@opencrvs/components/lib/interface'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
   goToEvents as goToEventsAction,
-  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
+  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
+  goToTab as goToTabAction,
+  goToApplicationDetails
 } from '@register/navigation'
-import { ISearchInputProps } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '@register/utils/userUtils'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { Header } from '@register/components/interface/Header/Header'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
-  FIELD_AGENT_ROLE,
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
+  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
+  FIELD_AGENT_ROLE
 } from '@register/utils/constants'
 import styled from '@register/styledComponents'
-import {
-  Button,
-  ICON_ALIGNMENT,
-  FloatingActionButton
-} from '@opencrvs/components/lib/buttons'
-import {
-  StatusProgress,
-  StatusOrange,
-  StatusRejected,
-  PlusTransparentWhite
-} from '@opencrvs/components/lib/icons'
-
 import { REGISTRAR_HOME } from '@register/navigation/routes'
+import { SentForReview } from '@register/views/FieldAgentHome/SentForReview'
+import { InProgress } from '@register/views/FieldAgentHome/InProgress'
 
 const Topbar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -39,6 +43,7 @@ const Topbar = styled.div`
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
+  overflow-x: auto;
   justify-content: flex-start;
   align-items: center;
 `
@@ -48,6 +53,7 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
+  flex-shrink: 0;
   outline: none;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & > div {
@@ -91,31 +97,62 @@ const messages: {
     description: 'The title of require updates tab'
   }
 })
-interface IFieldAgentHomeProps {
+interface IBaseFieldAgentHomeProps {
   language: string
   userDetails: IUserDetails | null
+  tabId: string
+  draftApplications: IApplication[]
+  goToTab: typeof goToTabAction
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
+  goToApplicationDetails: typeof goToApplicationDetails
+  applicationsReadyToSend: IApplication[]
 }
 
 interface IMatchParams {
   tabId: string
 }
 
-type FullProps = IFieldAgentHomeProps &
+type IFieldAgentHomeProps = IBaseFieldAgentHomeProps &
   InjectedIntlProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
+
+interface IFieldAgentHomeState {
+  progressCurrentPage: number
+  reviewCurrentPage: number
+  updatesCurrentPage: number
+}
 
 const TAB_ID = {
   inProgress: FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   sentForReview: FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   requireUpdates: FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 }
-class FieldAgentHomeView extends React.Component<FullProps> {
+
+class FieldAgentHomeView extends React.Component<
+  IFieldAgentHomeProps,
+  IFieldAgentHomeState
+> {
+  pageSize = 10
+  constructor(props: IFieldAgentHomeProps) {
+    super(props)
+    this.state = {
+      progressCurrentPage: 1,
+      reviewCurrentPage: 1,
+      updatesCurrentPage: 1
+    }
+  }
+
   render() {
-    const { userDetails, match, intl } = this.props
+    const {
+      draftApplications,
+      userDetails,
+      match,
+      intl,
+      applicationsReadyToSend
+    } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
     const isFieldAgent =
       userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
@@ -136,7 +173,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 }
               >
                 {intl.formatMessage(messages.inProgress, {
-                  total: 1
+                  total: draftApplications.length
                 })}
               </IconTab>
               <IconTab
@@ -150,7 +187,7 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 }
               >
                 {intl.formatMessage(messages.sentForReview, {
-                  total: 1
+                  total: applicationsReadyToSend.length
                 })}
               </IconTab>
               <IconTab
@@ -168,6 +205,15 @@ class FieldAgentHomeView extends React.Component<FullProps> {
                 })}
               </IconTab>
             </Topbar>
+            {tabId === TAB_ID.inProgress && (
+              <InProgress draftApplications={draftApplications} />
+            )}
+
+            {tabId === TAB_ID.sentForReview && (
+              <SentForReview
+                applicationsReadyToSend={applicationsReadyToSend}
+              />
+            )}
             <FABContainer>
               <FloatingActionButton
                 id="new_event_declaration"
@@ -185,16 +231,41 @@ class FieldAgentHomeView extends React.Component<FullProps> {
   }
 }
 
-const mapStateToProps = (store: IStoreState) => {
+const mapStateToProps = (
+  state: IStoreState,
+  props: RouteComponentProps<{ tabId: string }>
+) => {
+  const { match } = props
+
   return {
-    language: getLanguage(store),
-    userDetails: getUserDetails(store)
+    language: getLanguage(state),
+    userDetails: getUserDetails(state),
+    tabId: (match && match.params && match.params.tabId) || 'progress',
+    draftApplications:
+      (state.applicationsState.applications &&
+        state.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus ===
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      [],
+    applicationsReadyToSend:
+      (state.applicationsState.applications &&
+        state.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus !==
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      []
   }
 }
+
 export const FieldAgentHome = connect(
   mapStateToProps,
   {
+    goToTab: goToTabAction,
     goToEvents: goToEventsAction,
-    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction
+    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
+    goToApplicationDetails
   }
 )(injectIntl(FieldAgentHomeView))

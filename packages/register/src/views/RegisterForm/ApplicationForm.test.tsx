@@ -71,13 +71,15 @@ describe('when user has starts a new application', () => {
     beforeEach(async () => {
       draft = createApplication(Event.BIRTH)
       store.dispatch(storeApplication(draft))
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
-      )
-      await flushPromises()
-      app.update()
-    })
-    it('renders unlock screen', () => {
+
+      it('renders unlock screen', async () => {
+        await flushPromises()
+        history.replace(
+          DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
+        )
+        await flushPromises()
+        app.update()
+      })
       expect(app.find('#unlockPage').hostNodes().length).toBe(1)
     })
   })

@@ -4,6 +4,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as Hapi from 'hapi'
 
 import {
+<<<<<<< HEAD
   AUTH_HOST,
   AUTH_PORT,
   CERT_PUBLIC_KEY_PATH
@@ -18,21 +19,26 @@ import getUserMobile, {
 } from '@user-mgnt/features/getUserMobile/handler'
 import getPlugins from '@user-mgnt/config/plugins'
 import * as database from '@user-mgnt/database'
+=======
+  HOST,
+  PORT,
+  CERT_PUBLIC_KEY_PATH,
+  CHECK_INVALID_TOKEN,
+  AUTH_URL
+} from 'src/constants'
+import getPlugins from 'src/config/plugins'
+import * as database from 'src/database'
+>>>>>>> master
 import { readFileSync } from 'fs'
-
-const enum RouteScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance'
-}
+import { validateFunc } from '@opencrvs/commons'
+import { getRoutes } from 'src/config/routes'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   const server = new Hapi.Server({
-    host: AUTH_HOST,
-    port: AUTH_PORT,
+    host: HOST,
+    port: PORT,
     routes: {
       cors: { origin: ['*'] }
     }
@@ -47,68 +53,20 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:user-mgnt-user'
     },
-    validate: (payload: any, request: any) => ({
-      isValid: true,
-      credentials: payload
-    })
+    validate: (payload: any, request: Hapi.Request) =>
+      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
   })
 
   server.auth.default('jwt')
 
   // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:3030/verifyPassword
-  server.route({
-    method: 'POST',
-    path: '/verifyPassword',
-    handler: verifyPassHandler,
-    options: {
-      auth: false,
-      tags: ['api'],
-      description: 'Verify user password',
-      notes: 'Verify account exist and password is correct',
-      validate: {
-        payload: reqAuthSchema
-      },
-      response: {
-        schema: resAuthSchema
-      }
-    }
-  })
-
-  // Temporary route for testing authentication
-  server.route({
-    method: 'GET',
-    path: '/check-token',
-    handler: (request: Hapi.Request) => request.auth.credentials
-  })
-
-  server.route({
-    method: 'POST',
-    path: '/getUserMobile',
-    handler: getUserMobile,
-    options: {
-      tags: ['api'],
-      description: 'Retrieves a user mobile number',
-      auth: {
-        scope: [
-          RouteScope.DECLARE,
-          RouteScope.REGISTER,
-          RouteScope.CERTIFY,
-          RouteScope.PERFORMANCE
-        ]
-      },
-      validate: {
-        payload: userIdSchema
-      },
-      response: {
-        schema: resMobileSchema
-      }
-    }
-  })
+  const routes = getRoutes()
+  server.route(routes)
 
   async function start() {
     await server.start()
     await database.start()
-    server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
+    server.log('info', `server started on ${HOST}:${PORT}`)
   }
 
   async function stop() {
