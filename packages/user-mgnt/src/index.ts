@@ -4,34 +4,17 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as Hapi from 'hapi'
 
 import {
-<<<<<<< HEAD
-  AUTH_HOST,
-  AUTH_PORT,
-  CERT_PUBLIC_KEY_PATH
-} from '@user-mgnt/constants'
-import verifyPassHandler, {
-  requestSchema as reqAuthSchema,
-  responseSchema as resAuthSchema
-} from '@user-mgnt/features/verifyPassword/handler'
-import getUserMobile, {
-  requestSchema as userIdSchema,
-  responseSchema as resMobileSchema
-} from '@user-mgnt/features/getUserMobile/handler'
-import getPlugins from '@user-mgnt/config/plugins'
-import * as database from '@user-mgnt/database'
-=======
   HOST,
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from 'src/constants'
-import getPlugins from 'src/config/plugins'
-import * as database from 'src/database'
->>>>>>> master
+} from '@user-mgnt/constants'
+import getPlugins from '@user-mgnt/config/plugins'
+import * as database from '@user-mgnt/database'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
-import { getRoutes } from 'src/config/routes'
+import { getRoutes } from '@user-mgnt/config/routes'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

@@ -28,7 +28,7 @@ import {
   getStorageApplicationsSuccess,
   SUBMISSION_STATUS
 } from '@register/applications'
-import * as uuid from 'uuid'
+import uuid from 'uuid'
 import { Event } from '@register/forms'
 
 const fetch = fetchAny as any

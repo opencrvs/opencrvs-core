@@ -35,10 +35,12 @@ describe('Unlock page loads Properly', () => {
   }
 
   storage.getItem = jest.fn(async (key: string) =>
+    // @ts-ignore
     Promise.resolve(indexedDB[key])
   )
 
   storage.setItem = jest.fn(
+    // @ts-ignore
     async (key: string, value: string) => (indexedDB[key] = value)
   )
 
@@ -197,7 +199,9 @@ describe('Logout Sequence', async () => {
     SCREEN_LOCK: true,
     SECURITY_PIN_EXPIRED_AT: 1234
   }
+  // @ts-ignore
   storage.removeItem = jest.fn((key: string) => {
+    // @ts-ignore
     delete indexeddb[key]
   })
 
@@ -207,7 +211,9 @@ describe('Logout Sequence', async () => {
       .hostNodes()
       .simulate('click')
     testComponent.component.update()
+    // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
+    // @ts-ignore
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
   })
 })

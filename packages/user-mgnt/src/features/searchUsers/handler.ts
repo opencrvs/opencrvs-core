@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import User, { IUserModel } from 'src/model/user'
+import User, { IUserModel } from '@user-mgnt/model/user'
 
 interface IVerifyPayload {
   username?: string

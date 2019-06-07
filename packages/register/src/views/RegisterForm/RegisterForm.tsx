@@ -712,9 +712,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         {intl.formatMessage(activeSection.title)}
                         {activeSection.optional && (
                           <Optional
-                            id={`form_section_optional_label_${
-                              activeSection.id
-                            }`}
+                            id={`form_section_optional_label_${activeSection.id}`}
                             disabled={activeSection.disabled}
                           >
                             &nbsp;&nbsp;•&nbsp;

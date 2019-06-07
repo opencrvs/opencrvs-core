@@ -707,6 +707,7 @@ describe('Review Duplicates component', () => {
           query: rejectMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            // @ts-ignore
             reason: 'duplicate'
           }
         },
@@ -818,6 +819,7 @@ describe('Review Duplicates component', () => {
           query: notADuplicateMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            // @ts-ignore
             duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
@@ -876,6 +878,7 @@ describe('Review Duplicates component', () => {
           query: notADuplicateMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            // @ts-ignore
             duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
           }
         },

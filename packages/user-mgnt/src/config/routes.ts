@@ -2,14 +2,18 @@ import * as Hapi from 'hapi'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
-} from 'src/features/verifyPassword/handler'
+} from '@user-mgnt/features/verifyPassword/handler'
 import getUserMobile, {
   requestSchema as userIdSchema,
   responseSchema as resMobileSchema
-} from 'src/features/getUserMobile/handler'
-import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
-import getUser from 'src/features/getUser/handler'
-import getRoles, { searchRoleSchema } from 'src/features/getRoles/handler'
+} from '@user-mgnt/features/getUserMobile/handler'
+import searchUsers, {
+  searchSchema
+} from '@user-mgnt/features/searchUsers/handler'
+import getUser from '@user-mgnt/features/getUser/handler'
+import getRoles, {
+  searchRoleSchema
+} from '@user-mgnt/features/getRoles/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',

@@ -1,6 +1,6 @@
 import ApolloClient from 'apollo-client'
 import { setContext } from 'apollo-link-context'
-import { ApolloLink } from 'apollo-link'
+import { ApolloLink, from } from 'apollo-link'
 import { createHttpLink } from 'apollo-link-http'
 import {
   InMemoryCache,
@@ -9,7 +9,7 @@ import {
 import { resolve } from 'url'
 import { onError } from 'apollo-link-error'
 import { showSessionExpireConfirmation } from '@register/notification/actions'
-import { from } from 'apollo-link'
+
 import { IStoreState } from '@register/store'
 import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/browser'

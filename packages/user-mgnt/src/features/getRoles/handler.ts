@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import Role from 'src/model/role'
+import Role from '@user-mgnt/model/role'
 
 interface IVerifyPayload {
   title?: string

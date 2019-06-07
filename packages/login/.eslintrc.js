@@ -4,11 +4,10 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'prettier/@typescript-eslint',
-    'prettier/react',
     'plugin:import/errors',
     'plugin:import/warnings'
   ],
-  plugins: ['react', '@typescript-eslint', 'prettier', 'import'],
+  plugins: ['react', '@typescript-eslint', 'import'],
   env: {
     es6: true,
     browser: true,

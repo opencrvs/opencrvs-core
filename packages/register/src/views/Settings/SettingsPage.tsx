@@ -18,7 +18,9 @@ import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
 
-const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   settingsTitle: {
     id: 'settings.title',
     defaultMessage: 'Settings',
@@ -219,7 +221,7 @@ const CancelButton = styled(TertiaryButton)`
 `
 type IProps = InjectedIntlProps & {
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   modifyUserDetails: typeof modifyUserDetailsAction
 }
 
@@ -229,14 +231,19 @@ interface IState {
   showSuccessNotification: boolean
 }
 
-class SettingsView extends React.Component<IProps, IState> {
-  languagePreference = this.props.userDetails.language
+interface ILanguageOptions {
+  [key: string]: string
+}
+
+class SettingsView extends React.Component<IProps & IState, IState> {
   constructor(props: IProps & IState) {
     super(props)
     this.state = {
       showLanguageSettings: false,
       showSuccessNotification: false,
-      selectedLanguage: this.languagePreference
+      selectedLanguage: this.props.userDetails
+        ? this.props.userDetails.language
+        : window.config.LANGUAGE
     }
   }
 
@@ -254,17 +261,21 @@ class SettingsView extends React.Component<IProps, IState> {
 
   cancelLanguageSettings = () => {
     this.setState(state => ({
-      selectedLanguage: this.languagePreference,
+      selectedLanguage: this.props.userDetails
+        ? this.props.userDetails.language
+        : window.config.LANGUAGE,
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
 
   changeLanguage = () => {
-    this.props.userDetails.language = this.state.selectedLanguage
-    this.props.modifyUserDetails(this.props.userDetails)
+    if (this.props.userDetails) {
+      this.props.userDetails.language = this.state.selectedLanguage
+      this.props.modifyUserDetails(this.props.userDetails)
 
-    this.toggleLanguageSettingsModal()
-    this.toggleSuccessNotification()
+      this.toggleLanguageSettingsModal()
+      this.toggleSuccessNotification()
+    }
   }
 
   render() {
@@ -272,19 +283,29 @@ class SettingsView extends React.Component<IProps, IState> {
     let bengaliName = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === 'bn'
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === 'bn'
+        }
       ) as GQLHumanName
-      bengaliName =
-        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+
+      bengaliName = `${String(nameObj.firstNames)} ${String(
+        nameObj.familyName
+      )}`
     }
 
     let englishName = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === 'en'
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === 'en'
+        }
       ) as GQLHumanName
-      englishName =
-        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+
+      englishName = `${String(nameObj.firstNames)} ${String(
+        nameObj.familyName
+      )}`
     }
 
     const role =
@@ -292,7 +313,7 @@ class SettingsView extends React.Component<IProps, IState> {
         ? intl.formatMessage(messages[userDetails.role])
         : ''
 
-    const language = {
+    const language: ILanguageOptions = {
       bn: 'বাংলা',
       en: 'English'
     }
@@ -456,4 +477,4 @@ export const SettingsPage = connect(
   {
     modifyUserDetails: modifyUserDetailsAction
   }
-)(injectIntl<IProps>(SettingsView))
+)(injectIntl(SettingsView))

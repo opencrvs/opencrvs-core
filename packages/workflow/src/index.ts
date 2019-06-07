@@ -2,21 +2,15 @@
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
-<<<<<<< HEAD
-import { HOST, PORT, CERT_PUBLIC_KEY_PATH } from '@workflow/constants'
-import getPlugins from '@workflow/config/plugins'
-import { getRoutes } from '@workflow/config/routes'
-=======
 import {
   HOST,
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from './constants'
-import getPlugins from './config/plugins'
-import { getRoutes } from './config/routes'
->>>>>>> master
+} from '@workflow/constants'
+import getPlugins from '@workflow/config/plugins'
+import { getRoutes } from '@workflow/config/routes'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 
