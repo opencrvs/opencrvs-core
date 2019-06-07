@@ -31,6 +31,7 @@ import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
 import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
+import { SettingsPage } from '@register/views/Settings/SettingsPage'
 
 interface IAppProps {
   client?: ApolloClient<{}>

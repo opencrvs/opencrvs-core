@@ -1,9 +1,7 @@
 import * as React from 'react'
-
 import { Provider } from 'react-redux'
 import { graphql, print } from 'graphql'
 import ApolloClient from 'apollo-client'
-
 import { MockedProvider } from 'react-apollo/test-utils'
 import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '@register/store'
@@ -258,7 +256,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -458,7 +456,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -583,7 +581,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -708,7 +706,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       submissionStatus: 'DRAFT',
@@ -832,7 +830,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -957,7 +955,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -1082,7 +1080,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -1196,7 +1194,7 @@ export const currentUserApplications = {
           methodOfCauseOfDeath: '',
           causeOfDeathCode: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'death',
@@ -1321,7 +1319,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -1446,7 +1444,7 @@ export const currentUserApplications = {
           phoneVerificationWarning: '',
           commentsOrNotes: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'birth',
@@ -1560,7 +1558,7 @@ export const currentUserApplications = {
           methodOfCauseOfDeath: '',
           causeOfDeathCode: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'death',
@@ -1674,7 +1672,7 @@ export const currentUserApplications = {
           methodOfCauseOfDeath: '',
           causeOfDeathCode: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'death',
@@ -1788,7 +1786,7 @@ export const currentUserApplications = {
           methodOfCauseOfDeath: '',
           causeOfDeathCode: ''
         },
-        documents: { image_uploader: '', paragraph: '', list: '' },
+        documents: { imageUploader: '', paragraph: '', list: '' },
         preview: {}
       },
       event: 'death',

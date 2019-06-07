@@ -11,18 +11,18 @@ import {
   SUBMISSION_STATUS,
   IApplication,
   deleteApplication
-} from 'src/applications'
+} from '@register/applications'
 import {
   StatusSubmitted,
   StatusFailed24 as StatusFailed,
   StatusWaiting,
   StatusPendingOffline
 } from '@opencrvs/components/lib/icons'
-import { sentenceCase } from 'src/utils/data-formatting'
+import { sentenceCase } from '@register/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { calculateDays } from '../PrintCertificate/calculatePrice'
-import styled from 'src/styled-components'
-import { goToApplicationDetails } from 'src/navigation'
+import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
+import styled from '@register/styledComponents'
+import { goToApplicationDetails } from '@register/navigation'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -113,7 +113,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
     let icon: () => React.ReactNode
     let statusText: string
-    let overwriteStatusIfOffline: boolean = true
+    let overwriteStatusIfOffline = true
     let iconId: string
 
     switch (status) {
@@ -226,8 +226,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           id: draft.id,
           event: (draft.event && sentenceCase(draft.event)) || '',
           name: name || '',
-          submission_status: statusText || '',
-          status_indicator: icon ? [icon()] : null,
+          submissionStatus: statusText || '',
+          statusIndicator: icon ? [icon()] : null,
           rowClickHandler: [
             {
               label: 'rowClickHandler',

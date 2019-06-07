@@ -1,6 +1,6 @@
-import { createStore } from './store'
-import { SubmissionController } from './SubmissionController'
-import { SUBMISSION_STATUS } from './applications'
+import { createStore } from '@register/store'
+import { SubmissionController } from '@register/SubmissionController'
+import { SUBMISSION_STATUS } from '@register/applications'
 
 describe('Submission Controller', () => {
   it('starts the interval', () => {

@@ -19,7 +19,6 @@ import {
   writeApplicationByUser
 } from '@register/applications'
 import { v4 as uuid } from 'uuid'
-
 import { createStore } from '@register/store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
@@ -66,6 +65,7 @@ describe('when user logs in', async () => {
   }
 
   // Mocking storage reading
+  // @ts-ignore
   storage.getItem = jest.fn(
     (key: string): string => {
       switch (key) {
@@ -79,6 +79,7 @@ describe('when user logs in', async () => {
   )
 
   // Mocking storage writing
+  // @ts-ignore
   storage.setItem = jest.fn((key: string, value: string) => {
     switch (key) {
       case 'USER_DATA':

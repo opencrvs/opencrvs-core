@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GridTable } from '@opencrvs/components/lib/interface'
-import { IApplication } from 'src/applications'
+import { IApplication } from '@register/applications'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { sentenceCase } from 'src/utils/data-formatting'
-import * as moment from 'moment'
-import { goToApplicationDetails } from 'src/navigation'
+import { sentenceCase } from '@register/utils/data-formatting'
+import moment from 'moment'
+import { goToApplicationDetails } from '@register/navigation'
 
 interface IInProgressProps {
   draftApplications: IApplication[]
@@ -104,7 +104,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         id: draft.id,
         event: (draft.event && sentenceCase(draft.event)) || '',
         name: name || '',
-        date_of_modification:
+        dateOfModification:
           `Last updated ${lastModificationDate &&
             moment(lastModificationDate).fromNow()}` || '',
         rowClickHandler: [
@@ -145,7 +145,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
                 messages.listItemModificationDate
               ),
               width: 40,
-              key: 'date_of_modification'
+              key: 'dateOfModification'
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}

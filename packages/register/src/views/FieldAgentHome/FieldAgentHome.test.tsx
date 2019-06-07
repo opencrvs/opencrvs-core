@@ -21,9 +21,13 @@ import { storage } from '@register/storage'
 import * as CommonUtils from '@register/utils/commonUtils'
 import { FIELD_AGENT_ROLE } from '@register/utils/constants'
 import * as fetchAny from 'jest-fetch-mock'
-import { FieldAgentHome } from './FieldAgentHome'
+import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import * as React from 'react'
-import { storeApplication, SUBMISSION_STATUS } from '@register/applications'
+import {
+  storeApplication,
+  getStorageApplicationsSuccess,
+  SUBMISSION_STATUS
+} from '@register/applications'
 import * as uuid from 'uuid'
 import { Event } from '@register/forms'
 

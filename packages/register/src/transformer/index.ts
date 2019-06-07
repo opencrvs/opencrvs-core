@@ -28,9 +28,8 @@ export const draftToGqlTransformer = (
           draftData[section.id][fieldDef.name] === '')
       ) {
         throw new Error(
-          `Data is missing for a required field: ${fieldDef.name} on section ${
-            section.id
-          }`
+          `Data is missing for a required field: ${fieldDef.name}` +
+            `on section ${section.id}`
         )
       }
       if (

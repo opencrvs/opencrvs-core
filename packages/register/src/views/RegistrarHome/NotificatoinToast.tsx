@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ExpandableNotification } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 const messages = defineMessages({

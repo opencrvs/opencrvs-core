@@ -4,12 +4,12 @@ import {
   IApplication,
   modifyApplication,
   SUBMISSION_STATUS
-} from './applications'
-import { Action, IForm } from './forms'
-import { getRegisterForm } from './forms/register/application-selectors'
-import { AppStore } from './store'
-import { createClient } from './utils/apolloClient'
-import { getMutationMapping } from './views/DataProvider/MutationProvider'
+} from '@register/applications'
+import { Action, IForm } from '@register/forms'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { AppStore } from '@register/store'
+import { createClient } from '@register/utils/apolloClient'
+import { getMutationMapping } from '@register/views/DataProvider/MutationProvider'
 
 const INTERVAL_TIME = 5000
 const ALLOWED_STATUS_FOR_RETRY = [
