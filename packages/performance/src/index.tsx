@@ -6,8 +6,7 @@ import { App } from '@performance/App'
 import { createStore } from '@performance/store'
 import { injectGlobal } from '@performance/styledComponents'
 
-// Injecting global styles for the body tag - used only once
-// tslint:disable-next-line
+// @ts-ignore
 injectGlobal`
   body {
     margin: 0;

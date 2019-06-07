@@ -7,7 +7,7 @@ import { App } from '@login/App'
 import registerServiceWorker from '@login/registerServiceWorker'
 
 // Injecting global styles for the body tag - used only once
-// tslint:disable-next-line
+// @ts-ignore
 injectGlobal`
   body {
     margin: 0;

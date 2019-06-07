@@ -20,7 +20,7 @@ describe('reducer', () => {
     const expectedState = {
       ...initialState,
       language: 'bn',
-      // tslint:disable-next-line no-string-literal
+      // @ts-ignore
       messages: languages['bn'].messages
     }
     store.dispatch(action)

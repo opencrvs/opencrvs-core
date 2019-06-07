@@ -1,3 +1,4 @@
+// @ts-ignore
 const localStorageMock = {
   getItem: jest.fn(),
   setItem: jest.fn(),
@@ -15,10 +16,7 @@ Object.defineProperty(window, 'localStorage', {
 ;(window as any).location.assign = jest.fn()
 ;(window as any).navigator = navigatorMock
 ;(window as any).location.reload = jest.fn()
-// tslint:disable-next-line no-empty
 ;(window as any).scrollTo = () => {}
-
-// tslint:disable-next-line:no-any
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   COUNTRY: 'bgd',

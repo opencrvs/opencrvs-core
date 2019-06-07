@@ -257,20 +257,14 @@ export class StepOneForm extends React.Component<FullProps> {
             <Field
               name={mobileField.name}
               validate={mobileField.validate}
-              component={
-                // tslint:disable-next-line no-any
-                MobileInput as React.ComponentClass<any>
-              }
+              component={MobileInput as React.ComponentClass<any>}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
               name={passwordField.name}
               validate={passwordField.validate}
-              component={
-                // tslint:disable-next-line no-any
-                Password as React.ComponentClass<any>
-              }
+              component={Password as React.ComponentClass<any>}
             />
           </FieldWrapper>
           <ActionWrapper>
