@@ -8,7 +8,7 @@ import { ReactWrapper } from 'enzyme'
 
 const { store } = createStore()
 
-describe('Settings page tests', async () => {
+describe('Settings page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))

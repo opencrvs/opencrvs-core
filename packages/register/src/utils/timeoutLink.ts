@@ -92,8 +92,8 @@ export default class TimeoutLink extends ApolloLink {
 
           observer.error(
             throwTimeoutError(
-              `Timeout exceeded` +
-                `for ${operationType}"${operation.operationName}"`
+              `Timeout exceeded ` +
+                `for ${operationType} "${operation.operationName}"`
             )
           )
           subscription.unsubscribe()

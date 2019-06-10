@@ -334,7 +334,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelEnglishName),
             value: englishName,
             action: {
-              label: intl.formatMessage(messages.action_change),
+              label: intl.formatMessage(messages.actionChange),
               disabled: true
             }
           },
@@ -342,7 +342,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelPhone),
             value: '01711111111',
             action: {
-              label: intl.formatMessage(messages.action_change),
+              label: intl.formatMessage(messages.actionChange),
               disabled: true
             }
           }
@@ -355,7 +355,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelRole),
             value: role,
             action: {
-              label: intl.formatMessage(messages.action_change),
+              label: intl.formatMessage(messages.actionChange),
               disabled: true
             }
           }
@@ -368,7 +368,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelPassword),
             placeHolder: 'Last change 4 days ago',
             action: {
-              label: intl.formatMessage(messages.action_change),
+              label: intl.formatMessage(messages.actionChange),
               disabled: true
             }
           },
@@ -376,7 +376,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelPin),
             placeHolder: 'Last change 4 days ago',
             action: {
-              label: intl.formatMessage(messages.action_change),
+              label: intl.formatMessage(messages.actionChange),
               disabled: true
             }
           }
@@ -390,7 +390,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             value: language[this.state.selectedLanguage],
             action: {
               id: 'BtnChangeLanguage',
-              label: intl.formatMessage(messages.action_change),
+              label: intl.formatMessage(messages.actionChange),
               handler: this.toggleLanguageSettingsModal
             }
           }
