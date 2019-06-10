@@ -1027,6 +1027,26 @@ export const ENGLISH_STATE: ILanguage = {
     'changeLanguage.success': 'Language updted to English',
     'message.changeLanguage':
       'Your prefered language that you want to use on OpenCRVS',
-    'button.apply': 'Apply'
+    'button.apply': 'Apply',
+    'register.fieldAgentHome.rejectedDays': 'Rejected {text}',
+    'register.fieldAgentHome.zeroUpdatesText':
+      'No applications require updates',
+    'register.fieldAgentHome.allUpdatesText':
+      'Great job! You have updated all applications',
+    'register.fieldAgentHome.requireUpdatesLoading':
+      'Checking your applications',
+    'register.fieldAgentHome.queryError':
+      'An error occured while loading applications',
+    'register.sysAdminHome.overview': 'Overview',
+    'register.sysAdminHome.offices': 'Offices',
+    'register.sysAdminHome.network': 'Network',
+    'register.sysAdminHome.users': 'Users',
+    'register.sysAdminHome.devices': 'Devices',
+    'register.sysAdminHome.config': 'Config',
+    'register.home.header.LOCAL_SYSTEM_ADMIN': 'Sysadmin',
+    'register.home.header.systemTitle': 'System',
+    'register.home.header.settingsTitle': 'Settings',
+    'register.home.header.helpTitle': 'Help',
+    'register.home.header.logoutTitle': 'Logout'
   }
 }

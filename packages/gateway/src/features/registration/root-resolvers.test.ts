@@ -219,8 +219,12 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result.length).toBe(7)
-      expect(result).toMatch(/^D/)
+      expect(result).toEqual({
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+        trackingId: 'DewpkiM'
+      })
+      expect(result.trackingId.length).toBe(7)
+      expect(result.trackingId).toMatch(/^D/)
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
@@ -327,7 +331,10 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('2019123265B1234569')
+      expect(result).toEqual({
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+        registrationNumber: '2019123265B1234569'
+      })
     })
   })
   describe('createBirthRegistration()', () => {
@@ -375,8 +382,12 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result.length).toBe(7)
-      expect(result).toMatch(/^B/)
+      expect(result).toEqual({
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+        trackingId: 'BewpkiM'
+      })
+      expect(result.trackingId.length).toBe(7)
+      expect(result.trackingId).toMatch(/^B/)
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
@@ -488,7 +499,10 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('2019123265B1234569')
+      expect(result).toEqual({
+        compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
+        registrationNumber: '2019123265B1234569'
+      })
     })
 
     it('throws an error when invalid composition is returned', async () => {
@@ -849,7 +863,10 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('2018333417123456786')
+      expect(result).toEqual({
+        compositionId: '1',
+        registrationNumber: '2018333417123456786'
+      })
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })
@@ -1193,7 +1210,10 @@ describe('Registration root resolvers', () => {
       )
 
       expect(result).toBeDefined()
-      expect(result).toBe('2018333417123456786')
+      expect(result).toEqual({
+        compositionId: '1',
+        registrationNumber: '2018333417123456786'
+      })
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ method: 'POST' })

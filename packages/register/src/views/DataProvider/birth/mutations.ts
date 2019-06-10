@@ -5,7 +5,10 @@ import { draftToGqlTransformer } from '@register/transformer'
 
 const SUBMIT_BIRTH_APPLICATION = gql`
   mutation submitMutation($details: BirthRegistrationInput!) {
-    createBirthRegistration(details: $details)
+    createBirthRegistration(details: $details) {
+      trackingId
+      compositionId
+    }
   }
 `
 const REGISTER_BIRTH_APPLICATION = gql`

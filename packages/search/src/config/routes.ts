@@ -28,7 +28,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [RouteScope.REGISTER, RouteScope.DECLARE]
         },
         description:
           'Handles indexing a new declaration and searching for duplicates'

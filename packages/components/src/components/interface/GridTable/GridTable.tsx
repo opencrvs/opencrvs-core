@@ -5,6 +5,7 @@ import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
+import { grid } from '../../grid'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -40,13 +41,17 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
+const RowWrapper = styled.div.attrs<{
+  expandable?: boolean
+  clickable?: boolean
+}>({})`
   width: 100%;
-  cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
   padding: 0 24px;
   display: flex;
   align-items: center;
   min-height: 64px;
+  cursor: ${({ expandable, clickable }) =>
+    expandable || clickable ? 'pointer' : 'default'};
 `
 
 const ContentWrapper = styled.span.attrs<{
@@ -98,19 +103,20 @@ interface IGridTableProps {
   noResultText: string
   onPageChange?: (currentPage: number) => void
   pageSize?: number
-  totalPages?: number
-  initialPage?: number
+  totalItems: number
+  currentPage?: number
   expandable?: boolean
   clickable?: boolean
 }
 
 interface IGridTableState {
+  width: number
   expanded: string[]
 }
 
 const defaultConfiguration = {
   pageSize: 10,
-  initialPage: 1
+  currentPage: 1
 }
 
 const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
@@ -122,7 +128,20 @@ export class GridTable extends React.Component<
   IGridTableState
 > {
   state = {
+    width: window.innerWidth,
     expanded: []
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
   }
 
   renderActionBlock = (
@@ -213,17 +232,13 @@ export class GridTable extends React.Component<
       content,
       noResultText,
       pageSize = defaultConfiguration.pageSize,
-      initialPage = defaultConfiguration.initialPage
+      currentPage = defaultConfiguration.currentPage
     } = this.props
-    const totalPages = this.props.totalPages
-      ? this.props.totalPages
-      : getTotalPageNumber(
-          content.length,
-          this.props.pageSize || defaultConfiguration.pageSize
-        )
+    const { width } = this.state
+    const totalItems = this.props.totalItems || 0
     return (
       <Wrapper>
-        {content.length > 0 && (
+        {content.length > 0 && width > grid.breakpoints.lg && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ContentWrapper
@@ -236,7 +251,7 @@ export class GridTable extends React.Component<
             ))}
           </TableHeader>
         )}
-        {this.getDisplayItems(initialPage, pageSize, content).map(
+        {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
             const expanded = this.showExpandedSection(item.id as string)
             return (
@@ -244,6 +259,7 @@ export class GridTable extends React.Component<
                 <RowWrapper
                   id={'row_' + index}
                   expandable={this.props.expandable}
+                  clickable={this.props.clickable}
                   onClick={() =>
                     (this.props.expandable &&
                       this.toggleExpanded(item.id as string)) ||
@@ -294,10 +310,10 @@ export class GridTable extends React.Component<
           }
         )}
 
-        {totalPages > pageSize && (
+        {totalItems > pageSize && (
           <Pagination
-            initialPage={initialPage}
-            totalPages={Math.ceil(totalPages / pageSize)}
+            initialPage={currentPage}
+            totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}

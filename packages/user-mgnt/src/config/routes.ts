@@ -20,7 +20,8 @@ const enum RouteScope {
   REGISTER = 'register',
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
-  SYSTEM = 'system'
+  SYSTEM = 'system',
+  SYSADMIN = 'sysadmin'
 }
 
 export const getRoutes = () => {
@@ -59,7 +60,8 @@ export const getRoutes = () => {
             RouteScope.DECLARE,
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN
           ]
         },
         validate: {
@@ -79,7 +81,8 @@ export const getRoutes = () => {
           scope: [
             RouteScope.SYSTEM,
             // TODO: need to remove this once system role token is there
-            RouteScope.REGISTER
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
           ]
         },
         validate: {
@@ -100,7 +103,8 @@ export const getRoutes = () => {
             RouteScope.DECLARE,
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN
           ]
         },
         validate: {

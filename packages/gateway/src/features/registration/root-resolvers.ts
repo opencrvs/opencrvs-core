@@ -6,8 +6,8 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import {
   fetchFHIR,
   getIDFromResponse,
-  getTrackingIdFromResponse,
-  getRegistrationNumberFromResponse,
+  getDeclarationIdsFromResponse,
+  getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition
 } from '@gateway/features/fhir/utils'
 import { IAuthHeader } from '@gateway/common-types'
@@ -251,10 +251,10 @@ async function createEventRegistration(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
-    return await getRegistrationNumberFromResponse(res, event, authHeader)
+    return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
     // return tracking-id
-    return await getTrackingIdFromResponse(res, authHeader)
+    return await getDeclarationIdsFromResponse(res, authHeader)
   }
 }
 
@@ -284,7 +284,7 @@ async function markEventAsRegistered(
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return the registrationNumber
-  return await getRegistrationNumberFromResponse(res, event, authHeader)
+  return await getRegistrationIdsFromResponse(res, event, authHeader)
 }
 
 async function markEventAsCertified(

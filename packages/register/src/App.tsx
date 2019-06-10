@@ -32,6 +32,7 @@ import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
+import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -147,6 +148,16 @@ export class App extends React.Component<IAppProps> {
                                 <ProtectedRoute
                                   path={routes.APPLICATION_DETAIL}
                                   component={Details}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SYS_ADMIN_HOME}
+                                  component={SysAdminHome}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SYS_ADMIN_HOME_TAB}
+                                  component={SysAdminHome}
                                 />
                               </Switch>
                             </ProtectedPage>

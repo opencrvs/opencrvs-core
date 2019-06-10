@@ -1025,6 +1025,24 @@ export const BENGALI_STATE: ILanguage = {
     'changeLanguage.title': 'ভাষা পরিবর্তন',
     'changeLanguage.success': 'ভাষা পরিবর্তিত হয়ে বাংলা হয়েছে',
     'message.changeLanguage': 'OpenCRVS-এ যে ভাষা আপনি ব্যাবহার করতে চান',
-    'button.apply': 'প্রয়োগ করুন'
+    'button.apply': 'প্রয়োগ করুন',
+    'register.fieldAgentHome.rejectedDays': '{text} প্রত্যাখ্যাত',
+    'register.fieldAgentHome.zeroUpdatesText': 'হালনাগাদের জন্য কোন আবেদন নেই',
+    'register.fieldAgentHome.allUpdatesText':
+      'অভিনন্দন! আপনি সব আবেদন হালনাগাদ করেছেন',
+    'register.fieldAgentHome.requireUpdatesLoading':
+      'আপনার  আবেদন চেক করা হচ্ছে ',
+    'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
+    'register.sysAdminHome.overview': 'ওভারভিউ',
+    'register.sysAdminHome.offices': 'অফিস',
+    'register.sysAdminHome.network': 'নেটওয়ার্ক',
+    'register.sysAdminHome.users': 'ইউজারস',
+    'register.sysAdminHome.devices': 'ডিভাইসেস',
+    'register.sysAdminHome.config': 'কনফিগ',
+    'register.home.header.LOCAL_SYSTEM_ADMIN': 'সিস এডমিন ',
+    'register.home.header.systemTitle': 'সিস্টেম',
+    'register.home.header.settingsTitle': 'সেটিংস',
+    'register.home.header.helpTitle': 'সাহায্য',
+    'register.home.header.logoutTitle': 'লগআউট'
   }
 }

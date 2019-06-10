@@ -2,14 +2,17 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  updateComposition
+  updateComposition,
+  searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/index'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockDeathRejectionTaskBundle,
-  mockDeathRejectionTaskBundleWithoutCompositionReference
+  mockDeathRejectionTaskBundleWithoutCompositionReference,
+  mockSearchResponse,
+  mockSearchResponseWithoutCreatedBy
 } from '@search/test/utils'
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
@@ -61,7 +64,29 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      ;(indexComposition as jest.Mock).mockReturnValue({})
+      indexComposition.mockReturnValue({})
+      searchByCompositionId.mockReturnValue(mockSearchResponse)
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:search-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/new-declaration',
+        payload: mockDeathFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return status code 200 if the composition indexed correctly', async () => {
+      indexComposition.mockReturnValue({})
+      searchByCompositionId.mockReturnValue(mockSearchResponseWithoutCreatedBy)
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',

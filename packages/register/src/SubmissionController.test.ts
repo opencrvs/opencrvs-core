@@ -97,7 +97,16 @@ describe('Submission Controller', () => {
 
     // @ts-ignore
     const subCon = new SubmissionController(store)
-    subCon.client = { mutate: jest.fn() }
+    subCon.client = {
+      mutate: jest.fn().mockResolvedValueOnce({
+        data: {
+          createBirthRegistration: {
+            compositionId: '123',
+            trackingId: 'Baaaaaa'
+          }
+        }
+      })
+    }
 
     await subCon.sync()
 

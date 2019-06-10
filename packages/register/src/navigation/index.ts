@@ -12,7 +12,8 @@ import {
   FIELD_AGENT_HOME_TAB,
   SEARCH,
   APPLICATION_DETAIL,
-  SETTINGS
+  SETTINGS,
+  SYS_ADMIN_HOME_TAB
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -56,7 +57,18 @@ type GoToFieldAgentHome = {
   }
 }
 
-export type Action = GoToTabAction | GoToRegistrarHome | GoToFieldAgentHome
+export type Action =
+  | GoToTabAction
+  | GoToRegistrarHome
+  | GoToFieldAgentHome
+  | GoToSysAdminHome
+export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
+type GoToSysAdminHome = {
+  type: typeof GO_TO_SYS_ADMIN_HOME
+  payload: {
+    tabId: string
+  }
+}
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -137,6 +149,13 @@ export function goToFieldAgentHomeTab(tabId: string) {
   }
 }
 
+export function goToSysAdminHomeTab(tabId: string) {
+  return {
+    type: GO_TO_SYS_ADMIN_HOME,
+    payload: { tabId }
+  }
+}
+
 export function goToSettings() {
   return push(SETTINGS)
 }
@@ -202,6 +221,14 @@ export function navigationReducer(state: INavigationState, action: any) {
         state,
         Cmd.action(
           push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
+        )
+      )
+    case GO_TO_SYS_ADMIN_HOME:
+      const { tabId: SysAdminHomeTabId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
         )
       )
   }

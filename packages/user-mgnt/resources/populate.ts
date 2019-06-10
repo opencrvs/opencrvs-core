@@ -329,6 +329,30 @@ const registrationClerk4 = new User({
   ]
 })
 
+const sysAdmin = new User({
+  name: [
+    {
+      use: 'en',
+      given: ['Sahriar'],
+      family: ['Nafis']
+    }
+  ],
+  email: 'test@test.org',
+  mobile: '+8801721111111',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'LOCAL_SYSTEM_ADMIN',
+  scope: ['sysadmin', 'demo'],
+  practitionerId: 'd9cf6968-2b4b-4eda-8ba0-5265d53fdb22',
+  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+  catchmentAreaIds: [
+    'b21ce04e-7ccd-4d65-929f-453bc193a736',
+    '95754572-ab6f-407b-b51a-1636cb3d0683',
+    '7719942b-16a7-474a-8af1-cd0c94c730d2',
+    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ]
+})
+
 const users = [
   fieldAgent,
   fieldAgent2,
@@ -343,7 +367,8 @@ const users = [
   localRegistrar3,
   districtRegistrar,
   stateRegistrar,
-  nationalRegistrar
+  nationalRegistrar,
+  sysAdmin
 ]
 User.collection.insertMany(users)
 
