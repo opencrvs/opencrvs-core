@@ -1,4 +1,4 @@
-FROM node:dubnium
+FROM node:dubnium-alpine
 WORKDIR /usr/src/app
 
 # Override the base log level (info).

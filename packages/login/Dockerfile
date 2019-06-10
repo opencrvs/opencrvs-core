@@ -1,4 +1,4 @@
-FROM node:dubnium as builder
+FROM node:dubnium-alpine as builder
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
