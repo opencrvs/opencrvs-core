@@ -2,7 +2,8 @@ import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
 import {
   EVENT,
   ICompositionBody,
-  IDeathCompositionBody
+  IDeathCompositionBody,
+  getCreatedBy
 } from 'src/elasticsearch/utils'
 import {
   findEntry,
@@ -41,7 +42,7 @@ export async function upsertEvent(bundle: fhir.Bundle) {
     throw new Error(`Composition ID not found`)
   }
 
-  indexDeclaration(compositionId, composition, bundleEntries)
+  await indexDeclaration(compositionId, composition, bundleEntries)
 }
 
 async function updateEvent(task: fhir.Task) {
@@ -55,6 +56,11 @@ async function updateEvent(task: fhir.Task) {
     throw new Error('No Composition ID found')
   }
 
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
+
   const body: ICompositionBody = {}
 
   body.type =
@@ -66,6 +72,11 @@ async function updateEvent(task: fhir.Task) {
     task && task.note && task.note[0].text && task.note[0].text.split('&')
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
   body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
+  body.updatedBy =
+    regLastUserIdentifier &&
+    regLastUserIdentifier.valueReference &&
+    regLastUserIdentifier.valueReference.reference &&
+    regLastUserIdentifier.valueReference.reference.split('/')[1]
 
   await updateComposition(compositionId, body)
 }
@@ -77,17 +88,17 @@ async function indexDeclaration(
 ) {
   const body: ICompositionBody = { event: EVENT.DEATH }
 
-  createIndexBody(body, composition, bundleEntries)
+  await createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionId, body)
 }
 
-function createIndexBody(
+async function createIndexBody(
   body: IDeathCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   createDeceasedIndex(body, composition, bundleEntries)
-  createApplicationIndex(body, composition, bundleEntries)
+  await createApplicationIndex(body, composition, bundleEntries)
 }
 
 function createDeceasedIndex(
@@ -117,7 +128,7 @@ function createDeceasedIndex(
   body.deathDate = deceased.deceasedDateTime
 }
 
-function createApplicationIndex(
+async function createApplicationIndex(
   body: IDeathCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
@@ -150,6 +161,17 @@ function createApplicationIndex(
     'http://opencrvs.org/specs/id/death-registration-number'
   )
 
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
+
+  const regLastUser =
+    regLastUserIdentifier &&
+    regLastUserIdentifier.valueReference &&
+    regLastUserIdentifier.valueReference.reference &&
+    regLastUserIdentifier.valueReference.reference.split('/')[1]
+
   body.contactNumber = informantTelecom && informantTelecom.value
   body.type =
     task &&
@@ -165,4 +187,13 @@ function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+
+  const createdBy = await getCreatedBy(composition.id as string)
+
+  if (createdBy) {
+    body.createdBy = createdBy
+    body.updatedBy = regLastUser
+  } else {
+    body.createdBy = regLastUser
+  }
 }

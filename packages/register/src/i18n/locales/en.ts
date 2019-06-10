@@ -1027,6 +1027,15 @@ export const ENGLISH_STATE: ILanguage = {
     'changeLanguage.success': 'Language updted to English',
     'message.changeLanguage':
       'Your prefered language that you want to use on OpenCRVS',
-    'button.apply': 'Apply'
+    'button.apply': 'Apply',
+    'register.fieldAgentHome.rejectedDays': 'Rejected {text}',
+    'register.fieldAgentHome.zeroUpdatesText':
+      'No applications require updates',
+    'register.fieldAgentHome.allUpdatesText':
+      'Great job! You have updated all applications',
+    'register.fieldAgentHome.requireUpdatesLoading':
+      'Checking your applications',
+    'register.fieldAgentHome.queryError':
+      'An error occured while loading applications'
   }
 }

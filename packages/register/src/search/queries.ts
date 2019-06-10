@@ -44,3 +44,54 @@ export const SEARCH_EVENTS = gql`
     }
   }
 `
+export const SEARCH_APPLICATIONS_USER_WISE = gql`
+  query(
+    $status: String
+    $userId: String
+    $locationIds: [String]
+    $sort: String
+    $count: Int
+    $skip: Int
+  ) {
+    searchEvents(
+      status: $status
+      userId: $userId
+      locationIds: $locationIds
+      sort: $sort
+      count: $count
+      skip: $skip
+    ) {
+      totalItems
+      results {
+        id
+        type
+        registration {
+          dateOfApplication
+          status
+        }
+        ... on BirthEventSearchSet {
+          childName {
+            use
+            firstNames
+            familyName
+          }
+        }
+        ... on DeathEventSearchSet {
+          deceasedName {
+            use
+            firstNames
+            familyName
+          }
+        }
+      }
+    }
+  }
+`
+
+export const COUNT_USER_WISE_APPLICATIONS = gql`
+  query($status: String, $userId: String, $locationIds: [String]) {
+    searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
+      totalItems
+    }
+  }
+`
