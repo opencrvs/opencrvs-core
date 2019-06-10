@@ -21,7 +21,9 @@ import {
   TrackingID,
   BRN,
   Phone,
-  ArrowBack
+  ArrowBack,
+  SystemBlack,
+  SystemBlue
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
 import { storage } from 'src/storage'
@@ -41,7 +43,12 @@ import {
   goToSettings
 } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
-import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
+import {
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT,
+  SYS_ADMIN_ROLES
+} from 'src/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { goToEvents as goToEventsAction } from 'src/navigation'
@@ -70,6 +77,11 @@ const messages = defineMessages({
     id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
+  },
+  LOCAL_SYSTEM_ADMIN: {
+    id: 'register.home.header.LOCAL_SYSTEM_ADMIN',
+    defaultMessage: 'Sysadmin',
+    description: 'The description for Sysadmin role'
   },
   REGISTRATION_CLERK: {
     id: 'register.home.header.REGISTRATION_CLERK',
@@ -140,6 +152,26 @@ const messages = defineMessages({
     id: 'register.home.header.performanceTitle',
     defaultMessage: 'Performance',
     description: 'Performance title'
+  },
+  systemTitle: {
+    id: 'register.home.header.systemTitle',
+    defaultMessage: 'System',
+    description: 'System title'
+  },
+  settingsTitle: {
+    id: 'register.home.header.settingsTitle',
+    defaultMessage: 'Settings',
+    description: 'settings title'
+  },
+  helpTitle: {
+    id: 'register.home.header.helpTitle',
+    defaultMessage: 'Help',
+    description: 'Help title'
+  },
+  logoutTitle: {
+    id: 'register.home.header.logoutTitle',
+    defaultMessage: 'Logout',
+    description: 'logout title'
   }
 })
 
@@ -177,39 +209,74 @@ class HeaderComp extends React.Component<IProps, IState> {
         ? intl.formatMessage(messages[userDetails.role])
         : ''
 
-    const menuItems = [
+    let menuItems = [
       {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
-        label: 'Applications',
+        label: this.props.intl.formatMessage(messages.applicationTitle),
         onClick: goToHome
       },
       {
         icon: <StatsBlack />,
         iconHover: <StatsBlue />,
-        label: 'Performance',
+        label: this.props.intl.formatMessage(messages.performanceTitle),
         onClick: goToPerformance
       },
       {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
-        label: 'Settings',
+        label: this.props.intl.formatMessage(messages.settingsTitle),
         onClick: this.props.goToSettings
       },
       {
         icon: <HelpBlack />,
         iconHover: <HelpBlue />,
-        label: 'Help',
+        label: this.props.intl.formatMessage(messages.helpTitle),
         onClick: () => alert('Help!')
       },
       {
         icon: <LogoutBlack />,
         iconHover: <LogoutBlue />,
-        label: 'Logout',
+        label: this.props.intl.formatMessage(messages.logoutTitle),
         secondary: true,
         onClick: this.logout
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          icon: <SystemBlack />,
+          iconHover: <SystemBlue />,
+          label: this.props.intl.formatMessage(messages.systemTitle),
+          onClick: goToHome
+        },
+        {
+          icon: <SettingsBlack />,
+          iconHover: <SettingsBlue />,
+          label: this.props.intl.formatMessage(messages.settingsTitle),
+          onClick: this.props.goToSettings
+        },
+        {
+          icon: <HelpBlack />,
+          iconHover: <HelpBlue />,
+          label: this.props.intl.formatMessage(messages.helpTitle),
+          onClick: () => alert('Help!')
+        },
+        {
+          icon: <LogoutBlack />,
+          iconHover: <LogoutBlue />,
+          label: this.props.intl.formatMessage(messages.logoutTitle),
+          secondary: true,
+          onClick: this.logout
+        }
+      ]
+    }
+
     const userInfo = { name, role }
 
     return (
@@ -278,9 +345,10 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, userDetails } = this.props
     const title = this.props.title || intl.formatMessage(messages.defaultTitle)
-    const menuItems = [
+
+    let menuItems = [
       {
         key: 'application',
         title: intl.formatMessage(messages.applicationTitle),
@@ -294,6 +362,21 @@ class HeaderComp extends React.Component<IProps, IState> {
         selected: false
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          key: 'sysadmin',
+          title: intl.formatMessage(messages.systemTitle),
+          onClick: goToHome,
+          selected: true
+        }
+      ]
+    }
 
     const rightMenu = [
       {

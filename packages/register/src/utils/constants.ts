@@ -37,7 +37,13 @@ export const TRACKING_ID_TEXT = 'tracking-id'
 export const BRN_DRN_TEXT = 'brn-drn'
 export const PHONE_TEXT = 'phone'
 export const SEARCH_RESULT_SORT = 'DESC'
-export const FIELD_AGENT_ROLE = 'FIELD_AGENT'
+export const FIELD_AGENT_ROLES = ['FIELD_AGENT']
+export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
+export const REGISTRAR_ROLES = [
+  'LOCAL_REGISTRAR',
+  'DISTRICT_REGISTRAR',
+  'NATIONAL_REGISTRAR'
+]
 
 export const FIELD_AGENT_HOME_TAB_IN_PROGRESS = 'progress'
 export const FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW = 'review'

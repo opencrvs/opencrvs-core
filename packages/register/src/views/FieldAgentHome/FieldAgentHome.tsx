@@ -9,9 +9,11 @@ import {
   ISearchInputProps,
   GridTable,
   Loader,
-  Spinner
+  Spinner,
+  TopBar
 } from '@opencrvs/components/lib/interface'
 import { IUserDetails, getUserLocation } from '../../utils/userUtils'
+
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { Header } from 'src/components/interface/Header/Header'
 import {
@@ -24,11 +26,13 @@ import {
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  FIELD_AGENT_ROLE,
   LANG_EN,
   EMPTY_STRING,
   APPLICATION_DATE_FORMAT,
-  UNION_LOCATION_CODE
+  UNION_LOCATION_CODE,
+  FIELD_AGENT_ROLES,
+  SYS_ADMIN_ROLES,
+  REGISTRAR_ROLES
 } from 'src/utils/constants'
 import { InProgress } from './InProgress'
 import styled, { withTheme } from 'styled-components'
@@ -44,7 +48,7 @@ import {
   PlusTransparentWhite,
   ApplicationsOrangeAmber
 } from '@opencrvs/components/lib/icons'
-import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { REGISTRAR_HOME, SYS_ADMIN_HOME } from 'src/navigation/routes'
 import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 import { SentForReview } from './SentForReview'
 import { Query } from 'react-apollo'
@@ -66,16 +70,6 @@ import {
 import { createNamesMap } from 'src/utils/data-formatting'
 import * as moment from 'moment'
 
-const Topbar = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 48px;
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  display: flex;
-  overflow-x: auto;
-  justify-content: flex-start;
-  align-items: center;
-`
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
@@ -303,14 +297,13 @@ class FieldAgentHomeView extends React.Component<
       theme
     } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
-    const isFieldAgent =
-      userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
     const fieldAgentLocation =
       userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
     let parentQueryLoading = false
+    const role = userDetails && userDetails.role
     return (
       <>
-        {isFieldAgent && (
+        {role && FIELD_AGENT_ROLES.includes(role) && (
           <>
             <Query
               query={COUNT_USER_WISE_APPLICATIONS}
@@ -340,7 +333,7 @@ class FieldAgentHomeView extends React.Component<
                 return (
                   <>
                     <Header />
-                    <Topbar id="top-bar">
+                    <TopBar id="top-bar">
                       <IconTab
                         id={`tab_${TAB_ID.inProgress}`}
                         key={TAB_ID.inProgress}
@@ -385,7 +378,7 @@ class FieldAgentHomeView extends React.Component<
                           total: data.searchEvents.totalItems
                         })}
                       </IconTab>
-                    </Topbar>
+                    </TopBar>
                   </>
                 )
               }}
@@ -504,7 +497,10 @@ class FieldAgentHomeView extends React.Component<
             </FABContainer>
           </>
         )}
-        {userDetails && userDetails.role && !isFieldAgent && (
+        {role && SYS_ADMIN_ROLES.includes(role) && (
+          <Redirect to={SYS_ADMIN_HOME} />
+        )}
+        {role && REGISTRAR_ROLES.includes(role) && (
           <Redirect to={REGISTRAR_HOME} />
         )}
       </>
