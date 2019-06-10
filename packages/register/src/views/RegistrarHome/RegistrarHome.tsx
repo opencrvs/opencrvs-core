@@ -1236,7 +1236,7 @@ export class RegistrarHomeView extends React.Component<
                       data.listEventRegistrations &&
                       data.listEventRegistrations.totalItems
                     }
-                    initialPage={this.state.updatesCurrentPage}
+                    initialPage={this.state.printCurrentPage}
                     expandable={true}
                     arrowExpansionButtons={true}
                   />
