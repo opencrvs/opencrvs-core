@@ -220,9 +220,6 @@ type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
   RouteComponentProps<IMatchParams>
 
 interface IFieldAgentHomeState {
-  progressCurrentPage: number
-  reviewCurrentPage: number
-  updatesCurrentPage: number
   requireUpdatesPage: number
 }
 
@@ -240,9 +237,6 @@ class FieldAgentHomeView extends React.Component<
   constructor(props: FieldAgentHomeProps) {
     super(props)
     this.state = {
-      progressCurrentPage: 1,
-      reviewCurrentPage: 1,
-      updatesCurrentPage: 1,
       requireUpdatesPage: 1
     }
   }
