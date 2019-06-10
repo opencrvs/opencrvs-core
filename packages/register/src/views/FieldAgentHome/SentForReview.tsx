@@ -219,7 +219,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           draft.submissionStatus || '',
           navigator.onLine,
           index,
-          'DC5EDNG' // Later to be replaced by draft.trackingId ?
+          draft.trackingId
         )
 
         return {
@@ -231,7 +231,14 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           rowClickHandler: [
             {
               label: 'rowClickHandler',
-              handler: () => this.props.goToApplicationDetails(draft.id)
+              handler: () => {
+                if (!draft.compositionId) {
+                  throw new Error(
+                    'No composition id found for this application'
+                  )
+                }
+                this.props.goToApplicationDetails(draft.compositionId)
+              }
             }
           ]
         }
