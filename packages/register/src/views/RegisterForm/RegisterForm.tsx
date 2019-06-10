@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
-import * as Swipeable from 'react-swipeable'
+import Swipeable from 'react-swipeable'
 import { Box, Modal, InvertSpinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -14,7 +14,7 @@ import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Sentry from '@sentry/browser'
 import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
-import * as debounce from 'lodash/debounce'
+import debounce from 'lodash/debounce'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '@register/styledComponents'
 import {

@@ -71,7 +71,8 @@
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
-    "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' src/extract-translations.ts"
+    "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' src/extract-translations.ts",
+    "graphql:codegen": "graphql-codegen --config codegen.yml"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -83,8 +84,16 @@
     ]
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.2.0",
+    "@graphql-codegen/fragment-matcher": "1.2.0",
+    "@graphql-codegen/introspection": "^1.2.0",
+    "@graphql-codegen/typescript": "^1.2.0",
+    "@graphql-codegen/typescript-graphql-files-modules": "1.2.0",
+    "@graphql-codegen/typescript-operations": "1.2.0",
+    "@graphql-codegen/typescript-react-apollo": "1.2.0",
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
+    "@types/fetch-mock": "^7.3.0",
     "@types/jest": "^24.0.13",
     "@types/jwt-decode": "^2.2.1",
     "@types/nock": "^9.3.0",
@@ -107,6 +116,7 @@
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.13.0",
+    "fetch-mock": "^7.3.3",
     "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
     "json2csv": "^4.3.2",

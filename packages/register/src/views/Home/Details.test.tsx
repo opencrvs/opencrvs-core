@@ -85,7 +85,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('Details tests', async () => {
+describe('Details tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -213,6 +213,20 @@ describe('Details tests', async () => {
                   }
                 ]
               },
+              deceased: {
+                name: []
+              },
+              informant: {
+                individual: {
+                  telecom: [
+                    {
+                      system: '',
+                      use: '',
+                      value: ''
+                    }
+                  ]
+                }
+              },
               registration: {
                 id: '1',
                 type: 'birth',
@@ -303,6 +317,20 @@ describe('Details tests', async () => {
           data: {
             fetchRegistration: {
               id: '1',
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
               deceased: {
                 name: [
                   {
@@ -321,6 +349,7 @@ describe('Details tests', async () => {
                 individual: {
                   telecom: [
                     {
+                      use: '',
                       system: 'phone',
                       value: '01622688231'
                     }
@@ -407,10 +436,25 @@ describe('Details tests', async () => {
                   }
                 ]
               },
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
               informant: {
                 individual: {
                   telecom: [
                     {
+                      use: '',
                       system: 'phone',
                       value: '01622688231'
                     }

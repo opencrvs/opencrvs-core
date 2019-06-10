@@ -14,6 +14,7 @@ export interface IFacilitiesDataResponse {
 async function loadLocations(): Promise<any> {
   const url = resolve(window.config.RESOURCES_URL, 'locations')
 
+  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -33,7 +34,7 @@ async function loadLocations(): Promise<any> {
 
 async function loadFacilities(): Promise<any> {
   const url = resolve(window.config.RESOURCES_URL, 'facilities')
-
+  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {

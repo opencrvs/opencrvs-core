@@ -39,7 +39,7 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-describe('SearchResult tests', async () => {
+describe('SearchResult tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -92,7 +92,9 @@ describe('SearchResult tests', async () => {
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'DECLARED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
@@ -102,19 +104,25 @@ describe('SearchResult tests', async () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
-                  ]
+                  ],
+                  dateOfBirth: '',
+                  childName: []
                 },
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
                   type: 'Death',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'REJECTED',
                     trackingId: 'DXMJPYA',
                     registrationNumber: null,
@@ -128,19 +136,25 @@ describe('SearchResult tests', async () => {
                   dateOfDeath: '2010-01-01',
                   deceasedName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Zahir',
                       familyName: 'Raihan'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'জহির',
                       familyName: 'রায়হান'
                     }
-                  ]
+                  ],
+                  dateOfBirth: '',
+                  childName: []
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
                   type: 'Birth',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'REGISTERED',
                     trackingId: 'BQRZWDR',
                     registrationNumber: '2019333494BQRZWDR2',
@@ -150,19 +164,25 @@ describe('SearchResult tests', async () => {
                   dateOfBirth: '2010-01-01',
                   childName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Fokrul',
                       familyName: 'Islam'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'ফকরুল',
                       familyName: 'ইসলাম'
                     }
-                  ]
+                  ],
+                  dateOfDeath: '',
+                  deceasedName: []
                 },
                 {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
                   type: 'Birth',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'CERTIFIED',
                     trackingId: 'B3DBJMP',
                     registrationNumber: '2019333494B3DBJMP5',
@@ -172,14 +192,18 @@ describe('SearchResult tests', async () => {
                   dateOfBirth: '2008-01-01',
                   childName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Rafiq',
                       familyName: 'Islam'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'রফিক',
                       familyName: 'ইসলাম'
                     }
-                  ]
+                  ],
+                  dateOfDeath: '',
+                  deceasedName: []
                 }
               ],
               __typename: 'EventSearchResultSet'
@@ -211,6 +235,7 @@ describe('SearchResult tests', async () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
+    // testComponent.component.debug()
     const data = testComponent.component.find(DataTable).prop('data')
     expect(data).toEqual([
       {
@@ -310,7 +335,7 @@ describe('SearchResult tests', async () => {
     })
 
     testComponent.component.update()
-
+    testComponent.component.debug()
     expect(
       testComponent.component
         .find('#search-result-error-text')
@@ -320,7 +345,6 @@ describe('SearchResult tests', async () => {
 
     testComponent.component.unmount()
   })
-
   describe('SearchResult tests for different application activity', () => {
     it('renders declare section after expanding', async () => {
       const graphqlMock = [
@@ -366,7 +390,9 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
-                    __typename: 'BirthEventSearchSet'
+                    __typename: 'BirthEventSearchSet',
+                    dateOfDeath: '',
+                    deceasedName: []
                   }
                 ],
                 __typename: 'EventSearchResultSet'
@@ -385,24 +411,43 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
+                  __typename: 'X',
                   status: [
                     {
                       id:
                         '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                       timestamp: '2019-04-03T07:08:24.936Z',
+                      __typename: 'X',
                       user: {
                         id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        __typename: 'X',
                         name: [
                           {
                             use: 'en',
+                            __typename: 'X',
                             firstNames: 'Mohammad',
                             familyName: 'Ashraful'
                           },
                           {
                             use: 'bn',
+                            __typename: 'X',
                             firstNames: '',
                             familyName: ''
                           }
@@ -410,11 +455,13 @@ describe('SearchResult tests', async () => {
                         role: 'LOCAL_REGISTRAR'
                       },
                       location: {
+                        __typename: 'X',
                         id: '123',
                         name: 'Kaliganj Union Sub Center',
                         alias: ['']
                       },
                       office: {
+                        __typename: 'X',
                         id: '123',
                         name: 'Kaliganj Union Sub Center',
                         alias: [''],
@@ -522,7 +569,9 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
-                    __typename: 'BirthEventSearchSet'
+                    __typename: 'BirthEventSearchSet',
+                    dateOfDeath: '',
+                    deceasedName: []
                   }
                 ],
                 __typename: 'EventSearchResultSet'
@@ -638,7 +687,9 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
-                    __typename: 'BirthEventSearchSet'
+                    __typename: 'BirthEventSearchSet',
+                    dateOfDeath: '',
+                    deceasedName: []
                   }
                 ],
                 __typename: 'EventSearchResultSet'
@@ -657,6 +708,20 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
@@ -799,6 +864,8 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
+                    dateOfDeath: '',
+                    deceasedName: [],
                     __typename: 'BirthEventSearchSet'
                   }
                 ],
@@ -818,6 +885,20 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
@@ -950,6 +1031,8 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
+                    dateOfDeath: '',
+                    deceasedName: [],
                     __typename: 'BirthEventSearchSet'
                   }
                 ],
@@ -969,6 +1052,20 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
@@ -1106,6 +1203,8 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
+                    dateOfDeath: '',
+                    deceasedName: [],
                     __typename: 'BirthEventSearchSet'
                   }
                 ],
@@ -1125,6 +1224,20 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: [

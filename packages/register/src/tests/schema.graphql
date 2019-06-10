@@ -1,5 +1,5 @@
 # source: http://localhost:7070/graphql
-# timestamp: Wed Feb 13 2019 16:07:29 GMT+0000 (Greenwich Mean Time)
+# timestamp: Fri Jun 07 2019 20:35:09 GMT+0100 (British Summer Time)
 
 type Address {
   use: String
@@ -114,7 +114,28 @@ enum AttendantType {
   OTHER
 }
 
-type BirthRegistration {
+type BirthEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  childName: [HumanName]
+  dateOfBirth: Date
+  registration: RegistrationSearchSet
+}
+
+type BirthKeyFigures {
+  label: String
+  value: Int
+  total: Int
+  estimate: Int
+  categoricalData: [BirthKeyFiguresData]
+}
+
+type BirthKeyFiguresData {
+  name: String
+  value: Int
+}
+
+type BirthRegistration implements EventRegistration {
   id: ID!
   _fhirIDMap: Map
   registration: Registration
@@ -137,6 +158,11 @@ type BirthRegistration {
   updatedAt: Date
 }
 
+type BirthRegistrationByAgeMetrics {
+  label: String
+  value: Int
+}
+
 input BirthRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -157,6 +183,18 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
+}
+
+type BirthRegistrationMetrics {
+  keyFigures: [BirthKeyFigures]
+  regByAge: [BirthRegistrationByAgeMetrics]
+  regWithin45d: [BirthRegistrationWithIn45D]
+}
+
+type BirthRegistrationWithIn45D {
+  label: String
+  value: Int
+  totalEstimate: Int
 }
 
 enum BirthRegPresence {
@@ -234,7 +272,15 @@ input ContactPointInput {
 
 scalar Date
 
-type DeathRegistration {
+type DeathEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String
+  deceasedName: [HumanName]
+  dateOfDeath: Date
+  registration: RegistrationSearchSet
+}
+
+type DeathRegistration implements EventRegistration {
   id: ID!
   _fhirIDMap: Map
   registration: Registration
@@ -291,9 +337,26 @@ enum EducationType {
   NOT_STATED
 }
 
+interface EventRegistration {
+  id: ID!
+  registration: Registration
+  createdAt: Date
+}
+
 type EventRegResultSet {
   results: [EventRegistration]
   totalItems: Int
+}
+
+type EventSearchResultSet {
+  results: [EventSearchSet]
+  totalItems: Int
+}
+
+interface EventSearchSet {
+  id: ID!
+  type: String
+  registration: RegistrationSearchSet
 }
 
 type HumanName {
@@ -322,6 +385,7 @@ enum IdentityIDType {
   REFUGEE_NUMBER
   ALIEN_NUMBER
   OTHER
+  NO_ID
 }
 
 input IdentityInput {
@@ -409,20 +473,14 @@ type Mutation {
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(
-    id: ID!
-    details: BirthRegistrationInput
-  ): BirthRegistration
+  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsVerified(
-    id: ID!
-    details: DeathRegistrationInput
-  ): DeathRegistration
+  markDeathAsVerified(id: ID!, details: DeathRegistrationInput): DeathRegistration
   markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
 }
@@ -512,29 +570,24 @@ input PersonInput {
 }
 
 type Query {
-  listNotifications(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [Notification]
+  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): EventRegResultSet
+  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
+  listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): DeathRegResultSet
+  fetchEventRegistration(id: ID!): EventRegistration
+  listEventRegistrations(locationIds: [String], status: String, from: Date, to: Date, count: Int, skip: Int): EventRegResultSet
+  countEventRegistrations(locationIds: [String]): RegistrationCount
+  fetchRegistration(id: ID!): EventRegistration
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   getUser(userId: String): User
+  searchUsers(username: String, mobile: String, active: Boolean, role: String, primaryOfficeId: String, locationId: String, count: Int, skip: Int, sort: String): SearchUserResult
+  fetchBirthRegistrationMetrics(timeStart: String!, timeEnd: String!, locationId: String!): BirthRegistrationMetrics
+  searchEvents(locationIds: [String], trackingId: String, registrationNumber: String, contactNumber: String, sort: String): EventSearchResultSet
+  getRoles(title: String, value: String, type: String, active: Boolean, sortBy: String, sortOrder: String): [Role]
 }
 
 type Registration {
@@ -560,6 +613,11 @@ enum RegistrationContactType {
   FATHER
 }
 
+type RegistrationCount {
+  declared: Int
+  rejected: Int
+}
+
 input RegistrationInput {
   _fhirID: ID
   trackingId: String
@@ -574,6 +632,19 @@ input RegistrationInput {
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
+}
+
+type RegistrationSearchSet {
+  status: String
+  contactNumber: String
+  dateOfApplication: Date
+  trackingId: String
+  registrationNumber: String
+  eventLocationId: String
+  registeredLocationId: String
+  reason: String
+  comment: String
+  duplicates: [ID]
 }
 
 enum RegistrationType {
@@ -608,12 +679,15 @@ input RegWorkflowInput {
 
 type RelatedPerson {
   id: ID
+  _fhirID: ID
   relationship: RelationshipType
   otherRelationship: String
   individual: Person
 }
 
 input RelatedPersonInput {
+  id: ID
+  _fhirID: ID
   relationship: RelationshipType
   otherRelationship: String
   individual: PersonInput
@@ -627,27 +701,43 @@ enum RelationshipType {
   DAUGHTER
   EXTENDED_FAMILY
   OTHER
+  INFORMANT
+}
+
+type Role {
+  id: ID!
+  title: String
+  value: String
+  types: [String]
+  active: Boolean
+}
+
+type SearchUserResult {
+  results: [User]
+  totalItems: Int
 }
 
 type User {
   id: ID!
+  userMgntUserID: ID
+  practitionerId: String
   name: [HumanName]
+  username: String
+  mobile: String
   role: String
+  email: String
+  active: Boolean
   primaryOffice: Location
-  currentLocation: Location
   catchmentArea: [Location]
 }
 
 input UserInput {
   name: [HumanNameInput]
+  username: String
+  mobile: String
   role: String
+  email: String
+  active: Boolean
   primaryOffice: LocationInput
-  currentLocation: LocationInput
   catchmentArea: [LocationInput]
-}
-
-type EventRegistration {
-  id: ID! # long uuid
-  registration: Registration
-  createdAt: Date
 }

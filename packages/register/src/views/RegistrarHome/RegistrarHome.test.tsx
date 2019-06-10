@@ -99,6 +99,29 @@ const demoUserData = {
     ],
     birthDate: '2010-10-10'
   },
+  deceased: {
+    name: [
+      {
+        use: '',
+        firstNames: '',
+        familyName: ''
+      }
+    ],
+    deceased: {
+      deathDate: ''
+    }
+  },
+  informant: {
+    individual: {
+      telecom: [
+        {
+          system: '',
+          use: '',
+          value: ''
+        }
+      ]
+    }
+  },
   createdAt: '2018-05-23T14:44:58+02:00'
 }
 const userData: any = []
@@ -417,6 +440,29 @@ describe('RegistrarHome tests', async () => {
                       }
                     ]
                   },
+                  deceased: {
+                    name: [
+                      {
+                        use: '',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    deceased: {
+                      deathDate: ''
+                    }
+                  },
+                  informant: {
+                    individual: {
+                      telecom: [
+                        {
+                          system: '',
+                          use: '',
+                          value: ''
+                        }
+                      ]
+                    }
+                  },
                   child: {
                     name: [
                       {
@@ -488,11 +534,22 @@ describe('RegistrarHome tests', async () => {
                     individual: {
                       telecom: [
                         {
+                          use: '',
                           system: 'phone',
                           value: '01622688231'
                         }
                       ]
                     }
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: '',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    birthDate: ''
                   },
                   createdAt: '2018-05-23T14:44:58+02:00'
                 }
@@ -601,6 +658,29 @@ describe('RegistrarHome tests', async () => {
                     ],
                     birthDate: '2010-10-10'
                   },
+                  deceased: {
+                    name: [
+                      {
+                        use: '',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    deceased: {
+                      deathDate: '0'
+                    }
+                  },
+                  informant: {
+                    individual: {
+                      telecom: [
+                        {
+                          use: '',
+                          system: '',
+                          value: ''
+                        }
+                      ]
+                    }
+                  },
                   createdAt: '2018-05-23T14:44:58+02:00'
                 },
                 {
@@ -646,6 +726,16 @@ describe('RegistrarHome tests', async () => {
                       }
                     ]
                   },
+                  child: {
+                    name: [
+                      {
+                        use: '',
+                        firstNames: '',
+                        familyName: ''
+                      }
+                    ],
+                    birthDate: ''
+                  },
                   deceased: {
                     name: [
                       {
@@ -662,6 +752,7 @@ describe('RegistrarHome tests', async () => {
                     individual: {
                       telecom: [
                         {
+                          use: '',
                           system: 'phone',
                           value: '01622688231'
                         }
