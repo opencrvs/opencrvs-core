@@ -8,7 +8,7 @@ import getUserMobile, {
   responseSchema as resMobileSchema
 } from 'src/features/getUserMobile/handler'
 import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
-import getUser from 'src/features/getUser/handler'
+import getUser, { getUserRequestSchema } from 'src/features/getUser/handler'
 import getRoles, { searchRoleSchema } from 'src/features/getRoles/handler'
 
 const enum RouteScope {
@@ -100,7 +100,7 @@ export const getRoutes = () => {
           ]
         },
         validate: {
-          payload: userIdSchema
+          payload: getUserRequestSchema
         }
       }
     },

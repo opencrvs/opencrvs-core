@@ -310,7 +310,7 @@ export enum GQLRegStatus {
 }
 
 export interface GQLUser {
-  id: string
+  id?: string
   userMgntUserID?: string
   practitionerId?: string
   name?: Array<GQLHumanName | null>
