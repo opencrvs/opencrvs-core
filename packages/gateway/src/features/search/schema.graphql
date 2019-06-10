@@ -20,6 +20,8 @@ type RegistrationSearchSet {
   reason: String
   comment: String
   duplicates: [ID]
+  createdAt: String
+  modifiedAt: String
 }
 
 type BirthEventSearchSet implements EventSearchSet {
@@ -41,9 +43,12 @@ type DeathEventSearchSet implements EventSearchSet {
 type Query {
   searchEvents(
     locationIds: [String]
+    status: String
     trackingId: String
     registrationNumber: String
     contactNumber: String
+    count: Int
+    skip: Int
     sort: String
   ): EventSearchResultSet
 }

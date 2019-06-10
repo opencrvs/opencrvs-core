@@ -6,7 +6,10 @@ export const SEARCH_EVENTS = gql`
     $trackingId: String
     $contactNumber: String
     $registrationNumber: String
+    $status: String
     $locationIds: [String]
+    $count: Int
+    $skip: Int
   ) {
     searchEvents(
       sort: $sort
@@ -14,6 +17,9 @@ export const SEARCH_EVENTS = gql`
       registrationNumber: $registrationNumber
       contactNumber: $contactNumber
       locationIds: $locationIds
+      status: $status
+      count: $count
+      skip: $skip
     ) {
       totalItems
       results {
@@ -21,10 +27,13 @@ export const SEARCH_EVENTS = gql`
         type
         registration {
           status
+          contactNumber
           trackingId
           registrationNumber
           registeredLocationId
           duplicates
+          createdAt
+          modifiedAt
         }
         ... on BirthEventSearchSet {
           dateOfBirth

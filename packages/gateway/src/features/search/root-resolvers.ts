@@ -8,9 +8,12 @@ export const resolvers: GQLResolver = {
       _,
       {
         locationIds,
+        status,
         trackingId,
         registrationNumber,
         contactNumber,
+        count,
+        skip,
         sort = 'desc'
       },
       authHeader
@@ -21,6 +24,9 @@ export const resolvers: GQLResolver = {
       if (locationIds) {
         searchCriteria.applicationLocationId = locationIds.join(',')
       }
+      if (status) {
+        searchCriteria.status = status
+      }
       if (trackingId) {
         searchCriteria.trackingId = trackingId
       }
@@ -29,6 +35,12 @@ export const resolvers: GQLResolver = {
       }
       if (contactNumber) {
         searchCriteria.contactNumber = contactNumber
+      }
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
       }
 
       const searchResult = await postSearch(authHeader, searchCriteria)

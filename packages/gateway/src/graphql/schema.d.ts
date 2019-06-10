@@ -532,6 +532,8 @@ export interface GQLRegistrationSearchSet {
   reason?: string
   comment?: string
   duplicates?: Array<string | null>
+  createdAt?: string
+  modifiedAt?: string
 }
 
 export interface GQLRole {
@@ -1129,9 +1131,12 @@ export interface QueryToFetchBirthRegistrationMetricsResolver<
 
 export interface QueryToSearchEventsArgs {
   locationIds?: Array<string | null>
+  status?: string
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
+  count?: number
+  skip?: number
   sort?: string
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
@@ -2402,6 +2407,8 @@ export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   reason?: RegistrationSearchSetToReasonResolver<TParent>
   comment?: RegistrationSearchSetToCommentResolver<TParent>
   duplicates?: RegistrationSearchSetToDuplicatesResolver<TParent>
+  createdAt?: RegistrationSearchSetToCreatedAtResolver<TParent>
+  modifiedAt?: RegistrationSearchSetToModifiedAtResolver<TParent>
 }
 
 export interface RegistrationSearchSetToStatusResolver<
@@ -2468,6 +2475,20 @@ export interface RegistrationSearchSetToCommentResolver<
 }
 
 export interface RegistrationSearchSetToDuplicatesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToModifiedAtResolver<
   TParent = any,
   TResult = any
 > {

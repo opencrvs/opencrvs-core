@@ -20,6 +20,8 @@ export interface ICompositionBody {
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]
+  createdAt?: string
+  modifiedAt?: string
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {

@@ -10,10 +10,13 @@ interface ISearchDataTemplate {
 }
 export interface ISearchCriteria {
   applicationLocationId?: string
+  status?: string
   trackingId?: string
   contactNumber?: string
   registrationNumber?: string
   sort?: string
+  size?: number
+  from?: number
 }
 
 export const searchTypeResolvers: GQLResolver = {
