@@ -1043,7 +1043,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.sysAdminHome.users': 'Users',
     'register.sysAdminHome.devices': 'Devices',
     'register.sysAdminHome.config': 'Config',
-    'register.home.header.SYSADMIN': 'Sysadmin',
+    'register.home.header.LOCAL_SYSTEM_ADMIN': 'Sysadmin',
     'register.home.header.systemTitle': 'System',
     'register.home.header.settingsTitle': 'Settings',
     'register.home.header.helpTitle': 'Help',

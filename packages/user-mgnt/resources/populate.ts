@@ -343,7 +343,7 @@ const sysAdmin = new User({
   salt: pass.salt,
   role: 'LOCAL_SYSTEM_ADMIN',
   scope: ['sysadmin', 'demo'],
-  practitionerId: '0841dc65-5289-4dcf-8329-f266147f6afc',
+  practitionerId: 'd9cf6968-2b4b-4eda-8ba0-5265d53fdb22',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
     'b21ce04e-7ccd-4d65-929f-453bc193a736',
