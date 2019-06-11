@@ -1,8 +1,7 @@
-import { Field, WrappedFieldProps } from 'redux-form'
+import { Field, WrappedFieldProps, InjectedFormProps } from 'redux-form'
 import * as React from 'react'
 import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
-import { InjectedFormProps } from 'redux-form'
 
 import {
   TextInput,

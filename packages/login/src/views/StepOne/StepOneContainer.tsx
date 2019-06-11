@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl } from 'react-intl'
 import { reduxForm } from 'redux-form'
 import {
   StepOneForm,

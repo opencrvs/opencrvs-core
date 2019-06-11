@@ -1,5 +1,4 @@
-import { defineMessages } from 'react-intl'
-import { FormattedMessage, MessageValue } from 'react-intl'
+import { defineMessages, FormattedMessage, MessageValue } from 'react-intl'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
