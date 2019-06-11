@@ -21,7 +21,9 @@ import {
   TrackingID,
   BRN,
   Phone,
-  ArrowBack
+  ArrowBack,
+  SystemBlack,
+  SystemBlue
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
 import { storage } from 'src/storage'
@@ -41,11 +43,15 @@ import {
   goToSettings
 } from 'src/navigation'
 import { ProfileMenu } from 'src/components/ProfileMenu'
-import { TRACKING_ID_TEXT, BRN_DRN_TEXT, PHONE_TEXT } from 'src/utils/constants'
+import {
+  TRACKING_ID_TEXT,
+  BRN_DRN_TEXT,
+  PHONE_TEXT,
+  SYS_ADMIN_ROLES
+} from 'src/utils/constants'
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { goToEvents as goToEventsAction } from 'src/navigation'
-import { SEARCH } from 'src/navigation/routes'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
@@ -56,9 +62,12 @@ type IProps = InjectedIntlProps & {
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
+  goToHomeAction: typeof goToHome
+  goToPerformanceAction: typeof goToPerformance
   searchText?: string
   selectedSearchType?: string
   mobileSearchBar?: boolean
+  enableMenuSelection?: boolean
 }
 interface IState {
   showMenu: boolean
@@ -70,6 +79,11 @@ const messages = defineMessages({
     id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
+  },
+  LOCAL_SYSTEM_ADMIN: {
+    id: 'register.home.header.LOCAL_SYSTEM_ADMIN',
+    defaultMessage: 'Sysadmin',
+    description: 'The description for Sysadmin role'
   },
   REGISTRATION_CLERK: {
     id: 'register.home.header.REGISTRATION_CLERK',
@@ -140,6 +154,26 @@ const messages = defineMessages({
     id: 'register.home.header.performanceTitle',
     defaultMessage: 'Performance',
     description: 'Performance title'
+  },
+  systemTitle: {
+    id: 'register.home.header.systemTitle',
+    defaultMessage: 'System',
+    description: 'System title'
+  },
+  settingsTitle: {
+    id: 'register.home.header.settingsTitle',
+    defaultMessage: 'Settings',
+    description: 'settings title'
+  },
+  helpTitle: {
+    id: 'register.home.header.helpTitle',
+    defaultMessage: 'Help',
+    description: 'Help title'
+  },
+  logoutTitle: {
+    id: 'register.home.header.logoutTitle',
+    defaultMessage: 'Logout',
+    description: 'logout title'
   }
 })
 
@@ -177,39 +211,74 @@ class HeaderComp extends React.Component<IProps, IState> {
         ? intl.formatMessage(messages[userDetails.role])
         : ''
 
-    const menuItems = [
+    let menuItems = [
       {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
-        label: 'Applications',
+        label: this.props.intl.formatMessage(messages.applicationTitle),
         onClick: goToHome
       },
       {
         icon: <StatsBlack />,
         iconHover: <StatsBlue />,
-        label: 'Performance',
+        label: this.props.intl.formatMessage(messages.performanceTitle),
         onClick: goToPerformance
       },
       {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
-        label: 'Settings',
+        label: this.props.intl.formatMessage(messages.settingsTitle),
         onClick: this.props.goToSettings
       },
       {
         icon: <HelpBlack />,
         iconHover: <HelpBlue />,
-        label: 'Help',
+        label: this.props.intl.formatMessage(messages.helpTitle),
         onClick: () => alert('Help!')
       },
       {
         icon: <LogoutBlack />,
         iconHover: <LogoutBlue />,
-        label: 'Logout',
+        label: this.props.intl.formatMessage(messages.logoutTitle),
         secondary: true,
         onClick: this.logout
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          icon: <SystemBlack />,
+          iconHover: <SystemBlue />,
+          label: this.props.intl.formatMessage(messages.systemTitle),
+          onClick: goToHome
+        },
+        {
+          icon: <SettingsBlack />,
+          iconHover: <SettingsBlue />,
+          label: this.props.intl.formatMessage(messages.settingsTitle),
+          onClick: this.props.goToSettings
+        },
+        {
+          icon: <HelpBlack />,
+          iconHover: <HelpBlue />,
+          label: this.props.intl.formatMessage(messages.helpTitle),
+          onClick: () => alert('Help!')
+        },
+        {
+          icon: <LogoutBlack />,
+          iconHover: <LogoutBlue />,
+          label: this.props.intl.formatMessage(messages.logoutTitle),
+          secondary: true,
+          onClick: this.logout
+        }
+      ]
+    }
+
     const userInfo = { name, role }
 
     return (
@@ -234,7 +303,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     this.setState(prevState => ({ showMenu: !prevState.showMenu }))
   }
 
-  renderSearchInput(props: IProps, desktop?: boolean) {
+  renderSearchInput(props: IProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType } = props
 
     const searchTypeList: ISearchType[] = [
@@ -259,41 +328,58 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    const onClearText = () => {
-      if (desktop && window.location.pathname.includes(SEARCH)) {
-        history.back()
-      }
-    }
-
     return (
       <SearchTool
         key="searchMenu"
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        searchHandler={props.goToSearchResult}
-        onClearText={onClearText}
+        searchHandler={(text, type) =>
+          props.goToSearchResult(text, type, isMobile)
+        }
       />
     )
   }
 
   render() {
-    const { intl } = this.props
+    const {
+      intl,
+      userDetails,
+      enableMenuSelection,
+      goToHomeAction,
+      goToPerformanceAction
+    } = this.props
     const title = this.props.title || intl.formatMessage(messages.defaultTitle)
-    const menuItems = [
+
+    let menuItems = [
       {
         key: 'application',
         title: intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome,
-        selected: true
+        onClick: goToHomeAction,
+        selected: enableMenuSelection !== undefined ? enableMenuSelection : true
       },
       {
         key: 'performance',
         title: intl.formatMessage(messages.performanceTitle),
-        onClick: goToPerformance,
+        onClick: goToPerformanceAction,
         selected: false
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          key: 'sysadmin',
+          title: intl.formatMessage(messages.systemTitle),
+          onClick: goToHome,
+          selected: true
+        }
+      ]
+    }
 
     const rightMenu = [
       {
@@ -306,7 +392,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         )
       },
       {
-        element: this.renderSearchInput(this.props, true)
+        element: this.renderSearchInput(this.props)
       },
       {
         element: <ProfileMenu key="profileMenu" />
@@ -319,7 +405,7 @@ class HeaderComp extends React.Component<IProps, IState> {
             icon: () => <ArrowBack />,
             handler: () => history.back()
           },
-          mobileBody: this.renderSearchInput(this.props)
+          mobileBody: this.renderSearchInput(this.props, true)
         }
       : {
           mobileLeft: {
@@ -356,6 +442,8 @@ export const Header = connect(
     goToSearchResult,
     goToSearch,
     goToSettings,
-    goToEvents: goToEventsAction
+    goToEvents: goToEventsAction,
+    goToHomeAction: goToHome,
+    goToPerformanceAction: goToPerformance
   }
 )(injectIntl<IProps>(HeaderComp))

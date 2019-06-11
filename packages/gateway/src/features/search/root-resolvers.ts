@@ -7,6 +7,8 @@ export const resolvers: GQLResolver = {
     async searchEvents(
       _,
       {
+        status,
+        userId,
         locationIds,
         status,
         trackingId,
@@ -19,6 +21,8 @@ export const resolvers: GQLResolver = {
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
+        from: skip,
+        size: count,
         sort
       }
       if (locationIds) {
@@ -41,6 +45,12 @@ export const resolvers: GQLResolver = {
       }
       if (skip) {
         searchCriteria.from = skip
+      }
+      if (status) {
+        searchCriteria.status = status
+      }
+      if (userId) {
+        searchCriteria.createdBy = userId
       }
 
       const searchResult = await postSearch(authHeader, searchCriteria)

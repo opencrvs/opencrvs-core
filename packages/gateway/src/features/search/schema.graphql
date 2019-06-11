@@ -42,6 +42,8 @@ type DeathEventSearchSet implements EventSearchSet {
 
 type Query {
   searchEvents(
+    status: String
+    userId: String
     locationIds: [String]
     status: String
     trackingId: String

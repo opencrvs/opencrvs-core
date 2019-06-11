@@ -20,6 +20,7 @@ export interface IGQLLocation {
 
 export interface IUserDetails {
   userMgntUserID?: string
+  practitionerId?: string
   role?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
@@ -28,12 +29,22 @@ export interface IUserDetails {
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
-  const { catchmentArea, primaryOffice, name, role, userMgntUserID } = user
+  const {
+    catchmentArea,
+    primaryOffice,
+    name,
+    role,
+    userMgntUserID,
+    practitionerId
+  } = user
   const userDetails: IUserDetails = {
     language: window.config.LANGUAGE
   }
   if (userMgntUserID) {
     userDetails.userMgntUserID = userMgntUserID
+  }
+  if (practitionerId) {
+    userDetails.practitionerId = practitionerId
   }
   if (name) {
     userDetails.name = name

@@ -153,8 +153,8 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             this.onPageChange(currentPage)
           }}
           pageSize={this.pageSize}
-          totalPages={draftApplications && draftApplications.length}
-          initialPage={this.state.inProgressPageNo}
+          totalItems={draftApplications && draftApplications.length}
+          currentPage={this.state.inProgressPageNo}
           expandable={false}
           clickable={true}
         />

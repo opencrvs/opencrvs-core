@@ -20,6 +20,7 @@ export function queryBuilder(
   contactNumber: string,
   registrationNumber: string,
   applicationLocationId: string,
+  createdBy: string,
   filters: IFilter
 ) {
   const must: any[] = []
@@ -65,6 +66,16 @@ export function queryBuilder(
         'applicationLocationId.keyword': {
           value: applicationLocationId,
           boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (createdBy !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'createdBy.keyword': {
+          value: createdBy
         }
       }
     })

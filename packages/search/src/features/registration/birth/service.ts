@@ -3,7 +3,8 @@ import {
   detectDuplicates,
   EVENT,
   IBirthCompositionBody,
-  ICompositionBody
+  ICompositionBody,
+  getCreatedBy
 } from 'src/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -46,7 +47,7 @@ export async function upsertEvent(bundle: fhir.Bundle) {
     throw new Error(`Composition ID not found`)
   }
 
-  indexAndSearchComposition(compositionId, composition, bundleEntries)
+  await indexAndSearchComposition(compositionId, composition, bundleEntries)
 }
 
 async function updateEvent(task: fhir.Task) {
@@ -60,6 +61,10 @@ async function updateEvent(task: fhir.Task) {
     throw new Error('No Composition ID found')
   }
 
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
   const body: ICompositionBody = {}
   body.type =
     task &&
@@ -71,6 +76,11 @@ async function updateEvent(task: fhir.Task) {
     task && task.note && task.note[0].text && task.note[0].text.split('&')
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
   body.rejectComment = nodeText && nodeText[1] && nodeText[1].split('=')[1]
+  body.updatedBy =
+    regLastUserIdentifier &&
+    regLastUserIdentifier.valueReference &&
+    regLastUserIdentifier.valueReference.reference &&
+    regLastUserIdentifier.valueReference.reference.split('/')[1]
 
   await updateComposition(compositionId, body)
 }
@@ -85,13 +95,13 @@ async function indexAndSearchComposition(
     createdAt: Date.now().toString()
   }
 
-  createIndexBody(body, composition, bundleEntries)
+  await createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionId, body)
 
   await detectAndUpdateDuplicates(compositionId, composition, body)
 }
 
-function createIndexBody(
+async function createIndexBody(
   body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
@@ -99,7 +109,7 @@ function createIndexBody(
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
-  createApplicationIndex(body, bundleEntries)
+  await createApplicationIndex(body, composition.id as string, bundleEntries)
 }
 
 function createChildIndex(
@@ -182,8 +192,9 @@ function createFatherIndex(
   body.fatherIdentifier = father.identifier && father.identifier[0].value
 }
 
-function createApplicationIndex(
+async function createApplicationIndex(
   body: IBirthCompositionBody,
+  compositionId: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const task = findTask(bundleEntries)
@@ -205,6 +216,17 @@ function createApplicationIndex(
     'http://opencrvs.org/specs/id/birth-registration-number'
   )
 
+  const regLastUserIdentifier = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastUser'
+  )
+
+  const regLastUser =
+    regLastUserIdentifier &&
+    regLastUserIdentifier.valueReference &&
+    regLastUserIdentifier.valueReference.reference &&
+    regLastUserIdentifier.valueReference.reference.split('/')[1]
+
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.type =
@@ -221,6 +243,15 @@ function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+
+  const createdBy = await getCreatedBy(compositionId)
+
+  if (createdBy) {
+    body.createdBy = createdBy
+    body.updatedBy = regLastUser
+  } else {
+    body.createdBy = regLastUser
+  }
 }
 
 async function detectAndUpdateDuplicates(

@@ -8,7 +8,11 @@ import {
   StatusProgress,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
-import { ISearchInputProps, Spinner } from '@opencrvs/components/lib/interface'
+import {
+  ISearchInputProps,
+  Spinner,
+  TopBar
+} from '@opencrvs/components/lib/interface'
 import {
   ColumnContentAlignment,
   GridTable
@@ -54,29 +58,25 @@ export interface IProps extends IButtonProps {
   disabled?: boolean
   id: string
 }
-const Topbar = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 48px;
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`
+
 export const IconTab = styled(Button).attrs<IProps>({})`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
   padding-left: 0;
   padding-right: 0;
   border-radius: 0;
-  margin-right: 50px;
+  flex-shrink: 0;
   outline: none;
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
-  & div {
+  & > div {
+    padding: 0 16px;
+  }
+  :first-child > div {
     position: relative;
-
-    top: 2px;
-    margin-right: 6px;
+    padding-left: 0;
+  }
+  & div > div {
+    margin-right: 8px;
   }
   &:focus {
     outline: 0;
@@ -504,7 +504,7 @@ export class RegistrarHomeView extends React.Component<
 
             return (
               <>
-                <Topbar>
+                <TopBar>
                   <IconTab
                     id={`tab_${TAB_ID.inProgress}`}
                     key={TAB_ID.inProgress}
@@ -544,7 +544,7 @@ export class RegistrarHomeView extends React.Component<
                     {intl.formatMessage(messages.sentForUpdates)} (
                     {data.countEventRegistrations.rejected})
                   </IconTab>
-                </Topbar>
+                </TopBar>
               </>
             )
           }}
@@ -584,8 +584,8 @@ export class RegistrarHomeView extends React.Component<
                 this.onPageChange(currentPage)
               }}
               pageSize={this.pageSize}
-              totalPages={drafts && drafts.length}
-              initialPage={this.state.progressCurrentPage}
+              totalItems={drafts && drafts.length}
+              currentPage={this.state.progressCurrentPage}
             />
           </BodyContent>
         )}
@@ -669,11 +669,11 @@ export class RegistrarHomeView extends React.Component<
                       this.onPageChange(currentPage)
                     }}
                     pageSize={this.pageSize}
-                    totalPages={
+                    totalItems={
                       data.listEventRegistrations &&
                       data.listEventRegistrations.totalItems
                     }
-                    initialPage={this.state.reviewCurrentPage}
+                    currentPage={this.state.reviewCurrentPage}
                     expandable={true}
                   />
                 </BodyContent>
@@ -761,11 +761,11 @@ export class RegistrarHomeView extends React.Component<
                       this.onPageChange(currentPage)
                     }}
                     pageSize={this.pageSize}
-                    totalPages={
+                    totalItems={
                       data.listEventRegistrations &&
                       data.listEventRegistrations.totalItems
                     }
-                    initialPage={this.state.updatesCurrentPage}
+                    currentPage={this.state.updatesCurrentPage}
                     expandable={true}
                   />
                 </BodyContent>

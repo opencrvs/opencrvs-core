@@ -1130,6 +1130,8 @@ export interface QueryToFetchBirthRegistrationMetricsResolver<
 }
 
 export interface QueryToSearchEventsArgs {
+  status?: string
+  userId?: string
   locationIds?: Array<string | null>
   status?: string
   trackingId?: string
