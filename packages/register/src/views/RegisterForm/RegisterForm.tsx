@@ -5,7 +5,7 @@ import {
   DraftSimple,
   TickLarge
 } from '@opencrvs/components/lib/icons'
-import { Box, InvertSpinner, Modal } from '@opencrvs/components/lib/interface'
+import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Sentry from '@sentry/browser'
 import { isNull, isUndefined, merge } from 'lodash'
@@ -59,10 +59,6 @@ import {
 } from '../../navigation'
 import styled from '../../styled-components'
 import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import {
-  MutationContext,
-  MutationProvider
-} from '../DataProvider/MutationProvider'
 import { StickyFormTabs } from './StickyFormTabs'
 
 const FormSectionTitle = styled.h3`
@@ -224,12 +220,6 @@ const Optional = styled.span.attrs<
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
-`
-
-const ButtonSpinner = styled(InvertSpinner)`
-  width: 15px;
-  height: 15px;
-  top: 0px !important;
 `
 
 const ConfirmBtn = styled(PrimaryButton)`
@@ -503,9 +493,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.setState({ showSubmitModal: true })
   }
 
-  confirmSubmission = (application: IApplication) => {
-    application.submissionStatus =
-      SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]
+  confirmSubmission = (
+    application: IApplication,
+    submissionStatus: string,
+    action: string
+  ) => {
+    application.submissionStatus = submissionStatus
+    application.action = action
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
   }
@@ -805,7 +799,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <ConfirmBtn
                 key="submit"
                 id="submit_confirm"
-                onClick={() => this.confirmSubmission(application)}
+                onClick={() =>
+                  this.confirmSubmission(
+                    application,
+                    SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT],
+                    Action.SUBMIT_FOR_REVIEW.toString()
+                  )
+                }
               >
                 <>
                   <TickLarge />
@@ -832,57 +832,44 @@ class RegisterFormView extends React.Component<FullProps, State> {
           </Modal>
         )}
         {this.state.showRegisterModal && (
-          <MutationProvider
-            event={this.getEvent()}
-            action={Action.REGISTER_APPLICATION}
-            form={registerForm}
-            application={application}
-            onCompleted={this.successfullyRegistered}
-            onError={this.registrationOnError}
+          <Modal
+            title={intl.formatMessage(messages.submitConfirmation)}
+            actions={[
+              <ConfirmBtn
+                key="register"
+                id="register_confirm"
+                // @ts-ignore
+                onClick={() =>
+                  this.confirmSubmission(
+                    application,
+                    SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REGISTER],
+                    Action.REGISTER_APPLICATION.toString()
+                  )
+                }
+              >
+                <>
+                  <TickLarge />
+                  {intl.formatMessage(messages.submitButton)}
+                </>
+              </ConfirmBtn>,
+              <CancelButton
+                key="register_cancel"
+                id="register_cancel"
+                onClick={() => {
+                  this.toggleRegisterModalOpen()
+                  if (document.documentElement) {
+                    document.documentElement.scrollTop = 0
+                  }
+                }}
+              >
+                {intl.formatMessage(messages.cancel)}
+              </CancelButton>
+            ]}
+            show={this.state.showRegisterModal}
+            handleClose={this.toggleRegisterModalOpen}
           >
-            <MutationContext.Consumer>
-              {({ mutation, loading, data }) => (
-                <Modal
-                  title={intl.formatMessage(messages.submitConfirmation)}
-                  actions={[
-                    <ConfirmBtn
-                      key="register"
-                      id="register_confirm"
-                      disabled={loading || data}
-                      // @ts-ignore
-                      onClick={() => mutation()}
-                    >
-                      {!loading && (
-                        <>
-                          <TickLarge />
-                          {intl.formatMessage(messages.submitButton)}
-                        </>
-                      )}
-                      {loading && (
-                        <ButtonSpinner id="register_confirm_spinner" />
-                      )}
-                    </ConfirmBtn>,
-                    <CancelButton
-                      key="register_cancel"
-                      id="register_cancel"
-                      onClick={() => {
-                        this.toggleRegisterModalOpen()
-                        if (document.documentElement) {
-                          document.documentElement.scrollTop = 0
-                        }
-                      }}
-                    >
-                      {intl.formatMessage(messages.cancel)}
-                    </CancelButton>
-                  ]}
-                  show={this.state.showRegisterModal}
-                  handleClose={this.toggleRegisterModalOpen}
-                >
-                  {intl.formatMessage(messages.submitDescription)}
-                </Modal>
-              )}
-            </MutationContext.Consumer>
-          </MutationProvider>
+            {intl.formatMessage(messages.submitDescription)}
+          </Modal>
         )}
 
         {this.state.rejectFormOpen && (
