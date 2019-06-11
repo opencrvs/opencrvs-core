@@ -12,34 +12,33 @@ import { StatusWaiting } from '@opencrvs/components/lib/icons'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 import styled from 'src/styled-components'
-import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+
 import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 import { sentenceCase } from 'src/utils/data-formatting'
-// import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 
 const messages = {
   statusWaitingToRegister: {
-    id: 'register.fieldAgentHome.outbox.statusWaitingToRegister',
+    id: 'register.registrarHome.outbox.statusWaitingToRegister',
     defaultMessage: 'Waiting to register',
-    description: 'Label for application status Ready to Submit'
+    description: 'Label for application status waiting for register'
   },
   statusWaitingToReject: {
-    id: 'register.fieldAgentHome.outbox.statusWaitingToRegister',
+    id: 'register.registrarHome.outbox.statusWaitingToReject',
     defaultMessage: 'Waiting to reject',
-    description: 'Label for application status Ready to Submit'
+    description: 'Label for application status waiting for reject'
   },
-  statusSubmitting: {
-    id: 'register.fieldAgentHome.outbox.statusSubmitting',
+  statusRegistering: {
+    id: 'register.registrarHome.outbox.statusRegistering',
     defaultMessage: 'Registering...',
-    description: 'Label for application status Submitting'
+    description: 'Label for application status Registering'
+  },
+  statusRejecting: {
+    id: 'register.registrarHome.outbox.statusRejecting',
+    defaultMessage: 'Rejecting...',
+    description: 'Label for application status Rejecting'
   },
 
-  statusPendingConnection: {
-    id: 'register.fieldAgentHome.outbox.statusPendingConnection',
-    defaultMessage: 'Pending connection',
-    description: 'Label for application status Pending Connection'
-  },
+  // end of status type
   dataTableNoResults: {
     id: 'register.registrarHome.noResults',
     defaultMessage: 'No result to display',
@@ -76,25 +75,38 @@ type IFullProps = IProps & InjectedIntlProps
 class Outbox extends React.Component<IFullProps, IState> {
   submissionStatusMap = (status: string, index: number) => {
     const { formatMessage } = this.props.intl
-    const { statusWaitingToRegister, statusSubmitting } = messages
+    const {
+      statusWaitingToRegister,
+      statusRegistering,
+      statusRejecting,
+      statusWaitingToReject
+    } = messages
 
     let icon: () => React.ReactNode
     let statusText: string
     let iconId: string
 
     switch (status) {
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
-        iconId = `submitting${index}`
+      case SUBMISSION_STATUS.REGISTERING:
+        iconId = `registering${index}`
         icon = () => <SmallSpinner id={iconId} key={iconId} />
-        statusText = formatMessage(statusSubmitting)
+        statusText = formatMessage(statusRegistering)
         break
-
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
+      case SUBMISSION_STATUS.REJECTING:
+        iconId = `rejecting${index}`
+        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        statusText = formatMessage(statusRejecting)
+        break
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REJECT]:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToReject)
+        break
       default:
+        // default act as  SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REGISTER]:
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToRegister)
-        break
     }
 
     return {
@@ -104,7 +116,8 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 
   transformApplicationsReadyToSend = () => {
-    const allapplications = this.props.application
+    console.log(this.props.application)
+    const allapplications = this.props.application || []
     return allapplications.map((application, index) => {
       let name
       if (application.event && application.event.toString() === 'birth') {
@@ -210,15 +223,4 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 }
 
-function mapStatetoProps(state: IStoreState) {
-  const application = state.applicationsState.applications
-
-  return {
-    application
-  }
-}
-
-export default connect(
-  mapStatetoProps,
-  {}
-)(injectIntl(Outbox))
+export default injectIntl(Outbox)
