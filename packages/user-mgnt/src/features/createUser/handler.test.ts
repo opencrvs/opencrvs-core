@@ -1,9 +1,11 @@
 import { createServer } from '../..'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchMock from 'jest-fetch-mock'
 import { IUser } from '../../model/user'
 import User from '../../model/user'
+
+const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['system'] },
@@ -137,7 +139,7 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('return an error if a fetch return a error code', async () => {
+  it('return an error if a practitioner fetch returns a error code', async () => {
     fetch.mockResponseOnce('', { status: 404 })
 
     const res = await server.server.inject({
@@ -153,10 +155,36 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('returns an error if the user object is invalid', async () => {
+  it('return an error and rollsback if a practitionerRole Id isnt returned', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201 }],
+      ['', { status: 200 }]
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createUser',
+      payload: mockUser,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(fetch.mock.calls.length).toBe(3)
+    expect(fetch.mock.calls[2][0]).toEqual(
+      'http://localhost:5001/fhir/Practitioner/123'
+    )
+    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('returns an error and rollsback if the user object is invalid', async () => {
+    fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 200 }],
+      ['', { status: 200 }]
     )
 
     const copyMockUser = Object.assign({}, mockUser)
@@ -171,7 +199,15 @@ describe('createUser handler', () => {
       }
     })
 
-    expect(fetch.mock.calls.length).toBe(2)
+    expect(fetch.mock.calls.length).toBe(4)
+    expect(fetch.mock.calls[2][0]).toEqual(
+      'http://localhost:5001/fhir/Practitioner/123'
+    )
+    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
+    expect(fetch.mock.calls[3][0]).toEqual(
+      'http://localhost:5001/fhir/PractitionerRole/123'
+    )
+    expect(fetch.mock.calls[3][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(400)
   })
 })

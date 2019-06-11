@@ -12,4 +12,4 @@ export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
+export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
