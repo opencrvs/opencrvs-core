@@ -115,7 +115,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     let statusText: string
     let overwriteStatusIfOffline = true
     let iconId: string
-
     switch (status) {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
         iconId = `submitting${index}`
@@ -221,13 +220,12 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           index,
           draft.trackingId
         )
-
         return {
           id: draft.id,
           event: (draft.event && sentenceCase(draft.event)) || '',
           name: name || '',
-          submissionStatus: statusText || '',
-          statusIndicator: icon ? [icon()] : null,
+          submission_status: statusText || '',
+          status_indicator: icon ? [icon()] : null,
           rowClickHandler: [
             {
               label: 'rowClickHandler',

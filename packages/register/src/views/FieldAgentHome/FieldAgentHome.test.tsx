@@ -68,7 +68,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('FieldAgentHome tests', async () => {
+describe('FieldAgentHome tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -235,6 +235,19 @@ describe('FieldAgentHome tests', async () => {
                     firstNames: 'গায়ত্রী',
                     familyName: 'স্পিভক'
                   }
+                ],
+                // TODO: need to remove this once fragement type issue is resolved
+                deceasedName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  }
                 ]
               }
             ]
@@ -292,6 +305,19 @@ describe('FieldAgentHome tests', async () => {
                   status: 'REJECTED'
                 },
                 childName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  }
+                ],
+                // TODO: need to remove this once fragement type issue is resolved
+                deceasedName: [
                   {
                     use: 'en',
                     firstNames: 'Gayatri',
@@ -461,7 +487,23 @@ describe('FieldAgentHome tests', async () => {
     })
 
     it('renders no records text when no data in grid table', () => {
-      expect(component.find('#no-record').hostNodes()).toHaveLength(1)
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <FieldAgentHome
+          match={{
+            params: {
+              tabId: 'review'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      expect(
+        testComponent.component.find('#no-record').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('when online renders submission status', () => {
@@ -519,7 +561,6 @@ describe('FieldAgentHome tests', async () => {
       store.dispatch(storeApplication(readyApplication))
 
       component.update()
-
       expect(component.find('#offline0').hostNodes()).toHaveLength(1)
     })
   })
