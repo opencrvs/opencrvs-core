@@ -52,7 +52,6 @@ import {
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { goToEvents as goToEventsAction } from 'src/navigation'
-import { SEARCH } from 'src/navigation/routes'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
@@ -301,7 +300,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     this.setState(prevState => ({ showMenu: !prevState.showMenu }))
   }
 
-  renderSearchInput(props: IProps, desktop?: boolean) {
+  renderSearchInput(props: IProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType } = props
 
     const searchTypeList: ISearchType[] = [
@@ -326,20 +325,15 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    const onClearText = () => {
-      if (desktop && window.location.pathname.includes(SEARCH)) {
-        history.back()
-      }
-    }
-
     return (
       <SearchTool
         key="searchMenu"
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        searchHandler={props.goToSearchResult}
-        onClearText={onClearText}
+        searchHandler={(text, type) =>
+          props.goToSearchResult(text, type, isMobile)
+        }
       />
     )
   }
@@ -389,7 +383,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         )
       },
       {
-        element: this.renderSearchInput(this.props, true)
+        element: this.renderSearchInput(this.props)
       },
       {
         element: <ProfileMenu key="profileMenu" />
@@ -402,7 +396,7 @@ class HeaderComp extends React.Component<IProps, IState> {
             icon: () => <ArrowBack />,
             handler: () => history.back()
           },
-          mobileBody: this.renderSearchInput(this.props)
+          mobileBody: this.renderSearchInput(this.props, true)
         }
       : {
           mobileLeft: {

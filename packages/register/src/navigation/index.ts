@@ -90,13 +90,24 @@ export function goToPerformance() {
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
-export function goToSearchResult(searchText: string, searchType: string) {
-  return replace(
-    formatUrl(SEARCH_RESULT, {
-      searchText,
-      searchType
-    })
-  )
+export function goToSearchResult(
+  searchText: string,
+  searchType: string,
+  mobile?: boolean
+) {
+  return mobile
+    ? replace(
+        formatUrl(SEARCH_RESULT, {
+          searchText,
+          searchType
+        })
+      )
+    : push(
+        formatUrl(SEARCH_RESULT, {
+          searchText,
+          searchType
+        })
+      )
 }
 
 export function goToSearch() {
