@@ -29,7 +29,7 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  // TODO lets come back to how these are generated
+  // tslint:disable-next-line
   const code = Math.floor(100000 + Math.random() * 900000).toString()
 
   await storeVerificationCode(nonce, code)

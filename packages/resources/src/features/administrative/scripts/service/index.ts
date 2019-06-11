@@ -3,10 +3,10 @@ import { ADMINISTRATIVE_STRUCTURE_URL, ORG_URL } from '@resources/constants'
 import {
   sendToFhir,
   IOISFLocation,
-  ILocation
+  ILocation,
+  titleCase
 } from '@resources/features/utils/bn'
 import chalk from 'chalk'
-import { titleCase } from '@resources/features/utils/bn'
 
 const composeFhirLocation = (
   location: IOISFLocation,
@@ -185,6 +185,7 @@ const chalkColors = [
 ]
 
 function getRandomColor(): string {
+  // tslint:disable-next-line
   return chalkColors[Math.floor(Math.random() * chalkColors.length)]
 }
 
@@ -194,6 +195,7 @@ export async function getLocationsFromOISF(route: string): Promise<any> {
   console.log(`Fetching: ${url}.`)
   // tslint:disable-next-line:no-console
   console.log(
+    // tslint:disable-next-line
     `${chalk[getRandomColor()]('Please wait, will take 10 minutes ....')}`
   )
   const res = await fetch(url, {

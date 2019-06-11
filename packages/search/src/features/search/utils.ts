@@ -65,6 +65,7 @@ export function queryBuilder(
       term: {
         'applicationLocationId.keyword': {
           value: applicationLocationId,
+          // tslint:disable-next-line
           boost: 2.0
         }
       }

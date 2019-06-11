@@ -16,14 +16,12 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
-} from '@workflow/features/registration/fhir/constants'
-import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
-import {
+  EVENT_TYPE,
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   REG_STATUS_CERTIFIED
 } from '@workflow/features/registration/fhir/constants'
+import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
 import { generateRegistrationNumber } from '@workflow/features/registration/brnGenerator'
 
 export async function modifyRegistrationBundle(
@@ -39,6 +37,7 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
+  // tslint:disable-next-line
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
@@ -280,9 +279,7 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${
-      union.id
-    }`
+    regUserLastLocationExtension.valueReference.reference = `Location/${union.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
@@ -298,9 +295,7 @@ export async function setupLastRegLocation(
     )
   })
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
-    regUserLastOfficeExtension.valueReference.reference = `Location/${
-      primaryOffice.id
-    }`
+    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,

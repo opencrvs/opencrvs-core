@@ -16,6 +16,7 @@ export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
 ) => {
+  // tslint:disable-next-line
   countryCode = countryCode.toUpperCase()
   return mobileWithCountryCode.replace(
     callingCountries[countryCode].countryCallingCodes[0],

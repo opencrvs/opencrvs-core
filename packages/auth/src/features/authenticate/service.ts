@@ -92,6 +92,7 @@ export async function getStoredUserInformation(nonce: string) {
   return JSON.parse(record)
 }
 
+/* tslint:disable */
 const TokenPayload = t.type({
   sub: t.string,
   scope: t.array(t.string),
@@ -111,3 +112,4 @@ export function verifyToken(token: string): ITokenPayload {
   ThrowReporter.report(result)
   return result.value as ITokenPayload
 }
+/* tslint:enable */

@@ -12,6 +12,7 @@ export default async function getUser(
 ) {
   const { userId } = request.payload as IVerifyPayload
 
+  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne({ _id: userId })
 
   if (!user) {

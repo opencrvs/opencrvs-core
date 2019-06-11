@@ -1,8 +1,7 @@
-import { USER_MANAGEMENT_URL } from '@workflow/constants'
+import { USER_MANAGEMENT_URL, COUNTRY } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
 import { logger } from '@workflow/logger'
-import { COUNTRY } from '@workflow/constants'
 import { getTokenPayload } from '@workflow/utils/authUtils.ts'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 const JURISDICTION_TYPE_DISTRICT = 'district'
@@ -34,6 +33,7 @@ export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
 ) => {
+  // tslint:disable-next-line
   countryCode = countryCode.toUpperCase()
   return mobileWithCountryCode.replace(
     callingCountries[countryCode].countryCallingCodes[0],

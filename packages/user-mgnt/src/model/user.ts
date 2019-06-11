@@ -19,6 +19,7 @@ interface IUser {
   active: boolean
   creationDate: number
 }
+// tslint:disable-next-line
 const UserNameSchema = new Schema(
   {
     use: String,

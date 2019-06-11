@@ -1,5 +1,3 @@
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
-
 export const mockBirthFhirBundle = {
   resourceType: 'Bundle',
   type: 'document',
@@ -1749,7 +1747,7 @@ export const mockComposition: fhir.Composition = {
       },
       entry: [
         {
-          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below, the encounter may have zero or more observations attached to it
+          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below
         }
       ]
     },

@@ -50,7 +50,8 @@ export async function createServer() {
       tags: ['api'],
       description: 'Authenticate with username and password',
       notes:
-        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.  Sends an SMS to the user mobile with verification code',
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+        'Sends an SMS to the user mobile with verification code',
       validate: {
         payload: reqAuthSchema
       },
@@ -145,7 +146,8 @@ export async function createServer() {
       tags: ['api'],
       description: 'Marks token as invalid until it expires',
       notes:
-        'Adds a token to the invalid tokens stored in Redis, these are stored as individual key value pairs to that we can set their expiry TTL individually',
+        'Adds a token to the invalid tokens stored in Redis, ' +
+        'these are stored as individual key value pairs to that we can set their expiry TTL individually',
       validate: {
         payload: reqInvalidateTokenSchema
       },

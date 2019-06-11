@@ -38,6 +38,7 @@ export default async function getRoles(
     criteria = { ...criteria, active }
   }
 
+  // tslint:disable-next-line
   return await Role.find(criteria).sort({
     [sortBy]: sortOrder
   })

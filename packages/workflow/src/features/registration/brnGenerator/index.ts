@@ -11,6 +11,7 @@ export async function generateRegistrationNumber(
   practitioner: fhir.Practitioner,
   generatorCode?: string
 ): Promise<string> {
+  // tslint:disable-next-line
   generatorCode = generatorCode ? generatorCode : BRN_GENERATOR_CODE
 
   switch (generatorCode) {

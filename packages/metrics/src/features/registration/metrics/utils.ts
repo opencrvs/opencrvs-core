@@ -11,7 +11,7 @@ import {
   TOTAL_POPULATION_SEC
 } from '@metrics/features/registration/metrics/constants'
 import { fetchFHIR } from '@metrics/features/registration/fhirUtils'
-import { IAuthHeader } from '..'
+import { IAuthHeader } from '@metrics/features/registration'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -43,8 +43,8 @@ export const ageIntervals = [
 ]
 
 export const calculateInterval = (startTime: string, endTime: string) => {
-  const timeStartInMil = parseInt(startTime.substr(0, 13))
-  const timeEndInMil = parseInt(endTime.substr(0, 13))
+  const timeStartInMil = parseInt(startTime.substr(0, 13), 10)
+  const timeEndInMil = parseInt(endTime.substr(0, 13), 10)
   const diffInDays = moment(timeEndInMil).diff(timeStartInMil, 'days')
 
   if (diffInDays > 365) {
@@ -98,6 +98,7 @@ export const fetchEstimateByLocation = async (
     if (extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC) {
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
+      // tslint:disable-next-line
       for (let key = estimatedYear; key > 1; key--) {
         valueArray.forEach(data => {
           if (key in data) {
@@ -114,6 +115,7 @@ export const fetchEstimateByLocation = async (
     ) {
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
+      // tslint:disable-next-line
       for (let key = estimatedYear; key > 1; key--) {
         valueArray.forEach(data => {
           if (key in data) {

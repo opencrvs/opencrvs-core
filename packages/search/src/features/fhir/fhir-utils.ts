@@ -73,9 +73,7 @@ export function findEntryResourceByUrl(
 ) {
   const bundleEntry =
     bundleEntries &&
-    bundleEntries.find(
-      (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === url
-    )
+    bundleEntries.find((obj: fhir.BundleEntry) => obj.fullUrl === url)
   return bundleEntry && bundleEntry.resource
 }
 

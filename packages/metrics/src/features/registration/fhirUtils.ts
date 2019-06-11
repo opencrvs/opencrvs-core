@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { IAuthHeader } from '.'
+import { IAuthHeader } from '@metrics/features/registration'
 import { fhirUrl } from '@metrics/constants'
 
 export function getSectionBySectionCode(

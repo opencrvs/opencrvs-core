@@ -4,10 +4,10 @@ import {
   getLocationIDByDescription,
   getUpazilaID,
   getFromFhir,
-  sendToFhir
+  sendToFhir,
+  titleCase
 } from '@resources/features/utils/bn'
 import chalk from 'chalk'
-import { titleCase } from '@resources/features/utils/bn'
 
 interface ITestPractitioner {
   division: string

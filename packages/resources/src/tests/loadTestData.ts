@@ -27,6 +27,7 @@ async function importTestData(
       'location'
     ) as string
     location.id = locationHeader.split('/')[3]
+    // tslint:disable-next-line:no-console
     console.log('Location saved: ', locationHeader.split('/')[3])
     newLocations.push(location)
   }

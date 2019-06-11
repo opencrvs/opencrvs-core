@@ -37,6 +37,7 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
+  // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_NEW_DEC:
       await sendDeclarationNotification(
@@ -75,6 +76,7 @@ export async function sendEventNotification(
         'deathRegistrationSMS',
         authHeader
       )
+      // tslint:disable-next-line
       break
   }
 }
