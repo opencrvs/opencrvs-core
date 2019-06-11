@@ -20,14 +20,19 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
 const ACTION_LIST = {
-  [Action.SUBMIT_FOR_REVIEW.toString()]: Action.SUBMIT_FOR_REVIEW,
-  [Action.REGISTER_APPLICATION.toString()]: Action.REGISTER_APPLICATION,
-  [Action.REJECT_APPLICATION.toString()]: Action.REJECT_APPLICATION
+  [Action.SUBMIT_FOR_REVIEW]: Action.SUBMIT_FOR_REVIEW,
+  [Action.REGISTER_APPLICATION]: Action.REGISTER_APPLICATION,
+  [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION
+}
+const REQUEST_IN_PROGRESS_STATUS = {
+  [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
+  [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERING,
+  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING
 }
 const SUCCESS_SUBMISSION_STATUS = {
-  [Action.SUBMIT_FOR_REVIEW.toString()]: SUBMISSION_STATUS.SUBMITTED,
-  [Action.REGISTER_APPLICATION.toString()]: SUBMISSION_STATUS.REGISTERED,
-  [Action.REJECT_APPLICATION.toString()]: SUBMISSION_STATUS.REJECTED
+  [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
+  [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERED,
+  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED
 }
 
 export class SubmissionController {
@@ -54,7 +59,7 @@ export class SubmissionController {
 
   private getSubmitableApplications = () => {
     return this.getApplications().filter(
-      app =>
+      (app: IApplication) =>
         app.submissionStatus &&
         ALLOWED_STATUS_FOR_RETRY.includes(app.submissionStatus)
     )
@@ -102,7 +107,10 @@ export class SubmissionController {
       variables: null
     }
 
-    application.submissionStatus = SUBMISSION_STATUS.SUBMITTING
+    const requestInProgressStatus =
+      REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
+      SUBMISSION_STATUS.SUBMITTING
+    application.submissionStatus = requestInProgressStatus
     modifyApplication(application)
 
     try {
