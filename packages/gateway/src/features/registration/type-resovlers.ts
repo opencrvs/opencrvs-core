@@ -420,28 +420,6 @@ export const typeResolvers: GQLResolver = {
       )
     }
   },
-  User: {
-    role: async (user, _, authHeader) => {
-      const practitionerRole = await fetchFHIR(
-        `/PractitionerRole?practitioner=${user.id}`,
-        authHeader
-      )
-      const roleEntry = practitionerRole.entry[0].resource
-      if (
-        !roleEntry ||
-        !roleEntry.code ||
-        !roleEntry.code[0] ||
-        !roleEntry.code[0].coding ||
-        !roleEntry.code[0].coding[0] ||
-        !roleEntry.code[0].coding[0].code
-      ) {
-        throw new Error('PractitionerRole has no role code')
-      }
-      const role = roleEntry.code[0].coding[0].code
-
-      return role
-    }
-  },
   Comment: {
     user: comment => comment.authorString,
     comment: comment => comment.text,
