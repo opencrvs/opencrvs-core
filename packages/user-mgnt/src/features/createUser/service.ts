@@ -103,3 +103,22 @@ export const rollback = async (
     await deleteFhir(token, 'PractitionerRole', roleId)
   }
 }
+
+export function generateUsername(given: string[], family: string) {
+  const initials = given.reduce(
+    (accumulated, current) => accumulated + current.trim().charAt(0),
+    ''
+  )
+
+  const username = `${initials}${
+    initials === '' ? '' : '.'
+  }${family.trim().replace(/ /g, '-')}`.toLowerCase()
+
+  if (username.length < 3) {
+    throw new Error(
+      'username cannot be less than 3 characters, please provide more name details'
+    )
+  }
+
+  return username
+}
