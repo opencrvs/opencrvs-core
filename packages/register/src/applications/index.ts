@@ -18,6 +18,12 @@ export enum SUBMISSION_STATUS {
   READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTING = 'SUBMITTING',
   SUBMITTED = 'SUBMITTED',
+  READY_TO_REGISTER = 'READY_TO_REGISTER',
+  REGISTERING = 'REGISTERING',
+  REGISTERED = 'REGISTERED',
+  READY_TO_REJECT = 'READY_TO_REJECT',
+  REJECTING = 'REJECTING',
+  REJECTED = 'REJECTED',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
@@ -32,6 +38,7 @@ export interface IApplication {
   event: Event
   registrationStatus?: string
   submissionStatus?: string
+  action?: string
   trackingId?: string
   compositionId?: string
   registrationNumber?: string
