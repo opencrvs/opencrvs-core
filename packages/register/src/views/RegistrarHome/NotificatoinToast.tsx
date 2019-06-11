@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import Outbox from './Outbox'
-import { IApplication } from 'src/applications'
+import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 
 const messages = defineMessages({
   processingText: {
@@ -33,15 +33,21 @@ interface IProps {
 type IFullProps = IProps & InjectedIntlProps
 
 interface IState {
-  total: number
+  outboxData: any
 }
 class NotificationToast extends React.Component<IFullProps, IState> {
   state = {
-    total: 0
+    outboxData: []
   }
   componentDidMount() {
-    const total = this.props.application.length
-    this.setState({ total })
+    const outboxData = this.props.application.filter(
+      item =>
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
+        item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
+        item.submissionStatus === SUBMISSION_STATUS.REJECTING
+    )
+    this.setState({ outboxData })
   }
 
   render() {
@@ -49,16 +55,16 @@ class NotificationToast extends React.Component<IFullProps, IState> {
       <ExpandableNotificationContainer>
         <ExpandableNotification
           outboxText={this.props.intl.formatMessage(messages.outboxText, {
-            num: this.state.total
+            num: this.state.outboxData.length
           })}
           processingText={this.props.intl.formatMessage(
             messages.processingText,
             {
-              num: this.state.total
+              num: this.state.outboxData.length
             }
           )}
         >
-          <Outbox application={this.props.application} />
+          <Outbox application={this.state.outboxData} />
         </ExpandableNotification>
       </ExpandableNotificationContainer>
     )
