@@ -62,9 +62,12 @@ type IProps = InjectedIntlProps & {
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
+  goToHomeAction: typeof goToHome
+  goToPerformanceAction: typeof goToPerformance
   searchText?: string
   selectedSearchType?: string
   mobileSearchBar?: boolean
+  enableMenuSelection?: boolean
 }
 interface IState {
   showMenu: boolean
@@ -339,20 +342,26 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl, userDetails } = this.props
+    const {
+      intl,
+      userDetails,
+      enableMenuSelection,
+      goToHomeAction,
+      goToPerformanceAction
+    } = this.props
     const title = this.props.title || intl.formatMessage(messages.defaultTitle)
 
     let menuItems = [
       {
         key: 'application',
         title: intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome,
-        selected: true
+        onClick: goToHomeAction,
+        selected: enableMenuSelection !== undefined ? enableMenuSelection : true
       },
       {
         key: 'performance',
         title: intl.formatMessage(messages.performanceTitle),
-        onClick: goToPerformance,
+        onClick: goToPerformanceAction,
         selected: false
       }
     ]
@@ -433,6 +442,8 @@ export const Header = connect(
     goToSearchResult,
     goToSearch,
     goToSettings,
-    goToEvents: goToEventsAction
+    goToEvents: goToEventsAction,
+    goToHomeAction: goToHome,
+    goToPerformanceAction: goToPerformance
   }
 )(injectIntl<IProps>(HeaderComp))
