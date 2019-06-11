@@ -1,0 +1,24 @@
+input RoleInput {
+  title: String
+  value: String
+  types: [String]
+}
+
+type Role {
+  id: ID!
+  title: String
+  value: String
+  types: [String]
+  active: Boolean
+}
+
+type Query {
+  getRoles(
+    title: String
+    value: String
+    type: String
+    active: Boolean
+    sortBy: String
+    sortOrder: String
+  ): [Role]
+}

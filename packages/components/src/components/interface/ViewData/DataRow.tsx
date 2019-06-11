@@ -38,6 +38,7 @@ const Action = styled.div`
   width: auto;
 `
 interface IAction {
+  id?: string
   label: string
   disabled?: boolean
   handler?: () => void
@@ -63,7 +64,11 @@ export class DataRow extends React.Component<IDataProps> {
         </DataContainer>
         {action && (
           <Action>
-            <LinkButton disabled={action.disabled} onClick={action.handler}>
+            <LinkButton
+              id={action.id}
+              disabled={action.disabled}
+              onClick={action.handler}
+            >
               {action.label}
             </LinkButton>
           </Action>

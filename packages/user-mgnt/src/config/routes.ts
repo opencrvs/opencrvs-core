@@ -10,13 +10,15 @@ import getUserMobile, {
 import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
 import getUser from 'src/features/getUser/handler'
 import createUser from 'src/features/createUser/handler'
+import getRoles, { searchRoleSchema } from 'src/features/getRoles/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
-  SYSTEM = 'system'
+  SYSTEM = 'system',
+  SYSADMIN = 'sysadmin'
 }
 
 export const getRoutes = () => {
@@ -55,7 +57,8 @@ export const getRoutes = () => {
             RouteScope.DECLARE,
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN
           ]
         },
         validate: {
@@ -75,7 +78,8 @@ export const getRoutes = () => {
           scope: [
             RouteScope.SYSTEM,
             // TODO: need to remove this once system role token is there
-            RouteScope.REGISTER
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
           ]
         },
         validate: {
@@ -96,7 +100,8 @@ export const getRoutes = () => {
             RouteScope.DECLARE,
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN
           ]
         },
         validate: {
@@ -112,8 +117,30 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [RouteScope.SYSTEM, RouteScope.REGISTER]
+          scope: [
+            RouteScope.SYSTEM,
+            // TODO: need to remove this once system role token is there
+            RouteScope.REGISTER
+          ]
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/getRoles',
+      handler: getRoles,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.SYSTEM,
+            // TODO: need to remove this once system role token is there
+            RouteScope.REGISTER
+          ]
+        },
+        validate: {
+          payload: searchRoleSchema
+        },
+        tags: ['api']
       }
     }
   ]

@@ -10,6 +10,7 @@ import { getRegisterForm } from './forms/register/application-selectors'
 import { AppStore } from './store'
 import { createClient } from './utils/apolloClient'
 import { getMutationMapping } from './views/DataProvider/MutationProvider'
+import { FetchResult } from 'react-apollo'
 
 const INTERVAL_TIME = 5000
 const ALLOWED_STATUS_FOR_RETRY = [
@@ -92,16 +93,25 @@ export class SubmissionController {
     modifyApplication(application)
 
     try {
-      await this.client.mutate({ mutation, variables })
-      this.onSuccess(application)
+      const mutationResult = await this.client.mutate({ mutation, variables })
+      this.onSuccess(application, mutationResult)
     } catch (exception) {
       this.onError(application, exception)
     }
   }
 
-  private onSuccess = (application: IApplication) => {
+  private onSuccess = (application: IApplication, result: FetchResult) => {
     application.submissionStatus =
       SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+    if (result && result.data && result.data.createBirthRegistration) {
+      const { compositionId, trackingId } = result.data.createBirthRegistration
+      if (compositionId) {
+        application.compositionId = compositionId
+      }
+      if (trackingId) {
+        application.trackingId = trackingId
+      }
+    }
     this.store.dispatch(modifyApplication(application))
   }
 

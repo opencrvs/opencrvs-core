@@ -56,6 +56,7 @@ describe('when user logs in', async () => {
   }
 
   const currentUserDetails: IUserDetails = {
+    language: 'en',
     userMgntUserID: 'shakib75'
   }
 

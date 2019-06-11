@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose'
 
 import User from '../src/model/user'
+import Role from '../src/model/role'
 import { generateSaltedHash } from '../src/utils/password'
 import { MONGO_URL } from '../src/constants'
 mongoose.connect(MONGO_URL)
@@ -328,7 +329,31 @@ const registrationClerk4 = new User({
   ]
 })
 
-const testUsers = [
+const sysAdmin = new User({
+  name: [
+    {
+      use: 'en',
+      given: ['Sahriar'],
+      family: ['Nafis']
+    }
+  ],
+  email: 'test@test.org',
+  mobile: '+8801721111111',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'LOCAL_SYSTEM_ADMIN',
+  scope: ['sysadmin', 'demo'],
+  practitionerId: 'd9cf6968-2b4b-4eda-8ba0-5265d53fdb22',
+  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+  catchmentAreaIds: [
+    'b21ce04e-7ccd-4d65-929f-453bc193a736',
+    '95754572-ab6f-407b-b51a-1636cb3d0683',
+    '7719942b-16a7-474a-8af1-cd0c94c730d2',
+    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ]
+})
+
+const users = [
   fieldAgent,
   fieldAgent2,
   fieldAgent3,
@@ -342,7 +367,68 @@ const testUsers = [
   localRegistrar3,
   districtRegistrar,
   stateRegistrar,
-  nationalRegistrar
+  nationalRegistrar,
+  sysAdmin
+]
+User.collection.insertMany(users)
+
+const fieldAgentRole = new Role({
+  title: 'Field Agent',
+  value: 'FIELD_AGENT',
+  types: ['Hospital', 'CHA'],
+  active: true
+})
+
+const regitstrationAgentRole = new Role({
+  title: 'Registration Agent',
+  value: 'REGISTRATION_CLERK',
+  types: ['Entrepeneur', 'Data entry clerk'],
+  active: true
+})
+
+const regitstrarRole = new Role({
+  title: 'Registrar',
+  value: 'LOCAL_REGISTRAR',
+  types: ['Secretary', 'Chairman', 'Mayor'],
+  active: true
+})
+
+const sysAdminLocalRole = new Role({
+  title: 'System admin (local)',
+  value: 'LOCAL_SYSTEM_ADMIN',
+  types: ['System admin (local)'],
+  active: true
+})
+
+const sysAdminNationalRole = new Role({
+  title: 'System admin (national)',
+  value: 'LOCAL_SYSTEM_NATIONAL',
+  types: ['System admin (national)'],
+  active: true
+})
+
+const performanceOversightRole = new Role({
+  title: 'Performance Oversight',
+  value: 'PERFORMANCE_OVERSIGHT',
+  types: ['Cabinet Division', 'BBS'],
+  active: true
+})
+
+const performanceMgntRole = new Role({
+  title: 'Performance Management',
+  value: 'PERFORMANCE_MANAGEMENT',
+  types: ['Health Division', 'ORG Division'],
+  active: true
+})
+
+const roles = [
+  fieldAgentRole,
+  regitstrationAgentRole,
+  regitstrarRole,
+  sysAdminLocalRole,
+  sysAdminNationalRole,
+  performanceOversightRole,
+  performanceMgntRole
 ]
 
 function onInsert(err: any, values: any) {
@@ -350,5 +436,4 @@ function onInsert(err: any, values: any) {
     mongoose.disconnect()
   }
 }
-
-User.collection.insertMany(testUsers, onInsert)
+Role.collection.insertMany(roles, onInsert)

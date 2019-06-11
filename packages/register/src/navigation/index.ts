@@ -12,7 +12,8 @@ import {
   FIELD_AGENT_HOME_TAB,
   SEARCH,
   APPLICATION_DETAIL,
-  SETTINGS
+  SETTINGS,
+  SYS_ADMIN_HOME_TAB
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -56,7 +57,19 @@ type GoTo_FIELD_AGENT_HOME = {
   }
 }
 
-export type Action = GoToTabAction | GoToREGISTRAR_HOME | GoTo_FIELD_AGENT_HOME
+export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
+type GoTo_SYS_ADMIN_HOME = {
+  type: typeof GO_TO_SYS_ADMIN_HOME
+  payload: {
+    tabId: string
+  }
+}
+
+export type Action =
+  | GoToTabAction
+  | GoToREGISTRAR_HOME
+  | GoTo_FIELD_AGENT_HOME
+  | GoTo_SYS_ADMIN_HOME
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -77,13 +90,24 @@ export function goToPerformance() {
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
 
-export function goToSearchResult(searchText: string, searchType: string) {
-  return replace(
-    formatUrl(SEARCH_RESULT, {
-      searchText,
-      searchType
-    })
-  )
+export function goToSearchResult(
+  searchText: string,
+  searchType: string,
+  mobile?: boolean
+) {
+  return mobile
+    ? replace(
+        formatUrl(SEARCH_RESULT, {
+          searchText,
+          searchType
+        })
+      )
+    : push(
+        formatUrl(SEARCH_RESULT, {
+          searchText,
+          searchType
+        })
+      )
 }
 
 export function goToSearch() {
@@ -133,6 +157,13 @@ export function goToRegistrarHomeTab(tabId: string) {
 export function goToFieldAgentHomeTab(tabId: string) {
   return {
     type: GO_TO_FIELD_AGENT_HOME,
+    payload: { tabId }
+  }
+}
+
+export function goToSysAdminHomeTab(tabId: string) {
+  return {
+    type: GO_TO_SYS_ADMIN_HOME,
     payload: { tabId }
   }
 }
@@ -202,6 +233,14 @@ export function navigationReducer(state: INavigationState, action: Action) {
         state,
         Cmd.action(
           push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
+        )
+      )
+    case GO_TO_SYS_ADMIN_HOME:
+      const { tabId: SysAdminHomeTabId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
         )
       )
   }

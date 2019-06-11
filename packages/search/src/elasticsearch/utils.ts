@@ -1,4 +1,7 @@
-import { searchComposition } from 'src/elasticsearch/dbhelper'
+import {
+  searchComposition,
+  searchByCompositionId
+} from 'src/elasticsearch/dbhelper'
 import { SearchResponse } from 'elasticsearch'
 import { MATCH_SCORE_THRESHOLD } from 'src/constants'
 
@@ -20,6 +23,8 @@ export interface ICompositionBody {
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]
+  createdBy?: string
+  updatedBy?: string
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {
@@ -58,6 +63,15 @@ export async function detectDuplicates(
   const searchResponse = await searchComposition(body)
   const duplicates = findDuplicateIds(compositionId, searchResponse)
   return duplicates
+}
+
+export async function getCreatedBy(compositionId: string) {
+  const results = await searchByCompositionId(compositionId)
+  const result =
+    results.hits.hits &&
+    (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
+
+  return result && result.createdBy
 }
 
 function findDuplicateIds(
