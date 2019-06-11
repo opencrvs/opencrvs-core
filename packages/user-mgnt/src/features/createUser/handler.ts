@@ -31,7 +31,6 @@ export default async function createUser(
     }
     const role = createFhirPractitionerRole(user, practitionerId)
     roleId = await postFhir(token, role)
-    console.log(roleId)
     if (!roleId) {
       throw new Error(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
