@@ -492,8 +492,6 @@ describe('RegistrarHome tests', async () => {
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in rejected tab', async () => {
-    // TODO: Discuss with Yeasin about how he used moment.js in this scenario
-    // const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const graphqlMock = [
       {
         request: {
@@ -658,8 +656,6 @@ describe('RegistrarHome tests', async () => {
   })
 
   it('renders all items returned from graphql query in ready-to-print tab', async () => {
-    // TODO: Discuss with Yeasin about how he used moment.js in this scenario
-    // const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const graphqlMock = [
       {
         request: {
