@@ -52,7 +52,6 @@ import {
 import { Plus } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { goToEvents as goToEventsAction } from 'src/navigation'
-import { SEARCH } from 'src/navigation/routes'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails
@@ -63,9 +62,12 @@ type IProps = InjectedIntlProps & {
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
+  goToHomeAction: typeof goToHome
+  goToPerformanceAction: typeof goToPerformance
   searchText?: string
   selectedSearchType?: string
   mobileSearchBar?: boolean
+  enableMenuSelection?: boolean
 }
 interface IState {
   showMenu: boolean
@@ -301,7 +303,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     this.setState(prevState => ({ showMenu: !prevState.showMenu }))
   }
 
-  renderSearchInput(props: IProps, desktop?: boolean) {
+  renderSearchInput(props: IProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType } = props
 
     const searchTypeList: ISearchType[] = [
@@ -326,39 +328,40 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    const onClearText = () => {
-      if (desktop && window.location.pathname.includes(SEARCH)) {
-        history.back()
-      }
-    }
-
     return (
       <SearchTool
         key="searchMenu"
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        searchHandler={props.goToSearchResult}
-        onClearText={onClearText}
+        searchHandler={(text, type) =>
+          props.goToSearchResult(text, type, isMobile)
+        }
       />
     )
   }
 
   render() {
-    const { intl, userDetails } = this.props
+    const {
+      intl,
+      userDetails,
+      enableMenuSelection,
+      goToHomeAction,
+      goToPerformanceAction
+    } = this.props
     const title = this.props.title || intl.formatMessage(messages.defaultTitle)
 
     let menuItems = [
       {
         key: 'application',
         title: intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome,
-        selected: true
+        onClick: goToHomeAction,
+        selected: enableMenuSelection !== undefined ? enableMenuSelection : true
       },
       {
         key: 'performance',
         title: intl.formatMessage(messages.performanceTitle),
-        onClick: goToPerformance,
+        onClick: goToPerformanceAction,
         selected: false
       }
     ]
@@ -389,7 +392,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         )
       },
       {
-        element: this.renderSearchInput(this.props, true)
+        element: this.renderSearchInput(this.props)
       },
       {
         element: <ProfileMenu key="profileMenu" />
@@ -402,7 +405,7 @@ class HeaderComp extends React.Component<IProps, IState> {
             icon: () => <ArrowBack />,
             handler: () => history.back()
           },
-          mobileBody: this.renderSearchInput(this.props)
+          mobileBody: this.renderSearchInput(this.props, true)
         }
       : {
           mobileLeft: {
@@ -439,6 +442,8 @@ export const Header = connect(
     goToSearchResult,
     goToSearch,
     goToSettings,
-    goToEvents: goToEventsAction
+    goToEvents: goToEventsAction,
+    goToHomeAction: goToHome,
+    goToPerformanceAction: goToPerformance
   }
 )(injectIntl<IProps>(HeaderComp))

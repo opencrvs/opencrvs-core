@@ -27,7 +27,6 @@ export enum SUBMISSION_STATUS {
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
-
 export interface IApplication {
   id: string
   data: IFormData

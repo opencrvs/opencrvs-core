@@ -1007,6 +1007,11 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.notificationToast.processingText':
       '{num} application processing...',
     'register.registrarHome.notificationToast.outboxText': 'Outbox({num})',
+    'register.registrarHome.outbox.statusWaitingToRegister':
+      'Waiting to register',
+    'register.registrarHome.outbox.statusWaitingToReject': 'Waiting to reject',
+    'register.registrarHome.outbox.statusRegistering': 'Registering...',
+    'register.registrarHome.outbox.statusRejecting': 'Rejecting...',
     'settings.title': 'Settings',
     'profile.title': 'Profile',
     'security.title': 'Security',
