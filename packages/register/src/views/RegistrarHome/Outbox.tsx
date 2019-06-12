@@ -27,6 +27,11 @@ const messages = {
     defaultMessage: 'Waiting to reject',
     description: 'Label for application status waiting for reject'
   },
+  statusWaitingToSubmit: {
+    id: 'register.registrarHome.outbox.statusWaitingToSubmit',
+    defaultMessage: 'Waiting to submit',
+    description: 'Label for application status waiting for reject'
+  },
   statusRegistering: {
     id: 'register.registrarHome.outbox.statusRegistering',
     defaultMessage: 'Registering...',
@@ -36,6 +41,11 @@ const messages = {
     id: 'register.registrarHome.outbox.statusRejecting',
     defaultMessage: 'Rejecting...',
     description: 'Label for application status Rejecting'
+  },
+  statusSubmitting: {
+    id: 'register.registrarHome.outbox.statusSubmitting',
+    defaultMessage: 'Submitting...',
+    description: 'Label for application status submitting'
   },
 
   // end of status type
@@ -54,6 +64,9 @@ const messages = {
     id: 'register.registrarHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
+  },
+  waitingToRetry: {
+    id: 'register.registrarHome.outbox.waitingToRetry'
   }
 }
 
@@ -61,6 +74,10 @@ const Container = styled(BodyContent)`
   padding-top: 32px;
 `
 const SmallSpinner = styled(Spinner)`
+  background: ${({ theme }) =>
+    `linear-gradient(to right,${theme.colors.white} 10%,${
+      theme.colors.primary
+    } 42%)`};
   width: 24px;
   height: 24px;
 `
@@ -78,8 +95,11 @@ class Outbox extends React.Component<IFullProps, IState> {
     const {
       statusWaitingToRegister,
       statusRegistering,
+      statusWaitingToReject,
       statusRejecting,
-      statusWaitingToReject
+      statusWaitingToSubmit,
+      statusSubmitting,
+      waitingToRetry
     } = messages
 
     let icon: () => React.ReactNode
@@ -87,20 +107,35 @@ class Outbox extends React.Component<IFullProps, IState> {
     let iconId: string
 
     switch (status) {
+      case SUBMISSION_STATUS.READY_TO_SUBMIT:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToSubmit)
+        break
+      case SUBMISSION_STATUS.SUBMITTING:
+        iconId = `registering${index}`
+        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        statusText = formatMessage(statusSubmitting)
+        break
       case SUBMISSION_STATUS.REGISTERING:
         iconId = `registering${index}`
         icon = () => <SmallSpinner id={iconId} key={iconId} />
         statusText = formatMessage(statusRegistering)
+        break
+      case SUBMISSION_STATUS.READY_TO_REJECT:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToReject)
         break
       case SUBMISSION_STATUS.REJECTING:
         iconId = `rejecting${index}`
         icon = () => <SmallSpinner id={iconId} key={iconId} />
         statusText = formatMessage(statusRejecting)
         break
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REJECT]:
-        iconId = `waiting${index}`
+      case SUBMISSION_STATUS.FAILED_NETWORK:
+        iconId = `failed${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToReject)
+        statusText = formatMessage(waitingToRetry)
         break
       default:
         // default act as  SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REGISTER]:
@@ -116,7 +151,6 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 
   transformApplicationsReadyToSend = () => {
-    console.log(this.props.application)
     const allapplications = this.props.application || []
     return allapplications.map((application, index) => {
       let name
@@ -214,7 +248,7 @@ class Outbox extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}
-          totalPages={10}
+          totalItems={10}
           onPageChange={this.onPageChange}
           pageSize={10}
         />

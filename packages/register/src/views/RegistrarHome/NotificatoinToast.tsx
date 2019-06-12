@@ -31,40 +31,36 @@ interface IProps {
   application: IApplication[]
 }
 type IFullProps = IProps & InjectedIntlProps
-
-interface IState {
-  outboxData: any
-}
-class NotificationToast extends React.Component<IFullProps, IState> {
-  state = {
-    outboxData: []
+class NotificationToast extends React.Component<IFullProps> {
+  constructor(props: IFullProps) {
+    super(props)
   }
-  componentDidMount() {
+  render() {
     const outboxData = this.props.application.filter(
       item =>
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT ||
+        item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
         item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
-        item.submissionStatus === SUBMISSION_STATUS.REJECTING
+        item.submissionStatus === SUBMISSION_STATUS.REJECTING ||
+        item.submissionStatus === SUBMISSION_STATUS.FAILED_NETWORK
     )
-    this.setState({ outboxData })
-  }
 
-  render() {
-    return this.state.outboxData.length > 0 ? (
+    return outboxData.length > 0 ? (
       <ExpandableNotificationContainer>
         <ExpandableNotification
           outboxText={this.props.intl.formatMessage(messages.outboxText, {
-            num: this.state.outboxData.length
+            num: outboxData.length
           })}
           processingText={this.props.intl.formatMessage(
             messages.processingText,
             {
-              num: this.state.outboxData.length
+              num: outboxData.length
             }
           )}
         >
-          <Outbox application={this.state.outboxData} />
+          <Outbox application={outboxData} />
         </ExpandableNotification>
       </ExpandableNotificationContainer>
     ) : null
@@ -72,13 +68,8 @@ class NotificationToast extends React.Component<IFullProps, IState> {
 }
 
 function mapStatetoProps(state: IStoreState) {
-  const application = state.applicationsState.applications
-
   return {
-    application
+    application: [...state.applicationsState.applications]
   }
 }
-export default connect(
-  mapStatetoProps,
-  {}
-)(injectIntl(NotificationToast))
+export default connect(mapStatetoProps)(injectIntl(NotificationToast))
