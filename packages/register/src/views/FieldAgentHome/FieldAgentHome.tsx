@@ -1,21 +1,41 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { RouteComponentProps, Redirect } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { goToEvents as goToEventsAction } from 'src/navigation'
-import { ISearchInputProps } from '@opencrvs/components/lib/interface'
-import { IUserDetails } from '../../utils/userUtils'
+
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
+import {
+  ISearchInputProps,
+  GridTable,
+  Loader,
+  Spinner,
+  TopBar
+} from '@opencrvs/components/lib/interface'
+import { IUserDetails, getUserLocation } from '../../utils/userUtils'
+
 import { getUserDetails } from 'src/profile/profileSelectors'
 import { Header } from 'src/components/interface/Header/Header'
 import {
-  FIELD_AGENT_ROLE,
+  goToEvents as goToEventsAction,
+  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
+  goToTab as goToTabAction,
+  goToApplicationDetails
+} from 'src/navigation'
+import {
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
+  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
+  LANG_EN,
+  EMPTY_STRING,
+  APPLICATION_DATE_FORMAT,
+  UNION_LOCATION_CODE,
+  FIELD_AGENT_ROLES,
+  SYS_ADMIN_ROLES,
+  REGISTRAR_ROLES
 } from 'src/utils/constants'
-import styled from 'styled-components'
+import { InProgress } from './InProgress'
+import styled, { withTheme } from 'styled-components'
 import {
   Button,
   ICON_ALIGNMENT,
@@ -25,23 +45,31 @@ import {
   StatusProgress,
   StatusOrange,
   StatusRejected,
-  PlusTransparentWhite
+  PlusTransparentWhite,
+  ApplicationsOrangeAmber
 } from '@opencrvs/components/lib/icons'
-import { goToFieldAgentHomeTab as goToFieldAgentHomeTabAction } from '../../navigation'
-import { REGISTRAR_HOME } from 'src/navigation/routes'
+import { REGISTRAR_HOME, SYS_ADMIN_HOME } from 'src/navigation/routes'
 import { IApplication, SUBMISSION_STATUS } from 'src/applications'
 import { SentForReview } from './SentForReview'
+import { Query } from 'react-apollo'
+import {
+  SEARCH_APPLICATIONS_USER_WISE,
+  COUNT_USER_WISE_APPLICATIONS
+} from 'src/search/queries'
+import { EVENT_STATUS } from '../RegistrarHome/RegistrarHome'
+import * as Sentry from '@sentry/browser'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { BodyContent } from '@opencrvs/components/lib/layout'
+import {
+  GQLQuery,
+  GQLEventSearchSet,
+  GQLBirthEventSearchSet,
+  GQLHumanName,
+  GQLDeathEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
+import { createNamesMap } from 'src/utils/data-formatting'
+import * as moment from 'moment'
 
-const Topbar = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 48px;
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  display: flex;
-  overflow-x: auto;
-  justify-content: flex-start;
-  align-items: center;
-`
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
@@ -66,12 +94,41 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   }
 `
 const FABContainer = styled.div`
-  position: absolute;
-  left: 85.33%;
-  right: 5.33%;
-  top: 85%;
-  bottom: 9.17%;
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
+const StyledSpinner = styled(Spinner)`
+  margin: 20% auto;
+`
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  text-align: center;
+  margin-top: 100px;
+`
+
+const ZeroUpdatesContainer = styled.div`
+  padding-top: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
+const ZeroUpdatesText = styled.span`
+  padding-top: 10px;
+  color: ${({ theme }) => theme.colors.blackStormy};
+  ${({ theme }) => theme.fonts.h4Style};
+`
+
+const AllUpdatesText = styled.span`
+  color: ${({ theme }) => theme.colors.blackStormy};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+`
+
 const messages = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
@@ -87,90 +144,351 @@ const messages = defineMessages({
     id: 'register.fieldAgentHome.requireUpdates',
     defaultMessage: 'Require updates ({total})',
     description: 'The title of require updates tab'
+  },
+  rejectedDays: {
+    id: 'register.fieldAgentHome.rejectedDays',
+    defaultMessage: 'Rejected {text}',
+    description: 'The title of rejected days of application'
+  },
+  listItemName: {
+    id: 'register.registrarHome.listItemName',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  listItemType: {
+    id: 'register.registrarHome.resultsType',
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item'
+  },
+  listItemUpdateDate: {
+    id: 'register.registrarHome.results.updateDate',
+    defaultMessage: 'Sent on',
+    description: 'Label for rejection date in work queue list item'
+  },
+  zeroUpdatesText: {
+    id: 'register.fieldAgentHome.zeroUpdatesText',
+    defaultMessage: 'No applications require updates',
+    description: 'The text when no rejected applications'
+  },
+  allUpdatesText: {
+    id: 'register.fieldAgentHome.allUpdatesText',
+    defaultMessage: 'Great job! You have updated all applications',
+    description: 'The text when all rejected applications updated'
+  },
+  requireUpdatesLoading: {
+    id: 'register.fieldAgentHome.requireUpdatesLoading',
+    defaultMessage: 'Checking your applications',
+    description: 'The text when all rejected applications are loading'
+  },
+  queryError: {
+    id: 'register.fieldAgentHome.queryError',
+    defaultMessage: 'An error occured while loading applications',
+    description: 'The text when error ocurred loading rejected applications'
   }
 })
-interface IFieldAgentHomeProps {
+interface IBaseFieldAgentHomeProps {
+  theme: ITheme
   language: string
   userDetails: IUserDetails
+  tabId: string
+  draftApplications: IApplication[]
+  goToTab: typeof goToTabAction
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
+  goToApplicationDetails: typeof goToApplicationDetails
   applicationsReadyToSend: IApplication[]
+}
+
+interface IFieldAgentHomeState {
+  requireUpdatesPage: number
 }
 
 interface IMatchParams {
   tabId: string
 }
 
-type FullProps = IFieldAgentHomeProps &
+type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
   InjectedIntlProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
+
+interface IFieldAgentHomeState {
+  requireUpdatesPage: number
+}
 
 const TAB_ID = {
   inProgress: FIELD_AGENT_HOME_TAB_IN_PROGRESS,
   sentForReview: FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   requireUpdates: FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES
 }
-class FieldAgentHomeView extends React.Component<FullProps> {
+
+class FieldAgentHomeView extends React.Component<
+  FieldAgentHomeProps,
+  IFieldAgentHomeState
+> {
+  pageSize = 10
+  constructor(props: FieldAgentHomeProps) {
+    super(props)
+    this.state = {
+      requireUpdatesPage: 1
+    }
+  }
+
+  onPageChange = (newPageNumber: number) => {
+    if (this.props.match.params.tabId === TAB_ID.requireUpdates) {
+      this.setState({ requireUpdatesPage: newPageNumber })
+    }
+  }
+
+  transformRejectedContent = (data: GQLQuery) => {
+    if (!data.searchEvents || !data.searchEvents.results) {
+      return []
+    }
+
+    return data.searchEvents.results.map((reg: GQLEventSearchSet) => {
+      let names
+      if (reg.registration && reg.type === 'Birth') {
+        const birthReg = reg as GQLBirthEventSearchSet
+        names = birthReg && (birthReg.childName as GQLHumanName[])
+      } else {
+        const deathReg = reg as GQLDeathEventSearchSet
+        names = deathReg && (deathReg.deceasedName as GQLHumanName[])
+      }
+      moment.locale(this.props.intl.locale)
+      const daysOfRejection =
+        reg.registration &&
+        reg.registration.dateOfApplication &&
+        reg.registration.dateOfApplication &&
+        moment(
+          reg.registration.dateOfApplication,
+          APPLICATION_DATE_FORMAT
+        ).fromNow()
+
+      return {
+        id: reg.id,
+        event: reg.type as string,
+        name:
+          (createNamesMap(names)[this.props.intl.locale] as string) ||
+          (createNamesMap(names)[LANG_EN] as string),
+        days_of_rejection: this.props.intl.formatMessage(
+          messages.rejectedDays,
+          {
+            text: daysOfRejection
+          }
+        ),
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(reg.id)
+          }
+        ]
+      }
+    })
+  }
+
   render() {
-    const { userDetails, match, intl, applicationsReadyToSend } = this.props
+    const {
+      draftApplications,
+      userDetails,
+      match,
+      intl,
+      applicationsReadyToSend,
+      theme
+    } = this.props
     const tabId = match.params.tabId || TAB_ID.inProgress
-    const isFieldAgent =
-      userDetails && userDetails.name && userDetails.role === FIELD_AGENT_ROLE
+    const fieldAgentLocation =
+      userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
+    let parentQueryLoading = false
+    const role = userDetails && userDetails.role
     return (
       <>
-        {isFieldAgent && (
+        {role && FIELD_AGENT_ROLES.includes(role) && (
           <>
-            <Header />
-            <Topbar id="top-bar">
-              <IconTab
-                id={`tab_${TAB_ID.inProgress}`}
-                key={TAB_ID.inProgress}
-                active={tabId === TAB_ID.inProgress}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusProgress />}
-                onClick={() =>
-                  this.props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+            <Query
+              query={COUNT_USER_WISE_APPLICATIONS}
+              variables={{
+                userId: userDetails.practitionerId,
+                status: EVENT_STATUS.REJECTED,
+                locationIds: [fieldAgentLocation]
+              }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  parentQueryLoading = true
+                  return (
+                    <StyledSpinner
+                      id="field-agent-home-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )
                 }
-              >
-                {intl.formatMessage(messages.inProgress, {
-                  total: 1
-                })}
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.sentForReview}`}
-                key={TAB_ID.sentForReview}
-                active={tabId === TAB_ID.sentForReview}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusOrange />}
-                onClick={() =>
-                  this.props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                if (error) {
+                  Sentry.captureException(error)
+                  return (
+                    <ErrorText id="field-agent-home_error">
+                      {intl.formatMessage(messages.queryError)}
+                    </ErrorText>
+                  )
                 }
-              >
-                {intl.formatMessage(messages.sentForReview, {
-                  total: applicationsReadyToSend.length
-                })}
-              </IconTab>
-              <IconTab
-                id={`tab_${TAB_ID.requireUpdates}`}
-                key={TAB_ID.requireUpdates}
-                active={tabId === TAB_ID.requireUpdates}
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <StatusRejected />}
-                onClick={() =>
-                  this.props.goToFieldAgentHomeTab(TAB_ID.requireUpdates)
-                }
-              >
-                {intl.formatMessage(messages.requireUpdates, {
-                  total: 1
-                })}
-              </IconTab>
-            </Topbar>
+                return (
+                  <>
+                    <Header />
+                    <TopBar id="top-bar">
+                      <IconTab
+                        id={`tab_${TAB_ID.inProgress}`}
+                        key={TAB_ID.inProgress}
+                        active={tabId === TAB_ID.inProgress}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusProgress />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(TAB_ID.inProgress)
+                        }
+                      >
+                        {intl.formatMessage(messages.inProgress, {
+                          total: draftApplications.length
+                        })}
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.sentForReview}`}
+                        key={TAB_ID.sentForReview}
+                        active={tabId === TAB_ID.sentForReview}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusOrange />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
+                        }
+                      >
+                        {intl.formatMessage(messages.sentForReview, {
+                          total: applicationsReadyToSend.length
+                        })}
+                      </IconTab>
+                      <IconTab
+                        id={`tab_${TAB_ID.requireUpdates}`}
+                        key={TAB_ID.requireUpdates}
+                        active={tabId === TAB_ID.requireUpdates}
+                        align={ICON_ALIGNMENT.LEFT}
+                        icon={() => <StatusRejected />}
+                        onClick={() =>
+                          this.props.goToFieldAgentHomeTab(
+                            TAB_ID.requireUpdates
+                          )
+                        }
+                      >
+                        {intl.formatMessage(messages.requireUpdates, {
+                          total: data.searchEvents.totalItems
+                        })}
+                      </IconTab>
+                    </TopBar>
+                  </>
+                )
+              }}
+            </Query>
+
+            {tabId === TAB_ID.inProgress && (
+              <InProgress draftApplications={draftApplications} />
+            )}
+
             {tabId === TAB_ID.sentForReview && (
               <SentForReview
                 applicationsReadyToSend={applicationsReadyToSend}
               />
+            )}
+
+            {tabId === TAB_ID.requireUpdates && (
+              <Query
+                query={SEARCH_APPLICATIONS_USER_WISE}
+                variables={{
+                  userId: userDetails.practitionerId,
+                  status: EVENT_STATUS.REJECTED,
+                  locationIds: [fieldAgentLocation],
+                  count: this.pageSize,
+                  skip: (this.state.requireUpdatesPage - 1) * this.pageSize
+                }}
+              >
+                {({ loading, error, data }) => {
+                  if (loading) {
+                    return (
+                      <>
+                        {!parentQueryLoading && (
+                          <Loader
+                            id="require_updates_loader"
+                            marginPercent={20}
+                            spinnerDiameter={60}
+                            loadingText={intl.formatMessage(
+                              messages.requireUpdatesLoading
+                            )}
+                          />
+                        )}
+                      </>
+                    )
+                  }
+                  if (error) {
+                    Sentry.captureException(error)
+                    return (
+                      <ErrorText id="require_updates_loading_error">
+                        {intl.formatMessage(messages.queryError)}
+                      </ErrorText>
+                    )
+                  }
+                  return (
+                    <>
+                      {data && data.searchEvents.totalItems > 0 && (
+                        <BodyContent id="require_updates_list">
+                          <GridTable
+                            content={this.transformRejectedContent(data)}
+                            columns={[
+                              {
+                                label: this.props.intl.formatMessage(
+                                  messages.listItemType
+                                ),
+                                width: 30,
+                                key: 'event'
+                              },
+                              {
+                                label: this.props.intl.formatMessage(
+                                  messages.listItemName
+                                ),
+                                width: 40,
+                                key: 'name',
+                                color: theme.colors.secondaryLabel
+                              },
+                              {
+                                label: this.props.intl.formatMessage(
+                                  messages.listItemUpdateDate
+                                ),
+                                width: 30,
+                                key: 'days_of_rejection'
+                              }
+                            ]}
+                            noResultText={EMPTY_STRING}
+                            onPageChange={(currentPage: number) => {
+                              this.onPageChange(currentPage)
+                            }}
+                            pageSize={this.pageSize}
+                            totalItems={
+                              data.searchEvents && data.searchEvents.totalItems
+                            }
+                            currentPage={this.state.requireUpdatesPage}
+                            clickable={true}
+                          />
+                        </BodyContent>
+                      )}
+                      {data && data.searchEvents.totalItems === 0 && (
+                        <ZeroUpdatesContainer>
+                          <ApplicationsOrangeAmber />
+                          <ZeroUpdatesText>
+                            {intl.formatMessage(messages.zeroUpdatesText)}
+                          </ZeroUpdatesText>
+                          <AllUpdatesText>
+                            {intl.formatMessage(messages.allUpdatesText)}
+                          </AllUpdatesText>
+                        </ZeroUpdatesContainer>
+                      )}
+                    </>
+                  )
+                }}
+              </Query>
             )}
             <FABContainer>
               <FloatingActionButton
@@ -181,7 +499,10 @@ class FieldAgentHomeView extends React.Component<FullProps> {
             </FABContainer>
           </>
         )}
-        {userDetails && userDetails.role && !isFieldAgent && (
+        {role && SYS_ADMIN_ROLES.includes(role) && (
+          <Redirect to={SYS_ADMIN_HOME} />
+        )}
+        {role && REGISTRAR_ROLES.includes(role) && (
           <Redirect to={REGISTRAR_HOME} />
         )}
       </>
@@ -189,13 +510,27 @@ class FieldAgentHomeView extends React.Component<FullProps> {
   }
 }
 
-const mapStateToProps = (store: IStoreState) => {
+const mapStateToProps = (
+  state: IStoreState,
+  props: RouteComponentProps<{ tabId: string }>
+) => {
+  const { match } = props
+
   return {
-    language: getLanguage(store),
-    userDetails: getUserDetails(store),
+    language: getLanguage(state),
+    userDetails: getUserDetails(state),
+    tabId: (match && match.params && match.params.tabId) || 'progress',
+    draftApplications:
+      (state.applicationsState.applications &&
+        state.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus ===
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      [],
     applicationsReadyToSend:
-      (store.applicationsState.applications &&
-        store.applicationsState.applications.filter(
+      (state.applicationsState.applications &&
+        state.applicationsState.applications.filter(
           (application: IApplication) =>
             application.submissionStatus !==
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
@@ -207,7 +542,9 @@ const mapStateToProps = (store: IStoreState) => {
 export const FieldAgentHome = connect(
   mapStateToProps,
   {
+    goToTab: goToTabAction,
     goToEvents: goToEventsAction,
-    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction
+    goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
+    goToApplicationDetails
   }
-)(injectIntl(FieldAgentHomeView))
+)(injectIntl(withTheme(FieldAgentHomeView)))

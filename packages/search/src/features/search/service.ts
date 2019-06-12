@@ -14,6 +14,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     event = EMPTY_STRING,
     status = EMPTY_STRING,
     applicationLocationId = EMPTY_STRING,
+    createdBy = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC
@@ -30,6 +31,7 @@ export const searchComposition = async (params: ISearchQuery) => {
         contactNumber,
         registrationNumber,
         applicationLocationId,
+        createdBy,
         { event, status }
       ),
       sort: [{ dateOfApplication: sort }]

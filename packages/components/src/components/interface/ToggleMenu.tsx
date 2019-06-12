@@ -86,6 +86,10 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     this.closeMenu = this.closeMenu.bind(this)
   }
 
+  componentWillUnmount() {
+    document.removeEventListener('click', this.closeMenu)
+    document.removeEventListener('click', this.showMenu)
+  }
   showMenu() {
     this.setState(() => ({
       showSubmenu: true

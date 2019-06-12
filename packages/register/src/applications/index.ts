@@ -37,6 +37,9 @@ export interface IApplication {
   event: Event
   registrationStatus?: string
   submissionStatus?: string
+  trackingId?: string
+  compositionId?: string
+  registrationNumber?: string
 }
 
 interface IStoreApplicationAction {

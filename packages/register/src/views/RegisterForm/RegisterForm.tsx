@@ -1,34 +1,25 @@
-import * as React from 'react'
-import { RouteComponentProps } from 'react-router'
-import { connect } from 'react-redux'
-import * as Swipeable from 'react-swipeable'
-import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
+import { LinkButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ArrowForward,
   ArrowBack,
-  DraftSimple
+  ArrowForward,
+  DraftSimple,
+  TickLarge
 } from '@opencrvs/components/lib/icons'
+import { Box, InvertSpinner, Modal } from '@opencrvs/components/lib/interface'
+import { BodyContent } from '@opencrvs/components/lib/layout'
+import * as Sentry from '@sentry/browser'
+import { isNull, isUndefined, merge } from 'lodash'
+// @ts-ignore - Required for mocking
+import * as debounce from 'lodash/debounce'
+import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from '../../styled-components'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import * as Swipeable from 'react-swipeable'
 import {
-  goToTab as goToTabAction,
-  goBack as goBackAction
-} from '../../navigation'
-import {
-  IForm,
-  IFormSection,
-  IFormField,
-  IFormSectionData,
-  Event,
-  Action
-} from '../../forms'
-import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
-import { IStoreState } from 'src/store'
-import {
+  deleteApplication,
   IApplication,
   modifyApplication,
-  deleteApplication,
   SUBMISSION_STATUS
 } from 'src/applications'
 import {
@@ -36,37 +27,43 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from 'src/components/interface/footer'
-import { StickyFormTabs } from './StickyFormTabs'
-import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import { merge, isUndefined, isNull } from 'lodash'
 import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
-import { getOfflineState } from 'src/offline/selectors'
-import { IOfflineDataState } from 'src/offline/reducer'
 import { CONFIRMATION_SCREEN, HOME } from 'src/navigation/routes'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-
-import {
-  DECLARATION,
-  REJECTION,
-  REGISTRATION,
-  REGISTERED,
-  DUPLICATION,
-  OFFLINE
-} from 'src/utils/constants'
-
+import { toggleDraftSavedNotification } from 'src/notification/actions'
+import { IOfflineDataState } from 'src/offline/reducer'
+import { getOfflineState } from 'src/offline/selectors'
 import { getScope } from 'src/profile/profileSelectors'
+import { IStoreState } from 'src/store'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
 import {
-  MutationProvider,
-  MutationContext
+  DECLARATION,
+  DUPLICATION,
+  OFFLINE,
+  REGISTERED,
+  REGISTRATION,
+  REJECTION
+} from 'src/utils/constants'
+import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
+import {
+  Action,
+  Event,
+  IForm,
+  IFormField,
+  IFormSection,
+  IFormSectionData
+} from '../../forms'
+import {
+  goBack as goBackAction,
+  goToTab as goToTabAction
+} from '../../navigation'
+import styled from '../../styled-components'
+import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
+import {
+  MutationContext,
+  MutationProvider
 } from '../DataProvider/MutationProvider'
-import { toggleDraftSavedNotification } from 'src/notification/actions'
-import { InvertSpinner } from '@opencrvs/components/lib/interface'
-import { TickLarge } from '@opencrvs/components/lib/icons'
-import * as Sentry from '@sentry/browser'
-// @ts-ignore - Required for mocking
-import * as debounce from 'lodash/debounce'
+import { StickyFormTabs } from './StickyFormTabs'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -808,7 +805,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <ConfirmBtn
                 key="submit"
                 id="submit_confirm"
-                // @ts-ignore
                 onClick={() => this.confirmSubmission(application)}
               >
                 <>

@@ -38,3 +38,18 @@ export const searchComposition = async (body: ICompositionBody) => {
   })
   return response
 }
+
+export const searchByCompositionId = async (compositionId: string) => {
+  const response = await client.search({
+    index: 'ocrvs',
+    type: 'compositions',
+    body: {
+      query: {
+        match: {
+          _id: compositionId
+        }
+      }
+    }
+  })
+  return response
+}

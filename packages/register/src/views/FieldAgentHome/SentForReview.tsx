@@ -22,6 +22,7 @@ import { sentenceCase } from 'src/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '../PrintCertificate/calculatePrice'
 import styled from 'src/styled-components'
+import { goToApplicationDetails } from 'src/navigation'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -77,6 +78,7 @@ const SmallSpinner = styled(Spinner)`
 interface ISentForReviewProps {
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
+  goToApplicationDetails: typeof goToApplicationDetails
 }
 
 interface IState {
@@ -217,7 +219,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           draft.submissionStatus || '',
           navigator.onLine,
           index,
-          'DC5EDNG' // Later to be replaced by draft.trackingId ?
+          draft.trackingId
         )
 
         return {
@@ -225,7 +227,20 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           event: (draft.event && sentenceCase(draft.event)) || '',
           name: name || '',
           submission_status: statusText || '',
-          status_indicator: icon ? [icon()] : null
+          status_indicator: icon ? [icon()] : null,
+          rowClickHandler: [
+            {
+              label: 'rowClickHandler',
+              handler: () => {
+                if (!draft.compositionId) {
+                  throw new Error(
+                    'No composition id found for this application'
+                  )
+                }
+                this.props.goToApplicationDetails(draft.compositionId)
+              }
+            }
+          ]
         }
       }
     )
@@ -268,10 +283,11 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}
-          totalPages={applicationsReadyToSend && applicationsReadyToSend.length}
+          totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
-          initialPage={this.state.sentForReviewPageNo}
+          clickable={true}
+          currentPage={this.state.sentForReviewPageNo}
         />
       </BodyContent>
     )
@@ -280,5 +296,5 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
 export const SentForReview = connect(
   null,
-  { deleteApplication }
+  { deleteApplication, goToApplicationDetails }
 )(injectIntl(SentForReviewComponent))

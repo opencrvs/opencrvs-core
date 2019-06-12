@@ -1,10 +1,11 @@
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
 import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
+import { grid } from '../../grid'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -28,7 +29,7 @@ const TableHeader = styled.div`
 
 const StyledBox = styled(Box)`
   margin-top: 8px;
-  padding: 7px 0px 0px 0px;
+  padding: 0;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
@@ -40,13 +41,17 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const RowWrapper = styled.div.attrs<{ expandable?: boolean }>({})`
+const RowWrapper = styled.div.attrs<{
+  expandable?: boolean
+  clickable?: boolean
+}>({})`
   width: 100%;
-  cursor: ${({ expandable }) => (expandable ? 'pointer' : 'default')};
   padding: 0 24px;
   display: flex;
   align-items: center;
-  min-height: 56px;
+  min-height: 64px;
+  cursor: ${({ expandable, clickable }) =>
+    expandable || clickable ? 'pointer' : 'default'};
 `
 
 const ContentWrapper = styled.span.attrs<{
@@ -72,6 +77,10 @@ const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
 `
 
+const Error = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+`
+
 export enum ColumnContentAlignment {
   LEFT = 'left',
   RIGHT = 'right',
@@ -82,6 +91,7 @@ interface IGridPreference {
   label: string
   width: number
   key: string
+  errorValue?: string
   alignment?: ColumnContentAlignment
   isActionColumn?: boolean
   color?: string
@@ -95,19 +105,20 @@ interface IGridTableProps {
   hideTableHeader?: boolean
   onPageChange?: (currentPage: number) => void
   pageSize?: number
-  totalPages?: number
-  initialPage?: number
+  totalItems: number
+  currentPage?: number
   expandable?: boolean
+  clickable?: boolean
 }
 
 interface IGridTableState {
-  currentPage: number
+  width: number
   expanded: string[]
 }
 
 const defaultConfiguration = {
   pageSize: 10,
-  initialPage: 1
+  currentPage: 1
 }
 
 const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
@@ -119,8 +130,20 @@ export class GridTable extends React.Component<
   IGridTableState
 > {
   state = {
-    currentPage: this.props.initialPage || defaultConfiguration.initialPage,
+    width: window.innerWidth,
     expanded: []
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
   }
 
   renderActionBlock = (
@@ -198,9 +221,11 @@ export class GridTable extends React.Component<
   onPageChange = (currentPage: number) => {
     if (this.props.onPageChange) {
       this.props.onPageChange(currentPage)
-    } else {
-      this.setState({ currentPage })
     }
+  }
+
+  getRowClickHandler = (itemRowClickHandler: IAction[]) => {
+    return itemRowClickHandler[0].handler
   }
 
   render() {
@@ -210,18 +235,13 @@ export class GridTable extends React.Component<
       noResultText,
       hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
-      initialPage = defaultConfiguration.initialPage
+      currentPage = defaultConfiguration.currentPage
     } = this.props
-    const { currentPage } = this.state
-    const totalPages = this.props.totalPages
-      ? this.props.totalPages
-      : getTotalPageNumber(
-          content.length,
-          this.props.pageSize || defaultConfiguration.pageSize
-        )
+    const { width } = this.state
+    const totalItems = this.props.totalItems || 0
     return (
       <Wrapper>
-        {content.length > 0 && !hideTableHeader && (
+        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ContentWrapper
@@ -240,8 +260,17 @@ export class GridTable extends React.Component<
             return (
               <StyledBox key={index}>
                 <RowWrapper
+                  id={'row_' + index}
                   expandable={this.props.expandable}
-                  onClick={() => this.toggleExpanded(item.id as string)}
+                  clickable={this.props.clickable}
+                  onClick={() =>
+                    (this.props.expandable &&
+                      this.toggleExpanded(item.id as string)) ||
+                    (this.props.clickable &&
+                      this.getRowClickHandler(
+                        item.rowClickHandler as IAction[]
+                      )())
+                  }
                 >
                   {columns.map((preference, indx) => {
                     if (preference.isActionColumn) {
@@ -260,30 +289,34 @@ export class GridTable extends React.Component<
                           alignment={preference.alignment}
                           color={preference.color}
                         >
-                          {item[preference.key] as string}
+                          {(item[preference.key] as string) || (
+                            <Error>{preference.errorValue}</Error>
+                          )}
                         </ContentWrapper>
                       )
                     }
                   })}
                 </RowWrapper>
 
-                <ExpandedSectionContainer expanded={expanded}>
-                  {expanded && (
-                    <ExpansionContentInfo
-                      data={item}
-                      preference={this.props.expandedContentRows}
-                    />
-                  )}
-                </ExpandedSectionContainer>
+                {this.props.expandable && (
+                  <ExpandedSectionContainer expanded={expanded}>
+                    {expanded && (
+                      <ExpansionContentInfo
+                        data={item}
+                        preference={this.props.expandedContentRows}
+                      />
+                    )}
+                  </ExpandedSectionContainer>
+                )}
               </StyledBox>
             )
           }
         )}
 
-        {totalPages > pageSize && (
+        {totalItems > pageSize && (
           <Pagination
-            initialPage={initialPage}
-            totalPages={Math.ceil(totalPages / pageSize)}
+            initialPage={currentPage}
+            totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}

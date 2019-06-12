@@ -185,7 +185,7 @@ export class SearchTool extends React.Component<IProps, IState> {
     const { placeHolderText } = this.state.selectedSearchType
     return (
       <Wrapper action="javascript:void(0);" onSubmit={this.search}>
-        <SearchBlue onClick={this.search} />
+        <SearchBlue id="searchIconButton" onClick={this.search} />
         <SearchTextInput
           id="searchText"
           type="text"

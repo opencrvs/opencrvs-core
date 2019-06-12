@@ -21,7 +21,7 @@ describe('elastic search utils', async () => {
 
   it('should build the search query for a composition', async () => {
     const query = await buildQuery(mockCompositionBody)
-    expect(query.bool.must).toHaveLength(2)
-    expect(query.bool.should).toHaveLength(3)
+    expect(query.bool.must).toHaveLength(4)
+    expect(query.bool.should).toHaveLength(8)
   })
 })
