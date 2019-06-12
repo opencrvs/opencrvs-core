@@ -377,6 +377,7 @@ describe('RegistrarHome tests', () => {
   })
 
   it('renders all items returned from graphql query in reivew tab', async () => {
+    const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
@@ -674,214 +675,56 @@ describe('RegistrarHome tests', () => {
               totalItems: 2,
               results: [
                 {
-                  id: '9de759b1-a5fe-4476-94bd-b8123017db3f',
-                  type: 'DEATH',
+                  id: '14d088f8-b9fd-4e09-9e27-fda07ae40648',
+                  type: 'Birth',
                   registration: {
-                    trackingId: 'D1X8PO8',
-                    registrationNumber: '2019333494D1X8PO80',
-                    contactPhoneNumber: null,
-                    status: [
-                      {
-                        user: {
-                          id: '99636b42-72c3-40c2-9c19-947efa728068',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'REGISTERED',
-                        timestamp: '2019-05-17T05:49:45.658Z'
-                      },
-                      {
-                        user: {
-                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Shakib',
-                              familyName: 'Al Hasan'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'FIELD_AGENT'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'DECLARED',
-                        timestamp: '2019-05-17T05:49:26.898Z'
-                      }
-                    ]
+                    status: 'REGISTERED',
+                    contactNumber: '01677701431',
+                    trackingId: 'BLG332M',
+                    registrationNumber: '2019333494BLG332M3',
+                    registeredLocationId:
+                      '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+                    duplicates: null,
+                    createdAt: '1560855235444',
+                    modifiedAt: null
                   },
-                  createdAt: '2019-05-17T05:49:44.826Z',
-                  deceased: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
-                        familyName: 'খান'
-                      },
-                      {
-                        use: 'en',
-                        firstNames: 'K M Abdullah al amin',
-                        familyName: 'Khan'
-                      }
-                    ],
-                    deceased: {
-                      deathDate: '2019-01-18'
+                  dateOfBirth: '1995-09-14',
+                  childName: [
+                    {
+                      firstNames: 'Ahad',
+                      familyName: 'Chowdhury'
+                    },
+                    {
+                      firstNames: 'আহাদ',
+                      familyName: 'চৌধুরী'
                     }
-                  },
-                  informant: {
-                    individual: {
-                      telecom: [
-                        {
-                          system: 'phone',
-                          value: '01712345678'
-                        }
-                      ]
-                    }
-                  }
+                  ]
                 },
                 {
-                  id: 'f32d9e41-8172-4f54-b540-277951286a27',
-                  type: 'DEATH',
+                  id: '54cc5b6e-539b-45a3-9529-8f56b9bc5303',
+                  type: 'Birth',
                   registration: {
-                    trackingId: 'DKMN3PQ',
-                    registrationNumber: '2019333494DKMN3PQ2',
-                    contactPhoneNumber: null,
-                    status: [
-                      {
-                        user: {
-                          id: '99636b42-72c3-40c2-9c19-947efa728068',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'REGISTERED',
-                        timestamp: '2019-05-21T05:51:13.455Z'
-                      },
-                      {
-                        user: {
-                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Shakib',
-                              familyName: 'Al Hasan'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'FIELD_AGENT'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'DECLARED',
-                        timestamp: '2019-05-21T05:50:58.661Z'
-                      }
-                    ]
+                    status: 'REGISTERED',
+                    contactNumber: '01712345678',
+                    trackingId: 'BWBFLZQ',
+                    registrationNumber: '2019333494BWBFLZQ7',
+                    registeredLocationId:
+                      '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
+                    duplicates: null,
+                    createdAt: '1560495096884',
+                    modifiedAt: null
                   },
-                  createdAt: '2019-05-21T05:51:12.949Z',
-                  deceased: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
-                        familyName: 'খান'
-                      },
-                      {
-                        use: 'en',
-                        firstNames: 'K M Abdullah al amin',
-                        familyName: 'Khan'
-                      }
-                    ],
-                    deceased: {
-                      deathDate: '2019-01-18'
+                  dateOfBirth: '1995-09-14',
+                  childName: [
+                    {
+                      firstNames: '',
+                      familyName: 'Asif'
+                    },
+                    {
+                      firstNames: '',
+                      familyName: 'আসিফ'
                     }
-                  },
-                  informant: {
-                    individual: {
-                      telecom: [
-                        {
-                          system: 'phone',
-                          value: '01712345678'
-                        }
-                      ]
-                    }
-                  }
+                  ]
                 }
               ]
             }
@@ -905,12 +748,10 @@ describe('RegistrarHome tests', () => {
       setTimeout(resolve, 2000)
     })
     testComponent.component.update()
-    console.log('GRIDTABLE EXISTS?', testComponent.component.exists(GridTable))
+
     const data = testComponent.component.find(GridTable).prop('content')
 
     expect(data.length).toBe(2)
-    expect(data[1].id).toBe('f32d9e41-8172-4f54-b540-277951286a27')
-    expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
 
     testComponent.component.unmount()

@@ -28,9 +28,8 @@ import {
   // GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
-import * as moment from 'moment'
+import moment from 'moment'
 import * as React from 'react'
-import * as Sentry from '@sentry/browser'
 import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -280,10 +279,38 @@ export const EVENT_STATUS = {
   REJECTED: 'REJECTED',
   REGISTERED: 'REGISTERED'
 }
+
+function formatDate(date: string): string {
+  const d = new Date(Number(date))
+  let month = String(d.getMonth() + 1)
+  let day = String(d.getDate())
+  let year = String(d.getFullYear())
+  let hour = String(d.getHours())
+  let minute = String(d.getMinutes())
+  let second = String(d.getSeconds())
+
+  if (month.length < 2) {
+    month = '0' + month
+  }
+  if (day.length < 2) {
+    day = '0' + day
+  }
+  if (hour.length < 2) {
+    hour = '0' + hour
+  }
+  if (minute.length < 2) {
+    minute = '0' + minute
+  }
+  if (second.length < 2) {
+    second = '0' + second
+  }
+  return [year, month, day].join('-') + ' ' + [hour, minute, second].join(':')
+}
+
 export class RegistrarHomeView extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
-  > {
+> {
   pageSize = 10
   constructor(props: IRegistrarHomeProps) {
     super(props)
@@ -399,14 +426,14 @@ export class RegistrarHomeView extends React.Component<
             (!draft.data.child.firstNamesEng
               ? ''
               : draft.data.child.firstNamesEng + ' ') +
-            draft.data.child.familyNameEng) ||
+              draft.data.child.familyNameEng) ||
           (draft.data &&
             draft.data.child &&
             draft.data.child.familyName &&
             (!draft.data.child.firstNames
               ? ''
               : draft.data.child.firstNames + ' ') +
-            draft.data.child.familyName) ||
+              draft.data.child.familyName) ||
           ''
         pageRoute = DRAFT_BIRTH_PARENT_FORM
       } else if (draft.event && draft.event.toString() === 'death') {
@@ -417,14 +444,14 @@ export class RegistrarHomeView extends React.Component<
             (!draft.data.deceased.firstNamesEng
               ? ''
               : draft.data.deceased.firstNamesEng + ' ') +
-            draft.data.deceased.familyNameEng) ||
+              draft.data.deceased.familyNameEng) ||
           (draft.data &&
             draft.data.deceased &&
             draft.data.deceased.familyName &&
             (!draft.data.deceased.firstNames
               ? ''
               : draft.data.deceased.firstNames + ' ') +
-            draft.data.deceased.familyName) ||
+              draft.data.deceased.familyName) ||
           ''
         pageRoute = DRAFT_DEATH_FORM
       }
@@ -457,32 +484,26 @@ export class RegistrarHomeView extends React.Component<
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
+    console.log('DATA', data)
+
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
-      const actions = [] as IAction[]
-      if (this.userHasRegisterScope()) {
-        if (reg.duplicates && reg.duplicates.length > 0) {
-          actions.push({
-            label: this.props.intl.formatMessage(messages.reviewDuplicates),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
-          })
-        } else {
-          actions.push({
-            label: this.props.intl.formatMessage(messages.print),
-            handler: () =>
-              this.props.goToPrintCertificate(
-                reg.id,
-                reg.event.toLowerCase() || ''
-              )
-          })
+      const actions = [
+        {
+          label: this.props.intl.formatMessage(messages.print),
+          handler: () =>
+            this.props.goToPrintCertificate(
+              reg.id,
+              reg.event.toLocaleLowerCase() || ''
+            )
         }
-      }
+      ]
       return {
         ...reg,
-        date_of_registration:
-          (reg.modifiedAt &&
-            moment(reg.modifiedAt.toString(), 'YYYY-MM-DD').fromNow()) ||
-          '',
+        dateOfRegistration:
+          (reg.modifiedAt && moment(formatDate(reg.modifiedAt)).fromNow()) ||
+          ((reg.createdAt && moment(formatDate(reg.createdAt)).fromNow()) ||
+            ''),
         actions
       }
     })
@@ -511,6 +532,7 @@ export class RegistrarHomeView extends React.Component<
     const { theme, intl, userDetails, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
+    console.log('UNION', registrarUnion)
 
     return (
       <>
@@ -548,6 +570,8 @@ export class RegistrarHomeView extends React.Component<
                 </ErrorText>
               )
             }
+
+            console.log('COUNT DATA', data)
 
             return (
               <>
@@ -856,10 +880,18 @@ export class RegistrarHomeView extends React.Component<
               status: EVENT_STATUS.REGISTERED,
               locationIds: [registrarUnion],
               count: this.pageSize,
-              skip: (this.state.printCurrentPage - 1) * this.pageSize
+              skip: (this.state.updatesCurrentPage - 1) * this.pageSize
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (loading) {
                 return (
                   (!parentQueryLoading && (
@@ -874,13 +906,11 @@ export class RegistrarHomeView extends React.Component<
               if (error) {
                 Sentry.captureException(error)
                 return (
-                  <ErrorText id="search-result-error-text-print">
+                  <ErrorText id="search-result-error-text-reject">
                     {intl.formatMessage(messages.queryError)}
                   </ErrorText>
                 )
               }
-
-              console.log('DATA', data)
 
               return (
                 <BodyContent>
@@ -906,7 +936,7 @@ export class RegistrarHomeView extends React.Component<
                           messages.listItemRegisteredDate
                         ),
                         width: 22,
-                        key: 'date_of_registration'
+                        key: 'dateOfRegistration'
                       },
                       {
                         label: this.props.intl.formatMessage(
@@ -925,6 +955,7 @@ export class RegistrarHomeView extends React.Component<
                         alignment: ColumnContentAlignment.CENTER
                       }
                     ]}
+                    renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
                       messages.dataTableNoResults
                     )}
@@ -933,10 +964,9 @@ export class RegistrarHomeView extends React.Component<
                     }}
                     pageSize={this.pageSize}
                     totalItems={
-                      data.listEventRegistrations &&
-                      data.listEventRegistrations.totalItems
+                      data.searchEvents && data.searchEvents.totalItems
                     }
-                    currentPage={this.state.printCurrentPage}
+                    currentPage={this.state.updatesCurrentPage}
                     expandable={true}
                     arrowExpansionButtons={true}
                   />
