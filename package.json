@@ -17,7 +17,7 @@
     "dev:tmux": "tmuxinator start",
     "dev:tmux:kill": "tmux kill-session -t opencrvs",
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
-    "test": "lerna run test --stream --watchAll=false",
+    "test": "CI=true lerna run test --silent --noStackTrace --stream --watchAll=false",
     "compose": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev.yml up",
     "compose:down": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev.yml down",
     "compose:build": "docker-compose build",

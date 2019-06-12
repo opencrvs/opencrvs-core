@@ -64,8 +64,12 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchByCompositionId.mockReturnValue(mockSearchResponse)
+      const mockedIndexComposition = indexComposition as jest.Mocked<any>
+      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
+        any
+      >
+      mockedIndexComposition.mockResolvedValue({})
+      mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -85,8 +89,14 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchByCompositionId.mockReturnValue(mockSearchResponseWithoutCreatedBy)
+      const mockedIndexComposition = indexComposition as jest.Mocked<any>
+      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
+        any
+      >
+      mockedIndexComposition.mockReturnValue({})
+      mockedSearchByCompositionId.mockReturnValue(
+        mockSearchResponseWithoutCreatedBy
+      )
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -126,7 +136,7 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('should return status code 500 if the event data is updated with task where there is no focus reference for Composition', async () => {
+    it('500 if the event data is updated with task where there is no focus reference for Composition', async () => {
       ;(updateComposition as jest.Mock).mockReturnValue({})
 
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {

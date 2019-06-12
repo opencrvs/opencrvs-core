@@ -1,6 +1,8 @@
-import * as fetch from 'jest-fetch-mock'
+import { GlobalWithFetchMock } from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', { default: fetch })
+const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
+customGlobal.fetch = require('jest-fetch-mock')
+customGlobal.fetchMock = customGlobal.fetch
 jest.mock('lodash/debounce', () => jest.fn(fn => fn))
 
 const localStorageMock = {

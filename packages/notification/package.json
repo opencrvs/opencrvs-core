@@ -46,6 +46,7 @@
     "nodemon": "^1.17.5",
     "prettier": "^1.15.2",
     "ts-jest": "^24.0.2",
+    "lint-staged": "^7.1.0",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",

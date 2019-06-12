@@ -1,9 +1,8 @@
 import { referenceApi } from '@register/utils/referenceApi'
-import * as fetchAny from 'jest-fetch-mock'
-
+import * as fetchMock from 'jest-fetch-mock'
 import nock from 'nock'
 
-const fetch = fetchAny as any
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 export const mockFetchLocations = {
   data: [

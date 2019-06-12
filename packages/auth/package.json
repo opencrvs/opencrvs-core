@@ -38,6 +38,7 @@
     "node-fetch": "^2.6.0",
     "redis": "^2.8.0",
     "typescript": "^3.0.1",
+    "lint-staged": "^7.1.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {

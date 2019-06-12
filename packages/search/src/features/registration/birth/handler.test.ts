@@ -18,9 +18,9 @@ import {
   mockSearchResponseWithoutCreatedBy
 } from '@search/test/utils'
 
-import * as fetchAny from 'jest-fetch-mock'
+import * as fetchMock from 'jest-fetch-mock'
 
-const fetch = fetchAny as any
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 
@@ -72,7 +72,7 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('should return status code 500 if the event data is updated with a task where there is no focus reference for Composition', async () => {
+    it('500 if the event data is updated with a task where there is no focus reference for Composition', async () => {
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -96,10 +96,10 @@ describe('Verify handlers', () => {
       ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResponse)
       ;(updateComposition as jest.Mock).mockReturnValue({})
       fetch.mockResponses(
-        [JSON.stringify(mockCompositionResponse)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify({})]
+        [JSON.stringify(mockCompositionResponse), { status: 200 }],
+        [JSON.stringify(mockCompositionEntry), { status: 200 }],
+        [JSON.stringify(mockCompositionEntry), { status: 200 }],
+        [JSON.stringify({}), { status: 200 }]
       )
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
@@ -120,15 +120,21 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchComposition.mockReturnValue(mockSearchResponse)
-      searchByCompositionId.mockReturnValue(mockSearchResponse)
-      updateComposition.mockReturnValue({})
+      const mockedIndexComposition = indexComposition as jest.Mocked<any>
+      const mockedSearchComposition = searchComposition as jest.Mocked<any>
+      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
+        any
+      >
+      const mockedUpdateComposition = updateComposition as jest.Mocked<any>
+      mockedIndexComposition.mockReturnValue({})
+      mockedSearchComposition.mockReturnValue(mockSearchResponse)
+      mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
+      mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
-        [JSON.stringify(mockCompositionResponse)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify({})]
+        [JSON.stringify(mockCompositionResponse), { status: 200 }],
+        [JSON.stringify(mockCompositionEntry), { status: 200 }],
+        [JSON.stringify(mockCompositionEntry), { status: 200 }],
+        [JSON.stringify({}), { status: 200 }]
       )
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
@@ -149,15 +155,25 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchComposition.mockReturnValue(mockSearchResponseWithoutCreatedBy)
-      searchByCompositionId.mockReturnValue(mockSearchResponseWithoutCreatedBy)
-      updateComposition.mockReturnValue({})
+      const mockedIndexComposition = indexComposition as jest.Mocked<any>
+      const mockedSearchComposition = searchComposition as jest.Mocked<any>
+      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
+        any
+      >
+      const mockedUpdateComposition = updateComposition as jest.Mocked<any>
+      mockedIndexComposition.mockReturnValue({})
+      mockedSearchComposition.mockReturnValue(
+        mockSearchResponseWithoutCreatedBy
+      )
+      mockedSearchByCompositionId.mockReturnValue(
+        mockSearchResponseWithoutCreatedBy
+      )
+      mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
-        [JSON.stringify(mockCompositionResponse)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify(mockCompositionEntry)],
-        [JSON.stringify({})]
+        [JSON.stringify(mockCompositionResponse), { status: 200 }],
+        [JSON.stringify(mockCompositionEntry), { status: 200 }],
+        [JSON.stringify(mockCompositionEntry), { status: 200 }],
+        [JSON.stringify({}), { status: 200 }]
       )
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
