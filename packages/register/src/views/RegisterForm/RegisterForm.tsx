@@ -802,8 +802,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 onClick={() =>
                   this.confirmSubmission(
                     application,
-                    SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT],
-                    Action.SUBMIT_FOR_REVIEW.toString()
+                    SUBMISSION_STATUS.READY_TO_SUBMIT,
+                    Action.SUBMIT_FOR_REVIEW
                   )
                 }
               >
@@ -842,8 +842,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 onClick={() =>
                   this.confirmSubmission(
                     application,
-                    SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REGISTER],
-                    Action.REGISTER_APPLICATION.toString()
+                    SUBMISSION_STATUS.READY_TO_REGISTER,
+                    Action.REGISTER_APPLICATION
                   )
                 }
               >
