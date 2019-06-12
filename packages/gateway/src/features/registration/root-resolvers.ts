@@ -106,10 +106,18 @@ export const resolvers: GQLResolver = {
         0,
         0
       )
+      const registeredBundle = await getCompositions(
+        'REGISTERED',
+        locationIds,
+        authHeader,
+        0,
+        0
+      )
 
       return {
         declared: declaredBundle.totalItems,
-        rejected: rejectedBundle.totalItems
+        rejected: rejectedBundle.totalItems,
+        registered: registeredBundle.totalItems
       }
     }
   },
