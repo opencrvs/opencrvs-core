@@ -28,11 +28,19 @@ interface IListItemActionProps {
   id?: string
   expanded?: boolean
   isFullHeight?: boolean
+  arrowExpansionButtons?: boolean
   onExpand?: () => void
 }
 
 export function ListItemAction(props: IListItemActionProps) {
-  const { actions, expanded, onExpand, id, isFullHeight } = props
+  const {
+    actions,
+    expanded,
+    onExpand,
+    id,
+    isFullHeight,
+    arrowExpansionButtons
+  } = props
   return (
     <Container id={id}>
       {actions &&
@@ -48,6 +56,7 @@ export function ListItemAction(props: IListItemActionProps) {
         ))}
       {onExpand && (
         <ExpansionSec
+          arrowExpansionButtons={arrowExpansionButtons}
           isFullHeight={isFullHeight}
           expanded={expanded}
           onClick={onExpand}
