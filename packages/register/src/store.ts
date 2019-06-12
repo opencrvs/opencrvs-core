@@ -38,6 +38,10 @@ import {
 import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
 import * as Sentry from '@sentry/browser'
 import * as createSentryMiddleware from 'redux-sentry-middleware'
+import {
+  userFormReducer,
+  IUserFormState
+} from './views/SysAdmin/forms/userReducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -51,6 +55,7 @@ export interface IStoreState {
   printCertificateForm: IPrintFormState
   reject: IRejectState
   offline: IOfflineDataState
+  userForm: IUserFormState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -64,7 +69,8 @@ const reducers = combineReducers<IStoreState>({
   reviewForm: reviewReducer,
   reject: rejectReducer,
   printCertificateForm: printReducer,
-  offline: offlineDataReducer
+  offline: offlineDataReducer,
+  userForm: userFormReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

@@ -18,6 +18,7 @@ export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
+export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const LIST = 'LIST'
 export const PARAGRAPH = 'PARAGRAPH'
 export const DOCUMENTS = 'DOCUMENTS'
@@ -220,6 +221,9 @@ export interface ITextareaFormField extends IFormFieldBase {
 export interface ISubsectionFormField extends IFormFieldBase {
   type: typeof SUBSECTION
 }
+export interface IFieldGroupTitleField extends IFormFieldBase {
+  type: typeof FIELD_GROUP_TITLE
+}
 export interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
 }
@@ -287,6 +291,7 @@ export type IFormField =
   | IDateFormField
   | ITextareaFormField
   | ISubsectionFormField
+  | IFieldGroupTitleField
   | IDocumentsFormField
   | IListFormField
   | IParagraphFormField
@@ -455,6 +460,9 @@ export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
 export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
   type: typeof SUBSECTION
 }
+export interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
+  type: typeof FIELD_GROUP_TITLE
+}
 export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
@@ -507,6 +515,7 @@ export type Ii18nFormField =
   | Ii18nDateFormField
   | Ii18nTextareaFormField
   | Ii18nSubsectionFormField
+  | Ii18nFieldGroupTitleField
   | Ii18nDocumentsFormField
   | Ii18nListFormField
   | Ii18nParagraphFormField

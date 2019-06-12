@@ -32,3 +32,5 @@ export const APPLICATION_DETAIL = '/details/:applicationId'
 
 export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
+
+export const USER_FORM = '/user-form'

@@ -1043,6 +1043,20 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.systemTitle': 'সিস্টেম',
     'register.home.header.settingsTitle': 'সেটিংস',
     'register.home.header.helpTitle': 'সাহায্য',
-    'register.home.header.logoutTitle': 'লগআউট'
+    'register.home.header.logoutTitle': 'লগআউট',
+    'user.form.name': 'ব্যবহারকারী',
+    'user.title.create': 'নতুন ব্যবহারকারী তৈরি',
+    'user.section.userDetails': 'ব্যক্তিগত তথ্য',
+    'user.section.accountDetails': 'অ্যাকাউন্ট তথ্য',
+    'user.section.assignedRegisterOffice': 'নির্ধারিত নিবন্ধ অফিস',
+    'label.firstNameBN': 'বাংলা নামের প্রথম অংশ',
+    'label.lastNameBN': 'বাংলা নামের শেষাংশ',
+    'label.firstNameEN': 'ইংরেজি নামের প্রথম অংশ',
+    'label.lastNameEN': 'ইংরেজি নামের শেষাংশ',
+    'label.NID': 'জাতীয় পরিচয় নম্বর',
+    'label.username': 'ব্যবহারকারীর নাম',
+    'label.userDevice': 'ডিভাইস',
+    'label.registrationOffice': 'নিবন্ধন অফিস',
+    'button.continue': 'অগ্রসর হোন'
   }
 }
