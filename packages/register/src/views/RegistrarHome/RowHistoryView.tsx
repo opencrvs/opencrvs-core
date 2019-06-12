@@ -32,7 +32,6 @@ import {
 import { messages } from 'src/search/messages'
 import * as moment from 'moment'
 import {
-  StatusCertified,
   StatusGreen,
   StatusOrange,
   StatusRejected
@@ -102,6 +101,12 @@ const BorderedPaddedContent = styled(PaddedContent)`
 const BoldSpan = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   padding: 0 10px;
+`
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  text-align: center;
+  margin-top: 100px;
 `
 
 function LabelValue({ label, value }: { label: string; value: string }) {
@@ -179,11 +184,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
       statuses:
         (registration &&
           registration.status &&
-          registration.status.map((status, index) => {
-            const certificate =
-              registration.certificates && registration.certificates[index]
-            const collector = certificate && certificate.collector
-
+          registration.status.map(status => {
             return {
               type: status && status.type,
               practitionerName:
@@ -191,11 +192,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                   status.user &&
                   (createNamesMap(status.user.name as GQLHumanName[])[
                     locale
-                  ] as string)) ||
-                (status &&
-                  status.user &&
-                  (createNamesMap(status.user.name as GQLHumanName[])[
-                    ''
                   ] as string)) ||
                 '',
               timestamp: status && formatLongDate(status.timestamp, locale),
@@ -209,24 +205,11 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                 locale === LANG_EN
                   ? status && status.office && status.office.name
                   : status && status.office && status.office.alias,
-              collectorName:
-                (collector &&
-                  collector.individual &&
-                  (createNamesMap(collector.individual.name as GQLHumanName[])[
-                    locale
-                  ] as string)) ||
-                (collector &&
-                  collector.individual &&
-                  (createNamesMap(collector.individual.name as GQLHumanName[])[
-                    LANG_EN
-                  ] as string)) ||
-                '',
-              collectorType: collector && collector.relationship,
               rejectReasons:
                 (status &&
                   status.type === REJECTED &&
                   extractCommentFragmentValue(
-                    status.comments as GQLComment[],
+                    (status.comments as GQLComment[]) || [],
                     REJECT_REASON
                   )) ||
                 '',
@@ -234,7 +217,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                 (status &&
                   status.type === REJECTED &&
                   extractCommentFragmentValue(
-                    status.comments as GQLComment[],
+                    (status.comments as GQLComment[]) || [],
                     REJECT_COMMENTS
                   )) ||
                 '',
@@ -265,12 +248,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             <StatusRejected />
           </StatusIcon>
         )
-      case 'CERTIFIED':
-        return (
-          <StatusIcon>
-            <StatusCertified />
-          </StatusIcon>
-        )
       default:
         return (
           <StatusIcon>
@@ -288,8 +265,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         return messages.workflowStatusDateRegistered
       case 'REJECTED':
         return messages.workflowStatusDateRejected
-      case 'CERTIFIED':
-        return messages.workflowStatusDateCollected
       default:
         return messages.workflowStatusDateApplication
     }
@@ -308,7 +283,11 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
           {({ loading, error, data }) => {
             if (error) {
               Sentry.captureException(error)
-              throw error
+              return (
+                <ErrorText id="search-result-error-text-expanded">
+                  {intl.formatMessage(messages.queryError)}
+                </ErrorText>
+              )
             } else if (loading) {
               return (
                 <SpinnerContainer>
@@ -345,8 +324,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                       const {
                         practitionerName,
                         practitionerRole,
-                        collectorName,
-                        collectorType,
                         rejectReasons,
                         rejectComments,
                         informantContactNumber
@@ -357,9 +334,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         status.timestamp as string,
                         LOCAL_DATE_FORMAT
                       ).format(CERTIFICATE_DATE_FORMAT)
-                      const collectorInfo =
-                        collectorName + ' (' + collectorType + ')'
-
                       return (
                         <HistoryWrapper key={index}>
                           <ExpansionContainer id={type + '-' + index}>
@@ -379,20 +353,10 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                                   value={informantContactNumber}
                                 />
                               )}
-                              {collectorType && (
-                                <LabelValue
-                                  label={intl.formatMessage(
-                                    messages.collectedBy
-                                  )}
-                                  value={collectorInfo}
-                                />
-                              )}
                               <ValueContainer>
                                 <StyledLabel>
                                   {this.props.intl.formatMessage(
-                                    collectorType
-                                      ? messages.issuedBy
-                                      : messages.workflowPractitionerLabel
+                                    messages.workflowPractitionerLabel
                                   )}
                                   :
                                 </StyledLabel>

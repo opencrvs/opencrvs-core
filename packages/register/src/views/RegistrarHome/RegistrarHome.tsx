@@ -47,10 +47,9 @@ import { Scope } from 'src/utils/authUtils'
 import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
-import { COUNT_REGISTRATION_QUERY } from './queries'
+import { COUNT_REGISTRATION_QUERY, SEARCH_EVENTS } from './queries'
 import { sentenceCase } from 'src/utils/data-formatting'
 import NotificationToast from './NotificatoinToast'
-import { SEARCH_EVENTS } from 'src/search/queries'
 import { transformData } from 'src/search/transformer'
 import { RowHistoryView } from './RowHistoryView'
 
@@ -661,8 +660,7 @@ export class RegistrarHomeView extends React.Component<
                     }}
                     pageSize={this.pageSize}
                     totalItems={
-                      data.listEventRegistrations &&
-                      data.listEventRegistrations.totalItems
+                      data.searchEvents && data.searchEvents.totalItems
                     }
                     currentPage={this.state.reviewCurrentPage}
                     expandable={true}
@@ -754,8 +752,7 @@ export class RegistrarHomeView extends React.Component<
                     }}
                     pageSize={this.pageSize}
                     totalItems={
-                      data.listEventRegistrations &&
-                      data.listEventRegistrations.totalItems
+                      data.searchEvents && data.searchEvents.totalItems
                     }
                     currentPage={this.state.updatesCurrentPage}
                     expandable={true}
