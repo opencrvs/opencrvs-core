@@ -1,5 +1,10 @@
 import { IFormSection, TEXT, FIELD_GROUP_TITLE } from 'src/forms'
 import { defineMessages } from 'react-intl'
+import {
+  bengaliOnlyNameFormat,
+  englishOnlyNameFormat,
+  phoneNumberFormat
+} from 'src/utils/validate'
 
 const messages = defineMessages({
   userForm: {
@@ -99,7 +104,7 @@ export const userSection: IFormSection = {
       label: messages.firstNameBn,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'lastNameBn',
@@ -107,7 +112,7 @@ export const userSection: IFormSection = {
       label: messages.lastNameBn,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [bengaliOnlyNameFormat]
     },
     {
       name: 'firstNameEn',
@@ -115,7 +120,7 @@ export const userSection: IFormSection = {
       label: messages.firstNameEn,
       required: false,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'lastNameEn',
@@ -123,7 +128,7 @@ export const userSection: IFormSection = {
       label: messages.lastNameEn,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [englishOnlyNameFormat]
     },
     {
       name: 'phoneNumber',
@@ -131,7 +136,7 @@ export const userSection: IFormSection = {
       label: messages.phoneNumber,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [phoneNumberFormat]
     },
     {
       name: 'nid',
