@@ -1,7 +1,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Button, IButtonProps, ICON_ALIGNMENT } from './Button'
-import { PlusTransparent, MinusTransparent } from '../icons'
+import {
+  PlusTransparent,
+  MinusTransparent,
+  KeyboardArrowUp,
+  KeyboardArrowDown
+} from '../icons'
 
 const StyledButton = styled(Button)`
   color: ${({ theme }) => theme.colors.secondary};
@@ -23,13 +28,18 @@ const StyledButton = styled(Button)`
 `
 interface IExpansionButtonProps extends IButtonProps {
   expanded?: boolean
+  arrowExpansionButtons?: boolean
 }
 
 export function ExpansionButton(props: IExpansionButtonProps) {
   return (
     <StyledButton
       icon={() => {
-        return props.expanded ? <MinusTransparent /> : <PlusTransparent />
+        if (props.arrowExpansionButtons) {
+          return props.expanded ? <KeyboardArrowUp /> : <KeyboardArrowDown />
+        } else {
+          return props.expanded ? <MinusTransparent /> : <PlusTransparent />
+        }
       }}
       {...props}
     />
