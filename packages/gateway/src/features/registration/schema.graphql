@@ -338,6 +338,7 @@ type EventRegResultSet {
 type RegistrationCount {
   declared: Int
   rejected: Int
+  registered: Int
 }
 
 type CreatedIds {
