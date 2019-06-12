@@ -100,6 +100,8 @@ interface IGridTableProps {
   content: IDynamicValues[]
   columns: IGridPreference[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
+  expandedContentRows?: IExpandedContentPreference[]
+  arrowExpansionButtons?: boolean
   noResultText: string
   hideTableHeader?: boolean
   onPageChange?: (currentPage: number) => void
@@ -163,6 +165,7 @@ export class GridTable extends React.Component<
             }
             id="ListItemAction"
             onExpand={() => this.toggleExpanded(itemId)}
+            arrowExpansionButtons={this.props.arrowExpansionButtons}
           />
         </ActionWrapper>
       )
