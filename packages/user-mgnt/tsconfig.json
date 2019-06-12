@@ -16,7 +16,7 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["jest"]
+    "types": ["jest", "fhir"]
   },
   "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": [
@@ -24,7 +24,6 @@
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
+    "src/setupTests.ts"
   ]
 }

@@ -14,6 +14,7 @@ import getUser from '@user-mgnt/features/getUser/handler'
 import getRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
+import createUser from '@user-mgnt/features/createUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -109,6 +110,22 @@ export const getRoutes = () => {
         },
         validate: {
           payload: userIdSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createUser',
+      handler: createUser,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new user',
+        auth: {
+          scope: [
+            RouteScope.SYSTEM,
+            // TODO: need to remove this once system role token is there
+            RouteScope.REGISTER
+          ]
         }
       }
     },

@@ -39,7 +39,8 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: FIELD_AGENT_ROLES[0]
+      role: FIELD_AGENT_ROLES[0],
+      practitionerId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
     }
   }
 }
@@ -48,6 +49,7 @@ const countQueryGraphqlMock = {
   request: {
     query: COUNT_USER_WISE_APPLICATIONS,
     variables: {
+      userId: nameObj.data.getUser.practitionerId,
       status: EVENT_STATUS.REJECTED,
       locationIds: ['123456789']
     }
@@ -206,6 +208,7 @@ describe('FieldAgentHome tests', () => {
       request: {
         query: SEARCH_APPLICATIONS_USER_WISE,
         variables: {
+          userId: nameObj.data.getUser.practitionerId,
           status: EVENT_STATUS.REJECTED,
           locationIds: ['123456789'],
           count: 10,
@@ -286,6 +289,7 @@ describe('FieldAgentHome tests', () => {
       request: {
         query: SEARCH_APPLICATIONS_USER_WISE,
         variables: {
+          userId: nameObj.data.getUser.practitionerId,
           status: EVENT_STATUS.REJECTED,
           locationIds: ['123456789'],
           count: 10,

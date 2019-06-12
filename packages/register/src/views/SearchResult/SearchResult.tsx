@@ -724,6 +724,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           searchText={searchText}
           selectedSearchType={searchType}
           mobileSearchBar={true}
+          enableMenuSelection={false}
         />
         <Container>
           <BodyContent>

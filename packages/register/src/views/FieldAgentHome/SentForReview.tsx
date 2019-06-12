@@ -224,8 +224,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           id: draft.id,
           event: (draft.event && sentenceCase(draft.event)) || '',
           name: name || '',
-          submission_status: statusText || '',
-          status_indicator: icon ? [icon()] : null,
+          submissionStatus: statusText || '',
+          statusIndicator: icon ? [icon()] : null,
           rowClickHandler: [
             {
               label: 'rowClickHandler',
@@ -269,7 +269,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             {
               label: this.props.intl.formatMessage(messages.submissionStatus),
               width: 35,
-              key: 'submission_status',
+              key: 'submissionStatus',
               color: getTheme(window.config.COUNTRY, window.config.LANGUAGE)
                 .colors.secondaryLabel
             },
@@ -277,7 +277,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               label: '',
               width: 5,
               alignment: ColumnContentAlignment.CENTER,
-              key: 'status_indicator'
+              key: 'statusIndicator'
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}

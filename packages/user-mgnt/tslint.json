@@ -58,8 +58,9 @@
     "type-literal-delimiter": false,
     "non-literal-fs-path": false,
     "no-backbone-get-set-outside-model": false,
-    "cyclomatic-complexity": false
+    "cyclomatic-complexity": false,
+    "mocha-no-side-effect-code": false
   },
   "rulesDirectory": ["tslint-microsoft-contrib"],
-  "exclude": ["config/**/*.js", "node_modules/**/*.ts"]
+  "exclude": ["config/**/*.js", "node_modules/**/*.ts", "src/**/*.test.ts"]
 }

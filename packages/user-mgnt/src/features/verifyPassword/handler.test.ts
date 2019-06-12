@@ -1,5 +1,5 @@
 import User from '@user-mgnt/model/user'
-import { createServer } from '../..'
+import { createServer } from '@user-mgnt/index'
 import mockingoose from 'mockingoose'
 
 let server: any

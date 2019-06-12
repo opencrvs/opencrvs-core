@@ -5,6 +5,7 @@ export const FETCH_USER = gql`
   query($userId: String!) {
     getUser(userId: $userId) {
       userMgntUserID
+      practitionerId
       role
       name {
         use

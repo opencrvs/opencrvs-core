@@ -71,7 +71,7 @@
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
-    "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' src/extract-translations.ts",
+    "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' -r tsconfig-paths/register src/extract-translations.ts",
     "graphql:codegen": "graphql-codegen --config codegen.yml"
   },
   "lint-staged": {
@@ -130,6 +130,7 @@
     "stylelint-processor-styled-components": "^1.3.2",
     "ts-jest": "^24.0.2",
     "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.8.0",
     "typescript": "^3.0.1",
     "typescript-react-intl": "^0.3.0",
     "workbox-cli": "^4.0.0-alpha.0"
