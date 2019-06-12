@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'src/styled-components'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { FormFieldGenerator } from 'src/components/form'
-import { IFormSection } from 'src/forms'
+import { IFormSection, IFormSectionData } from 'src/forms'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
@@ -46,6 +46,9 @@ const FormTitle = styled.div`
 const Action = styled.div`
   margin-top: 32px;
 `
+type State = {
+  data: IFormSectionData
+}
 
 type IProps = {
   userForm: IFormSection
@@ -53,9 +56,19 @@ type IProps = {
 
 type IFullProps = InjectedIntlProps & IProps & { dispatch: Dispatch }
 
-class UserFormComponent extends React.Component<IFullProps> {
-  storeData = () => {
-    console.log('changed')
+class UserFormComponent extends React.Component<IFullProps, State> {
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      data: {}
+    }
+  }
+
+  storeData = (documentData: IFormSectionData) => {
+    console.log(JSON.stringify(documentData))
+    this.setState({
+      data: documentData
+    })
   }
 
   render = () => {

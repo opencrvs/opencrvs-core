@@ -21,6 +21,9 @@ describe('Settings page tests', async () => {
   it('it checks component has loaded', () => {
     // @ts-ignore
     expect(component.containsMatchingElement(ActionPageLight)).toBe(true)
+    component.find('input#firstNameEn').simulate('change', {
+      target: { id: 'firstNameEn', value: 'test' }
+    })
 
     component.unmount()
   })
