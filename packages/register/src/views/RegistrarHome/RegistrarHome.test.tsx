@@ -711,8 +711,6 @@ describe('RegistrarHome tests', () => {
   })
 
   it('renders all items returned from graphql query in ready-to-print tab', async () => {
-    // TODO: Discuss with Yeasin about how he used moment.js in this scenario
-    // const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const graphqlMock = [
       {
         request: {
