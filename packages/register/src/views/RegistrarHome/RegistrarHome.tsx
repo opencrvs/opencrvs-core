@@ -6,6 +6,7 @@ import {
 import {
   StatusOrange,
   StatusProgress,
+  StatusGreen,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
@@ -204,6 +205,26 @@ const messages: {
     id: 'register.registrarHome.action',
     defaultMessage: 'Action',
     description: 'Label for action in work queue list item'
+  },
+  readyToPrint: {
+    id: 'register.registrarHome.readyToPrint',
+    defaultMessage: 'Ready to print',
+    description: 'The title of ready to print tab'
+  },
+  registrationNumber: {
+    id: 'register.registrarHome.registrationNumber',
+    defaultMessage: 'Registration no.',
+    description: 'The heading of registration no. column'
+  },
+  listItemRegisteredDate: {
+    id: 'register.registrarHome.results.registeredDate',
+    defaultMessage: 'Application registered',
+    description: 'Label for date of registration in work queue list item'
+  },
+  print: {
+    id: 'register.registrarHome.printButton',
+    defaultMessage: 'Print',
+    description: 'The title of print button in list item actions'
   }
 })
 
@@ -224,6 +245,7 @@ interface IBaseRegistrarHomeProps {
   goToPage: typeof goToPageAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
+  goToPrintCertificate: typeof goToPrintCertificateAction
   tabId: string
   drafts: IApplication[]
 }
@@ -232,6 +254,7 @@ interface IRegistrarHomeState {
   progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
+  printCurrentPage: number
 }
 
 type IRegistrarHomeProps = InjectedIntlProps &
@@ -242,12 +265,14 @@ type IRegistrarHomeProps = InjectedIntlProps &
 const TAB_ID = {
   inProgress: 'progress',
   readyForReview: 'review',
-  sentForUpdates: 'updates'
+  sentForUpdates: 'updates',
+  readyToPrint: 'print'
 }
 
 export const EVENT_STATUS = {
   DECLARED: 'DECLARED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  REGISTERED: 'REGISTERED'
 }
 export class RegistrarHomeView extends React.Component<
   IRegistrarHomeProps,
@@ -259,7 +284,8 @@ export class RegistrarHomeView extends React.Component<
     this.state = {
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
-      updatesCurrentPage: 1
+      updatesCurrentPage: 1,
+      printCurrentPage: 1
     }
   }
   userHasRegisterScope() {
@@ -421,6 +447,127 @@ export class RegistrarHomeView extends React.Component<
     })
   }
 
+  transformPrintContent = (data: GQLQuery) => {
+    const { locale } = this.props.intl
+    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+      return []
+    }
+
+    return data.listEventRegistrations.results.map(
+      (reg: GQLEventRegistration) => {
+        let names
+        let contactPhoneNumber
+        if (reg.registration && reg.registration.type === 'BIRTH') {
+          const birthReg = reg as GQLBirthRegistration
+          names =
+            (birthReg &&
+              birthReg.child &&
+              (birthReg.child.name as GQLHumanName[])) ||
+            []
+          contactPhoneNumber =
+            (birthReg.registration &&
+              birthReg.registration.contactPhoneNumber) ||
+            ''
+        } else if (reg.registration && reg.registration.type === 'DEATH') {
+          const deathReg = reg as GQLDeathRegistration
+          names =
+            (deathReg &&
+              deathReg.deceased &&
+              (deathReg.deceased.name as GQLHumanName[])) ||
+            []
+          const phoneEntry =
+            (deathReg.informant &&
+              deathReg.informant.individual &&
+              deathReg.informant.individual.telecom &&
+              deathReg.informant.individual.telecom.find(
+                contactPoint =>
+                  (contactPoint && contactPoint.system === 'phone') || false
+              )) ||
+            null
+          contactPhoneNumber = (phoneEntry && phoneEntry.value) || ''
+        }
+        const actions = [] as IAction[]
+        actions.push({
+          label: this.props.intl.formatMessage(messages.print),
+          handler: () =>
+            this.props.goToPrintCertificate(
+              reg.id,
+              (reg.registration && reg.registration.type) || 'BIRTH'
+            )
+        })
+        const lang = 'en'
+        return {
+          id: reg.id,
+          name:
+            (names && (createNamesMap(names)[lang] as string)) ||
+            /* tslint:disable:no-string-literal */
+            (names && (createNamesMap(names)['bn'] as string)) ||
+            '',
+          date_of_registration:
+            reg.registration &&
+            reg.registration.status &&
+            reg.registration.status[0] &&
+            // @ts-ignore
+            reg.registration.status[0].timestamp &&
+            moment(
+              // @ts-ignore
+              reg.registration.status[0].timestamp.toString(),
+              'YYYY-MM-DD'
+            ).fromNow(),
+          registrationNumber:
+            (reg.registration && reg.registration.registrationNumber) ||
+            'BRN/DRN',
+          contact_number: contactPhoneNumber || '',
+          event:
+            (reg.registration &&
+              reg.registration.type &&
+              reg.registration.type.toString() &&
+              sentenceCase(reg.registration.type)) ||
+            '',
+          duplicates: (reg.registration && reg.registration.duplicates) || [],
+          actions,
+          status:
+            (reg.registration &&
+              reg.registration.status &&
+              reg.registration.status
+                .map(status => {
+                  return {
+                    type: (status && status.type) || null,
+                    practitionerName:
+                      (status &&
+                        status.user &&
+                        (createNamesMap(status.user.name as GQLHumanName[])[
+                          this.props.language
+                        ] as string)) ||
+                      (status &&
+                        status.user &&
+                        (createNamesMap(status.user.name as GQLHumanName[])[
+                          'default'
+                        ] as string)) ||
+                      /* tslint:enable:no-string-literal */
+                      '',
+                    timestamp:
+                      (status && formatLongDate(status.timestamp, locale)) ||
+                      null,
+                    practitionerRole:
+                      status && status.user && status.user.role
+                        ? this.props.intl.formatMessage(
+                            messages[status.user.role as string]
+                          )
+                        : '',
+                    officeName:
+                      locale === 'en'
+                        ? (status && status.office && status.office.name) || ''
+                        : (status && status.office && status.office.alias) || ''
+                  }
+                })
+                .reverse()) ||
+            null
+        }
+      }
+    )
+  }
+
   onPageChange = (newPageNumber: number) => {
     if (this.props.tabId === TAB_ID.inProgress) {
       this.setState({ progressCurrentPage: newPageNumber })
@@ -430,6 +577,9 @@ export class RegistrarHomeView extends React.Component<
     }
     if (this.props.tabId === TAB_ID.sentForUpdates) {
       this.setState({ updatesCurrentPage: newPageNumber })
+    }
+    if (this.props.tabId === TAB_ID.readyToPrint) {
+      this.setState({ printCurrentPage: newPageNumber })
     }
   }
 
@@ -520,6 +670,19 @@ export class RegistrarHomeView extends React.Component<
                   >
                     {intl.formatMessage(messages.sentForUpdates)} (
                     {data.countEventRegistrations.rejected})
+                  </IconTab>
+                  <IconTab
+                    id={`tab_${TAB_ID.readyToPrint}`}
+                    key={TAB_ID.readyToPrint}
+                    active={tabId === TAB_ID.readyToPrint}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusGreen />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.readyToPrint)
+                    }
+                  >
+                    {intl.formatMessage(messages.readyToPrint)} (
+                    {data.countEventRegistrations.registered})
                   </IconTab>
                 </TopBar>
               </>
@@ -760,6 +923,100 @@ export class RegistrarHomeView extends React.Component<
                     }
                     currentPage={this.state.updatesCurrentPage}
                     expandable={true}
+                  />
+                </BodyContent>
+              )
+            }}
+          </Query>
+        )}
+        {tabId === TAB_ID.readyToPrint && (
+          <Query
+            query={FETCH_REGISTRATIONS_QUERY}
+            variables={{
+              status: EVENT_STATUS.REGISTERED,
+              locationIds: [registrarUnion],
+              count: this.pageSize,
+              skip: (this.state.printCurrentPage - 1) * this.pageSize
+            }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) {
+                return (
+                  (!parentQueryLoading && (
+                    <StyledSpinner
+                      id="search-result-spinner"
+                      baseColor={theme.colors.background}
+                    />
+                  )) ||
+                  null
+                )
+              }
+              if (error) {
+                Sentry.captureException(error)
+                return (
+                  <ErrorText id="search-result-error-text-print">
+                    {intl.formatMessage(messages.queryError)}
+                  </ErrorText>
+                )
+              }
+
+              return (
+                <BodyContent>
+                  <GridTable
+                    content={this.transformPrintContent(data)}
+                    columns={[
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemType
+                        ),
+                        width: 14,
+                        key: 'event'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemName
+                        ),
+                        width: 23,
+                        key: 'name'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemRegisteredDate
+                        ),
+                        width: 22,
+                        key: 'date_of_registration'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.registrationNumber
+                        ),
+                        width: 21,
+                        key: 'registrationNumber'
+                      },
+                      {
+                        label: this.props.intl.formatMessage(
+                          messages.listItemAction
+                        ),
+                        width: 20,
+                        key: 'actions',
+                        isActionColumn: true,
+                        alignment: ColumnContentAlignment.CENTER
+                      }
+                    ]}
+                    noResultText={intl.formatMessage(
+                      messages.dataTableNoResults
+                    )}
+                    onPageChange={(currentPage: number) => {
+                      this.onPageChange(currentPage)
+                    }}
+                    pageSize={this.pageSize}
+                    totalItems={
+                      data.listEventRegistrations &&
+                      data.listEventRegistrations.totalItems
+                    }
+                    currentPage={this.state.printCurrentPage}
+                    expandable={true}
+                    arrowExpansionButtons={true}
                   />
                 </BodyContent>
               )
