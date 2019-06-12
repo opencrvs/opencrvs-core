@@ -5,6 +5,7 @@ export const COUNT_REGISTRATION_QUERY = gql`
     countEventRegistrations(locationIds: $locationIds) {
       declared
       rejected
+      registered
     }
   }
 `
@@ -48,6 +49,32 @@ export const SEARCH_EVENTS = gql`
           childName {
             firstNames
             familyName
+          contactPhoneNumber
+          status {
+            user {
+              id
+              name {
+                use
+                firstNames
+                familyName
+              }
+              role
+            }
+            location {
+              id
+              name
+              alias
+            }
+            office {
+              name
+              alias
+              address {
+                district
+                state
+              }
+            }
+            type
+            timestamp
           }
         }
         ... on DeathEventSearchSet {
