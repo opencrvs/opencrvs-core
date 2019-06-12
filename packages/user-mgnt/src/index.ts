@@ -42,7 +42,6 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
-  // curl -H 'Content-Type: application/json' -d '{"mobile": "27855555555", "password": "test"}' http://localhost:3030/verifyPassword
   const routes = getRoutes()
   server.route(routes)
 

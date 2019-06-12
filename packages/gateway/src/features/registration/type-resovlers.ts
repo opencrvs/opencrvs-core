@@ -54,7 +54,7 @@ export const typeResolvers: GQLResolver = {
       if (!name.family) {
         return null
       }
-      return name.family.join(' ')
+      return Array.isArray(name.family) ? name.family.join(' ') : name.family
     }
   },
   IdentityType: {
