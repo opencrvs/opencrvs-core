@@ -111,7 +111,7 @@ export class SubmissionController {
       REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTING
     application.submissionStatus = requestInProgressStatus
-    modifyApplication(application)
+    this.store.dispatch(modifyApplication(application))
 
     try {
       const mutationResult = await this.client.mutate({ mutation, variables })
