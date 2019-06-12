@@ -12,7 +12,9 @@ import {
   GQLQuery,
   GQLComment,
   GQLBirthRegistration,
-  GQLContactPoint
+  GQLContactPoint,
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   createNamesMap,
@@ -148,16 +150,19 @@ type IProps = InjectedIntlProps & {
 export class RowHistoryViewComponent extends React.Component<IProps> {
   transformer = (data: GQLQuery) => {
     const { locale } = this.props.intl
-    const registration =
-      data && data.fetchRegistration && data.fetchRegistration.registration
+    const fetchRegistration = data && data.fetchRegistration
+    const registration = fetchRegistration && fetchRegistration.registration
     const type = (registration && registration.type) || ''
     let name
     let dateOfEvent
-    let contactInfo: GQLContactPoint | undefined | null
+    let contactNumber: string
     if (type.toLowerCase() === 'birth') {
       const birthReg = data && (data.fetchRegistration as GQLBirthRegistration)
       name = (birthReg.child && birthReg.child.name) || []
       dateOfEvent = birthReg.child && birthReg.child.birthDate
+      contactNumber =
+        (birthReg.registration && birthReg.registration.contactPhoneNumber) ||
+        ''
     } else {
       const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
       name = (deathReg.deceased && deathReg.deceased.name) || []
@@ -165,12 +170,14 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         deathReg.deceased &&
         deathReg.deceased.deceased &&
         deathReg.deceased.deceased.deathDate
-      const informant = deathReg && deathReg.informant
-      contactInfo =
-        informant &&
-        informant.individual &&
-        informant.individual.telecom &&
-        informant.individual.telecom[0]
+      contactNumber =
+        (deathReg.informant &&
+          deathReg.informant.individual &&
+          deathReg.informant.individual.telecom &&
+          deathReg.informant.individual.telecom[0] &&
+          // @ts-ignore
+          deathReg.informant.individual.telecom[0].value) ||
+        ''
     }
 
     return {
@@ -222,7 +229,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     REJECT_COMMENTS
                   )) ||
                 '',
-              informantContactNumber: contactInfo && contactInfo.value
+              informantContactNumber: contactNumber
             }
           })) ||
         []
@@ -273,6 +280,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
 
   render() {
     const { intl } = this.props
+    console.log('EVENT ID', this.props.eventId)
     return (
       <ExpansionContent>
         <Query
@@ -308,6 +316,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               )
             }
             const transformedData = this.transformer(data)
+            console.log('TRANSFORMED DATA', transformedData)
             return (
               <>
                 <BorderedPaddedContent>
@@ -354,14 +363,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                                 )}
                                 value={timestamp}
                               />
-                              {type === DECLARED && informantContactNumber && (
-                                <LabelValue
-                                  label={intl.formatMessage(
-                                    messages.informantContact
-                                  )}
-                                  value={informantContactNumber}
-                                />
-                              )}
+                              <LabelValue
+                                label={intl.formatMessage(
+                                  messages.informantContact
+                                )}
+                                value={informantContactNumber || ''}
+                              />
                               <ValueContainer>
                                 <StyledLabel>
                                   {this.props.intl.formatMessage(
