@@ -7,7 +7,6 @@ export const resolvers: GQLResolver = {
     async searchEvents(
       _,
       {
-        status,
         userId,
         locationIds,
         status,
@@ -21,15 +20,10 @@ export const resolvers: GQLResolver = {
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
-        from: skip,
-        size: count,
         sort
       }
       if (locationIds) {
         searchCriteria.applicationLocationId = locationIds.join(',')
-      }
-      if (status) {
-        searchCriteria.status = status
       }
       if (trackingId) {
         searchCriteria.trackingId = trackingId

@@ -52,6 +52,7 @@ import { sentenceCase } from 'src/utils/data-formatting'
 import NotificationToast from './NotificatoinToast'
 import { SEARCH_EVENTS } from 'src/search/queries'
 import { transformData } from 'src/search/transformer'
+import { RowHistoryView } from './RowHistoryView'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -84,21 +85,6 @@ export const IconTab = styled(Button).attrs<IProps>({})`
 `
 
 const messages = defineMessages({
-  name: {
-    id: 'register.registrarHome.listItemName',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  dob: {
-    id: 'register.registrarHome.listItemDoB',
-    defaultMessage: 'D.o.B',
-    description: 'Label for DoB in work queue list item'
-  },
-  dod: {
-    id: 'register.registrarHome.listItemDod',
-    defaultMessage: 'D.o.D',
-    description: 'Label for DoD in work queue list item'
-  },
   hello: {
     id: 'register.registrarHome.header.Hello',
     defaultMessage: 'Hello {fullName}',
@@ -468,6 +454,10 @@ export class RegistrarHomeView extends React.Component<
     }
   }
 
+  renderExpandedComponent = (itemId: string) => {
+    return <RowHistoryView eventId={itemId} />
+  }
+
   render() {
     const { theme, intl, userDetails, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
@@ -662,6 +652,7 @@ export class RegistrarHomeView extends React.Component<
                         alignment: ColumnContentAlignment.CENTER
                       }
                     ]}
+                    renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
                       messages.dataTableNoResults
                     )}
@@ -754,6 +745,7 @@ export class RegistrarHomeView extends React.Component<
                         alignment: ColumnContentAlignment.CENTER
                       }
                     ]}
+                    renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
                       messages.dataTableNoResults
                     )}

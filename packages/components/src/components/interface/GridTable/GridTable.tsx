@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
 import { grid } from '../../grid'
 export { IAction } from './types'
@@ -99,7 +98,7 @@ interface IGridPreference {
 interface IGridTableProps {
   content: IDynamicValues[]
   columns: IGridPreference[]
-  expandedContentRows?: IExpandedContentPreference[]
+  renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText: string
   onPageChange?: (currentPage: number) => void
   pageSize?: number
@@ -117,10 +116,6 @@ interface IGridTableState {
 const defaultConfiguration = {
   pageSize: 10,
   currentPage: 1
-}
-
-const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
-  return totalItemCount > 0 ? Math.ceil(totalItemCount / pageSize) : 0
 }
 
 export class GridTable extends React.Component<
@@ -297,12 +292,9 @@ export class GridTable extends React.Component<
 
                 {this.props.expandable && (
                   <ExpandedSectionContainer expanded={expanded}>
-                    {expanded && (
-                      <ExpansionContentInfo
-                        data={item}
-                        preference={this.props.expandedContentRows}
-                      />
-                    )}
+                    {expanded &&
+                      this.props.renderExpandedComponent &&
+                      this.props.renderExpandedComponent(item.id as string)}
                   </ExpandedSectionContainer>
                 )}
               </StyledBox>
