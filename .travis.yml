@@ -8,6 +8,10 @@ jobs:
         - npm install codecov -g
         - codecov
     - before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      addons:
+        apt:
+          packages:
+          - libgconf-2-4
       script:
         - yarn global add wait-on
         - yarn dev:secrets:gen
