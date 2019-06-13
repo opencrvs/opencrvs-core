@@ -22,7 +22,7 @@ input UserInput {
 }
 
 type User {
-  id: ID!
+  id: ID
   userMgntUserID: ID
   practitionerId: String
   name: [HumanName] # -> .name

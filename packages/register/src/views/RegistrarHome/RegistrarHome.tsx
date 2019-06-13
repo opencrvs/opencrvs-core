@@ -20,13 +20,7 @@ import {
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLBirthRegistration,
-  GQLDeathRegistration,
-  GQLEventRegistration,
-  GQLHumanName,
-  GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema.d'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
 import * as moment from 'moment'
 import * as React from 'react'
@@ -37,7 +31,6 @@ import { RouteComponentProps } from 'react-router'
 import { Header } from 'src/components/interface/Header/Header'
 import { IViewHeadingProps } from 'src/components/ViewHeading'
 import { IApplication } from 'src/applications'
-import { Event } from 'src/forms'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
@@ -51,15 +44,14 @@ import {
 import { getScope, getUserDetails } from 'src/profile/profileSelectors'
 import { IStoreState } from 'src/store'
 import { Scope } from 'src/utils/authUtils'
-import { CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT } from 'src/utils/constants'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
 import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
-import { COUNT_REGISTRATION_QUERY, FETCH_REGISTRATIONS_QUERY } from './queries'
+import { COUNT_REGISTRATION_QUERY, SEARCH_EVENTS } from './queries'
 import { sentenceCase } from 'src/utils/data-formatting'
 import NotificationToast from './NotificatoinToast'
+import { transformData } from 'src/search/transformer'
+import { RowHistoryView } from './RowHistoryView'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -92,21 +84,6 @@ export const IconTab = styled(Button).attrs<IProps>({})`
 `
 
 const messages = defineMessages({
-  name: {
-    id: 'register.registrarHome.listItemName',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  dob: {
-    id: 'register.registrarHome.listItemDoB',
-    defaultMessage: 'D.o.B',
-    description: 'Label for DoB in work queue list item'
-  },
-  dod: {
-    id: 'register.registrarHome.listItemDod',
-    defaultMessage: 'D.o.D',
-    description: 'Label for DoD in work queue list item'
-  },
   hello: {
     id: 'register.registrarHome.header.Hello',
     defaultMessage: 'Hello {fullName}',
@@ -316,274 +293,83 @@ export class RegistrarHomeView extends React.Component<
   }
 
   transformDeclaredContent = (data: GQLQuery) => {
-    const { locale } = this.props.intl
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+    if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
+    const transformedData = transformData(data, this.props.intl)
 
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
-        const lang = 'bn'
-        let dateOfEvent
-        let names: GQLHumanName[] = []
-        if (reg.registration && reg.registration.type === 'BIRTH') {
-          const birthReg = reg as GQLBirthRegistration
-          dateOfEvent = birthReg && birthReg.child && birthReg.child.birthDate
-          names =
-            (birthReg &&
-              birthReg.child &&
-              (birthReg.child.name as GQLHumanName[])) ||
-            []
-        } else if (reg.registration && reg.registration.type === 'DEATH') {
-          const deathReg = reg as GQLDeathRegistration
-          dateOfEvent =
-            deathReg &&
-            deathReg.deceased &&
-            deathReg.deceased.deceased &&
-            deathReg.deceased.deceased.deathDate
-          names =
-            (deathReg &&
-              deathReg.deceased &&
-              (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-        }
-        const actions = [] as IAction[]
-        if (this.userHasRegisterScope()) {
-          if (
-            reg.registration &&
-            reg.registration.duplicates &&
-            reg.registration.duplicates.length > 0
-          ) {
-            actions.push({
-              label: this.props.intl.formatMessage(messages.reviewDuplicates),
-              handler: () => this.props.goToReviewDuplicate(reg.id)
-            })
-          } else {
-            actions.push({
-              label: this.props.intl.formatMessage(messages.review),
-              handler: () =>
-                this.props.gotoTab(
-                  REVIEW_EVENT_PARENT_FORM_TAB,
-                  reg.id,
-                  'review',
-                  (reg.registration &&
-                    reg.registration.type &&
-                    reg.registration.type.toLowerCase()) ||
-                    ''
-                )
-            })
-          }
-        }
-
-        return {
-          id: reg.id,
-          name:
-            (createNamesMap(names)[lang] as string) ||
-            /* tslint:disable:no-string-literal */
-            (createNamesMap(names)['default'] as string) ||
-            /* tslint:enable:no-string-literal */
-            '',
-          date_of_event:
-            (dateOfEvent &&
-              moment(dateOfEvent.toString(), 'YYYY-MM-DD').format(
-                CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
-              )) ||
-            '',
-          event_time_elapsed:
-            (dateOfEvent &&
-              moment(dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
-            '',
-          application_time_elapsed:
-            (reg.createdAt &&
-              moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
-            '',
-          tracking_id: (reg.registration && reg.registration.trackingId) || '',
-          event:
-            (reg.registration &&
-              reg.registration.type &&
-              reg.registration.type.toString() &&
-              sentenceCase(reg.registration.type)) ||
-            '',
-          duplicates: (reg.registration && reg.registration.duplicates) || [],
-          actions,
-          status:
-            (reg.registration &&
-              reg.registration.status &&
-              reg.registration.status
-                .map(status => {
-                  return {
-                    type: (status && status.type) || null,
-                    practitionerName:
-                      (status &&
-                        status.user &&
-                        (createNamesMap(status.user.name as GQLHumanName[])[
-                          this.props.language
-                        ] as string)) ||
-                      (status &&
-                        status.user &&
-                        /* tslint:disable:no-string-literal */
-                        (createNamesMap(status.user.name as GQLHumanName[])[
-                          'default'
-                        ] as string)) ||
-                      /* tslint:enable:no-string-literal */
-                      '',
-                    timestamp:
-                      (status && formatLongDate(status.timestamp, locale)) ||
-                      null,
-                    practitionerRole:
-                      status && status.user && status.user.role
-                        ? this.props.intl.formatMessage(
-                            messages[status.user.role as string]
-                          )
-                        : '',
-                    officeName:
-                      locale === 'en'
-                        ? (status && status.office && status.office.name) || ''
-                        : (status && status.office && status.office.alias) || ''
-                  }
-                })
-                .reverse()) ||
-            null
+    return transformedData.map(reg => {
+      const actions = [] as IAction[]
+      if (this.userHasRegisterScope()) {
+        if (reg.duplicates && reg.duplicates.length > 0) {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.reviewDuplicates),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.review),
+            handler: () =>
+              this.props.gotoTab(
+                REVIEW_EVENT_PARENT_FORM_TAB,
+                reg.id,
+                'review',
+                reg.event.toLowerCase()
+              )
+          })
         }
       }
-    )
+
+      return {
+        ...reg,
+        event_time_elapsed:
+          (reg.dateOfEvent &&
+            moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
+          '',
+        application_time_elapsed:
+          (reg.createdAt &&
+            moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+          '',
+        actions
+      }
+    })
   }
 
   transformRejectedContent = (data: GQLQuery) => {
-    const { locale } = this.props.intl
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+    if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
-        let names
-        let contactPhoneNumber
-        if (reg.registration && reg.registration.type === 'BIRTH') {
-          const birthReg = reg as GQLBirthRegistration
-          names =
-            (birthReg &&
-              birthReg.child &&
-              (birthReg.child.name as GQLHumanName[])) ||
-            []
-          contactPhoneNumber =
-            (birthReg.registration &&
-              birthReg.registration.contactPhoneNumber) ||
-            ''
-        } else if (reg.registration && reg.registration.type === 'DEATH') {
-          const deathReg = reg as GQLDeathRegistration
-          names =
-            (deathReg &&
-              deathReg.deceased &&
-              (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-          const phoneEntry =
-            (deathReg.informant &&
-              deathReg.informant.individual &&
-              deathReg.informant.individual.telecom &&
-              deathReg.informant.individual.telecom.find(
-                contactPoint =>
-                  (contactPoint && contactPoint.system === 'phone') || false
-              )) ||
-            null
-          contactPhoneNumber = (phoneEntry && phoneEntry.value) || ''
-        }
-        const actions = [] as IAction[]
-        if (this.userHasRegisterScope()) {
-          if (
-            reg.registration &&
-            reg.registration.duplicates &&
-            reg.registration.duplicates.length > 0
-          ) {
-            actions.push({
-              label: this.props.intl.formatMessage(messages.reviewDuplicates),
-              handler: () => this.props.goToReviewDuplicate(reg.id)
-            })
-          } else {
-            actions.push({
-              label: this.props.intl.formatMessage(messages.update),
-              handler: () =>
-                this.props.gotoTab(
-                  REVIEW_EVENT_PARENT_FORM_TAB,
-                  reg.id,
-                  'review',
-                  (reg.registration &&
-                    reg.registration.type &&
-                    reg.registration.type.toLowerCase()) ||
-                    ''
-                )
-            })
-          }
-        }
-        const lang = 'en'
-        return {
-          id: reg.id,
-          name:
-            (names && (createNamesMap(names)[lang] as string)) ||
-            /* tslint:disable:no-string-literal */
-            (names && (createNamesMap(names)['bn'] as string)) ||
-            '',
-          date_of_rejection:
-            reg.registration &&
-            reg.registration.status &&
-            reg.registration.status[0] &&
-            // @ts-ignore
-            reg.registration.status[0].timestamp &&
-            moment(
-              // @ts-ignore
-              reg.registration.status[0].timestamp.toString(),
-              'YYYY-MM-DD'
-            ).fromNow(),
-          contact_number: contactPhoneNumber || '',
-          event:
-            (reg.registration &&
-              reg.registration.type &&
-              reg.registration.type.toString() &&
-              sentenceCase(reg.registration.type)) ||
-            '',
-          duplicates: (reg.registration && reg.registration.duplicates) || [],
-          actions,
-          status:
-            (reg.registration &&
-              reg.registration.status &&
-              reg.registration.status
-                .map(status => {
-                  return {
-                    type: (status && status.type) || null,
-                    practitionerName:
-                      (status &&
-                        status.user &&
-                        (createNamesMap(status.user.name as GQLHumanName[])[
-                          this.props.language
-                        ] as string)) ||
-                      (status &&
-                        status.user &&
-                        /* tslint:disable:no-string-literal */
-                        (createNamesMap(status.user.name as GQLHumanName[])[
-                          'default'
-                        ] as string)) ||
-                      /* tslint:enable:no-string-literal */
-                      '',
-                    timestamp:
-                      (status && formatLongDate(status.timestamp, locale)) ||
-                      null,
-                    practitionerRole:
-                      status && status.user && status.user.role
-                        ? this.props.intl.formatMessage(
-                            messages[status.user.role as string]
-                          )
-                        : '',
-                    officeName:
-                      locale === 'en'
-                        ? (status && status.office && status.office.name) || ''
-                        : (status && status.office && status.office.alias) || ''
-                  }
-                })
-                .reverse()) ||
-            null
+    const transformedData = transformData(data, this.props.intl)
+    return transformedData.map(reg => {
+      const actions = [] as IAction[]
+      if (this.userHasRegisterScope()) {
+        if (reg.duplicates && reg.duplicates.length > 0) {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.reviewDuplicates),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.update),
+            handler: () =>
+              this.props.gotoTab(
+                REVIEW_EVENT_PARENT_FORM_TAB,
+                reg.id,
+                'review',
+                reg.event.toLowerCase() || ''
+              )
+          })
         }
       }
-    )
+      return {
+        ...reg,
+        date_of_rejection:
+          (reg.modifiedAt &&
+            moment(reg.modifiedAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+          '',
+        actions
+      }
+    })
   }
 
   transformDraftContent = () => {
@@ -665,6 +451,10 @@ export class RegistrarHomeView extends React.Component<
     if (this.props.tabId === TAB_ID.sentForUpdates) {
       this.setState({ updatesCurrentPage: newPageNumber })
     }
+  }
+
+  renderExpandedComponent = (itemId: string) => {
+    return <RowHistoryView eventId={itemId} />
   }
 
   render() {
@@ -790,7 +580,7 @@ export class RegistrarHomeView extends React.Component<
         )}
         {tabId === TAB_ID.readyForReview && (
           <Query
-            query={FETCH_REGISTRATIONS_QUERY}
+            query={SEARCH_EVENTS}
             variables={{
               status: EVENT_STATUS.DECLARED,
               locationIds: [registrarUnion],
@@ -861,22 +651,7 @@ export class RegistrarHomeView extends React.Component<
                         alignment: ColumnContentAlignment.CENTER
                       }
                     ]}
-                    expandedContentRows={[
-                      {
-                        label: intl.formatMessage(messages.name),
-                        key: 'name'
-                      },
-                      {
-                        label: intl.formatMessage(messages.dob),
-                        displayForEvents: [Event.BIRTH],
-                        key: 'date_of_event'
-                      },
-                      {
-                        label: intl.formatMessage(messages.dod),
-                        displayForEvents: [Event.DEATH],
-                        key: 'date_of_event'
-                      }
-                    ]}
+                    renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
                       messages.dataTableNoResults
                     )}
@@ -885,8 +660,7 @@ export class RegistrarHomeView extends React.Component<
                     }}
                     pageSize={this.pageSize}
                     totalItems={
-                      data.listEventRegistrations &&
-                      data.listEventRegistrations.totalItems
+                      data.searchEvents && data.searchEvents.totalItems
                     }
                     currentPage={this.state.reviewCurrentPage}
                     expandable={true}
@@ -898,7 +672,7 @@ export class RegistrarHomeView extends React.Component<
         )}
         {tabId === TAB_ID.sentForUpdates && (
           <Query
-            query={FETCH_REGISTRATIONS_QUERY}
+            query={SEARCH_EVENTS}
             variables={{
               status: EVENT_STATUS.REJECTED,
               locationIds: [registrarUnion],
@@ -969,6 +743,7 @@ export class RegistrarHomeView extends React.Component<
                         alignment: ColumnContentAlignment.CENTER
                       }
                     ]}
+                    renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
                       messages.dataTableNoResults
                     )}
@@ -977,8 +752,7 @@ export class RegistrarHomeView extends React.Component<
                     }}
                     pageSize={this.pageSize}
                     totalItems={
-                      data.listEventRegistrations &&
-                      data.listEventRegistrations.totalItems
+                      data.searchEvents && data.searchEvents.totalItems
                     }
                     currentPage={this.state.updatesCurrentPage}
                     expandable={true}
