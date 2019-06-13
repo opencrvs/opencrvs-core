@@ -33,4 +33,5 @@ RUN cd packages/components; yarn build && cd ../register; yarn build --productio
 
 # Add nginx build stage that only copies out the built webapp
 FROM nginx
+COPY infrastructure/nginx-default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /usr/src/app/packages/register/build /usr/share/nginx/html
