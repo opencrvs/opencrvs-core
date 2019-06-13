@@ -67,6 +67,7 @@ const ContentWrapper = styled.span.attrs<{
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
 `
+
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   margin-top: 5px;
   overflow: hidden;
@@ -100,6 +101,7 @@ interface IGridTableProps {
   columns: IGridPreference[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText: string
+  hideTableHeader?: boolean
   onPageChange?: (currentPage: number) => void
   pageSize?: number
   totalItems: number
@@ -226,6 +228,7 @@ export class GridTable extends React.Component<
       columns,
       content,
       noResultText,
+      hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage
     } = this.props
@@ -233,7 +236,7 @@ export class GridTable extends React.Component<
     const totalItems = this.props.totalItems || 0
     return (
       <Wrapper>
-        {content.length > 0 && width > grid.breakpoints.lg && (
+        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ContentWrapper
