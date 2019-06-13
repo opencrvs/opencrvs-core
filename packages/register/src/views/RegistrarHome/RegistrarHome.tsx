@@ -21,7 +21,13 @@ import {
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import {
+  GQLQuery,
+  GQLEventRegistration,
+  GQLBirthRegistration,
+  GQLHumanName,
+  GQLDeathRegistration
+} from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
 import * as moment from 'moment'
 import * as React from 'react'
@@ -49,10 +55,11 @@ import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, SEARCH_EVENTS } from './queries'
-import { sentenceCase } from 'src/utils/data-formatting'
+import { sentenceCase, createNamesMap } from 'src/utils/data-formatting'
 import NotificationToast from './NotificatoinToast'
 import { transformData } from 'src/search/transformer'
 import { RowHistoryView } from './RowHistoryView'
+import { formatLongDate } from 'src/utils/date-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -641,6 +648,8 @@ export class RegistrarHomeView extends React.Component<
               )
             }
 
+            console.log('DATA', data)
+
             return (
               <>
                 <TopBar>
@@ -927,7 +936,7 @@ export class RegistrarHomeView extends React.Component<
         )}
         {tabId === TAB_ID.readyToPrint && (
           <Query
-            query={FETCH_REGISTRATIONS_QUERY}
+            query={SEARCH_EVENTS}
             variables={{
               status: EVENT_STATUS.REGISTERED,
               locationIds: [registrarUnion],

@@ -31,9 +31,10 @@ const nameObj = {
         {
           use: 'en',
           firstNames: 'Mohammad',
-          familyName: 'Ashraful'
+          familyName: 'Ashraful',
+          __typename: 'HumanName'
         },
-        { use: 'bn', firstNames: '', familyName: '' }
+        { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
       role: 'DISTRICT_REGISTRAR'
     }
@@ -329,63 +330,9 @@ describe('RegistrarHome tests', async () => {
         .hostNodes()
         .text()
     ).toContain('Sent for updates (5)')
-    app.unmount()
   })
-  it('check registered (RTP) applications count', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['123456789']
-          }
-        },
-        result: {
-          data: {
-            countEventRegistrations: {
-              declared: 10,
-              rejected: 5,
-              registered: 7
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome
-        match={{
-          params: {
-            tabId: 'print'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_print')
-        .hostNodes()
-        .text()
-    ).toContain('Ready to print (7)')
-    app.unmount()
-  })
-  it('renders all items returned from graphql query in ready for reivew', async () => {
-    Date.now = jest.fn(() => 1559239200000)
+  it('renders all items returned from graphql query in ready for reivew tab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
@@ -480,6 +427,7 @@ describe('RegistrarHome tests', async () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
+    const data = testComponent.component.find(GridTable).prop('content')
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
@@ -492,6 +440,7 @@ describe('RegistrarHome tests', async () => {
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in rejected tab', async () => {
+    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const graphqlMock = [
       {
         request: {
@@ -583,17 +532,20 @@ describe('RegistrarHome tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 2000)
+      setTimeout(resolve, 100)
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_REJECTION = '15 days ago'
+    const EXPECTED_DATE_OF_REJECTION = moment(
+      TIME_STAMP,
+      'YYYY-MM-DD'
+    ).fromNow()
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
     expect(data[1].contact_number).toBe('01622688231')
     expect(data[1].date_of_rejection).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[1].event).toBe('Birth')
+    expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
 
     testComponent.component.unmount()
@@ -655,266 +607,6 @@ describe('RegistrarHome tests', async () => {
     testComponent.component.unmount()
   })
 
-  it('renders all items returned from graphql query in ready-to-print tab', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_REGISTRATIONS_QUERY,
-          variables: {
-            status: EVENT_STATUS.REGISTERED,
-            locationIds: ['123456789'],
-            count: 10,
-            skip: 0
-          }
-        },
-        result: {
-          data: {
-            listEventRegistrations: {
-              totalItems: 2,
-              results: [
-                {
-                  id: '9de759b1-a5fe-4476-94bd-b8123017db3f',
-                  registration: {
-                    type: 'DEATH',
-                    trackingId: 'D1X8PO8',
-                    registrationNumber: '2019333494D1X8PO80',
-                    contactPhoneNumber: null,
-                    status: [
-                      {
-                        user: {
-                          id: '99636b42-72c3-40c2-9c19-947efa728068',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'REGISTERED',
-                        timestamp: '2019-05-17T05:49:45.658Z'
-                      },
-                      {
-                        user: {
-                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Shakib',
-                              familyName: 'Al Hasan'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'FIELD_AGENT'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'DECLARED',
-                        timestamp: '2019-05-17T05:49:26.898Z'
-                      }
-                    ]
-                  },
-                  createdAt: '2019-05-17T05:49:44.826Z',
-                  deceased: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
-                        familyName: 'খান'
-                      },
-                      {
-                        use: 'en',
-                        firstNames: 'K M Abdullah al amin',
-                        familyName: 'Khan'
-                      }
-                    ],
-                    deceased: {
-                      deathDate: '2019-01-18'
-                    }
-                  },
-                  informant: {
-                    individual: {
-                      telecom: [
-                        {
-                          system: 'phone',
-                          value: '01712345678'
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  id: 'f32d9e41-8172-4f54-b540-277951286a27',
-                  registration: {
-                    type: 'DEATH',
-                    trackingId: 'DKMN3PQ',
-                    registrationNumber: '2019333494DKMN3PQ2',
-                    contactPhoneNumber: null,
-                    status: [
-                      {
-                        user: {
-                          id: '99636b42-72c3-40c2-9c19-947efa728068',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Mohammad',
-                              familyName: 'Ashraful'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'LOCAL_REGISTRAR'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'REGISTERED',
-                        timestamp: '2019-05-21T05:51:13.455Z'
-                      },
-                      {
-                        user: {
-                          id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-                          name: [
-                            {
-                              use: 'en',
-                              firstNames: 'Shakib',
-                              familyName: 'Al Hasan'
-                            },
-                            {
-                              use: 'bn',
-                              firstNames: '',
-                              familyName: ''
-                            }
-                          ],
-                          role: 'FIELD_AGENT'
-                        },
-                        location: {
-                          id: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-                          name: 'Moktarpur',
-                          alias: ['মোক্তারপুর']
-                        },
-                        office: {
-                          name: 'Moktarpur Union Parishad',
-                          alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                          address: {
-                            district: 'Gazipur',
-                            state: 'Dhaka'
-                          }
-                        },
-                        type: 'DECLARED',
-                        timestamp: '2019-05-21T05:50:58.661Z'
-                      }
-                    ]
-                  },
-                  createdAt: '2019-05-21T05:51:12.949Z',
-                  deceased: {
-                    name: [
-                      {
-                        use: 'bn',
-                        firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
-                        familyName: 'খান'
-                      },
-                      {
-                        use: 'en',
-                        firstNames: 'K M Abdullah al amin',
-                        familyName: 'Khan'
-                      }
-                    ],
-                    deceased: {
-                      deathDate: '2019-01-18'
-                    }
-                  },
-                  informant: {
-                    individual: {
-                      telecom: [
-                        {
-                          system: 'phone',
-                          value: '01712345678'
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 2000)
-    })
-    testComponent.component.update()
-    console.log('GRIDTABLE EXISTS?', testComponent.component.exists(GridTable))
-    const data = testComponent.component.find(GridTable).prop('content')
-
-    expect(data.length).toBe(2)
-    expect(data[1].id).toBe('f32d9e41-8172-4f54-b540-277951286a27')
-    expect(data[1].event).toBe('Death')
-    expect(data[1].actions).toBeDefined()
-
-    testComponent.component.unmount()
-  })
-
   it('should show pagination bar if items more than 11 in ReviewTab', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
@@ -967,7 +659,7 @@ describe('RegistrarHome tests', async () => {
     testComponent.component.unmount()
   })
 
-  it('should show pagination bar in rejected tab if items more than 11', async () => {
+  it('should show pagination bar in updates tab if items more than 11', async () => {
     const graphqlMock = [
       {
         request: {
@@ -1055,6 +747,7 @@ describe('RegistrarHome tests', async () => {
       .simulate('click')
     testComponent.component.unmount()
   })
+
   it('renders expanded area for ready to review', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
@@ -1531,6 +1224,7 @@ describe('RegistrarHome tests', async () => {
 
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
       setTimeout(resolve, 100)
