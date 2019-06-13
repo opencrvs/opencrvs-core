@@ -7,21 +7,19 @@ export const resolvers: GQLResolver = {
     async searchEvents(
       _,
       {
-        status,
         userId,
         locationIds,
+        status,
         trackingId,
         registrationNumber,
         contactNumber,
-        count = 10,
-        skip = 0,
+        count,
+        skip,
         sort = 'desc'
       },
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
-        from: skip,
-        size: count,
         sort
       }
       if (locationIds) {
@@ -35,6 +33,12 @@ export const resolvers: GQLResolver = {
       }
       if (contactNumber) {
         searchCriteria.contactNumber = contactNumber
+      }
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
       }
       if (status) {
         searchCriteria.status = status

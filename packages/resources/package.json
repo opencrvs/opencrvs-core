@@ -5,7 +5,7 @@
   "scripts": {
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "lint-staged",
+    "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test": "jest  --silent --noStackTrace && yarn test:compilation",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
@@ -84,7 +84,6 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "tslint --project ./tsconfig.json",
       "git add"
     ]
   },

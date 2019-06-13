@@ -15,8 +15,30 @@ import { FetchResult } from 'react-apollo'
 const INTERVAL_TIME = 5000
 const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_SUBMIT.toString(),
+  SUBMISSION_STATUS.READY_TO_REGISTER.toString(),
+  SUBMISSION_STATUS.READY_TO_REJECT.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
+
+interface IActionList {
+  [key: string]: string
+}
+
+const ACTION_LIST: IActionList = {
+  [Action.SUBMIT_FOR_REVIEW]: Action.SUBMIT_FOR_REVIEW,
+  [Action.REGISTER_APPLICATION]: Action.REGISTER_APPLICATION,
+  [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION
+}
+const REQUEST_IN_PROGRESS_STATUS: IActionList = {
+  [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
+  [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERING,
+  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING
+}
+const SUCCESS_SUBMISSION_STATUS: IActionList = {
+  [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
+  [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERED,
+  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED
+}
 
 export class SubmissionController {
   private store: AppStore
@@ -42,7 +64,7 @@ export class SubmissionController {
 
   private getSubmitableApplications = () => {
     return this.getApplications().filter(
-      app =>
+      (app: IApplication) =>
         app.submissionStatus &&
         ALLOWED_STATUS_FOR_RETRY.includes(app.submissionStatus)
     )
@@ -77,9 +99,11 @@ export class SubmissionController {
       return
     }
 
+    const applicationAction = ACTION_LIST[application.action || ''] || null
     const result = getMutationMapping(
       application.event,
-      Action.SUBMIT_FOR_REVIEW,
+      // @ts-ignore
+      applicationAction,
       null,
       this.registerForms[application.event],
       application
@@ -89,8 +113,11 @@ export class SubmissionController {
       variables: null
     }
 
-    application.submissionStatus = SUBMISSION_STATUS.SUBMITTING
-    modifyApplication(application)
+    const requestInProgressStatus =
+      REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
+      SUBMISSION_STATUS.SUBMITTING
+    application.submissionStatus = requestInProgressStatus
+    this.store.dispatch(modifyApplication(application))
 
     try {
       const mutationResult = await this.client.mutate({ mutation, variables })
@@ -101,8 +128,10 @@ export class SubmissionController {
   }
 
   private onSuccess = (application: IApplication, result: FetchResult) => {
-    application.submissionStatus =
-      SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+    const submissionStatus =
+      SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
+      SUBMISSION_STATUS.SUBMITTED
+    application.submissionStatus = submissionStatus
     if (result && result.data && result.data.createBirthRegistration) {
       const { compositionId, trackingId } = result.data.createBirthRegistration
       if (compositionId) {

@@ -11,7 +11,7 @@
     "test": "jest  --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "lint-staged",
+    "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
@@ -63,7 +63,6 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "tslint --project ./tsconfig.json",
       "git add"
     ]
   },

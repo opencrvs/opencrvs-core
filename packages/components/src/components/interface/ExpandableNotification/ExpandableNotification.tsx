@@ -23,6 +23,8 @@ const NotificationBar = styled.div`
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.bodyStyle};
   background-color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }) => theme.shadows.thickShadow};
+  z-index: 1;
   &:hover {
     ${({ theme }) => theme.gradients.gradientSkyDark};
   }

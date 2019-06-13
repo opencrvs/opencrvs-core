@@ -20,13 +20,16 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
     let birthReg
     let deathReg
     let names
+    let dateOfEvent
     const assignedReg = reg as GQLEventSearchSet
     if (assignedReg.registration && assignedReg.type === 'Birth') {
       birthReg = reg as GQLBirthEventSearchSet
       names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
+      dateOfEvent = birthReg && birthReg.dateOfBirth
     } else {
       deathReg = reg as GQLDeathEventSearchSet
       names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
+      dateOfEvent = deathReg && deathReg.dateOfDeath
     }
     const lang = 'bn'
     const status =
@@ -50,16 +53,20 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
           deathReg.dateOfDeath &&
           formatLongDate(deathReg.dateOfDeath, locale)) ||
         '',
+      dateOfEvent,
       registrationNumber:
         (assignedReg.registration &&
           assignedReg.registration.registrationNumber) ||
         '',
       trackingId:
         (assignedReg.registration && assignedReg.registration.trackingId) || '',
-      event: assignedReg.type,
-      declarationStatus: status,
+      event: assignedReg.type || '',
+      declarationStatus: status || '',
+      contactNumber:
+        (assignedReg.registration && assignedReg.registration.contactNumber) ||
+        '',
       duplicates:
-        assignedReg.registration && assignedReg.registration.duplicates,
+        (assignedReg.registration && assignedReg.registration.duplicates) || [],
       rejectionReasons:
         (status === 'REJECTED' &&
           assignedReg.registration &&
@@ -69,7 +76,10 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
         (status === 'REJECTED' &&
           assignedReg.registration &&
           assignedReg.registration.comment) ||
-        ''
+        '',
+      createdAt: assignedReg.registration && assignedReg.registration.createdAt,
+      modifiedAt:
+        assignedReg.registration && assignedReg.registration.modifiedAt
     }
   })
 }

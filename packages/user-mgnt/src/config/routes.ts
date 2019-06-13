@@ -10,11 +10,13 @@ import getUserMobile, {
 import searchUsers, {
   searchSchema
 } from '@user-mgnt/features/searchUsers/handler'
-import getUser from '@user-mgnt/features/getUser/handler'
+import getUser, {
+  getUserRequestSchema
+} from '@user-mgnt/features/getUser/handler'
+import createUser from '@user-mgnt/features/createUser/handler'
 import getRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
-import createUser from '@user-mgnt/features/createUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -109,7 +111,7 @@ export const getRoutes = () => {
           ]
         },
         validate: {
-          payload: userIdSchema
+          payload: getUserRequestSchema
         }
       }
     },

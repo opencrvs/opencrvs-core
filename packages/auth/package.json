@@ -10,7 +10,7 @@
     "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "jest --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
-    "precommit": "lint-staged",
+    "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
     "request-token": "NODE_PATH=. ts-node resources/request-token",
     "test:compilation": "tsc --noEmit"
@@ -62,7 +62,6 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "tslint --project ./tsconfig.json",
       "git add"
     ]
   },

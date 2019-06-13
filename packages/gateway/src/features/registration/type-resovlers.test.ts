@@ -898,21 +898,16 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns user of the task', async () => {
-      const mock = fetch.mockResponseOnce(
-        JSON.stringify({ resourceType: 'Practitioner' })
-      )
+      const mock = fetch.mockResponseOnce(JSON.stringify({ _id: '1' }))
       // @ts-ignore
       const user = await typeResolvers.RegWorkflow.user(mockTask)
 
-      expect(mock).toBeCalledWith(
-        'http://localhost:5001/fhir/Practitioner/123',
-        {
-          body: undefined,
-          headers: { 'Content-Type': 'application/fhir+json' },
-          method: 'GET'
-        }
-      )
-      expect(user.resourceType).toBe('Practitioner')
+      expect(mock).toBeCalledWith('http://localhost:3030/getUser', {
+        body: JSON.stringify({ practitionerId: '123' }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST'
+      })
+      expect(user._id).toBe('1')
     })
 
     it('returns null when there is no user extension in task', async () => {

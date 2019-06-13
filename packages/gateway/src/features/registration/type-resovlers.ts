@@ -33,6 +33,8 @@ import {
   OPENCRVS_SPECIFICATION_URL
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
+import fetch from 'node-fetch'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -387,10 +389,20 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
         task.extension
       )
-      if (!user || !user.valueReference) {
+      if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
       }
-      return await fetchFHIR(`/${user.valueReference.reference}`, authHeader)
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: user.valueReference.reference.split('/')[1]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      return await res.json()
     },
 
     timestamp: task => task.lastModified,

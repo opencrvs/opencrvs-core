@@ -71,6 +71,7 @@ async function updateEvent(task: fhir.Task) {
     task.businessStatus &&
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
+  body.modifiedAt = Date.now().toString()
   const nodeText =
     task && task.note && task.note[0].text && task.note[0].text.split('&')
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
@@ -89,7 +90,10 @@ async function indexDeclaration(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const body: ICompositionBody = { event: EVENT.DEATH }
+  const body: ICompositionBody = {
+    event: EVENT.DEATH,
+    createdAt: Date.now().toString()
+  }
 
   await createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionId, body)

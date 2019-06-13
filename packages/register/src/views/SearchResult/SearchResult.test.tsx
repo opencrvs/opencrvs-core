@@ -261,7 +261,11 @@ describe('SearchResult tests', () => {
         declarationStatus: 'DECLARED',
         duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
         rejectionReasons: '',
-        rejectionComment: ''
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2007-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       },
       {
         id: 'c7e83060-4db9-4057-8b14-71841243b05f',
@@ -272,9 +276,13 @@ describe('SearchResult tests', () => {
         trackingId: 'DXMJPYA',
         event: 'Death',
         declarationStatus: 'REJECTED',
-        duplicates: null,
+        duplicates: [],
         rejectionReasons: '',
-        rejectionComment: ''
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2010-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       },
       {
         id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
@@ -282,12 +290,16 @@ describe('SearchResult tests', () => {
         dob: '01-01-2010',
         dod: '',
         registrationNumber: '2019333494BQRZWDR2',
-        duplicates: null,
+        duplicates: [],
         trackingId: 'BQRZWDR',
         event: 'Birth',
         declarationStatus: 'REGISTERED',
         rejectionReasons: '',
-        rejectionComment: ''
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2010-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       },
       {
         id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
@@ -295,12 +307,16 @@ describe('SearchResult tests', () => {
         dob: '01-01-2008',
         dod: '',
         registrationNumber: '2019333494B3DBJMP5',
-        duplicates: null,
+        duplicates: [],
         trackingId: 'B3DBJMP',
         event: 'Birth',
         declarationStatus: 'CERTIFIED',
         rejectionReasons: '',
-        rejectionComment: ''
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2008-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       }
     ])
 

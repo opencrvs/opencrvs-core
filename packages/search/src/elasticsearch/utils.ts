@@ -28,6 +28,8 @@ export interface ICompositionBody {
   childFirstNamesLocal?: string
   createdBy?: string
   updatedBy?: string
+  createdAt?: string
+  modifiedAt?: string
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {

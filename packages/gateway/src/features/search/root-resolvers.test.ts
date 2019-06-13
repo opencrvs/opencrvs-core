@@ -128,6 +128,41 @@ describe('Search root resolvers', () => {
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
+    it('returns an array of composition results for userId', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          userId: '1'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results with given count', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          count: 10,
+          skip: 2
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
     it('returns total item as 0 and an empty array in-case of invalid result found from elastic', async () => {
       fetch.mockResponse(
         JSON.stringify({
