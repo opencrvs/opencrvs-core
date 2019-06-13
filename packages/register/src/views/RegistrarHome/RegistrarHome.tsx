@@ -277,7 +277,7 @@ export const EVENT_STATUS = {
 export class RegistrarHomeView extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
-> {
+  > {
   pageSize = 10
   constructor(props: IRegistrarHomeProps) {
     super(props)
@@ -393,14 +393,14 @@ export class RegistrarHomeView extends React.Component<
             (!draft.data.child.firstNamesEng
               ? ''
               : draft.data.child.firstNamesEng + ' ') +
-              draft.data.child.familyNameEng) ||
+            draft.data.child.familyNameEng) ||
           (draft.data &&
             draft.data.child &&
             draft.data.child.familyName &&
             (!draft.data.child.firstNames
               ? ''
               : draft.data.child.firstNames + ' ') +
-              draft.data.child.familyName) ||
+            draft.data.child.familyName) ||
           ''
         pageRoute = DRAFT_BIRTH_PARENT_FORM
       } else if (draft.event && draft.event.toString() === 'death') {
@@ -411,14 +411,14 @@ export class RegistrarHomeView extends React.Component<
             (!draft.data.deceased.firstNamesEng
               ? ''
               : draft.data.deceased.firstNamesEng + ' ') +
-              draft.data.deceased.familyNameEng) ||
+            draft.data.deceased.familyNameEng) ||
           (draft.data &&
             draft.data.deceased &&
             draft.data.deceased.familyName &&
             (!draft.data.deceased.firstNames
               ? ''
               : draft.data.deceased.firstNames + ' ') +
-              draft.data.deceased.familyName) ||
+            draft.data.deceased.familyName) ||
           ''
         pageRoute = DRAFT_DEATH_FORM
       }
@@ -552,8 +552,8 @@ export class RegistrarHomeView extends React.Component<
                     practitionerRole:
                       status && status.user && status.user.role
                         ? this.props.intl.formatMessage(
-                            messages[status.user.role as string]
-                          )
+                          messages[status.user.role as string]
+                        )
                         : '',
                     officeName:
                       locale === 'en'
@@ -628,6 +628,8 @@ export class RegistrarHomeView extends React.Component<
                 </ErrorText>
               )
             }
+
+            console.log('DATA', data)
 
             return (
               <>
@@ -931,7 +933,7 @@ export class RegistrarHomeView extends React.Component<
         )}
         {tabId === TAB_ID.readyToPrint && (
           <Query
-            query={FETCH_REGISTRATIONS_QUERY}
+            query={SEARCH_EVENTS}
             variables={{
               status: EVENT_STATUS.REGISTERED,
               locationIds: [registrarUnion],
