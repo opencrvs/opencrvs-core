@@ -25,6 +25,8 @@ export interface ICompositionBody {
   relatesTo?: string[]
   createdBy?: string
   updatedBy?: string
+  createdAt?: string
+  modifiedAt?: string
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {

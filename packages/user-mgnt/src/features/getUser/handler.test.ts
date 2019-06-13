@@ -47,13 +47,28 @@ const dummyUser = {
   creationDate: 1559054406433
 }
 describe('getUser tests', () => {
-  it('Successfully returns user', async () => {
+  it('Successfully returns user with user id', async () => {
     const spy = jest.spyOn(User, 'findOne').mockResolvedValueOnce(dummyUser)
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/getUser',
       payload: { userId: 'ba7022f0ff4822' },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.result).toEqual(dummyUser)
+    expect(spy).toBeCalled()
+  })
+  it('Successfully returns user with practitioner id', async () => {
+    const spy = jest.spyOn(User, 'findOne').mockResolvedValueOnce(dummyUser)
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getUser',
+      payload: { practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de' },
       headers: {
         Authorization: `Bearer ${token}`
       }

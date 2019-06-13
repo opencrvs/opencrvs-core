@@ -24,6 +24,7 @@ export interface IDynamicValues {
     | IStatus[]
     | React.ReactNode[]
     | null
+    | undefined
 }
 
 export interface IExpandedContentPreference {

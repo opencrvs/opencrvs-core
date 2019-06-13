@@ -20,12 +20,15 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
     let birthReg
     let deathReg
     let names
+    let dateOfEvent
     if (reg.registration && reg.type === 'Birth') {
       birthReg = reg as GQLBirthEventSearchSet
       names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
+      dateOfEvent = birthReg && birthReg.dateOfBirth
     } else {
       deathReg = reg as GQLDeathEventSearchSet
       names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
+      dateOfEvent = deathReg && deathReg.dateOfDeath
     }
     const lang = 'bn'
     const status = reg.registration && (reg.registration.status as GQLRegStatus)
@@ -47,12 +50,15 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
           deathReg.dateOfDeath &&
           formatLongDate(deathReg.dateOfDeath, locale)) ||
         '',
+      dateOfEvent,
       registrationNumber:
         (reg.registration && reg.registration.registrationNumber) || '',
       tracking_id: (reg.registration && reg.registration.trackingId) || '',
-      event: reg.type,
-      declaration_status: status,
-      duplicates: reg.registration && reg.registration.duplicates,
+      event: reg.type || '',
+      declaration_status: status || '',
+      contact_number:
+        (reg.registration && reg.registration.contactNumber) || '',
+      duplicates: (reg.registration && reg.registration.duplicates) || [],
       rejection_reasons:
         (status === 'REJECTED' &&
           reg.registration &&
@@ -62,7 +68,9 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
         (status === 'REJECTED' &&
           reg.registration &&
           reg.registration.comment) ||
-        ''
+        '',
+      createdAt: reg.registration && reg.registration.createdAt,
+      modifiedAt: reg.registration && reg.registration.modifiedAt
     }
   })
 }
