@@ -1159,13 +1159,6 @@
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.0.0.tgz#9f05469c88cb2fd3dcd624776b54ee95c312126a"
   integrity sha512-mV6T0IYqb0xL1UALPFplXYQmR0twnXG0M6jUswpquqT2sD12BOiCiLy3EvMp/Fy7s3DZElC4/aPjEjo2jeZpvw==
 
-"@hapi/boom@^7.4.2":
-  version "7.4.2"
-  resolved "https://registry.yarnpkg.com/@hapi/boom/-/boom-7.4.2.tgz#c16957cd09796f6c1bfb4031bdc39d66d6d750c3"
-  integrity sha512-T2CYcTI0AqSvC6YC7keu/fh9LVSMzfoMLharBnPbOwmc+Cexj9joIc5yNDKunaxYq9LPuOwMS0f2B3S1tFQUNw==
-  dependencies:
-    "@hapi/hoek" "6.x.x"
-
 "@hapi/hoek@6.x.x":
   version "6.2.4"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-6.2.4.tgz#4b95fbaccbfba90185690890bdf1a2fbbda10595"
@@ -9959,15 +9952,6 @@ hapi-auth-jwt2@8.1.0:
   integrity sha512-Xebbslw5jAPnw+KbxhsuFXV38SxPqtvTYwrSemXZicbRKvIn8p0Ut0MSNmzG6nxpB5Nd4aA0b8U6MCDFd2ElYw==
   dependencies:
     boom "^7.1.1"
-    cookie "^0.3.1"
-    jsonwebtoken "^8.1.0"
-
-hapi-auth-jwt2@^8.1.0:
-  version "8.6.1"
-  resolved "https://registry.yarnpkg.com/hapi-auth-jwt2/-/hapi-auth-jwt2-8.6.1.tgz#07d5652af5deb30b8406796ca4f23afb040de387"
-  integrity sha512-dnSvRaBKUnhWhjPql2RvbpEOrTrz0ZxBQYgHFx5S+uoaK2PVxYD71NSoNIpXpTi+BvleVi1V5C5P6FZsWD1SFg==
-  dependencies:
-    "@hapi/boom" "^7.4.2"
     cookie "^0.3.1"
     jsonwebtoken "^8.1.0"
 
