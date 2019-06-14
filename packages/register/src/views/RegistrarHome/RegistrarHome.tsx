@@ -22,11 +22,10 @@ import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
-  GQLQuery,
-  GQLEventRegistration,
-  GQLBirthRegistration,
-  GQLHumanName,
-  GQLDeathRegistration
+  GQLQuery
+  // GQLEventSearchSet,
+  // GQLBirthEventSearchSet,
+  // GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
 import * as moment from 'moment'
@@ -55,11 +54,11 @@ import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
 import styled, { withTheme } from 'styled-components'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
 import { COUNT_REGISTRATION_QUERY, SEARCH_EVENTS } from './queries'
-import { sentenceCase, createNamesMap } from 'src/utils/data-formatting'
+import { sentenceCase } from 'src/utils/data-formatting'
 import NotificationToast from './NotificatoinToast'
 import { transformData } from 'src/search/transformer'
 import { RowHistoryView } from './RowHistoryView'
-import { formatLongDate } from 'src/utils/date-formatting'
+// import { formatLongDate } from 'src/utils/date-formatting'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -475,124 +474,38 @@ export class RegistrarHomeView extends React.Component<
   }
 
   transformPrintContent = (data: GQLQuery) => {
-    const { locale } = this.props.intl
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+    if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration) => {
-        let names
-        let contactPhoneNumber
-        if (reg.registration && reg.registration.type === 'BIRTH') {
-          const birthReg = reg as GQLBirthRegistration
-          names =
-            (birthReg &&
-              birthReg.child &&
-              (birthReg.child.name as GQLHumanName[])) ||
-            []
-          contactPhoneNumber =
-            (birthReg.registration &&
-              birthReg.registration.contactPhoneNumber) ||
-            ''
-        } else if (reg.registration && reg.registration.type === 'DEATH') {
-          const deathReg = reg as GQLDeathRegistration
-          names =
-            (deathReg &&
-              deathReg.deceased &&
-              (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-          const phoneEntry =
-            (deathReg.informant &&
-              deathReg.informant.individual &&
-              deathReg.informant.individual.telecom &&
-              deathReg.informant.individual.telecom.find(
-                contactPoint =>
-                  (contactPoint && contactPoint.system === 'phone') || false
-              )) ||
-            null
-          contactPhoneNumber = (phoneEntry && phoneEntry.value) || ''
-        }
-        const actions = [] as IAction[]
-        actions.push({
-          label: this.props.intl.formatMessage(messages.print),
-          handler: () =>
-            this.props.goToPrintCertificate(
-              reg.id,
-              (reg.registration && reg.registration.type) || 'BIRTH'
-            )
-        })
-        const lang = 'en'
-        return {
-          id: reg.id,
-          name:
-            (names && (createNamesMap(names)[lang] as string)) ||
-            /* tslint:disable:no-string-literal */
-            (names && (createNamesMap(names)['bn'] as string)) ||
-            '',
-          date_of_registration:
-            reg.registration &&
-            reg.registration.status &&
-            reg.registration.status[0] &&
-            // @ts-ignore
-            reg.registration.status[0].timestamp &&
-            moment(
-              // @ts-ignore
-              reg.registration.status[0].timestamp.toString(),
-              'YYYY-MM-DD'
-            ).fromNow(),
-          registrationNumber:
-            (reg.registration && reg.registration.registrationNumber) ||
-            'BRN/DRN',
-          contact_number: contactPhoneNumber || '',
-          event:
-            (reg.registration &&
-              reg.registration.type &&
-              reg.registration.type.toString() &&
-              sentenceCase(reg.registration.type)) ||
-            '',
-          duplicates: (reg.registration && reg.registration.duplicates) || [],
-          actions,
-          status:
-            (reg.registration &&
-              reg.registration.status &&
-              reg.registration.status
-                .map(status => {
-                  return {
-                    type: (status && status.type) || null,
-                    practitionerName:
-                      (status &&
-                        status.user &&
-                        (createNamesMap(status.user.name as GQLHumanName[])[
-                          this.props.language
-                        ] as string)) ||
-                      (status &&
-                        status.user &&
-                        (createNamesMap(status.user.name as GQLHumanName[])[
-                          'default'
-                        ] as string)) ||
-                      /* tslint:enable:no-string-literal */
-                      '',
-                    timestamp:
-                      (status && formatLongDate(status.timestamp, locale)) ||
-                      null,
-                    practitionerRole:
-                      status && status.user && status.user.role
-                        ? this.props.intl.formatMessage(
-                            messages[status.user.role as string]
-                          )
-                        : '',
-                    officeName:
-                      locale === 'en'
-                        ? (status && status.office && status.office.name) || ''
-                        : (status && status.office && status.office.alias) || ''
-                  }
-                })
-                .reverse()) ||
-            null
+    const transformedData = transformData(data, this.props.intl)
+    return transformedData.map(reg => {
+      const actions = [] as IAction[]
+      if (this.userHasRegisterScope()) {
+        if (reg.duplicates && reg.duplicates.length > 0) {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.reviewDuplicates),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.print),
+            handler: () =>
+              this.props.goToPrintCertificate(
+                reg.id,
+                reg.event.toLowerCase() || ''
+              )
+          })
         }
       }
-    )
+      return {
+        ...reg,
+        date_of_registration:
+          (reg.modifiedAt &&
+            moment(reg.modifiedAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+          '',
+        actions
+      }
+    })
   }
 
   onPageChange = (newPageNumber: number) => {
@@ -647,8 +560,6 @@ export class RegistrarHomeView extends React.Component<
                 </ErrorText>
               )
             }
-
-            console.log('DATA', data)
 
             return (
               <>
@@ -964,6 +875,8 @@ export class RegistrarHomeView extends React.Component<
                   </ErrorText>
                 )
               }
+
+              console.log('DATA', data)
 
               return (
                 <BodyContent>
