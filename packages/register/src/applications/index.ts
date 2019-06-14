@@ -1,9 +1,9 @@
-import { IFormData, Event } from '../forms'
-import { GO_TO_TAB, Action as NavigationAction } from 'src/navigation'
+import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import { Action as NavigationAction, GO_TO_TAB } from 'src/navigation'
 import { storage } from 'src/storage'
-import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
-import { v4 as uuid } from 'uuid'
 import { IUserDetails } from 'src/utils/userUtils'
+import { v4 as uuid } from 'uuid'
+import { Event, IFormData, IFormFieldValue } from '../forms'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -27,6 +27,10 @@ export enum SUBMISSION_STATUS {
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
+
+export interface IPayload {
+  [key: string]: IFormFieldValue
+}
 export interface IApplication {
   id: string
   data: IFormData
@@ -41,6 +45,7 @@ export interface IApplication {
   trackingId?: string
   compositionId?: string
   registrationNumber?: string
+  payload?: IPayload
 }
 
 interface IStoreApplicationAction {

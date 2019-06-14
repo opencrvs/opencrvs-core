@@ -20,6 +20,7 @@ import {
   deleteApplication,
   IApplication,
   modifyApplication,
+  IPayload,
   SUBMISSION_STATUS
 } from 'src/applications'
 import {
@@ -496,10 +497,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
-    action: string
+    action: string,
+    payload?: IPayload
   ) => {
     application.submissionStatus = submissionStatus
     application.action = action
+    application.payload = payload
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
   }
@@ -875,10 +878,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
-            confirmRejectionEvent={this.rejectSubmission}
+            confirmRejectionEvent={this.confirmSubmission}
             duplicate={duplicate}
             draftId={application.id}
             event={this.getEvent()}
+            application={application}
           />
         )}
       </FormViewContainer>

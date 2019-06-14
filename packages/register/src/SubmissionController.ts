@@ -98,7 +98,7 @@ export class SubmissionController {
     const result = getMutationMapping(
       application.event,
       applicationAction,
-      null,
+      application.payload,
       this.registerForms[application.event],
       application
     )
