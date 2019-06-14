@@ -328,7 +328,10 @@ export class RegistrarHomeView extends React.Component<
           '',
         application_time_elapsed:
           (reg.createdAt &&
-            moment(reg.createdAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+            moment(
+              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
           '',
         actions
       }
@@ -365,7 +368,10 @@ export class RegistrarHomeView extends React.Component<
         ...reg,
         date_of_rejection:
           (reg.modifiedAt &&
-            moment(reg.modifiedAt.toString(), 'YYYY-MM-DD').fromNow()) ||
+            moment(
+              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
           '',
         actions
       }

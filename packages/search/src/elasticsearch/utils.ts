@@ -68,7 +68,12 @@ export async function detectDuplicates(
 }
 
 export async function getCreatedBy(compositionId: string) {
-  const results = await searchByCompositionId(compositionId)
+  let results
+  try {
+    results = await searchByCompositionId(compositionId)
+  } catch (error) {
+    console.log(error)
+  }
   const result =
     results.hits.hits &&
     (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
