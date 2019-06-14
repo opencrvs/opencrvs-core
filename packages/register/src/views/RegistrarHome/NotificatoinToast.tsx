@@ -69,7 +69,10 @@ class NotificationToast extends React.Component<IFullProps> {
 
 function mapStatetoProps(state: IStoreState) {
   return {
-    application: [...state.applicationsState.applications]
+    application:
+      state.applicationsState && state.applicationsState.applications
+        ? [...state.applicationsState.applications]
+        : []
   }
 }
 export default connect(mapStatetoProps)(injectIntl(NotificationToast))
