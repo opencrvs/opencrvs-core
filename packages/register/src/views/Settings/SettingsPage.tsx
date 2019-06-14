@@ -288,10 +288,11 @@ class SettingsView extends React.Component<IProps & IState, IState> {
           return name.use === 'bn'
         }
       ) as GQLHumanName
-
-      bengaliName = `${String(nameObj.firstNames)} ${String(
-        nameObj.familyName
-      )}`
+      if (nameObj) {
+        bengaliName = `${String(nameObj.firstNames)} ${String(
+          nameObj.familyName
+        )}`
+      }
     }
 
     let englishName = ''
