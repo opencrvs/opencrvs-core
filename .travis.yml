@@ -1,7 +1,6 @@
 language: node_js
 node_js:
   - 'lts/*'
-cache: yarn
 jobs:
   include:
     - stage: tests (unit and integration)
@@ -9,6 +8,10 @@ jobs:
         - npm install codecov -g
         - codecov
     - before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      addons:
+        apt:
+          packages:
+          - libgconf-2-4
       script:
         - yarn global add wait-on
         - yarn dev:secrets:gen
@@ -21,6 +24,7 @@ jobs:
         - cd packages/resources && yarn save:testData && cd ../..
         - cd packages/e2e && yarn start --record false
       env:
+        - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
         - CYPRESS_LOGIN_URL=http://localhost:3020/
         - CYPRESS_REGISTER_URL=http://localhost:3000/
         - CYPRESS_PERFORMANCE_URL=http://localhost:3002/
@@ -48,6 +52,10 @@ jobs:
     - stage: integration tests on staging
       if: branch = master AND type = push
       install: skip
+      addons:
+        apt:
+          packages:
+          - libgconf-2-4
       script: cd packages/e2e && yarn && yarn start --record false
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/

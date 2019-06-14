@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import { ExpansionContentInfo } from './ExpansionContentInfo'
 import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
 import { grid } from '../../grid'
 export { IAction } from './types'
@@ -68,6 +67,7 @@ const ContentWrapper = styled.span.attrs<{
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
 `
+
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   margin-top: 5px;
   overflow: hidden;
@@ -99,8 +99,9 @@ interface IGridPreference {
 interface IGridTableProps {
   content: IDynamicValues[]
   columns: IGridPreference[]
-  expandedContentRows?: IExpandedContentPreference[]
+  renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText: string
+  hideTableHeader?: boolean
   onPageChange?: (currentPage: number) => void
   pageSize?: number
   totalItems: number
@@ -117,10 +118,6 @@ interface IGridTableState {
 const defaultConfiguration = {
   pageSize: 10,
   currentPage: 1
-}
-
-const getTotalPageNumber = (totalItemCount: number, pageSize: number) => {
-  return totalItemCount > 0 ? Math.ceil(totalItemCount / pageSize) : 0
 }
 
 export class GridTable extends React.Component<
@@ -231,6 +228,7 @@ export class GridTable extends React.Component<
       columns,
       content,
       noResultText,
+      hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage
     } = this.props
@@ -238,7 +236,7 @@ export class GridTable extends React.Component<
     const totalItems = this.props.totalItems || 0
     return (
       <Wrapper>
-        {content.length > 0 && width > grid.breakpoints.lg && (
+        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ContentWrapper
@@ -297,12 +295,9 @@ export class GridTable extends React.Component<
 
                 {this.props.expandable && (
                   <ExpandedSectionContainer expanded={expanded}>
-                    {expanded && (
-                      <ExpansionContentInfo
-                        data={item}
-                        preference={this.props.expandedContentRows}
-                      />
-                    )}
+                    {expanded &&
+                      this.props.renderExpandedComponent &&
+                      this.props.renderExpandedComponent(item.id as string)}
                   </ExpandedSectionContainer>
                 )}
               </StyledBox>
