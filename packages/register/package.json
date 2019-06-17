@@ -1,9 +1,9 @@
 {
   "name": "@opencrvs/register",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "private": true,
   "dependencies": {
-    "@opencrvs/components": "^1.0.0-alpha.6",
+    "@opencrvs/components": "^1.0.0-alpha.1.0",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
