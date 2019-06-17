@@ -12,6 +12,7 @@ interface IVerifyPayload {
 
 interface IVerifyResponse {
   scope: string[]
+  status: string
   id: string
 }
 
@@ -32,7 +33,11 @@ export default async function verifyPassHandler(
     throw unauthorized()
   }
 
-  const response: IVerifyResponse = { scope: user.scope, id: user.id }
+  const response: IVerifyResponse = {
+    scope: user.scope,
+    status: user.status,
+    id: user.id
+  }
 
   return response
 }
@@ -44,5 +49,6 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   scope: Joi.array().items(Joi.string()),
+  status: Joi.string(),
   id: Joi.string()
 })

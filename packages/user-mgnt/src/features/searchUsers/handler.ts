@@ -7,7 +7,7 @@ interface IVerifyPayload {
   username?: string
   mobile?: string
   role?: string
-  active?: boolean
+  status?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -23,7 +23,7 @@ export default async function searchUsers(
     username,
     mobile,
     role,
-    active,
+    status,
     primaryOfficeId,
     locationId,
     count,
@@ -46,8 +46,8 @@ export default async function searchUsers(
   if (locationId) {
     criteria = { ...criteria, catchmentAreaIds: locationId }
   }
-  if (active !== undefined) {
-    criteria = { ...criteria, active }
+  if (status) {
+    criteria = { ...criteria, status }
   }
 
   const userList: IUserModel[] = await User.find(criteria)
@@ -67,7 +67,7 @@ export const searchSchema = Joi.object({
   username: Joi.string().optional(),
   mobile: Joi.string().optional(),
   role: Joi.string().optional(),
-  active: Joi.boolean().optional(),
+  status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),
   locationId: Joi.string().optional(),
   count: Joi.number()

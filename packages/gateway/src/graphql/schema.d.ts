@@ -318,7 +318,7 @@ export interface GQLUser {
   mobile?: string
   role?: string
   email?: string
-  active?: boolean
+  status?: string
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
 }
@@ -707,7 +707,6 @@ export interface GQLUserInput {
   mobile?: string
   role?: string
   email?: string
-  active?: boolean
   primaryOffice?: GQLLocationInput
   catchmentArea?: Array<GQLLocationInput | null>
 }
@@ -1095,7 +1094,7 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
 export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
-  active?: boolean
+  status?: string
   role?: string
   primaryOfficeId?: string
   locationId?: string
@@ -1890,7 +1889,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   mobile?: UserToMobileResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
-  active?: UserToActiveResolver<TParent>
+  status?: UserToStatusResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
 }
@@ -1927,7 +1926,7 @@ export interface UserToEmailResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToActiveResolver<TParent = any, TResult = any> {
+export interface UserToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

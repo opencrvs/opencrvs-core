@@ -16,7 +16,6 @@ input UserInput {
   mobile: String
   role: String
   email: String
-  active: Boolean
   primaryOffice: LocationInput
   catchmentArea: [LocationInput]
 }
@@ -30,7 +29,7 @@ type User {
   mobile: String
   role: String
   email: String
-  active: Boolean
+  status: String
   primaryOffice: Location
   catchmentArea: [Location]
 }
@@ -45,7 +44,7 @@ type Query {
   searchUsers(
     username: String
     mobile: String
-    active: Boolean
+    status: String
     role: String
     primaryOfficeId: String
     locationId: String

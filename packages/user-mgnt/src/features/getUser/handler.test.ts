@@ -35,7 +35,7 @@ const dummyUser = {
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
   salt: '12345',
   role: 'Field Agent',
-  active: true,
+  status: 'active',
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
