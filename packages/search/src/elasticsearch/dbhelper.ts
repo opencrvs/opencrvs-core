@@ -17,20 +17,27 @@ export const indexComposition = async (
   } catch (err) {
     // tslint:disable-next-line:no-console
     console.log(err)
+    throw err
   }
 }
 
 export const updateComposition = async (id: string, body: ICompositionBody) => {
-  const response = await client.update({
-    index: 'ocrvs',
-    type: 'compositions',
-    id,
-    body: {
-      doc: body
-    }
-  })
+  try {
+    const response = await client.update({
+      index: 'ocrvs',
+      type: 'compositions',
+      id,
+      body: {
+        doc: body
+      }
+    })
 
-  return response
+    return response
+  } catch (err) {
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    throw err
+  }
 }
 
 export const searchComposition = async (body: ICompositionBody) => {
@@ -46,6 +53,7 @@ export const searchComposition = async (body: ICompositionBody) => {
   } catch (err) {
     // tslint:disable-next-line:no-console
     console.log(err)
+    return null
   }
 }
 
@@ -66,5 +74,6 @@ export const searchByCompositionId = async (compositionId: string) => {
   } catch (err) {
     // tslint:disable-next-line:no-console
     console.log(err)
+    return null
   }
 }

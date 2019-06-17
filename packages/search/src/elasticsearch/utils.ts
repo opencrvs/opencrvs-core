@@ -68,13 +68,9 @@ export async function detectDuplicates(
 }
 
 export async function getCreatedBy(compositionId: string) {
-  let results
-  try {
-    results = await searchByCompositionId(compositionId)
-  } catch (error) {
-    console.log(error)
-  }
+  const results = await searchByCompositionId(compositionId)
   const result =
+    results &&
     results.hits.hits &&
     (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
 
@@ -83,9 +79,9 @@ export async function getCreatedBy(compositionId: string) {
 
 function findDuplicateIds(
   compositionIdentifier: string,
-  results: SearchResponse<{}>
+  results: SearchResponse<{}> | null
 ) {
-  const hits = results.hits.hits
+  const hits = (results && results.hits.hits) || []
   return hits
     .filter(
       hit =>
