@@ -2,11 +2,12 @@ import { defineMessages } from 'react-intl'
 
 export enum UserRole {
   FIELD_AGENT = 'Field Agent',
-  REGISTRATION_CLERK = 'Registrar',
-  LOCAL_REGISTRAR = 'Local Registrar',
+  REGISTRATION_CLERK = 'Registration Agent',
+  LOCAL_REGISTRAR = 'Registrar',
   DISTRICT_REGISTRAR = 'District Registrar',
   STATE_REGISTRAR = 'State Registrar',
-  NATIONAL_REGISTRAR = 'National Registrar'
+  NATIONAL_REGISTRAR = 'National Registrar',
+  LOCAL_SYSTEM_ADMIN = 'System Admin (Local)'
 }
 
 export enum UserStatus {
