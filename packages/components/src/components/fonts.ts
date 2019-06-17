@@ -56,7 +56,6 @@ export const fonts = (country: string, language: string): IFonts => ({
   bigBodyStyle: `font-family: ${
     countryFonts[country][language].regularFontFamily
   };
-    font-weight: 400;
     font-size: 18px;
     font-weight: normal;
     line-height: 27px;`,
