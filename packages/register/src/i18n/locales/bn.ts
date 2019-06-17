@@ -592,6 +592,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectVitalEvent.birth': 'জন্ম',
     'register.selectVitalEvent.death': 'মৃত্যু',
     'register.selectVitalEvent.continueButton': 'পরবর্তী',
+    'register.selectVitalEvent.errorMessage':
+      'দয়া করে একটি ইভেন্ট নির্বাচন করুন',
     'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',

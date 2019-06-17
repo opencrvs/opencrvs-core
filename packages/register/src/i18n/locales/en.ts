@@ -592,6 +592,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectVitalEvent.birth': 'Birth',
     'register.selectVitalEvent.death': 'Death',
     'register.selectVitalEvent.continueButton': 'Continue',
+    'register.selectVitalEvent.errorMessage': 'Please select the type of event',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
