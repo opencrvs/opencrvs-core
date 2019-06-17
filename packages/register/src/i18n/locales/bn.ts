@@ -586,8 +586,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectInformant.selfInformantDescription':
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
+    'register.selectVitalEvent.birth': 'জন্ম',
+    'register.selectVitalEvent.death': 'মৃত্যু',
+    'register.selectVitalEvent.continueButton': 'পরবর্তী',
     'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',

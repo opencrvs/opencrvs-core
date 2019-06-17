@@ -67,16 +67,22 @@ describe('when user is selecting the vital event', () => {
       app.update()
     })
     it('lists the options', () => {
-      expect(app.find('button#select_birth_event')).toHaveLength(1)
+      expect(app.find('#vitalEvents')).toHaveLength(2)
     })
     describe('when selects "Birth"', () => {
       beforeEach(() => {
         app
-          .find('#select_birth_event')
+          .find('#birthevent')
+          .hostNodes()
+          .simulate('change')
+
+        app
+          .find('#continue')
           .hostNodes()
           .simulate('click')
       })
       it('takes user to the informant selection view', () => {
+        console.log(app.debug())
         expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
       })
     })
@@ -84,7 +90,11 @@ describe('when user is selecting the vital event', () => {
     describe('when selects "Death"', () => {
       beforeEach(() => {
         app
-          .find('#select_death_event')
+          .find('#deathevent')
+          .hostNodes()
+          .simulate('change')
+        app
+          .find('#continue')
           .hostNodes()
           .simulate('click')
       })
