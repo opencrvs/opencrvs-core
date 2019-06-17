@@ -44,6 +44,11 @@ export const messages: {
     id: 'register.selectVitalEvent.continueButton',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
+  },
+  errorMessage: {
+    id: 'register.selectVitalEvent.errorMessage',
+    defaultMessage: 'Please select the type of event',
+    description: 'Error Message to show when no event is being selected'
   }
 })
 const TopBar = styled.div`
@@ -120,7 +125,7 @@ class SelectVitalEventView extends React.Component<
         <BodyContent>
           <Title>{intl.formatMessage(messages.registerNewEventHeading)}</Title>
           {this.state.goTo === 'error' && (
-            <ErrorText>Please select the type of event</ErrorText>
+            <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
           )}
           <Actions id="vitalEvents">
             <RadioButton
