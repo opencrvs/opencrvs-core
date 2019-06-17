@@ -111,7 +111,6 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
   }
 
   render() {
-    console.log(`STATE: ${this.state.usersPageNo}`)
     const { intl } = this.props
     const columns = [
       {
