@@ -11,7 +11,6 @@ import { Dispatch } from 'redux'
 import { createApplication, storeApplication } from '@register/applications'
 import { Event } from '@register/forms'
 import { Cross, ApplicationIcon } from '@opencrvs/components/lib/icons'
-import { BodyContent } from '@opencrvs/components/lib/layout'
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { RadioButton } from '@opencrvs/components/lib/interface'
@@ -51,6 +50,13 @@ export const messages: {
     description: 'Error Message to show when no event is being selected'
   }
 })
+
+const BodyContent = styled.div`
+  max-width: 940px;
+  margin: auto;
+  padding: 0 16px;
+  position: relative;
+`
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 64px;
