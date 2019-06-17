@@ -1049,6 +1049,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.requireUpdatesLoading':
       'আপনার  আবেদন চেক করা হচ্ছে ',
     'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
+    'system.user.queryError':
+      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি এই মুহূর্তে লোড করা সম্ভব হচ্ছে না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ করুন, অথবা পুনরায় চেষ্টা করুন।',
     'register.sysAdminHome.overview': 'ওভারভিউ',
     'register.sysAdminHome.offices': 'অফিস',
     'register.sysAdminHome.network': 'নেটওয়ার্ক',

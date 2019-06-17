@@ -1050,6 +1050,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Checking your applications',
     'register.fieldAgentHome.queryError':
       'An error occured while loading applications',
+    'system.user.queryError': 'An error occured while loading system users',
     'register.sysAdminHome.overview': 'Overview',
     'register.sysAdminHome.offices': 'Offices',
     'register.sysAdminHome.network': 'Network',
