@@ -67,12 +67,12 @@ describe('when user is selecting the vital event', () => {
       app.update()
     })
     it('lists the options', () => {
-      expect(app.find('#vitalEvents')).toHaveLength(2)
+      expect(app.find('#select_vital_event_view')).toHaveLength(2)
     })
     describe('when selects "Birth"', () => {
       beforeEach(() => {
         app
-          .find('#birthevent')
+          .find('#select_birth_event')
           .hostNodes()
           .simulate('change')
 
@@ -90,7 +90,7 @@ describe('when user is selecting the vital event', () => {
     describe('when selects "Death"', () => {
       beforeEach(() => {
         app
-          .find('#deathevent')
+          .find('#select_death_event')
           .hostNodes()
           .simulate('change')
         app

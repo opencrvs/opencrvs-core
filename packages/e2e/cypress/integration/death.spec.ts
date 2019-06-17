@@ -15,6 +15,7 @@ context('Death Registration Integration Test', () => {
     cy.get('#new_event_declaration').click()
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
+    cy.get('#continue').click()
     // APPLICATION FORM
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')

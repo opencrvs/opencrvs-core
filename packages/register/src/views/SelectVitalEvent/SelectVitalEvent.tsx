@@ -131,14 +131,14 @@ class SelectVitalEventView extends React.Component<
           {this.state.goTo === 'error' && (
             <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
           )}
-          <Actions id="vitalEvents">
+          <Actions id="select_vital_event_view">
             <RadioButton
               size="large"
               key="birthevent"
               name="birthevent"
               label={intl.formatMessage(messages.birth)}
               value="birth"
-              id="birthevent"
+              id="select_birth_event"
               selected={this.state.goTo === 'birth' ? 'birth' : ''}
               onChange={() => this.setState({ goTo: 'birth' })}
             />
@@ -148,7 +148,7 @@ class SelectVitalEventView extends React.Component<
               name="deathevent"
               label={intl.formatMessage(messages.death)}
               value="death"
-              id="deathevent"
+              id="select_death_event"
               selected={this.state.goTo === 'death' ? 'death' : ''}
               onChange={() => this.setState({ goTo: 'death' })}
             />
