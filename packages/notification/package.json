@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/notification",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "description": "OpenCRVS notification service",
   "main": "src/index.js",
   "license": "NONE",
@@ -15,7 +15,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.6",
+    "@opencrvs/commons": "^1.0.0-alpha.1.0",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "^8.0.1",
     "@types/joi": "^14.0.0",
