@@ -7,9 +7,11 @@ import {
   generateNonce,
   storeVerificationCode
 } from 'src/features/verifyCode/service'
+import { createToken } from 'src/features/authenticate/service'
 import { logger } from 'src/logger'
 import { unauthorized } from 'boom'
 import { PRODUCTION } from 'src/constants'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from 'src/constants'
 
 interface IAuthPayload {
   mobile: string
@@ -19,6 +21,8 @@ interface IAuthPayload {
 interface IAuthResponse {
   nonce: string
   mobile: string
+  status: string
+  token?: string
 }
 
 export default async function authenticateHandler(
@@ -56,7 +60,21 @@ export default async function authenticateHandler(
     await sendVerificationCode(result.mobile, verificationCode)
   }
 
-  return { mobile: result.mobile, nonce }
+  const respose: IAuthResponse = {
+    mobile: result.mobile,
+    status: result.status,
+    nonce
+  }
+
+  if (respose.status === 'pending') {
+    respose.token = await createToken(
+      result.userId,
+      result.scope,
+      WEB_USER_JWT_AUDIENCES,
+      JWT_ISSUER
+    )
+  }
+  return respose
 }
 
 export const requestSchema = Joi.object({
@@ -66,5 +84,7 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
-  mobile: Joi.string()
+  mobile: Joi.string(),
+  status: Joi.string(),
+  token: Joi.string().optional()
 })
