@@ -5,14 +5,19 @@ export const indexComposition = async (
   compositionIdentifier: string,
   body: ICompositionBody
 ) => {
-  const response = await client.index({
-    index: 'ocrvs',
-    type: 'compositions',
-    id: compositionIdentifier,
-    body
-  })
+  try {
+    const response = await client.index({
+      index: 'ocrvs',
+      type: 'compositions',
+      id: compositionIdentifier,
+      body
+    })
 
-  return response
+    return response
+  } catch (err) {
+    // tslint:disable-next-line:no-console
+    console.log(err)
+  }
 }
 
 export const updateComposition = async (id: string, body: ICompositionBody) => {
@@ -29,27 +34,37 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
 }
 
 export const searchComposition = async (body: ICompositionBody) => {
-  const response = client.search({
-    index: 'ocrvs',
-    type: 'compositions',
-    body: {
-      query: buildQuery(body)
-    }
-  })
-  return response
+  try {
+    const response = client.search({
+      index: 'ocrvs',
+      type: 'compositions',
+      body: {
+        query: buildQuery(body)
+      }
+    })
+    return response
+  } catch (err) {
+    // tslint:disable-next-line:no-console
+    console.log(err)
+  }
 }
 
 export const searchByCompositionId = async (compositionId: string) => {
-  const response = await client.search({
-    index: 'ocrvs',
-    type: 'compositions',
-    body: {
-      query: {
-        match: {
-          _id: compositionId
+  try {
+    const response = await client.search({
+      index: 'ocrvs',
+      type: 'compositions',
+      body: {
+        query: {
+          match: {
+            _id: compositionId
+          }
         }
       }
-    }
-  })
-  return response
+    })
+    return response
+  } catch (err) {
+    // tslint:disable-next-line:no-console
+    console.log(err)
+  }
 }
