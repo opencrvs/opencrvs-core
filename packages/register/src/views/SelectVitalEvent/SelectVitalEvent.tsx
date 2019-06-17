@@ -12,10 +12,17 @@ import { createApplication, storeApplication } from 'src/applications'
 import { Event } from 'src/forms'
 import { Cross, ApplicationIcon } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
-import { BodyContent } from '@opencrvs/components/lib/layout'
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { RadioButton } from '@opencrvs/components/lib/interface'
+
+const BodyContent = styled.div`
+  max-width: 940px;
+  margin: auto;
+  padding: 0 16px;
+  position: relative;
+`
+
 export const messages = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
