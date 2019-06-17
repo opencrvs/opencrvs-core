@@ -187,7 +187,7 @@ describe('Verify fhir templates', () => {
           'Patient referenced from composition section not found in FHIR bundle'
         )
       } else {
-        jest.fail()
+        throw new Error('Failed')
       }
     })
   })
@@ -214,7 +214,7 @@ describe('Verify fhir templates', () => {
       ) {
         expect(taskResourse).toEqual(testFhirBundle.entry[1].resource)
       } else {
-        jest.fail()
+        throw new Error('Failed')
       }
     })
     it('throws error if provided document type is not FhirBundle or FhirBundleTaskEntry ', () => {

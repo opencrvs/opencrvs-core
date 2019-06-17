@@ -60,7 +60,7 @@ describe('Verify handler', () => {
         )
       }
     } else {
-      jest.fail()
+      throw new Error('Failed')
     }
   })
 })

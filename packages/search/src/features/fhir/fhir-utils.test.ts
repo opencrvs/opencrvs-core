@@ -17,7 +17,7 @@ describe('fhir utils', () => {
         .reference as string).toEqual('Composition/123')
       expect(mockComposition.relatesTo.length).toEqual(3)
     } else {
-      jest.fail()
+      throw new Error('Failed')
     }
   })
   it('should not add duplicates to relatesTo property if already exists as duplicate', () => {
@@ -25,7 +25,7 @@ describe('fhir utils', () => {
     if (mockComposition.relatesTo) {
       expect(mockComposition.relatesTo.length).toEqual(3)
     } else {
-      jest.fail()
+      throw new Error('Failed')
     }
   })
 })

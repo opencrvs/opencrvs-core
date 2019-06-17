@@ -144,7 +144,7 @@ describe('Verify generateBirthRegistrationNumber', () => {
         )
       )
     } else {
-      jest.fail()
+      throw new Error('Failed')
     }
   })
   it('Throws error for default BRN generator', async () => {
@@ -159,7 +159,7 @@ describe('Verify generateBirthRegistrationNumber', () => {
         generateRegistrationNumber(testTask, practitioner, 'default')
       ).rejects.toThrowError('Default BRN generator has not been impleted yet')
     } else {
-      jest.fail()
+      throw new Error('Failed')
     }
   })
 })
