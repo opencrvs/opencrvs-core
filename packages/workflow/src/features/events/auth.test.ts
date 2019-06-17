@@ -1,5 +1,5 @@
-import { isUserAuthorized } from './auth'
-import { Events } from './handler'
+import { isUserAuthorized } from '@workflow/features/events/auth'
+import { Events } from '@workflow/features/events/handler'
 
 describe('isUserAuthorized()', () => {
   it('returns true when token scopes match event', () => {

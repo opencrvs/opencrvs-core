@@ -1,5 +1,5 @@
 import * as queryString from 'querystring'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 import * as Sentry from '@sentry/browser'
 
 export interface IURLParams {

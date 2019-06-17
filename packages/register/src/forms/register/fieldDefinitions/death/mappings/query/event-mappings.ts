@@ -1,5 +1,5 @@
-import { IFormField, IFormData, Event } from 'src/forms'
-import { REGISTRATION_SECTION } from './documents-mappings'
+import { IFormField, IFormData, Event } from '@register/forms'
+import { REGISTRATION_SECTION } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
 
 export const deceasedDateToFieldTransformation = (
   alternativeSectionId?: string

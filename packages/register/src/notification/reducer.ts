@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import * as actions from './actions'
+import * as actions from '@register/notification/actions'
 
 export type NotificationState = {
   newContentAvailable: boolean

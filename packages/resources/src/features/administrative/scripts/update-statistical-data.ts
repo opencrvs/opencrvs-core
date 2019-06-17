@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { internal } from 'boom'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
-import { sendToFhir } from '../../utils/bn'
+import { ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
+import { sendToFhir } from '@resources/features/utils/bn'
 import chalk from 'chalk'
 
 export default async function administrativeStructureHandler() {

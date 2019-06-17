@@ -6,21 +6,23 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
+} from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
-import * as actions from 'src/notification/actions'
-import * as i18nActions from 'src/i18n/actions'
-import * as CommonUtils from 'src/utils/commonUtils'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import * as fetchAny from 'jest-fetch-mock'
+import { storage } from '@register/storage'
+import * as actions from '@register/notification/actions'
+import * as i18nActions from '@register/i18n/actions'
+import * as CommonUtils from '@register/utils/commonUtils'
+
+const fetch = fetchAny as any
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 

@@ -3,24 +3,27 @@
  * "theme" context property coming in to all components.
  * This also requires that instead of
  *
- * import styled from 'styled-components';
+ * import styled from '@register/styledComponents';
  *
  * we import it from this module
  *
- * import styled from '../styled-components';
+ * import styled from '@register/styledComponents';
  */
 
 import * as styledComponents from 'styled-components'
 import { ThemedStyledComponentsModule } from 'styled-components'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { ITheme as IThemeInterface } from '@opencrvs/components/lib/theme'
+
+export type ITheme = IThemeInterface
 
 const {
   default: styled,
   css,
   injectGlobal,
   keyframes,
-  ThemeProvider
+  ThemeProvider,
+  withTheme
 } = styledComponents as ThemedStyledComponentsModule<ITheme>
 
-export { css, injectGlobal, keyframes, ThemeProvider }
+export { css, injectGlobal, keyframes, ThemeProvider, withTheme }
 export default styled

@@ -1,4 +1,4 @@
-import { testFhirBundle, testFhirTaskBundle } from 'src/test/utils'
+import { testFhirBundle, testFhirTaskBundle } from '@workflow/test/utils'
 import {
   getSharedContactMsisdn,
   getInformantName,
@@ -7,10 +7,16 @@ import {
   getBirthRegistrationNumber,
   getRegStatusCode,
   getPaperFormID
-} from './fhir-utils'
-import { setTrackingId, pushRN } from './fhir-bundle-modifier'
+} from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  setTrackingId,
+  pushRN
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { cloneDeep } from 'lodash'
-import * as fetch from 'jest-fetch-mock'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify getSharedContactMsisdn', () => {
   it('Returned shared contact number properly', async () => {
@@ -29,8 +35,20 @@ describe('Verify getSharedContactMsisdn', () => {
 
   it('Returns false when phonenumber is missing for shared contact', async () => {
     const fhirBundle = cloneDeep(testFhirBundle)
-    fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
-    expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
+    if (
+      fhirBundle &&
+      fhirBundle.entry &&
+      fhirBundle.entry[1] &&
+      fhirBundle.entry[1].resource &&
+      fhirBundle.entry[1].resource.extension &&
+      fhirBundle.entry[1].resource.extension[1] &&
+      fhirBundle.entry[1].resource.extension[1].url
+    ) {
+      fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
+      expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
+    } else {
+      throw new Error('Failed')
+    }
   })
 })
 
@@ -69,8 +87,12 @@ describe('Verify getInformantName', () => {
 describe('Verify getTrackingId', () => {
   it('Returned tracking id properly', () => {
     const trackingid = getTrackingId(setTrackingId(testFhirBundle))
-    expect(trackingid).toMatch(/^B/)
-    expect(trackingid.length).toBe(7)
+    if (trackingid) {
+      expect(trackingid).toMatch(/^B/)
+      expect(trackingid.length).toBe(7)
+    } else {
+      throw new Error('Failed')
+    }
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {
@@ -198,27 +220,66 @@ describe('Verify getBirthRegistrationNumber', () => {
     )
     const birthTrackingId = 'B5WGYJE'
     const brnChecksum = 1
-    testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-    const taskResource = await pushRN(
-      testFhirBundle.entry[1].resource as fhir.Task,
-      practitioner,
-      'birth-registration-number'
-    )
-    const brn = getBirthRegistrationNumber(taskResource)
-
-    expect(brn).toBeDefined()
-    expect(brn).toMatch(
-      new RegExp(
-        `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+    if (
+      testFhirBundle &&
+      testFhirBundle.entry &&
+      testFhirBundle.entry[1] &&
+      testFhirBundle.entry[1].resource &&
+      testFhirBundle.entry[1].resource.identifier &&
+      testFhirBundle.entry[1].resource.identifier[1] &&
+      testFhirBundle.entry[1].resource.identifier[1].value
+    ) {
+      testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
+      const taskResource = await pushRN(
+        testFhirBundle.entry[1].resource as fhir.Task,
+        practitioner,
+        'birth-registration-number'
       )
-    )
+      const brn = getBirthRegistrationNumber(taskResource)
+
+      expect(brn).toBeDefined()
+      expect(brn).toMatch(
+        new RegExp(
+          `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
+        )
+      )
+    } else {
+      throw new Error('Failed')
+    }
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {
-    const fhirBundle = cloneDeep(testFhirBundle)
-    fhirBundle.entry[1].resource.identifier = []
+    const testTask = {
+      resourceType: 'Task',
+      status: 'requested',
+      intent: '',
+      focus: {
+        reference: 'urn:uuid:888'
+      },
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/types',
+            code: 'birth-registration'
+          }
+        ]
+      },
+      identifier: [],
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'MOTHER'
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '+8801622688231'
+        }
+      ]
+    }
+
     expect(() =>
-      getBirthRegistrationNumber(fhirBundle.entry[1].resource)
+      getBirthRegistrationNumber(testTask as fhir.Task)
     ).toThrowError("Didn't find any identifier for birth registration number")
   })
 })
@@ -228,7 +289,8 @@ describe('Verify getRegStatusCode', () => {
     const tokenPayload = {
       iss: '',
       iat: 1541576965,
-      exp: 1573112965,
+      exp: '1573112965',
+      algorithm: '',
       aud: '',
       sub: '1',
       scope: ['register']
@@ -242,12 +304,14 @@ describe('Verify getRegStatusCode', () => {
     const tokenPayload = {
       iss: '',
       iat: 1541576965,
-      exp: 1573112965,
+      exp: '1573112965',
+      algorithm: '',
       aud: '',
-      sub: '1'
+      sub: '1',
+      scope: []
     }
     expect(() => getRegStatusCode(tokenPayload)).toThrowError(
-      'No scope found on token'
+      'No valid scope found on token'
     )
   })
 
@@ -255,7 +319,8 @@ describe('Verify getRegStatusCode', () => {
     const tokenPayload = {
       iss: '',
       iat: 1541576965,
-      exp: 1573112965,
+      exp: '1573112965',
+      algorithm: '',
       aud: '',
       sub: '1',
       scope: ['invalid']
@@ -267,13 +332,76 @@ describe('Verify getRegStatusCode', () => {
 })
 describe('Verify getPaperFormID', () => {
   it('Returned paper form id properly', () => {
-    const paperFormID = getPaperFormID(testFhirBundle.entry[1].resource)
+    const testTask = {
+      resourceType: 'Task',
+      status: 'requested',
+      intent: '',
+      focus: {
+        reference: 'urn:uuid:888'
+      },
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/types',
+            code: 'birth-registration'
+          }
+        ]
+      },
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/paper-form-id',
+          value: '12345678'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+          value: 'B5WGYJE'
+        }
+      ],
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'MOTHER'
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '+8801622688231'
+        }
+      ]
+    }
+    const paperFormID = getPaperFormID(testTask)
     expect(paperFormID).toEqual('12345678')
   })
   it('Throws error when paper form id not found', () => {
-    const fhirBundle = cloneDeep(testFhirBundle)
-    fhirBundle.entry[1].resource.identifier = []
-    expect(() => getPaperFormID(fhirBundle.entry[1].resource)).toThrowError(
+    const testTask = {
+      resourceType: 'Task',
+      status: 'requested',
+      intent: '',
+      focus: {
+        reference: 'urn:uuid:888'
+      },
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/types',
+            code: 'birth-registration'
+          }
+        ]
+      },
+      identifier: [],
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'MOTHER'
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '+8801622688231'
+        }
+      ]
+    }
+    expect(() => getPaperFormID(testTask)).toThrowError(
       "Didn't find any identifier for paper form id"
     )
   })

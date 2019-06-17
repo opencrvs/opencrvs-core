@@ -1,5 +1,5 @@
-import { ProfileState } from './reducer'
-import { IStoreState } from '../store'
+import { ProfileState } from '@performance/profile/reducer'
+import { IStoreState } from '@performance/store'
 
 const getPartialState = (store: IStoreState): ProfileState => store.profile
 

@@ -17,8 +17,8 @@ import {
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
+} from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 import {
   LANG_EN,
   REJECTED,
@@ -28,9 +28,9 @@ import {
   CERTIFICATE_DATE_FORMAT,
   DECLARED,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
-} from 'src/utils/constants'
-import { messages } from 'src/search/messages'
-import * as moment from 'moment'
+} from '@register/utils/constants'
+import { messages } from '@register/search/messages'
+import moment from 'moment'
 import {
   StatusGreen,
   StatusOrange,
@@ -280,7 +280,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             id: this.props.eventId
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data?: any
+          }) => {
             if (error) {
               Sentry.captureException(error)
               return (

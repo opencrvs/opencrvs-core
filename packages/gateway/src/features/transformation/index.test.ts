@@ -1,4 +1,4 @@
-import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 
 describe('Object transformation module', () => {
   it('converts an object using a simple set of field builders', async () => {

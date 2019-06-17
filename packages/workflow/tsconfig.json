@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "src/*": ["./src/*"]
-    },
+    "baseUrl": "./src",
+    "paths": { "@workflow/*": ["./*"] },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
@@ -18,7 +16,7 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir"]
+    "types": ["fhir", "jest"]
   },
   "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": [

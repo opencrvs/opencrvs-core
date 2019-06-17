@@ -1,9 +1,8 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
-import { createServer } from 'src/index'
-import { searchComposition } from './service'
-import { mockSearchResult } from 'src/test/utils'
+import { createServer } from '@search/index'
+import { searchComposition } from '@search/features/search/service'
+import { mockSearchResult } from '@search/test/utils'
 
 jest.mock('./service.ts')
 
@@ -62,7 +61,7 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
     it('should return status code 500', async () => {
-      searchComposition.mockImplementation(() => {
+      ;(searchComposition as jest.Mock).mockImplementation(() => {
         throw 'dead'
       })
       const token = jwt.sign(
@@ -92,7 +91,7 @@ describe('Verify handlers', () => {
   describe('When the request is made', async () => {
     let token: string
     beforeEach(async () => {
-      searchComposition.mockReturnValue(mockSearchResult)
+      ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResult)
       server = await createServer()
       token = jwt.sign(
         {

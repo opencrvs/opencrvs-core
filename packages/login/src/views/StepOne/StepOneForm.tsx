@@ -13,16 +13,18 @@ import {
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
 
-import { stepOneFields } from './stepOneFields'
+import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 
-import { IAuthenticationData } from '../../utils/authApi'
+import { IAuthenticationData } from '@login/utils/authApi'
 import { Logo } from '@opencrvs/components/lib/icons'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_INVALID_CREDENTIALS,
   ERROR_CODE_PHONE_NUMBER_VALIDATE
-} from '../../utils/authUtils'
-export const messages = defineMessages({
+} from '@login/utils/authUtils'
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   stepOneTitle: {
     id: 'login.stepOneTitle',
     defaultMessage: 'Login',
@@ -162,6 +164,10 @@ export interface IDispatchProps {
 
 type IStepOneForm = IProps & IDispatchProps
 
+export type FullProps = InjectedIntlProps &
+  InjectedFormProps<IAuthenticationData, IStepOneForm> &
+  IStepOneForm
+
 const mobileField = stepOneFields.mobile
 const passwordField = stepOneFields.password
 
@@ -218,11 +224,7 @@ const Password = injectIntl((props: Props) => {
   )
 })
 
-export class StepOneForm extends React.Component<
-  InjectedIntlProps &
-    InjectedFormProps<IAuthenticationData, IStepOneForm> &
-    IStepOneForm
-> {
+export class StepOneForm extends React.Component<FullProps> {
   render() {
     const {
       intl,
@@ -255,20 +257,14 @@ export class StepOneForm extends React.Component<
             <Field
               name={mobileField.name}
               validate={mobileField.validate}
-              component={
-                // tslint:disable-next-line no-any
-                MobileInput as React.ComponentClass<any>
-              }
+              component={MobileInput as React.ComponentClass<any>}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
               name={passwordField.name}
               validate={passwordField.validate}
-              component={
-                // tslint:disable-next-line no-any
-                Password as React.ComponentClass<any>
-              }
+              component={Password as React.ComponentClass<any>}
             />
           </FieldWrapper>
           <ActionWrapper>

@@ -3,20 +3,22 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import styled from '../styled-components'
+import styled from '@performance/styledComponents'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
   goToRegister as goToRegisterAction
-} from 'src/navigation'
-import { redirectToAuthentication } from 'src/profile/actions'
-import { getLanguages } from 'src/i18n/selectors'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { changeLanguage as changeLanguageAction } from 'src/i18n/actions'
+} from '@performance/navigation'
+import { redirectToAuthentication } from '@performance/profile/actions'
+import { getLanguages } from '@performance/i18n/selectors'
+import { IStoreState } from '@performance/store'
+import { IntlState } from '@performance/i18n/reducer'
+import { changeLanguage as changeLanguageAction } from '@performance/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

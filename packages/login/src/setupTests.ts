@@ -1,4 +1,4 @@
-// tslint:disable-next-line:no-any
+// @ts-ignore
 ;(window as any).config = {
   AUTH_API_URL: 'http://localhost:4040/',
   COUNTRY: 'bgd',

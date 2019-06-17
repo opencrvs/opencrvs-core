@@ -1,15 +1,15 @@
 import {
-  BirthRegistrationPoint,
-  PointLocation,
+  IBirthRegistrationPoint,
+  IPointLocation,
   IAuthHeader,
   IBirthRegistrationTags
-} from '.'
+} from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
   getRegLastLocation,
   fetchParentLocationByLocationID
-} from './fhirUtils'
-import { getAgeInDays } from './utils'
+} from '@metrics/features/registration/fhirUtils'
+import { getAgeInDays } from '@metrics/features/registration/utils'
 
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,
@@ -21,7 +21,7 @@ export const generateBirthRegPoint = async (
     throw new Error('No child found!')
   }
 
-  const fields: BirthRegistrationPoint = {
+  const fields: IBirthRegistrationPoint = {
     current_status: 'registered',
     age_in_days: child.birthDate ? getAgeInDays(child.birthDate) : undefined,
     ...(await generatePointLocations(payload, authHeader))
@@ -44,14 +44,15 @@ export const generateBirthRegPoint = async (
 const generatePointLocations = async (
   payload: fhir.Bundle,
   authHeader: IAuthHeader
-): Promise<PointLocation> => {
-  const locations: PointLocation = {}
+): Promise<IPointLocation> => {
+  const locations: IPointLocation = {}
   const locationLevel5 = getRegLastLocation(payload)
   if (!locationLevel5) {
     return locations
   }
   locations.locationLevel5 = locationLevel5
   let locationID: string = locations.locationLevel5
+  // tslint:disable-next-line
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
     if (!locationID) {

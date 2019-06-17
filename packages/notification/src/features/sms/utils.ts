@@ -1,5 +1,5 @@
 import { callingCountries } from 'country-data'
-import { COUNTRY_ALPHA3 } from 'src/constants'
+import { COUNTRY_ALPHA3 } from '@notification/constants'
 
 export const convertToMSISDN = (phone: string) => {
   const countryCode =

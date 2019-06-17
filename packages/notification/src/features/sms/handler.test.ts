@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
-import * as service from './service'
-import { createServer } from '../..'
+import * as service from '@notification/features/sms/service'
+import { createServer } from '@notification/index'
+import * as fetchAny from 'jest-fetch-mock'
 
+const fetch = fetchAny as any
 describe('Verify handlers', () => {
   let server: any
 

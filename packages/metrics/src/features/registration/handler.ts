@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
-import { writePoints } from 'src/influxdb/client'
-import { generateBirthRegPoint } from './pointGenerator'
+import { writePoints } from '@metrics/influxdb/client'
+import { generateBirthRegPoint } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
 
 export async function newBirthRegistrationHandler(

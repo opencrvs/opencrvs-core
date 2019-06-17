@@ -1,8 +1,8 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { IFileValue } from 'src/forms'
+import styled from '@register/styledComponents'
+import { IFileValue } from '@register/forms'
 import { ActionPage } from '@opencrvs/components/lib/interface'
-import { OverlayContainer } from './ImageUploadOption'
+import { OverlayContainer } from '@register/components/form/ImageUploadField/ImageUploadOption'
 
 const PreviewContainer = styled(OverlayContainer)`
   background: ${({ theme }) => theme.colors.black};

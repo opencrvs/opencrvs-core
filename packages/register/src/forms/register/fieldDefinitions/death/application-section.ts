@@ -10,7 +10,7 @@ import {
   TEL,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   FETCH_BUTTON
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
@@ -19,19 +19,20 @@ import {
   validIDNumber,
   numeric,
   maxLength,
-  isDateInPast
-} from 'src/utils/validate'
-import { countries } from 'src/forms/countries'
+  isDateInPast,
+  phoneNumberFormat
+} from '@register/utils/validate'
+import { countries } from '@register/forms/countries'
 import {
   messages as identityMessages,
   identityNameMapper,
   identityTypeMapper,
   deathIdentityOptions
-} from '../../../identity'
-import { messages as addressMessages } from '../../../address'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { conditionals } from 'src/forms/utils'
-import { phoneNumberFormat } from 'src/utils/validate'
+} from '@register/forms/identity'
+import { messages as addressMessages } from '@register/forms/address'
+import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
+import { conditionals } from '@register/forms/utils'
+
 import {
   fieldValueSectionExchangeTransformer,
   fieldToAddressTransformer,
@@ -41,7 +42,7 @@ import {
   fieldToArrayTransformer,
   copyAddressTransformer,
   fieldToPhoneNumberTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from '@register/forms/mappings/mutation/field-mappings'
 import {
   nestedValueToFieldTransformer,
   identifierToFieldTransformer,
@@ -51,23 +52,28 @@ import {
   addressToFieldTransformer,
   sameAddressFieldTransformer,
   sectionFieldExchangeTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from '@register/forms/mappings/query/field-mappings'
 import {
   phoneNumberToFieldTransformer,
   getInformantSectionTransformer
-} from './mappings/query/application-mappings'
+} from '@register/forms/register/fieldDefinitions/death/mappings/query/application-mappings'
 import {
   fieldValueNestingTransformer,
   setInformantSectionTransformer,
   OBJECT_TYPE
-} from './mappings/mutation/applicant-mapping'
+} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/applicant-mapping'
 import {
   FETCH_REGISTRATION,
   transformRegistrationData
-} from '../../queries/registration'
-import { FETCH_PERSON, transformInformantData } from '../../queries/person'
+} from '@register/forms/register/queries/registration'
+import {
+  FETCH_PERSON,
+  transformInformantData
+} from '@register/forms/register/queries/person'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   applicantTab: {
     id: 'register.form.tabs.applicantTab',
     defaultMessage: 'Applicant',

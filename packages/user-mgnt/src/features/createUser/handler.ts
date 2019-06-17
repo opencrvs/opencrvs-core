@@ -1,15 +1,15 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import User, { IUser } from 'src/model/user'
-import { generateSaltedHash } from 'src/utils/password'
-import { logger } from 'src/logger'
+import User, { IUser } from '@user-mgnt/model/user'
+import { generateSaltedHash } from '@user-mgnt/utils/password'
+import { logger } from '@user-mgnt/logger'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir,
   rollback
-} from './service'
+} from '@user-mgnt/features/createUser/service'
 
 export default async function createUser(
   request: Hapi.Request,

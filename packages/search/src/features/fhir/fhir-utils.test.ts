@@ -1,27 +1,31 @@
 import {
   addDuplicatesToComposition,
   createDuplicatesTemplate
-} from 'src/features/fhir/fhir-utils'
-import {
-  mockComposition,
-  mockSearchResponse,
-  mockCompositionBody
-} from 'src/test/utils'
-import { logger } from 'src/logger'
+} from '@search/features/fhir/fhir-utils'
+import { mockComposition } from '@search/test/utils'
 
 describe('fhir utils', () => {
   it('should add duplicates to relatesTo property of compostion', () => {
     addDuplicatesToComposition(['123'], mockComposition)
-    expect(mockComposition.relatesTo[2].targetReference.reference).toEqual(
-      'Composition/123'
-    )
-    expect(mockComposition.relatesTo.length).toEqual(3)
-  })
-  it('should throw error for no composition', () => {
-    expect(() => addDuplicatesToComposition(['123'], undefined)).toThrow()
+    if (
+      mockComposition.relatesTo &&
+      mockComposition.relatesTo[2] &&
+      mockComposition.relatesTo[2].targetReference &&
+      mockComposition.relatesTo[2].targetReference.reference
+    ) {
+      expect(mockComposition.relatesTo[2].targetReference
+        .reference as string).toEqual('Composition/123')
+      expect(mockComposition.relatesTo.length).toEqual(3)
+    } else {
+      throw new Error('Failed')
+    }
   })
   it('should not add duplicates to relatesTo property if already exists as duplicate', () => {
     createDuplicatesTemplate(['123'], mockComposition)
-    expect(mockComposition.relatesTo.length).toEqual(3)
+    if (mockComposition.relatesTo) {
+      expect(mockComposition.relatesTo.length).toEqual(3)
+    } else {
+      throw new Error('Failed')
+    }
   })
 })

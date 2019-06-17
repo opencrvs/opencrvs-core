@@ -11,7 +11,9 @@ export const ALIEN_NUMBER = 'ALIEN_NUMBER'
 export const OTHER = 'OTHER'
 export const NO_ID = 'NO_ID'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   iDType: {
     id: 'formFields.iDType',
     defaultMessage: 'Type of ID',

@@ -11,10 +11,10 @@ import { StatusWaiting } from '@opencrvs/components/lib/icons'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
 
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
-import { sentenceCase } from 'src/utils/data-formatting'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
+import { sentenceCase } from '@register/utils/data-formatting'
 
 const messages = {
   statusWaitingToRegister: {
@@ -75,9 +75,7 @@ const Container = styled(BodyContent)`
 `
 const SmallSpinner = styled(Spinner)`
   background: ${({ theme }) =>
-    `linear-gradient(to right,${theme.colors.white} 10%,${
-      theme.colors.primary
-    } 42%)`};
+    `linear-gradient(to right,${theme.colors.white} 10%,${theme.colors.primary} 42%)`};
   width: 24px;
   height: 24px;
 `
@@ -202,8 +200,8 @@ class Outbox extends React.Component<IFullProps, IState> {
         id: application.id,
         event: (application.event && sentenceCase(application.event)) || '',
         name: name || '',
-        submission_status: statusText || '',
-        status_indicator: icon ? [icon()] : null
+        submissionStatus: statusText || '',
+        statusIndicator: icon ? [icon()] : null
       }
     })
   }
@@ -236,7 +234,7 @@ class Outbox extends React.Component<IFullProps, IState> {
                 messages.statusWaitingToRegister
               ),
               width: 35,
-              key: 'submission_status',
+              key: 'submissionStatus',
               color: getTheme(window.config.COUNTRY, window.config.LANGUAGE)
                 .colors.secondaryLabel
             },
@@ -244,7 +242,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               label: '',
               width: 5,
               alignment: ColumnContentAlignment.CENTER,
-              key: 'status_indicator'
+              key: 'statusIndicator'
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}

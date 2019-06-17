@@ -2,15 +2,16 @@ import * as React from 'react'
 import {
   createTestComponent,
   flushPromises,
-  sysadminToken
-} from 'src/tests/util'
-import { queries } from 'src/profile/queries'
+  sysadminToken,
+  mockUserResponse
+} from '@register/tests/util'
+import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { mockUserResponse } from 'src/tests/util'
-import { storage } from 'src/storage'
-import { createStore } from 'src/store'
-import { checkAuth } from 'src/profile/profileActions'
-import { SYS_ADMIN_ROLES } from 'src/utils/constants'
+
+import { storage } from '@register/storage'
+import { createStore } from '@register/store'
+import { checkAuth } from '@register/profile/profileActions'
+import { SYS_ADMIN_ROLES } from '@register/utils/constants'
 import { SysAdminHome } from './SysAdminHome'
 
 const getItem = window.localStorage.getItem as jest.Mock

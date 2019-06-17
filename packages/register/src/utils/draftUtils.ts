@@ -1,5 +1,5 @@
-import { Event, IFormSectionData } from 'src/forms'
-import { IApplication } from 'src/applications'
+import { Event, IFormSectionData } from '@register/forms'
+import { IApplication } from '@register/applications'
 
 const getApplicantFullName = (
   sectionData: IFormSectionData,

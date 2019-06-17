@@ -1,5 +1,4 @@
-import { defineMessages } from 'react-intl'
-import { FormattedMessage, MessageValue } from 'react-intl'
+import { defineMessages, FormattedMessage, MessageValue } from 'react-intl'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
@@ -8,7 +7,9 @@ export interface IValidationResult {
 
 export type Validation = (value: string) => IValidationResult | undefined
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   required: {
     id: 'validations.required',
     defaultMessage: 'Required',
@@ -55,7 +56,14 @@ export const messages = defineMessages({
 
 const fallbackCountry = window.config.COUNTRY
 
-const mobilePhonePatternTable = {
+interface IMobilePhonePattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+}
+
+const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
   gbr: {
     pattern: /^07[0-9]{9,10}$/,
     example: '07123456789',

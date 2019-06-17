@@ -1,8 +1,8 @@
-import { USER_MANAGEMENT_URL } from 'src/constants'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
-import { logger } from 'src/logger'
+import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
-import { IAuthHeader } from 'src/common-types'
+import { IAuthHeader } from '@gateway/common-types'
 import * as decode from 'jwt-decode'
 
 export interface ITokenPayload {
@@ -16,6 +16,7 @@ export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
 ) => {
+  // tslint:disable-next-line
   countryCode = countryCode.toUpperCase()
   return mobileWithCountryCode.replace(
     callingCountries[countryCode].countryCallingCodes[0],

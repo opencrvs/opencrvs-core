@@ -1,15 +1,18 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { authenticate, storeUserInformation } from './service'
+import {
+  authenticate,
+  storeUserInformation
+} from '@auth/features/authenticate/service'
 import {
   generateVerificationCode,
   sendVerificationCode,
   generateNonce,
   storeVerificationCode
-} from 'src/features/verifyCode/service'
-import { logger } from 'src/logger'
+} from '@auth/features/verifyCode/service'
+import { logger } from '@auth/logger'
 import { unauthorized } from 'boom'
-import { PRODUCTION } from 'src/constants'
+import { PRODUCTION } from '@auth/constants'
 
 interface IAuthPayload {
   mobile: string

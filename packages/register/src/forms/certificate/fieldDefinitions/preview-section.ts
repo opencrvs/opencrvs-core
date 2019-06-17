@@ -1,7 +1,9 @@
-import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from 'src/forms'
+import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from '@register/forms'
 import { defineMessages } from 'react-intl'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   preview: {
     id: 'print.certificate.certificatePreview',
     defaultMessage: 'Certificate Preview',

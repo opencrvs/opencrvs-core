@@ -1,4 +1,4 @@
-import { createServerWithEnvironment } from 'src/tests/util'
+import { createServerWithEnvironment } from '@auth/tests/util'
 import { createServer } from '../..'
 
 describe('resend handler receives a request', () => {

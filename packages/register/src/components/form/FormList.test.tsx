@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { FormList } from './FormList'
+import { createTestComponent } from '@register/tests/util'
+import { FormList } from '@register/components/form/FormList'
 import { ReactWrapper } from 'enzyme'
-import * as actions from 'src/i18n/actions'
-import { createStore } from '../../store'
+import * as actions from '@register/i18n/actions'
+import { createStore } from '@register/store'
 
 describe('when user is in the document upload page', () => {
   const { store } = createStore()

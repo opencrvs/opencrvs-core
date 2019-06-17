@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { createTestComponent } from '../../tests/util'
+import { createTestComponent } from '@register/tests/util'
 import {
   ReviewDuplicates,
   rejectMutation,
   notADuplicateMutation,
   FETCH_DUPLICATES,
   createDuplicateDetailsQuery
-} from './ReviewDuplicates'
-import { createStore } from 'src/store'
+} from '@register/views/Duplicates/ReviewDuplicates'
+import { createStore } from '@register/store'
 import { ReactWrapper } from 'enzyme'
-import { DuplicateDetails } from 'src/components/DuplicateDetails'
+import { DuplicateDetails } from '@register/components/DuplicateDetails'
 import { clone } from 'lodash'
-import { SEARCH_RESULT } from 'src/navigation/routes'
+import { SEARCH_RESULT } from '@register/navigation/routes'
 
 const assign = window.location.assign as jest.Mock
 
@@ -707,6 +707,7 @@ describe('Review Duplicates component', () => {
           query: rejectMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            // @ts-ignore
             reason: 'duplicate'
           }
         },
@@ -818,6 +819,7 @@ describe('Review Duplicates component', () => {
           query: notADuplicateMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            // @ts-ignore
             duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
@@ -876,6 +878,7 @@ describe('Review Duplicates component', () => {
           query: notADuplicateMutation,
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+            // @ts-ignore
             duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
           }
         },
