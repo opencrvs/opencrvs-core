@@ -3,7 +3,13 @@ import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
+import { ExpansionContentInfo } from './ExpansionContentInfo'
+import {
+  IAction,
+  IDynamicValues,
+  IExpandedContentPreference,
+  IColumn
+} from './types'
 import { grid } from '../../grid'
 export { IAction } from './types'
 
@@ -86,19 +92,9 @@ export enum ColumnContentAlignment {
   CENTER = 'center'
 }
 
-interface IGridPreference {
-  label: string
-  width: number
-  key: string
-  errorValue?: string
-  alignment?: ColumnContentAlignment
-  isActionColumn?: boolean
-  color?: string
-}
-
 interface IGridTableProps {
   content: IDynamicValues[]
-  columns: IGridPreference[]
+  columns: IColumn[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText: string
   hideTableHeader?: boolean

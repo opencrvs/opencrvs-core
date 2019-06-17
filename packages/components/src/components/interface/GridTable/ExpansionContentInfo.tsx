@@ -226,7 +226,7 @@ export class ExpansionContentComp extends React.Component<IProps> {
                       separator={<Separator />}
                     />
                   </ValueContainer>
-                  {item.duplicates && item.duplicates.length > 0 && (
+                  {item.duplicates && (item.duplicates as string[]).length > 0 && (
                     <DuplicateIndicatorContainer>
                       <Duplicate />
                       <span>
