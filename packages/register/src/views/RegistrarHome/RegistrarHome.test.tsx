@@ -325,6 +325,7 @@ describe('RegistrarHome tests', async () => {
     ).toContain('Sent for updates (5)')
   })
   it('renders all items returned from graphql query in ready for reivew', async () => {
+    const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
@@ -353,8 +354,8 @@ describe('RegistrarHome tests', async () => {
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
                   },
                   dateOfBirth: '2010-10-10',
                   childName: [
@@ -381,8 +382,8 @@ describe('RegistrarHome tests', async () => {
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: '2007-01-01',
-                    modifiedAt: '2007-01-01'
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
                   },
                   dateOfBirth: null,
                   childName: null,
@@ -421,11 +422,15 @@ describe('RegistrarHome tests', async () => {
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
+    const EXPECTED_DATE_OF_APPLICATION = moment(
+      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+      'YYYY-MM-DD HH:mm:ss'
+    ).fromNow()
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].event_time_elapsed).toBe('8 years ago')
-    expect(data[0].application_time_elapsed).toBe('10 months ago')
+    expect(data[0].application_time_elapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
     expect(data[0].tracking_id).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
@@ -433,7 +438,7 @@ describe('RegistrarHome tests', async () => {
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in rejected tab', async () => {
-    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
+    const TIME_STAMP = '1544188309380'
     const graphqlMock = [
       {
         request: {
@@ -525,13 +530,13 @@ describe('RegistrarHome tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 200)
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
-      TIME_STAMP,
-      'YYYY-MM-DD'
+      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+      'YYYY-MM-DD HH:mm:ss'
     ).fromNow()
 
     expect(data.length).toBe(2)
