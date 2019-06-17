@@ -770,7 +770,6 @@ describe('when user is previewing the form data', () => {
         })
 
       store.dispatch = jest.fn()
-      console.log(app.debug())
       app
         .find('#submit_reject_form')
         .hostNodes()

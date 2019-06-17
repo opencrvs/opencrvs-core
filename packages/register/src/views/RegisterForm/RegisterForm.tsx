@@ -7,7 +7,6 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import * as Sentry from '@sentry/browser'
 import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
 import * as debounce from 'lodash/debounce'
@@ -19,8 +18,8 @@ import * as Swipeable from 'react-swipeable'
 import {
   deleteApplication,
   IApplication,
-  modifyApplication,
   IPayload,
+  modifyApplication,
   SUBMISSION_STATUS
 } from 'src/applications'
 import {
@@ -37,14 +36,6 @@ import { getScope } from 'src/profile/profileSelectors'
 import { IStoreState } from 'src/store'
 import { Scope } from 'src/utils/authUtils'
 import { isMobileDevice } from 'src/utils/commonUtils'
-import {
-  DECLARATION,
-  DUPLICATION,
-  OFFLINE,
-  REGISTERED,
-  REGISTRATION,
-  REJECTION
-} from 'src/utils/constants'
 import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
 import {
   Action,
@@ -313,37 +304,6 @@ const VIEW_TYPE = {
   PREVIEW: 'preview'
 }
 
-interface IFullName {
-  fullNameInBn: string
-  fullNameInEng: string
-}
-
-const getFullName = (childData: IFormSectionData): IFullName => {
-  let fullNameInBn = ''
-  let fullNameInEng = ''
-
-  if (childData.firstNames) {
-    fullNameInBn = `${String(childData.firstNames)} ${String(
-      childData.familyName
-    )}`
-  } else {
-    fullNameInBn = String(childData.familyName)
-  }
-
-  if (childData.firstNamesEng) {
-    fullNameInEng = `${String(childData.firstNamesEng)} ${String(
-      childData.familyNameEng
-    )}`
-  } else if (childData.familyNameEng) {
-    fullNameInEng = String(childData.familyNameEng)
-  }
-
-  return {
-    fullNameInBn,
-    fullNameInEng
-  }
-}
-
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -378,115 +338,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
           ...sectionData
         }
       }
-    })
-  }
-
-  rejectSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: application.data.registration.trackingId,
-      eventName: REJECTION,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      eventType: event,
-      trackingSection: true,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-
-    this.props.deleteApplication(application)
-  }
-
-  successfulSubmission = (response: string) => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  offlineSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackingSection: true,
-      eventName: OFFLINE,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  successfullyRegistered = (response: string) => {
-    const {
-      history,
-      application: application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    const eventName = duplicate ? DUPLICATION : REGISTRATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      actionName: REGISTERED,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-    this.props.deleteApplication(application)
-  }
-
-  registrationOnError = (error: Error) => {
-    Sentry.captureException(error)
-    this.setState({
-      showRegisterModal: false,
-      hasError: true
     })
   }
 
