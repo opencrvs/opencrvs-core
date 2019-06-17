@@ -1,8 +1,8 @@
 import * as React from 'react'
 
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
-import { RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router'
+
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
@@ -15,7 +15,7 @@ import {
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification
-} from 'src/notification/actions'
+} from '@register/notification/actions'
 
 type NotificationProps = {
   language?: string
@@ -34,7 +34,9 @@ type DispatchProps = {
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newContentAvailable: {
     id: 'register.notification.newContentAvailable',
     defaultMessage: "We've made some updates, click here to refresh.",
@@ -67,7 +69,7 @@ class Component extends React.Component<
       this.props.waitingSW.postMessage('skipWaiting')
     }
     this.props.hideNewContentAvailableNotification()
-    location.reload()
+    window.location.reload()
   }
 
   hideBackgroundSyncedNotification = () => {
@@ -156,7 +158,7 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps>(
+  connect<NotificationProps, DispatchProps, NotificationProps, IStoreState>(
     mapStateToProps,
     {
       hideNewContentAvailableNotification,
@@ -165,4 +167,4 @@ export const NotificationComponent = withRouter(
       toggleDraftSavedNotification
     }
   )(injectIntl(Component))
-)
+) as any

@@ -1,9 +1,10 @@
-import { IFormField, IFormData } from 'src/forms'
-import { attachmentToFieldTransformer } from 'src/forms/mappings/query/field-mappings'
+import { IFormField, IFormData } from '@register/forms'
+import { attachmentToFieldTransformer } from '@register/forms/mappings/query/field-mappings'
 import {
   documentForWhomFhirMapping,
   documentTypeFhirMapping
-} from '../mutation/documents-mappings'
+} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+
 export const REGISTRATION_SECTION = 'registration'
 
 export function deathAttachmentToFieldTransformer(

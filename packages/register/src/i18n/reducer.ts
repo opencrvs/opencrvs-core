@@ -1,7 +1,7 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import * as actions from './actions'
-import { ENGLISH_STATE } from './locales/en'
-import { BENGALI_STATE } from './locales/bn'
+import * as actions from '@register/i18n/actions'
+import { ENGLISH_STATE } from '@register/i18n/locales/en'
+import { BENGALI_STATE } from '@register/i18n/locales/bn'
 
 export interface IntlMessages {
   [key: string]: string
@@ -37,9 +37,9 @@ const getNextMessages = (language: string): IntlMessages => {
   return languages[language].messages
 }
 
-export const intlReducer: LoopReducer<IntlState, actions.Action> = (
+export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: actions.Action
+  action: any
 ): IntlState | Loop<IntlState, actions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:

@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import { internal } from 'boom'
-import { sendSMS } from './service'
-import { NON_UNICODED_LANGUAGES } from 'src/constants'
+import { sendSMS } from '@notification/features/sms/service'
+import { NON_UNICODED_LANGUAGES } from '@notification/constants'
 
 export type HapiRequest = Hapi.Request & {
   i18n: {

@@ -1,0 +1,16 @@
+{
+  "editor.formatOnSave": true,
+  "eslint.autoFixOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    { "language": "typescript", "autoFix": true },
+    { "language": "typescriptreact", "autoFix": true }
+  ],
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "eslint.workingDirectories": [
+    { "directory": "./packages/performance", "changeProcessCWD": true },
+    { "directory": "./packages/register", "changeProcessCWD": true },
+    { "directory": "./packages/login", "changeProcessCWD": true }
+  ]
+}

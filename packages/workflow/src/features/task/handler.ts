@@ -1,10 +1,10 @@
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { HEARTH_URL } from 'src/constants'
-import { modifyTaskBundle } from './fhir/fhir-bundle-modifier'
-import { getEntryId } from 'src/features/registration/fhir/fhir-utils'
-import { getToken } from 'src/utils/authUtils'
-import { logger } from 'src/logger'
+import { HEARTH_URL } from '@workflow/constants'
+import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
+import { getEntryId } from '@workflow/features/registration/fhir/fhir-utils'
+import { getToken } from '@workflow/utils/authUtils'
+import { logger } from '@workflow/logger'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,

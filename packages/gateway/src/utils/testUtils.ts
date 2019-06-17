@@ -53,7 +53,7 @@ export const mockPatient = {
     ],
     text: 'Married'
   },
-  multipleBirthInteger: 1, // the number is the birth number in the sequence. E.g. The middle birth in tripplets would be valueInteger=2 and the third born would have valueInteger=3
+  multipleBirthInteger: 1,
   photo: [
     {
       contentType: '',
@@ -432,7 +432,7 @@ export const mockComposition = {
       text: '',
       entry: [
         {
-          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below, the encounter may have zero or more observations attached to it
+          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below
         }
       ]
     },
@@ -568,7 +568,7 @@ export const mockDeathComposition = {
       text: '',
       entry: [
         {
-          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below, the encounter may have zero or more observations attached to it
+          reference: 'urn:uuid:xxx' // reference to Encounter resource contained below
         }
       ]
     },

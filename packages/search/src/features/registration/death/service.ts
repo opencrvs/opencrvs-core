@@ -1,10 +1,13 @@
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import {
   EVENT,
   ICompositionBody,
   IDeathCompositionBody,
   getCreatedBy
-} from 'src/elasticsearch/utils'
+} from '@search/elasticsearch/utils'
 import {
   findEntry,
   findEntryResourceByUrl,
@@ -12,7 +15,7 @@ import {
   findTask,
   findTaskExtension,
   findTaskIdentifier
-} from 'src/features/fhir/fhir-utils'
+} from '@search/features/fhir/fhir-utils'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'

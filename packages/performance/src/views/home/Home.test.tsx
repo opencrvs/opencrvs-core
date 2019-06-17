@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { Home } from './Home'
+import { Home } from '@performance/views/home/Home'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
+import { createStore } from '@performance/store'
 import {
   createTestComponent,
   mockUserResponse,
   userDetails
-} from 'src/tests/util'
-import { queries } from 'src/profile/queries'
+} from '@performance/tests/util'
+import { queries } from '@performance/profile/queries'
 import { setInitialUserDetails } from '@opencrvs/performance/src/profile/actions'
-import { FETCH_METRIC } from './queries'
+import { FETCH_METRIC } from '@performance/views/home/queries'
 
 const mockFetchUserDetails = jest.fn()
 Date.now = jest.fn(() => 1567142659530)

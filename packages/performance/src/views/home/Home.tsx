@@ -7,20 +7,18 @@ import {
   FormattedHTMLMessage,
   defineMessages
 } from 'react-intl'
-import { Box } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
-import { withTheme } from 'styled-components'
+import { Box, Spinner } from '@opencrvs/components/lib/interface'
+import styled, { withTheme, ITheme } from '@performance/styledComponents'
 import {
   GQLHumanName,
   GQLBirthKeyFigures
 } from '@opencrvs/gateway/src/graphql/schema'
-import { getUserDetails } from 'src/profile/selectors'
-import { getUserLocation } from 'src/utils/userUtils'
-import { getLanguage } from '@opencrvs/performance/src/i18n/selectors'
-import { IUserDetails } from 'src/utils/userUtils'
-import { Page } from 'src/components/Page'
-import { IStoreState } from '@opencrvs/performance/src/store'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { getUserDetails } from '@performance/profile/selectors'
+import { getUserLocation, IUserDetails } from '@performance/utils/userUtils'
+import { getLanguage } from '@performance/i18n/selectors'
+import { Page } from '@performance/components/Page'
+import { IStoreState } from '@performance/store'
+import { HomeViewHeader } from '@performance/components/HomeViewHeader'
 
 import { Legend, VerticalBar, Line } from '@opencrvs/components/lib/charts'
 import { ICategoryDataPoint } from '@opencrvs/components/lib/charts/datapoint'
@@ -28,11 +26,11 @@ import { Male, Female } from '@opencrvs/components/lib/icons'
 
 import { Query } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
-import { Spinner } from '@opencrvs/components/lib/interface'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { FETCH_METRIC } from './queries'
+import { FETCH_METRIC } from '@performance/views/home/queries'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   logoutActionTitle: {
     id: 'register.home.logout',
     defaultMessage: 'Log out',
@@ -233,7 +231,7 @@ interface IData {
 interface IHomeProps {
   theme: ITheme
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
 }
 
 type FullProps = IHomeProps & InjectedIntlProps
@@ -301,8 +299,12 @@ class HomeView extends React.Component<FullProps> {
     const { intl, language, userDetails, theme } = this.props
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
       ) as GQLHumanName
+
       const fullName = `${String(nameObj.firstNames)} ${String(
         nameObj.familyName
       )}`
@@ -326,7 +328,15 @@ class HomeView extends React.Component<FullProps> {
                 locationId: userDetails && getUserLocation(userDetails, 'UNION')
               }}
             >
-              {({ loading, error, data }) => {
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: any
+                error?: any
+                data: any
+              }) => {
                 if (loading) {
                   return (
                     <StyledSpinner

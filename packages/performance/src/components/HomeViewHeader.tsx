@@ -1,9 +1,12 @@
 import * as React from 'react'
-import { IViewHeadingProps, ViewHeading } from './ViewHeading'
+import {
+  IViewHeadingProps,
+  ViewHeading
+} from '@performance/components/ViewHeading'
 import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
-import styled from '../styled-components'
-import { TopMenu } from './TopMenu'
+import styled from '@performance/styledComponents'
+import { TopMenu } from '@performance/components/TopMenu'
 import { Logo, Offline, Online } from '@opencrvs/components/lib/icons'
 
 const StretchedHeader = styled(Header)`

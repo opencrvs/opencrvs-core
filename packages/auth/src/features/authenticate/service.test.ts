@@ -1,4 +1,7 @@
-import { verifyToken, getStoredUserInformation } from './service'
+import {
+  verifyToken,
+  getStoredUserInformation
+} from '@auth/features/authenticate/service'
 
 describe('authenticate service errors', () => {
   describe('verifyToken - token expired', () => {

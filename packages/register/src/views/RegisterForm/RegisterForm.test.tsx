@@ -5,8 +5,8 @@ import {
   mockApplicationData,
   mockDeathApplicationData,
   mockDeathApplicationDataWithoutFirstNames
-} from 'src/tests/util'
-import { RegisterForm } from './RegisterForm'
+} from '@register/tests/util'
+import { RegisterForm } from '@register/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import {
   createApplication,
@@ -17,10 +17,9 @@ import {
   getCurrentUserID,
   getApplicationsOfCurrentUser,
   writeApplicationByUser
-} from 'src/applications'
+} from '@register/applications'
 import { v4 as uuid } from 'uuid'
-
-import { createStore } from '../../store'
+import { createStore } from '@register/store'
 import {
   DRAFT_BIRTH_PARENT_FORM_TAB,
   REVIEW_EVENT_PARENT_FORM_TAB,
@@ -30,13 +29,13 @@ import {
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import { Event, IFormData } from '@opencrvs/register/src/forms'
-import { draftToGqlTransformer } from 'src/transformer'
-import { IForm } from 'src/forms'
+import { draftToGqlTransformer } from '@register/transformer'
+import { IForm } from '@register/forms'
 import { clone } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
-import { storage } from 'src/storage'
-import { IUserDetails } from 'src/utils/userUtils'
+import { storage } from '@register/storage'
+import { IUserDetails } from '@register/utils/userUtils'
 
 describe('when user logs in', async () => {
   // Some mock data
@@ -66,19 +65,19 @@ describe('when user logs in', async () => {
   }
 
   // Mocking storage reading
-  storage.getItem = jest.fn(
-    (key: string): string => {
-      switch (key) {
-        case 'USER_DATA':
-        case 'USER_DETAILS':
-          return indexedDB[key]
-        default:
-          return 'undefined'
-      }
+  // @ts-ignore
+  storage.getItem = jest.fn((key: string): string => {
+    switch (key) {
+      case 'USER_DATA':
+      case 'USER_DETAILS':
+        return indexedDB[key]
+      default:
+        return 'undefined'
     }
-  )
+  })
 
   // Mocking storage writing
+  // @ts-ignore
   storage.setItem = jest.fn((key: string, value: string) => {
     switch (key) {
       case 'USER_DATA':
@@ -121,18 +120,18 @@ describe('when user logs in', async () => {
 
 describe('when there is no user-data saved', () => {
   it('should return an empty array', async () => {
-    storage.getItem = jest.fn(
-      (key: string): string => {
-        switch (key) {
-          case 'USER_DATA':
-            return '[]'
-          case 'USER_DETAILS':
-            return '{ "userMgntUserID": "tamimIq" }'
-          default:
-            return ''
-        }
+    // Mocking storage reading
+    // @ts-ignore
+    storage.getItem = jest.fn((key: string): string => {
+      switch (key) {
+        case 'USER_DATA':
+          return '[]'
+        case 'USER_DETAILS':
+          return '{ "userMgntUserID": "tamimIq" }'
+        default:
+          return ''
       }
-    )
+    })
     const str = await getApplicationsOfCurrentUser()
     const drafts = (JSON.parse(str) as IUserData).applications
     expect(drafts.length).toBe(0)
@@ -148,6 +147,7 @@ describe('when user is in the register form before initial draft load', () => {
   it('throws error when draft not found after initial drafts load', () => {
     try {
       createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -157,7 +157,7 @@ describe('when user is in the register form before initial draft load', () => {
           application={draft}
           tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
-            params: { draftId: '', tabId: '' },
+            params: { applicationId: '', tabId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -185,6 +185,7 @@ describe('when user is in the register form for birth event', async () => {
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -194,7 +195,7 @@ describe('when user is in the register form for birth event', async () => {
           application={draft}
           tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'mother' },
+            params: { applicationId: draft.id, tabId: 'mother' },
             isExact: true,
             path: '',
             url: ''
@@ -240,6 +241,7 @@ describe('when user is in the register form for death event', async () => {
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -249,7 +251,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'causeOfDeath' },
+            params: { applicationId: draft.id, tabId: 'causeOfDeath' },
             isExact: true,
             path: '',
             url: ''
@@ -275,6 +277,7 @@ describe('when user is in the register form for death event', async () => {
   describe('when user is in deceased section', () => {
     it('renders loader button when idType is Birth Registration Number', () => {
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -284,7 +287,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, tabId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -299,6 +302,7 @@ describe('when user is in the register form for death event', async () => {
 
     it('renders loader button when idType is National ID', () => {
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -308,7 +312,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, tabId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -357,6 +361,7 @@ describe('when user is in the register form for death event', async () => {
         }
       ]
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -366,7 +371,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, tabId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -475,6 +480,7 @@ describe('when user is in the register form for death event', async () => {
         }
       ]
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -484,7 +490,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, tabId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -593,6 +599,7 @@ describe('when user is in the register form for death event', async () => {
         }
       ]
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -602,7 +609,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'informant' },
+            params: { applicationId: draft.id, tabId: 'informant' },
             isExact: true,
             path: '',
             url: ''
@@ -657,6 +664,7 @@ describe('when user is in the register form for death event', async () => {
         }
       ]
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -666,7 +674,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, tabId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -726,6 +734,7 @@ describe('when user is in the register form for death event', async () => {
         }
       ]
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -735,7 +744,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, tabId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -794,6 +803,7 @@ describe('when user is in the register form preview section', () => {
   const mock: any = jest.fn()
   const form = getRegisterForm(store.getState())[Event.BIRTH]
   const testComponent = createTestComponent(
+    // @ts-ignore
     <RegisterForm
       location={mock}
       scope={mock}
@@ -803,7 +813,7 @@ describe('when user is in the register form preview section', () => {
       application={draft}
       tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
       match={{
-        params: { draftId: draft.id, tabId: 'preview' },
+        params: { applicationId: draft.id, tabId: 'preview' },
         isExact: true,
         path: '',
         url: ''
@@ -859,6 +869,7 @@ describe('when user is in the register form preview section', () => {
 
       const nform = getRegisterForm(store.getState())[Event.BIRTH]
       const nTestComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           history={history}
@@ -962,6 +973,7 @@ describe('when user is in the register form review section', () => {
     const mock: any = jest.fn()
     const form = getReviewForm(store.getState()).birth
     const testComponent = createTestComponent(
+      // @ts-ignore
       <RegisterForm
         location={mock}
         scope={mock}
@@ -972,9 +984,8 @@ describe('when user is in the register form review section', () => {
         tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
         match={{
           params: {
-            draftId: application.id,
-            tabId: 'review',
-            event: application.event.toLowerCase()
+            applicationId: application.id,
+            tabId: 'review'
           },
           isExact: true,
           path: '',
@@ -1025,6 +1036,7 @@ describe('when user is in the register form for death event', async () => {
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
       const testComponent = createTestComponent(
+        // @ts-ignore
         <RegisterForm
           location={mock}
           scope={mock}
@@ -1034,7 +1046,7 @@ describe('when user is in the register form for death event', async () => {
           application={draft}
           tabRoute={DRAFT_DEATH_FORM_TAB}
           match={{
-            params: { draftId: draft.id, tabId: 'causeOfDeath' },
+            params: { applicationId: draft.id, tabId: 'causeOfDeath' },
             isExact: true,
             path: '',
             url: ''
@@ -1083,6 +1095,7 @@ describe('When user is in Preview section death event', async () => {
 
     deathForm = getRegisterForm(store.getState())[Event.DEATH]
     const nTestComponent = createTestComponent(
+      // @ts-ignore
       <RegisterForm
         location={mock}
         history={history}
@@ -1091,7 +1104,7 @@ describe('When user is in Preview section death event', async () => {
         application={deathDraft}
         tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
         match={{
-          params: { draftId: deathDraft.id, tabId: 'preview' },
+          params: { applicationId: deathDraft.id, tabId: 'preview' },
           isExact: true,
           path: '',
           url: ''
@@ -1204,6 +1217,7 @@ describe('When user is in Preview section death event in offline mode', async ()
 
     deathForm = getRegisterForm(store.getState())[Event.DEATH]
     const nTestComponent = createTestComponent(
+      // @ts-ignore
       <RegisterForm
         location={mock}
         history={history}
@@ -1212,7 +1226,7 @@ describe('When user is in Preview section death event in offline mode', async ()
         application={deathDraft}
         tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
         match={{
-          params: { draftId: deathDraft.id, tabId: 'preview' },
+          params: { applicationId: deathDraft.id, tabId: 'preview' },
           isExact: true,
           path: '',
           url: ''

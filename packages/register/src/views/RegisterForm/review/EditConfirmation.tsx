@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
@@ -10,7 +10,9 @@ const PreviewButton = styled.a`
   cursor: pointer;
 `
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   preview: {
     id: 'review.edit.modal.preview',
     defaultMessage: 'Back to Preview',

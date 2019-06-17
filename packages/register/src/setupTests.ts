@@ -1,6 +1,8 @@
-import * as fetch from 'jest-fetch-mock'
+import { GlobalWithFetchMock } from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', { default: fetch })
+const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
+customGlobal.fetch = require('jest-fetch-mock')
+customGlobal.fetchMock = customGlobal.fetch
 jest.mock('lodash/debounce', () => jest.fn(fn => fn))
 
 const localStorageMock = {
@@ -20,7 +22,7 @@ Object.defineProperty(window, 'localStorage', {
 ;(window as any).location.assign = jest.fn()
 ;(window as any).navigator = navigatorMock
 ;(window as any).location.reload = jest.fn()
-// tslint:disable-next-line no-empty
+// eslint-disable-line no-empty
 ;(window as any).scrollTo = () => {}
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',

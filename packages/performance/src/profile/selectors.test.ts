@@ -1,5 +1,9 @@
-import { getAuthenticated, getUserDetails, getTokenPayload } from './selectors'
-import { getInitialState } from '../tests/util'
+import {
+  getAuthenticated,
+  getUserDetails,
+  getTokenPayload
+} from '@performance/profile/selectors'
+import { getInitialState } from '@performance/tests/util'
 
 describe('profileSelectors', () => {
   describe('selectors', () => {

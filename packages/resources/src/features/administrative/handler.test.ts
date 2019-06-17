@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '../..'
-import * as locationsService from 'src/features/administrative/service/service'
-import { ILocationDataResponse } from './service/service'
+import { createServer } from '@resources/index'
+import * as locationsService from '@resources/features/administrative/service/service'
+import { ILocationDataResponse } from '@resources/features/administrative/service/service'
 
 describe('administrative handler receives a request', () => {
   let server: any

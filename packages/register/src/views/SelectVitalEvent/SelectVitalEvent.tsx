@@ -1,15 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
 import {
   goToBirthRegistration,
   goToDeathRegistration,
   goBack as goBackAction
-} from 'src/navigation'
+} from '@register/navigation'
 import { Dispatch } from 'redux'
-import { createApplication, storeApplication } from 'src/applications'
-import { Event } from 'src/forms'
+import { createApplication, storeApplication } from '@register/applications'
+import { Event } from '@register/forms'
 import { Cross, ApplicationIcon } from '@opencrvs/components/lib/icons'
 import styled from 'src/styled-components'
 import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
@@ -23,7 +22,9 @@ const BodyContent = styled.div`
   position: relative;
 `
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New application',

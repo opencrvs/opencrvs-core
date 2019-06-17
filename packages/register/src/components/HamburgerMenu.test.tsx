@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
+import { createTestComponent } from '@register/tests/util'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from '../store'
+import { createStore } from '@register/store'
 
 describe('when user is in the menu page', () => {
   const { store } = createStore()

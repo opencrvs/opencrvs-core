@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
-import { ProfileMenu } from './ProfileMenu'
-import { userDetails } from 'src/tests/util'
+import { createStore } from '@register/store'
+import { createTestComponent, userDetails } from '@register/tests/util'
+import { ProfileMenu } from '@register/components/ProfileMenu'
+
 import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
 
 const { store } = createStore()

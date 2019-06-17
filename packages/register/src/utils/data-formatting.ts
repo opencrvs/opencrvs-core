@@ -1,11 +1,15 @@
 import { GQLHumanName, GQLComment } from '@opencrvs/gateway/src/graphql/schema'
 
-export const createNamesMap = (names: GQLHumanName[]) =>
-  names.filter(Boolean).reduce((prevNamesMap, name) => {
+interface INamesMap {
+  [key: string]: string
+}
+
+export const createNamesMap = (names: GQLHumanName[]): INamesMap =>
+  names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
     if (!name.use) {
-      /* tslint:disable:no-string-literal */
+      /* eslint-disable no-string-literal */
       prevNamesMap['default'] = `${name.firstNames} ${
-        /* tslint:enable:no-string-literal */
+        /* eslint-enable no-string-literal */
         name.familyName
       }`.trim()
       return prevNamesMap
@@ -19,7 +23,7 @@ export const extractCommentFragmentValue = (
   comments: GQLComment[],
   fragmentItem: string
 ): string => {
-  let fragmentValue: string = ''
+  let fragmentValue = ''
 
   for (const comment of comments) {
     if (comment.comment) {

@@ -1,6 +1,6 @@
-import { getLanguage, getMessages } from './selectors'
-import { getInitialState } from '../tests/util'
-import { ENGLISH_STATE } from './locales/en'
+import { getLanguage, getMessages } from '@performance/i18n/selectors'
+import { getInitialState } from '@performance/tests/util'
+import { ENGLISH_STATE } from '@performance/i18n/locales/en'
 
 describe('intl selectors', () => {
   let mockState: any

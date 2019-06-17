@@ -1,10 +1,14 @@
-import { required, IValidationResult } from '../utils/validate'
-import { IFormField, IFormSectionData, IDynamicFormField } from './'
+import { required, IValidationResult } from '@register/utils/validate'
+import {
+  IFormField,
+  IFormSectionData,
+  IDynamicFormField
+} from '@register/forms'
 import {
   getConditionalActionsForField,
   getFieldValidation
 } from '@opencrvs/register/src/forms/utils'
-import { IOfflineDataState } from 'src/offline/reducer'
+import { IOfflineDataState } from '@register/offline/reducer'
 
 export function getValidationErrorsForField(
   field: IFormField,

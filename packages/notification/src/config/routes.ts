@@ -4,12 +4,12 @@ import {
   sendBirthRegistrationConfirmation,
   sendDeathDeclarationConfirmation,
   sendDeathRegistrationConfirmation
-} from 'src/features/sms/handler'
+} from '@notification/features/sms/handler'
 import {
   requestSchema,
   declarationNotificationSchema,
   registrationNotificationSchema
-} from 'src/features/sms/payload-schema'
+} from '@notification/features/sms/payload-schema'
 
 const enum RouteScope {
   DECLARE = 'declare',

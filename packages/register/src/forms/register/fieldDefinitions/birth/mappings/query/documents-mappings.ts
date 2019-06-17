@@ -1,9 +1,9 @@
-import { IFormField, IFormData } from 'src/forms'
-import { attachmentToFieldTransformer } from 'src/forms/mappings/query/field-mappings'
+import { IFormField, IFormData } from '@register/forms'
+import { attachmentToFieldTransformer } from '@register/forms/mappings/query/field-mappings'
 import {
   documentForWhomFhirMapping,
   documentTypeFhirMapping
-} from '../mutation/documents-mappings'
+} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 export function birthAttachmentToFieldTransformer(
   transformedData: IFormData,

@@ -1,10 +1,13 @@
-import { createServer } from '../../..'
-import { readPoints } from '../../../influxdb/client'
+import { createServer } from '@metrics/index'
+import { readPoints } from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
+import { mocked } from 'ts-jest/utils'
+import * as fetchAny from 'jest-fetch-mock'
 
-jest.mock('../../../influxdb/client.ts')
+const fetch = fetchAny as any
+
+jest.mock('@metrics/influxdb/client.ts')
 
 const mockLocation = {
   resourceType: 'Location',
@@ -49,7 +52,7 @@ describe('verify metrics handler', () => {
 
   it('returns ok for valid request', async () => {
     fetch.mockResponse(JSON.stringify(mockLocation))
-    readPoints.mockImplementation(() => {
+    mocked(readPoints).mockImplementation(() => {
       return [
         {
           total: 28334,
@@ -88,7 +91,7 @@ describe('verify metrics handler', () => {
 
   it('returns empty keyfigure if no matching data found', async () => {
     fetch.mockResponse(JSON.stringify(mockLocation))
-    readPoints.mockImplementation(() => {
+    mocked(readPoints).mockImplementation(() => {
       return null
     })
 

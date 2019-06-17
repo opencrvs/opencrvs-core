@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { client } from 'src/utils/apolloClient'
+import { client } from '@performance/utils/apolloClient'
 
 const FETCH_USER = gql`
   query($userId: String!) {

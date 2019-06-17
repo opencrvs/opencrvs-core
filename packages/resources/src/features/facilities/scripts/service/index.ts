@@ -1,7 +1,10 @@
 import { Response } from 'node-fetch'
-import { ORG_URL } from '../../../../constants'
-import { getLocationIDByDescription, sendToFhir } from '../../../utils/bn'
-import { ILocation } from '../../../utils/bn'
+import { ORG_URL } from '@resources/constants'
+import {
+  getLocationIDByDescription,
+  sendToFhir,
+  ILocation
+} from '@resources/features/utils/bn'
 
 interface IDGHSFacility {
   division: string
@@ -84,7 +87,7 @@ export async function composeAndSaveFacilities(
 ): Promise<fhir.Location[]> {
   const locations: fhir.Location[] = []
   for (const facility of facilities) {
-    const parentLocationID = await getLocationIDByDescription(
+    const parentLocationID = getLocationIDByDescription(
       parentLocations,
       facility.A2IReference
     )
@@ -94,9 +97,7 @@ export async function composeAndSaveFacilities(
     )
     // tslint:disable-next-line:no-console
     console.log(
-      `Saving facility ... type: ${facility.facilityTypeEnglish}, name: ${
-        facility.facilityNameEnglish
-      }`
+      `Saving facility ... type: ${facility.facilityTypeEnglish}, name: ${facility.facilityNameEnglish}`
     )
     const savedLocationResponse = (await sendToFhir(
       newLocation,

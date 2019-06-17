@@ -1,9 +1,9 @@
-import { ILocation } from './reducer'
+import { ILocation } from '@register/offline/reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse
-} from 'src/utils/referenceApi'
-import { IUserDetails } from 'src/utils/userUtils'
+} from '@register/utils/referenceApi'
+import { IUserDetails } from '@register/utils/userUtils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {

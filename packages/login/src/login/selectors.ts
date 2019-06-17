@@ -1,5 +1,5 @@
-import { LoginState } from './reducer'
-import { IStoreState } from '../store'
+import { LoginState } from '@login/login/reducer'
+import { IStoreState } from '@login/store'
 const getPartialState = (store: IStoreState): LoginState => store.login
 
 function getKey<K extends keyof LoginState>(store: IStoreState, key: K) {

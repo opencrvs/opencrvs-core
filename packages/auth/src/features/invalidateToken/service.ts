@@ -1,8 +1,8 @@
-import { setex } from 'src/database'
+import { setex } from '@auth/database'
 import {
   INVALID_TOKEN_NAMESPACE,
   CONFIG_TOKEN_EXPIRY_SECONDS
-} from 'src/constants'
+} from '@auth/constants'
 
 export async function invalidateToken(token: string) {
   return setex(

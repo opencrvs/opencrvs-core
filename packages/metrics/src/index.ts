@@ -8,12 +8,16 @@ import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from './constants'
-import getPlugins from './config/plugins'
-import { getRoutes } from './config/routes'
+} from '@metrics/constants'
+import getPlugins from '@metrics/config/plugins'
+import { getRoutes } from '@metrics/config/routes'
 import { readFileSync } from 'fs'
-import { influx } from './influxdb/client'
-import { INFLUX_DB, INFLUX_HOST, INFLUX_PORT } from './influxdb/constants'
+import { influx } from '@metrics/influxdb/client'
+import {
+  INFLUX_DB,
+  INFLUX_HOST,
+  INFLUX_PORT
+} from '@metrics/influxdb/constants'
 import { validateFunc } from '@opencrvs/commons'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -59,7 +63,7 @@ export async function createServer() {
         server.log('info', `Metrics server started on ${HOST}:${PORT}`)
       })
       .catch((err: Error) => {
-        console.error(`Error creating Influx database! ${err.stack}`)
+        server.log('info', `Error creating Influx database! ${err.stack}`)
       })
   }
 

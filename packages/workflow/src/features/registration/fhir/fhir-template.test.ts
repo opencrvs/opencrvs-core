@@ -1,12 +1,18 @@
-import * as fetch from 'jest-fetch-mock'
 import {
   selectOrCreateTaskRefResource,
   findPersonEntry,
   getTaskResource
-} from './fhir-template'
-import { OPENCRVS_SPECIFICATION_URL, MOTHER_SECTION_CODE } from './constants'
-import { testFhirBundle } from 'src/test/utils'
+} from '@workflow/features/registration/fhir/fhir-template'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  MOTHER_SECTION_CODE
+} from '@workflow/features/registration/fhir/constants'
+import { testFhirBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify fhir templates', () => {
   describe('SelectOrCreateTaskRefResource', () => {
@@ -50,6 +56,7 @@ describe('Verify fhir templates', () => {
       expect(taskResource).toEqual({
         resourceType: 'Task',
         status: 'requested',
+        intent: '',
         focus: {
           reference: 'urn:uuid:888'
         },
@@ -162,13 +169,26 @@ describe('Verify fhir templates', () => {
     })
     it('throws error for invalid section reference on composite entry', async () => {
       const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[0].resource.section[1].entry[0].reference =
-        'INVALID_REF_MOTHER_ENTRY'
-      await expect(
-        findPersonEntry(MOTHER_SECTION_CODE, fhirBundle)
-      ).rejects.toThrow(
-        'Patient referenced from composition section not found in FHIR bundle'
-      )
+      if (
+        fhirBundle.entry &&
+        fhirBundle.entry[0] &&
+        fhirBundle.entry[0].resource &&
+        fhirBundle.entry[0].resource.section &&
+        fhirBundle.entry[0].resource.section[1] &&
+        fhirBundle.entry[0].resource.section[1].entry &&
+        fhirBundle.entry[0].resource.section[1].entry[0] &&
+        fhirBundle.entry[0].resource.section[1].entry[0].reference
+      ) {
+        fhirBundle.entry[0].resource.section[1].entry[0].reference =
+          'INVALID_REF_MOTHER_ENTRY'
+        await expect(
+          findPersonEntry(MOTHER_SECTION_CODE, fhirBundle)
+        ).rejects.toThrow(
+          'Patient referenced from composition section not found in FHIR bundle'
+        )
+      } else {
+        throw new Error('Failed')
+      }
     })
   })
   describe('getTaskResource', () => {
@@ -186,17 +206,26 @@ describe('Verify fhir templates', () => {
       const taskResourse = getTaskResource(payload)
 
       expect(taskResourse).toBeDefined()
-      expect(taskResourse).toEqual(testFhirBundle.entry[1].resource)
+      if (
+        testFhirBundle &&
+        testFhirBundle.entry &&
+        testFhirBundle.entry[1] &&
+        testFhirBundle.entry[1].resource
+      ) {
+        expect(taskResourse).toEqual(testFhirBundle.entry[1].resource)
+      } else {
+        throw new Error('Failed')
+      }
     })
     it('throws error if provided document type is not FhirBundle or FhirBundleTaskEntry ', () => {
       const fhirBundle = cloneDeep(testFhirBundle)
-      fhirBundle.entry[0].resource.resourceType = undefined
+      fhirBundle.entry[0].resource.resourceType = ''
       expect(() => getTaskResource(fhirBundle)).toThrowError(
         'Unable to find Task Bundle from the provided data'
       )
     })
     it('throws error if invalid document is sent', () => {
-      expect(() => getTaskResource(undefined)).toThrowError(
+      expect(() => getTaskResource({ type: '' })).toThrowError(
         'Invalid FHIR bundle found'
       )
     })
