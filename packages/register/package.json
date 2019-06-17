@@ -66,7 +66,6 @@
     "test": "PORT=3000 craco test --silent --noStackTrace --env=jsdom --modulePaths=src/ && yarn test:compilation",
     "test:watch": "PORT=3000 craco test --env=jsdom --modulePaths=src/ --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "eject": "craco eject",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
