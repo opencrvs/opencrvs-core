@@ -16,12 +16,16 @@ describe('fhir utils', () => {
       expect(mockComposition.relatesTo[2].targetReference
         .reference as string).toEqual('Composition/123')
       expect(mockComposition.relatesTo.length).toEqual(3)
+    } else {
+      jest.fail()
     }
   })
   it('should not add duplicates to relatesTo property if already exists as duplicate', () => {
     createDuplicatesTemplate(['123'], mockComposition)
     if (mockComposition.relatesTo) {
       expect(mockComposition.relatesTo.length).toEqual(3)
+    } else {
+      jest.fail()
     }
   })
 })

@@ -34,6 +34,7 @@ export async function modifyRegistrationBundle(
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
+    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
@@ -173,6 +174,7 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
+    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
 

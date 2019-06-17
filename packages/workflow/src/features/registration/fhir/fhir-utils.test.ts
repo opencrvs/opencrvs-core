@@ -46,6 +46,8 @@ describe('Verify getSharedContactMsisdn', () => {
     ) {
       fhirBundle.entry[1].resource.extension[1].url = 'INVALID'
       expect(await getSharedContactMsisdn(fhirBundle)).toEqual(false)
+    } else {
+      jest.fail()
     }
   })
 })
@@ -88,6 +90,8 @@ describe('Verify getTrackingId', () => {
     if (trackingid) {
       expect(trackingid).toMatch(/^B/)
       expect(trackingid.length).toBe(7)
+    } else {
+      jest.fail()
     }
   })
 
@@ -239,6 +243,8 @@ describe('Verify getBirthRegistrationNumber', () => {
           `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
         )
       )
+    } else {
+      jest.fail()
     }
   })
 

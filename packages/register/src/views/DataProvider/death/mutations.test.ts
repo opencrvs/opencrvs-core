@@ -7,6 +7,8 @@ describe('When calling getDeathQueryMappings', () => {
     expect(query).not.toBe(null)
     if (query && query.dataKey) {
       expect(query.dataKey).toEqual('markDeathAsCertified')
+    } else {
+      jest.fail()
     }
   })
 

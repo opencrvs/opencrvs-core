@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/resources",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "description": "OpenCRVS resources for reference data",
   "scripts": {
     "test:watch": "jest --watch",
@@ -57,7 +57,7 @@
     "typestyle": "^1.3.7"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.6",
+    "@opencrvs/commons": "^1.0.0-alpha.1.0",
     "@types/chalk": "^2.2.0",
     "@types/hapi": "^17.8.2",
     "@types/hapi-auth-jwt2": "8.0.1",

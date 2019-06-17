@@ -10,6 +10,8 @@ describe('When calling getDeathQueryMappings', () => {
     expect(query).not.toBe(null)
     if (query && query.query) {
       expect(query.query).toEqual(GET_DEATH_REGISTRATION_FOR_CERTIFICATION)
+    } else {
+      jest.fail()
     }
   })
 

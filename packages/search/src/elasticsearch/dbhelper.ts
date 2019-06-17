@@ -40,32 +40,35 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
 }
 
 export const searchComposition = async (body: ICompositionBody) => {
-  let response: any
   try {
-    response = client.search({
+    const response = client.search({
       index: 'ocrvs',
       type: 'compositions',
       body: {
         query: buildQuery(body)
       }
     })
-  } catch (e) {
-    logger.error(`searchComposition: error: ${e}`)
+    return response
+  } catch (err) {
+    return null
   }
-  return response
 }
 
 export const searchByCompositionId = async (compositionId: string) => {
-  const response = await client.search({
-    index: 'ocrvs',
-    type: 'compositions',
-    body: {
-      query: {
-        match: {
-          _id: compositionId
+  try {
+    const response = await client.search({
+      index: 'ocrvs',
+      type: 'compositions',
+      body: {
+        query: {
+          match: {
+            _id: compositionId
+          }
         }
       }
-    }
-  })
-  return response
+    })
+    return response
+  } catch (err) {
+    return null
+  }
 }

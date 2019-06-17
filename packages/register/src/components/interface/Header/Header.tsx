@@ -201,7 +201,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     const { userDetails, language, intl } = this.props
 
     let name = ''
-    if (userDetails && userDetails.name && userDetails.name) {
+    if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName | null) => {
           const name = storedName as GQLHumanName

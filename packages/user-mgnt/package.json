@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/user-mgnt",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "description": "OpenCRVS user management service",
   "main": "src/index.js",
   "license": "NONE",
@@ -16,7 +16,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.6",
+    "@opencrvs/commons": "^1.0.0-alpha.1.0",
     "@types/boom": "^7.2.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",

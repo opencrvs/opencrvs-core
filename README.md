@@ -130,7 +130,7 @@ All hotfixes that are done for that release should be submitted in a PR against 
 1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `register` depend on `components`, so update the dependency: Do a find and replace for `1.0.0-alpha.2` and replace with `1.0.0-alpha.3`
 2. Run `yarn` to ensure there are no version errors.
 3. Run `yarn test` and ensure all passed.
-4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.6`
+4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.1.0`
 5. Run `git push origin v<version_number>`
 6. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
 7. Dockerhub should automatically build the images when a new release tag is created in Git. Howver Dockerhub can sometimes timeout and you may need to compose and push the release tagged images locally. To do that, run `yarn compose:push:release`

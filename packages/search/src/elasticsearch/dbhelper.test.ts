@@ -58,6 +58,8 @@ describe('elasticsearch db helper', async () => {
         searchSpy.mock.calls[0][0]
       ) {
         expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
+      } else {
+        jest.fail()
       }
       expect(searchSpy).toBeCalled()
     })

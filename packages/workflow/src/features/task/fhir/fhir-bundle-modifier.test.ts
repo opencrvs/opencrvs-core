@@ -59,6 +59,8 @@ describe('Verify handler', () => {
           'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
         )
       }
+    } else {
+      jest.fail()
     }
   })
 })

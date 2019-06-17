@@ -143,6 +143,8 @@ describe('Verify generateBirthRegistrationNumber', () => {
           `^${new Date().getFullYear()}103421${birthTrackingId}${brnChecksum}`
         )
       )
+    } else {
+      jest.fail()
     }
   })
   it('Throws error for default BRN generator', async () => {
@@ -156,6 +158,8 @@ describe('Verify generateBirthRegistrationNumber', () => {
       expect(
         generateRegistrationNumber(testTask, practitioner, 'default')
       ).rejects.toThrowError('Default BRN generator has not been impleted yet')
+    } else {
+      jest.fail()
     }
   })
 })

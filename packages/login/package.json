@@ -1,10 +1,10 @@
 {
   "name": "@opencrvs/login",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^5.2.1",
-    "@opencrvs/components": "^1.0.0-alpha.6",
+    "@opencrvs/components": "^1.0.0-alpha.1.0",
     "@sentry/browser": "^4.6.3",
     "@types/history": "^4.6.2",
     "@types/react-intl": "^2.3.8",

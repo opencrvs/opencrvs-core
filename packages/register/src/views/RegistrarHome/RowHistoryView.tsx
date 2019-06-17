@@ -106,7 +106,7 @@ const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
-  margin-top: 100px;
+  margin: 25px;
 `
 
 function LabelValue({ label, value }: { label: string; value: string }) {

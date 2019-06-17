@@ -52,6 +52,10 @@ jobs:
     - stage: integration tests on staging
       if: branch = master AND type = push
       install: skip
+      addons:
+        apt:
+          packages:
+          - libgconf-2-4
       script: cd packages/e2e && yarn && yarn start --record false
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
