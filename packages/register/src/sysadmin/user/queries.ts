@@ -12,6 +12,7 @@ export const SEARCH_USERS = gql`
           familyName
         }
         role
+        type
         active
       }
     }

@@ -98,7 +98,7 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
         photo: <AvatarSmall />,
         name,
         role: UserRole[user.role as string] || 'Unknown',
-        type: '',
+        type: user.type || 'Unknown',
         status: <Status status={status} />,
         menu: <VerticalThreeDots />
       }
