@@ -317,6 +317,7 @@ export interface GQLUser {
   username?: string
   mobile?: string
   role?: string
+  type?: string
   email?: string
   status?: string
   primaryOffice?: GQLLocation
@@ -1888,6 +1889,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
   role?: UserToRoleResolver<TParent>
+  type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
@@ -1919,6 +1921,10 @@ export interface UserToMobileResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToRoleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

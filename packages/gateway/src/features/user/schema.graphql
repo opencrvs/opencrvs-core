@@ -28,6 +28,7 @@ type User {
   username: String
   mobile: String
   role: String
+  type: String
   email: String
   status: String
   primaryOffice: Location

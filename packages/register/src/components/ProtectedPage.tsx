@@ -6,12 +6,14 @@ import { storage } from 'src/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from 'src/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-
+import { USER_DETAILS } from 'src/utils/userUtils'
+import { UserSetupPage } from 'src/views/UserSetup/UserSetupPage'
 export const SCREEN_LOCK = 'screenLock'
 
 interface IProtectPageState {
   secured: boolean
   pinExists: boolean
+  pendingUser: boolean
 }
 class ProtectedPageComponent extends React.Component<
   RouteComponentProps<{}>,
@@ -21,7 +23,8 @@ class ProtectedPageComponent extends React.Component<
     super(props)
     this.state = {
       secured: true,
-      pinExists: true
+      pinExists: true,
+      pendingUser: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -39,6 +42,12 @@ class ProtectedPageComponent extends React.Component<
       newState.pinExists = true
     } else {
       newState.pinExists = false
+    }
+    const userDetails = JSON.parse(
+      (await storage.getItem(USER_DETAILS)) || '{}'
+    )
+    if (userDetails && userDetails.status && userDetails.status === 'pending') {
+      newState.pendingUser = true
     }
     this.setState(newState)
   }
@@ -71,8 +80,9 @@ class ProtectedPageComponent extends React.Component<
   }
 
   render() {
-    const { secured, pinExists } = this.state
+    const { pendingUser, secured, pinExists } = this.state
     return (
+      (pendingUser && <UserSetupPage />) ||
       (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
       (isMobileDevice() && (
         <PageVisibility onChange={this.handleVisibilityChange}>

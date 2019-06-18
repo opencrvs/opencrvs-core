@@ -44,6 +44,7 @@ import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 import * as Sentry from '@sentry/browser'
 import { REJECTED, REJECT_REASON, REJECT_COMMENTS } from 'src/utils/constants'
 import { ITheme } from '@opencrvs/components/lib/theme'
+import { roleMessages } from 'src/utils/roleTypeMessages'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px;
@@ -172,36 +173,6 @@ const messages = defineMessages({
     defaultMessage: 'Application submitted on',
     description:
       'Label for the workflow timestamp when the status is application'
-  },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
   },
   update: {
     id: 'register.workQueue.list.buttons.update',
@@ -379,7 +350,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             new Date(draft.modifiedOn).toString(),
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
-                  messages[userDetails.role as string]
+                  roleMessages[userDetails.role as string]
                 )
               : '',
             (userDetails &&
@@ -397,7 +368,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           (draft.savedOn && new Date(draft.savedOn).toString()) || '',
           userDetails && userDetails.role
             ? this.props.intl.formatMessage(
-                messages[userDetails.role as string]
+                roleMessages[userDetails.role as string]
               )
             : '',
           (userDetails &&
@@ -465,7 +436,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             (status && status.timestamp) || '',
             status && status.user && status.user.role
               ? this.props.intl.formatMessage(
-                  messages[status.user.role as string]
+                  roleMessages[status.user.role as string]
                 )
               : '',
             this.props.language === 'en'

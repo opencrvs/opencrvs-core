@@ -22,6 +22,8 @@ export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
   role?: string
+  type?: string
+  status?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
@@ -34,6 +36,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     primaryOffice,
     name,
     role,
+    type,
+    status,
     userMgntUserID,
     practitionerId
   } = user
@@ -51,6 +55,12 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   }
   if (role) {
     userDetails.role = role
+  }
+  if (type) {
+    userDetails.type = type
+  }
+  if (status) {
+    userDetails.status = status
   }
   if (primaryOffice) {
     userDetails.primaryOffice = {
