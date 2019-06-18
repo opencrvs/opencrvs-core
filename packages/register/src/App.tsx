@@ -33,6 +33,7 @@ import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
+import { SecurityQuestion } from './views/SecurityQuestion/SecurityQuestionView'
 
 interface IAppProps {
   client?: ApolloClient<{}>
