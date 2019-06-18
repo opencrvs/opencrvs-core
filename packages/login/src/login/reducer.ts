@@ -3,7 +3,6 @@ import { push } from 'react-router-redux'
 import * as actions from './actions'
 import { authApi } from '../utils/authApi'
 import * as routes from '../navigation/routes'
-import { ITokenPayload, getTokenPayload } from '../utils/authUtils'
 import { REGISTER_APP } from '../navigation/routes'
 
 export type LoginState = {
@@ -67,7 +66,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
       return loop(
         {
           ...state,
-          submitting: false,
+          submitting: action.payload.token ? true : false,
           submissionError: false,
           resentSMS: false,
           authenticationDetails: {
@@ -130,37 +129,20 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.VERIFY_CODE_FAILED:
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
-      const decoded: ITokenPayload = getTokenPayload(
-        action.payload.token
-      ) as ITokenPayload
-      const isPerformanceUser = decoded.scope.indexOf('performance') > -1
-      if (isPerformanceUser) {
-        return loop(
-          {
-            ...state,
-            stepSubmitting: false,
-            submissionError: false,
-            resentSMS: false,
-            token: action.payload.token
-          },
-          Cmd.action(push(routes.MANAGER))
-        )
-      } else {
-        return loop(
-          {
-            ...state,
-            stepSubmitting: false,
-            submissionError: false,
-            resentSMS: false,
-            token: action.payload.token
-          },
-          Cmd.run(() => {
-            window.location.assign(
-              `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
-            )
-          })
-        )
-      }
+      return loop(
+        {
+          ...state,
+          stepSubmitting: false,
+          submissionError: false,
+          resentSMS: false,
+          token: action.payload.token
+        },
+        Cmd.run(() => {
+          window.location.assign(
+            `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
+          )
+        })
+      )
     case actions.GOTO_APP:
       let redirectUrl: string
       if (action.payload === REGISTER_APP) {

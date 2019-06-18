@@ -8,11 +8,10 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 import { IntlContainer } from './i18n/components/I18nContainer'
 import { createStore, history } from './store'
-import { PageContainer, DarkPageContainer } from './common/PageContainer'
+import { DarkPageContainer } from './common/PageContainer'
 import * as routes from './navigation/routes'
 import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from './views/StepOne/StepOneContainer'
-import { ManagerViewContainer } from './views/Manager/ManagerView'
 import { ErrorBoundary } from './ErrorBoundary'
 
 export const store = createStore()
@@ -31,23 +30,16 @@ export class App extends React.Component {
               )}
             >
               <ConnectedRouter history={history}>
-                <Switch>
-                  <Route exact path={routes.STEP_ONE}>
-                    <DarkPageContainer>
+                <DarkPageContainer>
+                  <Switch>
+                    <Route exact path={routes.STEP_ONE}>
                       <StepOneContainer />
-                    </DarkPageContainer>
-                  </Route>
-                  <Route exact path={routes.STEP_TWO}>
-                    <DarkPageContainer>
+                    </Route>
+                    <Route exact path={routes.STEP_TWO}>
                       <StepTwoContainer />
-                    </DarkPageContainer>
-                  </Route>
-                  <Route exact path={routes.MANAGER}>
-                    <PageContainer>
-                      <ManagerViewContainer />
-                    </PageContainer>
-                  </Route>
-                </Switch>
+                    </Route>
+                  </Switch>
+                </DarkPageContainer>
               </ConnectedRouter>
             </ThemeProvider>
           </IntlContainer>
