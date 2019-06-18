@@ -44,7 +44,7 @@ import {
   FooterAction,
   FooterPrimaryButton,
   ViewFooter
-} from 'src/components/interface/footer'
+} from '@register/components/interface/footer'
 import { StickyFormTabs } from '@register/views/RegisterForm/StickyFormTabs'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
@@ -560,9 +560,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         {intl.formatMessage(activeSection.title)}
                         {activeSection.optional && (
                           <Optional
-                            id={`form_section_optional_label_${
-                              activeSection.id
-                            }`}
+                            id={`form_section_opt_label_${activeSection.id}`}
                             disabled={activeSection.disabled}
                           >
                             &nbsp;&nbsp;•&nbsp;

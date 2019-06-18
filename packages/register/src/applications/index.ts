@@ -1,8 +1,8 @@
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 // import { Action as NavigationAction, GO_TO_TAB } from 'src/navigation'
-import { storage } from 'src/storage'
+import { storage } from '@register/storage'
 import { v4 as uuid } from 'uuid'
-import { Event, IFormData, IFormFieldValue } from '../forms'
+import { Event, IFormData, IFormFieldValue } from '@register/forms'
 import { GO_TO_TAB, Action as NavigationAction } from '@register/navigation'
 import { IUserDetails } from '@register/utils/userUtils'
 

@@ -9,7 +9,11 @@ import { getRejectForm } from '@opencrvs/register/src/review/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { IApplication, IPayload, SUBMISSION_STATUS } from 'src/applications'
+import {
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS
+} from '@register/applications'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { goToSearchResult } from '@register/navigation'
 
