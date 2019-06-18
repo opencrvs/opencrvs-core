@@ -309,7 +309,6 @@ type State = {
   showRegisterModal: boolean
   isDataAltered: boolean
   rejectFormOpen: boolean
-  selectedTabId: string
   hasError: boolean
 }
 const VIEW_TYPE = {
@@ -353,7 +352,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     super(props)
     this.state = {
       showSubmitModal: false,
-      selectedTabId: '',
       isDataAltered: false,
       rejectFormOpen: false,
       showRegisterModal: false,

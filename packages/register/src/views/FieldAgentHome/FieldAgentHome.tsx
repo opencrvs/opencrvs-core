@@ -14,7 +14,6 @@ import {
 import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
-  goToPage as goToPageAction,
   goToApplicationDetails
 } from '@register/navigation'
 import { IUserDetails, getUserLocation } from '@register/utils/userUtils'
@@ -192,7 +191,6 @@ interface IBaseFieldAgentHomeProps {
   userDetails: IUserDetails | null
   tabId: string
   draftApplications: IApplication[]
-  goToPage: typeof goToPageAction
   goToEvents: typeof goToEventsAction
   draftCount: string
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
@@ -560,7 +558,6 @@ const mapStateToProps = (
 export const FieldAgentHome = connect(
   mapStateToProps,
   {
-    goToPage: goToPageAction,
     goToEvents: goToEventsAction,
     goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
     goToApplicationDetails
