@@ -14,11 +14,12 @@ import * as Sentry from '@sentry/browser'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { SEARCH_USERS } from 'src/sysadmin/user/queries'
-import styled from 'src/styled-components'
-import { LANG_EN } from 'src/utils/constants'
-import { createNamesMap } from 'src/utils/data-formatting'
+import { SEARCH_USERS } from '@register/sysadmin/user/queries'
+import { LANG_EN } from '@register/utils/constants'
+import { createNamesMap } from '@register/utils/data-formatting'
 import { messages, UserRole, UserStatus } from './utils'
+import styled from 'styled-components'
+import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 
 const UserTable = styled.div`
   margin-top: 30px;
@@ -84,23 +85,25 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
       return []
     }
 
-    return data.searchUsers.results.map((user: GQLUser) => {
-      const name =
-        (createNamesMap(user && (user.name as GQLHumanName[]))[
-          this.props.intl.locale
-        ] as string) ||
-        (createNamesMap(user && (user.name as GQLHumanName[]))[
-          LANG_EN
-        ] as string)
-      const status = user.active ? 'Active' : 'Pending'
+    return data.searchUsers.results.map((user: GQLUser | null) => {
+      if (user !== null) {
+        const name =
+          (createNamesMap(user && (user.name as GQLHumanName[]))[
+            this.props.intl.locale
+          ] as string) ||
+          (createNamesMap(user && (user.name as GQLHumanName[]))[
+            LANG_EN
+          ] as string)
+        const status = user.active ? 'Active' : 'Pending'
 
-      return {
-        photo: <AvatarSmall />,
-        name,
-        role: UserRole[user.role as string] || 'Unknown',
-        type: user.type || 'Unknown',
-        status: <Status status={status} />,
-        menu: <VerticalThreeDots />
+        return {
+          photo: <AvatarSmall />,
+          name,
+          role: UserRole[user.role as any] || 'Unknown',
+          type: user.type || 'Unknown',
+          status: <Status status={status} />,
+          menu: <VerticalThreeDots />
+        }
       }
     })
   }
@@ -152,7 +155,7 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
           skip: (this.state.usersPageNo - 1) * this.pageSize
         }}
       >
-        {({ error, data }) => {
+        {({ error, data }: { error?: any; data: any }) => {
           if (error) {
             Sentry.captureException(error)
             return (
@@ -172,7 +175,7 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
                   <AddUser />
                 </TableHeader>
                 <ListTable
-                  content={this.generateUserContents(data)}
+                  content={this.generateUserContents(data) as IDynamicValues[]}
                   columns={columns}
                   noResultText="No result to display"
                   onPageChange={(currentPage: number) => {
