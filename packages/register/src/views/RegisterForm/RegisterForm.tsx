@@ -29,10 +29,7 @@ import {
   Event,
   Action
 } from '@register/forms'
-import {
-  FormFieldGenerator,
-  ViewHeaderWithTabs
-} from '@register/components/form'
+import { FormFieldGenerator } from '@register/components/form'
 import { IStoreState } from '@register/store'
 import {
   deleteApplication,
@@ -45,7 +42,6 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from '@register/components/interface/footer'
-import { StickyFormTabs } from '@register/views/RegisterForm/StickyFormTabs'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import { getOfflineState } from '@register/offline/selectors'
@@ -63,6 +59,7 @@ import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
+import { ViewHeader } from '@register/components/ViewHeader'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -629,12 +626,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ? messages.previewEventRegistration
       : messages.newVitalEventRegistration
     const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
-    const sectionForReview = isReviewForm
-      ? this.generateSectionListForReview(
-          isReviewSection,
-          registerForm.sections
-        )
-      : registerForm.sections
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -648,23 +639,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
         {!isErrorOccured && (
           <>
-            <ViewHeaderWithTabs
+            <ViewHeader
               id="informant_parent_view"
               title={intl.formatMessage(title, { event: application.event })}
-            >
-              <StickyFormTabs
-                sections={sectionForReview}
-                activeTabId={activeSection.id}
-                onTabClick={(tabId: string) =>
-                  goToTab(
-                    this.props.tabRoute,
-                    application.id,
-                    tabId,
-                    application.event.toLowerCase()
-                  )
-                }
-              />
-            </ViewHeaderWithTabs>
+            ></ViewHeader>
             <FormContainer>
               <BodyContent>
                 <Swipeable
