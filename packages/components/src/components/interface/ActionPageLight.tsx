@@ -43,6 +43,24 @@ const BackButtonText = styled.span`
 const MenuTitle = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
+
+const Container = styled.div`
+  ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.shadows.mistyShadow};
+  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.white};
+  padding: 24px 32px;
+  margin: 36px auto 0;
+  max-width: 940px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 0;
+    padding: 24px;
+    width: 100%;
+    min-height: 100vh;
+    margin-top: 0;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+`
 interface IProps {
   title?: string
   backLabel?: string
@@ -68,7 +86,7 @@ export class ActionPageLight extends React.Component<
             {title && <MenuTitle>{title}</MenuTitle>}
           </BodyContent>
         </HeaderContainer>
-        {this.props.children}
+        <Container>{this.props.children}</Container>
       </ActionContainer>
     )
   }
