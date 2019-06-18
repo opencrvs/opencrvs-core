@@ -298,7 +298,7 @@ class FieldAgentHomeView extends React.Component<
       applicationsReadyToSend,
       theme
     } = this.props
-    const tabId = match.params.tabId || TAB_ID.inProgress
+    const tabId = match.params.tabId || TAB_ID.sentForReview
     const fieldAgentLocation =
       userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
     let parentQueryLoading = false
