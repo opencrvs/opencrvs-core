@@ -95,7 +95,7 @@ export class UserSetupView extends React.Component<
           </LogoContainer>
           <TitleHolder>{intl.formatMessage(messages.welcomeTitle)}</TitleHolder>
           <InfoHolder>
-            <NameHolder>
+            <NameHolder id="user-setup-name-holder">
               {(userDetails &&
                 userDetails.name &&
                 (createNamesMap(userDetails.name as GQLHumanName[])[
@@ -103,7 +103,7 @@ export class UserSetupView extends React.Component<
                 ] as string)) ||
                 ''}
             </NameHolder>
-            <RoleHolder>
+            <RoleHolder id="user-setup-role-holder">
               {(userDetails &&
                 (userDetails.type
                   ? `${intl.formatMessage(
@@ -120,7 +120,7 @@ export class UserSetupView extends React.Component<
           <InstructionHolder>
             {intl.formatMessage(messages.instruction)}
           </InstructionHolder>
-          <NextButton id="start_button">
+          <NextButton id="user-setup-start-button">
             {intl.formatMessage(messages.startButtonLabel)}
           </NextButton>
         </Container>
