@@ -172,9 +172,9 @@ export function goToSettings() {
 }
 
 export function goToPage(
-  tabRoute: string,
+  pageRoute: string,
   applicationId: string,
-  tabId: string,
+  pageId: string,
   event: string,
   fieldNameHash?: string,
   historyState?: IDynamicValues
@@ -183,10 +183,10 @@ export function goToPage(
     type: GO_TO_TAB,
     payload: {
       applicationId,
-      tabId,
+      pageId,
       event,
       fieldNameHash,
-      tabRoute,
+      pageRoute,
       historyState
     }
   }
@@ -200,18 +200,18 @@ export function navigationReducer(state: INavigationState, action: any) {
       const {
         fieldNameHash,
         applicationId,
-        tabId,
+        pageId,
         event,
-        tabRoute,
+        pageRoute,
         historyState
       } = action.payload
       return loop(
         state,
         Cmd.action(
           push(
-            formatUrl(tabRoute, {
+            formatUrl(pageRoute, {
               applicationId: applicationId.toString(),
-              tabId,
+              pageId,
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState

@@ -243,8 +243,8 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
-  return viewParams.tabId || form.sections[0].id
+function getActiveSectionId(form: IForm, viewParams: { pageId?: string }) {
+  return viewParams.pageId || form.sections[0].id
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
@@ -300,7 +300,7 @@ export type FullProps = IFormProps &
   Props &
   DispatchProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
-    tabId: string
+    pageId: string
     applicationId: string
   }>
 
@@ -885,7 +885,7 @@ function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
     Props &
-    RouteComponentProps<{ tabId: string; applicationId: string }>
+    RouteComponentProps<{ pageId: string; applicationId: string }>
 ) {
   const { match, registerForm, application } = props
 
@@ -896,7 +896,7 @@ function mapStateToProps(
   )
 
   if (!activeSection) {
-    throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
+    throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
 
   if (!application) {
