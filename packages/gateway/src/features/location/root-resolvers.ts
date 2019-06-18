@@ -1,6 +1,6 @@
-import { FHIR_URL } from 'src/constants'
-import { GQLResolver } from 'src/graphql/schema'
-import { fetchFHIR } from 'src/features/fhir/utils'
+import { FHIR_URL } from '@gateway/constants'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 export const resolvers: GQLResolver = {
   Query: {

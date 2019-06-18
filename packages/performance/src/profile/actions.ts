@@ -1,6 +1,6 @@
 import { RouterAction } from 'react-router-redux'
-import { IURLParams } from '../utils/authUtils'
-import { IUserDetails } from '../utils/userUtils'
+import { IURLParams } from '@performance/utils/authUtils'
+import { IUserDetails } from '@performance/utils/userUtils'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 export const SET_INITIAL_USER_DETAILS = 'PROFILE/SET_INITIAL_USER_DETAILS'

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from 'src/store'
+import { IStoreState } from '@register/store'
 
 const ErrorContainer = styled.div`
   display: flex;
@@ -33,7 +33,9 @@ const GoToHomepage = styled(Button)`
   margin-top: 60px;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   errorCodeUnauthorized: {
     id: 'error.code',
     defaultMessage: '401',
@@ -68,10 +70,14 @@ const messages = defineMessages({
 
 type IFullProps = InjectedIntlProps
 
+interface IErrorInfo extends React.ErrorInfo {
+  [key: string]: string
+}
+
 class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   state = { error: null, authError: false }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: IErrorInfo) {
     this.setState({ error, authError: error.message === '401' })
 
     Sentry.withScope(scope => {
@@ -86,8 +92,8 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
     const { intl } = this.props
     if (this.state.error) {
       if (
-        location.hostname !== 'localhost' &&
-        location.hostname !== '127.0.0.1'
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1'
       ) {
         Sentry.showReportDialog()
       }
@@ -109,7 +115,10 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
           <ErrorMessage>
             {intl.formatMessage(messages.errorDescription2)}
           </ErrorMessage>
-          <GoToHomepage id="GoToHomepage" onClick={() => (location.href = '/')}>
+          <GoToHomepage
+            id="GoToHomepage"
+            onClick={() => (window.location.href = '/')}
+          >
             {intl.formatMessage(messages.goToHomepage)}
           </GoToHomepage>
         </ErrorContainer>

@@ -1,6 +1,5 @@
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -12,20 +11,20 @@ import {
   Spinner,
   TopBar
 } from '@opencrvs/components/lib/interface'
-import { IUserDetails, getUserLocation } from '../../utils/userUtils'
-
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { Header } from 'src/components/interface/Header/Header'
 import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
   goToTab as goToTabAction,
   goToApplicationDetails
-} from 'src/navigation'
+} from '@register/navigation'
+import { IUserDetails, getUserLocation } from '@register/utils/userUtils'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { Header } from '@register/components/interface/Header/Header'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
   FIELD_AGENT_HOME_TAB_IN_PROGRESS,
-  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
+  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
   LANG_EN,
   EMPTY_STRING,
   APPLICATION_DATE_FORMAT,
@@ -33,9 +32,11 @@ import {
   FIELD_AGENT_ROLES,
   SYS_ADMIN_ROLES,
   REGISTRAR_ROLES
-} from 'src/utils/constants'
-import { InProgress } from './InProgress'
-import styled, { withTheme } from 'styled-components'
+} from '@register/utils/constants'
+import styled, { withTheme } from '@register/styledComponents'
+import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@register/navigation/routes'
+import { SentForReview } from '@register/views/FieldAgentHome/SentForReview'
+import { InProgress } from '@register/views/FieldAgentHome/InProgress'
 import {
   Button,
   ICON_ALIGNMENT,
@@ -48,15 +49,12 @@ import {
   PlusTransparentWhite,
   ApplicationsOrangeAmber
 } from '@opencrvs/components/lib/icons'
-import { REGISTRAR_HOME, SYS_ADMIN_HOME } from 'src/navigation/routes'
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
-import { SentForReview } from './SentForReview'
 import { Query } from 'react-apollo'
 import {
   SEARCH_APPLICATIONS_USER_WISE,
   COUNT_USER_WISE_APPLICATIONS
-} from 'src/search/queries'
-import { EVENT_STATUS } from '../RegistrarHome/RegistrarHome'
+} from '@register/search/queries'
+import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
 import * as Sentry from '@sentry/browser'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { BodyContent } from '@opencrvs/components/lib/layout'
@@ -67,8 +65,8 @@ import {
   GQLHumanName,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { createNamesMap } from 'src/utils/data-formatting'
-import * as moment from 'moment'
+import { createNamesMap } from '@register/utils/data-formatting'
+import moment from 'moment'
 
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
@@ -120,16 +118,18 @@ const ZeroUpdatesContainer = styled.div`
 `
 const ZeroUpdatesText = styled.span`
   padding-top: 10px;
-  color: ${({ theme }) => theme.colors.blackStormy};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h4Style};
 `
 
 const AllUpdatesText = styled.span`
-  color: ${({ theme }) => theme.colors.blackStormy};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   inProgress: {
     id: 'register.fieldAgentHome.inProgress',
     defaultMessage: 'In progress ({total})',
@@ -189,7 +189,7 @@ const messages = defineMessages({
 interface IBaseFieldAgentHomeProps {
   theme: ITheme
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   tabId: string
   draftApplications: IApplication[]
   goToTab: typeof goToTabAction
@@ -246,9 +246,13 @@ class FieldAgentHomeView extends React.Component<
       return []
     }
 
-    return data.searchEvents.results.map((reg: GQLEventSearchSet) => {
+    return data.searchEvents.results.map((reg: GQLEventSearchSet | null) => {
+      const registrationSearchSet = reg as GQLEventSearchSet
       let names
-      if (reg.registration && reg.type === 'Birth') {
+      if (
+        registrationSearchSet.registration &&
+        registrationSearchSet.type === 'Birth'
+      ) {
         const birthReg = reg as GQLBirthEventSearchSet
         names = birthReg && (birthReg.childName as GQLHumanName[])
       } else {
@@ -257,30 +261,28 @@ class FieldAgentHomeView extends React.Component<
       }
       moment.locale(this.props.intl.locale)
       const daysOfRejection =
-        reg.registration &&
-        reg.registration.dateOfApplication &&
-        reg.registration.dateOfApplication &&
+        registrationSearchSet.registration &&
+        registrationSearchSet.registration.dateOfApplication &&
+        registrationSearchSet.registration.dateOfApplication &&
         moment(
-          reg.registration.dateOfApplication,
+          registrationSearchSet.registration.dateOfApplication,
           APPLICATION_DATE_FORMAT
         ).fromNow()
 
       return {
-        id: reg.id,
-        event: reg.type as string,
+        id: registrationSearchSet.id,
+        event: registrationSearchSet.type as string,
         name:
           (createNamesMap(names)[this.props.intl.locale] as string) ||
           (createNamesMap(names)[LANG_EN] as string),
-        days_of_rejection: this.props.intl.formatMessage(
-          messages.rejectedDays,
-          {
-            text: daysOfRejection
-          }
-        ),
+        daysOfRejection: this.props.intl.formatMessage(messages.rejectedDays, {
+          text: daysOfRejection
+        }),
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(reg.id)
+            handler: () =>
+              this.props.goToApplicationDetails(registrationSearchSet.id)
           }
         ]
       }
@@ -308,12 +310,20 @@ class FieldAgentHomeView extends React.Component<
             <Query
               query={COUNT_USER_WISE_APPLICATIONS}
               variables={{
-                userId: userDetails.practitionerId,
+                userId: userDetails ? userDetails.practitionerId : '',
                 status: EVENT_STATUS.REJECTED,
                 locationIds: [fieldAgentLocation]
               }}
             >
-              {({ loading, error, data }) => {
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: any
+                data?: any
+                error?: any
+              }) => {
                 if (loading) {
                   parentQueryLoading = true
                   return (
@@ -399,14 +409,22 @@ class FieldAgentHomeView extends React.Component<
               <Query
                 query={SEARCH_APPLICATIONS_USER_WISE}
                 variables={{
-                  userId: userDetails.practitionerId,
+                  userId: userDetails ? userDetails.practitionerId : '',
                   status: EVENT_STATUS.REJECTED,
                   locationIds: [fieldAgentLocation],
                   count: this.pageSize,
                   skip: (this.state.requireUpdatesPage - 1) * this.pageSize
                 }}
               >
-                {({ loading, error, data }) => {
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: any
+                  data?: any
+                  error?: any
+                }) => {
                   if (loading) {
                     return (
                       <>
@@ -458,7 +476,7 @@ class FieldAgentHomeView extends React.Component<
                                   messages.listItemUpdateDate
                                 ),
                                 width: 30,
-                                key: 'days_of_rejection'
+                                key: 'daysOfRejection'
                               }
                             ]}
                             noResultText={EMPTY_STRING}

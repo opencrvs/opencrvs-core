@@ -1,8 +1,8 @@
 import * as Hapi from 'hapi'
-import { logger } from 'src/logger'
+import { logger } from '@search/logger'
 import { internal } from 'boom'
-import { searchComposition } from './service'
-import { ISearchQuery } from './types'
+import { searchComposition } from '@search/features/search/service'
+import { ISearchQuery } from '@search/features/search/types'
 
 export async function searchDeclaration(
   request: Hapi.Request,

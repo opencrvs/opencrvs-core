@@ -1,8 +1,8 @@
 import * as Hapi from 'hapi'
 import { internal } from 'boom'
 
-import { logger } from 'src/logger'
-import { upsertEvent } from './service'
+import { logger } from '@search/logger'
+import { upsertEvent } from '@search/features/registration/death/service'
 
 export async function deathEventHandler(
   request: Hapi.Request,

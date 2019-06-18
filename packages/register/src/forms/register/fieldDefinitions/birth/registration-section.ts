@@ -5,22 +5,24 @@ import {
   TEL,
   TEXTAREA,
   WARNING
-} from 'src/forms'
-import { phoneNumberFormat } from 'src/utils/validate'
+} from '@register/forms'
+import { phoneNumberFormat } from '@register/utils/validate'
 import {
   fieldNameTransformer,
   fieldToCommentTransformer,
   sectionFieldToBundleFieldTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from '@register/forms/mappings/mutation/field-mappings'
 import {
   fieldValueTransformer,
   bundleFieldToSectionFieldTransformer,
   commentToFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
-import { setRegistrationSectionTransformer } from './mappings/mutation/registration-mappings'
-import { getRegistrationSectionTransformer } from './mappings/query/registration-mappings'
+} from '@register/forms/mappings/query/field-mappings'
+import { setRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/registration-mappings'
+import { getRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/registration-mappings'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registrationTab: {
     id: 'register.form.tabs.registrationTab',
     defaultMessage: 'Registration',

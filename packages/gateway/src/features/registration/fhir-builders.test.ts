@@ -1,12 +1,12 @@
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle
-} from 'src/features/registration/fhir-builders'
+} from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   FHIR_OBSERVATION_CATEGORY_URL
-} from 'src/features/fhir/constants'
+} from '@gateway/features/fhir/constants'
 
 import {
   BIRTH_TYPE_CODE,
@@ -16,10 +16,9 @@ import {
   BIRTH_REG_PRESENT_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
-  LAST_LIVE_BIRTH_CODE,
-  HEALTH_FACILITY_BIRTH_CODE,
-  BIRTH_LOCATION_TYPE_CODE
-} from 'src/features/fhir/templates'
+  LAST_LIVE_BIRTH_CODE
+} from '@gateway/features/fhir/templates'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
@@ -203,7 +202,7 @@ test('should build a minimal FHIR registration document without error', async ()
         }
       }
     },
-    'BIRTH'
+    'BIRTH' as EVENT_TYPE
   )
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(6)
@@ -676,6 +675,7 @@ test('should update a task document as rejected', async () => {
         'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
       resource: {
         resourceType: 'Task',
+        intent: '000',
         status: 'requested',
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]

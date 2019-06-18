@@ -4,36 +4,33 @@ require('dotenv').config({
   path: `${process.cwd()}/.env`
 })
 // tslint:enable no-var-requires
-
 import * as Hapi from 'hapi'
-
-import { AUTH_HOST, AUTH_PORT } from './constants'
+import { AUTH_HOST, AUTH_PORT } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
-} from './features/authenticate/handler'
+} from '@auth/features/authenticate/handler'
 import verifyCodeHandler, {
   requestSchema as reqVerifySchema,
   responseSchma as resVerifySchema
-} from './features/verifyCode/handler'
+} from '@auth/features/verifyCode/handler'
 import refreshTokenHandler, {
   requestSchema as reqRefreshSchema,
   responseSchma as resRefreshSchema
-} from './features/refresh/handler'
+} from '@auth/features/refresh/handler'
 import resendSmsHandler, {
   requestSchema as reqResendSmsSchema,
   responseSchma as resResendSmsSchema
-} from './features/resend/handler'
-import getPlugins from './config/plugins'
-
-import * as database from './database'
+} from '@auth/features/resend/handler'
+import getPlugins from '@auth/config/plugins'
+import * as database from '@auth/database'
 import verifyTokenHandler, {
   reqVerifyTokenSchema,
   resVerifyTokenSchema
-} from './features/verifyToken/handler'
+} from '@auth/features/verifyToken/handler'
 import invalidateTokenHandler, {
   reqInvalidateTokenSchema
-} from './features/invalidateToken/handler'
+} from '@auth/features/invalidateToken/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -53,7 +50,8 @@ export async function createServer() {
       tags: ['api'],
       description: 'Authenticate with username and password',
       notes:
-        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.  Sends an SMS to the user mobile with verification code',
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+        'Sends an SMS to the user mobile with verification code',
       validate: {
         payload: reqAuthSchema
       },
@@ -148,7 +146,8 @@ export async function createServer() {
       tags: ['api'],
       description: 'Marks token as invalid until it expires',
       notes:
-        'Adds a token to the invalid tokens stored in Redis, these are stored as individual key value pairs to that we can set their expiry TTL individually',
+        'Adds a token to the invalid tokens stored in Redis, ' +
+        'these are stored as individual key value pairs to that we can set their expiry TTL individually',
       validate: {
         payload: reqInvalidateTokenSchema
       },

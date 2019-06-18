@@ -1,5 +1,5 @@
-import { IApplicationsState } from './index'
-import { IStoreState } from '../store'
+import { IApplicationsState } from '@register/applications/index'
+import { IStoreState } from '@register/store'
 
 export const getDraftsState = (store: IStoreState): IApplicationsState =>
   store.applicationsState

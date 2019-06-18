@@ -1,6 +1,8 @@
 import { defineMessages } from 'react-intl'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   mobileLabel: {
     id: 'login.mobileLabel',
     defaultMessage: 'Mobile number',

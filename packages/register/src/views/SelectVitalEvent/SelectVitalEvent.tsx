@@ -3,14 +3,19 @@ import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
 
-import { ViewHeader } from 'src/components/ViewHeader'
-import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
+import { ViewHeader } from '@register/components/ViewHeader'
+import {
+  goToBirthRegistration,
+  goToDeathRegistration
+} from '@register/navigation'
 import { Dispatch } from 'redux'
-import { createApplication, storeApplication } from 'src/applications'
-import { Event } from 'src/forms'
+import { createApplication, storeApplication } from '@register/applications'
+import { Event } from '@register/forms'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
     defaultMessage: 'New vital event application',

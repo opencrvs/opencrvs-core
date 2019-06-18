@@ -1,21 +1,25 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { mockUserResponse } from 'src/tests/util'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { queries } from 'src/profile/queries'
+import {
+  createTestComponent,
+  mockUserResponse,
+  validToken
+} from '@register/tests/util'
+
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
+import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { storage } from 'src/storage'
-import { createStore } from 'src/store'
-import { validToken } from 'src/tests/util'
-import { checkAuth } from 'src/profile/profileActions'
-import { Details } from 'src/views/Home/Details'
+import { storage } from '@register/storage'
+import { createStore } from '@register/store'
+
+import { checkAuth } from '@register/profile/profileActions'
+import { Details } from '@register/views/Home/Details'
 import {
   createApplication,
   storeApplication,
   modifyApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
-import { Event } from 'src/forms'
+} from '@register/applications'
+import { Event } from '@register/forms'
 
 const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
@@ -81,7 +85,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('Details tests', async () => {
+describe('Details tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -209,6 +213,22 @@ describe('Details tests', async () => {
                   }
                 ]
               },
+              // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              deceased: {
+                name: []
+              },
+              informant: {
+                individual: {
+                  telecom: [
+                    {
+                      system: '',
+                      use: '',
+                      value: ''
+                    }
+                  ]
+                }
+              },
               registration: {
                 id: '1',
                 type: 'birth',
@@ -299,6 +319,22 @@ describe('Details tests', async () => {
           data: {
             fetchRegistration: {
               id: '1',
+              // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
               deceased: {
                 name: [
                   {
@@ -317,6 +353,7 @@ describe('Details tests', async () => {
                 individual: {
                   telecom: [
                     {
+                      use: '',
                       system: 'phone',
                       value: '01622688231'
                     }
@@ -403,10 +440,27 @@ describe('Details tests', async () => {
                   }
                 ]
               },
+              // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
               informant: {
                 individual: {
                   telecom: [
                     {
+                      use: '',
                       system: 'phone',
                       value: '01622688231'
                     }

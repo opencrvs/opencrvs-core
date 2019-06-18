@@ -1,15 +1,19 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 
 const ErrorMessage = styled.h1`
   text-align: center;
 `
 
+interface IErrorInfo extends React.ErrorInfo {
+  [key: string]: string
+}
+
 export class ErrorBoundary extends React.Component {
   state = { error: null }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: IErrorInfo) {
     this.setState({ error })
     Sentry.withScope(scope => {
       Object.keys(errorInfo).forEach(key => {
@@ -22,8 +26,8 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       if (
-        location.hostname !== 'localhost' &&
-        location.hostname !== '127.0.0.1'
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1'
       ) {
         Sentry.showReportDialog()
       }

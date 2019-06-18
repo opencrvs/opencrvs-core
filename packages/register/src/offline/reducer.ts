@@ -1,12 +1,12 @@
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
-import * as actions from './actions'
-import { storage } from 'src/storage'
-import { referenceApi } from 'src/utils/referenceApi'
-import * as i18nActions from 'src/i18n/actions'
-import { ILanguageState, languages, IntlMessages } from 'src/i18n/reducer'
-import { getUserLocation } from 'src/utils/userUtils'
-import { filterLocations } from 'src/utils/locationUtils'
-import { tempData } from 'src/offline/temp/tempLocations'
+import * as actions from '@register/offline/actions'
+import { storage } from '@register/storage'
+import { referenceApi } from '@register/utils/referenceApi'
+import * as i18nActions from '@register/i18n/actions'
+import { ILanguageState, languages, IntlMessages } from '@register/i18n/reducer'
+import { getUserLocation } from '@register/utils/userUtils'
+import { filterLocations } from '@register/utils/locationUtils'
+import { tempData } from '@register/offline/temp/tempLocations'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -71,11 +71,8 @@ export const initialState: IOfflineDataState = {
   loadingError: false,
   healthFacilityFilterLocation: ''
 }
-
-export const offlineDataReducer: LoopReducer<
-  IOfflineDataState,
-  actions.Action | i18nActions.Action
-> = (
+// TODO: Union type actions.Action | i18nActions.Action stopped working after upgrade.  Temp replacement of any
+export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
   state: IOfflineDataState = initialState,
   action: actions.Action
 ):
@@ -91,12 +88,13 @@ export const offlineDataReducer: LoopReducer<
           loadingError: true,
           locations: tempData.locations
         },
-        Cmd.run<
-          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
-        >(referenceApi.loadFacilities, {
-          successActionCreator: actions.facilitiesLoaded,
-          failActionCreator: actions.facilitiesFailed
-        })
+        Cmd.run<actions.FacilitiesFailedAction, actions.FacilitiesLoadedAction>(
+          referenceApi.loadFacilities,
+          {
+            successActionCreator: actions.facilitiesLoaded,
+            failActionCreator: actions.facilitiesFailed
+          }
+        )
       )
     case actions.FACILITIES_FAILED:
       locationLanguageState = formatLocationLanguageState(
@@ -124,12 +122,13 @@ export const offlineDataReducer: LoopReducer<
           loadingError: false,
           locations: action.payload
         },
-        Cmd.run<
-          actions.FacilitiesLoadedAction | actions.FacilitiesFailedAction
-        >(referenceApi.loadFacilities, {
-          successActionCreator: actions.facilitiesLoaded,
-          failActionCreator: actions.facilitiesFailed
-        })
+        Cmd.run<actions.FacilitiesFailedAction, actions.FacilitiesLoadedAction>(
+          referenceApi.loadFacilities,
+          {
+            successActionCreator: actions.facilitiesLoaded,
+            failActionCreator: actions.facilitiesFailed
+          }
+        )
       )
     case actions.FACILITIES_LOADED:
       const facilities = filterLocations(
@@ -173,8 +172,8 @@ export const offlineDataReducer: LoopReducer<
           )
         },
         Cmd.run<
-          | actions.IGetOfflineDataSuccessAction
-          | actions.IGetOfflineDataFailedAction
+          actions.IGetOfflineDataFailedAction,
+          actions.IGetOfflineDataSuccessAction
         >(storage.getItem, {
           successActionCreator: actions.getOfflineDataSuccess,
           failActionCreator: actions.getOfflineDataFailed,
@@ -211,12 +210,13 @@ export const offlineDataReducer: LoopReducer<
           {
             ...state
           },
-          Cmd.run<
-            actions.LocationsLoadedAction | actions.LocationsFailedAction
-          >(referenceApi.loadLocations, {
-            successActionCreator: actions.locationsLoaded,
-            failActionCreator: actions.locationsFailed
-          })
+          Cmd.run<actions.LocationsFailedAction, actions.LocationsLoadedAction>(
+            referenceApi.loadLocations,
+            {
+              successActionCreator: actions.locationsLoaded,
+              failActionCreator: actions.locationsFailed
+            }
+          )
         )
       }
 

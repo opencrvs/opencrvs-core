@@ -1,14 +1,14 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
-import { FormFieldGenerator } from 'src/components/form'
-import { IFormSection, IFormSectionData, IFileValue } from 'src/forms'
-import { hasFormError } from 'src/forms/utils'
+import { FormFieldGenerator } from '@register/components/form'
+import { IFormSection, IFormSectionData, IFileValue } from '@register/forms'
+import { hasFormError } from '@register/forms/utils'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Jimp from 'jimp'
-import { ALLOWED_IMAGE_TYPE } from 'src/utils/constants'
+import { ALLOWED_IMAGE_TYPE } from '@register/utils/constants'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 const FormContainer = styled.div`
@@ -40,7 +40,9 @@ const UploadErrorSec = styled.div`
   margin-top: 10px;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   uploadError: {
     id: 'imageUploadOption.upload.error',
     defaultMessage: 'Must be in JPEG/JPG/PNG format',

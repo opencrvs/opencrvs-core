@@ -1,1 +1,1 @@
-export * from './ImageUploadField'
+export * from '@register/components/form/ImageUploadField/ImageUploadField'

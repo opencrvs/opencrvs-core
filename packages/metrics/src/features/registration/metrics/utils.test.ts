@@ -1,5 +1,10 @@
-import { calculateInterval, fetchEstimateByLocation } from './utils'
-import * as fetch from 'jest-fetch-mock'
+import {
+  calculateInterval,
+  fetchEstimateByLocation
+} from '@metrics/features/registration/metrics/utils'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('verify metrics util', () => {
   describe('verify calculateInterval', () => {

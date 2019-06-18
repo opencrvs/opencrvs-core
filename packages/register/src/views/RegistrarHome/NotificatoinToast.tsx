@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { ExpandableNotification } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+import { IStoreState } from '@register/store'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import Outbox from './Outbox'
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 const messages = defineMessages({
   processingText: {

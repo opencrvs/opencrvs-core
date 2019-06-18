@@ -1,4 +1,4 @@
-import { fhirWorkflowEventHandler } from 'src/features/events/handler'
+import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 
 export const getRoutes = () => {
   const routes = [

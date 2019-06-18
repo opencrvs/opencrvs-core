@@ -1,7 +1,13 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
-import * as actions from './profileActions'
-import { storage } from 'src/storage'
-import { USER_DETAILS } from 'src/utils/userUtils'
+import * as actions from '@register/profile/profileActions'
+import { storage } from '@register/storage'
+import {
+  USER_DETAILS,
+  IUserDetails,
+  getUserDetails,
+  storeUserDetails,
+  removeUserDetails
+} from '@register/utils/userUtils'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -9,18 +15,13 @@ import {
   getToken,
   isTokenStillValid,
   removeToken
-} from '../utils/authUtils'
-import {
-  IUserDetails,
-  getUserDetails,
-  storeUserDetails,
-  removeUserDetails
-} from 'src/utils/userUtils'
+} from '@register/utils/authUtils'
+
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
-import { queries } from 'src/profile/queries'
-import * as offlineActions from 'src/offline/actions'
-import * as changeLanguageActions from 'src/i18n/actions'
+import { queries } from '@register/profile/queries'
+import * as offlineActions from '@register/offline/actions'
+import * as changeLanguageActions from '@register/i18n/actions'
 
 export type ProfileState = {
   authenticated: boolean
@@ -156,8 +157,8 @@ export const profileReducer: LoopReducer<
           ...state
         },
         Cmd.run<
-          | actions.IGetStorageUserDetailsSuccessAction
-          | actions.IGetStorageUserDetailsFailedAction
+          actions.IGetStorageUserDetailsFailedAction,
+          actions.IGetStorageUserDetailsSuccessAction
         >(storage.getItem, {
           successActionCreator: actions.getStorageUserDetailsSuccess,
           failActionCreator: actions.getStorageUserDetailsFailed,

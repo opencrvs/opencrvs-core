@@ -9,9 +9,9 @@ import {
   CLICKATELL_USER,
   INFOBIP_API_KEY,
   INFOBIP_GATEWAY_ENDPOINT
-} from 'src/constants'
-import { logger } from 'src/logger'
-import { convertToMSISDN } from './utils'
+} from '@notification/constants'
+import { logger } from '@notification/logger'
+import { convertToMSISDN } from '@notification/features/sms/utils'
 
 async function sendSMSClickatell(
   msisdn: string,

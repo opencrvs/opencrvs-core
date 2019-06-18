@@ -1,5 +1,7 @@
-import { getFacilities } from './service'
-import * as fetch from 'jest-fetch-mock'
+import { getFacilities } from '@resources/features/facilities/service/service'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 const crvsOfficeBundle = JSON.stringify({
   resourceType: 'Bundle',

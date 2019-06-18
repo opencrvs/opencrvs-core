@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
 import { createServer } from '../..'
 import {
   userMock,
@@ -12,7 +11,11 @@ import {
   officeMock,
   testFhirTaskBundle,
   testFhirBundleWithIdsForDeath
-} from '../../test/utils'
+} from '@workflow/test/utils'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify handler', () => {
   let server: any

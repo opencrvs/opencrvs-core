@@ -1,4 +1,4 @@
-import { formatLongDate } from './date-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 
 describe('date formatting tests', () => {
   it('formats long date with or without localization', () => {

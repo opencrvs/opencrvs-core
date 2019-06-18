@@ -1,5 +1,5 @@
-import Role from '../../model/role'
-import { createServer } from '../..'
+import Role from '@user-mgnt/model/role'
+import { createServer } from '@user-mgnt/index'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 

@@ -18,23 +18,23 @@ import {
   DEATH_ENCOUNTER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE
-} from 'src/features/fhir/templates'
+} from '@gateway/features/fhir/templates'
 import {
   ITemplatedBundle,
   ITemplatedComposition
-} from '../registration/fhir-builders'
+} from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { FHIR_URL, SEARCH_URL, METRICS_URL } from 'src/constants'
-import { IAuthHeader } from 'src/common-types'
+import { FHIR_URL, SEARCH_URL, METRICS_URL } from '@gateway/constants'
+import { IAuthHeader } from '@gateway/common-types'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
   BIRTH_REG_NO,
   DEATH_REG_NO
-} from './constants'
-import { ISearchCriteria } from '../search/type-resovlers'
-import { ITimeRange } from '../metrics/root-resolvers'
+} from '@gateway/features/fhir/constants'
+import { ISearchCriteria } from '@gateway/features/search/type-resovlers'
+import { ITimeRange } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 
 export function findCompositionSectionInBundle(

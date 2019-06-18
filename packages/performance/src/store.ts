@@ -13,10 +13,10 @@ import {
   routerMiddleware,
   RouterState
 } from 'react-router-redux'
-import { profileReducer, ProfileState } from './profile/reducer'
-import { intlReducer, IntlState } from './i18n/reducer'
+import { profileReducer, ProfileState } from '@performance/profile/reducer'
+import { intlReducer, IntlState } from '@performance/i18n/reducer'
 import * as Sentry from '@sentry/browser'
-import * as createSentryMiddleware from 'redux-sentry-middleware'
+import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {
   profile: ProfileState
@@ -42,11 +42,9 @@ export const createStore = (): { store: AppStore; history: History } => {
     applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),
-    // tslint:disable no-any
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
       : (f: any) => f
-    // tslint:enable no-any
   ) as StoreEnhancer<IStoreState>
 
   const store = enhancedCreateStore<IStoreState, AnyAction>(

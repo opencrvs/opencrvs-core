@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from 'src/forms'
+import { IFormField, IFormData } from '@register/forms'
 
 export function hasCaseOfDeathSectionTransformer(
   transformedData: IFormData,

@@ -1,9 +1,17 @@
 import * as Hapi from 'hapi'
-import { regByAge, regWithin45d, fetchKeyFigures } from './metricsGenerator'
-import { logger } from 'src/logger'
+import {
+  regByAge,
+  regWithin45d,
+  fetchKeyFigures
+} from '@metrics/features/registration/metrics/metricsGenerator'
+import { logger } from '@metrics/logger'
 import { internal } from 'boom'
-import { TIME_FROM, TIME_TO, LOCATION_ID } from './constants'
-import { IAuthHeader } from '..'
+import {
+  TIME_FROM,
+  TIME_TO,
+  LOCATION_ID
+} from '@metrics/features/registration/metrics/constants'
+import { IAuthHeader } from '@metrics/features/registration/'
 
 export async function metricsHandler(
   request: Hapi.Request,

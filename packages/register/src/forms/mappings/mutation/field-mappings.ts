@@ -1,4 +1,13 @@
-import { IFormField, IFormData, IFormFieldValue, IAttachment } from '../..'
+import {
+  IFormField,
+  IFormData,
+  IFormFieldValue,
+  IAttachment
+} from '@register/forms'
+
+interface IPersonName {
+  [key: string]: string
+}
 
 export const fieldToNameTransformer = (
   language: string,
@@ -17,15 +26,16 @@ export const fieldToNameTransformer = (
       }
     ]
   }
-  let personName = (sectionData.name as [{ use: string }]).find(
-    name => name.use === language
-  )
+  let personName: IPersonName | undefined = (sectionData.name as [
+    { use: string }
+  ]).find(name => name.use === language)
   if (!personName) {
     personName = { use: language }
     sectionData.name.push(personName)
   }
-  personName[!transformedFieldName ? field.name : transformedFieldName] =
-    draftData[sectionId][field.name]
+  personName[
+    !transformedFieldName ? field.name : transformedFieldName
+  ] = draftData[sectionId][field.name] as string
 
   return transformedData
 }
@@ -64,6 +74,10 @@ export const fieldToIdentifierTransformer = (identifierField: string) => (
   return transformedData
 }
 
+interface IAddress {
+  [key: string]: any
+}
+
 export const fieldToAddressTransformer = (
   addressType: string,
   lineNumber: number = 0,
@@ -78,7 +92,7 @@ export const fieldToAddressTransformer = (
   if (!sectionData.address) {
     sectionData.address = []
   }
-  let address = (sectionData.address as [
+  let address: IAddress | undefined = (sectionData.address as [
     { type: string; line: IFormFieldValue[] }
   ]).find(addr => addr.type === addressType)
   if (!address) {

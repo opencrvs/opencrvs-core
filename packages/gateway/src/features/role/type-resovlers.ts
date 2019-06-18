@@ -1,4 +1,4 @@
-import { GQLResolver } from 'src/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 interface IRoleModelData {
   _id: string

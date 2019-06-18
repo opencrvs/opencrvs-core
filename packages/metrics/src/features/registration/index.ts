@@ -1,4 +1,4 @@
-export interface BirthRegistrationPoint extends Point {
+export interface IBirthRegistrationPoint extends IPoint {
   current_status: string
   age_in_days: number | undefined
   locationLevel5?: string
@@ -7,11 +7,11 @@ export interface BirthRegistrationPoint extends Point {
   locationLevel2?: string
 }
 
-export interface Point {
+export interface IPoint {
   time?: string
 }
 
-export interface PointLocation {
+export interface IPointLocation {
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string

@@ -6,8 +6,8 @@ import {
   withRouter
 } from 'react-router'
 import { connect } from 'react-redux'
-import { IStoreState } from '../store'
-import { getAuthenticated } from '../profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { getAuthenticated } from '@register/profile/profileSelectors'
 
 export interface IProps {
   authenticated: boolean
@@ -32,5 +32,7 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter(
-  connect<IProps, {}>(mapStateToProps)(ProtectedRouteWrapper)
-)
+  connect<IProps, {}, IProps, IStoreState>(mapStateToProps)(
+    ProtectedRouteWrapper
+  )
+) as any

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
-import { HEARTH_URL } from 'src/constants'
-import { logger } from 'src/logger'
+import { HEARTH_URL } from '@search/constants'
+import { logger } from '@search/logger'
 
 export interface ITemplatedComposition extends fhir.Composition {
   section?: fhir.CompositionSection[]
@@ -73,9 +73,7 @@ export function findEntryResourceByUrl(
 ) {
   const bundleEntry =
     bundleEntries &&
-    bundleEntries.find(
-      (bundleEntry: fhir.BundleEntry) => bundleEntry.fullUrl === url
-    )
+    bundleEntries.find((obj: fhir.BundleEntry) => obj.fullUrl === url)
   return bundleEntry && bundleEntry.resource
 }
 
