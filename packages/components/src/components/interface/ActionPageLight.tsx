@@ -31,6 +31,7 @@ const BackButton = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
   justify-content: center;
   margin: 0;
+  margin-right: 16px;
   padding: 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 24px;
@@ -39,7 +40,6 @@ const BackButton = styled(Button)`
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
-  margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -49,7 +49,7 @@ const MenuTitle = styled.div`
 `
 
 const Container = styled.div`
-  ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
