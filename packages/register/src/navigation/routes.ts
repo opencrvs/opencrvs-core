@@ -35,3 +35,5 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const USER_FORM = '/user-form'
+
+export const CREATE_PASSWORD = '/password'
