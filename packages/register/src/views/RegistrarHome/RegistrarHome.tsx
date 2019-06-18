@@ -40,7 +40,7 @@ import {
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
-  REVIEW_EVENT_PARENT_FORM_TAB
+  REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
@@ -315,7 +315,7 @@ export class RegistrarHomeView extends React.Component<
             label: this.props.intl.formatMessage(messages.review),
             handler: () =>
               this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_TAB,
+                REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
@@ -360,7 +360,7 @@ export class RegistrarHomeView extends React.Component<
             label: this.props.intl.formatMessage(messages.update),
             handler: () =>
               this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_TAB,
+                REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
@@ -388,7 +388,7 @@ export class RegistrarHomeView extends React.Component<
     }
     return this.props.drafts.map((draft: IApplication) => {
       let name
-      let tabRoute: string
+      let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         name =
           (draft.data &&
@@ -406,7 +406,7 @@ export class RegistrarHomeView extends React.Component<
               : draft.data.child.firstNames + ' ') +
               draft.data.child.familyName) ||
           ''
-        tabRoute = DRAFT_BIRTH_PARENT_FORM
+        pageRoute = DRAFT_BIRTH_PARENT_FORM
       } else if (draft.event && draft.event.toString() === 'death') {
         name =
           (draft.data &&
@@ -424,7 +424,7 @@ export class RegistrarHomeView extends React.Component<
               : draft.data.deceased.firstNames + ' ') +
               draft.data.deceased.familyName) ||
           ''
-        tabRoute = DRAFT_DEATH_FORM
+        pageRoute = DRAFT_DEATH_FORM
       }
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
@@ -432,7 +432,7 @@ export class RegistrarHomeView extends React.Component<
           label: this.props.intl.formatMessage(messages.update),
           handler: () =>
             this.props.goToPage(
-              tabRoute,
+              pageRoute,
               draft.id,
               '',
               (draft.event && draft.event.toString()) || ''

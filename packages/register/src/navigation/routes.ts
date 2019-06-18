@@ -4,14 +4,14 @@ export const SELECT_INFORMANT = '/events/birth'
 
 export const DRAFT_BIRTH_PARENT_FORM =
   '/drafts/:applicationId/events/birth/parent'
-export const DRAFT_BIRTH_PARENT_FORM_TAB =
+export const DRAFT_BIRTH_PARENT_FORM_PAGE =
   '/drafts/:applicationId/events/birth/parent/:pageId'
 
 export const DRAFT_DEATH_FORM = '/drafts/:applicationId/events/death'
-export const DRAFT_DEATH_FORM_TAB =
+export const DRAFT_DEATH_FORM_PAGE =
   '/drafts/:applicationId/events/death/:pageId'
 
-export const REVIEW_EVENT_PARENT_FORM_TAB =
+export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:applicationId/events/:event/parent/:pageId'
 
 export const SAVED_REGISTRATION = '/saved'

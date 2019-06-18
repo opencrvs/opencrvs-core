@@ -21,9 +21,9 @@ import {
 import { v4 as uuid } from 'uuid'
 import { createStore } from '@register/store'
 import {
-  DRAFT_BIRTH_PARENT_FORM_TAB,
-  REVIEW_EVENT_PARENT_FORM_TAB,
-  DRAFT_DEATH_FORM_TAB,
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
   HOME
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
@@ -155,9 +155,9 @@ describe('when user is in the register form before initial draft load', () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: '', tabId: '' },
+            params: { applicationId: '', pageId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -193,9 +193,9 @@ describe('when user is in the register form for birth event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'mother' },
+            params: { applicationId: draft.id, pageId: 'mother' },
             isExact: true,
             path: '',
             url: ''
@@ -249,9 +249,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'causeOfDeath' },
+            params: { applicationId: draft.id, pageId: 'causeOfDeath' },
             isExact: true,
             path: '',
             url: ''
@@ -285,9 +285,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, pageId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -310,9 +310,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, pageId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -369,9 +369,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, pageId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -488,9 +488,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, pageId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -607,9 +607,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'informant' },
+            params: { applicationId: draft.id, pageId: 'informant' },
             isExact: true,
             path: '',
             url: ''
@@ -672,9 +672,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, pageId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -742,9 +742,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'deceased' },
+            params: { applicationId: draft.id, pageId: 'deceased' },
             isExact: true,
             path: '',
             url: ''
@@ -811,9 +811,9 @@ describe('when user is in the register form preview section', () => {
       staticContext={mock}
       registerForm={form}
       application={draft}
-      tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+      pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
       match={{
-        params: { applicationId: draft.id, tabId: 'preview' },
+        params: { applicationId: draft.id, pageId: 'preview' },
         isExact: true,
         path: '',
         url: ''
@@ -876,9 +876,9 @@ describe('when user is in the register form preview section', () => {
           staticContext={mock}
           registerForm={nform}
           application={nApplication}
-          tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: nApplication.id, tabId: 'preview' },
+            params: { applicationId: nApplication.id, pageId: 'preview' },
             isExact: true,
             path: '',
             url: ''
@@ -981,11 +981,11 @@ describe('when user is in the register form review section', () => {
         staticContext={mock}
         registerForm={form}
         application={application}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review'
+            pageId: 'review'
           },
           isExact: true,
           path: '',
@@ -1044,9 +1044,9 @@ describe('when user is in the register form for death event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          tabRoute={DRAFT_DEATH_FORM_TAB}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, tabId: 'causeOfDeath' },
+            params: { applicationId: draft.id, pageId: 'causeOfDeath' },
             isExact: true,
             path: '',
             url: ''
@@ -1102,9 +1102,9 @@ describe('When user is in Preview section death event', async () => {
         staticContext={mock}
         registerForm={deathForm}
         application={deathDraft}
-        tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+        pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
-          params: { applicationId: deathDraft.id, tabId: 'preview' },
+          params: { applicationId: deathDraft.id, pageId: 'preview' },
           isExact: true,
           path: '',
           url: ''
@@ -1224,9 +1224,9 @@ describe('When user is in Preview section death event in offline mode', async ()
         staticContext={mock}
         registerForm={deathForm}
         application={deathDraft}
-        tabRoute={DRAFT_BIRTH_PARENT_FORM_TAB}
+        pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
-          params: { applicationId: deathDraft.id, tabId: 'preview' },
+          params: { applicationId: deathDraft.id, pageId: 'preview' },
           isExact: true,
           path: '',
           url: ''

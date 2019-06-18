@@ -261,7 +261,7 @@ const DraftButtonContainer = styled.div`
 interface IProps {
   draft: IApplication
   registerForm: { [key: string]: IForm }
-  tabRoute: string
+  pageRoute: string
   registerClickEvent?: () => void
   rejectApplicationClickEvent?: () => void
   submitClickEvent?: () => void
@@ -556,7 +556,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       deleteApplicationClickEvent,
       offlineResources,
       language,
-      tabRoute,
+      pageRoute,
       draft: { event }
     } = this.props
 
@@ -641,7 +641,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                 <RequiredFieldLink
                                   onClick={() => {
                                     this.props.goToPage(
-                                      tabRoute,
+                                      pageRoute,
                                       draft.id,
                                       section.id,
                                       draft.event.toLowerCase(),
@@ -756,7 +756,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               handleClose={this.toggleDisplayDialog}
               handleEdit={() => {
                 this.props.goToPage(
-                  tabRoute,
+                  pageRoute,
                   draft.id,
                   this.state.editClickedSectionId,
                   draft.event.toLowerCase()

@@ -29,13 +29,13 @@ function formatUrl(url: string, props: { [key: string]: string }) {
   )
 }
 
-export const GO_TO_TAB = 'navigation/GO_TO_TAB'
-type GoToTabAction = {
-  type: typeof GO_TO_TAB
+export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
+type GoToPageAction = {
+  type: typeof GO_TO_PAGE
   payload: {
-    tabRoute: string
+    pageRoute: string
     applicationId: string
-    tabId: string
+    pageId: string
     event: string
     fieldNameHash?: string
     historyState?: IDynamicValues
@@ -58,7 +58,7 @@ type GoToFieldAgentHome = {
 }
 
 export type Action =
-  | GoToTabAction
+  | GoToPageAction
   | GoToRegistrarHome
   | GoToFieldAgentHome
   | GoToSysAdminHome
@@ -180,7 +180,7 @@ export function goToPage(
   historyState?: IDynamicValues
 ) {
   return {
-    type: GO_TO_TAB,
+    type: GO_TO_PAGE,
     payload: {
       applicationId,
       pageId,
@@ -196,7 +196,7 @@ export type INavigationState = undefined
 
 export function navigationReducer(state: INavigationState, action: any) {
   switch (action.type) {
-    case GO_TO_TAB:
+    case GO_TO_PAGE:
       const {
         fieldNameHash,
         applicationId,

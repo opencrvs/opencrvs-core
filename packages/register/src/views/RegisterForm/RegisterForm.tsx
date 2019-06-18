@@ -277,7 +277,7 @@ function getPreviousSection(
 export interface IFormProps {
   application: IApplication
   registerForm: IForm
-  tabRoute: string
+  pageRoute: string
   duplicate?: boolean
 }
 
@@ -534,7 +534,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.props.registerForm.sections,
             this.props.activeSection
           ),
-          this.props.tabRoute,
+          this.props.pageRoute,
           this.props.application.event.toLowerCase()
         )
       } else {
@@ -544,7 +544,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.props.registerForm.sections,
             this.props.activeSection
           ),
-          this.props.tabRoute,
+          this.props.pageRoute,
           this.props.application.event.toLowerCase()
         )
       }
@@ -554,11 +554,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
   onSwiped = (
     applicationId: string,
     selectedSection: IFormSection | null,
-    tabRoute: string,
+    pageRoute: string,
     event: string
   ): void => {
     if (selectedSection) {
-      this.props.goToPage(tabRoute, applicationId, selectedSection.id, event)
+      this.props.goToPage(pageRoute, applicationId, selectedSection.id, event)
     }
   }
 
@@ -656,7 +656,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 >
                   {activeSection.viewType === VIEW_TYPE.PREVIEW && (
                     <ReviewSection
-                      tabRoute={this.props.tabRoute}
+                      pageRoute={this.props.pageRoute}
                       draft={application}
                       submitClickEvent={this.submitForm}
                       saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
@@ -668,7 +668,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   )}
                   {activeSection.viewType === VIEW_TYPE.REVIEW && (
                     <ReviewSection
-                      tabRoute={this.props.tabRoute}
+                      pageRoute={this.props.pageRoute}
                       draft={application}
                       rejectApplicationClickEvent={() => {
                         this.toggleRejectForm()
@@ -730,7 +730,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             <FormPrimaryButton
                               onClick={() =>
                                 goToPage(
-                                  this.props.tabRoute,
+                                  this.props.pageRoute,
                                   application.id,
                                   nextSection.id,
                                   application.event.toLowerCase()

@@ -13,7 +13,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { goToPage as goToPageAction } from '@register/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import Moment from 'react-moment'
 import { getRejectionReasonDisplayValue } from '@register/views/SearchResult/SearchResult'
 
@@ -395,7 +395,7 @@ class DuplicateDetailsClass extends React.Component<
               id={`review_link_${data.id}`}
               onClick={() => {
                 this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_TAB,
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
                   data.id,
                   'review',
                   'birth',

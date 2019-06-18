@@ -1,5 +1,5 @@
 import { IFormData, Event } from '@register/forms'
-import { GO_TO_TAB, Action as NavigationAction } from '@register/navigation'
+import { GO_TO_PAGE, Action as NavigationAction } from '@register/navigation'
 import { storage } from '@register/storage'
 import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
@@ -240,19 +240,19 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
   action: Action
 ): IApplicationsState | Loop<IApplicationsState, Action> => {
   switch (action.type) {
-    case GO_TO_TAB: {
+    case GO_TO_PAGE: {
       const application = state.applications.find(
         ({ id }) => id === action.payload.applicationId
       )
 
-      if (!application || application.data[action.payload.tabId]) {
+      if (!application || application.data[action.payload.pageId]) {
         return state
       }
       const modifiedApplication = {
         ...application,
         data: {
           ...application.data,
-          [action.payload.tabId]: {}
+          [action.payload.pageId]: {}
         }
       }
       return loop(state, Cmd.action(modifyApplication(modifiedApplication)))

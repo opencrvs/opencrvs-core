@@ -38,7 +38,7 @@ import {
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToPage as goToPageAction
 } from '@register/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { messages as rejectionMessages } from '@register/review/reject-registration'
 import { messages } from '@register/search/messages'
@@ -627,7 +627,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           label: this.props.intl.formatMessage(messages.review),
           handler: () =>
             this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_TAB,
+              REVIEW_EVENT_PARENT_FORM_PAGE,
               item.id,
               'review',
               item.event.toLowerCase()
@@ -638,7 +638,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           label: this.props.intl.formatMessage(messages.reject),
           handler: () =>
             this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_TAB,
+              REVIEW_EVENT_PARENT_FORM_PAGE,
               item.id,
               'review',
               item.event.toLowerCase()
