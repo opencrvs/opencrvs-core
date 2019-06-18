@@ -1055,6 +1055,19 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.systemTitle': 'System',
     'register.home.header.settingsTitle': 'Settings',
     'register.home.header.helpTitle': 'Help',
-    'register.home.header.logoutTitle': 'Logout'
+    'register.home.header.logoutTitle': 'Logout',
+    'userSetup.landing.title': 'Welcome to OpenCRVS',
+    'userSetup.landing.instruction':
+      'You just a few steps away from completing your account set up.',
+    'userSetup.type.HOSPITAL': 'Hospital',
+    'userSetup.type.CHA': 'CHA',
+    'userSetup.type.ENTREPENEUR': 'Entrepeneur',
+    'userSetup.type.DATA_ENTRY_CLERK': 'Data entry clerk',
+    'userSetup.type.SECRETARY': 'Secretary',
+    'userSetup.type.CHAIRMAN': 'Chairman',
+    'userSetup.type.MAYOR': 'Mayor',
+    'userSetup.type.LOCAL_SYSTEM_ADMIN': 'System admin (local)',
+    'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
+    'userSetup.landing.button.start': 'Start'
   }
 }

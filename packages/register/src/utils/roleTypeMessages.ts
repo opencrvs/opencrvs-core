@@ -37,3 +37,51 @@ export const roleMessages = defineMessages({
     description: 'The description for Sysadmin role'
   }
 })
+
+export const typeMessages = defineMessages({
+  HOSPITAL: {
+    id: 'userSetup.type.HOSPITAL',
+    defaultMessage: 'Hospital',
+    description: 'The description for HOSPITAL type'
+  },
+  CHA: {
+    id: 'userSetup.type.CHA',
+    defaultMessage: 'CHA',
+    description: 'The description for CHA type'
+  },
+  ENTREPENEUR: {
+    id: 'userSetup.type.ENTREPENEUR',
+    defaultMessage: 'Entrepeneur',
+    description: 'The description for ENTREPENEUR type'
+  },
+  DATA_ENTRY_CLERK: {
+    id: 'userSetup.type.DATA_ENTRY_CLERK',
+    defaultMessage: 'Data entry clerk',
+    description: 'The description for DATA_ENTRY_CLERK type'
+  },
+  SECRETARY: {
+    id: 'userSetup.type.SECRETARY',
+    defaultMessage: 'Secretary',
+    description: 'The description for SECRETARY type'
+  },
+  CHAIRMAN: {
+    id: 'userSetup.type.CHAIRMAN',
+    defaultMessage: 'Chairman',
+    description: 'The description for CHAIRMAN type'
+  },
+  MAYOR: {
+    id: 'userSetup.type.MAYOR',
+    defaultMessage: 'Mayor',
+    description: 'The description for MAYOR type'
+  },
+  LOCAL_SYSTEM_ADMIN: {
+    id: 'userSetup.type.LOCAL_SYSTEM_ADMIN',
+    defaultMessage: 'System admin (local)',
+    description: 'The description for LOCAL_SYSTEM_ADMIN type'
+  },
+  NATIONAL_SYSTEM_ADMIN: {
+    id: 'userSetup.type.NATIONAL_SYSTEM_ADMIN',
+    defaultMessage: 'System admin (national)',
+    description: 'The description for NATIONAL_SYSTEM_ADMIN type'
+  }
+})

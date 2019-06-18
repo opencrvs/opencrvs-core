@@ -1053,6 +1053,19 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.systemTitle': 'সিস্টেম',
     'register.home.header.settingsTitle': 'সেটিংস',
     'register.home.header.helpTitle': 'সাহায্য',
-    'register.home.header.logoutTitle': 'লগআউট'
+    'register.home.header.logoutTitle': 'লগআউট',
+    'userSetup.landing.title': 'OpenCRVS এ স্বাগতম',
+    'userSetup.landing.instruction':
+      'আপনি আপনার অ্যাকাউন্ট সেট আপ সম্পূর্ণ করার মাত্র কয়েক পদক্ষেপ দূরে।',
+    'userSetup.type.HOSPITAL': 'হাসপাতাল',
+    'userSetup.type.CHA': 'CHA',
+    'userSetup.type.ENTREPENEUR': 'উদ্যোক্তা',
+    'userSetup.type.DATA_ENTRY_CLERK': 'ডাটা এন্ট্রি কেরানি',
+    'userSetup.type.SECRETARY': 'সচিব',
+    'userSetup.type.CHAIRMAN': 'চেয়ারম্যান',
+    'userSetup.type.MAYOR': 'মেয়র',
+    'userSetup.type.LOCAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (স্থানীয়)',
+    'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'userSetup.landing.button.start': 'শুরু'
   }
 }
