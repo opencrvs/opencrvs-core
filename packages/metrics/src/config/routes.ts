@@ -2,8 +2,8 @@ import * as Joi from 'joi'
 import {
   birthRegistrationHandler,
   newBirthRegistrationHandler
-} from 'src/features/registration/handler'
-import { metricsHandler } from 'src/features/registration/metrics/handler'
+} from '@metrics/features/registration/handler'
+import { metricsHandler } from '@metrics/features/registration/metrics/handler'
 
 export const getRoutes = () => {
   const routes = [

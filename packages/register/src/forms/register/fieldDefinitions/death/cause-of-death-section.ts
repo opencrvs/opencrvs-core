@@ -4,19 +4,20 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   TEXT
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
-import { maxLength, match } from 'src/utils/validate'
-import { conditionals } from 'src/forms/utils'
+import { maxLength, blockAlphaNumericDot } from '@register/utils/validate'
+import { conditionals } from '@register/forms/utils'
 import {
   sectionFieldToBundleFieldTransformer,
   ignoreFieldTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
-import { bundleFieldToSectionFieldTransformer } from 'src/forms/mappings/query/field-mappings'
-import { hasCaseOfDeathSectionTransformer } from './mappings/query/cause-of-death-mappings'
-import { REGEXP_BLOCK_ALPHA_NUMERIC_DOT } from 'src/utils/constants'
+} from '@register/forms/mappings/mutation/field-mappings'
+import { bundleFieldToSectionFieldTransformer } from '@register/forms/mappings/query/field-mappings'
+import { hasCaseOfDeathSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/cause-of-death-mappings'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   causeOfDeathTab: {
     id: 'register.form.tabs.causeOfDeathTab',
     defaultMessage: 'Cause of Death',
@@ -133,10 +134,7 @@ export const causeOfDeathSection: IFormSection = {
       label: messages.causeOfDeathCode,
       required: false,
       conditionals: [conditionals.causeOfDeathEstablished],
-      validate: [
-        match(REGEXP_BLOCK_ALPHA_NUMERIC_DOT, messages.blockAlphaNumericDot),
-        maxLength(17)
-      ],
+      validate: [blockAlphaNumericDot, maxLength(17)],
       mapping: {
         mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
         query: bundleFieldToSectionFieldTransformer('causeOfDeath')

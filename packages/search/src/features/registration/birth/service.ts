@@ -1,11 +1,14 @@
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import {
   detectDuplicates,
   EVENT,
   IBirthCompositionBody,
   ICompositionBody,
   getCreatedBy
-} from 'src/elasticsearch/utils'
+} from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
   findEntry,
@@ -15,8 +18,8 @@ import {
   findTaskIdentifier,
   getCompositionById,
   updateInHearth
-} from 'src/features/fhir/fhir-utils'
-import { logger } from 'src/logger'
+} from '@search/features/fhir/fhir-utils'
+import { logger } from '@search/logger'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -71,6 +74,7 @@ async function updateEvent(task: fhir.Task) {
     task.businessStatus &&
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
+  body.modifiedAt = Date.now().toString()
   const nodeText =
     task && task.note && task.note[0].text && task.note[0].text.split('&')
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
@@ -89,7 +93,10 @@ async function indexAndSearchComposition(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const body: IBirthCompositionBody = { event: EVENT.BIRTH }
+  const body: IBirthCompositionBody = {
+    event: EVENT.BIRTH,
+    createdAt: Date.now().toString()
+  }
 
   await createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionId, body)
@@ -271,6 +278,7 @@ async function updateCompositionWithDuplicates(
   duplicates: string[]
 ) {
   const duplicateCompositions = await Promise.all(
+    // tslint:disable-next-line
     duplicates.map(duplicate => getCompositionById(duplicate))
   )
 

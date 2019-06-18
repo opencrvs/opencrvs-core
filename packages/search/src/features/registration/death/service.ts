@@ -1,10 +1,13 @@
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import {
   EVENT,
   ICompositionBody,
   IDeathCompositionBody,
   getCreatedBy
-} from 'src/elasticsearch/utils'
+} from '@search/elasticsearch/utils'
 import {
   findEntry,
   findEntryResourceByUrl,
@@ -12,7 +15,7 @@ import {
   findTask,
   findTaskExtension,
   findTaskIdentifier
-} from 'src/features/fhir/fhir-utils'
+} from '@search/features/fhir/fhir-utils'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -68,6 +71,7 @@ async function updateEvent(task: fhir.Task) {
     task.businessStatus &&
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
+  body.modifiedAt = Date.now().toString()
   const nodeText =
     task && task.note && task.note[0].text && task.note[0].text.split('&')
   body.rejectReason = nodeText && nodeText[0] && nodeText[0].split('=')[1]
@@ -86,7 +90,10 @@ async function indexDeclaration(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const body: ICompositionBody = { event: EVENT.DEATH }
+  const body: ICompositionBody = {
+    event: EVENT.DEATH,
+    createdAt: Date.now().toString()
+  }
 
   await createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionId, body)

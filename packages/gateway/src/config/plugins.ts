@@ -1,7 +1,7 @@
 import { graphqlHapi } from 'apollo-server-hapi'
 import * as Good from 'good'
 import * as JWT from 'hapi-auth-jwt2'
-import { getExecutableSchema } from 'src/graphql/config'
+import { getExecutableSchema } from '@gateway/graphql/config'
 
 export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const plugins: any[] = []

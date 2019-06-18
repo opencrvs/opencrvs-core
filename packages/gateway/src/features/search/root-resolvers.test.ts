@@ -1,5 +1,7 @@
-import { resolvers } from './root-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { resolvers } from '@gateway/features/search/root-resolvers'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -119,6 +121,41 @@ describe('Search root resolvers', () => {
         {},
         {
           contactNumber: '01622688231'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results for userId', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          userId: '1'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('returns an array of composition results with given count', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          count: 10,
+          skip: 2
         }
       )
 

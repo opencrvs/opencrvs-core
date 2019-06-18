@@ -1,18 +1,18 @@
 import * as React from 'react'
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { FormFieldGenerator } from 'src/components/form'
-import { IFormSection, IFormSectionData } from 'src/forms'
+import { FormFieldGenerator } from '@register/components/form'
+import { IFormSection, IFormSectionData } from '@register/forms'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+import { IStoreState } from '@register/store'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { goToHome, goToUserReview } from 'src/navigation'
+import { goToHome, goToUserReview } from '@register/navigation'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { modifyUserFormData } from '../forms/userReducer'
-import { replaceInitialValues } from 'src/views/RegisterForm/RegisterForm'
+import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
+import { replaceInitialValues } from '@register/views/RegisterForm/RegisterForm'
 import { FormikTouched, FormikValues } from 'formik'
-import { hasFormError } from 'src/forms/utils'
+import { hasFormError } from '@register/forms/utils'
 
 const messages = defineMessages({
   continue: {
@@ -61,7 +61,7 @@ type IProps = {
 type IFullProps = InjectedIntlProps & IProps & { dispatch: Dispatch }
 
 class UserFormComponent extends React.Component<IFullProps> {
-  setAllFormFieldsTouched: (touched: FormikTouched<FormikValues>) => void
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   handleFormAction = () => {
     const { userForm, data } = this.props

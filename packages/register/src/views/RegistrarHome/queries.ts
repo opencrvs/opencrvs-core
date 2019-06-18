@@ -8,76 +8,125 @@ export const COUNT_REGISTRATION_QUERY = gql`
     }
   }
 `
-export const FETCH_REGISTRATIONS_QUERY = gql`
-  query data($status: String, $locationIds: [String], $count: Int, $skip: Int) {
-    listEventRegistrations(
-      status: $status
+export const SEARCH_EVENTS = gql`
+  query(
+    $sort: String
+    $trackingId: String
+    $contactNumber: String
+    $registrationNumber: String
+    $status: String
+    $locationIds: [String]
+    $count: Int
+    $skip: Int
+  ) {
+    searchEvents(
+      sort: $sort
+      trackingId: $trackingId
+      registrationNumber: $registrationNumber
+      contactNumber: $contactNumber
       locationIds: $locationIds
+      status: $status
       count: $count
       skip: $skip
     ) {
       totalItems
       results {
         id
+        type
         registration {
-          type
+          status
+          contactNumber
           trackingId
-          contactPhoneNumber
-          status {
-            user {
-              id
-              name {
-                use
-                firstNames
-                familyName
-              }
-              role
-            }
-            location {
-              id
-              name
-              alias
-            }
-            office {
-              name
-              alias
-              address {
-                district
-                state
-              }
-            }
-            type
-            timestamp
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
           }
         }
-        createdAt
-        ... on BirthRegistration {
-          child {
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+          }
+        }
+      }
+    }
+  }
+`
+
+export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
+  query data($id: ID!) {
+    fetchRegistration(id: $id) {
+      id
+      registration {
+        id
+        type
+        status {
+          id
+          user {
+            id
             name {
               use
               firstNames
               familyName
             }
-            birthDate
+            role
+          }
+          location {
+            id
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+          type
+          timestamp
+          comments {
+            comment
           }
         }
-        ... on DeathRegistration {
+      }
+      ... on BirthRegistration {
+        child {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          birthDate
+        }
+      }
+      ... on DeathRegistration {
+        deceased {
+          name {
+            use
+            firstNames
+            familyName
+          }
           deceased {
-            name {
-              use
-              firstNames
-              familyName
-            }
-            deceased {
-              deathDate
-            }
+            deathDate
           }
-          informant {
-            individual {
-              telecom {
-                system
-                value
-              }
+        }
+        informant {
+          individual {
+            telecom {
+              use
+              system
+              value
             }
           }
         }

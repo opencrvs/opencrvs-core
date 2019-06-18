@@ -1,17 +1,16 @@
 import { importSchema } from 'graphql-import'
 import { makeExecutableSchema, IResolvers } from 'graphql-tools'
-
-import { resolvers as notificationRootResolvers } from 'src/features/notification/root-resolvers'
-import { resolvers as registrationRootResolvers } from 'src/features/registration/root-resolvers'
-import { resolvers as locationRootResolvers } from 'src/features/location/root-resolvers'
-import { resolvers as userRootResolvers } from 'src/features/user/root-resolvers'
-import { resolvers as metricsRootResolvers } from 'src/features/metrics/root-resolvers'
-import { typeResolvers } from 'src/features/registration/type-resovlers'
-import { resolvers as searchRootResolvers } from 'src/features/search/root-resolvers'
-import { searchTypeResolvers } from 'src/features/search/type-resovlers'
-import { userTypeResolvers } from 'src/features/user/type-resovlers'
-import { resolvers as roleRootResolvers } from 'src/features/role/root-resolvers'
-import { roleTypeResolvers } from 'src/features/role/type-resovlers'
+import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
+import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
+import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
+import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
+import { typeResolvers } from '@gateway/features/registration/type-resovlers'
+import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
+import { searchTypeResolvers } from '@gateway/features/search/type-resovlers'
+import { userTypeResolvers } from '@gateway/features/user/type-resovlers'
+import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
+import { roleTypeResolvers } from '@gateway/features/role/type-resovlers'
 
 export const getExecutableSchema = (schemaPath: string) => {
   const typeDefs = importSchema(schemaPath)

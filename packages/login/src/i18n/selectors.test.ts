@@ -1,6 +1,6 @@
-import { getLanguage, getMessages } from './selectors'
-import { mockState } from '../tests/util'
-import { BENGALI_STATE } from './locales/bn'
+import { getLanguage, getMessages } from '@login/i18n/selectors'
+import { mockState } from '@login/tests/util'
+import { BENGALI_STATE } from '@login/i18n/locales/bn'
 
 describe('intl selectors', () => {
   describe('getLanguage', () => {

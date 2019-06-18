@@ -1,5 +1,5 @@
 import * as redis from 'redis'
-import { REDIS_HOST } from './constants'
+import { REDIS_HOST } from '@auth/constants'
 import { promisify } from 'util'
 
 let redisClient: redis.RedisClient

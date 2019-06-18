@@ -1,6 +1,6 @@
 {
   "name": "e2e",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {

@@ -1,7 +1,7 @@
-import * as actions from './actions'
-import { initialState } from './reducer'
-import { createStore, AppStore } from '../store'
-import { mockUserResponse } from 'src/tests/util'
+import * as actions from '@performance/profile/actions'
+import { initialState } from '@performance/profile/reducer'
+import { createStore, AppStore } from '@performance/store'
+import { mockUserResponse } from '@performance/tests/util'
 
 describe('profileReducer tests', () => {
   let store: AppStore

@@ -8,9 +8,9 @@ import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from './constants'
-import getPlugins from './config/plugins'
-import { getRoutes } from './config/routes'
+} from '@workflow/constants'
+import getPlugins from '@workflow/config/plugins'
+import { getRoutes } from '@workflow/config/routes'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 

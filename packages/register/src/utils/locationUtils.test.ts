@@ -1,4 +1,4 @@
-import { filterLocations } from './locationUtils'
+import { filterLocations } from '@register/utils/locationUtils'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {

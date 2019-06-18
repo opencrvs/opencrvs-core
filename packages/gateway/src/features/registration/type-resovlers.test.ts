@@ -1,10 +1,9 @@
-import { typeResolvers } from 'src/features/registration/type-resovlers'
+import { typeResolvers } from '@gateway/features/registration/type-resovlers'
 import {
   MOTHER_CODE,
   FATHER_CODE,
   CHILD_CODE
-} from 'src/features/fhir/templates'
-import * as fetch from 'jest-fetch-mock'
+} from '@gateway/features/fhir/templates'
 import {
   mockPatient,
   mockDocumentReference,
@@ -18,8 +17,11 @@ import {
   mockCertificateComposition,
   mockCertificate,
   mockErrorComposition
-} from 'src/utils/testUtils'
+} from '@gateway/utils/testUtils'
 import { clone } from 'lodash'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -896,25 +898,20 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns user of the task', async () => {
-      const mock = fetch.mockResponseOnce(
-        JSON.stringify({ resourceType: 'Practitioner' })
-      )
+      const mock = fetch.mockResponseOnce(JSON.stringify({ _id: '1' }))
       // @ts-ignore
       const user = await typeResolvers.RegWorkflow.user(mockTask)
 
-      expect(mock).toBeCalledWith(
-        'http://localhost:5001/fhir/Practitioner/123',
-        {
-          body: undefined,
-          headers: { 'Content-Type': 'application/fhir+json' },
-          method: 'GET'
-        }
-      )
-      expect(user.resourceType).toBe('Practitioner')
+      expect(mock).toBeCalledWith('http://localhost:3030/getUser', {
+        body: JSON.stringify({ practitionerId: '123' }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST'
+      })
+      expect(user._id).toBe('1')
     })
 
     it('returns null when there is no user extension in task', async () => {
-      const mock = fetch.mockResponseOnce(JSON.stringify({}))
+      fetch.mockResponseOnce(JSON.stringify({}))
       // @ts-ignore
       const user = await typeResolvers.RegWorkflow.user({
         resourceType: 'Task',
@@ -954,7 +951,7 @@ describe('Registration type resolvers', () => {
     })
 
     it('returns an array of duplicates', async () => {
-      const mock = fetch.mockResponseOnce(JSON.stringify(mockComposition))
+      fetch.mockResponseOnce(JSON.stringify(mockComposition))
 
       // @ts-ignore
       const duplicates = await typeResolvers.Registration.duplicates(mockTask)

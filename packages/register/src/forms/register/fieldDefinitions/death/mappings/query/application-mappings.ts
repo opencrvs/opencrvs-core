@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from 'src/forms'
+import { IFormField, IFormData } from '@register/forms'
 import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
 
 export const phoneNumberToFieldTransformer = (

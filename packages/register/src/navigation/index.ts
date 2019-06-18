@@ -15,9 +15,9 @@ import {
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
   USER_REVIEW
-} from 'src/navigation/routes'
+} from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken } from 'src/utils/authUtils'
+import { getToken } from '@register/utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -43,7 +43,7 @@ type GoToTabAction = {
   }
 }
 export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
-type GoToREGISTRAR_HOME = {
+type GoToRegistrarHome = {
   type: typeof GO_TO_REGISTRAR_HOME
   payload: {
     tabId: string
@@ -51,16 +51,8 @@ type GoToREGISTRAR_HOME = {
 }
 
 export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
-type GoTo_FIELD_AGENT_HOME = {
+type GoToFieldAgentHome = {
   type: typeof GO_TO_FIELD_AGENT_HOME
-  payload: {
-    tabId: string
-  }
-}
-
-export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
-type GoTo_SYS_ADMIN_HOME = {
-  type: typeof GO_TO_SYS_ADMIN_HOME
   payload: {
     tabId: string
   }
@@ -68,9 +60,16 @@ type GoTo_SYS_ADMIN_HOME = {
 
 export type Action =
   | GoToTabAction
-  | GoToREGISTRAR_HOME
-  | GoTo_FIELD_AGENT_HOME
-  | GoTo_SYS_ADMIN_HOME
+  | GoToRegistrarHome
+  | GoToFieldAgentHome
+  | GoToSysAdminHome
+export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
+type GoToSysAdminHome = {
+  type: typeof GO_TO_SYS_ADMIN_HOME
+  payload: {
+    tabId: string
+  }
+}
 
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
@@ -200,7 +199,7 @@ export function goToTab(
 
 export type INavigationState = undefined
 
-export function navigationReducer(state: INavigationState, action: Action) {
+export function navigationReducer(state: INavigationState, action: any) {
   switch (action.type) {
     case GO_TO_TAB:
       const {

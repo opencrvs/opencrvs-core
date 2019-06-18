@@ -7,8 +7,8 @@ import {
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { InjectedIntl } from 'react-intl'
-import { createNamesMap } from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
+import { createNamesMap } from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 
 export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
   const { locale } = intl
@@ -16,26 +16,32 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
     return []
   }
 
-  return data.searchEvents.results.map((reg: GQLEventSearchSet) => {
+  return data.searchEvents.results.map((reg: GQLEventSearchSet | null) => {
     let birthReg
     let deathReg
     let names
-    if (reg.registration && reg.type === 'Birth') {
+    let dateOfEvent
+    const assignedReg = reg as GQLEventSearchSet
+    if (assignedReg.registration && assignedReg.type === 'Birth') {
       birthReg = reg as GQLBirthEventSearchSet
       names = (birthReg && (birthReg.childName as GQLHumanName[])) || []
+      dateOfEvent = birthReg && birthReg.dateOfBirth
     } else {
       deathReg = reg as GQLDeathEventSearchSet
       names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
+      dateOfEvent = deathReg && deathReg.dateOfDeath
     }
     const lang = 'bn'
-    const status = reg.registration && (reg.registration.status as GQLRegStatus)
+    const status =
+      assignedReg.registration &&
+      (assignedReg.registration.status as GQLRegStatus)
     return {
-      id: reg.id,
+      id: assignedReg.id,
       name:
         (createNamesMap(names)[lang] as string) ||
-        /* tslint:disable:no-string-literal */
+        /* eslint-disable no-string-literal */
         (createNamesMap(names)['default'] as string) ||
-        /* tslint:enable:no-string-literal */
+        /* eslint-enable no-string-literal */
         '',
       dob:
         (birthReg &&
@@ -47,22 +53,33 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
           deathReg.dateOfDeath &&
           formatLongDate(deathReg.dateOfDeath, locale)) ||
         '',
+      dateOfEvent,
       registrationNumber:
-        (reg.registration && reg.registration.registrationNumber) || '',
-      tracking_id: (reg.registration && reg.registration.trackingId) || '',
-      event: reg.type,
-      declaration_status: status,
-      duplicates: reg.registration && reg.registration.duplicates,
-      rejection_reasons:
-        (status === 'REJECTED' &&
-          reg.registration &&
-          reg.registration.reason) ||
+        (assignedReg.registration &&
+          assignedReg.registration.registrationNumber) ||
         '',
-      rejection_comment:
+      trackingId:
+        (assignedReg.registration && assignedReg.registration.trackingId) || '',
+      event: assignedReg.type || '',
+      declarationStatus: status || '',
+      contactNumber:
+        (assignedReg.registration && assignedReg.registration.contactNumber) ||
+        '',
+      duplicates:
+        (assignedReg.registration && assignedReg.registration.duplicates) || [],
+      rejectionReasons:
         (status === 'REJECTED' &&
-          reg.registration &&
-          reg.registration.comment) ||
-        ''
+          assignedReg.registration &&
+          assignedReg.registration.reason) ||
+        '',
+      rejectionComment:
+        (status === 'REJECTED' &&
+          assignedReg.registration &&
+          assignedReg.registration.comment) ||
+        '',
+      createdAt: assignedReg.registration && assignedReg.registration.createdAt,
+      modifiedAt:
+        assignedReg.registration && assignedReg.registration.modifiedAt
     }
   })
 }

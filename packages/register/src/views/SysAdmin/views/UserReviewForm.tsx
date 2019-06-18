@@ -4,10 +4,10 @@ import {
   IFormSection,
   IFormField,
   FIELD_GROUP_TITLE
-} from 'src/forms'
+} from '@register/forms'
 
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+import { IStoreState } from '@register/store'
 import {
   DataSection,
   ActionPageLight,
@@ -15,7 +15,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { RouteComponentProps } from 'react-router'
-import { goBack } from 'src/navigation'
+import { goBack } from '@register/navigation'
 import { Container, FormTitle } from './UserForm'
 
 interface IUserReviewFormProps {
@@ -38,7 +38,7 @@ type IFullProps = IUserReviewFormProps &
   RouteComponentProps<IMatchParams>
 
 const messages = defineMessages({
-  action_change: {
+  actionChange: {
     id: 'action.change',
     defaultMessage: 'Change',
     description: 'Change action'
@@ -50,17 +50,17 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
     const { intl, data } = this.props
     const dataEntries = Object.entries(data)
     const sections: ISectionData[] = []
-    dataEntries.forEach(([key, value]: [string, string]) => {
+    dataEntries.forEach(([key, value]: [string, unknown]) => {
       const field = this.getField(key)
       if (field && field.type === FIELD_GROUP_TITLE) {
         sections.push({ title: intl.formatMessage(field.label), items: [] })
       } else if (field && sections.length > 0) {
         sections[sections.length - 1].items.push({
           label: intl.formatMessage(field.label),
-          value,
+          value: value as string,
           action: {
             id: `btn${field.name}`,
-            label: intl.formatMessage(messages.action_change),
+            label: intl.formatMessage(messages.actionChange),
             handler: () => console.log(field.name, 'change action clicked')
           }
         })

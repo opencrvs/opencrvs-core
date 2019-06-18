@@ -35,9 +35,9 @@ import {
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData
-} from 'src/forms/utils'
+} from '@register/forms/utils'
 
-import styled, { keyframes } from 'src/styled-components'
+import styled, { keyframes } from '@register/styledComponents'
 
 import {
   IFormField,
@@ -75,20 +75,20 @@ import {
   IForm,
   IFormSection,
   FIELD_GROUP_TITLE
-} from 'src/forms'
+} from '@register/forms'
 
-import { IValidationResult } from 'src/utils/validate'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { getValidationErrorsForForm } from 'src/forms/validation'
-import { InputField } from 'src/components/form/InputField'
-import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
+import { IValidationResult } from '@register/utils/validate'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { getValidationErrorsForForm } from '@register/forms/validation'
+import { InputField } from '@register/components/form/InputField'
+import { SubSectionDivider } from '@register/components/form/SubSectionDivider'
 
-import { FormList } from './FormList'
-import { ImageUploadField } from './ImageUploadField'
-import { FetchButtonField } from './FetchButton'
+import { FormList } from '@register/components/form/FormList'
+import { ImageUploadField } from '@register/components/form/ImageUploadField'
+import { FetchButtonField } from '@register/components/form/FetchButton'
 
-import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
-import { gqlToDraftTransformer } from 'src/transformer'
+import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
+import { gqlToDraftTransformer } from '@register/transformer'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -369,6 +369,10 @@ type Props = IFormSectionProps &
   FormikProps<IFormSectionData> &
   InjectedIntlProps
 
+interface IQueryData {
+  [key: string]: any
+}
+
 class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
     const userChangedForm = !isEqual(nextProps.values, this.props.values)
@@ -514,7 +518,7 @@ class FormSectionComponent extends React.Component<Props> {
                       sections: [section]
                     } as IForm
 
-                    const queryData = {}
+                    const queryData: IQueryData = {}
                     queryData[this.props.id] = response
 
                     const transformedData = gqlToDraftTransformer(

@@ -1,5 +1,5 @@
-import { IForm, IFormData } from '../forms'
-import { getConditionalActionsForField } from '../forms/utils'
+import { IForm, IFormData } from '@register/forms'
+import { getConditionalActionsForField } from '@register/forms/utils'
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
@@ -28,9 +28,8 @@ export const draftToGqlTransformer = (
           draftData[section.id][fieldDef.name] === '')
       ) {
         throw new Error(
-          `Data is missing for a required field: ${fieldDef.name} on section ${
-            section.id
-          }`
+          `Data is missing for a required field: ${fieldDef.name}` +
+            `on section ${section.id}`
         )
       }
       if (

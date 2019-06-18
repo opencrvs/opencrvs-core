@@ -8,17 +8,19 @@ import {
   WARNING,
   PARAGRAPH,
   FIELD_WITH_DYNAMIC_DEFINITIONS
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
-import { conditionals } from 'src/forms/utils'
+import { conditionals } from '@register/forms/utils'
 import {
   messages as identityMessages,
   identityTypeMapper,
   identityNameMapper
-} from 'src/forms/identity'
-import { validIDNumber } from 'src/utils/validate'
+} from '@register/forms/identity'
+import { validIDNumber } from '@register/utils/validate'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   certificateCollectionTitle: {
     id: 'register.workQueue.title.certificateCollection',
     defaultMessage: 'Certificate Collection',

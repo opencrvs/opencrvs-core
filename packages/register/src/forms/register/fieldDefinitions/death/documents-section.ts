@@ -6,12 +6,14 @@ import {
   PARAGRAPH,
   LIST,
   SELECT_WITH_DYNAMIC_OPTIONS
-} from 'src/forms'
-import { deathFieldToAttachmentTransformer } from './mappings/mutation/documents-mappings'
-import { deathAttachmentToFieldTransformer } from './mappings/query/documents-mappings'
+} from '@register/forms'
+import { deathFieldToAttachmentTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+import { deathAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
 import { defineMessages } from 'react-intl'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   documentsTab: {
     id: 'register.form.tabs.documentsTab',
     defaultMessage: 'Documents',
@@ -134,7 +136,7 @@ export const documentsSection: IFormSection = {
   optional: true,
   fields: [
     {
-      name: 'image_uploader',
+      name: 'imageUploader',
       type: IMAGE_UPLOADER_WITH_OPTIONS,
       label: messages.uploadImage,
       required: false,

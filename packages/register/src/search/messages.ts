@@ -1,6 +1,23 @@
 import { defineMessages } from 'react-intl'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
+  name: {
+    id: 'register.registrarHome.listItemName',
+    defaultMessage: 'Name',
+    description: 'Label for name in work queue list item'
+  },
+  dob: {
+    id: 'register.registrarHome.listItemDoB',
+    defaultMessage: 'D.o.B',
+    description: 'Label for DoB in work queue list item'
+  },
+  dod: {
+    id: 'register.registrarHome.listItemDod',
+    defaultMessage: 'D.o.D',
+    description: 'Label for DoD in work queue list item'
+  },
   queryError: {
     id: 'register.searchResult.queryError',
     defaultMessage: 'An error occurred while searching',
@@ -213,5 +230,10 @@ export const messages = defineMessages({
     id: 'register.SearchResult.rejectComments',
     defaultMessage: 'Comments',
     description: 'The rejected comments'
+  },
+  listItemDuplicateLabel: {
+    id: 'register.workQueue.labels.results.duplicate',
+    defaultMessage: 'Possible duplicate found',
+    description: 'Label for duplicate indication in work queue'
   }
 })

@@ -1,25 +1,24 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { RouteComponentProps } from 'react-router'
+import styled from '@register/styledComponents'
+import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { setInitialApplications } from 'src/applications'
+import { setInitialApplications } from '@register/applications'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { getInitialApplicationsLoaded } from 'src/applications/selectors'
+import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 import {
   getOfflineDataLoaded,
   getOfflineLoadingError
-} from 'src/offline/selectors'
+} from '@register/offline/selectors'
 import { parse } from 'querystring'
-import { IURLParams } from '../utils/authUtils'
-import { storage } from 'src/storage'
-import { checkAuth } from '../profile/profileActions'
-import { showConfigurationErrorNotification } from '../notification/actions'
-import { changeLanguage } from 'src/i18n/actions'
-import { Ii18n } from 'src/type/i18n'
-import { USER_DETAILS } from 'src/utils/userUtils'
+import { IURLParams } from '@register/utils/authUtils'
+import { checkAuth } from '@register/profile/profileActions'
+import { showConfigurationErrorNotification } from '@register/notification/actions'
+import { storage } from '@register/storage'
+import { changeLanguage } from '@register/i18n/actions'
+import { Ii18n } from '@register/type/i18n'
+import { USER_DETAILS } from '@register/utils/userUtils'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -167,8 +166,8 @@ const mapDispatchToProps = {
 }
 
 export const Page = withRouter(
-  connect<IPageProps, IDispatchProps>(
+  connect<IPageProps, IDispatchProps, IPageProps, IStoreState>(
     mapStateToProps,
     mapDispatchToProps
   )(Component)
-)
+) as any

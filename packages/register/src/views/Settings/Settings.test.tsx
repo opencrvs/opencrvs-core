@@ -1,15 +1,14 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { createStore } from 'src/store'
-import { SettingsPage } from './SettingsPage'
-import { userDetails } from 'src/tests/util'
+import { createTestComponent, userDetails } from '@register/tests/util'
+import { createStore } from '@register/store'
+import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 
 const { store } = createStore()
 
-describe('Settings page tests', async () => {
+describe('Settings page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))

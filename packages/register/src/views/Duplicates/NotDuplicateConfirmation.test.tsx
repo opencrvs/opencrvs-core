@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfirmation'
+import { NotDuplicateConfirmation } from '@register/views/Duplicates/NotDuplicateConfirmation'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
+import { createStore } from '@register/store'
+import { createTestComponent } from '@register/tests/util'
 
 const { store } = createStore()
 const mockHandleYes = jest.fn()

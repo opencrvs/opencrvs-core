@@ -1,4 +1,4 @@
-import { ILanguage } from '../reducer'
+import { ILanguage } from '@register/i18n/reducer'
 
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
@@ -1007,6 +1007,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.notificationToast.processingText':
       '{num} টি আবেদন প্রক্রিয়াধীন...',
     'register.registrarHome.notificationToast.outboxText': 'আউটবক্স({num})',
+    'register.registrarHome.outbox.statusWaitingToRegister':
+      'নিবন্ধনের অপেক্ষায়',
+    'register.registrarHome.outbox.statusWaitingToSubmit': 'নিবন্ধনের অপেক্ষায়',
+    'register.registrarHome.outbox.statusWaitingToReject':
+      'প্রত্যাখ্যানের অপেক্ষায়',
+    'register.registrarHome.outbox.statusRegistering': 'নিবন্ধিত হচ্ছে...',
+    'register.registrarHome.outbox.statusRejecting': 'প্রত্যাক্ষিত হচ্ছে...',
+    'register.registrarHome.outbox.statusSubmitting': 'পাঠানো হচ্ছে...',
+    'register.registrarHome.outbox.waitingToRetry':
+      'পুনরায় চেষ্টা করার জন্য অপেক্ষা হচ্ছে',
     'settings.title': 'সেটিংস',
     'profile.title': 'প্রোফাইল',
     'security.title': 'নিরাপত্তা',

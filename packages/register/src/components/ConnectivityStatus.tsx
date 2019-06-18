@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Online, Offline } from '@opencrvs/components/lib/icons'
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
 
 const StyledOnline = styled.div`
   position: absolute;

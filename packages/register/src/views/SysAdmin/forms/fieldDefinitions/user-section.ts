@@ -1,10 +1,10 @@
-import { IFormSection, TEXT, FIELD_GROUP_TITLE } from 'src/forms'
+import { IFormSection, TEXT, FIELD_GROUP_TITLE } from '@register/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   phoneNumberFormat
-} from 'src/utils/validate'
+} from '@register/utils/validate'
 
 const messages = defineMessages({
   userForm: {

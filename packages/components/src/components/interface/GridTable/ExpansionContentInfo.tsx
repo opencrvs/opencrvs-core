@@ -82,7 +82,9 @@ type IProps = InjectedIntlProps & {
   preference: IExpandedContentPreference[] | undefined
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   workflowStatusDateRegistered: {
     id: 'register.workQueue.listItem.status.dateLabel.registered',
     defaultMessage: 'Registrated on',

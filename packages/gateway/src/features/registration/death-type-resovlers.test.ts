@@ -1,13 +1,15 @@
-import { typeResolvers } from 'src/features/registration/type-resovlers'
-import { DECEASED_CODE } from 'src/features/fhir/templates'
-import * as fetch from 'jest-fetch-mock'
+import { typeResolvers } from '@gateway/features/registration/type-resovlers'
+import { DECEASED_CODE } from '@gateway/features/fhir/templates'
 import {
   mockDeathComposition,
   mockPatient,
   mockObservations,
   mockRelatedPerson,
   mockLocation
-} from 'src/utils/testUtils'
+} from '@gateway/utils/testUtils'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()

@@ -1,6 +1,6 @@
-import { createStore } from './store'
-import { SubmissionController } from './SubmissionController'
-import { SUBMISSION_STATUS } from './applications'
+import { createStore } from '@register/store'
+import { SubmissionController } from '@register/SubmissionController'
+import { SUBMISSION_STATUS } from '@register/applications'
 
 describe('Submission Controller', () => {
   it('starts the interval', () => {
@@ -111,7 +111,7 @@ describe('Submission Controller', () => {
     await subCon.sync()
 
     expect(subCon.client.mutate).toHaveBeenCalledTimes(2)
-    expect(store.dispatch).toHaveBeenCalledTimes(2)
+    expect(store.dispatch).toHaveBeenCalledTimes(4)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
@@ -148,7 +148,7 @@ describe('Submission Controller', () => {
     await subCon.sync()
 
     expect(subCon.client.mutate).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.FAILED_NETWORK)
@@ -181,7 +181,7 @@ describe('Submission Controller', () => {
     await subCon.sync()
 
     expect(subCon.client.mutate).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.FAILED)

@@ -1,27 +1,25 @@
-import { GQLResolver } from 'src/graphql/schema'
-import { postSearch } from 'src/features/fhir/utils'
-import { ISearchCriteria } from './type-resovlers'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { postSearch } from '@gateway/features/fhir/utils'
+import { ISearchCriteria } from '@gateway/features/search/type-resovlers'
 
 export const resolvers: GQLResolver = {
   Query: {
     async searchEvents(
       _,
       {
-        status,
         userId,
         locationIds,
+        status,
         trackingId,
         registrationNumber,
         contactNumber,
-        count = 10,
-        skip = 0,
+        count,
+        skip,
         sort = 'desc'
       },
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
-        from: skip,
-        size: count,
         sort
       }
       if (locationIds) {
@@ -35,6 +33,12 @@ export const resolvers: GQLResolver = {
       }
       if (contactNumber) {
         searchCriteria.contactNumber = contactNumber
+      }
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
       }
       if (status) {
         searchCriteria.status = status

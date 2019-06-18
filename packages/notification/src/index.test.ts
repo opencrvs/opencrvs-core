@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from './index'
-import { createServerWithEnvironment } from './tests/util'
+import { createServer } from '@notification/index'
+import { createServerWithEnvironment } from '@notification/tests/util'
 
 describe('Route authorization', () => {
   it('helth check', async () => {

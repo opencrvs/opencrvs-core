@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { verifyToken } from './service'
+import { verifyToken } from '@auth/features/verifyToken/service'
 import { internal } from 'boom'
 
 interface IVerifyTokenPayload {

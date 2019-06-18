@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { ExpandableNotification } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
+import { connect } from 'react-redux'
+import { IStoreState } from '@register/store'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import Outbox from './Outbox'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 const messages = defineMessages({
   processingText: {
@@ -22,16 +26,53 @@ const ExpandableNotificationContainer = styled.div`
   width: 100%;
   flex-direction: column;
 `
-const NotificationToast = (props: InjectedIntlProps) => (
-  <ExpandableNotificationContainer>
-    <ExpandableNotification
-      outboxText={props.intl.formatMessage(messages.outboxText, { num: 4 })}
-      processingText={props.intl.formatMessage(messages.processingText, {
-        num: 2
-      })}
-    >
-      <h2>Hello from the outbox!</h2>
-    </ExpandableNotification>
-  </ExpandableNotificationContainer>
-)
-export default injectIntl(NotificationToast)
+
+interface IProps {
+  application: IApplication[]
+}
+type IFullProps = IProps & InjectedIntlProps
+class NotificationToast extends React.Component<IFullProps> {
+  constructor(props: IFullProps) {
+    super(props)
+  }
+  render() {
+    const outboxData = this.props.application.filter(
+      item =>
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT ||
+        item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
+        item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
+        item.submissionStatus === SUBMISSION_STATUS.REJECTING ||
+        item.submissionStatus === SUBMISSION_STATUS.FAILED_NETWORK
+    )
+
+    return outboxData.length > 0 ? (
+      <ExpandableNotificationContainer>
+        <ExpandableNotification
+          outboxText={this.props.intl.formatMessage(messages.outboxText, {
+            num: outboxData.length
+          })}
+          processingText={this.props.intl.formatMessage(
+            messages.processingText,
+            {
+              num: outboxData.length
+            }
+          )}
+        >
+          <Outbox application={outboxData} />
+        </ExpandableNotification>
+      </ExpandableNotificationContainer>
+    ) : null
+  }
+}
+
+function mapStatetoProps(state: IStoreState) {
+  return {
+    application:
+      state.applicationsState && state.applicationsState.applications
+        ? [...state.applicationsState.applications]
+        : []
+  }
+}
+export default connect(mapStatetoProps)(injectIntl(NotificationToast))

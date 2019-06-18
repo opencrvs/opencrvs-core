@@ -1,4 +1,4 @@
-import { ILanguage } from '../reducer'
+import { ILanguage } from '@register/i18n/reducer'
 
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
@@ -1007,6 +1007,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.notificationToast.processingText':
       '{num} application processing...',
     'register.registrarHome.notificationToast.outboxText': 'Outbox({num})',
+    'register.registrarHome.outbox.statusWaitingToRegister':
+      'Waiting to register',
+    'register.registrarHome.outbox.statusWaitingToSubmit': 'Waiting to submit',
+    'register.registrarHome.outbox.statusWaitingToReject': 'Waiting to reject',
+    'register.registrarHome.outbox.statusRegistering': 'Registering...',
+    'register.registrarHome.outbox.statusRejecting': 'Rejecting...',
+    'register.registrarHome.outbox.statusSubmitting': 'Submitting...',
+    'register.registrarHome.outbox.waitingToRetry': 'Waiting to retry',
     'settings.title': 'Settings',
     'profile.title': 'Profile',
     'security.title': 'Security',

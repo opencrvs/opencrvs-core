@@ -1,11 +1,12 @@
-import TimeoutLink from './timeoutLink'
+import TimeoutLink from '@register/utils/timeoutLink'
 import gql from 'graphql-tag'
 import {
   ApolloLink,
   Observable,
   Operation,
   execute,
-  GraphQLRequest
+  GraphQLRequest,
+  FetchResult
 } from 'apollo-link'
 
 const testOperation: GraphQLRequest = {
@@ -24,7 +25,13 @@ const fastResponseLink = new ApolloLink((operation: Operation) => {
   return new Observable(observer => {
     new Promise(resolve => {
       setTimeout(() => resolve({ response: true }), 100)
-    }).then(res => observer.next(res))
+    }).then(res =>
+      observer.next(res as FetchResult<
+        { [key: string]: any },
+        Record<string, any>,
+        Record<string, any>
+      >)
+    )
   })
 })
 
@@ -32,7 +39,13 @@ const slowResponseLink = new ApolloLink((operation: Operation) => {
   return new Observable(observer => {
     new Promise(resolve => {
       setTimeout(() => resolve({ response: true }), 300)
-    }).then(res => observer.next(res))
+    }).then(res =>
+      observer.next(res as FetchResult<
+        { [key: string]: any },
+        Record<string, any>,
+        Record<string, any>
+      >)
+    )
   })
 })
 

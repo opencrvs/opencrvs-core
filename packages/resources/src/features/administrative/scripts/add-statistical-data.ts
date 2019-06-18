@@ -1,8 +1,8 @@
 import { internal } from 'boom'
 import chalk from 'chalk'
-import { getFromFhir, IStatistic } from '../../utils/bn'
+import { getFromFhir, IStatistic } from '@resources/features/utils/bn'
 import * as fs from 'fs'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
 
 const divisionsStatistics = JSON.parse(
   fs

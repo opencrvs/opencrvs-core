@@ -1,6 +1,6 @@
 import * as moxios from 'moxios'
-import { createTestApp, wait } from './tests/util'
-import { client } from './utils/authApi'
+import { createTestApp, wait } from '@login/tests/util'
+import { client } from '@login/utils/authApi'
 import { resolve } from 'url'
 import { ReactWrapper } from 'enzyme'
 

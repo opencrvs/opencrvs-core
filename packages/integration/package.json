@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/integration",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "description": "A set of integration and performance tests for OpenCRVS",
   "main": "index.js",
   "license": "NONE",

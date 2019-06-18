@@ -6,13 +6,13 @@ import {
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { queries } from 'src/profile/queries'
-import { SEARCH_EVENTS } from 'src/search/queries'
-import { createStore } from 'src/store'
-import { createTestComponent, mockUserResponse } from 'src/tests/util'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { SearchResult } from './SearchResult'
-import { goToSearch } from 'src/navigation'
+import { queries } from '@register/profile/queries'
+import { SEARCH_EVENTS } from '@register/search/queries'
+import { createStore } from '@register/store'
+import { createTestComponent, mockUserResponse } from '@register/tests/util'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
+import { SearchResult } from '@register/views/SearchResult/SearchResult'
+import { goToSearch } from '@register/navigation'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -40,12 +40,14 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-describe('SearchResult tests', async () => {
+describe('SearchResult tests', () => {
+  const { store } = createStore()
+
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
-  const { store } = createStore()
+
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -91,7 +93,9 @@ describe('SearchResult tests', async () => {
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'DECLARED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
@@ -101,19 +105,28 @@ describe('SearchResult tests', async () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
-                  ]
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfBirth: '',
+                  childName: []
                 },
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
                   type: 'Death',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'REJECTED',
                     trackingId: 'DXMJPYA',
                     registrationNumber: null,
@@ -127,19 +140,28 @@ describe('SearchResult tests', async () => {
                   dateOfDeath: '2010-01-01',
                   deceasedName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Zahir',
                       familyName: 'Raihan'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'জহির',
                       familyName: 'রায়হান'
                     }
-                  ]
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfBirth: '',
+                  childName: []
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
                   type: 'Birth',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'REGISTERED',
                     trackingId: 'BQRZWDR',
                     registrationNumber: '2019333494BQRZWDR2',
@@ -149,19 +171,28 @@ describe('SearchResult tests', async () => {
                   dateOfBirth: '2010-01-01',
                   childName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Fokrul',
                       familyName: 'Islam'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'ফকরুল',
                       familyName: 'ইসলাম'
                     }
-                  ]
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfDeath: '',
+                  deceasedName: []
                 },
                 {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
                   type: 'Birth',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'CERTIFIED',
                     trackingId: 'B3DBJMP',
                     registrationNumber: '2019333494B3DBJMP5',
@@ -171,14 +202,21 @@ describe('SearchResult tests', async () => {
                   dateOfBirth: '2008-01-01',
                   childName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Rafiq',
                       familyName: 'Islam'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'রফিক',
                       familyName: 'ইসলাম'
                     }
-                  ]
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfDeath: '',
+                  deceasedName: []
                 }
               ],
               __typename: 'EventSearchResultSet'
@@ -218,12 +256,16 @@ describe('SearchResult tests', async () => {
         dob: '',
         dod: '01-01-2007',
         registrationNumber: '',
-        tracking_id: 'DW0UTHR',
+        trackingId: 'DW0UTHR',
         event: 'Death',
-        declaration_status: 'DECLARED',
+        declarationStatus: 'DECLARED',
         duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-        rejection_reasons: '',
-        rejection_comment: ''
+        rejectionReasons: '',
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2007-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       },
       {
         id: 'c7e83060-4db9-4057-8b14-71841243b05f',
@@ -231,12 +273,16 @@ describe('SearchResult tests', async () => {
         dob: '',
         dod: '01-01-2010',
         registrationNumber: '',
-        tracking_id: 'DXMJPYA',
+        trackingId: 'DXMJPYA',
         event: 'Death',
-        declaration_status: 'REJECTED',
-        duplicates: null,
-        rejection_reasons: '',
-        rejection_comment: ''
+        declarationStatus: 'REJECTED',
+        duplicates: [],
+        rejectionReasons: '',
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2010-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       },
       {
         id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
@@ -244,12 +290,16 @@ describe('SearchResult tests', async () => {
         dob: '01-01-2010',
         dod: '',
         registrationNumber: '2019333494BQRZWDR2',
-        duplicates: null,
-        tracking_id: 'BQRZWDR',
+        duplicates: [],
+        trackingId: 'BQRZWDR',
         event: 'Birth',
-        declaration_status: 'REGISTERED',
-        rejection_reasons: '',
-        rejection_comment: ''
+        declarationStatus: 'REGISTERED',
+        rejectionReasons: '',
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2010-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       },
       {
         id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
@@ -257,12 +307,16 @@ describe('SearchResult tests', async () => {
         dob: '01-01-2008',
         dod: '',
         registrationNumber: '2019333494B3DBJMP5',
-        duplicates: null,
-        tracking_id: 'B3DBJMP',
+        duplicates: [],
+        trackingId: 'B3DBJMP',
         event: 'Birth',
-        declaration_status: 'CERTIFIED',
-        rejection_reasons: '',
-        rejection_comment: ''
+        declarationStatus: 'CERTIFIED',
+        rejectionReasons: '',
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2008-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
       }
     ])
 
@@ -309,7 +363,7 @@ describe('SearchResult tests', async () => {
     })
 
     testComponent.component.update()
-
+    testComponent.component.debug()
     expect(
       testComponent.component
         .find('#search-result-error-text')
@@ -319,7 +373,6 @@ describe('SearchResult tests', async () => {
 
     testComponent.component.unmount()
   })
-
   describe('SearchResult tests for different application activity', () => {
     it('renders declare section after expanding', async () => {
       const graphqlMock = [
@@ -365,7 +418,12 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
-                    __typename: 'BirthEventSearchSet'
+                    __typename: 'BirthEventSearchSet',
+
+                    // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    dateOfDeath: '',
+                    deceasedName: []
                   }
                 ],
                 __typename: 'EventSearchResultSet'
@@ -384,24 +442,45 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
+                  __typename: 'X',
                   status: [
                     {
                       id:
                         '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
                       timestamp: '2019-04-03T07:08:24.936Z',
+                      __typename: 'X',
                       user: {
                         id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        __typename: 'X',
                         name: [
                           {
                             use: 'en',
+                            __typename: 'X',
                             firstNames: 'Mohammad',
                             familyName: 'Ashraful'
                           },
                           {
                             use: 'bn',
+                            __typename: 'X',
                             firstNames: '',
                             familyName: ''
                           }
@@ -409,11 +488,13 @@ describe('SearchResult tests', async () => {
                         role: 'LOCAL_REGISTRAR'
                       },
                       location: {
+                        __typename: 'X',
                         id: '123',
                         name: 'Kaliganj Union Sub Center',
                         alias: ['']
                       },
                       office: {
+                        __typename: 'X',
                         id: '123',
                         name: 'Kaliganj Union Sub Center',
                         alias: [''],
@@ -521,7 +602,11 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
-                    __typename: 'BirthEventSearchSet'
+                    __typename: 'BirthEventSearchSet',
+                    // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    dateOfDeath: '',
+                    deceasedName: []
                   }
                 ],
                 __typename: 'EventSearchResultSet'
@@ -637,7 +722,11 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
-                    __typename: 'BirthEventSearchSet'
+                    __typename: 'BirthEventSearchSet',
+                    // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    dateOfDeath: '',
+                    deceasedName: []
                   }
                 ],
                 __typename: 'EventSearchResultSet'
@@ -656,6 +745,22 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
@@ -798,6 +903,10 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
+                    // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    dateOfDeath: '',
+                    deceasedName: [],
                     __typename: 'BirthEventSearchSet'
                   }
                 ],
@@ -817,6 +926,22 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
@@ -949,6 +1074,10 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
+                    // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    dateOfDeath: '',
+                    deceasedName: [],
                     __typename: 'BirthEventSearchSet'
                   }
                 ],
@@ -968,6 +1097,22 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: null,
@@ -1105,6 +1250,10 @@ describe('SearchResult tests', async () => {
                         __typename: 'HumanName'
                       }
                     ],
+                    // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    dateOfDeath: '',
+                    deceasedName: [],
                     __typename: 'BirthEventSearchSet'
                   }
                 ],
@@ -1124,6 +1273,22 @@ describe('SearchResult tests', async () => {
             data: {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                informant: {
+                  __typename: 'X',
+                  individual: {
+                    __typename: 'X',
+                    telecom: [
+                      {
+                        __typename: 'X',
+                        system: 'phone',
+                        use: '',
+                        value: '01622688231'
+                      }
+                    ]
+                  }
+                },
                 registration: {
                   id: '345678',
                   certificates: [
@@ -1176,17 +1341,6 @@ describe('SearchResult tests', async () => {
                       comments: null
                     }
                   ]
-                },
-                informant: {
-                  individual: {
-                    telecom: [
-                      {
-                        use: null,
-                        system: 'phone',
-                        value: '01686972106'
-                      }
-                    ]
-                  }
                 }
               }
             }

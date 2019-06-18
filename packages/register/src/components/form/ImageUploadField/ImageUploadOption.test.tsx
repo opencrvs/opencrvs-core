@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { createShallowRenderedComponent } from 'src/tests/util'
-import { ImageUploadOption } from './ImageUploadOption'
-import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
+import { createShallowRenderedComponent } from '@register/tests/util'
+import { ImageUploadOption } from '@register/components/form/ImageUploadField/ImageUploadOption'
+import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
 import { IImageUploaderWithOptionsFormField } from '@opencrvs/register/src/forms'
 import { IntlProvider } from 'react-intl'
 

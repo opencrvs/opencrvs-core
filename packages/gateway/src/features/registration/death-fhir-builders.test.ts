@@ -1,4 +1,5 @@
-import { buildFHIRBundle } from 'src/features/registration/fhir-builders'
+import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
@@ -160,7 +161,7 @@ test('should build a minimal FHIR registration document without error', async ()
         encounter: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
       }
     },
-    'DEATH'
+    'DEATH' as EVENT_TYPE
   )
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.section.length).toBe(5)
@@ -214,7 +215,7 @@ test('should build a minimal FHIR registration document without error', async ()
         otherRelationship: 'Nephew'
       }
     },
-    'DEATH'
+    'DEATH' as EVENT_TYPE
   )
   expect(fhir).toBeDefined()
   // informant relationship

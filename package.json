@@ -9,14 +9,15 @@
     }
   },
   "scripts": {
-    "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration start",
-    "start:prod": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration start:prod",
+    "postinstall": "patch-package",
+    "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start",
+    "start:prod": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
     "dev": "yarn dev:secrets:gen && concurrently \"yarn run start\" \"yarn run compose\"",
     "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
     "dev:tmux": "tmuxinator start",
     "dev:tmux:kill": "tmux kill-session -t opencrvs",
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
-    "test": "lerna run test --stream --watchAll=false",
+    "test": "CI=true lerna run test --silent --noStackTrace --stream --watchAll=false",
     "compose": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev.yml up",
     "compose:down": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev.yml down",
     "compose:build": "docker-compose build",
@@ -40,6 +41,8 @@
     "prettier": "^1.15.2"
   },
   "dependencies": {
-    "opener": "^1.5.1"
+    "opener": "^1.5.1",
+    "patch-package": "^6.1.2",
+    "postinstall-postinstall": "^2.0.0"
   }
 }
