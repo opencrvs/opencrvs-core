@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import {
   injectIntl,
   InjectedIntlProps,
@@ -13,14 +13,14 @@ import {
   LogoutBlack,
   AvatarSmall
 } from '@opencrvs/components/lib/icons'
-import { IStoreState } from 'src/store'
-import { IUserDetails } from 'src/utils/userUtils'
-import { getLanguage } from 'src/i18n/selectors'
-import { getUserDetails } from 'src/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { IUserDetails } from '@register/utils/userUtils'
+import { getLanguage } from '@register/i18n/selectors'
+import { getUserDetails } from '@register/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { redirectToAuthentication } from 'src/profile/profileActions'
-import { goToSettings } from 'src/navigation'
-import { roleMessages } from 'src/utils/roleTypeMessages'
+import { roleMessages } from '@register/utils/roleTypeMessages'
+import { redirectToAuthentication } from '@register/profile/profileActions'
+import { goToSettings } from '@register/navigation'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -49,7 +49,7 @@ const messages = defineMessages({
 
 interface IProps {
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   goToSettings: typeof goToSettings
 }
@@ -79,19 +79,21 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   getMenuHeader = (
     intl: InjectedIntl,
     language: string,
-    userDetails: IUserDetails
+    userDetails: IUserDetails | null
   ): JSX.Element => {
     let userName
     let userRole
 
-    if (userDetails) {
-      const nameObj =
-        userDetails.name &&
-        (userDetails.name.find(
-          (storedName: GQLHumanName) => storedName.use === language
-        ) as GQLHumanName)
-      userName =
-        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
+      ) as GQLHumanName
+
+      userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+
       userRole =
         userDetails.role &&
         intl.formatMessage(roleMessages[userDetails.role as string])

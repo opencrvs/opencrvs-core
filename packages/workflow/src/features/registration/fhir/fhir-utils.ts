@@ -4,16 +4,16 @@ import {
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   EVENT_TYPE
-} from './constants'
-import { HEARTH_URL } from 'src/constants'
+} from '@workflow/features/registration/fhir/constants'
+import { HEARTH_URL } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
   selectInformantResource
-} from './fhir-template'
-import { ITokenPayload, USER_SCOPE } from 'src/utils/authUtils.ts'
+} from '@workflow/features/registration/fhir/fhir-template'
+import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
 import fetch from 'node-fetch'
-import { getEventType } from '../utils'
+import { getEventType } from '@workflow/features/registration/utils'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {

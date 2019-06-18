@@ -1,29 +1,40 @@
-import { client } from 'src/elasticsearch/client'
-import { buildQuery, ICompositionBody } from 'src/elasticsearch/utils'
+import { client } from '@search/elasticsearch/client'
+import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
+import { logger } from '@search/logger'
 
 export const indexComposition = async (
   compositionIdentifier: string,
   body: ICompositionBody
 ) => {
-  const response = await client.index({
-    index: 'ocrvs',
-    type: 'compositions',
-    id: compositionIdentifier,
-    body
-  })
+  let response: any
+  try {
+    response = await client.index({
+      index: 'ocrvs',
+      type: 'compositions',
+      id: compositionIdentifier,
+      body
+    })
+  } catch (e) {
+    logger.error(`indexComposition: error: ${e}`)
+  }
 
   return response
 }
 
 export const updateComposition = async (id: string, body: ICompositionBody) => {
-  const response = await client.update({
-    index: 'ocrvs',
-    type: 'compositions',
-    id,
-    body: {
-      doc: body
-    }
-  })
+  let response: any
+  try {
+    response = await client.update({
+      index: 'ocrvs',
+      type: 'compositions',
+      id,
+      body: {
+        doc: body
+      }
+    })
+  } catch (e) {
+    logger.error(`updateComposition: error: ${e}`)
+  }
 
   return response
 }

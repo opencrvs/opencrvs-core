@@ -1,7 +1,9 @@
 import { defineMessages } from 'react-intl'
-import { CHECKBOX_GROUP, TEXTAREA, IFormField } from 'src/forms'
+import { CHECKBOX_GROUP, TEXTAREA, IFormField } from '@register/forms'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   rejectionForm: {
     id: 'review.rejection.form',
     defaultMessage: 'Rejection Form',

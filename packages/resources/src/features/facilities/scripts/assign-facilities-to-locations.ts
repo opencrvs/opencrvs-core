@@ -1,9 +1,12 @@
 import * as fs from 'fs'
-import { FACILITIES_SOURCE, ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { FACILITIES_SOURCE, ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
 import chalk from 'chalk'
 import { internal } from 'boom'
-import { composeAndSaveFacilities, generateLocationResource } from './service'
-import { ILocation } from '../../utils/bn'
+import {
+  composeAndSaveFacilities,
+  generateLocationResource
+} from '@resources/features/facilities/scripts/service'
+import { ILocation } from '@resources/features/utils/bn'
 
 const crvsOfficeSourceJSON = `${FACILITIES_SOURCE}crvs-facilities.json`
 const healthFacilitySourceJSON = `${FACILITIES_SOURCE}health-facilities.json`

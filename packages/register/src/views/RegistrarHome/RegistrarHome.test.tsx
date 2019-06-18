@@ -1,22 +1,28 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { queries } from 'src/profile/queries'
+import { createTestComponent, mockUserResponse } from '@register/tests/util'
+import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { mockUserResponse } from 'src/tests/util'
-import { storage } from 'src/storage'
-import { createStore } from 'src/store'
-import { RegistrarHome, EVENT_STATUS } from './RegistrarHome'
+
+import { storage } from '@register/storage'
+import { createStore } from '@register/store'
+import {
+  RegistrarHome,
+  EVENT_STATUS
+} from '@register/views/RegistrarHome/RegistrarHome'
 import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import {
   COUNT_REGISTRATION_QUERY,
   SEARCH_EVENTS,
   FETCH_REGISTRATION_BY_COMPOSITION
-} from './queries'
-import { checkAuth } from 'src/profile/profileActions'
-import { storeApplication, createReviewApplication } from 'src/applications'
-import { Event } from 'src/forms'
-import * as moment from 'moment'
+} from '@register/views/RegistrarHome/queries'
+import { checkAuth } from '@register/profile/profileActions'
+import {
+  storeApplication,
+  createReviewApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
+import moment from 'moment'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -41,7 +47,7 @@ const nameObj = {
   }
 }
 
-const demoUserData = {
+const mockUserData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
   type: 'Birth',
   registration: {
@@ -65,13 +71,51 @@ const demoUserData = {
       familyName: 'খান'
     }
   ],
+  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+  child: {
+    name: [
+      {
+        firstNames: 'Iliyas',
+        familyName: 'Khan'
+      },
+      {
+        firstNames: 'ইলিয়াস',
+        familyName: 'খান'
+      }
+    ],
+    birthDate: '2010-10-10'
+  },
+  deceased: {
+    name: [
+      {
+        use: '',
+        firstNames: '',
+        familyName: ''
+      }
+    ],
+    deceased: {
+      deathDate: ''
+    }
+  },
+  informant: {
+    individual: {
+      telecom: [
+        {
+          system: '',
+          use: '',
+          value: ''
+        }
+      ]
+    }
+  },
   dateOfDeath: null,
-  deceasedName: null
+  deceasedName: null,
+  createdAt: '2018-05-23T14:44:58+02:00'
 }
-
 const userData: any = []
 for (let i = 0; i < 14; i++) {
-  userData.push(demoUserData)
+  userData.push(mockUserData)
 }
 merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
@@ -80,7 +124,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('RegistrarHome tests', async () => {
+describe('RegistrarHome tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -418,7 +462,7 @@ describe('RegistrarHome tests', async () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 500)
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
@@ -429,9 +473,9 @@ describe('RegistrarHome tests', async () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].event_time_elapsed).toBe('8 years ago')
-    expect(data[0].application_time_elapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
-    expect(data[0].tracking_id).toBe('BW0UTHR')
+    expect(data[0].eventTimeElapsed).toBe('8 years ago')
+    expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
+    expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
 
@@ -533,6 +577,7 @@ describe('RegistrarHome tests', async () => {
       setTimeout(resolve, 200)
     })
     testComponent.component.update()
+    console.log(testComponent.component.debug())
     const data = testComponent.component.find(GridTable).prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -541,8 +586,8 @@ describe('RegistrarHome tests', async () => {
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-    expect(data[1].contact_number).toBe('01622688231')
-    expect(data[1].date_of_rejection).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].contactNumber).toBe('01622688231')
+    expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
 
@@ -598,7 +643,7 @@ describe('RegistrarHome tests', async () => {
 
     expect(data[1].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[1].name).toBe('Anik')
-    expect(data[1].date_of_modification).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
 

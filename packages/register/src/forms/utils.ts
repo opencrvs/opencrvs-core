@@ -22,23 +22,35 @@ import {
   ILoaderButton,
   IFieldInput,
   IQuery
-} from './'
+} from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
-import { getValidationErrorsForForm } from 'src/forms/validation'
+import { getValidationErrorsForForm } from '@register/forms/validation'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { Validation } from 'src/utils/validate'
-import * as moment from 'moment'
+} from '@register/offline/reducer'
+import { Validation } from '@register/utils/validate'
+import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 interface IRange {
   start: number
   end?: number
   value: string
+}
+
+export const internationaliseOptions = (
+  intl: InjectedIntl,
+  options: Array<ISelectOption | IRadioOption | ICheckboxOption>
+) => {
+  return options.map(opt => {
+    return {
+      ...opt,
+      label: intl.formatMessage(opt.label)
+    }
+  })
 }
 
 export const internationaliseFieldObject = (
@@ -74,18 +86,6 @@ export const internationaliseFieldObject = (
   }
 
   return base as Ii18nFormField
-}
-
-export const internationaliseOptions = (
-  intl: InjectedIntl,
-  options: Array<ISelectOption | IRadioOption | ICheckboxOption>
-) => {
-  return options.map(opt => {
-    return {
-      ...opt,
-      label: intl.formatMessage(opt.label)
-    }
-  })
 }
 
 export const generateOptions = (
@@ -204,8 +204,12 @@ export const getFieldOptions = (
   }
 }
 
+interface INested {
+  [key: string]: any
+}
+
 const getNestedValue = (obj: object, key: string) => {
-  return key.split('.').reduce((res, k) => res[k] || '', obj)
+  return key.split('.').reduce((res: INested, k) => res[k] || '', obj)
 }
 
 const betweenRange = (range: IRange, check: number) =>
@@ -216,10 +220,10 @@ export const getFieldOptionsByValueMapper = (
   values: IFormSectionData | IFormData,
   valueMapper: IDynamicValueMapper
 ) => {
-  const dependencyVal = getNestedValue(
+  const dependencyVal = (getNestedValue(
     values,
     field.dynamicItems.dependency
-  ) as string
+  ) as unknown) as string
 
   const firstKey = Object.keys(field.dynamicItems.items)[0]
 
@@ -269,6 +273,21 @@ export function isCityLocation(
   }
 }
 
+interface IVars {
+  [key: string]: any
+}
+
+export function getInputValues(
+  inputs: IFieldInput[],
+  values: IFormSectionData
+): IDynamicValues {
+  const variables: IVars = {}
+  inputs.forEach((input: IFieldInput) => {
+    variables[input.name] = values[input.valueField]
+  })
+  return variables
+}
+
 export function getQueryData(
   field: ILoaderButton,
   values: IFormSectionData
@@ -285,17 +304,6 @@ export function getQueryData(
   return queryData
 }
 
-export function getInputValues(
-  inputs: IFieldInput[],
-  values: IFormSectionData
-): IDynamicValues {
-  const variables = {}
-  inputs.forEach((input: IFieldInput) => {
-    variables[input.name] = values[input.valueField]
-  })
-  return variables
-}
-
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
@@ -307,7 +315,7 @@ export const getConditionalActionsForField = (
 
   return field.conditionals
     .filter(conditional =>
-      /* tslint:disable-next-line: no-eval */
+      /* eslint-disable-line  no-eval */
       eval(conditional.expression)
     )
     .map((conditional: IConditional) => conditional.action)

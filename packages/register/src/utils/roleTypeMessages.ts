@@ -1,6 +1,8 @@
 import { defineMessages } from 'react-intl'
 
-export const roleMessages = defineMessages({
+export const roleMessages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   FIELD_AGENT: {
     id: 'register.home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
@@ -38,7 +40,9 @@ export const roleMessages = defineMessages({
   }
 })
 
-export const typeMessages = defineMessages({
+export const typeMessages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   HOSPITAL: {
     id: 'userSetup.type.HOSPITAL',
     defaultMessage: 'Hospital',

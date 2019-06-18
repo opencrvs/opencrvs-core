@@ -2,7 +2,7 @@ import {
   findCompositionSection,
   findExtension,
   fetchFHIR
-} from 'src/features/fhir/utils'
+} from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
   FATHER_CODE,
@@ -24,20 +24,21 @@ import {
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
   CERTIFICATE_DOCS_CODE
-} from 'src/features/fhir/templates'
-import { GQLResolver } from 'src/graphql/schema'
+} from '@gateway/features/fhir/templates'
+import { GQLResolver } from '@gateway/graphql/schema'
 import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL
-} from 'src/features/fhir/constants'
-import { ITemplatedComposition } from './fhir-builders'
+} from '@gateway/features/fhir/constants'
+import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from 'src/constants'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
+    // tslint:disable-next-line
     __resolveType(obj) {
       if (obj.type.coding[0].code === 'birth-declaration') {
         return 'BirthRegistration'
@@ -146,6 +147,7 @@ export const typeResolvers: GQLResolver = {
     },
     individual: async (relatedPerson, _, authHeader) => {
       if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
+        // tslint:disable-next-line
         relatedPerson = await fetchFHIR(
           `/${relatedPerson.patient.reference}`,
           authHeader
@@ -521,6 +523,7 @@ export const typeResolvers: GQLResolver = {
     address: location => location.address
   },
   DeathRegistration: {
+    // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       return {
         composition: composition.id
@@ -665,6 +668,7 @@ export const typeResolvers: GQLResolver = {
     }
   },
   BirthRegistration: {
+    // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(

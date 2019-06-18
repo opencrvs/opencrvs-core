@@ -1,10 +1,9 @@
-import { USER_MANAGEMENT_URL } from 'src/constants'
+import { USER_MANAGEMENT_URL, COUNTRY } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
-import { logger } from 'src/logger'
-import { COUNTRY } from 'src/constants'
-import { getTokenPayload } from 'src/utils/authUtils.ts'
-import { getFromFhir } from 'src/features/registration/fhir/fhir-utils'
+import { logger } from '@workflow/logger'
+import { getTokenPayload } from '@workflow/utils/authUtils.ts'
+import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 const JURISDICTION_TYPE_DISTRICT = 'district'
 const JURISDICTION_TYPE_UPAZILA = 'upazila'
 const JURISDICTION_TYPE_UNION = 'union'
@@ -34,6 +33,7 @@ export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
 ) => {
+  // tslint:disable-next-line
   countryCode = countryCode.toUpperCase()
   return mobileWithCountryCode.replace(
     callingCountries[countryCode].countryCallingCodes[0],
@@ -147,7 +147,6 @@ export async function getPractitionerLocations(
   const roleResponse = await getFromFhir(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
-
   const roleEntry = roleResponse.entry[0].resource
   if (!roleEntry || !roleEntry.location) {
     throw new Error('PractitionerRole has no locations associated')

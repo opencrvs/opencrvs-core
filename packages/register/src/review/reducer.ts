@@ -2,7 +2,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import {
   rejectRegistration,
   IRejectRegistrationForm
-} from 'src/review/reject-registration'
+} from '@register/review/reject-registration'
 
 export type IRejectState = {
   rejectForm: IRejectRegistrationForm

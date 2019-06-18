@@ -6,13 +6,13 @@ import { ThemeProvider } from 'styled-components'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-import { IntlContainer } from './i18n/components/I18nContainer'
-import { createStore, history } from './store'
-import { DarkPageContainer } from './common/PageContainer'
-import * as routes from './navigation/routes'
-import { StepTwoContainer } from './views/StepTwo/StepTwoContainer'
-import { StepOneContainer } from './views/StepOne/StepOneContainer'
-import { ErrorBoundary } from './ErrorBoundary'
+import { IntlContainer } from '@login/i18n/components/I18nContainer'
+import { createStore, history } from '@login/store'
+import { DarkPageContainer } from '@login/common/PageContainer'
+import * as routes from '@login/navigation/routes'
+import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
+import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
+import { ErrorBoundary } from '@login/ErrorBoundary'
 
 export const store = createStore()
 export class App extends React.Component {

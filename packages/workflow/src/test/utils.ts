@@ -93,6 +93,7 @@ export const testFhirBundle = {
       resource: {
         resourceType: 'Task',
         status: 'requested',
+        intent: '',
         focus: {
           reference: 'urn:uuid:888'
         },

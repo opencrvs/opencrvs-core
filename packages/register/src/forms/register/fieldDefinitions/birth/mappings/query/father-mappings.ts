@@ -1,4 +1,4 @@
-import { IFormData } from 'src/forms'
+import { IFormData } from '@register/forms'
 
 export function emptyFatherSectionTransformer(
   transformedData: IFormData,

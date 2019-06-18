@@ -19,39 +19,41 @@ import {
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import * as Sentry from '@sentry/browser'
-import * as moment from 'moment'
+import moment from 'moment'
 import * as React from 'react'
+import * as Sentry from '@sentry/browser'
 import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { Header } from 'src/components/interface/Header/Header'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
-import { IApplication } from 'src/applications'
+import { Header } from '@register/components/interface/Header/Header'
+import { IViewHeadingProps } from '@register/components/ViewHeading'
+import { IApplication } from '@register/applications'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction
-} from 'src/navigation'
+  goToTab as goToTabAction,
+  goToRegistrarHomeTab as goToRegistrarHomeTabAction
+} from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB
-} from 'src/navigation/routes'
-import { getScope, getUserDetails } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
-import { getUserLocation, IUserDetails } from 'src/utils/userUtils'
-import styled, { withTheme } from 'styled-components'
-import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '../../navigation'
-import { COUNT_REGISTRATION_QUERY, SEARCH_EVENTS } from './queries'
-import { sentenceCase } from 'src/utils/data-formatting'
-import NotificationToast from './NotificatoinToast'
-import { transformData } from 'src/search/transformer'
-import { RowHistoryView } from './RowHistoryView'
+} from '@register/navigation/routes'
+import { getScope, getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { Scope } from '@register/utils/authUtils'
+import { sentenceCase } from '@register/utils/data-formatting'
+import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
+import {
+  COUNT_REGISTRATION_QUERY,
+  SEARCH_EVENTS
+} from '@register/views/RegistrarHome/queries'
+import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
+import { transformData } from '@register/search/transformer'
+import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -83,7 +85,9 @@ export const IconTab = styled(Button).attrs<IProps>({})`
   }
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   hello: {
     id: 'register.registrarHome.header.Hello',
     defaultMessage: 'Hello {fullName}',
@@ -215,8 +219,8 @@ const ErrorText = styled.div`
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   language: string
-  scope: Scope
-  userDetails: IUserDetails
+  scope: Scope | null
+  userDetails: IUserDetails | null
   gotoTab: typeof goToTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
@@ -284,7 +288,7 @@ export class RegistrarHomeView extends React.Component<
                 REVIEW_EVENT_PARENT_FORM_TAB,
                 reg.id,
                 'review',
-                reg.event.toLowerCase()
+                reg.event ? reg.event.toLowerCase() : ''
               )
           })
         }
@@ -292,11 +296,11 @@ export class RegistrarHomeView extends React.Component<
 
       return {
         ...reg,
-        event_time_elapsed:
+        eventTimeElapsed:
           (reg.dateOfEvent &&
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
           '',
-        application_time_elapsed:
+        applicationTimeElapsed:
           (reg.createdAt &&
             moment(
               moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -329,14 +333,14 @@ export class RegistrarHomeView extends React.Component<
                 REVIEW_EVENT_PARENT_FORM_TAB,
                 reg.id,
                 'review',
-                reg.event.toLowerCase() || ''
+                reg.event ? reg.event.toLowerCase() : ''
               )
           })
         }
       }
       return {
         ...reg,
-        date_of_rejection:
+        dateOfRejection:
           (reg.modifiedAt &&
             moment(
               moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -409,7 +413,7 @@ export class RegistrarHomeView extends React.Component<
         id: draft.id,
         event: (draft.event && sentenceCase(draft.event)) || '',
         name: name || '',
-        date_of_modification:
+        dateOfModification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||
           '',
         actions
@@ -447,7 +451,15 @@ export class RegistrarHomeView extends React.Component<
             locationIds: [registrarUnion]
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
             if (loading) {
               parentQueryLoading = true
               return (
@@ -534,7 +546,7 @@ export class RegistrarHomeView extends React.Component<
                     messages.listItemModificationDate
                   ),
                   width: 35,
-                  key: 'date_of_modification'
+                  key: 'dateOfModification'
                 },
                 {
                   label: this.props.intl.formatMessage(messages.listItemAction),
@@ -564,7 +576,15 @@ export class RegistrarHomeView extends React.Component<
               skip: (this.state.reviewCurrentPage - 1) * this.pageSize
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (loading) {
                 return (
                   (!parentQueryLoading && (
@@ -601,21 +621,21 @@ export class RegistrarHomeView extends React.Component<
                           messages.listItemTrackingNumber
                         ),
                         width: 20,
-                        key: 'tracking_id'
+                        key: 'trackingId'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemApplicationDate
                         ),
                         width: 23,
-                        key: 'application_time_elapsed'
+                        key: 'applicationTimeElapsed'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemEventDate
                         ),
                         width: 23,
-                        key: 'event_time_elapsed'
+                        key: 'eventTimeElapsed'
                       },
                       {
                         label: this.props.intl.formatMessage(
@@ -656,7 +676,15 @@ export class RegistrarHomeView extends React.Component<
               skip: (this.state.updatesCurrentPage - 1) * this.pageSize
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (loading) {
                 return (
                   (!parentQueryLoading && (
@@ -700,14 +728,14 @@ export class RegistrarHomeView extends React.Component<
                           messages.listItemApplicantNumber
                         ),
                         width: 21,
-                        key: 'contact_number'
+                        key: 'contactNumber'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemUpdateDate
                         ),
                         width: 22,
-                        key: 'date_of_rejection'
+                        key: 'dateOfRejection'
                       },
                       {
                         label: this.props.intl.formatMessage(

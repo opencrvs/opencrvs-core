@@ -1,6 +1,6 @@
-import { birthEventHandler } from 'src/features/registration/birth/handler'
-import { deathEventHandler } from 'src/features/registration/death/handler'
-import { searchDeclaration } from 'src/features/search/handler'
+import { birthEventHandler } from '@search/features/registration/birth/handler'
+import { deathEventHandler } from '@search/features/registration/death/handler'
+import { searchDeclaration } from '@search/features/search/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',

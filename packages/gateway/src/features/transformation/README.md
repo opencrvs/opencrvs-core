@@ -17,7 +17,7 @@ These functions may be asynchronous if necessary. E.g. if you need to make an AP
 Example usage
 
 ```ts
-import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 
 // the property name of the builder must match the property name in the incoming
 // source object, these may also be nested if the source object has nested properties

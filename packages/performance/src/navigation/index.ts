@@ -1,6 +1,6 @@
 import { push, goBack as back } from 'react-router-redux'
-import { HOME } from 'src/navigation/routes'
-import { getToken } from 'src/utils/authUtils'
+import { HOME } from '@performance/navigation/routes'
+import { getToken } from '@performance/utils/authUtils'
 
 export function goBack() {
   return back()

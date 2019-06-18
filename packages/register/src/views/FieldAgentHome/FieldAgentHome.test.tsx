@@ -3,25 +3,25 @@ import {
   createTestComponent,
   validToken,
   flushPromises,
-  mockApplicationData
-} from 'src/tests/util'
-import { queries } from 'src/profile/queries'
+  mockApplicationData,
+  mockUserResponse
+} from '@register/tests/util'
+import { ReactWrapper } from 'enzyme'
+import { storage } from '@register/storage'
+import { FIELD_AGENT_ROLES } from '@register/utils/constants'
+import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
+import { storeApplication, SUBMISSION_STATUS } from '@register/applications'
+import uuid from 'uuid'
+import { Event } from '@register/forms'
+import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { mockUserResponse } from 'src/tests/util'
-import { storage } from 'src/storage'
-import { createStore } from 'src/store'
-import { checkAuth } from 'src/profile/profileActions'
-import { FIELD_AGENT_ROLES } from 'src/utils/constants'
-import { EVENT_STATUS } from '../RegistrarHome/RegistrarHome'
+import { createStore } from '@register/store'
+import { checkAuth } from '@register/profile/profileActions'
+import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
 import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
-} from 'src/search/queries'
-import { FieldAgentHome } from './FieldAgentHome'
-import { ReactWrapper } from 'enzyme'
-import * as uuid from 'uuid'
-import { SUBMISSION_STATUS, storeApplication } from 'src/applications'
-import { Event } from 'src/forms'
+} from '@register/search/queries'
 
 const getItem = window.localStorage.getItem as jest.Mock
 
@@ -70,7 +70,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('FieldAgentHome tests', async () => {
+describe('FieldAgentHome tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -238,6 +238,19 @@ describe('FieldAgentHome tests', async () => {
                     firstNames: 'গায়ত্রী',
                     familyName: 'স্পিভক'
                   }
+                ],
+                // TODO: need to remove this once fragement type issue is resolved
+                deceasedName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  }
                 ]
               }
             ]
@@ -296,6 +309,19 @@ describe('FieldAgentHome tests', async () => {
                   status: 'REJECTED'
                 },
                 childName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Gayatri',
+                    familyName: 'Spivak'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'গায়ত্রী',
+                    familyName: 'স্পিভক'
+                  }
+                ],
+                // TODO: need to remove this once fragement type issue is resolved
+                deceasedName: [
                   {
                     use: 'en',
                     firstNames: 'Gayatri',
@@ -465,7 +491,23 @@ describe('FieldAgentHome tests', async () => {
     })
 
     it('renders no records text when no data in grid table', () => {
-      expect(component.find('#no-record').hostNodes()).toHaveLength(1)
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <FieldAgentHome
+          match={{
+            params: {
+              tabId: 'review'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      expect(
+        testComponent.component.find('#no-record').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('when online renders submission status', () => {
@@ -523,7 +565,6 @@ describe('FieldAgentHome tests', async () => {
       store.dispatch(storeApplication(readyApplication))
 
       component.update()
-
       expect(component.find('#offline0').hostNodes()).toHaveLength(1)
     })
   })

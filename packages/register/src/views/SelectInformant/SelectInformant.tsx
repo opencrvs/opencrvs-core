@@ -5,13 +5,15 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 import { Action, ActionList } from '@opencrvs/components/lib/buttons'
-import { ViewHeader } from '../../components/ViewHeader'
-import { goToBirthRegistrationAsParent } from 'src/navigation'
-import { createApplication, storeApplication } from 'src/applications'
-import { Event } from 'src/forms'
+import { ViewHeader } from '@register/components/ViewHeader'
+import { goToBirthRegistrationAsParent } from '@register/navigation'
+import { createApplication, storeApplication } from '@register/applications'
+import { Event } from '@register/forms'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
     defaultMessage: 'New birth application',

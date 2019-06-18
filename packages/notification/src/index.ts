@@ -12,10 +12,10 @@ import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from './constants'
-import getPlugins from './config/plugins'
+} from '@notification/constants'
+import getPlugins from '@notification/config/plugins'
 import { readFileSync } from 'fs'
-import getRoutes from './config/routes'
+import getRoutes from '@notification/config/routes'
 import { validateFunc } from '@opencrvs/commons'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)

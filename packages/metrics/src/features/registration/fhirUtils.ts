@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
-import { IAuthHeader } from '.'
-import { fhirUrl } from 'src/constants'
+import { IAuthHeader } from '@metrics/features/registration'
+import { fhirUrl } from '@metrics/constants'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,

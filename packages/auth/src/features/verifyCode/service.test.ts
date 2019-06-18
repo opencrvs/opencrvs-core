@@ -4,9 +4,9 @@ import {
   generateNonce,
   checkVerificationCode,
   deleteUsedVerificationCode
-} from './service'
+} from '@auth/features/verifyCode/service'
 
-import { CONFIG_SMS_CODE_EXPIRY_SECONDS } from 'src/constants'
+import { CONFIG_SMS_CODE_EXPIRY_SECONDS } from '@auth/constants'
 
 const nonce = '12345'
 const mobile = '+447111111111'

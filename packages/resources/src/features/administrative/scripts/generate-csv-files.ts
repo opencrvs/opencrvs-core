@@ -1,6 +1,6 @@
 import { Parser } from 'json2csv'
 import * as fs from 'fs'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
 
 interface IStats {
   OpenCRVS_ID: string

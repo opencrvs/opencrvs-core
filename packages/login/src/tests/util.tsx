@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { mount, configure, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
-import * as Adapter from 'enzyme-adapter-react-16'
-import * as en from 'react-intl/locale-data/en'
+import Adapter from 'enzyme-adapter-react-16'
+import en from 'react-intl/locale-data/en'
 import { ThemeProvider } from 'styled-components'
 import { addLocaleData } from 'react-intl'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-import { App, store } from '../App'
-import { IStoreState, createStore } from '../store'
-import { IntlContainer } from '../i18n/components/I18nContainer'
+import { App, store } from '@login/App'
+import { IStoreState, createStore } from '@login/store'
+import { IntlContainer } from '@login/i18n/components/I18nContainer'
 
 configure({ adapter: new Adapter() })
 addLocaleData([...en])

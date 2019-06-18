@@ -13,7 +13,7 @@ const fieldAgent = new User({
     {
       use: 'en',
       given: ['Sakib Al'],
-      family: ['Hasan']
+      family: 'Hasan'
     }
   ],
   email: 'test@test.org',
@@ -39,7 +39,7 @@ const registrationClerk = new User({
     {
       use: 'en',
       given: ['Rabindranath'],
-      family: ['Tagore']
+      family: 'Tagore'
     }
   ],
   email: 'test@test.org',
@@ -65,7 +65,7 @@ const localRegistrar = new User({
     {
       use: 'en',
       given: ['Mohammad'],
-      family: ['Ashraful']
+      family: 'Ashraful'
     }
   ],
   email: 'test@test.org',
@@ -91,7 +91,7 @@ const districtRegistrar = new User({
     {
       use: 'en',
       given: ['Muhammad Abdul'],
-      family: ['Muid Khan']
+      family: 'Muid Khan'
     }
   ],
   email: 'test@test.org',
@@ -112,7 +112,7 @@ const stateRegistrar = new User({
     {
       use: 'en',
       given: ['Nasreen Pervin'],
-      family: ['Huq']
+      family: 'Huq'
     }
   ],
   email: 'test@test.org',
@@ -133,7 +133,7 @@ const nationalRegistrar = new User({
     {
       use: 'en',
       given: ['Mohamed Abu'],
-      family: ['Abdullah']
+      family: 'Abdullah'
     }
   ],
   email: 'test@test.org',
@@ -154,7 +154,7 @@ const fieldAgent2 = new User({
     {
       use: 'en',
       given: ['Md. Ariful'],
-      family: ['Islam']
+      family: 'Islam'
     }
   ],
   email: 'test@test.org',
@@ -180,7 +180,7 @@ const fieldAgent3 = new User({
     {
       use: 'en',
       given: ['Md. Ashraful'],
-      family: ['Alam']
+      family: 'Alam'
     }
   ],
   email: 'test@test.org',
@@ -206,7 +206,7 @@ const registrationClerk2 = new User({
     {
       use: 'en',
       given: ['Lovely'],
-      family: ['Khatun']
+      family: 'Khatun'
     }
   ],
   email: 'test@test.org',
@@ -232,7 +232,7 @@ const registrationClerk3 = new User({
     {
       use: 'en',
       given: ['Md. Seikh'],
-      family: ['Farid']
+      family: 'Farid'
     }
   ],
   email: 'test@test.org',
@@ -258,7 +258,7 @@ const localRegistrar2 = new User({
     {
       use: 'en',
       given: ['Md. Jahangir'],
-      family: ['Alam']
+      family: 'Alam'
     }
   ],
   email: 'test@test.org',
@@ -284,7 +284,7 @@ const localRegistrar3 = new User({
     {
       use: 'en',
       given: ['A.K.M Mahmudur'],
-      family: ['Rohman']
+      family: 'Rohman'
     }
   ],
   email: 'test@test.org',
@@ -310,7 +310,7 @@ const fieldAgent4 = new User({
     {
       use: 'en',
       given: ['Abdullah Al'],
-      family: ['Arafat']
+      family: 'Arafat'
     }
   ],
   email: 'test@test.org',
@@ -336,7 +336,7 @@ const registrationClerk4 = new User({
     {
       use: 'en',
       given: ['Neelima'],
-      family: ['Yasmeen']
+      family: 'Yasmeen'
     }
   ],
   email: 'test@test.org',
@@ -362,7 +362,7 @@ const sysAdmin = new User({
     {
       use: 'en',
       given: ['Sahriar'],
-      family: ['Nafis']
+      family: 'Nafis'
     }
   ],
   email: 'test@test.org',

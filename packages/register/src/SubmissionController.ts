@@ -4,12 +4,12 @@ import {
   IApplication,
   modifyApplication,
   SUBMISSION_STATUS
-} from './applications'
-import { Action, IForm } from './forms'
-import { getRegisterForm } from './forms/register/application-selectors'
-import { AppStore } from './store'
-import { createClient } from './utils/apolloClient'
-import { getMutationMapping } from './views/DataProvider/MutationProvider'
+} from '@register/applications'
+import { Action, IForm } from '@register/forms'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { AppStore } from '@register/store'
+import { createClient } from '@register/utils/apolloClient'
+import { getMutationMapping } from '@register/views/DataProvider/MutationProvider'
 import { FetchResult } from 'react-apollo'
 
 const INTERVAL_TIME = 5000
@@ -19,17 +19,22 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_REJECT.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
-const ACTION_LIST = {
+
+interface IActionList {
+  [key: string]: string
+}
+
+const ACTION_LIST: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: Action.SUBMIT_FOR_REVIEW,
   [Action.REGISTER_APPLICATION]: Action.REGISTER_APPLICATION,
   [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION
 }
-const REQUEST_IN_PROGRESS_STATUS = {
+const REQUEST_IN_PROGRESS_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
   [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERING,
   [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING
 }
-const SUCCESS_SUBMISSION_STATUS = {
+const SUCCESS_SUBMISSION_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
   [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERED,
   [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED
@@ -97,6 +102,7 @@ export class SubmissionController {
     const applicationAction = ACTION_LIST[application.action || ''] || null
     const result = getMutationMapping(
       application.event,
+      // @ts-ignore
       applicationAction,
       null,
       this.registerForms[application.event],

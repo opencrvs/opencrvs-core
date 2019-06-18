@@ -1,5 +1,5 @@
-import { GQLResolver } from 'src/graphql/schema'
-import { fetchFHIR } from 'src/features/fhir/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 interface IUserModelData {
   _id: string

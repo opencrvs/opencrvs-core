@@ -1,5 +1,5 @@
-import { ITemplatedComposition } from '../registration/fhir-builders'
-import { EVENT_TYPE } from './constants'
+import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'

@@ -1,17 +1,19 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { authenticate, storeUserInformation } from './service'
+import {
+  authenticate,
+  storeUserInformation,
+  createToken
+} from '@auth/features/authenticate/service'
 import {
   generateVerificationCode,
   sendVerificationCode,
   generateNonce,
   storeVerificationCode
-} from 'src/features/verifyCode/service'
-import { createToken } from 'src/features/authenticate/service'
-import { logger } from 'src/logger'
+} from '@auth/features/verifyCode/service'
+import { logger } from '@auth/logger'
 import { unauthorized } from 'boom'
-import { PRODUCTION } from 'src/constants'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from 'src/constants'
+import { PRODUCTION, WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
   mobile: string

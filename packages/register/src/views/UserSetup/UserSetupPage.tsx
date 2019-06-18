@@ -2,13 +2,13 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { IUserDetails } from 'src/utils/userUtils'
-import { createNamesMap } from 'src/utils/data-formatting'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { IUserDetails } from '@register/utils/userUtils'
+import { createNamesMap } from '@register/utils/data-formatting'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { LightLogo } from '@opencrvs/components/lib/icons'
-import { roleMessages, typeMessages } from 'src/utils/roleTypeMessages'
+import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const Page = styled.div`
@@ -61,7 +61,9 @@ const NextButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   welcomeTitle: {
     id: 'userSetup.landing.title',
     defaultMessage: 'Welcome to OpenCRVS',
@@ -81,7 +83,7 @@ const messages = defineMessages({
 })
 
 export class UserSetupView extends React.Component<
-  { userDetails: IUserDetails } & InjectedIntlProps
+  { userDetails: IUserDetails | null } & InjectedIntlProps
 > {
   render() {
     const { intl, userDetails } = this.props
@@ -94,23 +96,25 @@ export class UserSetupView extends React.Component<
           <TitleHolder>{intl.formatMessage(messages.welcomeTitle)}</TitleHolder>
           <InfoHolder>
             <NameHolder>
-              {(userDetails.name &&
+              {(userDetails &&
+                userDetails.name &&
                 (createNamesMap(userDetails.name as GQLHumanName[])[
                   intl.locale
                 ] as string)) ||
                 ''}
             </NameHolder>
             <RoleHolder>
-              {' '}
-              {userDetails.type
-                ? `${intl.formatMessage(
-                    typeMessages[userDetails.type as string]
-                  )} - ${intl.formatMessage(
-                    roleMessages[userDetails.role as string]
-                  )}`
-                : `${intl.formatMessage(
-                    roleMessages[userDetails.role as string]
-                  )}`}
+              {(userDetails &&
+                (userDetails.type
+                  ? `${intl.formatMessage(
+                      typeMessages[userDetails.type as string]
+                    )} - ${intl.formatMessage(
+                      roleMessages[userDetails.role as string]
+                    )}`
+                  : `${intl.formatMessage(
+                      roleMessages[userDetails.role as string]
+                    )}`)) ||
+                ''}
             </RoleHolder>
           </InfoHolder>
           <InstructionHolder>

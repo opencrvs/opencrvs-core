@@ -1,4 +1,4 @@
-import { IFilter } from './types'
+import { IFilter } from '@search/features/search/types'
 const SEARCHABLE_FIELDS = [
   'childFirstNames',
   'childFamilyName',
@@ -65,6 +65,7 @@ export function queryBuilder(
       term: {
         'applicationLocationId.keyword': {
           value: applicationLocationId,
+          // tslint:disable-next-line
           boost: 2.0
         }
       }

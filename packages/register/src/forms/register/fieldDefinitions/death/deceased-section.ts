@@ -10,7 +10,7 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   FETCH_BUTTON,
   TEL
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
@@ -19,34 +19,34 @@ import {
   validIDNumber,
   numeric,
   maxLength
-} from 'src/utils/validate'
-import { countries } from 'src/forms/countries'
+} from '@register/utils/validate'
+import { countries } from '@register/forms/countries'
 
 import {
   messages as identityMessages,
   identityNameMapper,
   identityTypeMapper,
   deathIdentityOptions
-} from '../../../identity'
-import { messages as maritalStatusMessages } from '../../../maritalStatus'
-import { messages as addressMessages } from '../../../address'
+} from '@register/forms/identity'
+import { messages as maritalStatusMessages } from '@register/forms/maritalStatus'
+import { messages as addressMessages } from '@register/forms/address'
 
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
-import { conditionals } from 'src/forms/utils'
+import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
+import { conditionals } from '@register/forms/utils'
 import {
   fieldToNameTransformer,
   fieldToArrayTransformer,
   fieldToIdentifierTransformer,
   fieldToAddressTransformer,
   copyAddressTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from '@register/forms/mappings/mutation/field-mappings'
 import {
   nameToFieldTransformer,
   arrayToFieldTransformer,
   identifierToFieldTransformer,
   addressToFieldTransformer,
   sameAddressFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from '@register/forms/mappings/query/field-mappings'
 import {
   FETCH_REGISTRATION,
   transformRegistrationData
@@ -56,7 +56,9 @@ import {
   transformPersonData
 } from '@opencrvs/register/src/forms/register/queries/person'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   deceasedTab: {
     id: 'register.form.tabs.deceasedTab',
     defaultMessage: 'Deceased',

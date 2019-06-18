@@ -1,8 +1,8 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import { verifyToken } from 'src/features/authenticate/service'
-import { refreshToken } from './service'
+import { verifyToken } from '@auth/features/authenticate/service'
+import { refreshToken } from '@auth/features/refresh/service'
 
 interface IRefreshPayload {
   nonce: string

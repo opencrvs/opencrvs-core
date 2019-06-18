@@ -1,13 +1,23 @@
 import * as React from 'react'
-import { ReviewSection, renderSelectDynamicLabel } from './ReviewSection'
+import {
+  ReviewSection,
+  renderSelectDynamicLabel
+} from '@register/views/RegisterForm/review/ReviewSection'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent, mockOfflineData, intl } from 'src/tests/util'
-import { createApplication, createReviewApplication } from 'src/applications'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { Event } from 'src/forms'
+import { createStore } from '@register/store'
+import {
+  createTestComponent,
+  mockOfflineData,
+  intl
+} from '@register/tests/util'
+import {
+  createApplication,
+  createReviewApplication
+} from '@register/applications'
+import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
-import { REJECTED } from 'src/utils/constants'
+import { REJECTED } from '@register/utils/constants'
 
 const { store } = createStore()
 const mockHandler = jest.fn()
@@ -29,7 +39,7 @@ draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: { fathersDetailsExist: true, addressSameAsMother: false },
   documents: {
-    image_uploader: [{ title: 'dummy', description: 'dummy', data: '' }]
+    imageUploader: [{ title: 'dummy', description: 'dummy', data: '' }]
   }
 }
 

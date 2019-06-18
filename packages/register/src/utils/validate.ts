@@ -1,7 +1,11 @@
-import { defineMessages } from 'react-intl'
-import { FormattedMessage, MessageValue } from 'react-intl'
-import { IFormFieldValue } from '@opencrvs/register/src/forms'
+import { defineMessages, FormattedMessage, MessageValue } from 'react-intl'
 
+import { IFormFieldValue } from '@opencrvs/register/src/forms'
+import {
+  REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
+  REGEXP_ALPHA_NUMERIC,
+  REGEXP_BLOCK_ALPHA_NUMERIC
+} from '@register/utils/constants'
 import { validate as validateEmail } from 'email-validator'
 import * as XRegExp from 'xregexp'
 import { isArray } from 'util'
@@ -10,13 +14,23 @@ import {
   BIRTH_REGISTRATION_NUMBER,
   DEATH_REGISTRATION_NUMBER,
   PASSPORT
-} from 'src/forms/identity'
-import { REGEXP_ALPHA_NUMERIC, REGEXP_BLOCK_ALPHA_NUMERIC } from './constants'
+} from '@register/forms/identity'
+
+import { string } from 'joi'
 
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
   props?: { [key: string]: MessageValue }
 }
+
+export type RangeValidation = (
+  min: number,
+  max: number
+) => (value: IFormFieldValue) => IValidationResult | undefined
+
+export type MaxLengthValidation = (
+  customisation: number
+) => (value: IFormFieldValue) => IValidationResult | undefined
 
 export type Validation = (
   value: IFormFieldValue
@@ -24,7 +38,9 @@ export type Validation = (
 
 export type ValidationInitializer = (...value: any[]) => Validation
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   required: {
     id: 'validations.required',
     defaultMessage: 'Required',
@@ -147,12 +163,25 @@ export const messages = defineMessages({
     defaultMessage: 'Must be a greater than zero',
     description:
       'The error message appears when input is less than or equal to 0'
+  },
+  blockAlphaNumericDot: {
+    id: 'validations.blockAlphaNumericDot',
+    defaultMessage:
+      'Can contain only block character, number and dot (e.g. C91.5)',
+    description: 'The error message that appears when an invalid value is used'
   }
 })
 
 const fallbackCountry = window.config.COUNTRY
 
-const mobilePhonePatternTable = {
+interface IMobilePhonePattern {
+  pattern: RegExp
+  example: string
+  start: string
+  num: string
+}
+
+const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
   gbr: {
     pattern: /^07[0-9]{9,10}$/,
     example: '07123456789',
@@ -208,10 +237,10 @@ export const isAValidDateFormat = (value: string): boolean => {
   return givenDate.toISOString().slice(0, 10) === valueISOString
 }
 
-export const requiredSymbol: Validation = (value: string) =>
+export const requiredSymbol: Validation = (value: IFormFieldValue) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: string | boolean | string[]) => {
+export const required: Validation = (value: IFormFieldValue) => {
   if (typeof value === 'string') {
     return value !== '' ? undefined : { message: messages.required }
   }
@@ -227,8 +256,14 @@ export const minLength = (min: number) => (value: string) => {
     : undefined
 }
 
-export const maxLength = (max: number) => (value: string) => {
-  return isLessOrEqual(value, max)
+const isLessOrEqual = (value: string, max: number) => {
+  return value && value.toString().length <= max
+}
+
+export const maxLength: MaxLengthValidation = (max: number) => (
+  value: IFormFieldValue
+) => {
+  return isLessOrEqual(value as string, max)
     ? undefined
     : { message: messages.maxLength, props: { max } }
 }
@@ -238,23 +273,27 @@ const isNumber = (value: string): boolean => !value || !isNaN(Number(value))
 const isRegexpMatched = (value: string, regexp: string): boolean =>
   !value || value.match(regexp) !== null
 
-export const match = (
-  regexp: string,
-  message: FormattedMessage.MessageDescriptor
-) => (value: string) =>
-  isRegexpMatched(value, regexp) ? undefined : { message }
+export const blockAlphaNumericDot: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return isRegexpMatched(cast, REGEXP_BLOCK_ALPHA_NUMERIC_DOT)
+    ? undefined
+    : { message: messages.blockAlphaNumericDot }
+}
 
-export const numeric: Validation = (value: string) =>
-  isNumber(value) ? undefined : { message: messages.numberRequired }
+export const numeric: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return isNumber(cast) ? undefined : { message: messages.numberRequired }
+}
 
-export const phoneNumberFormat: Validation = (value: string) => {
+export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
   const country = window.config.COUNTRY
   const countryMobileTable =
     mobilePhonePatternTable[country] || mobilePhonePatternTable[fallbackCountry]
   const { start, num } = countryMobileTable
   const validationProps = { start, num }
 
-  const trimmedValue = value === undefined || value === null ? '' : value.trim()
+  const cast = value as string
+  const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
 
   if (!trimmedValue) {
     return undefined
@@ -268,16 +307,18 @@ export const phoneNumberFormat: Validation = (value: string) => {
       }
 }
 
-export const emailAddressFormat: Validation = (value: string) => {
-  return value && isAValidEmailAddressFormat(value)
+export const emailAddressFormat: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return cast && isAValidEmailAddressFormat(cast)
     ? undefined
     : {
         message: messages.emailAddressFormat
       }
 }
 
-export const dateFormat: Validation = (value: string) => {
-  return value && isAValidDateFormat(value)
+export const dateFormat: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return cast && isAValidDateFormat(cast)
     ? undefined
     : {
         message: messages.dateFormat
@@ -288,8 +329,9 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(new Date())
 }
 
-export const isValidBirthDate: Validation = (value: string) => {
-  return value && isDateNotInFuture(value) && isAValidDateFormat(value)
+export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? undefined
     : {
         message: messages.isValidBirthDate
@@ -298,14 +340,15 @@ export const isValidBirthDate: Validation = (value: string) => {
 
 export const checkBirthDate: ValidationInitializer = (
   marriageDate: string
-): Validation => (value: string) => {
-  if (!isAValidDateFormat(value)) {
+): Validation => (value: IFormFieldValue) => {
+  const cast = value as string
+  if (!isAValidDateFormat(cast)) {
     return {
       message: messages.dateFormat
     }
   }
 
-  const bDate = new Date(value)
+  const bDate = new Date(cast)
   // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
   if (bDate > new Date()) {
     return {
@@ -326,14 +369,15 @@ export const checkBirthDate: ValidationInitializer = (
 
 export const checkMarriageDate: ValidationInitializer = (
   birthDate: string
-): Validation => (value: string) => {
-  if (!isAValidDateFormat(value)) {
+): Validation => (value: IFormFieldValue) => {
+  const cast = value as string
+  if (!isAValidDateFormat(cast)) {
     return {
       message: messages.dateFormat
     }
   }
 
-  const mDate = new Date(value)
+  const mDate = new Date(cast)
   // didn't call `isDateNotInFuture(value)`, because no need to call `new Date(value)` twice
   if (mDate > new Date()) {
     return {
@@ -354,12 +398,13 @@ export const checkMarriageDate: ValidationInitializer = (
 
 export const dateGreaterThan: ValidationInitializer = (
   previousDate: string
-): Validation => (value: string) => {
+): Validation => (value: IFormFieldValue) => {
+  const cast = value as string
   if (!previousDate || !isAValidDateFormat(previousDate)) {
     return undefined
   }
 
-  return new Date(value) > new Date(previousDate)
+  return new Date(cast) > new Date(previousDate)
     ? undefined
     : {
         message: messages.domLaterThanDob
@@ -368,12 +413,13 @@ export const dateGreaterThan: ValidationInitializer = (
 
 export const dateLessThan: ValidationInitializer = (
   laterDate: string
-): Validation => (value: string) => {
+): Validation => (value: IFormFieldValue) => {
+  const cast = value as string
   if (!laterDate || !isAValidDateFormat(laterDate)) {
     return undefined
   }
 
-  return new Date(value) < new Date(laterDate)
+  return new Date(cast) < new Date(laterDate)
     ? undefined
     : {
         message: messages.dobEarlierThanDom
@@ -381,24 +427,13 @@ export const dateLessThan: ValidationInitializer = (
 }
 
 export const dateNotInFuture: ValidationInitializer = (): Validation => (
-  value: string
+  value: IFormFieldValue
 ) => {
-  if (isDateNotInFuture(value)) {
+  const cast = value as string
+  if (isDateNotInFuture(cast)) {
     return undefined
   } else {
     return { message: messages.dateFormat }
-  }
-}
-
-export const dateInPast: ValidationInitializer = (): Validation => (
-  value: string
-) => isDateInPast(value)
-
-export const isDateInPast: Validation = (value: string) => {
-  if (isDateNotInFuture(value) && dateNotToday(value)) {
-    return undefined
-  } else {
-    return { message: messages.isValidBirthDate } // specific to DOB of parent/applicant
   }
 }
 
@@ -408,8 +443,21 @@ export const dateNotToday = (date: string): boolean => {
   return day !== today
 }
 
+export const isDateInPast: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  if (isDateNotInFuture(cast) && dateNotToday(cast)) {
+    return undefined
+  } else {
+    return { message: messages.isValidBirthDate } // specific to DOB of parent/applicant
+  }
+}
+
+export const dateInPast: ValidationInitializer = (): Validation => (
+  value: IFormFieldValue
+) => isDateInPast(value)
+
 export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
-  value: string
+  value: IFormFieldValue
 ) => dateFormat(value)
 
 /*
@@ -465,10 +513,6 @@ const checkNameWords = (value: string, checker: Checker): boolean => {
   return parts.every(checker)
 }
 
-const isLessOrEqual = (value: string, max: number) => {
-  return value && value.toString().length <= max
-}
-
 export const isValidBengaliName = (value: string): boolean => {
   return checkNameWords(value, isValidBengaliWord)
 }
@@ -486,20 +530,25 @@ export const isValueWithinRange = (min: number, max: number) => (
   return !isNaN(value) && value >= min && value <= max
 }
 
-export const bengaliOnlyNameFormat: Validation = (value: string) => {
-  return isValidBengaliName(value)
+export const bengaliOnlyNameFormat: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return isValidBengaliName(cast)
     ? undefined
     : { message: messages.bengaliOnlyNameFormat }
 }
 
-export const englishOnlyNameFormat: Validation = (value: string) => {
-  return isValidEnglishName(value)
+export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
+  const cast = value as string
+  return isValidEnglishName(cast)
     ? undefined
     : { message: messages.englishOnlyNameFormat }
 }
 
-export const range = (min: number, max: number) => (value: string) => {
-  return isValueWithinRange(min, max)(parseFloat(value))
+export const range: RangeValidation = (min: number, max: number) => (
+  value: IFormFieldValue
+) => {
+  const cast = value as string
+  return isValueWithinRange(min, max)(parseFloat(cast))
     ? undefined
     : { message: messages.range, props: { min, max } }
 }
@@ -564,15 +613,18 @@ export const validIDNumber: ValidationInitializer = (
   }
 }
 
-export const isValidDeathOccurrenceDate: Validation = (value: string) => {
-  return value && isDateNotInFuture(value) && isAValidDateFormat(value)
+export const isValidDeathOccurrenceDate: Validation = (
+  value: IFormFieldValue
+) => {
+  const cast = value as string
+  return value && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? undefined
     : {
         message: messages.isValidDateOfDeath
       }
 }
 
-export const greaterThanZero: Validation = (value: string) => {
+export const greaterThanZero: Validation = (value: IFormFieldValue) => {
   return value && Number(value) > 0
     ? undefined
     : {

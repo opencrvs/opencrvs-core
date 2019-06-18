@@ -9,8 +9,8 @@ jest.mock('mongoose', () => ({
 }))
 
 import * as mongoose from 'mongoose'
-import { start, stop } from './database'
-import { logger } from 'src/logger'
+import { start, stop } from '@user-mgnt/database'
+import { logger } from '@user-mgnt/logger'
 
 const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 
@@ -20,7 +20,7 @@ describe('Database connector', () => {
     const promise = start()
     await wait(1)
     expect(spy).toHaveBeenCalled()
-    jest.spyOn(mongoose, 'connect').mockResolvedValueOnce('hello!')
+    jest.spyOn(mongoose, 'connect').mockResolvedValueOnce(mongoose)
     await promise
   })
   it('attaches loggers to database events', async () => {

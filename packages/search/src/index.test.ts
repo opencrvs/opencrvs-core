@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from './index'
+import { createServer } from '@search/index'
 
 describe('Route authorization', () => {
   it('blocks requests without a token', async () => {

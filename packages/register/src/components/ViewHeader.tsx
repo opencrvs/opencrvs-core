@@ -2,11 +2,14 @@ import * as React from 'react'
 
 import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
-import styled from '../styled-components'
-import { TopMenu } from '../components/TopMenu'
+import styled from '@register/styledComponents'
+import { TopMenu } from '@register/components/TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
-import { ViewHeading, IViewHeadingProps } from '../components/ViewHeading'
-import ConnectivityStatus from './ConnectivityStatus'
+import {
+  ViewHeading,
+  IViewHeadingProps
+} from '@register/components/ViewHeading'
+import ConnectivityStatus from '@register/components/ConnectivityStatus'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 
 const HeaderWarapper = styled(Header)`

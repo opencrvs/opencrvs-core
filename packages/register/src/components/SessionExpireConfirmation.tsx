@@ -1,16 +1,18 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from 'src/store'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import { IStoreState } from '@register/store'
+import { redirectToAuthentication } from '@register/profile/profileActions'
 
 const StyledModal = styled(Modal)`
   z-index: 4;
 `
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   loginButton: {
     id: 'login.stepOneTitle',
     defaultMessage: 'Login',
@@ -65,9 +67,14 @@ const mapStateToProps = (store: IStoreState) => {
   }
 }
 
-export const SessionExpireConfirmation = connect<SessionExpireProps, IProps>(
+export const SessionExpireConfirmation = connect<
+  SessionExpireProps,
+  IProps,
+  SessionExpireProps & IProps,
+  IStoreState
+>(
   mapStateToProps,
   {
     redirectToAuthentication
   }
-)(injectIntl(SessionExpireComponent))
+)(injectIntl(SessionExpireComponent)) as any

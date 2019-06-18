@@ -3,12 +3,12 @@ import {
   createTestApp,
   mockOfflineData,
   createTestComponent
-} from 'src/tests/util'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import { createClient } from 'src/utils/apolloClient'
-import * as actions from 'src/notification/actions'
-import { StyledErrorBoundary } from './components/StyledErrorBoundary'
-import { createStore } from './store'
+} from '@register/tests/util'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import { createClient } from '@register/utils/apolloClient'
+import * as actions from '@register/notification/actions'
+import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
+import { createStore } from '@register/store'
 
 const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -23,7 +23,7 @@ function flushPromises() {
 }
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -53,7 +53,7 @@ describe('when user has a valid token in url but an expired one in localStorage'
     const token =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 
-    history.replaceState({}, '', '?token=' + token)
+    window.history.replaceState({}, '', '?token=' + token)
 
     createTestApp()
     expect(assign.mock.calls).toHaveLength(0)
@@ -95,9 +95,8 @@ describe('when user has a valid token in local storage', () => {
 describe('it handles react errors', () => {
   const { store } = createStore()
   it('displays react error page', () => {
-    function Problem() {
+    function Problem(): JSX.Element {
       throw new Error('Error thrown.')
-      return <div>Error</div>
     }
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -116,9 +115,8 @@ describe('it handles react errors', () => {
 describe('it handles react unauthorized errors', () => {
   const { store } = createStore()
   it('displays react error page', () => {
-    function Problem() {
+    function Problem(): JSX.Element {
       throw new Error('401')
-      return <div>Error</div>
     }
     const testComponent = createTestComponent(
       // @ts-ignore

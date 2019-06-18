@@ -1,5 +1,7 @@
-import { resolvers } from './root-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { resolvers } from '@gateway/features/user/root-resolvers'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()

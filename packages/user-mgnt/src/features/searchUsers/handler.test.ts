@@ -1,5 +1,5 @@
-import User, { IUserModel } from '../../model/user'
-import { createServer } from '../..'
+import User from '@user-mgnt/model/user'
+import { createServer } from '@user-mgnt/index'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 

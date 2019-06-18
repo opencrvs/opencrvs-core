@@ -1,7 +1,7 @@
 import * as Good from 'good'
 import * as JWT from 'hapi-auth-jwt2'
 import * as HapiI18n from 'hapi-i18n'
-import { LANGUAGE } from '../constants'
+import { LANGUAGE } from '@notification/constants'
 
 export default function getPlugins() {
   const plugins: any[] = [

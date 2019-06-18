@@ -21,10 +21,10 @@ import {
   RouterState
 } from 'react-router-redux'
 import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
-import { loginReducer, LoginState } from './login/reducer'
-import { intlReducer, IntlState } from './i18n/reducer'
+import { loginReducer, LoginState } from '@login/login/reducer'
+import { intlReducer, IntlState } from '@login/i18n/reducer'
 import * as Sentry from '@sentry/browser'
-import * as createSentryMiddleware from 'redux-sentry-middleware'
+import createSentryMiddleware from 'redux-sentry-middleware'
 
 export const history = createBrowserHistory()
 
@@ -35,10 +35,11 @@ export interface IStoreState {
   i18n: IntlState
 }
 
+// @ts-ignore
 const formRed: LoopReducer<FormStateMap, FormAction> = (
   state: FormStateMap,
   action: FormAction
-) => formReducer(state, action)
+) => formReducer(state as FormStateMap, action)
 
 const reducers = combineReducers<IStoreState>({
   login: loginReducer,
@@ -54,11 +55,10 @@ const enhancer = compose(
   applyMiddleware(routerMiddleware(history)),
   // @ts-ignore types are not correct for this module yet
   applyMiddleware(createSentryMiddleware(Sentry)),
-  // tslint:disable no-any
+
   typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
     ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
     : (f: any) => f
-  // tslint:enable no-any
 ) as StoreEnhancer<IStoreState>
 
 export type AppStore = Store<IStoreState, AnyAction>

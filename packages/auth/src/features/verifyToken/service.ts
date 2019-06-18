@@ -1,5 +1,5 @@
-import { get } from 'src/database'
-import { INVALID_TOKEN_NAMESPACE } from 'src/constants'
+import { get } from '@auth/database'
+import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
 
 export async function verifyToken(token: string) {
   const record = await get(`${INVALID_TOKEN_NAMESPACE}:${token}`)

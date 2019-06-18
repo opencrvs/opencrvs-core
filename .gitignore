@@ -17,6 +17,5 @@ build
 .secrets/*
 # But, keep the .gitignore so the folder is created
 !.secrets/.gitignore
-.vscode
 .idea
 data

@@ -42,6 +42,7 @@ async function transformField(
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
+    // tslint:disable-next-line
     await fieldBuilderForVal(targetObj, sourceVal, context)
     return targetObj
   }
@@ -63,6 +64,7 @@ export default async function transformObj(
 ) {
   // ensure the sourceObj has Object in its prototype chain
   // graphql-js creates objects with Object.create(null)
+  // tslint:disable-next-line
   sourceObj = Object.assign({}, sourceObj)
   for (const currentPropName in sourceObj) {
     if (sourceObj.hasOwnProperty(currentPropName)) {

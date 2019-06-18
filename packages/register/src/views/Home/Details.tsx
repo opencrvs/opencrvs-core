@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IApplication, SUBMISSION_STATUS } from 'src/applications'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
   goToTab as goToTabAction,
   goToHome as goToHomeAction
-} from 'src/navigation'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { IUserDetails } from 'src/utils/userUtils'
+} from '@register/navigation'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { IUserDetails } from '@register/utils/userUtils'
 import {
   StatusProgress,
   StatusOrange,
@@ -19,13 +19,13 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { getDraftApplicantFullName } from 'src/utils/draftUtils'
-import styled, { withTheme } from 'styled-components'
+import { getDraftApplicantFullName } from '@register/utils/draftUtils'
+import styled, { withTheme, ITheme } from '@register/styledComponents'
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
+} from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 import {
   GQLHumanName,
   GQLQuery,
@@ -38,13 +38,16 @@ import { Event } from '@opencrvs/register/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM
-} from 'src/navigation/routes'
+} from '@register/navigation/routes'
 import { Query } from 'react-apollo'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
 import * as Sentry from '@sentry/browser'
-import { REJECTED, REJECT_REASON, REJECT_COMMENTS } from 'src/utils/constants'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { roleMessages } from 'src/utils/roleTypeMessages'
+import { roleMessages } from '@register/utils/roleTypeMessages'
+import {
+  REJECTED,
+  REJECT_REASON,
+  REJECT_COMMENTS
+} from '@register/utils/constants'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px;
@@ -105,8 +108,8 @@ interface IDetailProps {
   theme: ITheme
   language: string
   applicationId: string
-  draft: IApplication
-  userDetails: IUserDetails
+  draft: IApplication | null
+  userDetails: IUserDetails | null
   goToTab: typeof goToTabAction
   goToHome: typeof goToHomeAction
 }
@@ -129,7 +132,9 @@ interface IHistoryData {
   action?: React.ReactElement
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   workflowStatusDateDraftStarted: {
     id: 'register.details.status.dateLabel.draft.started',
     defaultMessage: 'Started on',
@@ -337,12 +342,15 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     }
   }
 
-  generateDraftHistorData = (): IHistoryData => {
+  generateDraftHistoryData = (): IHistoryData => {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
     let action: React.ReactElement
-    if (draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]) {
-      if (draft.modifiedOn) {
+    if (
+      draft &&
+      draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    ) {
+      if (draft.modifiedOn && userDetails) {
         history.push(
           generateHistoryEntry(
             DraftStatus.DRAFT_MODIFIED,
@@ -361,23 +369,25 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           )
         )
       }
-      history.push(
-        generateHistoryEntry(
-          DraftStatus.DRAFT_STARTED,
-          userDetails.name as GQLHumanName[],
-          (draft.savedOn && new Date(draft.savedOn).toString()) || '',
-          userDetails && userDetails.role
-            ? this.props.intl.formatMessage(
-                roleMessages[userDetails.role as string]
-              )
-            : '',
-          (userDetails &&
-            userDetails.primaryOffice &&
-            userDetails.primaryOffice.name) ||
-            '',
-          this.props.language
+      if (userDetails) {
+        history.push(
+          generateHistoryEntry(
+            DraftStatus.DRAFT_STARTED,
+            userDetails.name as GQLHumanName[],
+            (draft.savedOn && new Date(draft.savedOn).toString()) || '',
+            userDetails && userDetails.role
+              ? this.props.intl.formatMessage(
+                  roleMessages[userDetails.role as string]
+                )
+              : '',
+            (userDetails &&
+              userDetails.primaryOffice &&
+              userDetails.primaryOffice.name) ||
+              '',
+            this.props.language
+          )
         )
-      )
+      }
       const tabRoute =
         draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
       action = (
@@ -396,22 +406,17 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         </ActionButton>
       )
     } else {
-      history.push(
-        generateHistoryEntry(
-          DraftStatus.FAILED,
-          null,
-          (draft.modifiedOn && new Date(draft.modifiedOn).toString()) || '',
-          '',
-          ''
-        )
-      )
+      history.push(generateHistoryEntry(DraftStatus.FAILED, null, '', '', ''))
       action = (
         <ActionButton id="failed_retry" disabled>
           {this.props.intl.formatMessage(messages.retry)}
         </ActionButton>
       )
     }
-    const title = getDraftApplicantFullName(draft, this.props.language)
+    let title = ''
+    if (draft) {
+      title = getDraftApplicantFullName(draft, this.props.language)
+    }
     return {
       title: title !== '' ? title : undefined,
       history,
@@ -589,7 +594,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   render() {
     return (
       (this.props.draft &&
-        this.renderSubPage(this.generateDraftHistorData())) || (
+        this.renderSubPage(this.generateDraftHistoryData())) || (
         <>
           <Query
             query={FETCH_REGISTRATION_BY_COMPOSITION}
@@ -597,7 +602,15 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
               id: this.props.applicationId
             }}
           >
-            {({ loading, error, data }) => {
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: any
+              error?: any
+              data: any
+            }) => {
               if (error) {
                 Sentry.captureException(error)
                 throw error
