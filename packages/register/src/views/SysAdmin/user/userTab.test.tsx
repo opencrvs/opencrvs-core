@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { createStore } from 'src/store'
-import { SEARCH_USERS } from 'src/sysadmin/user/queries'
-import { createTestComponent } from 'src/tests/util'
+import { createStore } from '@register/store'
+import { SEARCH_USERS } from '@register/sysadmin/user/queries'
+import { createTestComponent } from '@register/tests/util'
 import { UserTab } from './userTab'
 
 describe('User tab tests', async () => {
