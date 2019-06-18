@@ -899,7 +899,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
-function replaceInitialValues(fields: IFormField[], sectionValues: object) {
+export function replaceInitialValues(
+  fields: IFormField[],
+  sectionValues: object
+) {
   return fields.map(field => ({
     ...field,
     initialValue:

@@ -7,8 +7,12 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { IStoreState } from 'src/store'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { goToHome } from 'src/navigation'
+import { goToHome, goToUserReview } from 'src/navigation'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { modifyUserFormData } from '../forms/userReducer'
+import { replaceInitialValues } from 'src/views/RegisterForm/RegisterForm'
+import { FormikTouched, FormikValues } from 'formik'
+import { hasFormError } from 'src/forms/utils'
 
 const messages = defineMessages({
   continue: {
@@ -17,7 +21,7 @@ const messages = defineMessages({
     description: 'Continue button label'
   }
 })
-const Container = styled.div`
+export const Container = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
@@ -35,7 +39,7 @@ const Container = styled.div`
   }
 `
 
-const FormTitle = styled.div`
+export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1Style};
   height: 72px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -46,51 +50,58 @@ const FormTitle = styled.div`
 const Action = styled.div`
   margin-top: 32px;
 `
-type State = {
-  data: IFormSectionData
-}
-
 type IProps = {
   userForm: IFormSection
+  data: IFormSectionData
+  goToUserReview: typeof goToUserReview
+  goToHome: typeof goToHome
+  modifyUserFormData: typeof modifyUserFormData
 }
 
 type IFullProps = InjectedIntlProps & IProps & { dispatch: Dispatch }
 
-class UserFormComponent extends React.Component<IFullProps, State> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      data: {}
+class UserFormComponent extends React.Component<IFullProps> {
+  setAllFormFieldsTouched: (touched: FormikTouched<FormikValues>) => void
+
+  handleFormAction = () => {
+    const { userForm, data } = this.props
+    if (hasFormError(userForm.fields, data)) {
+      this.showAllValidationErrors()
+    } else {
+      this.props.goToUserReview()
     }
   }
 
-  storeData = (documentData: IFormSectionData) => {
-    console.log(JSON.stringify(documentData))
-    this.setState({
-      data: documentData
-    })
+  showAllValidationErrors = () => {
+    const touched = this.props.userForm.fields.reduce(
+      (memo, { name }) => ({ ...memo, [name]: true }),
+      {}
+    )
+    this.setAllFormFieldsTouched(touched)
   }
 
   render = () => {
-    const { dispatch, userForm, intl } = this.props
+    const { userForm, intl } = this.props
+
     return (
       <>
         <ActionPageLight
           title={intl.formatMessage(userForm.title)}
-          goBack={() => {
-            dispatch(goToHome())
-          }}
+          goBack={this.props.goToHome}
         >
           <Container>
             <FormTitle>{intl.formatMessage(userForm.title)}</FormTitle>
             <FormFieldGenerator
               id={userForm.id}
-              onChange={this.storeData}
+              onChange={this.props.modifyUserFormData}
               setAllFieldsDirty={false}
               fields={userForm.fields}
+              onSetTouched={setTouchedFunc => {
+                this.setAllFormFieldsTouched = setTouchedFunc
+              }}
             />
             <Action>
-              <PrimaryButton>
+              <PrimaryButton onClick={this.handleFormAction}>
                 {intl.formatMessage(messages.continue)}
               </PrimaryButton>
             </Action>
@@ -102,12 +113,21 @@ class UserFormComponent extends React.Component<IFullProps, State> {
 }
 
 function mapStatetoProps(state: IStoreState) {
+  const { userForm, userFormData } = state.userForm
+
+  const fields = replaceInitialValues(userForm.fields, userFormData)
+
   return {
     language: state.i18n.language,
-    userForm: state.userForm.userForm
+    userForm: {
+      ...userForm,
+      fields
+    },
+    data: userFormData
   }
 }
 
-export const UserForm = connect((state: IStoreState) => mapStatetoProps)(
-  injectIntl<IFullProps>(UserFormComponent)
-)
+export const UserForm = connect(
+  mapStatetoProps,
+  { goToUserReview, goToHome, modifyUserFormData }
+)(injectIntl<IFullProps>(UserFormComponent))

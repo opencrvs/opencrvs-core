@@ -1,5 +1,13 @@
 import * as React from 'react'
-import { withFormik, FastField, Field, FormikProps, FieldProps } from 'formik'
+import {
+  withFormik,
+  FastField,
+  Field,
+  FormikProps,
+  FieldProps,
+  FormikTouched,
+  FormikValues
+} from 'formik'
 import { isEqual } from 'lodash'
 import {
   InjectedIntlProps,
@@ -346,6 +354,7 @@ const mapFieldsToValues = (fields: IFormField[]) =>
     {}
   )
 
+type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
   fields: IFormField[]
   id: string
@@ -353,6 +362,7 @@ interface IFormSectionProps {
   offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
+  onSetTouched?: (func: ISetTouchedFunction) => void
 }
 
 type Props = IFormSectionProps &
@@ -379,6 +389,10 @@ class FormSectionComponent extends React.Component<Props> {
   async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
+    }
+
+    if (this.props.onSetTouched) {
+      this.props.onSetTouched(this.props.setTouched)
     }
   }
 
