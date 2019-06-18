@@ -1,22 +1,24 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-import { FormFieldGenerator } from 'src/components/form'
-import { IFormSectionData, Event, Action } from 'src/forms'
-import { hasFormError } from 'src/forms/utils'
+import { FormFieldGenerator } from '@register/components/form'
+import { IFormSectionData, Event, Action } from '@register/forms'
+import { hasFormError } from '@register/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
-import { goToSearchResult } from 'src/navigation'
+import { goToSearchResult } from '@register/navigation'
 import {
   MutationProvider,
   MutationContext
-} from 'src/views/DataProvider/MutationProvider'
+} from '@register/views/DataProvider/MutationProvider'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

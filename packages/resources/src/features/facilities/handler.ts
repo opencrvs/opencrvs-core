@@ -1,5 +1,8 @@
 import * as Hapi from 'hapi'
-import { ILocationDataResponse, getFacilities } from './service/service'
+import {
+  ILocationDataResponse,
+  getFacilities
+} from '@resources/features/facilities/service/service'
 
 export default async function facilitiesHandler(
   request: Hapi.Request,

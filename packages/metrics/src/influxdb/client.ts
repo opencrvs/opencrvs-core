@@ -1,6 +1,10 @@
 import * as Influx from 'influx'
-import { INFLUX_DB, INFLUX_HOST, INFLUX_PORT } from './constants'
-import { logger } from 'src/logger'
+import {
+  INFLUX_DB,
+  INFLUX_HOST,
+  INFLUX_PORT
+} from '@metrics/influxdb/constants'
+import { logger } from '@metrics/logger'
 
 export const influx = new Influx.InfluxDB({
   host: INFLUX_HOST,

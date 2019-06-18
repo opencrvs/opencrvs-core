@@ -1,4 +1,4 @@
-import { ILanguageState } from './reducer'
+import { ILanguageState } from '@register/i18n/reducer'
 
 interface Ii18n {
   language: string

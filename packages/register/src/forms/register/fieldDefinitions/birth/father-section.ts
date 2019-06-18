@@ -1,14 +1,15 @@
 import { defineMessages } from 'react-intl'
-import { messages as addressMessages } from '../../../address'
-import { countries } from '../../../countries'
+import { messages as addressMessages } from '@register/forms/address'
+import { countries } from '@register/forms/countries'
 import {
   messages as identityMessages,
   birthIdentityOptions,
-  identityTypeMapper
-} from '../../../identity'
-import { messages as maritalStatusMessages } from '../../../maritalStatus'
-import { messages as educationMessages } from '../../../education'
-import { OFFLINE_LOCATIONS_KEY } from 'src/offline/reducer'
+  identityTypeMapper,
+  identityNameMapper
+} from '@register/forms/identity'
+import { messages as maritalStatusMessages } from '@register/forms/maritalStatus'
+import { messages as educationMessages } from '@register/forms/education'
+import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import {
   ViewType,
   RADIO_GROUP,
@@ -20,7 +21,7 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   FETCH_BUTTON,
   TEL
-} from 'src/forms'
+} from '@register/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
@@ -32,17 +33,10 @@ import {
   maxLength,
   numeric,
   dateInPast
-} from 'src/utils/validate'
+} from '@register/utils/validate'
 
-export interface IFatherSectionFormData {
-  firstName: string
-  foo: string
-  bar: string
-  baz: string
-}
-import { identityNameMapper } from 'src/forms/identity'
-import { IFormSection } from '../../../index'
-import { conditionals } from '../../../utils'
+import { IFormSection } from '@register/forms/index'
+import { conditionals } from '@register/forms/utils'
 import {
   fieldToNameTransformer,
   fieldToArrayTransformer,
@@ -51,7 +45,7 @@ import {
   copyAddressTransformer,
   sectionRemoveTransformer,
   fieldNameTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from '@register/forms/mappings/mutation/field-mappings'
 
 import {
   nameToFieldTransformer,
@@ -60,19 +54,31 @@ import {
   identifierToFieldTransformer,
   addressToFieldTransformer,
   sameAddressFieldTransformer
-} from 'src/forms/mappings/query/field-mappings'
-import { emptyFatherSectionTransformer } from './mappings/query/father-mappings'
+} from '@register/forms/mappings/query/field-mappings'
+import { emptyFatherSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/father-mappings'
 import {
   transformRegistrationData,
   FETCH_REGISTRATION
-} from '../../queries/registration'
-import { FETCH_PERSON, transformPersonData } from '../../queries/person'
+} from '@register/forms/register/queries/registration'
+import {
+  FETCH_PERSON,
+  transformPersonData
+} from '@register/forms/register/queries/person'
 import {
   getFatherDateOfBirthLabel,
   getDateOfMarriageLabel
-} from './staticLabel'
+} from '@register/forms/register/fieldDefinitions/birth/staticLabel'
 
-export const messages = defineMessages({
+export interface IFatherSectionFormData {
+  firstName: string
+  foo: string
+  bar: string
+  baz: string
+}
+
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   fatherTab: {
     id: 'register.form.tabs.fatherTab',
     defaultMessage: 'Father',

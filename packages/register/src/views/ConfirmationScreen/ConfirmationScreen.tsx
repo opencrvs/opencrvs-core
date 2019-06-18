@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import {
   OffLineCircled,
   Rejected,
@@ -14,12 +14,19 @@ import {
   FooterPrimaryButton
 } from '@opencrvs/register/src/components/interface/footer'
 import { RouteComponentProps } from 'react-router'
-import { IStoreState } from 'src/store'
-import { IntlState } from 'src/i18n/reducer'
-import { DECLARATION, REJECTION, BIRTH, OFFLINE } from 'src/utils/constants'
-import { HomeViewHeader } from 'src/components/HomeViewHeader'
+import { IStoreState } from '@register/store'
+import { IntlState } from '@register/i18n/reducer'
+import {
+  DECLARATION,
+  REJECTION,
+  BIRTH,
+  OFFLINE
+} from '@register/utils/constants'
+import { HomeViewHeader } from '@register/components/HomeViewHeader'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   backButton: {
     id: 'register.confirmationScreen.buttons.back',
     defaultMessage: 'Back to homescreen',
@@ -33,16 +40,16 @@ const messages = defineMessages({
   },
   boxHeaderDesc: {
     id: 'register.confirmationScreen.boxHeaderDesc',
-    defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.} 
-    duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.} 
-    certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.} 
+    defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}
+    duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.}
+    certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.}
     offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
     description:
       'The first box header description that appear on the confirmation screen '
   },
   trackingSectionTitle: {
     id: 'register.confirmationScreen.trackingSectionTitle',
-    defaultMessage: `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:} 
+    defaultMessage: `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:}
     duplication {{eventType, select, birth {Birth} death {Death}} Registration Number:} rejection {Tracking number:} certificate {} offline {Tracking number:}} `,
     description:
       'The tracking section title that appear on the confirmation screen'
@@ -50,10 +57,10 @@ const messages = defineMessages({
   trackingSectionDesc: {
     id: 'register.confirmationScreen.trackingSectionDesc',
     defaultMessage: `{event, select, certificate {Certificates have been collected from your jurisdiction.}
-    declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} 
-    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.} 
+    declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.}
+    registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
     duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate.}
-    rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.} 
+    rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.}
     offline {The informant will receive the tracking ID number via SMS when the application has been sent for review.}} `,
     description:
       'The tracking section description that appear on the confirmation screen'
@@ -254,7 +261,7 @@ class ConfirmationScreenView extends React.Component<
           <FooterAction>
             <FooterPrimaryButton
               id="go_to_homepage_button"
-              onClick={() => (location.href = '/')}
+              onClick={() => (window.location.href = '/')}
             >
               {intl.formatMessage(messages.backButton)}
             </FooterPrimaryButton>
@@ -263,7 +270,7 @@ class ConfirmationScreenView extends React.Component<
             <FooterAction>
               <FooterPrimaryButton
                 id="go_to_new_declaration"
-                onClick={() => (location.href = '/')}
+                onClick={() => (window.location.href = '/')}
               >
                 {intl.formatMessage(messages.newButton)}
               </FooterPrimaryButton>

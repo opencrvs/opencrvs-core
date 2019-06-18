@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
-import { IForm, Action } from 'src/forms'
-import { IApplication } from 'src/applications'
-import { draftToGqlTransformer } from 'src/transformer'
+import { IForm, Action } from '@register/forms'
+import { IApplication } from '@register/applications'
+import { draftToGqlTransformer } from '@register/transformer'
 
 const SUBMIT_DEATH_APPLICATION = gql`
   mutation submitMutation($details: DeathRegistrationInput!) {

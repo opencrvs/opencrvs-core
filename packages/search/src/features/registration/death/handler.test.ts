@@ -1,8 +1,11 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
-import { createServer } from 'src/index'
-import { searchByCompositionId } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  updateComposition,
+  searchByCompositionId
+} from '@search/elasticsearch/dbhelper'
+import { createServer } from '@search/index'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
@@ -10,9 +13,9 @@ import {
   mockDeathRejectionTaskBundleWithoutCompositionReference,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy
-} from 'src/test/utils'
+} from '@search/test/utils'
 
-jest.mock('src/elasticsearch/dbhelper.ts')
+jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('Verify handlers', () => {
   let server: any
@@ -61,8 +64,12 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchByCompositionId.mockReturnValue(mockSearchResponse)
+      const mockedIndexComposition = indexComposition as jest.Mocked<any>
+      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
+        any
+      >
+      mockedIndexComposition.mockResolvedValue({})
+      mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -82,8 +89,14 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      indexComposition.mockReturnValue({})
-      searchByCompositionId.mockReturnValue(mockSearchResponseWithoutCreatedBy)
+      const mockedIndexComposition = indexComposition as jest.Mocked<any>
+      const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
+        any
+      >
+      mockedIndexComposition.mockReturnValue({})
+      mockedSearchByCompositionId.mockReturnValue(
+        mockSearchResponseWithoutCreatedBy
+      )
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -103,7 +116,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the event data is updated with task', async () => {
-      updateComposition.mockReturnValue({})
+      ;(updateComposition as jest.Mock).mockReturnValue({})
 
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
@@ -123,8 +136,8 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it('should return status code 500 if the event data is updated with task where there is no focus reference for Composition', async () => {
-      updateComposition.mockReturnValue({})
+    it('500 if the event data is updated with task where there is no focus reference for Composition', async () => {
+      ;(updateComposition as jest.Mock).mockReturnValue({})
 
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',

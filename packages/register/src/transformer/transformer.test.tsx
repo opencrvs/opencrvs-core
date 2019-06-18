@@ -6,24 +6,26 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
+} from '@register/tests/util'
+import { DRAFT_BIRTH_PARENT_FORM } from '@register/navigation/routes'
 import {
   storeApplication,
   IApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
+} from '@register/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
+import { storage } from '@register/storage'
 import { v4 as uuid } from 'uuid'
-import { draftToGqlTransformer } from 'src/transformer'
+import { draftToGqlTransformer } from '@register/transformer'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-import { getOfflineDataSuccess } from 'src/offline/actions'
+import { getOfflineDataSuccess } from '@register/offline/actions'
 import { Event, IForm } from '@opencrvs/register/src/forms'
 import { clone } from 'lodash'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 interface IPersonDetails {
   [key: string]: any
@@ -33,7 +35,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -142,7 +144,7 @@ describe('when draft data is transformed to graphql', () => {
       father: fatherDetails,
       mother: motherDetails,
       registration: registrationDetails,
-      documents: { image_uploader: '' }
+      documents: { imageUploader: '' }
     }
 
     customDraft = {
@@ -180,7 +182,7 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       expect(draftToGqlTransformer(form, data).eventLocation.type).toBe(
@@ -195,7 +197,7 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       expect(
@@ -212,7 +214,7 @@ describe('when draft data is transformed to graphql', () => {
         father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       expect(draftToGqlTransformer(form, data).father).toBeUndefined()

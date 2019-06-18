@@ -1,26 +1,28 @@
 import * as React from 'react'
 import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { Logo, Logout } from '@opencrvs/components/lib/icons'
-import styled from 'styled-components'
-import { redirectToAuthentication } from 'src/profile/profileActions'
+import styled from '@register/styledComponents'
+import { redirectToAuthentication } from '@register/profile/profileActions'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IUserDetails } from '../../utils/userUtils'
+import { IStoreState } from '@register/store'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IUserDetails } from '@register/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { storage } from 'src/storage'
+import { storage } from '@register/storage'
 import {
   SECURITY_PIN_INDEX,
   SECURITY_PIN_EXPIRED_AT
-} from 'src/utils/constants'
-import * as moment from 'moment'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+} from '@register/utils/constants'
+import moment from 'moment'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
-import { pinOps } from './ComparePINs'
+import { pinOps } from '@register/views/Unlock/ComparePINs'
 import * as ReactDOM from 'react-dom'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   incorrect: {
     id: 'unlockApp.incorrectPin',
     defaultMessage: 'Incorrect pin. Please try again'
@@ -88,7 +90,7 @@ type ErrorState = {
 type IFullState = IState & ErrorState
 
 type Props = {
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
 }
 type IFullProps = Props &
@@ -132,6 +134,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       (userDetails &&
         userDetails.name &&
         (userDetails.name.find(
+          // @ts-ignore
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
       {}

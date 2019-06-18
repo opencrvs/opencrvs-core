@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { IViewHeadingProps, ViewHeading } from './ViewHeading'
+import {
+  IViewHeadingProps,
+  ViewHeading
+} from '@register/components/ViewHeading'
 import { Header } from '@opencrvs/components/lib/interface'
 import { ActionList } from '@opencrvs/components/lib/buttons'
-import styled from '../styled-components'
-import { TopMenu } from './TopMenu'
+import styled from '@register/styledComponents'
+import { TopMenu } from '@register/components/TopMenu'
 import { Logo } from '@opencrvs/components/lib/icons'
-import ConnectivityStatus from './ConnectivityStatus'
+import ConnectivityStatus from '@register/components/ConnectivityStatus'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 
 const HeaderWrapper = styled(Header)`

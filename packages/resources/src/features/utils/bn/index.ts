@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { FHIR_URL } from '../../../constants'
+import { FHIR_URL } from '@resources/constants'
 
 type ISupportedType =
   | fhir.Practitioner
@@ -100,7 +100,7 @@ export async function getUpazilaID(
     description = kurigramA2IIdescription
   }
 
-  return await getLocationIDByDescription(upazilas, description)
+  return getLocationIDByDescription(upazilas, description)
 }
 
 export function checkDuplicate(
@@ -119,6 +119,7 @@ export function checkDuplicate(
 
 export const titleCase = (str: string) => {
   const stringArray = str.toLowerCase().split(' ')
+  // tslint:disable-next-line
   for (let i = 0; i < stringArray.length; i++) {
     stringArray[i] =
       stringArray[i].charAt(0).toUpperCase() + stringArray[i].slice(1)

@@ -23,7 +23,7 @@ import {
   dateNotInFuture,
   dateFormatIsCorrect,
   dateInPast
-} from './validate'
+} from '@register/utils/validate'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {

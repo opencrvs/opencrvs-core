@@ -4,18 +4,18 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
 import { readFileSync } from 'fs'
-import getPlugins from './config/plugins'
+import getPlugins from '@resources/config/plugins'
 import {
   RESOURCES_HOST,
   RESOURCES_PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from './constants'
+} from '@resources/constants'
 import { validateFunc } from '@opencrvs/commons'
 
-import locationsHandler from './features/administrative/handler'
-import facilitiesHandler from './features/facilities/handler'
+import locationsHandler from '@resources/features/administrative/handler'
+import facilitiesHandler from '@resources/features/facilities/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 

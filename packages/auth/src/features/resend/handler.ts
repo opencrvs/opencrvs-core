@@ -1,13 +1,13 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import { getStoredUserInformation } from 'src/features/authenticate/service'
+import { getStoredUserInformation } from '@auth/features/authenticate/service'
 import {
   generateVerificationCode,
   sendVerificationCode
-} from 'src/features/verifyCode/service'
-import { PRODUCTION } from 'src/constants'
-import { logger } from 'src/logger'
+} from '@auth/features/verifyCode/service'
+import { PRODUCTION } from '@auth/constants'
+import { logger } from '@auth/logger'
 
 interface IRefreshPayload {
   nonce: string

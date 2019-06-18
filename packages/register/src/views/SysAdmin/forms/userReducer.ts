@@ -1,7 +1,7 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import { userSection } from './fieldDefinitions/user-section'
 import { Action } from 'redux'
-import { IFormSection } from 'src/forms'
+import { IFormSection } from '@register/forms'
 
 const initialState: IUserFormState = {
   userForm: userSection

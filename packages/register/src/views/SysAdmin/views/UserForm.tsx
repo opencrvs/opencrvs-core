@@ -1,13 +1,13 @@
 import * as React from 'react'
-import styled from 'src/styled-components'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { FormFieldGenerator } from 'src/components/form'
-import { IFormSection, IFormSectionData } from 'src/forms'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+import styled from '@register/styledComponents'
+import { FormFieldGenerator } from '@register/components/form'
+import { IFormSection, IFormSectionData } from '@register/forms'
+import { IStoreState } from '@register/store'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { goToHome } from 'src/navigation'
+import { goToHome } from '@register/navigation'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const messages = defineMessages({

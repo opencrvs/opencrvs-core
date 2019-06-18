@@ -1,10 +1,10 @@
-import { getLoggedInPractitionerResource } from 'src/features/user/utils'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
   setupLastRegUser,
   setupLastRegLocation,
   setupAuthorOnNotes
-} from 'src/features/registration/fhir/fhir-bundle-modifier'
-import { getTaskResource } from 'src/features/registration/fhir/fhir-template'
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 export async function modifyTaskBundle(
   fhirBundle: fhir.Bundle,

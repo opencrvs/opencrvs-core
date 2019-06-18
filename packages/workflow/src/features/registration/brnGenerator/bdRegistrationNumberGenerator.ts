@@ -1,11 +1,11 @@
-import { getTrackingIdFromTaskResource } from '../fhir/fhir-utils'
+import { getTrackingIdFromTaskResource } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getPractitionerLocations,
   getJurisDictionalLocations
-} from 'src/features/user/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '../fhir/constants'
+} from '@workflow/features/user/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 import * as Verhoeff from 'node-verhoeff'
-import { convertStringToASCII } from '../utils'
+import { convertStringToASCII } from '@workflow/features/registration/utils'
 
 export async function generateBdRegistrationNumber(
   taskResource: fhir.Task,

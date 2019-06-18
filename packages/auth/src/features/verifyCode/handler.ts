@@ -1,13 +1,16 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import { checkVerificationCode, deleteUsedVerificationCode } from './service'
+import {
+  checkVerificationCode,
+  deleteUsedVerificationCode
+} from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
   createToken
-} from 'src/features/authenticate/service'
-import { logger } from 'src/logger'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from 'src/constants'
+} from '@auth/features/authenticate/service'
+import { logger } from '@auth/logger'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IVerifyPayload {
   nonce: string

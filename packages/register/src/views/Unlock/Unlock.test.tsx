@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from 'src/tests/util'
-import { createStore } from 'src/store'
-import { Unlock } from './Unlock'
-import { storage } from 'src/storage'
-import { pinOps } from './ComparePINs'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
-import { SECURITY_PIN_EXPIRED_AT } from 'src/utils/constants'
+import { createTestComponent, flushPromises } from '@register/tests/util'
+import { createStore } from '@register/store'
+import { Unlock } from '@register/views/Unlock/Unlock'
+import { storage } from '@register/storage'
+import { pinOps } from '@register/views/Unlock/ComparePINs'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
+import { SECURITY_PIN_EXPIRED_AT } from '@register/utils/constants'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -30,14 +30,17 @@ describe('Unlock page loads Properly', () => {
     ]),
     screenLock: undefined,
     USER_ID: 'shakib75',
+    // eslint-disable-next-line @typescript-eslint/camelcase
     locked_time: undefined
   }
 
   storage.getItem = jest.fn(async (key: string) =>
+    // @ts-ignore
     Promise.resolve(indexedDB[key])
   )
 
   storage.setItem = jest.fn(
+    // @ts-ignore
     async (key: string, value: string) => (indexedDB[key] = value)
   )
 
@@ -196,7 +199,9 @@ describe('Logout Sequence', async () => {
     SCREEN_LOCK: true,
     SECURITY_PIN_EXPIRED_AT: 1234
   }
+  // @ts-ignore
   storage.removeItem = jest.fn((key: string) => {
+    // @ts-ignore
     delete indexeddb[key]
   })
 
@@ -206,7 +211,9 @@ describe('Logout Sequence', async () => {
       .hostNodes()
       .simulate('click')
     testComponent.component.update()
+    // @ts-ignore
     expect(indexeddb[SCREEN_LOCK]).toBeFalsy()
+    // @ts-ignore
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
   })
 })

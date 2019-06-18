@@ -1,41 +1,56 @@
-import { LinkButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import * as React from 'react'
+import { RouteComponentProps } from 'react-router'
+import { connect } from 'react-redux'
+import Swipeable from 'react-swipeable'
+import { Box, Modal } from '@opencrvs/components/lib/interface'
+import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
   ArrowForward,
   DraftSimple,
   TickLarge
 } from '@opencrvs/components/lib/icons'
-import { Box, Modal } from '@opencrvs/components/lib/interface'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Sentry from '@sentry/browser'
 import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
-import * as debounce from 'lodash/debounce'
-import * as React from 'react'
+import debounce from 'lodash/debounce'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import * as Swipeable from 'react-swipeable'
+import styled from '@register/styledComponents'
+import {
+  goToTab as goToTabAction,
+  goBack as goBackAction
+} from '@register/navigation'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  Event,
+  Action
+} from '@register/forms'
+import {
+  FormFieldGenerator,
+  ViewHeaderWithTabs
+} from '@register/components/form'
+import { IStoreState } from '@register/store'
 import {
   deleteApplication,
   IApplication,
   modifyApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
+} from '@register/applications'
 import {
   FooterAction,
   FooterPrimaryButton,
   ViewFooter
-} from 'src/components/interface/footer'
-import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
-import { CONFIRMATION_SCREEN, HOME } from 'src/navigation/routes'
-import { toggleDraftSavedNotification } from 'src/notification/actions'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { getOfflineState } from 'src/offline/selectors'
-import { getScope } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
-import { isMobileDevice } from 'src/utils/commonUtils'
+} from '@register/components/interface/footer'
+import { StickyFormTabs } from '@register/views/RegisterForm/StickyFormTabs'
+import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
+import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
+import { getOfflineState } from '@register/offline/selectors'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { CONFIRMATION_SCREEN, HOME } from '@register/navigation/routes'
 import {
   DECLARATION,
   DUPLICATION,
@@ -43,23 +58,11 @@ import {
   REGISTERED,
   REGISTRATION,
   REJECTION
-} from 'src/utils/constants'
-import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
-import {
-  Action,
-  Event,
-  IForm,
-  IFormField,
-  IFormSection,
-  IFormSectionData
-} from '../../forms'
-import {
-  goBack as goBackAction,
-  goToTab as goToTabAction
-} from '../../navigation'
-import styled from '../../styled-components'
-import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import { StickyFormTabs } from './StickyFormTabs'
+} from '@register/utils/constants'
+import { getScope } from '@register/profile/profileSelectors'
+import { Scope } from '@register/utils/authUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
+import { toggleDraftSavedNotification } from '@register/notification/actions'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -124,7 +127,9 @@ const CancelButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
 `
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newBirthRegistration: {
     id: 'register.form.newBirthRegistration',
     defaultMessage: 'New birth application',
@@ -294,10 +299,13 @@ type Props = {
   offlineResources: IOfflineDataState
 }
 
-type FullProps = IFormProps &
+export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
+    tabId: string
+    applicationId: string
+  }>
 
 type State = {
   showSubmitModal: boolean
@@ -456,7 +464,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   successfullyRegistered = (response: string) => {
     const {
       history,
-      application: application,
+      application,
       application: { event }
     } = this.props
     const personData =
@@ -698,9 +706,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         {intl.formatMessage(activeSection.title)}
                         {activeSection.optional && (
                           <Optional
-                            id={`form_section_optional_label_${
-                              activeSection.id
-                            }`}
+                            id={`form_section_optional_label_${activeSection.id}`}
                             disabled={activeSection.disabled}
                           >
                             &nbsp;&nbsp;•&nbsp;
@@ -886,7 +892,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
-function replaceInitialValues(fields: IFormField[], sectionValues: object) {
+function replaceInitialValues(fields: IFormField[], sectionValues: any) {
   return fields.map(field => ({
     ...field,
     initialValue:
@@ -949,7 +955,12 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(
+export const RegisterForm = connect<
+  Props,
+  DispatchProps,
+  FullProps,
+  IStoreState
+>(
   mapStateToProps,
   {
     modifyApplication,
@@ -957,7 +968,7 @@ export const RegisterForm = connect<Props, DispatchProps>(
     goToTab: goToTabAction,
     goBack: goBackAction,
     toggleDraftSavedNotification,
-    handleSubmit: values => {
+    handleSubmit: (values: any) => {
       console.log(values)
     }
   }

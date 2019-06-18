@@ -1,6 +1,6 @@
 import { Tabs } from '@opencrvs/components/lib/interface'
-import styled from '../../styled-components'
-import { ViewHeader } from '../ViewHeader'
+import styled from '@register/styledComponents'
+import { ViewHeader } from '@register/components/ViewHeader'
 
 export const ViewHeaderWithTabs = styled(ViewHeader)`
   padding-bottom: 0;

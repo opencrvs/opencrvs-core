@@ -8,37 +8,39 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEXT,
   NUMBER
-} from 'src/forms'
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
-import { isValidDeathOccurrenceDate } from 'src/utils/validate'
-import { messages as addressMessages } from '../../../address'
-import { countries } from 'src/forms/countries'
-import { conditionals } from 'src/forms/utils'
+import { isValidDeathOccurrenceDate } from '@register/utils/validate'
+import { messages as addressMessages } from '@register/forms/address'
+import { countries } from '@register/forms/countries'
+import { conditionals } from '@register/forms/utils'
 import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
-} from 'src/offline/reducer'
+} from '@register/offline/reducer'
 import {
   sectionFieldToBundleFieldTransformer,
   copyEventAddressTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
+} from '@register/forms/mappings/mutation/field-mappings'
 import {
   fieldToDeceasedDateTransformation,
-  eventLocationMutationTransformer
-} from './mappings/mutation/event-mappings'
+  eventLocationMutationTransformer,
+  setRegistrationSectionTransformer
+} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/event-mappings'
 import {
   eventLocationIDQueryTransformer,
   bundleFieldToSectionFieldTransformer,
   eventLocationQueryTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from '@register/forms/mappings/query/field-mappings'
 import {
   deceasedDateToFieldTransformation,
-  deathPlaceToFieldTransformer
-} from './mappings/query/event-mappings'
-import { setRegistrationSectionTransformer } from './mappings/mutation/event-mappings'
-import { getRegistrationSectionTransformer } from './mappings/query/event-mappings'
+  deathPlaceToFieldTransformer,
+  getRegistrationSectionTransformer
+} from '@register/forms/register/fieldDefinitions/death/mappings/query/event-mappings'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   deathEventTab: {
     id: 'register.form.tabs.deathEventTab',
     defaultMessage: 'Event',

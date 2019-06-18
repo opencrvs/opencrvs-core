@@ -9,7 +9,6 @@ const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
-  height: 90px;
   display: block;
   justify-content: space-between;
   align-items: center;
@@ -17,6 +16,7 @@ const HeaderContainer = styled.div`
 `
 const BodyContent = styled.div`
   max-width: 940px;
+  height: 64px;
   margin: auto;
   padding: 24px 0px;
   display: flex;
@@ -31,11 +31,15 @@ const BackButton = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
   justify-content: center;
   margin: 0;
+  padding: 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 24px;
+  }
 `
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
-  margin-left: 14px;
+  margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }

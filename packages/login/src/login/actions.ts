@@ -1,12 +1,12 @@
 import { AxiosError } from 'axios'
 import { RouterAction } from 'react-router-redux'
-import { convertToMSISDN } from '../utils/dataCleanse'
+import { convertToMSISDN } from '@login/utils/dataCleanse'
 import {
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
-} from '../utils/authApi'
-import { phoneNumberFormat } from '../utils/validate'
+} from '@login/utils/authApi'
+import { phoneNumberFormat } from '@login/utils/validate'
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'

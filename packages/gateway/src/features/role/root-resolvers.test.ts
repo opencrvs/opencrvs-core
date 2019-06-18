@@ -1,4 +1,4 @@
-import { resolvers } from './root-resolvers'
+import { resolvers } from '@gateway/features/role/root-resolvers'
 import * as fetch from 'jest-fetch-mock'
 
 beforeEach(() => {

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import * as moxios from 'moxios'
 import { ReactWrapper } from 'enzyme'
-import { StepOneContainer } from './StepOneContainer'
-import { createTestComponent } from '../../tests/util'
-import { client } from '../../utils/authApi'
+import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
+import { createTestComponent } from '@login/tests/util'
+import { client } from '@login/utils/authApi'
 
 describe('Login app step one', () => {
   beforeEach(() => {

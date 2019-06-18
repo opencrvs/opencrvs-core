@@ -1,5 +1,7 @@
-import { resolvers } from './root-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { resolvers } from '@gateway/features/notification/root-resolvers'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Notification root resolvers', () => {
   describe('listNotifications()', () => {
@@ -21,7 +23,7 @@ describe('Notification root resolvers', () => {
       // @ts-ignore
       const result = await resolvers.Mutation.createNotification(
         {},
-        { createAt: new Date() }
+        { details: new Date() }
       )
 
       expect(result).toBeDefined()

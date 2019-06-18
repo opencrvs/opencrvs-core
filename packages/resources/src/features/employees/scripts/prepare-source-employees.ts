@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { EMPLOYEES_SOURCE } from '../../../constants'
+import { EMPLOYEES_SOURCE } from '@resources/constants'
 import * as csv2json from 'csv2json'
 const sourceJSON = `${EMPLOYEES_SOURCE}test-employees.json`
 import chalk from 'chalk'

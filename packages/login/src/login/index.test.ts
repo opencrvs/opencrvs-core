@@ -1,12 +1,16 @@
 import * as moxios from 'moxios'
-import * as actions from './actions'
-import { initialState } from './reducer'
-import { createStore, AppStore } from '../store'
+import * as actions from '@login/login/actions'
+import { initialState } from '@login/login/reducer'
+import { createStore, AppStore } from '@login/store'
 import { resolve } from 'url'
-import { client } from '../utils/authApi'
+import { client } from '@login/utils/authApi'
 
-import { getSubmissionError, getResentSMS, getsubmitting } from './selectors'
-import { mockState } from '../tests/util'
+import {
+  getSubmissionError,
+  getResentSMS,
+  getsubmitting
+} from '@login/login/selectors'
+import { mockState } from '@login/tests/util'
 
 describe('actions', () => {
   describe('authenticate', () => {

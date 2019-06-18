@@ -6,7 +6,7 @@ import {
   DATE,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS
-} from 'src/forms'
+} from '@register/forms'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
@@ -14,21 +14,21 @@ import {
   isValidBirthDate,
   greaterThanZero,
   maxLength
-} from 'src/utils/validate'
-import { conditionals } from '../../../utils'
+} from '@register/utils/validate'
+import { conditionals } from '@register/forms/utils'
 import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
-} from 'src/offline/reducer'
-import { messages as addressMessages } from '../../../address'
-import { countries } from '../../../countries'
+} from '@register/offline/reducer'
+import { messages as addressMessages } from '@register/forms/address'
+import { countries } from '@register/forms/countries'
 import {
   fieldToNameTransformer,
   sectionFieldToBundleFieldTransformer,
   fieldNameTransformer,
   fieldValueSectionExchangeTransformer
-} from 'src/forms/mappings/mutation/field-mappings'
-import { eventLocationMutationTransformer } from './mappings/mutation/child-mappings'
+} from '@register/forms/mappings/mutation/field-mappings'
+import { eventLocationMutationTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/child-mappings'
 import {
   nameToFieldTransformer,
   fieldValueTransformer,
@@ -37,7 +37,8 @@ import {
   eventLocationTypeQueryTransformer,
   eventLocationIDQueryTransformer,
   eventLocationQueryTransformer
-} from 'src/forms/mappings/query/field-mappings'
+} from '@register/forms/mappings/query/field-mappings'
+import { IFormSection } from '@register/forms/index'
 
 export interface IChildSectionFormData {
   firstName: string
@@ -45,9 +46,10 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
-import { IFormSection } from '../../../index'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   childTab: {
     id: 'register.form.tabs.childTab',
     defaultMessage: 'Child',

@@ -1,14 +1,17 @@
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from 'src/constants'
+import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { logger } from 'src/logger'
-import { getInformantName, getTrackingId } from './fhir/fhir-utils'
+import { logger } from '@workflow/logger'
+import {
+  getInformantName,
+  getTrackingId
+} from '@workflow/features/registration/fhir/fhir-utils'
 import {
   EVENT_TYPE,
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE
-} from './fhir/constants'
-import { Events } from '../events/handler'
+} from '@workflow/features/registration/fhir/constants'
+import { Events } from '@workflow/features/events/handler'
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -34,6 +37,7 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
+  // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_NEW_DEC:
       await sendDeclarationNotification(
@@ -72,6 +76,7 @@ export async function sendEventNotification(
         'deathRegistrationSMS',
         authHeader
       )
+      // tslint:disable-next-line
       break
   }
 }
