@@ -13,7 +13,8 @@ import {
   SEARCH,
   APPLICATION_DETAIL,
   SETTINGS,
-  SYS_ADMIN_HOME_TAB
+  SYS_ADMIN_HOME_TAB,
+  USER_REVIEW
 } from 'src/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from 'src/utils/authUtils'
@@ -170,6 +171,10 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
+}
+
+export function goToUserReview() {
+  return push(USER_REVIEW)
 }
 
 export function goToTab(

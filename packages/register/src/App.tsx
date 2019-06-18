@@ -34,6 +34,7 @@ import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from './views/Settings/SettingsPage'
 import { SysAdminHome } from './views/SysAdmin/SysAdminHome'
 import { UserForm } from './views/SysAdmin/views/UserForm'
+import { UserReviewForm } from './views/SysAdmin/views/UserReviewForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -164,6 +165,11 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.USER_FORM}
                                   component={UserForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.USER_REVIEW}
+                                  component={UserReviewForm}
                                 />
                               </Switch>
                             </ProtectedPage>
