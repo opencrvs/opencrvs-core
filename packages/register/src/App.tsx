@@ -33,6 +33,7 @@ import { SelectInformant } from './views/SelectInformant/SelectInformant'
 import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from './views/Settings/SettingsPage'
 import { SysAdminHome } from './views/SysAdmin/SysAdminHome'
+import { SecurityQuestion } from './views/SecurityQuestion/SecurityQuestionView'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -158,6 +159,11 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.SYS_ADMIN_HOME_TAB}
                                   component={SysAdminHome}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SECURITY_QUESTION}
+                                  component={SecurityQuestion}
                                 />
                               </Switch>
                             </ProtectedPage>
