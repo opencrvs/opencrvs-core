@@ -34,7 +34,7 @@ import { IApplication } from '@register/applications'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction,
+  goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction
 } from '@register/navigation'
 import {
@@ -251,7 +251,7 @@ interface IBaseRegistrarHomeProps {
   language: string
   scope: Scope | null
   userDetails: IUserDetails | null
-  gotoTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
@@ -314,7 +314,7 @@ export class RegistrarHomeView extends React.Component<
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
             handler: () =>
-              this.props.gotoTab(
+              this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_TAB,
                 reg.id,
                 'review',
@@ -359,7 +359,7 @@ export class RegistrarHomeView extends React.Component<
           actions.push({
             label: this.props.intl.formatMessage(messages.update),
             handler: () =>
-              this.props.gotoTab(
+              this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_TAB,
                 reg.id,
                 'review',
@@ -431,7 +431,7 @@ export class RegistrarHomeView extends React.Component<
         {
           label: this.props.intl.formatMessage(messages.update),
           handler: () =>
-            this.props.gotoTab(
+            this.props.goToPage(
               tabRoute,
               draft.id,
               '',
@@ -819,7 +819,7 @@ function mapStateToProps(
 export const RegistrarHome = connect(
   mapStateToProps,
   {
-    gotoTab: goToTabAction,
+    goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction

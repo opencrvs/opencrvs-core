@@ -171,7 +171,7 @@ export function goToSettings() {
   return push(SETTINGS)
 }
 
-export function goToTab(
+export function goToPage(
   tabRoute: string,
   applicationId: string,
   tabId: string,

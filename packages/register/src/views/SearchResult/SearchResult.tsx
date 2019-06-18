@@ -36,7 +36,7 @@ import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction
+  goToPage as goToPageAction
 } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
@@ -230,7 +230,7 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails | null
-  gotoTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
 }
@@ -626,7 +626,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
           handler: () =>
-            this.props.gotoTab(
+            this.props.goToPage(
               REVIEW_EVENT_PARENT_FORM_TAB,
               item.id,
               'review',
@@ -637,7 +637,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.reject),
           handler: () =>
-            this.props.gotoTab(
+            this.props.goToPage(
               REVIEW_EVENT_PARENT_FORM_TAB,
               item.id,
               'review',
@@ -819,7 +819,7 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
-    gotoTab: goToTabAction,
+    goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }

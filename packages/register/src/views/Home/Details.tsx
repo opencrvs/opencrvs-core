@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
-  goToTab as goToTabAction,
+  goToPage as goToPageAction,
   goToHome as goToHomeAction
 } from '@register/navigation'
 import { getUserDetails } from '@register/profile/profileSelectors'
@@ -109,7 +109,7 @@ interface IDetailProps {
   applicationId: string
   draft: IApplication | null
   userDetails: IUserDetails | null
-  goToTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goToHome: typeof goToHomeAction
 }
 
@@ -423,7 +423,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         <ActionButton
           id="draft_update"
           onClick={() =>
-            this.props.goToTab(
+            this.props.goToPage(
               tabRoute,
               draft.id,
               '',
@@ -693,7 +693,7 @@ function mapStateToProps(
 export const Details = connect(
   mapStateToProps,
   {
-    goToTab: goToTabAction,
+    goToPage: goToPageAction,
     goToHome: goToHomeAction
   }
 )(injectIntl(withTheme(DetailView)))

@@ -18,7 +18,7 @@ import debounce from 'lodash/debounce'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '@register/styledComponents'
 import {
-  goToTab as goToTabAction,
+  goToPage as goToPageAction,
   goBack as goBackAction
 } from '@register/navigation'
 import {
@@ -282,7 +282,7 @@ export interface IFormProps {
 }
 
 type DispatchProps = {
-  goToTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goBack: typeof goBackAction
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -558,7 +558,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     event: string
   ): void => {
     if (selectedSection) {
-      this.props.goToTab(tabRoute, applicationId, selectedSection.id, event)
+      this.props.goToPage(tabRoute, applicationId, selectedSection.id, event)
     }
   }
 
@@ -605,7 +605,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
-      goToTab,
+      goToPage,
       goBack,
       intl,
       activeSection,
@@ -729,7 +729,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           {nextSection && (
                             <FormPrimaryButton
                               onClick={() =>
-                                goToTab(
+                                goToPage(
                                   this.props.tabRoute,
                                   application.id,
                                   nextSection.id,
@@ -943,7 +943,7 @@ export const RegisterForm = connect<
   {
     modifyApplication,
     deleteApplication,
-    goToTab: goToTabAction,
+    goToPage: goToPageAction,
     goBack: goBackAction,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {

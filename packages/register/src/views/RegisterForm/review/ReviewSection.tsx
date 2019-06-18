@@ -23,7 +23,7 @@ import {
 import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToTab } from '@register/navigation'
+import { goToPage } from '@register/navigation'
 
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
 import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
@@ -267,7 +267,7 @@ interface IProps {
   submitClickEvent?: () => void
   saveDraftClickEvent?: () => void
   deleteApplicationClickEvent?: () => void
-  goToTab: typeof goToTab
+  goToPage: typeof goToPage
   scope: Scope | null
   offlineResources: IOfflineDataState
   language: string
@@ -640,7 +640,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               {errorsOnField.length > 0 ? (
                                 <RequiredFieldLink
                                   onClick={() => {
-                                    this.props.goToTab(
+                                    this.props.goToPage(
                                       tabRoute,
                                       draft.id,
                                       section.id,
@@ -755,7 +755,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               show={this.state.displayEditDialog}
               handleClose={this.toggleDisplayDialog}
               handleEdit={() => {
-                this.props.goToTab(
+                this.props.goToPage(
                   tabRoute,
                   draft.id,
                   this.state.editClickedSectionId,
@@ -788,5 +788,5 @@ export const ReviewSection = connect(
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
   }),
-  { goToTab }
+  { goToPage }
 )(injectIntl(ReviewSectionComp))
