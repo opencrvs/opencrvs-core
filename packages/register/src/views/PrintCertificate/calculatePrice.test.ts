@@ -1,7 +1,11 @@
-import { calculateDays, timeElapsed } from './calculatePrice'
+import {
+  calculateDays,
+  timeElapsed
+} from '@register/views/PrintCertificate/calculatePrice'
 
 describe('calculateDays, timeElapsed tests', async () => {
   it('timeElapsedInWords function returns required time duration in words', () => {
+    // @ts-ignore
     Date.now = jest.fn(() => new Date('2019-01-01'))
 
     let days = calculateDays('1985-08-18')

@@ -1,19 +1,21 @@
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import * as React from 'react'
+import styled from '@register/styledComponents'
 import { ActionPage, Box } from '@opencrvs/components/lib/interface'
+import { FormFieldGenerator } from '@register/components/form'
+import { IFormSectionData, Event, Action } from '@register/forms'
+import { hasFormError } from '@register/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { IApplication, IPayload, SUBMISSION_STATUS } from 'src/applications'
-import { FormFieldGenerator } from 'src/components/form'
-import { Action, Event, IFormSectionData } from 'src/forms'
-import { hasFormError } from 'src/forms/utils'
-import { goToSearchResult } from 'src/navigation'
-import styled from 'styled-components'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { goToSearchResult } from '@register/navigation'
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',

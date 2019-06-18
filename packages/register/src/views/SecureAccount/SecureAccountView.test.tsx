@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { createTestComponent } from '../../tests/util'
-import { SecureAccount } from './SecureAccountView'
-import { createStore } from 'src/store'
+import { createTestComponent } from '@register/tests/util'
+import { SecureAccount } from '@register/views/SecureAccount/SecureAccountView'
+import { createStore } from '@register/store'
 import { ReactWrapper } from 'enzyme'
 
 describe('Login app > Secure Account Page', () => {

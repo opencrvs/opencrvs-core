@@ -1,4 +1,4 @@
-import { IFieldGroup } from '../../utils/fieldUtils'
+import { IFieldGroup } from '@login/utils/fieldUtils'
 
 export const stepTwoFields: IFieldGroup = {
   code: {

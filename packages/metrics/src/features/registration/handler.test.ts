@@ -1,7 +1,9 @@
-import { createServer } from '../../index'
+import { createServer } from '@metrics/index'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify handler', () => {
   let server: any

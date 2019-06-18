@@ -1,25 +1,25 @@
 {
   "name": "@opencrvs/notification",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.1.0",
   "description": "OpenCRVS notification service",
   "main": "src/index.js",
   "license": "NONE",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -- src/index.ts",
-    "start:prod": "ts-node src/index.ts",
-    "test": "jest --coverage && yarn test:compilation",
-    "test:watch": "jest --watch --coverage",
+    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
+    "test": "jest --silent --noStackTrace && yarn test:compilation",
+    "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "lint-staged",
+    "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.6",
+    "@opencrvs/commons": "^1.0.0-alpha.1.0",
     "@types/hapi": "^17.0.12",
-    "@types/hapi-auth-jwt2": "^8.0.1",
+    "@types/hapi-auth-jwt2": "8.0.1",
     "@types/joi": "^14.0.0",
-    "@types/node-fetch": "^2.1.2",
+    "@types/node-fetch": "^2.3.4",
     "@types/winston": "^2.3.9",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
@@ -29,24 +29,28 @@
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
-    "hapi-auth-jwt2": "^8.1.0",
+    "hapi-auth-jwt2": "8.1.0",
     "hapi-i18n": "^2.0.0",
     "iconv": "^2.3.1",
     "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
-    "node-fetch": "^2.2.1",
+    "node-fetch": "^2.6.0",
     "typescript": "^3.0.1",
     "winston": "^3.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.9",
+    "@types/jest": "^24.0.13",
     "cross-env": "^5.2.0",
-    "jest": "23.6.0",
-    "jest-fetch-mock": "^1.6.5",
+    "jest": "24.7.1",
+    "jest-fetch-mock": "^2.1.2",
     "nodemon": "^1.17.5",
     "prettier": "^1.15.2",
-    "ts-jest": "^22.4.6",
-    "ts-node": "^6.1.1"
+    "ts-jest": "^24.0.2",
+    "lint-staged": "^7.1.0",
+    "ts-node": "^6.1.1",
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.17.0",
+    "tslint-microsoft-contrib": "^6.2.0"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
@@ -61,6 +65,9 @@
     "modulePaths": [
       "<rootDir>"
     ],
+    "moduleNameMapper": {
+      "@notification/(.*)": "<rootDir>/src/$1"
+    },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "setupFiles": [
       "./test/setupJest.ts"

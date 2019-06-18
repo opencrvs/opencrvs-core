@@ -1,4 +1,4 @@
-import { authApi, client } from './authApi'
+import { authApi, client } from '@login/utils/authApi'
 import * as moxios from 'moxios'
 
 describe('authApi', () => {

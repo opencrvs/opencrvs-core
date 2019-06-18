@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { internal } from 'boom'
-import { invalidateToken } from './service'
+import { invalidateToken } from '@auth/features/invalidateToken/service'
 
 interface IInvalidateTokenPayload {
   token: string

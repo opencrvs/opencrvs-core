@@ -1,14 +1,19 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { ActionPage, Box } from '@opencrvs/components/lib/interface'
-import { Spinner, InvertSpinner } from '@opencrvs/components/lib/interface'
+import styled from '@register/styledComponents'
+import {
+  ActionPage,
+  Box,
+  Spinner,
+  InvertSpinner
+} from '@opencrvs/components/lib/interface'
+
 import {
   InjectedIntlProps,
   injectIntl,
   defineMessages,
   InjectedIntl
 } from 'react-intl'
-import { FormFieldGenerator } from 'src/components/form'
+import { FormFieldGenerator } from '@register/components/form'
 import {
   IFormSection,
   IFormSectionData,
@@ -20,18 +25,18 @@ import {
   IForm,
   Event,
   Action
-} from 'src/forms'
+} from '@register/forms'
 import {
   PrimaryButton,
   SecondaryButton,
   IconAction
 } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { hasFormError } from 'src/forms/utils'
-import { calculatePrice } from './calculatePrice'
-import { Print } from '@opencrvs/components/lib/icons'
-import * as moment from 'moment'
+import { IStoreState } from '@register/store'
+import { hasFormError } from '@register/forms/utils'
+import { calculatePrice } from '@register/views/PrintCertificate/calculatePrice'
+import { Print, TickLarge, Edit } from '@opencrvs/components/lib/icons'
+import moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import {
@@ -40,9 +45,13 @@ import {
   generateCertificateDataURL,
   CertificateDetails,
   generateAndPrintCertificate
-} from './generatePDF'
-import { CERTIFICATE_DATE_FORMAT } from 'src/utils/constants'
-import { TickLarge, Edit } from '@opencrvs/components/lib/icons'
+} from '@register/views/PrintCertificate/generatePDF'
+import {
+  CERTIFICATE_DATE_FORMAT,
+  CERTIFICATION,
+  COMPLETION
+} from '@register/utils/constants'
+
 import {
   storeApplication,
   createReviewApplication,
@@ -54,32 +63,35 @@ import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   fatherDataDoesNotExist,
   fatherDataExists
-} from 'src/forms/certificate/fieldDefinitions/collector-section'
-import { gqlToDraftTransformer, draftToGqlTransformer } from 'src/transformer'
-import { documentForWhomFhirMapping } from 'src/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+} from '@register/forms/certificate/fieldDefinitions/collector-section'
+import {
+  gqlToDraftTransformer,
+  draftToGqlTransformer
+} from '@register/transformer'
+import { documentForWhomFhirMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import {
   MutationProvider,
   MutationContext
-} from 'src/views/DataProvider/MutationProvider'
+} from '@register/views/DataProvider/MutationProvider'
 import {
   QueryProvider,
   QueryContext
-} from 'src/views/DataProvider/QueryProvider'
-import { getUserDetails } from 'src/profile/profileSelectors'
+} from '@register/views/DataProvider/QueryProvider'
+import { getUserDetails } from '@register/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from 'src/utils/userUtils'
+import { IUserDetails } from '@register/utils/userUtils'
 import { RouteComponentProps } from 'react-router'
-import { goToHome } from 'src/navigation'
-import { CERTIFICATION, COMPLETION } from 'src/utils/constants'
-import { CONFIRMATION_SCREEN } from 'src/navigation/routes'
+import { goToHome } from '@register/navigation'
+
+import { CONFIRMATION_SCREEN } from '@register/navigation/routes'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { getOfflineState } from 'src/offline/selectors'
-import { renderSelectDynamicLabel } from 'src/views/RegisterForm/review/ReviewSection'
+} from '@register/offline/reducer'
+import { getOfflineState } from '@register/offline/selectors'
+import { renderSelectDynamicLabel } from '@register/views/RegisterForm/review/ReviewSection'
 import * as Sentry from '@sentry/browser'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
@@ -214,7 +226,9 @@ const ButtonSpinner = styled(InvertSpinner)`
   top: 0px !important;
 `
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   queryError: {
     id: 'print.certificate.queryError',
     defaultMessage:
@@ -390,7 +404,7 @@ type IProps = {
   paymentFormSection: IFormSection
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   offlineResources: IOfflineDataState
   draft: IApplication
 }
@@ -709,11 +723,11 @@ class PrintCertificateActionComponent extends React.Component<
     let names
     let eventDateTime
     if (event === Event.BIRTH) {
-      names = data.child.name as Array<{ [key: string]: {} }>
+      names = data.child.name as ICertDetail[]
       eventDateTime = data.child.birthDate
     }
     if (event === Event.DEATH) {
-      names = data.deceased.name as Array<{ [key: string]: {} }>
+      names = data.deceased.name as ICertDetail[]
       eventDateTime = (data.deceased.deceased as { [key: string]: string })
         .deathDate
     }
@@ -744,11 +758,11 @@ class PrintCertificateActionComponent extends React.Component<
     let names
     let eventDateTime
     if (event === Event.BIRTH) {
-      names = data.child.name as Array<{ [key: string]: {} }>
+      names = data.child.name as ICertDetail[]
       eventDateTime = data.child.birthDate
     }
     if (event === Event.DEATH) {
-      names = data.deceased.name as Array<{ [key: string]: {} }>
+      names = data.deceased.name as ICertDetail[]
       eventDateTime = data.deceased.deceased.deathDate
     }
 
@@ -929,7 +943,10 @@ class PrintCertificateActionComponent extends React.Component<
 
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
       ) as GQLHumanName
       fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
     }
@@ -1121,16 +1138,6 @@ class PrintCertificateActionComponent extends React.Component<
   }
 }
 
-const getDraft = (
-  drafts: IApplication[],
-  registrationId: string,
-  eventType: string
-) =>
-  drafts.find(draftItem => draftItem.id === registrationId) || {
-    data: {},
-    event: getEvent(eventType)
-  }
-
 const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
@@ -1140,6 +1147,17 @@ const getEvent = (eventType: string | undefined) => {
       return Event.DEATH
   }
 }
+
+const getDraft = (
+  drafts: IApplication[],
+  registrationId: string,
+  eventType: string
+) =>
+  drafts.find(draftItem => draftItem.id === registrationId) || {
+    id: '',
+    data: {},
+    event: getEvent(eventType)
+  }
 
 const getCollectCertificateForm = (event: Event, state: IStoreState) => {
   switch (event) {

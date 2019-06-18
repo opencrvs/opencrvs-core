@@ -1,4 +1,4 @@
-import { extractCommentFragmentValue } from './data-formatting'
+import { extractCommentFragmentValue } from '@register/utils/data-formatting'
 
 describe('Data formatting tests', () => {
   it('return a single reason', () => {

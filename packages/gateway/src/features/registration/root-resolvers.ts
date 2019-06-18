@@ -1,18 +1,18 @@
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle
-} from 'src/features/registration/fhir-builders'
-import { GQLResolver } from 'src/graphql/schema'
+} from '@gateway/features/registration/fhir-builders'
+import { GQLResolver } from '@gateway/graphql/schema'
 import {
   fetchFHIR,
   getIDFromResponse,
   getDeclarationIdsFromResponse,
   getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition
-} from 'src/features/fhir/utils'
-import { IAuthHeader } from 'src/common-types'
-import { hasScope } from 'src/features/user/utils'
-import { EVENT_TYPE } from '../fhir/constants'
+} from '@gateway/features/fhir/utils'
+import { IAuthHeader } from '@gateway/common-types'
+import { hasScope } from '@gateway/features/user/utils'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 
 export const resolvers: GQLResolver = {
   Query: {

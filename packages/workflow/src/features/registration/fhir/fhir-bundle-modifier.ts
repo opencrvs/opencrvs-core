@@ -2,23 +2,27 @@ import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   getEventType
-} from '../utils'
-import { getRegStatusCode } from './fhir-utils'
+} from '@workflow/features/registration/utils'
+import { getRegStatusCode } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
   getPractitionerUnionLocation,
   getPractitionerRef
-} from 'src/features/user/utils'
-import { selectOrCreateTaskRefResource, getTaskResource } from './fhir-template'
-import { OPENCRVS_SPECIFICATION_URL, EVENT_TYPE } from './constants'
-import { ITokenPayload, getTokenPayload } from 'src/utils/authUtils.ts'
+} from '@workflow/features/user/utils'
 import {
+  selectOrCreateTaskRefResource,
+  getTaskResource
+} from '@workflow/features/registration/fhir/fhir-template'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  EVENT_TYPE,
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   REG_STATUS_CERTIFIED
-} from './constants'
-import { generateRegistrationNumber } from '../brnGenerator'
+} from '@workflow/features/registration/fhir/constants'
+import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
+import { generateRegistrationNumber } from '@workflow/features/registration/brnGenerator'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -30,9 +34,11 @@ export async function modifyRegistrationBundle(
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
+    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
+  // tslint:disable-next-line
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
@@ -168,6 +174,7 @@ export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
     !fhirBundle.entry[0] ||
     !fhirBundle.entry[0].resource
   ) {
+    fail('Invalid FHIR bundle found for declaration')
     throw new Error('Invalid FHIR bundle found for declaration')
   }
 
@@ -274,9 +281,7 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${
-      union.id
-    }`
+    regUserLastLocationExtension.valueReference.reference = `Location/${union.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
@@ -292,9 +297,7 @@ export async function setupLastRegLocation(
     )
   })
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
-    regUserLastOfficeExtension.valueReference.reference = `Location/${
-      primaryOffice.id
-    }`
+    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,

@@ -1,12 +1,19 @@
 import * as React from 'react'
-import { SectionDrawer } from '@opencrvs/components/lib/interface'
-import styled from 'styled-components'
-import { IApplication } from 'src/applications'
+import {
+  SectionDrawer,
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
+import styled from '@register/styledComponents'
+import { IApplication } from '@register/applications'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
-import { getRegisterForm } from 'src/forms/register/application-selectors'
-import { EditConfirmation } from './EditConfirmation'
-import { getConditionalActionsForField } from 'src/forms/utils'
+import { IStoreState } from '@register/store'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
+import {
+  getConditionalActionsForField,
+  getFieldLabel
+} from '@register/forms/utils'
 import {
   TickLarge,
   CrossLarge,
@@ -15,24 +22,21 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from 'src/forms/validation'
-import { goToTab } from 'src/navigation'
-import {
-  DocumentViewer,
-  IDocumentViewerOptions
-} from '@opencrvs/components/lib/interface'
+import { getValidationErrorsForForm } from '@register/forms/validation'
+import { goToTab } from '@register/navigation'
+
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
-import { documentsSection } from 'src/forms/register/fieldDefinitions/birth/documents-section'
-import { getScope } from 'src/profile/profileSelectors'
-import { Scope } from 'src/utils/authUtils'
-import { getOfflineState } from 'src/offline/selectors'
+import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
+import { getScope } from '@register/profile/profileSelectors'
+import { Scope } from '@register/utils/authUtils'
+import { getOfflineState } from '@register/offline/selectors'
 import {
   IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation
-} from 'src/offline/reducer'
-import { getLanguage } from 'src/i18n/selectors'
+} from '@register/offline/reducer'
+import { getLanguage } from '@register/i18n/selectors'
 import {
   defineMessages,
   InjectedIntlProps,
@@ -62,12 +66,14 @@ import {
   DATE,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField
-} from 'src/forms'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { getFieldLabel } from 'src/forms/utils'
-import { REJECTED } from 'src/utils/constants'
+} from '@register/forms'
+import { formatLongDate } from '@register/utils/date-formatting'
 
-const messages = defineMessages({
+import { REJECTED } from '@register/utils/constants'
+
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   valueYes: {
     id: 'register.form.valueYes',
     defaultMessage: 'Yes',
@@ -262,7 +268,7 @@ interface IProps {
   saveDraftClickEvent?: () => void
   deleteApplicationClickEvent?: () => void
   goToTab: typeof goToTab
-  scope: Scope
+  scope: Scope | null
   offlineResources: IOfflineDataState
   language: string
 }
@@ -439,8 +445,8 @@ const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
 
   const uploadedDocuments =
     draft.data[draftItemName] &&
-    isArray(draft.data[draftItemName].image_uploader)
-      ? (draft.data[draftItemName].image_uploader as FullIFileValue[])
+    isArray(draft.data[draftItemName].imageUploader)
+      ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
       : []
 
   uploadedDocuments.map(document => {
@@ -531,7 +537,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    if (this.props.scope) {
+      return this.props.scope && this.props.scope.includes('register')
+    } else {
+      return false
+    }
   }
 
   render() {
@@ -567,7 +577,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const numberOfErrors = flatten(
+      // @ts-ignore
       Object.values(errorsOnFields).map(Object.values)
+      // @ts-ignore
     ).filter(errors => errors.length > 0).length
 
     const isRejected =
@@ -609,6 +621,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       )
                       .map((field: IFormField, key: number) => {
                         const errorsOnField =
+                          // @ts-ignore
                           errorsOnFields[section.id][field.name]
 
                         return (

@@ -1,11 +1,11 @@
 import { connect } from 'react-redux'
 import { addLocaleData, IntlProvider } from 'react-intl'
-import * as en from 'react-intl/locale-data/en'
-import * as bn from 'react-intl/locale-data/bn'
+import en from 'react-intl/locale-data/en'
+import bn from 'react-intl/locale-data/bn'
 
-import { getLanguage, getMessages } from '../selectors'
-import { IStoreState } from '../../store'
-import { IntlMessages } from '../reducer'
+import { getLanguage, getMessages } from '@login/i18n/selectors'
+import { IStoreState } from '@login/i18n/../store'
+import { IntlMessages } from '@login/i18n/reducer'
 
 addLocaleData([...en, ...bn])
 
@@ -21,6 +21,6 @@ const mapStateToProps = (store: IStoreState): StateProps => {
   }
 }
 
-export const IntlContainer = connect<StateProps, {}>(mapStateToProps)(
-  IntlProvider
-)
+export const IntlContainer = connect<StateProps, {}, StateProps, IStoreState>(
+  mapStateToProps
+)(IntlProvider) as any

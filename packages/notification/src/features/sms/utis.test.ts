@@ -1,4 +1,4 @@
-import { convertToMSISDN } from './utils'
+import { convertToMSISDN } from '@notification/features/sms/utils'
 
 describe('converToMSISDN', () => {
   it('should send the phone number as it is when it has country code as prefix', () => {

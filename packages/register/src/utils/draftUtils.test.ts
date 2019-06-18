@@ -1,5 +1,5 @@
-import { getDraftApplicantFullName } from './draftUtils'
-import { Event } from 'src/forms'
+import { getDraftApplicantFullName } from '@register/utils/draftUtils'
+import { Event } from '@register/forms'
 
 describe('draftUtils tests', () => {
   describe('getDraftApplicantFullName()', () => {

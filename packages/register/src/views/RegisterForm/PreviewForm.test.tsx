@@ -6,28 +6,31 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
+} from '@register/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   REVIEW_EVENT_PARENT_FORM_TAB,
   HOME
-} from 'src/navigation/routes'
+} from '@register/navigation/routes'
 import {
   storeApplication,
   IApplication,
   SUBMISSION_STATUS
-} from 'src/applications'
+} from '@register/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
-import { Event } from 'src/forms'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import { storage } from '@register/storage'
+import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
-import * as CommonUtils from 'src/utils/commonUtils'
+import * as CommonUtils from '@register/utils/commonUtils'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 interface IPersonDetails {
   [key: string]: any
@@ -38,7 +41,7 @@ storage.setItem = jest.fn()
 jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -150,7 +153,7 @@ describe('when user is previewing the form data', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        documents: { image_uploader: '' }
+        documents: { imageUploader: '' }
       }
 
       customDraft = {
@@ -380,7 +383,7 @@ describe('when user is previewing the form data', () => {
         mother: motherDetails,
         registration: registrationDetails,
         documents: {
-          image_uploader: [
+          imageUploader: [
             {
               data: 'base64-data',
               type: 'image/jpeg',
@@ -660,7 +663,7 @@ describe('when user is previewing the form data', () => {
         causeOfDeath: causeOfDeathDetails,
         registration: registrationDetails,
         documents: {
-          image_uploader: [
+          imageUploader: [
             {
               data: 'base64-data',
               type: 'image/jpeg',

@@ -1,8 +1,8 @@
 import * as fs from 'fs'
-import { EMPLOYEES_SOURCE, ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { EMPLOYEES_SOURCE, ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
 import chalk from 'chalk'
 import { internal } from 'boom'
-import { composeAndSavePractitioners } from './service'
+import { composeAndSavePractitioners } from '@resources/features/employees/scripts/service'
 
 const sourceJSON = `${EMPLOYEES_SOURCE}test-employees.json`
 const divisions = JSON.parse(

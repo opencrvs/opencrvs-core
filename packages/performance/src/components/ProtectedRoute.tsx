@@ -6,10 +6,10 @@ import {
   withRouter
 } from 'react-router'
 import { connect } from 'react-redux'
-import { IStoreState } from '../store'
-import { getAuthenticated } from 'src/profile/selectors'
-import { checkAuth } from 'src/profile/actions'
-import { IURLParams } from '../utils/authUtils'
+import { IStoreState } from '@performance/store'
+import { getAuthenticated } from '@performance/profile/selectors'
+import { checkAuth } from '@performance/profile/actions'
+import { IURLParams } from '@performance/utils/authUtils'
 import { parse } from 'querystring'
 
 export interface IProps {
@@ -20,6 +20,8 @@ interface IDispatchProps {
 }
 
 type Props = RouteProps & RouteComponentProps<{}>
+
+type FullProps = IProps & IDispatchProps & Props
 
 class ProtectedRouteWrapper extends Route<IProps & IDispatchProps & Props> {
   public componentDidMount() {
@@ -40,7 +42,10 @@ const mapStateToProps = (store: IStoreState): IProps => {
   }
 }
 export const ProtectedRoute = withRouter<Props>(
-  connect<IProps, IDispatchProps>(mapStateToProps, {
-    checkAuth
-  })(ProtectedRouteWrapper)
-)
+  connect<IProps, IDispatchProps, any, IStoreState>(
+    mapStateToProps,
+    {
+      checkAuth
+    }
+  )(ProtectedRouteWrapper)
+) as any

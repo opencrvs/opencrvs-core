@@ -1,9 +1,10 @@
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-import { Action as NavigationAction, GO_TO_TAB } from 'src/navigation'
+// import { Action as NavigationAction, GO_TO_TAB } from 'src/navigation'
 import { storage } from 'src/storage'
-import { IUserDetails } from 'src/utils/userUtils'
 import { v4 as uuid } from 'uuid'
 import { Event, IFormData, IFormFieldValue } from '../forms'
+import { GO_TO_TAB, Action as NavigationAction } from '@register/navigation'
+import { IUserDetails } from '@register/utils/userUtils'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -177,6 +178,69 @@ function writeApplication(
   return { type: WRITE_APPLICATION, payload: { application } }
 }
 
+export async function getCurrentUserID(): Promise<string> {
+  const userDetails = await storage.getItem('USER_DETAILS')
+  if (!userDetails) {
+    return ''
+  }
+  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
+}
+
+export async function getApplicationsOfCurrentUser(): Promise<string> {
+  // returns a 'stringified' IUserData
+  const storageTable = await storage.getItem('USER_DATA')
+  if (!storageTable) {
+    return '{}'
+  }
+
+  const currentUserID = await getCurrentUserID()
+  const allUserData = JSON.parse(storageTable) as IUserData[]
+  if (!allUserData.length) {
+    // No user-data at all
+    const payloadWithoutApplications: IUserData = {
+      userID: currentUserID,
+      applications: []
+    }
+    return JSON.stringify(payloadWithoutApplications)
+  }
+
+  const currentUserData = allUserData.find(
+    uData => uData.userID === currentUserID
+  )
+  const currentUserApplications: IApplication[] =
+    (currentUserData && currentUserData.applications) || []
+  const payload: IUserData = {
+    userID: currentUserID,
+    applications: currentUserApplications
+  }
+  return JSON.stringify(payload)
+}
+
+export async function writeApplicationByUser(
+  applicationsState: IApplicationsState
+) {
+  const uID = applicationsState.userID || (await getCurrentUserID())
+  const userData = await storage.getItem('USER_DATA')
+  if (!userData) {
+    // No storage option found
+    storage.configStorage('OpenCRVS')
+  }
+  const allUserData: IUserData[] = !userData
+    ? []
+    : (JSON.parse(userData) as IUserData[])
+  const currentUserData = allUserData.find(uData => uData.userID === uID)
+
+  if (currentUserData) {
+    currentUserData.applications = applicationsState.applications
+  } else {
+    allUserData.push({
+      userID: uID,
+      applications: applicationsState.applications
+    })
+  }
+  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+}
+
 export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
   state: IApplicationsState = initialState,
   action: Action
@@ -252,8 +316,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state
         },
         Cmd.run<
-          | IGetStorageApplicationsSuccessAction
-          | IGetStorageApplicationsFailedAction
+          IGetStorageApplicationsFailedAction,
+          IGetStorageApplicationsSuccessAction
         >(getApplicationsOfCurrentUser, {
           successActionCreator: getStorageApplicationsSuccess,
           failActionCreator: getStorageApplicationsFailed,
@@ -277,67 +341,4 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
     default:
       return state
   }
-}
-
-export async function getApplicationsOfCurrentUser(): Promise<string> {
-  // returns a 'stringified' IUserData
-  const storageTable = await storage.getItem('USER_DATA')
-  if (!storageTable) {
-    return '{}'
-  }
-
-  const currentUserID = await getCurrentUserID()
-  const allUserData = JSON.parse(storageTable) as IUserData[]
-  if (!allUserData.length) {
-    // No user-data at all
-    const payloadWithoutApplications: IUserData = {
-      userID: currentUserID,
-      applications: []
-    }
-    return JSON.stringify(payloadWithoutApplications)
-  }
-
-  const currentUserData = allUserData.find(
-    uData => uData.userID === currentUserID
-  )
-  const currentUserApplications: IApplication[] =
-    (currentUserData && currentUserData.applications) || []
-  const payload: IUserData = {
-    userID: currentUserID,
-    applications: currentUserApplications
-  }
-  return JSON.stringify(payload)
-}
-
-export async function writeApplicationByUser(
-  applicationsState: IApplicationsState
-) {
-  const uID = applicationsState.userID || (await getCurrentUserID())
-  const userData = await storage.getItem('USER_DATA')
-  if (!userData) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === uID)
-
-  if (currentUserData) {
-    currentUserData.applications = applicationsState.applications
-  } else {
-    allUserData.push({
-      userID: uID,
-      applications: applicationsState.applications
-    })
-  }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
-}
-
-export async function getCurrentUserID(): Promise<string> {
-  const userDetails = await storage.getItem('USER_DETAILS')
-  if (!userDetails) {
-    return ''
-  }
-  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
 }

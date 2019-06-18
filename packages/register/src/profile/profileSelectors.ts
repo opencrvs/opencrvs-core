@@ -1,6 +1,6 @@
-import { ProfileState } from './profileReducer'
-import { IStoreState } from '../store'
-import { Scope } from '../utils/authUtils'
+import { ProfileState } from '@register/profile/profileReducer'
+import { IStoreState } from '@register/store'
+import { Scope } from '@register/utils/authUtils'
 
 const getPartialState = (store: IStoreState): ProfileState => store.profile
 

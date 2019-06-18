@@ -1,4 +1,4 @@
-import { getAgeInDays } from './utils'
+import { getAgeInDays } from '@metrics/features/registration/utils'
 
 describe('Verify age in days conversion', () => {
   it('Return valid age in days', () => {

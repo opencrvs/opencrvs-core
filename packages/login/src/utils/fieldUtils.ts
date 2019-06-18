@@ -1,5 +1,5 @@
 import { FormattedMessage } from 'react-intl'
-import { Validation } from './validate'
+import { Validation } from '@login/utils/validate'
 import { Field } from 'redux-form'
 import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 

@@ -3,12 +3,18 @@ import {
   generateDeathTrackingId,
   convertStringToASCII,
   sendEventNotification
-} from './utils'
-import { setTrackingId } from './fhir/fhir-bundle-modifier'
-import { logger } from '../../logger'
-import * as fetch from 'jest-fetch-mock'
-import { testFhirBundle, testFhirBundleWithIdsForDeath } from 'src/test/utils'
-import { Events } from '../events/handler'
+} from '@workflow/features/registration/utils'
+import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { logger } from '@workflow/logger'
+import {
+  testFhirBundle,
+  testFhirBundleWithIdsForDeath
+} from '@workflow/test/utils'
+import { Events } from '@workflow/features/events/handler'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
   it('Generates proper birth tracking id successfully', async () => {
@@ -37,15 +43,9 @@ describe('Verify utility functions', () => {
   it('send Birth declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.BIRTH_NEW_DEC,
-        '01711111111',
-        {
-          Authorization: 'bearer acd '
-        },
-        false
-      )
+      sendEventNotification(fhirBundle, Events.BIRTH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Birth declaration notification logs an error in case of invalid data', async () => {
@@ -59,8 +59,7 @@ describe('Verify utility functions', () => {
       '01711111111',
       {
         Authorization: 'bearer acd '
-      },
-      false
+      }
     )
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
@@ -69,15 +68,9 @@ describe('Verify utility functions', () => {
   it('send Birth registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.BIRTH_MARK_REG,
-        '01711111111',
-        {
-          Authorization: 'bearer acd '
-        },
-        false
-      )
+      sendEventNotification(fhirBundle, Events.BIRTH_MARK_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Birth registration notification logs an error in case of invalid data', async () => {
@@ -91,8 +84,7 @@ describe('Verify utility functions', () => {
       '01711111111',
       {
         Authorization: 'bearer acd '
-      },
-      false
+      }
     )
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
@@ -101,15 +93,9 @@ describe('Verify utility functions', () => {
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.DEATH_NEW_DEC,
-        '01711111111',
-        {
-          Authorization: 'bearer acd '
-        },
-        false
-      )
+      sendEventNotification(fhirBundle, Events.DEATH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Death declaration notification logs an error in case of invalid data', async () => {
@@ -123,8 +109,7 @@ describe('Verify utility functions', () => {
       '01711111111',
       {
         Authorization: 'bearer acd '
-      },
-      false
+      }
     )
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
@@ -133,15 +118,9 @@ describe('Verify utility functions', () => {
   it('send Death registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.DEATH_MARK_REG,
-        '01711111111',
-        {
-          Authorization: 'bearer acd '
-        },
-        false
-      )
+      sendEventNotification(fhirBundle, Events.DEATH_MARK_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Death registration notification logs an error in case of invalid data', async () => {
@@ -155,8 +134,7 @@ describe('Verify utility functions', () => {
       '01711111111',
       {
         Authorization: 'bearer acd '
-      },
-      false
+      }
     )
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'

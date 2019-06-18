@@ -1,6 +1,6 @@
-import { IUser } from 'src/model/user'
+import { IUser } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
-import { FHIR_URL } from 'src/constants'
+import { FHIR_URL } from '@user-mgnt/constants'
 
 export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
   return {

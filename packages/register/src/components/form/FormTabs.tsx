@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Tab, Tabs } from '@opencrvs/components/lib/interface'
-import { IFormSection } from '../../forms'
+import { IFormSection } from '@register/forms'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 
 interface IFormTabProps {

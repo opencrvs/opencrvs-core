@@ -1,5 +1,5 @@
-import { GQLResolver } from 'src/graphql/schema'
-import { getMetrics } from '../fhir/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { getMetrics } from '@gateway/features/fhir/utils'
 
 export interface ITimeRange {
   timeStart: string

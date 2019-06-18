@@ -1,4 +1,4 @@
-import { GQLResolver } from 'src/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -22,6 +22,7 @@ export interface ISearchCriteria {
 
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
+    // tslint:disable-next-line
     __resolveType(obj: ISearchEventDataTemplate) {
       if (obj._type === 'compositions' && obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'

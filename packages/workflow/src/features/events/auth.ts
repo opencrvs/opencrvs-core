@@ -1,4 +1,4 @@
-import { Events } from './handler'
+import { Events } from '@workflow/features/events/handler'
 
 const enum Scopes {
   DECLARE = 'declare',

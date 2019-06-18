@@ -3,7 +3,7 @@ const { styles, theme } = require('./styleguide.styles')
 const path = require('path')
 
 function getWebpackConfig() {
-  const webpackConfig = require('react-scripts-ts/config/webpack.config.dev.js')
+  const webpackConfig = require('./config/webpack.config.dev.js')
   if (!webpackConfig.devServer) {
     webpackConfig.devServer = {}
   }

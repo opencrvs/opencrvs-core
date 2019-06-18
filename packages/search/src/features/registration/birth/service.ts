@@ -1,11 +1,14 @@
-import { indexComposition, updateComposition } from 'src/elasticsearch/dbhelper'
+import {
+  indexComposition,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import {
   detectDuplicates,
   EVENT,
   IBirthCompositionBody,
   ICompositionBody,
   getCreatedBy
-} from 'src/elasticsearch/utils'
+} from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
   findEntry,
@@ -15,8 +18,8 @@ import {
   findTaskIdentifier,
   getCompositionById,
   updateInHearth
-} from 'src/features/fhir/fhir-utils'
-import { logger } from 'src/logger'
+} from '@search/features/fhir/fhir-utils'
+import { logger } from '@search/logger'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -275,6 +278,7 @@ async function updateCompositionWithDuplicates(
   duplicates: string[]
 ) {
   const duplicateCompositions = await Promise.all(
+    // tslint:disable-next-line
     duplicates.map(duplicate => getCompositionById(duplicate))
   )
 
