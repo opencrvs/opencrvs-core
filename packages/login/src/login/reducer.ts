@@ -75,7 +75,13 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
             nonce: action.payload.nonce
           }
         },
-        Cmd.action(push(routes.STEP_TWO))
+        (action.payload.token &&
+          Cmd.run(() => {
+            window.location.assign(
+              `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
+            )
+          })) ||
+          Cmd.action(push(routes.STEP_TWO))
       )
     case actions.RESEND_SMS:
       return loop(

@@ -18,6 +18,7 @@ export const client = axios.create({
 
 export interface IAuthenticateResponse {
   nonce: string
+  token?: string
 }
 
 export interface ITokenResponse {
