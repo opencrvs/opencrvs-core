@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { createStore } from 'src/store'
+import { createTestComponent } from '@register/tests/util'
+import { createStore } from '@register/store'
 import { UserForm } from './UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
