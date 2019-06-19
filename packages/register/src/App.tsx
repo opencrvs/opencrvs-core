@@ -94,7 +94,7 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                                  path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
@@ -104,12 +104,12 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.DRAFT_DEATH_FORM_TAB}
+                                  path={routes.DRAFT_DEATH_FORM_PAGE}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
+                                  path={routes.REVIEW_EVENT_PARENT_FORM_PAGE}
                                   component={ReviewForm}
                                 />
                                 <ProtectedRoute
