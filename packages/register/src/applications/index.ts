@@ -1,5 +1,4 @@
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-// import { Action as NavigationAction, GO_TO_TAB } from 'src/navigation'
 import { storage } from '@register/storage'
 import { v4 as uuid } from 'uuid'
 import { Event, IFormData, IFormFieldValue } from '@register/forms'
