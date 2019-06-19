@@ -5,16 +5,17 @@ import { FormFieldGenerator } from '@register/components/form'
 import { IFormSectionData, Event, Action } from '@register/forms'
 import { hasFormError } from '@register/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
-import { IStoreState } from '@opencrvs/register/src/store'
-import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
-import { goToSearchResult } from '@register/navigation'
+import { IStoreState } from '@opencrvs/register/src/store'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
 import {
-  MutationProvider,
-  MutationContext
-} from '@register/views/DataProvider/MutationProvider'
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS
+} from '@register/applications'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { goToSearchResult } from '@register/navigation'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -60,10 +61,16 @@ interface IState {
 }
 interface IProps {
   draftId: string
+  application: IApplication
   event: Event
   duplicate?: boolean
   onBack: () => void
-  confirmRejectionEvent: () => void
+  confirmRejectionEvent: (
+    application: IApplication,
+    status: string,
+    action: string,
+    payload: IPayload
+  ) => void
 }
 
 type IFullProps = InjectedIntlProps & IProps & { form: IRejectRegistrationForm }
@@ -110,7 +117,14 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { event, form, intl, confirmRejectionEvent, duplicate } = this.props
+    const {
+      application,
+      form,
+      intl,
+      confirmRejectionEvent,
+      duplicate
+    } = this.props
+    const payload = this.processSubmitData()
     const { fields } = form
     if (duplicate) {
       fields.map(field => {
@@ -121,44 +135,39 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     }
 
     return (
-      <MutationProvider
-        event={event}
-        action={Action.REJECT_APPLICATION}
-        payload={this.processSubmitData()}
-        onCompleted={confirmRejectionEvent}
-      >
-        <MutationContext.Consumer>
-          {({ mutation }) => (
-            <OverlayContainer id="reject-registration-form-container">
-              <ActionPage
-                title={intl.formatMessage(messages.rejectionFormTitle)}
-                backLabel={intl.formatMessage(messages.back)}
-                goBack={this.props.onBack}
-              >
-                <FormContainer>
-                  <Box>
-                    <FormFieldGenerator
-                      id="reject_form"
-                      fields={fields}
-                      onChange={this.storeData}
-                      setAllFieldsDirty={false}
-                    />
+      <OverlayContainer id="reject-registration-form-container">
+        <ActionPage
+          title={intl.formatMessage(messages.rejectionFormTitle)}
+          backLabel={intl.formatMessage(messages.back)}
+          goBack={this.props.onBack}
+        >
+          <FormContainer>
+            <Box>
+              <FormFieldGenerator
+                id="reject_form"
+                fields={fields}
+                onChange={this.storeData}
+                setAllFieldsDirty={false}
+              />
 
-                    <StyledPrimaryButton
-                      id="submit_reject_form"
-                      // @ts-ignore
-                      onClick={() => mutation()}
-                      disabled={!this.state.enableUploadButton}
-                    >
-                      {intl.formatMessage(messages.rejectionReasonSubmit)}
-                    </StyledPrimaryButton>
-                  </Box>
-                </FormContainer>
-              </ActionPage>
-            </OverlayContainer>
-          )}
-        </MutationContext.Consumer>
-      </MutationProvider>
+              <StyledPrimaryButton
+                id="submit_reject_form"
+                onClick={() =>
+                  confirmRejectionEvent(
+                    application,
+                    SUBMISSION_STATUS.READY_TO_REJECT,
+                    Action.REJECT_APPLICATION,
+                    payload
+                  )
+                }
+                disabled={!this.state.enableUploadButton}
+              >
+                {intl.formatMessage(messages.rejectionReasonSubmit)}
+              </StyledPrimaryButton>
+            </Box>
+          </FormContainer>
+        </ActionPage>
+      </OverlayContainer>
     )
   }
 }

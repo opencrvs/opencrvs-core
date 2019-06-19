@@ -26,7 +26,7 @@ import {
   QueryContext
 } from '@register/views/DataProvider/QueryProvider'
 import * as Sentry from '@sentry/browser'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -162,8 +162,8 @@ interface IReviewFormState {
 function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{
-    tabRoute: string
-    tabId: string
+    pageRoute: string
+    pageId: string
     applicationId: string
     event: string
   }>
@@ -186,7 +186,7 @@ function mapStatetoProps(
     applicationId: match.params.applicationId,
     event: getEvent(match.params.event),
     registerForm: form,
-    tabRoute: REVIEW_EVENT_PARENT_FORM_TAB,
+    pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
     duplicate: history.location.state && history.location.state.duplicate
   }
 }

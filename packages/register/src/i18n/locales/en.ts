@@ -586,8 +586,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.selfInformantDescription':
       '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'New vital event application',
+    'register.selectVitalEvent.registerNewEventTitle': 'New application',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'What type of event do you want to declare?',
+    'register.selectVitalEvent.birth': 'Birth',
+    'register.selectVitalEvent.death': 'Death',
+    'register.selectVitalEvent.continueButton': 'Continue',
+    'register.selectVitalEvent.errorMessage': 'Please select the type of event',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
@@ -1068,6 +1073,20 @@ export const ENGLISH_STATE: ILanguage = {
     'userSetup.type.MAYOR': 'Mayor',
     'userSetup.type.LOCAL_SYSTEM_ADMIN': 'System admin (local)',
     'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
-    'userSetup.landing.button.start': 'Start'
+    'userSetup.landing.button.start': 'Start',
+    'user.form.name': 'User',
+    'user.title.create': 'Create new user',
+    'user.section.userDetails': 'User details',
+    'user.section.accountDetails': 'Account details',
+    'user.section.assignedRegisterOffice': 'Assigned Register Office',
+    'label.firstNameBN': 'Bangla first name',
+    'label.lastNameBN': 'Bangla last name',
+    'label.firstNameEN': 'English first name',
+    'label.lastNameEN': 'English last name',
+    'label.NID': 'NID',
+    'label.username': 'Username',
+    'label.userDevice': 'Device',
+    'label.registrationOffice': 'Registration Office',
+    'button.continue': 'Continue'
   }
 }

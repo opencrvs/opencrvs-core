@@ -174,7 +174,9 @@ class HeaderComp extends React.Component<IProps, IState> {
           return name.use === language
         }
       ) as GQLHumanName
-      name = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      name = nameObj
+        ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+        : ''
     }
 
     const role =
@@ -187,7 +189,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
         label: this.props.intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome
+        onClick: this.props.goToHomeAction
       },
       {
         icon: <StatsBlack />,
@@ -226,7 +228,7 @@ class HeaderComp extends React.Component<IProps, IState> {
           icon: <SystemBlack />,
           iconHover: <SystemBlue />,
           label: this.props.intl.formatMessage(messages.systemTitle),
-          onClick: goToHome
+          onClick: this.props.goToHomeAction
         },
         {
           icon: <SettingsBlack />,

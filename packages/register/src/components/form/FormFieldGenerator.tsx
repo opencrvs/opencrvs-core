@@ -65,7 +65,8 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   IForm,
-  IFormSection
+  IFormSection,
+  FIELD_GROUP_TITLE
 } from '@register/forms'
 
 import { IValidationResult } from '@register/utils/validate'
@@ -92,6 +93,11 @@ const FormItem = styled.div`
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+const FieldGroupTitle = styled.div`
+  ${({ theme }) => theme.fonts.h4Style};
+  margin: 48px 0 0;
 `
 
 type GeneratedInputFieldProps = {
@@ -237,6 +243,9 @@ function GeneratedInputField({
         required={inputFieldProps.required}
       />
     )
+  }
+  if (fieldDefinition.type === FIELD_GROUP_TITLE) {
+    return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
   }
   if (fieldDefinition.type === PARAGRAPH) {
     const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
