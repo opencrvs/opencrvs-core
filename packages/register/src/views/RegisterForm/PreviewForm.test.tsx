@@ -515,7 +515,7 @@ describe('when user is previewing the form data', () => {
 
       expect(app.find('#register_cancel').hostNodes()).toHaveLength(0)
     })
-    it('rejecting application redirects to reject confirmation screen', async () => {
+    it('rejecting application redirects to home screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
       app
         .find('#next_button_child')
@@ -552,6 +552,7 @@ describe('when user is previewing the form data', () => {
           }
         })
 
+      store.dispatch = jest.fn()
       app
         .find('#submit_reject_form')
         .hostNodes()
@@ -560,12 +561,13 @@ describe('when user is previewing the form data', () => {
       await flushPromises()
       app.update()
 
-      expect(
-        app
-          .find('#submission_text')
-          .hostNodes()
-          .text()
-      ).toEqual('birth application has been rejected.')
+      expect(store.dispatch).toBeCalled()
+      // expect(
+      //   app
+      //     .find('#submission_text')
+      //     .hostNodes()
+      //     .text()
+      // ).toEqual('birth application has been rejected.')
     })
   })
   describe('when user is in the death review section', () => {
@@ -801,20 +803,18 @@ describe('when user is previewing the form data', () => {
           }
         })
 
+      store.dispatch = jest.fn()
       app
         .find('#submit_reject_form')
         .hostNodes()
         .simulate('click')
 
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
       await flushPromises()
       app.update()
-
-      expect(
-        app
-          .find('#submission_text')
-          .hostNodes()
-          .text()
-      ).toEqual('death application has been rejected.')
+      expect(store.dispatch).toBeCalled()
     })
   })
 })

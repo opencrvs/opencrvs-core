@@ -11,7 +11,6 @@ import {
   TickLarge
 } from '@opencrvs/components/lib/icons'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import * as Sentry from '@sentry/browser'
 import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
@@ -34,6 +33,7 @@ import { IStoreState } from '@register/store'
 import {
   deleteApplication,
   IApplication,
+  IPayload,
   modifyApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
@@ -47,14 +47,6 @@ import { RejectRegistrationForm } from '@register/components/review/RejectRegist
 import { getOfflineState } from '@register/offline/selectors'
 import { IOfflineDataState } from '@register/offline/reducer'
 import { CONFIRMATION_SCREEN, HOME } from '@register/navigation/routes'
-import {
-  DECLARATION,
-  DUPLICATION,
-  OFFLINE,
-  REGISTERED,
-  REGISTRATION,
-  REJECTION
-} from '@register/utils/constants'
 import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
@@ -316,37 +308,6 @@ const VIEW_TYPE = {
   PREVIEW: 'preview'
 }
 
-interface IFullName {
-  fullNameInBn: string
-  fullNameInEng: string
-}
-
-const getFullName = (childData: IFormSectionData): IFullName => {
-  let fullNameInBn = ''
-  let fullNameInEng = ''
-
-  if (childData.firstNames) {
-    fullNameInBn = `${String(childData.firstNames)} ${String(
-      childData.familyName
-    )}`
-  } else {
-    fullNameInBn = String(childData.familyName)
-  }
-
-  if (childData.firstNamesEng) {
-    fullNameInEng = `${String(childData.firstNamesEng)} ${String(
-      childData.familyNameEng
-    )}`
-  } else if (childData.familyNameEng) {
-    fullNameInEng = String(childData.familyNameEng)
-  }
-
-  return {
-    fullNameInBn,
-    fullNameInEng
-  }
-}
-
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -383,115 +344,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  rejectSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: application.data.registration.trackingId,
-      eventName: REJECTION,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      eventType: event,
-      trackingSection: true,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-
-    this.props.deleteApplication(application)
-  }
-
-  successfulSubmission = (response: string) => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  offlineSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackingSection: true,
-      eventName: OFFLINE,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  successfullyRegistered = (response: string) => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    const eventName = duplicate ? DUPLICATION : REGISTRATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      actionName: REGISTERED,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-    this.props.deleteApplication(application)
-  }
-
-  registrationOnError = (error: Error) => {
-    Sentry.captureException(error)
-    this.setState({
-      showRegisterModal: false,
-      hasError: true
-    })
-  }
-
   submitForm = () => {
     this.setState({ showSubmitModal: true })
   }
@@ -499,10 +351,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
-    action: string
+    action: string,
+    payload?: IPayload
   ) => {
     application.submissionStatus = submissionStatus
     application.action = action
+    application.payload = payload
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
   }
@@ -682,7 +536,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         {intl.formatMessage(activeSection.title)}
                         {activeSection.optional && (
                           <Optional
-                            id={`form_section_optional_label_${activeSection.id}`}
+                            id={`form_section_opt_label_${activeSection.id}`}
                             disabled={activeSection.disabled}
                           >
                             &nbsp;&nbsp;•&nbsp;
@@ -857,10 +711,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
-            confirmRejectionEvent={this.rejectSubmission}
+            confirmRejectionEvent={this.confirmSubmission}
             duplicate={duplicate}
             draftId={application.id}
             event={this.getEvent()}
+            application={application}
           />
         )}
       </FormViewContainer>
