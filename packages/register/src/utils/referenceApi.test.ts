@@ -45,18 +45,22 @@ describe('referenceApi', () => {
   })
 
   it('retrieves the locations.json from the server', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockFetchLocations))
+    fetch.mockResponses([JSON.stringify(mockFetchLocations), { status: 200 }])
 
-    return referenceApi.loadLocations().then(data => {
-      expect(data).toEqual(mockFetchLocations)
+    const data = await referenceApi.loadLocations()
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
     })
+    expect(data).toEqual(mockFetchLocations)
   })
 
   it('retrieves the facilities.json from the server', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockFetchFacilities))
+    fetch.mockResponses([JSON.stringify(mockFetchFacilities), { status: 200 }])
 
-    return referenceApi.loadFacilities().then(data => {
-      expect(data).toEqual(mockFetchFacilities)
+    const data = await referenceApi.loadFacilities()
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
     })
+    expect(data).toEqual(mockFetchFacilities)
   })
 })
