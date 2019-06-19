@@ -48,7 +48,6 @@ class UserFormComponent extends React.Component<IFullProps, State> {
   }
 
   storeData = (documentData: IFormSectionData) => {
-    console.log(JSON.stringify(documentData))
     this.setState({
       data: documentData
     })
@@ -84,7 +83,6 @@ class UserFormComponent extends React.Component<IFullProps, State> {
 
 function mapStatetoProps(state: IStoreState) {
   return {
-    language: state.i18n.language,
     userForm: state.userForm.userForm
   }
 }

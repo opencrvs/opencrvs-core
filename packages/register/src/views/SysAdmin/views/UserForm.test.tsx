@@ -7,7 +7,7 @@ import { ReactWrapper } from 'enzyme'
 
 const { store } = createStore()
 
-describe('Settings page tests', async () => {
+describe('Create new user page tests', async () => {
   let component: ReactWrapper
   beforeEach(async () => {
     const testComponent = createTestComponent(
