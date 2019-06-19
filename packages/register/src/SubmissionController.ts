@@ -104,7 +104,7 @@ export class SubmissionController {
       application.event,
       // @ts-ignore
       applicationAction,
-      null,
+      application.payload,
       this.registerForms[application.event],
       application
     )

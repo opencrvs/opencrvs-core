@@ -92,7 +92,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
     } else if (kc >= 96 && kc <= 105) {
       // numpad
       if (pin.length <= 3) {
-        const newPIN = pin + (kc - 48)
+        const newPIN = pin + (kc - 96)
         if (newPIN.length === 4) {
           onComplete(newPIN)
         }
