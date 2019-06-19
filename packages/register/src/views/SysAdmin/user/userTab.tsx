@@ -109,7 +109,6 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
   }
 
   onPageChange = (newPageNumber: number) => {
-    console.log(newPageNumber)
     this.setState({ usersPageNo: newPageNumber })
   }
 
