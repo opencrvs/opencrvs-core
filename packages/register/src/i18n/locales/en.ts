@@ -586,8 +586,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.selfInformantDescription':
       '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'New vital event application',
+    'register.selectVitalEvent.registerNewEventTitle': 'New application',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'What type of event do you want to declare?',
+    'register.selectVitalEvent.birth': 'Birth',
+    'register.selectVitalEvent.death': 'Death',
+    'register.selectVitalEvent.continueButton': 'Continue',
+    'register.selectVitalEvent.errorMessage': 'Please select the type of event',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
