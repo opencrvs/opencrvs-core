@@ -1055,6 +1055,20 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.systemTitle': 'System',
     'register.home.header.settingsTitle': 'Settings',
     'register.home.header.helpTitle': 'Help',
-    'register.home.header.logoutTitle': 'Logout'
+    'register.home.header.logoutTitle': 'Logout',
+    'user.form.name': 'User',
+    'user.title.create': 'Create new user',
+    'user.section.userDetails': 'User details',
+    'user.section.accountDetails': 'Account details',
+    'user.section.assignedRegisterOffice': 'Assigned Register Office',
+    'label.firstNameBN': 'Bangla first name',
+    'label.lastNameBN': 'Bangla last name',
+    'label.firstNameEN': 'English first name',
+    'label.lastNameEN': 'English last name',
+    'label.NID': 'NID',
+    'label.username': 'Username',
+    'label.userDevice': 'Device',
+    'label.registrationOffice': 'Registration Office',
+    'button.continue': 'Continue'
   }
 }

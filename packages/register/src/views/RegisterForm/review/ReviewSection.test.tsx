@@ -14,7 +14,7 @@ import {
   createApplication,
   createReviewApplication
 } from '@register/applications'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import { REJECTED } from '@register/utils/constants'
@@ -48,7 +48,7 @@ describe('when user is in the review page', () => {
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <ReviewSection
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={draft}
         registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}
@@ -138,7 +138,7 @@ describe('when user is in the review page for rejected birth application', () =>
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <ReviewSection
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftBirth}
         registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}
@@ -173,7 +173,7 @@ describe('when user is in the review page for rejected death application', () =>
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <ReviewSection
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftDeath}
         registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}

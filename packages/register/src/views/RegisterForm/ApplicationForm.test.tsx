@@ -130,7 +130,7 @@ describe('when user has starts a new application', () => {
       })
     })
 
-    describe('when user enters childBirthDate and clicks to documents tab', () => {
+    describe('when user enters childBirthDate and clicks to documents page', () => {
       beforeEach(async () => {
         Date.now = jest.fn(() => 1549607679507) // 08-02-2019
         app
@@ -155,10 +155,28 @@ describe('when user has starts a new application', () => {
         app.update()
       })
 
-      describe('when user goes to documents tab', () => {
+      describe('when user goes to documents page', () => {
         beforeEach(async () => {
           app
-            .find('#tab_documents')
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+          app
+            .find('#next_section')
             .hostNodes()
             .simulate('click')
           await flushPromises()
@@ -261,13 +279,12 @@ describe('when user has starts a new application', () => {
         )
       })
     })
-    describe('when user clicks the "mother" tab', () => {
+    describe('when user clicks the "mother" page', () => {
       beforeEach(async () => {
         app
-          .find('#tab_mother')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
-
         await flushPromises()
         app.update()
       })
@@ -330,13 +347,18 @@ describe('when user has starts a new application', () => {
         )
       })
     })
-    describe('when user clicks the "father" tab', () => {
+    describe('when user clicks the "father" page', () => {
       beforeEach(async () => {
         app
-          .find('#tab_father')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
-
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
         await flushPromises()
         app.update()
       })
@@ -346,13 +368,30 @@ describe('when user has starts a new application', () => {
         )
       })
     })
-    describe('when user is in document tab', () => {
+    describe('when user is in document page', () => {
       beforeEach(async () => {
         app
-          .find('#tab_documents')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
-
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
         await flushPromises()
         app.update()
       })

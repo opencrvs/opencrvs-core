@@ -36,9 +36,9 @@ import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction
+  goToPage as goToPageAction
 } from '@register/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { messages as rejectionMessages } from '@register/review/reject-registration'
 import { messages } from '@register/search/messages'
@@ -230,7 +230,7 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails | null
-  gotoTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
 }
@@ -626,8 +626,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
           handler: () =>
-            this.props.gotoTab(
-              REVIEW_EVENT_PARENT_FORM_TAB,
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
               item.id,
               'review',
               item.event.toLowerCase()
@@ -637,8 +637,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.reject),
           handler: () =>
-            this.props.gotoTab(
-              REVIEW_EVENT_PARENT_FORM_TAB,
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
               item.id,
               'review',
               item.event.toLowerCase()
@@ -819,7 +819,7 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
-    gotoTab: goToTabAction,
+    goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
