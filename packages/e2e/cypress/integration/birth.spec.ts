@@ -63,11 +63,6 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_confirm').click()
   })
 
-  it('Test cypress holds local data', () => {
-    cy.visit('http://localhost:3000/')
-    cy.get('new_event_declaration').should('be.visible')
-  })
-
   it('Tests from application to registration using maximum input', () => {
     // LOGIN
     cy.login('fieldWorker')
