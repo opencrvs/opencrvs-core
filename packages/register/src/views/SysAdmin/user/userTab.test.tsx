@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { createStore } from '@register/store'
 import { SEARCH_USERS } from '@register/sysadmin/user/queries'
-import { createTestComponent } from '@register/tests/util'
+import { createTestComponent, flushPromises } from '@register/tests/util'
+import * as React from 'react'
 import { UserTab } from './userTab'
 
 describe('User tab tests', async () => {
@@ -48,6 +48,50 @@ describe('User tab tests', async () => {
           .hostNodes()
           .html()
       ).toContain('Users (0)')
+    })
+    it('add user button redirects to user form', async () => {
+      const userListMock = [
+        {
+          request: {
+            query: SEARCH_USERS,
+            variables: {
+              count: 10,
+              skip: 0
+            }
+          },
+          result: {
+            data: {
+              searchUsers: {
+                totalItems: 0,
+                results: []
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <UserTab />,
+        store,
+        userListMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+      const app = testComponent.component
+      app
+        .find('#add-user')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+
+      testComponent.component.update()
+      expect(window.location.href).toContain('/user-form')
     })
   })
 

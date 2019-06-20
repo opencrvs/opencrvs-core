@@ -194,7 +194,10 @@ class UserTabComponent extends React.Component<IProps, IState> {
                   {(data && data.searchUsers && data.searchUsers.totalItems) ||
                     0}
                   )
-                  <AddUserContainer onClick={this.onClickAddUser} />
+                  <AddUserContainer
+                    id="add-user"
+                    onClick={this.onClickAddUser}
+                  />
                 </TableHeader>
                 <ListTable
                   content={this.generateUserContents(data) as IDynamicValues[]}
