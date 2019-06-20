@@ -7,7 +7,7 @@
     "cypress": "^3.2.0"
   },
   "scripts": {
-    "start": "cypress run",
+    "start": "CYPRESS_LOGIN_URL=http://localhost:3020/ CYPRESS_REGISTER_URL=http://localhost:3000/ CYPRESS_AUTH_URL=http://localhost:4040/ cypress run",
     "open": "CYPRESS_LOGIN_URL=http://localhost:3020/ CYPRESS_REGISTER_URL=http://localhost:3000/ CYPRESS_AUTH_URL=http://localhost:4040/ cypress open",
     "open:staging": "CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/ CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/ CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/ cypress open",
     "open:qa": "CYPRESS_LOGIN_URL=https://login.opencrvs.qa1.jembi.org/ CYPRESS_REGISTER_URL=https://register.opencrvs.qa1.jembi.org/ CYPRESS_AUTH_URL=https://auth.opencrvs.qa1.jembi.org/ cypress open"
