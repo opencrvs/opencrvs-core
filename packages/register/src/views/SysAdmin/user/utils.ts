@@ -12,7 +12,8 @@ export enum UserRole {
 
 export enum UserStatus {
   ACTIVE,
-  PENDING
+  PENDING,
+  DISABLED
 }
 
 export const messages = defineMessages({

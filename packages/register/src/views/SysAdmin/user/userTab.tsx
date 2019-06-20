@@ -20,6 +20,7 @@ import { createNamesMap } from '@register/utils/data-formatting'
 import { messages, UserRole, UserStatus } from './utils'
 import styled from 'styled-components'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 
 const UserTable = styled.div`
   margin-top: 30px;
@@ -51,18 +52,25 @@ const ActiveStatusBox = styled(StatusBox)`
 const PendingStatusBox = styled(StatusBox)`
   background: rgba(255, 255, 153, 1);
 `
+const DisabledStatusBox = styled(StatusBox)`
+  background: rgba(206, 206, 206, 0.3);
+`
 
 interface IStatusProps {
   status: string
 }
 
 const Status = (statusProps: IStatusProps) => {
-  switch (statusProps.status.toLowerCase()) {
+  const status =
+    statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
+  switch (status.toLowerCase()) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
-    default:
-      return <ActiveStatusBox>{statusProps.status}</ActiveStatusBox>
+      return <ActiveStatusBox>{status}</ActiveStatusBox>
+    case UserStatus[UserStatus.DISABLED].toLowerCase():
+      return <DisabledStatusBox>{status}</DisabledStatusBox>
     case UserStatus[UserStatus.PENDING].toLowerCase():
-      return <PendingStatusBox>{statusProps.status}</PendingStatusBox>
+    default:
+      return <PendingStatusBox>{status}</PendingStatusBox>
   }
 }
 
@@ -81,6 +89,8 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
   }
 
   generateUserContents = (data: GQLQuery) => {
+    const { intl } = this.props
+
     if (!data || !data.searchUsers || !data.searchUsers.results) {
       return []
     }
@@ -94,13 +104,13 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
           (createNamesMap(user && (user.name as GQLHumanName[]))[
             LANG_EN
           ] as string)
-        const status = user.active ? 'Active' : 'Pending'
+        const status = user.status || 'pending'
 
         return {
           photo: <AvatarSmall />,
           name,
-          role: UserRole[user.role as any] || 'Unknown',
-          type: user.type || 'Unknown',
+          role: user.role && intl.formatMessage(roleMessages[user.role]),
+          type: user.type && intl.formatMessage(typeMessages[user.type]),
           status: <Status status={status} />,
           menu: <VerticalThreeDots />
         }

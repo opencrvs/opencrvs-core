@@ -13,7 +13,7 @@ export const SEARCH_USERS = gql`
         }
         role
         type
-        active
+        status
       }
     }
   }
