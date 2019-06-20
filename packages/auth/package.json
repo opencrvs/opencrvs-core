@@ -10,6 +10,7 @@
     "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "jest --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
+    "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
     "request-token": "NODE_PATH=. ts-node resources/request-token",

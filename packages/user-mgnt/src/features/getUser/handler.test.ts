@@ -37,7 +37,7 @@ const dummyUser = {
   salt: '12345',
   scope: ['register'],
   role: 'Field Agent',
-  active: true,
+  status: 'active',
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [

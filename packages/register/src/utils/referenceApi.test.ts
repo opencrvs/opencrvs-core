@@ -50,9 +50,8 @@ describe('referenceApi', () => {
   it.skip('retrieves the locations.json from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchLocations))
 
-    return referenceApi.loadLocations().then(data => {
-      expect(data).toEqual(mockFetchLocations)
-    })
+    const data = await referenceApi.loadLocations()
+    expect(data).toEqual(mockFetchLocations)
   })
 
   /*
@@ -61,8 +60,7 @@ describe('referenceApi', () => {
   it.skip('retrieves the facilities.json from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchFacilities))
 
-    return referenceApi.loadFacilities().then(data => {
-      expect(data).toEqual(mockFetchFacilities)
-    })
+    const data = await referenceApi.loadFacilities()
+    expect(data).toEqual(mockFetchFacilities)
   })
 })

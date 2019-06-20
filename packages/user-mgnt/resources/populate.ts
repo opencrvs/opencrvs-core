@@ -21,7 +21,9 @@ const fieldAgent = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'CHA',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -45,7 +47,9 @@ const registrationClerk = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_CLERK',
+  type: 'ENTREPENEUR',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '8179ec96-7cf3-4e43-a60d-df031c431886',
   primaryOfficeId: 'd8f5e899-0461-4d58-943f-3a980733a8d3',
   catchmentAreaIds: [
@@ -69,7 +73,9 @@ const localRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '99636b42-72c3-40c2-9c19-947efa728068',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -93,7 +99,9 @@ const districtRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'DISTRICT_REGISTRAR',
+  type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '4522ce59-3742-4989-9159-bea7f45d1d89',
   primaryOfficeId: '95754572-ab6f-407b-b51a-1636cb3d0683',
   catchmentAreaIds: ['b21ce04e-7ccd-4d65-929f-453bc193a736']
@@ -112,7 +120,9 @@ const stateRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'STATE_REGISTRAR',
+  type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '936aec8d-f5bf-48f6-a4fd-d1505010ac82',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
   catchmentAreaIds: []
@@ -131,7 +141,9 @@ const nationalRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'NATIONAL_REGISTRAR',
+  type: 'SECRETARY',
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'],
+  status: 'active',
   practitionerId: '636840d9-3e0a-4f9a-86a2-9c0b542c122d',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
   catchmentAreaIds: []
@@ -150,7 +162,9 @@ const fieldAgent2 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'HOSPITAL',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: '7c3fe905-dd96-4af7-b442-a952b0feb23d',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -174,7 +188,9 @@ const fieldAgent3 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'CHA',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: '95d758e4-acac-49ec-a6cf-db5a338b29ba',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -198,7 +214,9 @@ const registrationClerk2 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_CLERK',
+  type: 'DATA_ENTRY_CLERK',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'a6c1e54d-0d3b-4ca8-bd79-06bccdfcf171',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -222,7 +240,9 @@ const registrationClerk3 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_CLERK',
+  type: 'DATA_ENTRY_CLERK',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '5ae8a55a-5e31-4b97-ae53-d5144ad6529f',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -246,7 +266,9 @@ const localRegistrar2 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'b5ee7d9b-9de2-4457-b273-9ed4dc0e3e08',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -270,7 +292,9 @@ const localRegistrar3 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'e59724eb-4f93-4dc5-b731-c025290f1415',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -294,7 +318,9 @@ const fieldAgent4 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'CHA',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: '7d4a6d0d-1d58-4430-8343-91b8e71ceced',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -318,7 +344,9 @@ const registrationClerk4 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'dd480509-cc3e-41b7-8a1c-8e63534660c2',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -342,7 +370,9 @@ const sysAdmin = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_SYSTEM_ADMIN',
+  type: 'LOCAL_SYSTEM_ADMIN',
   scope: ['sysadmin', 'demo'],
+  status: 'active',
   practitionerId: 'd9cf6968-2b4b-4eda-8ba0-5265d53fdb22',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
