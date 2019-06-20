@@ -49,6 +49,7 @@ export const SEARCH_EVENTS = gql`
           childName {
             firstNames
             familyName
+            use
           }
         }
         ... on DeathEventSearchSet {
@@ -56,6 +57,7 @@ export const SEARCH_EVENTS = gql`
           deceasedName {
             firstNames
             familyName
+            use
           }
         }
       }

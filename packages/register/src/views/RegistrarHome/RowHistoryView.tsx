@@ -164,7 +164,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         (birthReg.registration && birthReg.registration.contactPhoneNumber) ||
         ''
     } else {
-      const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
+      const deathReg =
+        (data && (data.fetchRegistration as GQLDeathRegistration)) || {}
       name = (deathReg.deceased && deathReg.deceased.name) || []
       dateOfEvent =
         deathReg.deceased &&
@@ -280,7 +281,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
 
   render() {
     const { intl } = this.props
-    console.log('EVENT ID', this.props.eventId)
     return (
       <ExpansionContent>
         <Query
@@ -316,7 +316,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               )
             }
             const transformedData = this.transformer(data)
-            console.log('TRANSFORMED DATA', transformedData)
             return (
               <>
                 <BorderedPaddedContent>

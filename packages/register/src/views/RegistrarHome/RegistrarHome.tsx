@@ -484,7 +484,6 @@ export class RegistrarHomeView extends React.Component<
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-    console.log('DATA', data)
 
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
@@ -532,7 +531,6 @@ export class RegistrarHomeView extends React.Component<
     const { theme, intl, userDetails, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
-    console.log('UNION', registrarUnion)
 
     return (
       <>
@@ -570,8 +568,6 @@ export class RegistrarHomeView extends React.Component<
                 </ErrorText>
               )
             }
-
-            console.log('COUNT DATA', data)
 
             return (
               <>
@@ -951,8 +947,7 @@ export class RegistrarHomeView extends React.Component<
                         ),
                         width: 20,
                         key: 'actions',
-                        isActionColumn: true,
-                        alignment: ColumnContentAlignment.CENTER
+                        isActionColumn: true
                       }
                     ]}
                     renderExpandedComponent={this.renderExpandedComponent}
