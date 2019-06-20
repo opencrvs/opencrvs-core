@@ -68,7 +68,7 @@ export default async function authenticateHandler(
     nonce
   }
 
-  if (respose.status === 'pending') {
+  if (respose.status && respose.status === 'pending') {
     respose.token = await createToken(
       result.userId,
       result.scope,

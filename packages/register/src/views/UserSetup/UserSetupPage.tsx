@@ -25,7 +25,7 @@ const Container = styled.div`
   height: auto;
   padding: 0px;
   margin: 125px auto 0px auto;
-  width: 460px;
+  max-width: 460px;
 `
 const LogoContainer = styled.div`
   flex-direction: row;
