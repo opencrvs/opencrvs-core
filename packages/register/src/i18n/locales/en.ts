@@ -1088,6 +1088,10 @@ export const ENGLISH_STATE: ILanguage = {
     'label.username': 'Username',
     'label.userDevice': 'Device',
     'label.registrationOffice': 'Registration Office',
-    'button.continue': 'Continue'
+    'button.continue': 'Continue',
+    'table.column.header.name': 'Name',
+    'table.column.header.role': 'Role',
+    'table.column.header.type': 'Type',
+    'table.column.header.status': 'Status'
   }
 }

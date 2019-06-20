@@ -1088,6 +1088,10 @@ export const BENGALI_STATE: ILanguage = {
     'label.username': 'ব্যবহারকারীর নাম',
     'label.userDevice': 'ডিভাইস',
     'label.registrationOffice': 'নিবন্ধন অফিস',
-    'button.continue': 'অগ্রসর হোন'
+    'button.continue': 'অগ্রসর হোন',
+    'table.column.header.name': 'নাম',
+    'table.column.header.role': 'দায়িত্ব',
+    'table.column.header.type': 'ধরন',
+    'table.column.header.status': 'অবস্থা'
   }
 }

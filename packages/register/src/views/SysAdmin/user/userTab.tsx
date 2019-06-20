@@ -131,22 +131,22 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
         key: 'photo'
       },
       {
-        label: 'Name',
+        label: intl.formatMessage(messages.name),
         width: 35,
         key: 'name'
       },
       {
-        label: 'Role',
+        label: intl.formatMessage(messages.role),
         width: 23,
         key: 'role'
       },
       {
-        label: 'Type',
+        label: intl.formatMessage(messages.type),
         width: 20,
         key: 'type'
       },
       {
-        label: 'Status',
+        label: intl.formatMessage(messages.status),
         width: 10,
         key: 'status'
       },
