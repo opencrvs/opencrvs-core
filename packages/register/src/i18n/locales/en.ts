@@ -1069,6 +1069,8 @@ export const ENGLISH_STATE: ILanguage = {
     'label.username': 'Username',
     'label.userDevice': 'Device',
     'label.registrationOffice': 'Registration Office',
-    'button.continue': 'Continue'
+    'button.continue': 'Continue',
+    'createUser.buttons.submit': 'Create user',
+    'createUser.preview.title': 'Please review the new users details'
   }
 }

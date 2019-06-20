@@ -1,18 +1,15 @@
-import * as React from 'react'
-import styled from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@register/components/form'
 import { IFormSection, IFormSectionData } from '@register/forms'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-import { IStoreState } from '@register/store'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { goToHome, goToUserReview } from '@register/navigation'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
-import { replaceInitialValues } from '@register/views/RegisterForm/RegisterForm'
-import { FormikTouched, FormikValues } from 'formik'
 import { hasFormError } from '@register/forms/utils'
+import { goToCreateUserSection, goToHome } from '@register/navigation'
+import styled from '@register/styledComponents'
+import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
+import { FormikTouched, FormikValues } from 'formik'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
 
 const messages = defineMessages({
   continue: {
@@ -38,7 +35,6 @@ export const Container = styled.div`
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
 `
-
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1Style};
   height: 72px;
@@ -46,34 +42,33 @@ export const FormTitle = styled.div`
     display: none;
   }
 `
-
-const Action = styled.div`
+export const Action = styled.div`
   margin-top: 32px;
 `
 type IProps = {
-  userForm: IFormSection
-  data: IFormSectionData
-  goToUserReview: typeof goToUserReview
+  section: IFormSection
   goToHome: typeof goToHome
   modifyUserFormData: typeof modifyUserFormData
+  goToCreateUserSection: typeof goToCreateUserSection
+  formData: IFormSectionData
 }
 
-type IFullProps = InjectedIntlProps & IProps & { dispatch: Dispatch }
+type IFullProps = InjectedIntlProps & IProps
 
 class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   handleFormAction = () => {
-    const { userForm, data } = this.props
-    if (hasFormError(userForm.fields, data)) {
+    const { section, formData } = this.props
+    if (hasFormError(section.fields, formData)) {
       this.showAllValidationErrors()
     } else {
-      this.props.goToUserReview()
+      this.props.goToCreateUserSection('preview')
     }
   }
 
   showAllValidationErrors = () => {
-    const touched = this.props.userForm.fields.reduce(
+    const touched = this.props.section.fields.reduce(
       (memo, { name }) => ({ ...memo, [name]: true }),
       {}
     )
@@ -81,21 +76,21 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { userForm, intl } = this.props
+    const { section, intl } = this.props
 
     return (
       <>
         <ActionPageLight
-          title={intl.formatMessage(userForm.title)}
+          title={intl.formatMessage(section.title)}
           goBack={this.props.goToHome}
         >
           <Container>
-            <FormTitle>{intl.formatMessage(userForm.title)}</FormTitle>
+            <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
             <FormFieldGenerator
-              id={userForm.id}
+              id={section.id}
               onChange={this.props.modifyUserFormData}
               setAllFieldsDirty={false}
-              fields={userForm.fields}
+              fields={section.fields}
               onSetTouched={setTouchedFunc => {
                 this.setAllFormFieldsTouched = setTouchedFunc
               }}
@@ -112,22 +107,7 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 }
 
-function mapStatetoProps(state: IStoreState) {
-  const { userForm, userFormData } = state.userForm
-
-  const fields = replaceInitialValues(userForm.fields, userFormData)
-
-  return {
-    language: state.i18n.language,
-    userForm: {
-      ...userForm,
-      fields
-    },
-    data: userFormData
-  }
-}
-
 export const UserForm = connect(
-  mapStatetoProps,
-  { goToUserReview, goToHome, modifyUserFormData }
+  null,
+  { modifyUserFormData, goToCreateUserSection, goToHome }
 )(injectIntl<IFullProps>(UserFormComponent))

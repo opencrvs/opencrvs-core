@@ -1067,6 +1067,8 @@ export const BENGALI_STATE: ILanguage = {
     'label.username': 'ব্যবহারকারীর নাম',
     'label.userDevice': 'ডিভাইস',
     'label.registrationOffice': 'নিবন্ধন অফিস',
-    'button.continue': 'অগ্রসর হোন'
+    'button.continue': 'অগ্রসর হোন',
+    'createUser.buttons.submit': 'ব্যবহারকারী যুক্ত করুন',
+    'createUser.preview.title': 'নতুন ব্যবহারকারীর বিবরণ পর্যালোচনা করুন'
   }
 }

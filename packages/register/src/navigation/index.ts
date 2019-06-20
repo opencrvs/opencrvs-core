@@ -14,7 +14,8 @@ import {
   APPLICATION_DETAIL,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
-  USER_REVIEW
+  CREATE_USER,
+  CREATE_USER_SECTION
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -172,8 +173,33 @@ export function goToSettings() {
   return push(SETTINGS)
 }
 
-export function goToUserReview() {
-  return push(USER_REVIEW)
+export function goToCreateNewUser() {
+  return push(CREATE_USER)
+}
+
+export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
+type GoToCreateUserSection = {
+  type: typeof GO_TO_CREATE_USER_SECTION
+  payload: {
+    sectionId: string
+    userFormFieldNameHash?: string
+    formHistoryState?: IDynamicValues
+  }
+}
+
+export function goToCreateUserSection(
+  sectionId: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+): GoToCreateUserSection {
+  return {
+    type: GO_TO_CREATE_USER_SECTION,
+    payload: {
+      sectionId,
+      userFormFieldNameHash: fieldNameHash,
+      formHistoryState: historyState
+    }
+  }
 }
 
 export function goToTab(
@@ -245,6 +271,22 @@ export function navigationReducer(state: INavigationState, action: any) {
         state,
         Cmd.action(
           push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
+        )
+      )
+    case GO_TO_CREATE_USER_SECTION:
+      const {
+        sectionId,
+        userFormFieldNameHash,
+        formHistoryState
+      } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(CREATE_USER_SECTION, { sectionId }) +
+              (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
+            formHistoryState
+          )
         )
       )
   }

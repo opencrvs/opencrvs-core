@@ -1,31 +1,30 @@
-import * as React from 'react'
-import {
-  IFormSectionData,
-  IFormSection,
-  IFormField,
-  FIELD_GROUP_TITLE
-} from '@register/forms'
-
-import { connect } from 'react-redux'
-import { IStoreState } from '@register/store'
 import {
   DataSection,
-  ActionPageLight,
-  IDataProps
+  IDataProps,
+  ActionPageLight
 } from '@opencrvs/components/lib/interface'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { RouteComponentProps } from 'react-router'
-import { goBack } from '@register/navigation'
-import { Container, FormTitle } from './UserForm'
+import {
+  FIELD_GROUP_TITLE,
+  IFormField,
+  IFormSection,
+  IFormSectionData
+} from '@register/forms'
+import { goToCreateUserSection, goBack } from '@register/navigation'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import {
+  Container,
+  FormTitle,
+  Action
+} from '@register/views/SysAdmin/views/UserForm'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 interface IUserReviewFormProps {
   section: IFormSection
-  data: IFormSectionData
+  goToCreateUserSection: typeof goToCreateUserSection
   goBack: typeof goBack
-}
-
-interface IMatchParams {
-  data: string
+  formData: IFormSectionData
 }
 
 interface ISectionData {
@@ -33,22 +32,25 @@ interface ISectionData {
   items: IDataProps[]
 }
 
-type IFullProps = IUserReviewFormProps &
-  InjectedIntlProps &
-  RouteComponentProps<IMatchParams>
+type IFullProps = IUserReviewFormProps & InjectedIntlProps
 
 const messages = defineMessages({
   actionChange: {
     id: 'action.change',
     defaultMessage: 'Change',
     description: 'Change action'
+  },
+  submit: {
+    id: 'createUser.buttons.submit',
+    defaultMessage: 'Create user',
+    description: 'Label for submit button of user creation form'
   }
 })
 
 class UserReviewFormComponent extends React.Component<IFullProps> {
   transformSectionData = () => {
-    const { intl, data } = this.props
-    const dataEntries = Object.entries(data)
+    const { intl, formData } = this.props
+    const dataEntries = Object.entries(formData)
     const sections: ISectionData[] = []
     dataEntries.forEach(([key, value]: [string, unknown]) => {
       const field = this.getField(key)
@@ -61,7 +63,8 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
           action: {
             id: `btn${field.name}`,
             label: intl.formatMessage(messages.actionChange),
-            handler: () => console.log(field.name, 'change action clicked')
+            handler: () =>
+              this.props.goToCreateUserSection('userForm', field.name)
           }
         })
       }
@@ -78,6 +81,10 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
     return foundField
   }
 
+  handleSubmit = () => {
+    console.log('TO DO')
+  }
+
   render() {
     const { intl, section } = this.props
 
@@ -87,10 +94,15 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
         goBack={this.props.goBack}
       >
         <Container>
-          <FormTitle>Please review new user details</FormTitle>
+          <FormTitle>{intl.formatMessage(section.name)}</FormTitle>
           {this.transformSectionData().map((sec, index) => (
             <DataSection key={index} {...sec} />
           ))}
+          <Action>
+            <PrimaryButton onClick={this.handleSubmit}>
+              {intl.formatMessage(messages.submit)}
+            </PrimaryButton>
+          </Action>
         </Container>
       </ActionPageLight>
     )
@@ -98,11 +110,6 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
 }
 
 export const UserReviewForm = connect(
-  (state: IStoreState) => {
-    return {
-      section: state.userForm.userForm,
-      data: state.userForm.userFormData
-    }
-  },
-  { goBack }
+  null,
+  { goToCreateUserSection, goBack }
 )(injectIntl(UserReviewFormComponent))
