@@ -1,15 +1,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Box } from '../../interface'
-import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import {
-  IAction,
-  IDynamicValues,
-  IExpandedContentPreference,
-  IColumn
-} from './types'
+import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
+import { Box } from '../../interface'
+import { IAction, IColumn, IDynamicValues } from './types'
 export { IAction } from './types'
 
 const Wrapper = styled.div`

@@ -1,12 +1,8 @@
 import * as React from 'react'
-import { grid } from '../../grid'
 import styled from 'styled-components'
-import {
-  IColumn,
-  IDynamicValues,
-  IExpandedContentPreference
-} from '../GridTable/types'
+import { grid } from '../../grid'
 import { Pagination } from '../DataTable/Pagination'
+import { IColumn, IDynamicValues } from '../GridTable/types'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -27,18 +23,13 @@ const TableBody = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-const RowWrapper = styled.div.attrs<{
-  expandable?: boolean
-  clickable?: boolean
-}>({})`
+const RowWrapper = styled.div`
   width: 100%;
   padding: 0 24px;
   display: flex;
   align-items: center;
   min-height: 64px;
   box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
-  cursor: ${({ expandable, clickable }) =>
-    expandable || clickable ? 'pointer' : 'default'};
 `
 const ContentWrapper = styled.span.attrs<{
   width: number
@@ -81,14 +72,11 @@ const defaultConfiguration = {
 interface IListTableProps {
   content: IDynamicValues[]
   columns: IColumn[]
-  expandedContentRows?: IExpandedContentPreference[]
   noResultText: string
   onPageChange?: (currentPage: number) => void
   pageSize?: number
   totalItems?: number
   currentPage?: number
-  expandable?: boolean
-  clickable?: boolean
 }
 
 interface IListTableState {
@@ -167,12 +155,7 @@ export class ListTable extends React.Component<
             {this.getDisplayItems(currentPage, pageSize, content).map(
               (item, index) => {
                 return (
-                  <RowWrapper
-                    key={index}
-                    id={'row_' + index}
-                    expandable={this.props.expandable}
-                    clickable={this.props.clickable}
-                  >
+                  <RowWrapper key={index} id={'row_' + index}>
                     {columns.map((preference, indx) => {
                       return (
                         <ValueWrapper

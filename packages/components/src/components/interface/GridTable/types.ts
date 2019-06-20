@@ -38,9 +38,3 @@ export interface IDynamicValues {
     | null
     | undefined
 }
-
-export interface IExpandedContentPreference {
-  label: string
-  displayForEvents?: string[]
-  key: string
-}
