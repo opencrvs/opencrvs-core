@@ -4,23 +4,23 @@ import {
   VerticalThreeDots
 } from '@opencrvs/components/lib/icons'
 import { ListTable } from '@opencrvs/components/lib/interface'
+import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   GQLHumanName,
   GQLQuery,
   GQLUser
 } from '@opencrvs/gateway/src/graphql/schema'
+import { SEARCH_USERS } from '@register/sysadmin/user/queries'
+import { LANG_EN } from '@register/utils/constants'
+import { createNamesMap } from '@register/utils/data-formatting'
+import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { SEARCH_USERS } from '@register/sysadmin/user/queries'
-import { LANG_EN } from '@register/utils/constants'
-import { createNamesMap } from '@register/utils/data-formatting'
-import { messages, UserRole, UserStatus } from './utils'
 import styled from 'styled-components'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
+import { messages, UserStatus } from './utils'
 
 const UserTable = styled.div`
   margin-top: 30px;
