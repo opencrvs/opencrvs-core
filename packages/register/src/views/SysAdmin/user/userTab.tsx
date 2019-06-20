@@ -42,7 +42,7 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 const StatusBox = styled.span`
-  padding: 4px;
+  padding: 4px 6px;
   border-radius: 4px;
   text-align: center;
 `
