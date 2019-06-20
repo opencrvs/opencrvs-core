@@ -105,7 +105,7 @@ describe('User tab tests', async () => {
                 totalItems: 5,
                 results: [
                   {
-                    id: '5cfe3c5727cf63466dfd22e7',
+                    id: '5d08e102542c7a19fc55b790',
                     name: [
                       {
                         use: 'en',
@@ -114,11 +114,11 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: 'Chairman',
-                    active: true
+                    type: 'ENTREPENEUR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e8',
+                    id: '5d08e102542c7a19fc55b791',
                     name: [
                       {
                         use: 'en',
@@ -127,11 +127,11 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'LOCAL_REGISTRAR',
-                    type: null,
-                    active: false
+                    type: 'CHAIRMAN',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e9',
+                    id: '5d08e102542c7a19fc55b792',
                     name: [
                       {
                         use: 'en',
@@ -140,11 +140,11 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'DISTRICT_REGISTRAR',
-                    type: null,
-                    active: true
+                    type: 'MAYOR',
+                    status: 'pending'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ea',
+                    id: '5d08e102542c7a19fc55b793',
                     name: [
                       {
                         use: 'en',
@@ -153,21 +153,21 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'STATE_REGISTRAR',
-                    type: null,
-                    active: true
+                    type: 'MAYOR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22eb',
+                    id: '5d08e102542c7a19fc55b795',
                     name: [
                       {
                         use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
+                        firstNames: 'Md. Ariful',
+                        familyName: 'Islam'
                       }
                     ],
-                    role: 'REGISTRAR',
-                    type: null,
-                    active: true
+                    role: 'FIELD_AGENT',
+                    type: 'HOSPITAL',
+                    status: 'disabled'
                   }
                 ]
               }
@@ -210,7 +210,7 @@ describe('User tab tests', async () => {
                 totalItems: 5,
                 results: [
                   {
-                    id: '5cfe3c5727cf63466dfd22e7',
+                    id: '5d08e102542c7a19fc55b790',
                     name: [
                       {
                         use: 'en',
@@ -219,11 +219,11 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: 'Chairman',
-                    active: true
+                    type: 'ENTREPENEUR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e8',
+                    id: '5d08e102542c7a19fc55b791',
                     name: [
                       {
                         use: 'en',
@@ -232,11 +232,11 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'LOCAL_REGISTRAR',
-                    type: null,
-                    active: false
+                    type: 'CHAIRMAN',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e9',
+                    id: '5d08e102542c7a19fc55b792',
                     name: [
                       {
                         use: 'en',
@@ -245,11 +245,11 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'DISTRICT_REGISTRAR',
-                    type: null,
-                    active: true
+                    type: 'MAYOR',
+                    status: 'pending'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ea',
+                    id: '5d08e102542c7a19fc55b793',
                     name: [
                       {
                         use: 'en',
@@ -258,21 +258,21 @@ describe('User tab tests', async () => {
                       }
                     ],
                     role: 'STATE_REGISTRAR',
-                    type: null,
-                    active: true
+                    type: 'MAYOR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22eb',
+                    id: '5d08e102542c7a19fc55b795',
                     name: [
                       {
                         use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah'
+                        firstNames: 'Md. Ariful',
+                        familyName: 'Islam'
                       }
                     ],
-                    role: 'REGISTRAR',
-                    type: null,
-                    active: true
+                    role: 'FIELD_AGENT',
+                    type: 'HOSPITAL',
+                    status: 'disabled'
                   }
                 ]
               }
@@ -312,157 +312,136 @@ describe('User tab tests', async () => {
                 totalItems: 15,
                 results: [
                   {
-                    id: '5cfe3c5727cf63466dfd22e6',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Sakib Al',
-                        familyName: 'Hasan',
-                        __typename: 'HumanName'
-                      }
-                    ],
-                    role: 'FIELD_AGENT',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
-                  },
-                  {
-                    id: '5cfe3c5727cf63466dfd22e7',
+                    id: '5d08e102542c7a19fc55b790',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Rabindranath',
-                        familyName: 'Tagore',
-                        __typename: 'HumanName'
+                        familyName: 'Tagore'
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'ENTREPENEUR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e8',
+                    id: '5d08e102542c7a19fc55b791',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Mohammad',
-                        familyName: 'Ashraful',
-                        __typename: 'HumanName'
+                        familyName: 'Ashraful'
                       }
                     ],
                     role: 'LOCAL_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'CHAIRMAN',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e9',
+                    id: '5d08e102542c7a19fc55b792',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan',
-                        __typename: 'HumanName'
+                        familyName: 'Muid Khan'
                       }
                     ],
                     role: 'DISTRICT_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'MAYOR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ea',
+                    id: '5d08e102542c7a19fc55b793',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq',
-                        __typename: 'HumanName'
+                        familyName: 'Huq'
                       }
                     ],
                     role: 'STATE_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'MAYOR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22eb',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah',
-                        __typename: 'HumanName'
-                      }
-                    ],
-                    role: 'NATIONAL_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
-                  },
-                  {
-                    id: '5cfe3c5727cf63466dfd22ec',
+                    id: '5d08e102542c7a19fc55b795',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Md. Ariful',
-                        familyName: 'Islam',
-                        __typename: 'HumanName'
+                        familyName: 'Islam'
                       }
                     ],
                     role: 'FIELD_AGENT',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'HOSPITAL',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ed',
+                    id: '5d08e102542c7a19fc55b796',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Md. Ashraful',
-                        familyName: 'Alam',
-                        __typename: 'HumanName'
+                        familyName: 'Alam'
                       }
                     ],
                     role: 'FIELD_AGENT',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'CHA',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ee',
+                    id: '5d08e102542c7a19fc55b797',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Lovely',
-                        familyName: 'Khatun',
-                        __typename: 'HumanName'
+                        familyName: 'Khatun'
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ef',
+                    id: '5d08e102542c7a19fc55b794',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Mohamed Abu',
+                        familyName: 'Abdullah'
+                      }
+                    ],
+                    role: 'NATIONAL_REGISTRAR',
+                    type: 'SECRETARY',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b798',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Md. Seikh',
-                        familyName: 'Farid',
-                        __typename: 'HumanName'
+                        familyName: 'Farid'
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b799',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Jahangir',
+                        familyName: 'Alam'
+                      }
+                    ],
+                    role: 'LOCAL_REGISTRAR',
+                    type: 'CHAIRMAN',
+                    status: 'active'
                   }
-                ],
-                __typename: 'SearchUserResult'
+                ]
               }
             }
           }
@@ -505,157 +484,136 @@ describe('User tab tests', async () => {
                 totalItems: 15,
                 results: [
                   {
-                    id: '5cfe3c5727cf63466dfd22e6',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Sakib Al',
-                        familyName: 'Hasan',
-                        __typename: 'HumanName'
-                      }
-                    ],
-                    role: 'FIELD_AGENT',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
-                  },
-                  {
-                    id: '5cfe3c5727cf63466dfd22e7',
+                    id: '5d08e102542c7a19fc55b790',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Rabindranath',
-                        familyName: 'Tagore',
-                        __typename: 'HumanName'
+                        familyName: 'Tagore'
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'ENTREPENEUR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e8',
+                    id: '5d08e102542c7a19fc55b791',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Mohammad',
-                        familyName: 'Ashraful',
-                        __typename: 'HumanName'
+                        familyName: 'Ashraful'
                       }
                     ],
                     role: 'LOCAL_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'CHAIRMAN',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22e9',
+                    id: '5d08e102542c7a19fc55b792',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan',
-                        __typename: 'HumanName'
+                        familyName: 'Muid Khan'
                       }
                     ],
                     role: 'DISTRICT_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'MAYOR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ea',
+                    id: '5d08e102542c7a19fc55b793',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq',
-                        __typename: 'HumanName'
+                        familyName: 'Huq'
                       }
                     ],
                     role: 'STATE_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'MAYOR',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22eb',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohamed Abu',
-                        familyName: 'Abdullah',
-                        __typename: 'HumanName'
-                      }
-                    ],
-                    role: 'NATIONAL_REGISTRAR',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
-                  },
-                  {
-                    id: '5cfe3c5727cf63466dfd22ec',
+                    id: '5d08e102542c7a19fc55b795',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Md. Ariful',
-                        familyName: 'Islam',
-                        __typename: 'HumanName'
+                        familyName: 'Islam'
                       }
                     ],
                     role: 'FIELD_AGENT',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'HOSPITAL',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ed',
+                    id: '5d08e102542c7a19fc55b796',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Md. Ashraful',
-                        familyName: 'Alam',
-                        __typename: 'HumanName'
+                        familyName: 'Alam'
                       }
                     ],
                     role: 'FIELD_AGENT',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'CHA',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ee',
+                    id: '5d08e102542c7a19fc55b797',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Lovely',
-                        familyName: 'Khatun',
-                        __typename: 'HumanName'
+                        familyName: 'Khatun'
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
                   },
                   {
-                    id: '5cfe3c5727cf63466dfd22ef',
+                    id: '5d08e102542c7a19fc55b794',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Mohamed Abu',
+                        familyName: 'Abdullah'
+                      }
+                    ],
+                    role: 'NATIONAL_REGISTRAR',
+                    type: 'SECRETARY',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b798',
                     name: [
                       {
                         use: 'en',
                         firstNames: 'Md. Seikh',
-                        familyName: 'Farid',
-                        __typename: 'HumanName'
+                        familyName: 'Farid'
                       }
                     ],
                     role: 'REGISTRATION_CLERK',
-                    type: null,
-                    active: true,
-                    __typename: 'User'
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b799',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Jahangir',
+                        familyName: 'Alam'
+                      }
+                    ],
+                    role: 'LOCAL_REGISTRAR',
+                    type: 'CHAIRMAN',
+                    status: 'active'
                   }
-                ],
-                __typename: 'SearchUserResult'
+                ]
               }
             }
           }
