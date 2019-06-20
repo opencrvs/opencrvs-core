@@ -21,6 +21,8 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { messages, UserStatus } from './utils'
+import { goToUserForm } from '@register/navigation'
+import { connect } from 'react-redux'
 
 const UserTable = styled.div`
   margin-top: 30px;
@@ -55,6 +57,9 @@ const PendingStatusBox = styled(StatusBox)`
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
 `
+const AddUserContainer = styled(AddUser)`
+  cursor: pointer;
+`
 
 interface IStatusProps {
   status: string
@@ -74,14 +79,18 @@ const Status = (statusProps: IStatusProps) => {
   }
 }
 
+interface IProps extends InjectedIntlProps {
+  goToUserForm: typeof goToUserForm
+}
+
 interface IState {
   usersPageNo: number
 }
 
-class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
+class UserTabComponent extends React.Component<IProps, IState> {
   pageSize: number
 
-  constructor(props: InjectedIntlProps) {
+  constructor(props: IProps) {
     super(props)
 
     this.pageSize = 10
@@ -116,6 +125,10 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
         }
       }
     })
+  }
+
+  onClickAddUser = () => {
+    this.props.goToUserForm()
   }
 
   onPageChange = (newPageNumber: number) => {
@@ -181,7 +194,7 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
                   {(data && data.searchUsers && data.searchUsers.totalItems) ||
                     0}
                   )
-                  <AddUser />
+                  <AddUserContainer onClick={this.onClickAddUser} />
                 </TableHeader>
                 <ListTable
                   content={this.generateUserContents(data) as IDynamicValues[]}
@@ -205,4 +218,7 @@ class UserTabComponent extends React.Component<InjectedIntlProps, IState> {
   }
 }
 
-export const UserTab = injectIntl(UserTabComponent)
+export const UserTab = connect(
+  null,
+  { goToUserForm }
+)(injectIntl(UserTabComponent))
