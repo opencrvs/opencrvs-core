@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { Box } from '../../interface'
 import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import { ExpansionContentInfo } from './ExpansionContentInfo'
 import {
   IAction,
   IDynamicValues,
