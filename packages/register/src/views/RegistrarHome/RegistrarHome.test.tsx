@@ -585,7 +585,7 @@ describe('RegistrarHome tests', () => {
       setTimeout(resolve, 200)
     })
     testComponent.component.update()
-    console.log(testComponent.component.debug())
+
     const data = testComponent.component.find(GridTable).prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -1030,7 +1030,8 @@ describe('RegistrarHome tests', () => {
                     type: 'DECLARED',
                     comments: null
                   }
-                ]
+                ],
+                contactPhoneNumber: '01711999777'
               },
               child: null,
               deceased: {
@@ -1227,7 +1228,8 @@ describe('RegistrarHome tests', () => {
                       }
                     ]
                   }
-                ]
+                ],
+                contactPhoneNumber: '01711111111'
               },
               child: {
                 name: [
