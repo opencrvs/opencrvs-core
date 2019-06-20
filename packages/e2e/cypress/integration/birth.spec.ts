@@ -4,15 +4,83 @@ context('Birth Registration Integration Test', () => {
   beforeEach(() => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
-  it('Tests from application to registration', () => {
+
+  it('Tests from application to registration using minimum input', () => {
+    // LOGIN
     cy.login('fieldWorker')
+    // CREATE PIN
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn').click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
+    // LANDING PAGE
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
+    // EVENTS
+    cy.get('#select_vital_event_view').should('be.visible')
+    cy.get('#select_birth_event').click()
+    cy.get('#select_parent_informant').click()
+    // APPLICATION FORM
+    // CHILD DETAILS
+    cy.get('#familyName').type('স্পিভক')
+    cy.get('#familyNameEng').type('Spivak')
+    cy.selectOption('#gender', 'Female', 'Female')
+    cy.get('#childBirthDate-dd').type('01')
+    cy.get('#childBirthDate-mm').type('08')
+    cy.get('#childBirthDate-yyyy').type('2018')
+    cy.get('#multipleBirth').type('1')
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // MOTHER DETAILS
+    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.get('#iD').type('1234567898765')
+    cy.get('#familyName').type('স্পিভক')
+    cy.get('#familyNameEng').type('Spivak')
+    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
+    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // FATHER DETAILS
+    cy.get('#fathersDetailsExist_false').click()
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // APPLICATION DETAILS
+    cy.get('#registrationPhone').type('01711111111')
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // DOCUMENTS
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // PREVIEW
+    cy.get('#next_button_child').click()
+    cy.get('#next_button_mother').click()
+    cy.get('#next_button_father').click()
+    cy.get('#submit_form').click()
+    // MODAL
+    cy.get('#submit_confirm').click()
+  })
+
+  it('Test cypress holds local data', () => {
+    cy.visit('http://localhost:3000/')
+    cy.get('new_event_declaration').should('be.visible')
+  })
+
+  it('Tests from application to registration using maximum input', () => {
+    // LOGIN
+    cy.login('fieldWorker')
+    // CREATE PIN
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+    cy.get('#createPinBtn').click()
+    for (let i = 1; i <= 8; i++) {
+      cy.get(`#keypad-${i % 2}`).click()
+    }
+    // LANDING PAGE
+    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
+    cy.get('#new_event_declaration').click()
+    // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#select_parent_informant').click()
@@ -104,7 +172,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#postCodePermanent').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
-    // REGISTRATION
+    // APPLICATION DETAILS
     cy.selectOption(
       '#presentAtBirthRegistration',
       'Both Parents',
