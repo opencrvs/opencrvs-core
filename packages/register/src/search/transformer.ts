@@ -31,15 +31,15 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
       names = (deathReg && (deathReg.deceasedName as GQLHumanName[])) || []
       dateOfEvent = deathReg && deathReg.dateOfDeath
     }
-    const lang = 'bn'
+
     const status =
       assignedReg.registration &&
       (assignedReg.registration.status as GQLRegStatus)
     return {
       id: assignedReg.id,
       name:
-        (createNamesMap(names)[lang] as string) ||
         /* eslint-disable no-string-literal */
+        (createNamesMap(names)['en'] as string) ||
         (createNamesMap(names)['default'] as string) ||
         /* eslint-enable no-string-literal */
         '',
