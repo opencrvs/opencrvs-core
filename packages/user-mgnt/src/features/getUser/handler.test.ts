@@ -37,7 +37,7 @@ const dummyUser = {
   salt: '12345',
   scope: ['register'],
   role: 'Field Agent',
-  active: true,
+  status: 'active',
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -45,6 +45,20 @@ const dummyUser = {
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ],
   creationDate: 1559054406433
 }

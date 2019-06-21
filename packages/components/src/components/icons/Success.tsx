@@ -1,23 +1,15 @@
 import * as React from 'react'
 
 export const Success = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={60} height={60} {...props}>
-    <title>{'Icons/nav/success_60pt'}</title>
-    <g fill="none" fillRule="evenodd" stroke="#49B78D" strokeWidth={3}>
-      <rect x={1.5} y={1.5} width={57} height={57} rx={28.5} />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fillRule="nonzero"
-        d="M19 32.304l8.425 7.916L43.075 21"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fillRule="nonzero"
-        d="M19 32.304l8.425 7.916L43.075 21"
-      />
-    </g>
+  <svg width={40} height={40} fill="none" {...props}>
+    <circle cx={20} cy={20} r={11} fill="#fff" stroke="#fff" strokeWidth={2} />
+    <path
+      d="M14 19.594L18.56 25 26 16"
+      stroke="#49B78D"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 

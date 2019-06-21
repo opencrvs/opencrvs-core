@@ -7,7 +7,7 @@ interface IUserModelData {
   name: string
   email: string
   mobile: string
-  active: boolean
+  status: string
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -16,7 +16,7 @@ interface IUserModelData {
 export interface IUserSearchPayload {
   username?: string
   mobile?: string
-  active?: boolean
+  status?: string
   role?: string
   primaryOfficeId?: string
   locationId?: string

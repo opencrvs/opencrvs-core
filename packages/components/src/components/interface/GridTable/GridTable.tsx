@@ -1,10 +1,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Box } from '../../interface'
-import { ListItemAction } from '../../buttons'
 import { Pagination } from '..'
-import { IAction, IDynamicValues, IExpandedContentPreference } from './types'
+import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
+import { Box } from '../../interface'
+import { IAction, IColumn, IDynamicValues } from './types'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -86,19 +86,9 @@ export enum ColumnContentAlignment {
   CENTER = 'center'
 }
 
-interface IGridPreference {
-  label: string
-  width: number
-  key: string
-  errorValue?: string
-  alignment?: ColumnContentAlignment
-  isActionColumn?: boolean
-  color?: string
-}
-
 interface IGridTableProps {
   content: IDynamicValues[]
-  columns: IGridPreference[]
+  columns: IColumn[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText: string
   hideTableHeader?: boolean

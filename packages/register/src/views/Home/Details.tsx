@@ -42,6 +42,7 @@ import {
 import { Query } from 'react-apollo'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
 import * as Sentry from '@sentry/browser'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 import {
   REJECTED,
   REJECT_REASON,
@@ -177,36 +178,6 @@ const messages: {
     defaultMessage: 'Application submitted on',
     description:
       'Label for the workflow timestamp when the status is application'
-  },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
   },
   update: {
     id: 'register.workQueue.list.buttons.update',
@@ -371,7 +342,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     }
   }
 
-  generateDraftHistorData = (): IHistoryData => {
+  generateDraftHistoryData = (): IHistoryData => {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
     let action: React.ReactElement
@@ -387,7 +358,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             new Date(draft.modifiedOn).toString(),
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
-                  messages[userDetails.role as string]
+                  roleMessages[userDetails.role as string]
                 )
               : '',
             (userDetails &&
@@ -406,7 +377,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             (draft.savedOn && new Date(draft.savedOn).toString()) || '',
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
-                  messages[userDetails.role as string]
+                  roleMessages[userDetails.role as string]
                 )
               : '',
             (userDetails &&
@@ -470,7 +441,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             (status && status.timestamp) || '',
             status && status.user && status.user.role
               ? this.props.intl.formatMessage(
-                  messages[status.user.role as string]
+                  roleMessages[status.user.role as string]
                 )
               : '',
             this.props.language === 'en'
@@ -623,7 +594,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   render() {
     return (
       (this.props.draft &&
-        this.renderSubPage(this.generateDraftHistorData())) || (
+        this.renderSubPage(this.generateDraftHistoryData())) || (
         <>
           <Query
             query={FETCH_REGISTRATION_BY_COMPOSITION}

@@ -586,8 +586,14 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectInformant.selfInformantDescription':
       '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
       '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
+    'register.selectVitalEvent.birth': 'জন্ম',
+    'register.selectVitalEvent.death': 'মৃত্যু',
+    'register.selectVitalEvent.continueButton': 'পরবর্তী',
+    'register.selectVitalEvent.errorMessage':
+      'দয়া করে একটি ইভেন্ট নির্বাচন করুন',
     'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
@@ -1043,6 +1049,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.requireUpdatesLoading':
       'আপনার  আবেদন চেক করা হচ্ছে ',
     'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
+    'system.user.queryError':
+      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি এই মুহূর্তে লোড করা সম্ভব হচ্ছে না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ করুন, অথবা পুনরায় চেষ্টা করুন।',
     'register.sysAdminHome.overview': 'ওভারভিউ',
     'register.sysAdminHome.offices': 'অফিস',
     'register.sysAdminHome.network': 'নেটওয়ার্ক',
@@ -1054,6 +1062,19 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.settingsTitle': 'সেটিংস',
     'register.home.header.helpTitle': 'সাহায্য',
     'register.home.header.logoutTitle': 'লগআউট',
+    'userSetup.landing.title': 'OpenCRVS এ স্বাগতম',
+    'userSetup.landing.instruction':
+      'আপনি আপনার অ্যাকাউন্ট সেট আপ সম্পূর্ণ করার মাত্র কয়েক পদক্ষেপ দূরে।',
+    'userSetup.type.HOSPITAL': 'হাসপাতাল',
+    'userSetup.type.CHA': 'CHA',
+    'userSetup.type.ENTREPENEUR': 'উদ্যোক্তা',
+    'userSetup.type.DATA_ENTRY_CLERK': 'ডাটা এন্ট্রি কেরানি',
+    'userSetup.type.SECRETARY': 'সচিব',
+    'userSetup.type.CHAIRMAN': 'চেয়ারম্যান',
+    'userSetup.type.MAYOR': 'মেয়র',
+    'userSetup.type.LOCAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (স্থানীয়)',
+    'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'userSetup.landing.button.start': 'শুরু',
     'user.form.name': 'ব্যবহারকারী',
     'user.title.create': 'নতুন ব্যবহারকারী তৈরি',
     'user.section.userDetails': 'ব্যক্তিগত তথ্য',
@@ -1078,6 +1099,23 @@ export const BENGALI_STATE: ILanguage = {
     'register.securityquestion.enterResponse':
       'আপনার নির্বাচিত নিরাপত্তা প্রশ্নের একটি প্রতিক্রিয়া লিখুন',
     'register.securityquestion.securityQuestionLabel':
-      'নিরাপত্তা প্রশ্ন {count}'
+      'নিরাপত্তা প্রশ্ন {count}',
+    'table.column.header.name': 'নাম',
+    'table.column.header.role': 'দায়িত্ব',
+    'table.column.header.type': 'ধরন',
+    'table.column.header.status': 'অবস্থা',
+    'register.userSetup.securityQuestions.BIRTH_TOWN':
+      'কোন শহরে আপনার জন্ম হয়?',
+    'register.userSetup.securityQuestions.FIRST_SCHOOL':
+      'আপনার প্রথম স্কুলের নাম কি?',
+    'register.userSetup.securityQuestions.MOTHER_NICK_NAME':
+      'আপনার মা এর ডাক নাম কি?',
+    'register.userSetup.securityQuestions.FATHER_NICK_NAME':
+      'আপনার বাবার ডাক নাম কি?',
+    'register.userSetup.securityQuestions.FAVORITE_TEACHER':
+      'আপনার প্রিয় শিক্ষক কে?',
+    'register.userSetup.securityQuestions.FAVORITE_MOVIE':
+      'আপনার প্রিয় সিনেমা কি?',
+    'register.userSetup.securityQuestions.FAVORITE_COLOR': 'আপনার প্রিয় রং কি?'
   }
 }

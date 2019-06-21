@@ -25,7 +25,7 @@ export interface IUser {
   primaryOfficeId: string
   catchmentAreaIds: string[]
   scope: string[]
-  active: boolean
+  status: string
   deviceId?: string
   creationDate: number
 }
@@ -49,6 +49,14 @@ const IdentifierSchema = new Schema(
   },
   { _id: false }
 )
+// tslint:disable-next-line
+const SecurityQuestionAnswerSchema = new Schema(
+  {
+    questionKey: String,
+    answerHash: String
+  },
+  { _id: false }
+)
 
 const userSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
@@ -64,7 +72,12 @@ const userSchema = new Schema({
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
   scope: { type: [String], required: true },
-  active: { type: Boolean, default: true },
+  status: {
+    type: String,
+    enum: ['pending', 'active', 'disabled'],
+    default: 'pending'
+  },
+  securityQuestionAnswers: [SecurityQuestionAnswerSchema],
   deviceId: String,
   creationDate: { type: Number, default: Date.now }
 })

@@ -32,6 +32,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
+          status: 'active',
           scope: ['admin']
         })
       )
@@ -56,6 +57,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
+          status: 'pending',
           scope: ['admin']
         })
       )

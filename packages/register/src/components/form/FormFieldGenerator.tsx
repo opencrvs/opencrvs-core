@@ -92,7 +92,7 @@ const FormItem = styled.div`
   animation: ${fadeIn} 500ms;
 `
 const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 const FieldGroupTitle = styled.div`

@@ -21,7 +21,9 @@ const fieldAgent = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'CHA',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -29,6 +31,20 @@ const fieldAgent = new User({
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -45,7 +61,9 @@ const registrationClerk = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_CLERK',
+  type: 'ENTREPENEUR',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '8179ec96-7cf3-4e43-a60d-df031c431886',
   primaryOfficeId: 'd8f5e899-0461-4d58-943f-3a980733a8d3',
   catchmentAreaIds: [
@@ -53,6 +71,20 @@ const registrationClerk = new User({
     '9d00135f-c892-4e39-ab87-e02698e1b30e',
     '4b100ad2-ac0d-4970-85df-d4fb8ed79808',
     'b9958fa4-5c6e-4037-9f6a-fbad315344f9'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -69,7 +101,9 @@ const localRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '99636b42-72c3-40c2-9c19-947efa728068',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -77,6 +111,20 @@ const localRegistrar = new User({
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -93,10 +141,26 @@ const districtRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'DISTRICT_REGISTRAR',
+  type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '4522ce59-3742-4989-9159-bea7f45d1d89',
   primaryOfficeId: '95754572-ab6f-407b-b51a-1636cb3d0683',
-  catchmentAreaIds: ['b21ce04e-7ccd-4d65-929f-453bc193a736']
+  catchmentAreaIds: ['b21ce04e-7ccd-4d65-929f-453bc193a736'],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ]
 })
 
 const stateRegistrar = new User({
@@ -112,10 +176,26 @@ const stateRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'STATE_REGISTRAR',
+  type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '936aec8d-f5bf-48f6-a4fd-d1505010ac82',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
-  catchmentAreaIds: []
+  catchmentAreaIds: [],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ]
 })
 
 const nationalRegistrar = new User({
@@ -131,10 +211,26 @@ const nationalRegistrar = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'NATIONAL_REGISTRAR',
+  type: 'SECRETARY',
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'],
+  status: 'active',
   practitionerId: '636840d9-3e0a-4f9a-86a2-9c0b542c122d',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
-  catchmentAreaIds: []
+  catchmentAreaIds: [],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ]
 })
 
 const fieldAgent2 = new User({
@@ -150,7 +246,9 @@ const fieldAgent2 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'HOSPITAL',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: '7c3fe905-dd96-4af7-b442-a952b0feb23d',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -158,6 +256,20 @@ const fieldAgent2 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -174,7 +286,9 @@ const fieldAgent3 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'CHA',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: '95d758e4-acac-49ec-a6cf-db5a338b29ba',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -182,6 +296,20 @@ const fieldAgent3 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -198,7 +326,9 @@ const registrationClerk2 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_CLERK',
+  type: 'DATA_ENTRY_CLERK',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'a6c1e54d-0d3b-4ca8-bd79-06bccdfcf171',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -206,6 +336,20 @@ const registrationClerk2 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -222,7 +366,9 @@ const registrationClerk3 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_CLERK',
+  type: 'DATA_ENTRY_CLERK',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: '5ae8a55a-5e31-4b97-ae53-d5144ad6529f',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -230,6 +376,20 @@ const registrationClerk3 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -246,7 +406,9 @@ const localRegistrar2 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'b5ee7d9b-9de2-4457-b273-9ed4dc0e3e08',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -254,6 +416,20 @@ const localRegistrar2 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -270,7 +446,9 @@ const localRegistrar3 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'e59724eb-4f93-4dc5-b731-c025290f1415',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -278,6 +456,20 @@ const localRegistrar3 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -294,7 +486,9 @@ const fieldAgent4 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'FIELD_AGENT',
+  type: 'CHA',
   scope: ['declare', 'demo'],
+  status: 'active',
   practitionerId: '7d4a6d0d-1d58-4430-8343-91b8e71ceced',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -302,6 +496,20 @@ const fieldAgent4 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -318,7 +526,9 @@ const registrationClerk4 = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
   practitionerId: 'dd480509-cc3e-41b7-8a1c-8e63534660c2',
   primaryOfficeId: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
   catchmentAreaIds: [
@@ -326,6 +536,20 @@ const registrationClerk4 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -342,7 +566,9 @@ const sysAdmin = new User({
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'LOCAL_SYSTEM_ADMIN',
+  type: 'LOCAL_SYSTEM_ADMIN',
   scope: ['sysadmin', 'demo'],
+  status: 'active',
   practitionerId: 'd9cf6968-2b4b-4eda-8ba0-5265d53fdb22',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -350,6 +576,20 @@ const sysAdmin = new User({
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
