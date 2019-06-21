@@ -1,13 +1,50 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
 import { goBack } from '@register/navigation'
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
-import { remove, cloneDeep } from 'lodash'
-import { number, date } from 'joi'
+import { cloneDeep, find } from 'lodash'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
-const QUESTION_LIST = [
+const messages = defineMessages({
+  title: {
+    id: 'register.securityquestion.title',
+    defaultMessage: 'Security questions'
+  },
+  heading: {
+    id: 'register.securityquestion.heading',
+    defaultMessage: 'Set your security questions'
+  },
+  description: {
+    id: 'register.securityquestion.description',
+    defaultMessage: `From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.`
+  },
+  select: {
+    id: 'register.securityquestion.select',
+    defaultMessage: 'Select'
+  },
+  selectSecurityQuestion: {
+    id: 'register.securityquestion.selectSecurityQuestion',
+    defaultMessage: 'Select a security question'
+  },
+  enterResponse: {
+    id: 'register.securityquestion.enterResponse',
+    defaultMessage: 'Enter a response to your chosen security question'
+  },
+  continue: {
+    id: 'button.continue',
+    defaultMessage: 'Continue'
+  },
+  securityQuestionLabel: {
+    id: 'register.securityquestion.securityQuestionLabel',
+    defaultMessage: 'Security question {count}'
+  }
+})
+
+const EMPTY_VALUE = ''
+const QUESTION_LIST: IQuestion[] = [
   {
     label: `What is your mother's Maiden name?`,
     value: `What is your mother's Maiden name?`
@@ -42,22 +79,34 @@ type IState = {
   refresher: number
 }
 
+const H3 = styled.h3`
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+`
+const P = styled.p`
+  margin-bottom: 37px;
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
 const QuestionWrapper = styled.div`
   margin-bottom: 66px;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
-const Label = styled.label``
 const Wrapper = styled.div`
   display: flex;
   flex-flow: column;
   margin-bottom: 20px;
 `
 const FullWidthSelect = styled(Select)`
-  width: 100%;
+  width: 70%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
 `
 const FullWidthInput = styled(TextInput)`
-  width: 100%;
+  width: 70%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
 `
-
 class SecurityQuestionView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
@@ -74,8 +123,8 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     for (i = 0; i < QUESTION_LIST.length; i++) {
       questionnaire.push({
         questionList: cloneDeep(QUESTION_LIST),
-        selectedQuestion: '',
-        answer: ''
+        selectedQuestion: EMPTY_VALUE,
+        answer: EMPTY_VALUE
       })
     }
     return questionnaire
@@ -86,19 +135,50 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     questionnaire[index].selectedQuestion = value
 
     questionnaire.map((elem: IQuestionnaire, key: number) => {
-      if (index === key) return elem
-      remove(elem.questionList, { value })
-      return elem
+      const answeredQuestions: IQuestion[] = []
+
+      questionnaire.forEach((questionnaire: IQuestionnaire, nkey: number) => {
+        if (
+          (index === key && index === nkey) ||
+          elem.selectedQuestion === questionnaire.selectedQuestion
+        )
+          return
+        answeredQuestions.push({
+          value: questionnaire.selectedQuestion,
+          label: questionnaire.selectedQuestion
+        })
+      })
+
+      const newQuestionList: IQuestion[] = []
+      QUESTION_LIST.forEach((value: IQuestion) => {
+        if (find(answeredQuestions, { value: value.value })) return
+        newQuestionList.push(value)
+      })
+
+      elem.questionList = newQuestionList
     })
 
-    console.log(questionnaire)
     this.setState(() => ({
       questionnaire,
       refresher: Date.now()
     }))
   }
 
+  onAnswerChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const questionnaire = this.state.questionnaire
+    questionnaire[index].answer = event.target.value
+    this.setState({ questionnaire })
+  }
+
+  onsubmit = () => {
+    console.log(this.state.questionnaire)
+  }
+
   showQuestionnaire = () => {
+    const { intl } = this.props
     return (
       <div key={this.state.refresher}>
         {this.state.questionnaire.map(
@@ -106,7 +186,11 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
             return (
               <QuestionWrapper key={index}>
                 <Wrapper>
-                  <Label>Security question {index + 1}</Label>
+                  <label>
+                    {intl.formatMessage(messages.securityQuestionLabel, {
+                      count: index + 1
+                    })}
+                  </label>
                   <FullWidthSelect
                     id={`question-${index}`}
                     onChange={(value: string) =>
@@ -114,31 +198,40 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     }
                     value={questionnaire.selectedQuestion}
                     options={questionnaire.questionList}
-                    placeholder=""
+                    placeholder={intl.formatMessage(messages.select)}
                   />
                 </Wrapper>
                 <Wrapper>
-                  <Label>Answer</Label>
-                  <FullWidthInput />
+                  <label>Answer</label>
+                  <FullWidthInput
+                    id={`answer-${index}`}
+                    onChange={answer => this.onAnswerChange(answer, index)}
+                    value={this.state.questionnaire[index].answer}
+                  />
                 </Wrapper>
               </QuestionWrapper>
             )
           }
         )}
+
+        <PrimaryButton onClick={this.onsubmit}>
+          {intl.formatMessage(messages.continue)}
+        </PrimaryButton>
       </div>
     )
   }
 
   render() {
+    const { intl } = this.props
     return (
-      <>
-        <h3>Set your security questions</h3>
-        <p>
-          From the drop down lists below, select questions that can be used
-          later to confirm your identity should you forget your password.
-        </p>
+      <ActionPageLight
+        goBack={this.props.goBack}
+        title={intl.formatMessage(messages.title)}
+      >
+        <H3>{intl.formatMessage(messages.heading)}</H3>
+        <P>{intl.formatMessage(messages.description)}</P>
         {this.showQuestionnaire()}
-      </>
+      </ActionPageLight>
     )
   }
 }

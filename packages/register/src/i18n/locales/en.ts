@@ -1069,6 +1069,17 @@ export const ENGLISH_STATE: ILanguage = {
     'label.username': 'Username',
     'label.userDevice': 'Device',
     'label.registrationOffice': 'Registration Office',
-    'button.continue': 'Continue'
+    'button.continue': 'Continue',
+    'register.securityquestion.title': 'Security questions',
+    'register.securityquestion.heading': 'Set your security questions',
+    'register.securityquestion.description':
+      'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
+    'register.securityquestion.select': 'Select',
+    'register.securityquestion.selectSecurityQuestion':
+      'Select a security question',
+    'register.securityquestion.enterResponse':
+      'Enter a response to your chosen security question',
+    'register.securityquestion.securityQuestionLabel':
+      'Security question {count}'
   }
 }
