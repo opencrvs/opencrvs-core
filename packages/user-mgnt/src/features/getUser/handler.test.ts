@@ -46,6 +46,20 @@ const dummyUser = {
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
   ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ],
   creationDate: 1559054406433
 }
 describe('getUser tests', () => {

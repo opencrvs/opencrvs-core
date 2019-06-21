@@ -49,6 +49,14 @@ const IdentifierSchema = new Schema(
   },
   { _id: false }
 )
+// tslint:disable-next-line
+const SecurityQuestionAnswerSchema = new Schema(
+  {
+    questionKey: String,
+    answerHash: String
+  },
+  { _id: false }
+)
 
 const userSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
@@ -69,6 +77,7 @@ const userSchema = new Schema({
     enum: ['pending', 'active', 'disabled'],
     default: 'pending'
   },
+  securityQuestionAnswers: [SecurityQuestionAnswerSchema],
   deviceId: String,
   creationDate: { type: Number, default: Date.now }
 })
