@@ -31,6 +31,20 @@ const fieldAgent = new User({
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -57,6 +71,20 @@ const registrationClerk = new User({
     '9d00135f-c892-4e39-ab87-e02698e1b30e',
     '4b100ad2-ac0d-4970-85df-d4fb8ed79808',
     'b9958fa4-5c6e-4037-9f6a-fbad315344f9'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -83,6 +111,20 @@ const localRegistrar = new User({
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -104,7 +146,21 @@ const districtRegistrar = new User({
   status: 'active',
   practitionerId: '4522ce59-3742-4989-9159-bea7f45d1d89',
   primaryOfficeId: '95754572-ab6f-407b-b51a-1636cb3d0683',
-  catchmentAreaIds: ['b21ce04e-7ccd-4d65-929f-453bc193a736']
+  catchmentAreaIds: ['b21ce04e-7ccd-4d65-929f-453bc193a736'],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ]
 })
 
 const stateRegistrar = new User({
@@ -125,7 +181,21 @@ const stateRegistrar = new User({
   status: 'active',
   practitionerId: '936aec8d-f5bf-48f6-a4fd-d1505010ac82',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
-  catchmentAreaIds: []
+  catchmentAreaIds: [],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ]
 })
 
 const nationalRegistrar = new User({
@@ -146,7 +216,21 @@ const nationalRegistrar = new User({
   status: 'active',
   practitionerId: '636840d9-3e0a-4f9a-86a2-9c0b542c122d',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
-  catchmentAreaIds: []
+  catchmentAreaIds: [],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ]
 })
 
 const fieldAgent2 = new User({
@@ -172,6 +256,20 @@ const fieldAgent2 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -198,6 +296,20 @@ const fieldAgent3 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -224,6 +336,20 @@ const registrationClerk2 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -250,6 +376,20 @@ const registrationClerk3 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -276,6 +416,20 @@ const localRegistrar2 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -302,6 +456,20 @@ const localRegistrar3 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -328,6 +496,20 @@ const fieldAgent4 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -354,6 +536,20 @@ const registrationClerk4 = new User({
     '1f5eb576-75e8-4afd-a4f2-4ce1b17be5a4',
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_TEACHER',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FIRST_SCHOOL',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
@@ -380,6 +576,20 @@ const sysAdmin = new User({
     '95754572-ab6f-407b-b51a-1636cb3d0683',
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FATHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_COLOR',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
   ]
 })
 
