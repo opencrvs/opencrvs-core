@@ -7,6 +7,10 @@ import { TextInput, Select } from '@opencrvs/components/lib/forms'
 import { cloneDeep, find } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  QUESTION_KEYS,
+  questionMessages
+} from '@register/utils/userSecurityQuestions'
 
 const messages = defineMessages({
   title: {
@@ -45,20 +49,6 @@ const messages = defineMessages({
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
-const QUESTION_LIST: IQuestion[] = [
-  {
-    label: `What is your mother's Maiden name?`,
-    value: `What is your mother's Maiden name?`
-  },
-  {
-    label: `Name of your first pet`,
-    value: `Name of your first pet`
-  },
-  {
-    label: `Where were you born?`,
-    value: `Where were you born?`
-  }
-]
 
 type IProps = {
   goBack: () => void
@@ -123,6 +113,23 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
       refresher: Date.now(),
       showError: false
     }
+
+    this.getQuestionList()
+  }
+
+  getQuestionList = (): IQuestion[] => {
+    const questionKeys = Object.keys(QUESTION_KEYS)
+    questionKeys.splice(0, questionKeys.length / 2)
+    const result: IQuestion[] = []
+
+    questionKeys.forEach((value: string) => {
+      result.push({
+        value,
+        label: this.props.intl.formatHTMLMessage(questionMessages[value])
+      })
+    })
+
+    return result
   }
 
   preparequestionnaire = (): IQuestionnaire[] => {
@@ -130,7 +137,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     const questionnaire = []
     for (i = 0; i < VISIBLE_QUESTION; i++) {
       questionnaire.push({
-        questionList: cloneDeep(QUESTION_LIST),
+        questionList: this.getQuestionList(),
         selectedQuestion: EMPTY_VALUE,
         answer: EMPTY_VALUE
       })
@@ -158,7 +165,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
       })
 
       const newQuestionList: IQuestion[] = []
-      QUESTION_LIST.forEach((value: IQuestion) => {
+      this.getQuestionList().forEach((value: IQuestion) => {
         if (find(answeredQuestions, { value: value.value })) return
         newQuestionList.push(value)
       })
