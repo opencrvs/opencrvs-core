@@ -5,7 +5,10 @@ import { IFormSection, IFormSectionData } from '@register/forms'
 import { hasFormError } from '@register/forms/utils'
 import { goToCreateUserSection, goToHome } from '@register/navigation'
 import styled from '@register/styledComponents'
-import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
+import {
+  modifyUserFormData,
+  clearUserFormData
+} from '@register/views/SysAdmin/forms/userReducer'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
@@ -34,6 +37,7 @@ type IProps = {
   goToHome: typeof goToHome
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
+  clearUserFormData: typeof clearUserFormData
   formData: IFormSectionData
 }
 
@@ -59,6 +63,11 @@ class UserFormComponent extends React.Component<IFullProps> {
     this.setAllFormFieldsTouched(touched)
   }
 
+  handleBackAction = () => {
+    this.props.goToHome()
+    this.props.clearUserFormData()
+  }
+
   render = () => {
     const { section, intl } = this.props
 
@@ -66,7 +75,7 @@ class UserFormComponent extends React.Component<IFullProps> {
       <>
         <ActionPageLight
           title={intl.formatMessage(section.title)}
-          goBack={this.props.goToHome}
+          goBack={this.handleBackAction}
         >
           <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
           <FormFieldGenerator
@@ -91,5 +100,5 @@ class UserFormComponent extends React.Component<IFullProps> {
 
 export const UserForm = connect(
   null,
-  { modifyUserFormData, goToCreateUserSection, goToHome }
+  { modifyUserFormData, goToCreateUserSection, goToHome, clearUserFormData }
 )(injectIntl<IFullProps>(UserFormComponent))

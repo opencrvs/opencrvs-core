@@ -4,7 +4,8 @@ import { IFormSectionData, IForm } from '@register/forms'
 import { Action } from 'redux'
 import { defineMessages } from 'react-intl'
 
-const MODIFY_USER_FORM_DATA = 'MODIFY_USER_FORM_DATA'
+const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
+const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -55,6 +56,12 @@ export function modifyUserFormData(
   }
 }
 
+export function clearUserFormData(): Action {
+  return {
+    type: CLEAR_USER_FORM_DATA
+  }
+}
+
 type UserFormAction = IUserFormDataModifyAction | Action
 
 export interface IUserFormState {
@@ -71,6 +78,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return {
         ...state,
         userFormData: (action as IUserFormDataModifyAction).payload.data
+      }
+    case CLEAR_USER_FORM_DATA:
+      return {
+        ...state,
+        userFormData: {}
       }
     default:
       return state
