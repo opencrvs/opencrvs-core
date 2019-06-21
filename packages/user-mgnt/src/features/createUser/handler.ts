@@ -7,7 +7,8 @@ import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir,
-  rollback
+  rollback,
+  generateUsername
 } from '@user-mgnt/features/createUser/service'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
@@ -54,6 +55,7 @@ export default async function createUser(
 
   // save user in user-mgnt data store
   try {
+    user.username = generateUsername(user.name)
     await User.create(user)
   } catch (err) {
     logger.error(err)
