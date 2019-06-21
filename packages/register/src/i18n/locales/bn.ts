@@ -1049,6 +1049,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.requireUpdatesLoading':
       'আপনার  আবেদন চেক করা হচ্ছে ',
     'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
+    'system.user.queryError':
+      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি এই মুহূর্তে লোড করা সম্ভব হচ্ছে না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ করুন, অথবা পুনরায় চেষ্টা করুন।',
     'register.sysAdminHome.overview': 'ওভারভিউ',
     'register.sysAdminHome.offices': 'অফিস',
     'register.sysAdminHome.network': 'নেটওয়ার্ক',
@@ -1088,6 +1090,10 @@ export const BENGALI_STATE: ILanguage = {
     'label.registrationOffice': 'নিবন্ধন অফিস',
     'button.continue': 'অগ্রসর হোন',
     'createUser.buttons.submit': 'ব্যবহারকারী যুক্ত করুন',
-    'createUser.preview.title': 'নতুন ব্যবহারকারীর বিবরণ পর্যালোচনা করুন'
+    'createUser.preview.title': 'নতুন ব্যবহারকারীর বিবরণ পর্যালোচনা করুন',
+    'table.column.header.name': 'নাম',
+    'table.column.header.role': 'দায়িত্ব',
+    'table.column.header.type': 'ধরন',
+    'table.column.header.status': 'অবস্থা'
   }
 }

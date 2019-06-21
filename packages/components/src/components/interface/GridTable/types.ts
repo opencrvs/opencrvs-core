@@ -1,4 +1,5 @@
 import { IAction } from '../ListItem'
+import { ColumnContentAlignment } from './GridTable'
 export { IAction } from '../ListItem'
 
 enum GQLRegStatus {
@@ -16,6 +17,16 @@ export interface IStatus {
   officeName: string | Array<string | null> | null
 }
 
+export interface IColumn {
+  label: string
+  width: number
+  key: string
+  errorValue?: string
+  alignment?: ColumnContentAlignment
+  isActionColumn?: boolean
+  color?: string
+}
+
 export interface IDynamicValues {
   [key: string]:
     | string
@@ -23,12 +34,7 @@ export interface IDynamicValues {
     | Array<string | null>
     | IStatus[]
     | React.ReactNode[]
+    | JSX.Element
     | null
     | undefined
-}
-
-export interface IExpandedContentPreference {
-  label: string
-  displayForEvents?: string[]
-  key: string
 }

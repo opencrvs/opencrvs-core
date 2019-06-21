@@ -1050,6 +1050,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Checking your applications',
     'register.fieldAgentHome.queryError':
       'An error occured while loading applications',
+    'system.user.queryError': 'An error occured while loading system users',
     'register.sysAdminHome.overview': 'Overview',
     'register.sysAdminHome.offices': 'Offices',
     'register.sysAdminHome.network': 'Network',
@@ -1089,6 +1090,10 @@ export const ENGLISH_STATE: ILanguage = {
     'label.registrationOffice': 'Registration Office',
     'button.continue': 'Continue',
     'createUser.buttons.submit': 'Create user',
-    'createUser.preview.title': 'Please review the new users details'
+    'createUser.preview.title': 'Please review the new users details',
+    'table.column.header.name': 'Name',
+    'table.column.header.role': 'Role',
+    'table.column.header.type': 'Type',
+    'table.column.header.status': 'Status'
   }
 }
