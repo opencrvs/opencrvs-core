@@ -18,23 +18,7 @@ const messages = defineMessages({
     description: 'Continue button label'
   }
 })
-export const Container = styled.div`
-  ${({ theme }) => theme.fonts.regularFont};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
-  padding: 24px 32px;
-  margin: 36px auto 0;
-  max-width: 940px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px;
-    width: 100%;
-    min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  }
-`
+
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1Style};
   height: 72px;
@@ -84,23 +68,21 @@ class UserFormComponent extends React.Component<IFullProps> {
           title={intl.formatMessage(section.title)}
           goBack={this.props.goToHome}
         >
-          <Container>
-            <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
-            <FormFieldGenerator
-              id={section.id}
-              onChange={this.props.modifyUserFormData}
-              setAllFieldsDirty={false}
-              fields={section.fields}
-              onSetTouched={setTouchedFunc => {
-                this.setAllFormFieldsTouched = setTouchedFunc
-              }}
-            />
-            <Action>
-              <PrimaryButton onClick={this.handleFormAction}>
-                {intl.formatMessage(messages.continue)}
-              </PrimaryButton>
-            </Action>
-          </Container>
+          <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
+          <FormFieldGenerator
+            id={section.id}
+            onChange={this.props.modifyUserFormData}
+            setAllFieldsDirty={false}
+            fields={section.fields}
+            onSetTouched={setTouchedFunc => {
+              this.setAllFormFieldsTouched = setTouchedFunc
+            }}
+          />
+          <Action>
+            <PrimaryButton onClick={this.handleFormAction}>
+              {intl.formatMessage(messages.continue)}
+            </PrimaryButton>
+          </Action>
         </ActionPageLight>
       </>
     )

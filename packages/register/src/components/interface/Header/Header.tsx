@@ -51,7 +51,8 @@ import {
   PHONE_TEXT,
   SYS_ADMIN_ROLES
 } from '@register/utils/constants'
-import styled from '@register/styledComponents'
+import styled from 'styled-components'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails | null
@@ -77,41 +78,6 @@ interface IState {
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  LOCAL_SYSTEM_ADMIN: {
-    id: 'register.home.header.LOCAL_SYSTEM_ADMIN',
-    defaultMessage: 'Sysadmin',
-    description: 'The description for Sysadmin role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
-  },
   typeTrackingId: {
     id: 'register.home.header.typeTrackingId',
     defaultMessage: 'Tracking ID',
@@ -208,12 +174,14 @@ class HeaderComp extends React.Component<IProps, IState> {
           return name.use === language
         }
       ) as GQLHumanName
-      name = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      name = nameObj
+        ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+        : ''
     }
 
     const role =
       userDetails && userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
+        ? intl.formatMessage(roleMessages[userDetails.role])
         : ''
 
     let menuItems = [
@@ -221,7 +189,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
         label: this.props.intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome
+        onClick: this.props.goToHomeAction
       },
       {
         icon: <StatsBlack />,
@@ -260,7 +228,7 @@ class HeaderComp extends React.Component<IProps, IState> {
           icon: <SystemBlack />,
           iconHover: <SystemBlue />,
           label: this.props.intl.formatMessage(messages.systemTitle),
-          onClick: goToHome
+          onClick: this.props.goToHomeAction
         },
         {
           icon: <SettingsBlack />,

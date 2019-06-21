@@ -11,14 +11,13 @@ import {
   TickLarge
 } from '@opencrvs/components/lib/icons'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import * as Sentry from '@sentry/browser'
 import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '@register/styledComponents'
 import {
-  goToTab as goToTabAction,
+  goToPage as goToPageAction,
   goBack as goBackAction
 } from '@register/navigation'
 import {
@@ -29,14 +28,12 @@ import {
   Event,
   Action
 } from '@register/forms'
-import {
-  FormFieldGenerator,
-  ViewHeaderWithTabs
-} from '@register/components/form'
+import { FormFieldGenerator } from '@register/components/form'
 import { IStoreState } from '@register/store'
 import {
   deleteApplication,
   IApplication,
+  IPayload,
   modifyApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
@@ -45,24 +42,16 @@ import {
   FooterPrimaryButton,
   ViewFooter
 } from '@register/components/interface/footer'
-import { StickyFormTabs } from '@register/views/RegisterForm/StickyFormTabs'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import { getOfflineState } from '@register/offline/selectors'
 import { IOfflineDataState } from '@register/offline/reducer'
 import { CONFIRMATION_SCREEN, HOME } from '@register/navigation/routes'
-import {
-  DECLARATION,
-  DUPLICATION,
-  OFFLINE,
-  REGISTERED,
-  REGISTRATION,
-  REJECTION
-} from '@register/utils/constants'
 import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
+import { ViewHeader } from '@register/components/ViewHeader'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -246,8 +235,8 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
-  return viewParams.tabId || form.sections[0].id
+function getActiveSectionId(form: IForm, viewParams: { pageId?: string }) {
+  return viewParams.pageId || form.sections[0].id
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
@@ -280,12 +269,12 @@ function getPreviousSection(
 export interface IFormProps {
   application: IApplication
   registerForm: IForm
-  tabRoute: string
+  pageRoute: string
   duplicate?: boolean
 }
 
 type DispatchProps = {
-  goToTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goBack: typeof goBackAction
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -303,7 +292,7 @@ export type FullProps = IFormProps &
   Props &
   DispatchProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
-    tabId: string
+    pageId: string
     applicationId: string
   }>
 
@@ -312,7 +301,6 @@ type State = {
   showRegisterModal: boolean
   isDataAltered: boolean
   rejectFormOpen: boolean
-  selectedTabId: string
   hasError: boolean
 }
 const VIEW_TYPE = {
@@ -320,43 +308,11 @@ const VIEW_TYPE = {
   PREVIEW: 'preview'
 }
 
-interface IFullName {
-  fullNameInBn: string
-  fullNameInEng: string
-}
-
-const getFullName = (childData: IFormSectionData): IFullName => {
-  let fullNameInBn = ''
-  let fullNameInEng = ''
-
-  if (childData.firstNames) {
-    fullNameInBn = `${String(childData.firstNames)} ${String(
-      childData.familyName
-    )}`
-  } else {
-    fullNameInBn = String(childData.familyName)
-  }
-
-  if (childData.firstNamesEng) {
-    fullNameInEng = `${String(childData.firstNamesEng)} ${String(
-      childData.familyNameEng
-    )}`
-  } else if (childData.familyNameEng) {
-    fullNameInEng = String(childData.familyNameEng)
-  }
-
-  return {
-    fullNameInBn,
-    fullNameInEng
-  }
-}
-
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
       showSubmitModal: false,
-      selectedTabId: '',
       isDataAltered: false,
       rejectFormOpen: false,
       showRegisterModal: false,
@@ -388,115 +344,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  rejectSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: application.data.registration.trackingId,
-      eventName: REJECTION,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      eventType: event,
-      trackingSection: true,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-
-    this.props.deleteApplication(application)
-  }
-
-  successfulSubmission = (response: string) => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  offlineSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackingSection: true,
-      eventName: OFFLINE,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  successfullyRegistered = (response: string) => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    const eventName = duplicate ? DUPLICATION : REGISTRATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      actionName: REGISTERED,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-    this.props.deleteApplication(application)
-  }
-
-  registrationOnError = (error: Error) => {
-    Sentry.captureException(error)
-    this.setState({
-      showRegisterModal: false,
-      hasError: true
-    })
-  }
-
   submitForm = () => {
     this.setState({ showSubmitModal: true })
   }
@@ -504,10 +351,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
-    action: string
+    action: string,
+    payload?: IPayload
   ) => {
     application.submissionStatus = submissionStatus
     application.action = action
+    application.payload = payload
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
   }
@@ -537,7 +386,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.props.registerForm.sections,
             this.props.activeSection
           ),
-          this.props.tabRoute,
+          this.props.pageRoute,
           this.props.application.event.toLowerCase()
         )
       } else {
@@ -547,7 +396,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.props.registerForm.sections,
             this.props.activeSection
           ),
-          this.props.tabRoute,
+          this.props.pageRoute,
           this.props.application.event.toLowerCase()
         )
       }
@@ -557,11 +406,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
   onSwiped = (
     applicationId: string,
     selectedSection: IFormSection | null,
-    tabRoute: string,
+    pageRoute: string,
     event: string
   ): void => {
     if (selectedSection) {
-      this.props.goToTab(tabRoute, applicationId, selectedSection.id, event)
+      this.props.goToPage(pageRoute, applicationId, selectedSection.id, event)
     }
   }
 
@@ -608,7 +457,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
-      goToTab,
+      goToPage,
       goBack,
       intl,
       activeSection,
@@ -629,12 +478,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ? messages.previewEventRegistration
       : messages.newVitalEventRegistration
     const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
-    const sectionForReview = isReviewForm
-      ? this.generateSectionListForReview(
-          isReviewSection,
-          registerForm.sections
-        )
-      : registerForm.sections
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -648,23 +491,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
         {!isErrorOccured && (
           <>
-            <ViewHeaderWithTabs
+            <ViewHeader
               id="informant_parent_view"
               title={intl.formatMessage(title, { event: application.event })}
-            >
-              <StickyFormTabs
-                sections={sectionForReview}
-                activeTabId={activeSection.id}
-                onTabClick={(tabId: string) =>
-                  goToTab(
-                    this.props.tabRoute,
-                    application.id,
-                    tabId,
-                    application.event.toLowerCase()
-                  )
-                }
-              />
-            </ViewHeaderWithTabs>
+            ></ViewHeader>
             <FormContainer>
               <BodyContent>
                 <Swipeable
@@ -678,7 +508,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 >
                   {activeSection.viewType === VIEW_TYPE.PREVIEW && (
                     <ReviewSection
-                      tabRoute={this.props.tabRoute}
+                      pageRoute={this.props.pageRoute}
                       draft={application}
                       submitClickEvent={this.submitForm}
                       saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
@@ -690,7 +520,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   )}
                   {activeSection.viewType === VIEW_TYPE.REVIEW && (
                     <ReviewSection
-                      tabRoute={this.props.tabRoute}
+                      pageRoute={this.props.pageRoute}
                       draft={application}
                       rejectApplicationClickEvent={() => {
                         this.toggleRejectForm()
@@ -706,7 +536,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         {intl.formatMessage(activeSection.title)}
                         {activeSection.optional && (
                           <Optional
-                            id={`form_section_optional_label_${activeSection.id}`}
+                            id={`form_section_opt_label_${activeSection.id}`}
                             disabled={activeSection.disabled}
                           >
                             &nbsp;&nbsp;•&nbsp;
@@ -751,8 +581,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           {nextSection && (
                             <FormPrimaryButton
                               onClick={() =>
-                                goToTab(
-                                  this.props.tabRoute,
+                                goToPage(
+                                  this.props.pageRoute,
                                   application.id,
                                   nextSection.id,
                                   application.event.toLowerCase()
@@ -881,10 +711,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
-            confirmRejectionEvent={this.rejectSubmission}
+            confirmRejectionEvent={this.confirmSubmission}
             duplicate={duplicate}
             draftId={application.id}
             event={this.getEvent()}
+            application={application}
           />
         )}
       </FormViewContainer>
@@ -907,7 +738,7 @@ function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
     Props &
-    RouteComponentProps<{ tabId: string; applicationId: string }>
+    RouteComponentProps<{ pageId: string; applicationId: string }>
 ) {
   const { match, registerForm, application } = props
 
@@ -918,7 +749,7 @@ function mapStateToProps(
   )
 
   if (!activeSection) {
-    throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
+    throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
 
   if (!application) {
@@ -965,7 +796,7 @@ export const RegisterForm = connect<
   {
     modifyApplication,
     deleteApplication,
-    goToTab: goToTabAction,
+    goToPage: goToPageAction,
     goBack: goBackAction,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {

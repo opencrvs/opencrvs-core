@@ -12,8 +12,8 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { goToTab as goToTabAction } from '@register/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@register/navigation/routes'
+import { goToPage as goToPageAction } from '@register/navigation'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import Moment from 'react-moment'
 import { getRejectionReasonDisplayValue } from '@register/views/SearchResult/SearchResult'
 
@@ -63,7 +63,7 @@ interface IProps {
   }
   notDuplicateHandler?: () => void
   rejectHandler?: () => void
-  gotoTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
 }
 
 const messages: {
@@ -394,8 +394,8 @@ class DuplicateDetailsClass extends React.Component<
             <PrimaryButton
               id={`review_link_${data.id}`}
               onClick={() => {
-                this.props.gotoTab(
-                  REVIEW_EVENT_PARENT_FORM_TAB,
+                this.props.goToPage(
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
                   data.id,
                   'review',
                   'birth',
@@ -428,6 +428,6 @@ class DuplicateDetailsClass extends React.Component<
 export const DuplicateDetails = connect(
   null,
   {
-    gotoTab: goToTabAction
+    goToPage: goToPageAction
   }
 )(injectIntl<IProps>(DuplicateDetailsClass))

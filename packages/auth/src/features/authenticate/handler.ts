@@ -2,7 +2,8 @@ import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import {
   authenticate,
-  storeUserInformation
+  storeUserInformation,
+  createToken
 } from '@auth/features/authenticate/service'
 import {
   generateVerificationCode,
@@ -12,7 +13,7 @@ import {
 } from '@auth/features/verifyCode/service'
 import { logger } from '@auth/logger'
 import { unauthorized } from 'boom'
-import { PRODUCTION } from '@auth/constants'
+import { PRODUCTION, WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
   mobile: string
@@ -22,6 +23,8 @@ interface IAuthPayload {
 interface IAuthResponse {
   nonce: string
   mobile: string
+  status: string
+  token?: string
 }
 
 export default async function authenticateHandler(
@@ -59,7 +62,21 @@ export default async function authenticateHandler(
     await sendVerificationCode(result.mobile, verificationCode)
   }
 
-  return { mobile: result.mobile, nonce }
+  const respose: IAuthResponse = {
+    mobile: result.mobile,
+    status: result.status,
+    nonce
+  }
+
+  if (respose.status && respose.status === 'pending') {
+    respose.token = await createToken(
+      result.userId,
+      result.scope,
+      WEB_USER_JWT_AUDIENCES,
+      JWT_ISSUER
+    )
+  }
+  return respose
 }
 
 export const requestSchema = Joi.object({
@@ -69,5 +86,7 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
-  mobile: Joi.string()
+  mobile: Joi.string(),
+  status: Joi.string(),
+  token: Joi.string().optional()
 })

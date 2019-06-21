@@ -586,8 +586,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.selfInformantDescription':
       '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
       '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'New vital event application',
+    'register.selectVitalEvent.registerNewEventTitle': 'New application',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'What type of event do you want to declare?',
+    'register.selectVitalEvent.birth': 'Birth',
+    'register.selectVitalEvent.death': 'Death',
+    'register.selectVitalEvent.continueButton': 'Continue',
+    'register.selectVitalEvent.errorMessage': 'Please select the type of event',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
@@ -1056,6 +1061,19 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.settingsTitle': 'Settings',
     'register.home.header.helpTitle': 'Help',
     'register.home.header.logoutTitle': 'Logout',
+    'userSetup.landing.title': 'Welcome to OpenCRVS',
+    'userSetup.landing.instruction':
+      'You just a few steps away from completing your account set up.',
+    'userSetup.type.HOSPITAL': 'Hospital',
+    'userSetup.type.CHA': 'CHA',
+    'userSetup.type.ENTREPENEUR': 'Entrepeneur',
+    'userSetup.type.DATA_ENTRY_CLERK': 'Data entry clerk',
+    'userSetup.type.SECRETARY': 'Secretary',
+    'userSetup.type.CHAIRMAN': 'Chairman',
+    'userSetup.type.MAYOR': 'Mayor',
+    'userSetup.type.LOCAL_SYSTEM_ADMIN': 'System admin (local)',
+    'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
+    'userSetup.landing.button.start': 'Start',
     'user.form.name': 'User',
     'user.title.create': 'Create new user',
     'user.section.userDetails': 'User details',

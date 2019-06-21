@@ -42,12 +42,12 @@ import {
   IPrintFormState,
   printReducer
 } from '@register/forms/certificate/printReducer'
-import {
-  IUserFormState,
-  userFormReducer
-} from '@register/views/SysAdmin/forms/userReducer'
 import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
+import {
+  userFormReducer,
+  IUserFormState
+} from '@register/views/SysAdmin/forms/userReducer'
 
 export interface IStoreState {
   profile: ProfileState

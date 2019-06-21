@@ -23,7 +23,7 @@ import {
 import { Link } from '@opencrvs/components/lib/typography'
 import { findIndex, filter, flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToTab } from '@register/navigation'
+import { goToPage } from '@register/navigation'
 
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/forms'
 import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
@@ -261,13 +261,13 @@ const DraftButtonContainer = styled.div`
 interface IProps {
   draft: IApplication
   registerForm: { [key: string]: IForm }
-  tabRoute: string
+  pageRoute: string
   registerClickEvent?: () => void
   rejectApplicationClickEvent?: () => void
   submitClickEvent?: () => void
   saveDraftClickEvent?: () => void
   deleteApplicationClickEvent?: () => void
-  goToTab: typeof goToTab
+  goToPage: typeof goToPage
   scope: Scope | null
   offlineResources: IOfflineDataState
   language: string
@@ -556,7 +556,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       deleteApplicationClickEvent,
       offlineResources,
       language,
-      tabRoute,
+      pageRoute,
       draft: { event }
     } = this.props
 
@@ -640,8 +640,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               {errorsOnField.length > 0 ? (
                                 <RequiredFieldLink
                                   onClick={() => {
-                                    this.props.goToTab(
-                                      tabRoute,
+                                    this.props.goToPage(
+                                      pageRoute,
                                       draft.id,
                                       section.id,
                                       draft.event.toLowerCase(),
@@ -755,8 +755,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               show={this.state.displayEditDialog}
               handleClose={this.toggleDisplayDialog}
               handleEdit={() => {
-                this.props.goToTab(
-                  tabRoute,
+                this.props.goToPage(
+                  pageRoute,
                   draft.id,
                   this.state.editClickedSectionId,
                   draft.event.toLowerCase()
@@ -788,5 +788,5 @@ export const ReviewSection = connect(
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
   }),
-  { goToTab }
+  { goToPage }
 )(injectIntl(ReviewSectionComp))

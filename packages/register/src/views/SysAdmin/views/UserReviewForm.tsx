@@ -13,11 +13,7 @@ import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import {
-  Container,
-  FormTitle,
-  Action
-} from '@register/views/SysAdmin/views/UserForm'
+import { FormTitle, Action } from '@register/views/SysAdmin/views/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 interface IUserReviewFormProps {
@@ -93,17 +89,15 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
         title={intl.formatMessage(section.title)}
         goBack={this.props.goBack}
       >
-        <Container>
-          <FormTitle>{intl.formatMessage(section.name)}</FormTitle>
-          {this.transformSectionData().map((sec, index) => (
-            <DataSection key={index} {...sec} />
-          ))}
-          <Action>
-            <PrimaryButton onClick={this.handleSubmit}>
-              {intl.formatMessage(messages.submit)}
-            </PrimaryButton>
-          </Action>
-        </Container>
+        <FormTitle>{intl.formatMessage(section.name)}</FormTitle>
+        {this.transformSectionData().map((sec, index) => (
+          <DataSection key={index} {...sec} />
+        ))}
+        <Action>
+          <PrimaryButton onClick={this.handleSubmit}>
+            {intl.formatMessage(messages.submit)}
+          </PrimaryButton>
+        </Action>
       </ActionPageLight>
     )
   }

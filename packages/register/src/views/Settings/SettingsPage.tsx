@@ -16,6 +16,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
 
 export const messages: {
@@ -110,36 +111,6 @@ export const messages: {
     id: 'formFields.fetchButton.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button label'
-  },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
@@ -311,7 +282,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
 
     const role =
       userDetails && userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
+        ? intl.formatMessage(roleMessages[userDetails.role])
         : ''
 
     const language: ILanguageOptions = {

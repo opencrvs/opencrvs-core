@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { createTestComponent } from 'src/tests/util'
-import { createStore } from 'src/store'
+import { createTestComponent } from '@register/tests/util'
+import { createStore } from '@register/store'
 import { UserForm } from './UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 
 const { store } = createStore()
 
-describe('Settings page tests', async () => {
+describe('Create new user page tests', async () => {
   let component: ReactWrapper
   beforeEach(async () => {
     const testComponent = createTestComponent(
