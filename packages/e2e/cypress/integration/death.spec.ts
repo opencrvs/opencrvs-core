@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-context('Death Registration Integration Test', () => {
+context('Death Registration Integration Test using maximum input', () => {
   beforeEach(() => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
@@ -11,12 +11,13 @@ context('Death Registration Integration Test', () => {
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
+    // LANDING
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
     cy.get('#new_event_declaration').click()
+    // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
-    // APPLICATION FORM
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -24,11 +25,13 @@ context('Death Registration Integration Test', () => {
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
     cy.get('#familyNameEng').type('Khan')
+    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#gender', 'Male', 'Male')
     cy.selectOption('#maritalStatus', 'Married', 'Married')
     cy.get('#birthDate-dd').type('16')
     cy.get('#birthDate-mm').type('06')
     cy.get('#birthDate-yyyy').type('1988')
+    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
@@ -59,6 +62,7 @@ context('Death Registration Integration Test', () => {
     cy.get('#applicantBirthDate-yyyy').type('1956')
     cy.selectOption('#applicantsRelationToDeceased', 'Father', 'Father')
     cy.get('#applicantPhone').type('01712345678')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
@@ -66,6 +70,15 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('48')
     cy.get('#postCode').type('1024')
+    // cy.get('applicantPermanentAddressSameAsCurrent_true').click()
+    // cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
+    // cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
+    // cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
+    // cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
+    // cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
+    // cy.get('#addressLine2Permanent').type('Bahadur street')
+    // cy.get('#addressLine1Permanent').type('40 Ward')
+    // cy.get('#postCodePermanent').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // EVENT DETAILS
@@ -73,7 +86,16 @@ context('Death Registration Integration Test', () => {
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
     cy.selectOption('#manner', 'Homicide', 'Homicide')
-    cy.get('#deathPlaceAddress_CURRENT').click()
+    cy.get('#deathPlaceAddress_OTHER').click()
+    cy.selectOption('#placeOfDeath', 'Private Home', 'Private Home')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
