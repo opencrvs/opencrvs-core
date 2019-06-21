@@ -1,7 +1,7 @@
 import { model, Schema, Document } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
-interface IUserName {
+export interface IUserName {
   use: string
   family: string
   given: string[]

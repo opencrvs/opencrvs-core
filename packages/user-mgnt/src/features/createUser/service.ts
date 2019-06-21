@@ -1,4 +1,4 @@
-import { IUser } from '@user-mgnt/model/user'
+import { IUser, IUserName } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 import { FHIR_URL } from '@user-mgnt/constants'
 
@@ -104,7 +104,9 @@ export const rollback = async (
   }
 }
 
-export function generateUsername(given: string[], family: string) {
+export function generateUsername(names: IUserName[]) {
+  const { given = [], family = '' } =
+    names.find(name => name.use === 'en') || {}
   const initials = given.reduce(
     (accumulated, current) => accumulated + current.trim().charAt(0),
     ''
