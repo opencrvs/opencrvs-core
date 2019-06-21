@@ -44,6 +44,7 @@ const messages = defineMessages({
 })
 
 const EMPTY_VALUE = ''
+const VISIBLE_QUESTION = 3
 const QUESTION_LIST: IQuestion[] = [
   {
     label: `What is your mother's Maiden name?`,
@@ -77,6 +78,7 @@ type IQuestionnaire = {
 type IState = {
   questionnaire: IQuestionnaire[]
   refresher: number
+  showError: boolean
 }
 
 const H3 = styled.h3`
@@ -107,20 +109,26 @@ const FullWidthInput = styled(TextInput)`
     width: 100%;
   }
 `
+const Error = styled.span`
+  color: ${({ theme }) => theme.colors.error};
+  ${({ theme }) => theme.fonts.captionStyle};
+`
+
 class SecurityQuestionView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
 
     this.state = {
       questionnaire: this.preparequestionnaire(),
-      refresher: Date.now()
+      refresher: Date.now(),
+      showError: false
     }
   }
 
   preparequestionnaire = (): IQuestionnaire[] => {
     let i
     const questionnaire = []
-    for (i = 0; i < QUESTION_LIST.length; i++) {
+    for (i = 0; i < VISIBLE_QUESTION; i++) {
       questionnaire.push({
         questionList: cloneDeep(QUESTION_LIST),
         selectedQuestion: EMPTY_VALUE,
@@ -173,14 +181,20 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     this.setState({ questionnaire })
   }
 
-  onsubmit = () => {
+  onsubmit = (
+    e:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault()
+    this.setState({ showError: true })
     console.log(this.state.questionnaire)
   }
 
   showQuestionnaire = () => {
     const { intl } = this.props
     return (
-      <div key={this.state.refresher}>
+      <form onSubmit={this.onsubmit} key={this.state.refresher}>
         {this.state.questionnaire.map(
           (questionnaire: IQuestionnaire, index: number) => {
             return (
@@ -190,6 +204,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     {intl.formatMessage(messages.securityQuestionLabel, {
                       count: index + 1
                     })}
+                    <Error>*</Error>
                   </label>
                   <FullWidthSelect
                     id={`question-${index}`}
@@ -199,15 +214,37 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     value={questionnaire.selectedQuestion}
                     options={questionnaire.questionList}
                     placeholder={intl.formatMessage(messages.select)}
+                    error={
+                      this.state.showError && !questionnaire.selectedQuestion
+                    }
+                    touched={this.state.showError}
                   />
+                  {this.state.showError && !questionnaire.selectedQuestion && (
+                    <Error>
+                      {intl.formatMessage(messages.selectSecurityQuestion)}
+                    </Error>
+                  )}
                 </Wrapper>
                 <Wrapper>
-                  <label>Answer</label>
+                  <label>
+                    Answer<Error>*</Error>
+                  </label>
                   <FullWidthInput
                     id={`answer-${index}`}
                     onChange={answer => this.onAnswerChange(answer, index)}
                     value={this.state.questionnaire[index].answer}
+                    error={
+                      this.state.showError &&
+                      !this.state.questionnaire[index].answer
+                    }
+                    touched={this.state.showError}
                   />
+                  {this.state.showError &&
+                    !this.state.questionnaire[index].answer && (
+                      <Error>
+                        {intl.formatMessage(messages.enterResponse)}
+                      </Error>
+                    )}
                 </Wrapper>
               </QuestionWrapper>
             )
@@ -217,7 +254,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         <PrimaryButton onClick={this.onsubmit}>
           {intl.formatMessage(messages.continue)}
         </PrimaryButton>
-      </div>
+      </form>
     )
   }
 
