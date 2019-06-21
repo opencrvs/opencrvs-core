@@ -20,6 +20,7 @@ context('Birth Registration Integration Test', () => {
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
+    cy.get('#continue').click()
     cy.get('#select_parent_informant').click()
     // APPLICATION FORM
     // CHILD DETAILS
