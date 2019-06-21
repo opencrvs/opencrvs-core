@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { createTestComponent } from '@register/tests/util'
 import { createStore } from '@register/store'
-import { UserForm } from './UserForm'
+import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 const { store } = createStore()
 
@@ -12,7 +13,7 @@ describe('Create new user page tests', async () => {
   beforeEach(async () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <UserForm />,
+      <UserForm section={userSection} />,
       store
     )
     component = testComponent.component
