@@ -34,13 +34,13 @@ import { IApplication } from '@register/applications'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
-  goToTab as goToTabAction,
+  goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction
 } from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
-  REVIEW_EVENT_PARENT_FORM_TAB
+  REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
@@ -144,36 +144,6 @@ const messages: {
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab'
   },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
-  },
   listItemType: {
     id: 'register.registrarHome.resultsType',
     defaultMessage: 'Type',
@@ -251,7 +221,7 @@ interface IBaseRegistrarHomeProps {
   language: string
   scope: Scope | null
   userDetails: IUserDetails | null
-  gotoTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   tabId: string
@@ -314,8 +284,8 @@ export class RegistrarHomeView extends React.Component<
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
             handler: () =>
-              this.props.gotoTab(
-                REVIEW_EVENT_PARENT_FORM_TAB,
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
@@ -359,8 +329,8 @@ export class RegistrarHomeView extends React.Component<
           actions.push({
             label: this.props.intl.formatMessage(messages.update),
             handler: () =>
-              this.props.gotoTab(
-                REVIEW_EVENT_PARENT_FORM_TAB,
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
                 reg.event ? reg.event.toLowerCase() : ''
@@ -388,7 +358,7 @@ export class RegistrarHomeView extends React.Component<
     }
     return this.props.drafts.map((draft: IApplication) => {
       let name
-      let tabRoute: string
+      let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         name =
           (draft.data &&
@@ -406,7 +376,7 @@ export class RegistrarHomeView extends React.Component<
               : draft.data.child.firstNames + ' ') +
               draft.data.child.familyName) ||
           ''
-        tabRoute = DRAFT_BIRTH_PARENT_FORM
+        pageRoute = DRAFT_BIRTH_PARENT_FORM
       } else if (draft.event && draft.event.toString() === 'death') {
         name =
           (draft.data &&
@@ -424,15 +394,15 @@ export class RegistrarHomeView extends React.Component<
               : draft.data.deceased.firstNames + ' ') +
               draft.data.deceased.familyName) ||
           ''
-        tabRoute = DRAFT_DEATH_FORM
+        pageRoute = DRAFT_DEATH_FORM
       }
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
         {
           label: this.props.intl.formatMessage(messages.update),
           handler: () =>
-            this.props.gotoTab(
-              tabRoute,
+            this.props.goToPage(
+              pageRoute,
               draft.id,
               '',
               (draft.event && draft.event.toString()) || ''
@@ -819,7 +789,7 @@ function mapStateToProps(
 export const RegistrarHome = connect(
   mapStateToProps,
   {
-    gotoTab: goToTabAction,
+    goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction

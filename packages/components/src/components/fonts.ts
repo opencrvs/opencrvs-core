@@ -47,16 +47,11 @@ export const fonts = (country: string, language: string): IFonts => ({
   englishTextFont: 'noto_sansregular',
   regularFont: countryFonts[country][language].regularFontFamily,
   semiBoldFont: countryFonts[country][language].semiBoldFontFamily,
-  bigBodyBoldStyle: `font-family: ${
-    countryFonts[country][language].semiBoldFontFamily
-  };
+  bigBodyBoldStyle: `font-family: ${countryFonts[country][language].semiBoldFontFamily};
     font-size: 18px;
     font-weight: normal;
     line-height: 27px;`,
-  bigBodyStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
-  };
-    font-weight: 400;
+  bigBodyStyle: `font-family: ${countryFonts[country][language].regularFontFamily};
     font-size: 18px;
     font-weight: normal;
     line-height: 27px;`,
@@ -64,21 +59,15 @@ export const fonts = (country: string, language: string): IFonts => ({
     font-size: 16px;
     font-weight: normal;
     line-height: 24px;`,
-  bodyBoldStyle: `font-family: ${
-    countryFonts[country][language].semiBoldFontFamily
-  };
+  bodyBoldStyle: `font-family: ${countryFonts[country][language].semiBoldFontFamily};
     font-size: 16px;
     line-height: 24px;
     font-weight: normal;`,
-  subtitleStyle: `font-family: ${
-    countryFonts[country][language].semiBoldFontFamily
-  };
+  subtitleStyle: `font-family: ${countryFonts[country][language].semiBoldFontFamily};
     font-size: 14px;
     line-height: 21px;
     font-weight: normal;`,
-  captionStyle: `font-family: ${
-    countryFonts[country][language].regularFontFamily
-  };
+  captionStyle: `font-family: ${countryFonts[country][language].regularFontFamily};
     font-size: 12px;
     line-height: 18px;
     font-weight: normal;
@@ -105,9 +94,7 @@ export const fonts = (country: string, language: string): IFonts => ({
     line-height: 120px;
     font-weight: normal;
     letter-spacing: -1.5px;`,
-  buttonStyle: `font-family: ${
-    countryFonts[country][language].semiBoldFontFamily
-  };
+  buttonStyle: `font-family: ${countryFonts[country][language].semiBoldFontFamily};
     font-size: 16px;
     line-height: 24px;
     font-weight: normal;

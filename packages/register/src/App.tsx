@@ -33,6 +33,7 @@ import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
+import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -93,7 +94,7 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                                  path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
@@ -103,12 +104,12 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.DRAFT_DEATH_FORM_TAB}
+                                  path={routes.DRAFT_DEATH_FORM_PAGE}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
+                                  path={routes.REVIEW_EVENT_PARENT_FORM_PAGE}
                                   component={ReviewForm}
                                 />
                                 <ProtectedRoute
@@ -158,6 +159,11 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.SYS_ADMIN_HOME_TAB}
                                   component={SysAdminHome}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.USER_FORM}
+                                  component={UserForm}
                                 />
                               </Switch>
                             </ProtectedPage>

@@ -7,6 +7,8 @@ export const FETCH_USER = gql`
       userMgntUserID
       practitionerId
       role
+      type
+      status
       name {
         use
         firstNames

@@ -23,7 +23,7 @@ export const resolvers: GQLResolver = {
         username = null,
         mobile = null,
         role = null,
-        active = null,
+        status = null,
         primaryOfficeId = null,
         locationId = null,
         count = 10,
@@ -52,8 +52,8 @@ export const resolvers: GQLResolver = {
       if (primaryOfficeId) {
         payload = { ...payload, primaryOfficeId }
       }
-      if (active !== null) {
-        payload = { ...payload, active }
+      if (status) {
+        payload = { ...payload, status }
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
         method: 'POST',

@@ -25,7 +25,7 @@ export interface IUser {
   primaryOfficeId: string
   catchmentAreaIds: string[]
   scope: string[]
-  active: boolean
+  status: string
   deviceId?: string
   creationDate: number
 }
@@ -64,7 +64,11 @@ const userSchema = new Schema({
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
   scope: { type: [String], required: true },
-  active: { type: Boolean, default: true },
+  status: {
+    type: String,
+    enum: ['pending', 'active', 'disabled'],
+    default: 'pending'
+  },
   deviceId: String,
   creationDate: { type: Number, default: Date.now }
 })
