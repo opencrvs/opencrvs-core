@@ -6,7 +6,7 @@ import {
 } from '@opencrvs/register/src/applications'
 import { Event } from '@opencrvs/register/src/forms'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/register/src/navigation/routes'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
@@ -61,7 +61,7 @@ describe('ReviewForm tests', async () => {
         registerForm={form}
         scope={scope}
         event={application.event}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -223,7 +223,7 @@ describe('ReviewForm tests', async () => {
         staticContext={mock}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -383,7 +383,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -484,7 +484,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -642,7 +642,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -720,7 +720,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -951,7 +951,7 @@ describe('ReviewForm tests', async () => {
           staticContext={mock}
           event={application.event}
           registerForm={getReviewForm(store.getState()).death}
-          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
               applicationId: application.id,
@@ -1199,7 +1199,7 @@ describe('ReviewForm tests', async () => {
           staticContext={mock}
           event={application.event}
           registerForm={getReviewForm(store.getState()).death}
-          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
               applicationId: application.id,
@@ -1289,7 +1289,7 @@ describe('ReviewForm tests', async () => {
           scope={scope}
           event={application.event}
           registerForm={form}
-          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
               draftId: application.id,

@@ -25,6 +25,7 @@ const sign = promisify(jwt.sign) as (
 export interface IAuthentication {
   mobile: string
   userId: string
+  status: string
   scope: string[]
 }
 
@@ -53,6 +54,7 @@ export async function authenticate(
   return {
     userId: body.id,
     scope: body.scope,
+    status: body.status,
     mobile
   }
 }

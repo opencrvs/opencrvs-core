@@ -36,6 +36,7 @@ import {
   StatusOrange,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -198,7 +199,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
-                      messages[status.user.role as string]
+                      roleMessages[status.user.role as string]
                     )
                   : '',
               officeName:

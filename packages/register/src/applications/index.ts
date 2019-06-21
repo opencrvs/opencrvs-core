@@ -1,8 +1,8 @@
-import { IFormData, Event } from '@register/forms'
-import { GO_TO_TAB, Action as NavigationAction } from '@register/navigation'
+import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@register/storage'
-import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { Event, IFormData, IFormFieldValue } from '@register/forms'
+import { GO_TO_PAGE, Action as NavigationAction } from '@register/navigation'
 import { IUserDetails } from '@register/utils/userUtils'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
@@ -27,6 +27,10 @@ export enum SUBMISSION_STATUS {
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
+
+export interface IPayload {
+  [key: string]: IFormFieldValue
+}
 export interface IApplication {
   id: string
   data: IFormData
@@ -41,6 +45,7 @@ export interface IApplication {
   trackingId?: string
   compositionId?: string
   registrationNumber?: string
+  payload?: IPayload
 }
 
 interface IStoreApplicationAction {
@@ -240,19 +245,19 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
   action: Action
 ): IApplicationsState | Loop<IApplicationsState, Action> => {
   switch (action.type) {
-    case GO_TO_TAB: {
+    case GO_TO_PAGE: {
       const application = state.applications.find(
         ({ id }) => id === action.payload.applicationId
       )
 
-      if (!application || application.data[action.payload.tabId]) {
+      if (!application || application.data[action.payload.pageId]) {
         return state
       }
       const modifiedApplication = {
         ...application,
         data: {
           ...application.data,
-          [action.payload.tabId]: {}
+          [action.payload.pageId]: {}
         }
       }
       return loop(state, Cmd.action(modifyApplication(modifiedApplication)))
