@@ -908,6 +908,8 @@ export class RegistrarHomeView extends React.Component<
                 )
               }
 
+              console.log('PRINT DATA', data)
+
               return (
                 <BodyContent>
                   <GridTable
@@ -938,15 +940,16 @@ export class RegistrarHomeView extends React.Component<
                         label: this.props.intl.formatMessage(
                           messages.registrationNumber
                         ),
-                        width: 21,
+                        width: 26,
                         key: 'registrationNumber'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemAction
                         ),
-                        width: 20,
+                        width: 9,
                         key: 'actions',
+                        alignment: ColumnContentAlignment.CENTER,
                         isActionColumn: true
                       }
                     ]}
