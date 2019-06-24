@@ -500,6 +500,16 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
+    'register.selectInformant.newBirthRegistration': 'New birth application',
+    'register.selectInformant.informantTitle':
+      'Who is applying for birth registration?',
+    'register.selectInformant.mother': 'Mother',
+    'register.selectInformant.father': 'Father',
+    'register.selectInformant.parents': 'Mother & Father',
+    'register.selectInformant.someoneElse': 'Someone Else',
+    'register.selectInformant.self': 'Self (18+)',
+    'register.selectInformant.errorMessage':
+      'দয়া করে আবেদন করার সময় কে উপস্থিত ছিল সেটা নির্বাচন করুন',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
@@ -571,21 +581,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'Back to homescreen',
     'register.savedRegistration.buttons.newDeclaration': 'New application',
     'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
-    'register.selectInformant.newBirthRegistration': 'New birth application',
-    'register.selectInformant.informantTitle': 'Who is the informant?',
-    'register.selectInformant.informantDescription':
-      'Tell us who is providing the details, and check what information is needed to submit the form.',
-    'register.selectInformant.parentInformantTitle': 'Parent',
-    'register.selectInformant.parentInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>child, mother</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>father.</strong>',
-    'register.selectInformant.otherInformantTitle': 'Someone else',
-    'register.selectInformant.otherInformantDescription':
-      'Required: Details of the child and informant. Optional: Details of the mother/father.',
-    'register.selectInformant.selfInformantTitle': 'Self (18+)',
-    'register.selectInformant.selfInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
+
     'register.selectVitalEvent.registerNewEventTitle': 'New application',
     'register.selectVitalEvent.registerNewEventHeading':
       'What type of event do you want to declare?',

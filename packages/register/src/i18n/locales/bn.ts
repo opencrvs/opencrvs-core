@@ -571,21 +571,17 @@ export const BENGALI_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.savedRegistration.buttons.newDeclaration': 'নতুন আবেদন',
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশে ফেরত যান',
+
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
-    'register.selectInformant.informantTitle': 'তথ্যদাতা কে?',
-    'register.selectInformant.informantDescription':
-      'কে ঘোষণা ফর্মের প্রয়োজনীয় ও বিস্তারিত তথ্য উপাত্ত প্রদান করিবেন',
-    'register.selectInformant.parentInformantTitle': 'পিতামাতা',
-    'register.selectInformant.parentInformantDescription':
-      '<strong>প্রয়োজনীয়</strong>: শিশু এবং মায়ের বিবরণ' +
-      '<br /><strong>ঐচ্ছিক</strong>: বাবা বিস্তারিত বিবরণ',
-    'register.selectInformant.otherInformantTitle': 'অন্য কেউ',
-    'register.selectInformant.otherInformantDescription':
-      'প্রয়োজনীয়: শিশু এবং তথ্যপ্রদানকারীর বিবরণ. ঐচ্ছিক: মা / বাবা বিস্তারিত বিবরণ.',
-    'register.selectInformant.selfInformantTitle': 'নিজ (১৮+)',
-    'register.selectInformant.selfInformantDescription':
-      '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
-      '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
+    'register.selectInformant.informantTitle':
+      'কে জন্ম নিবন্ধনের জন্য আবেদন করছে?',
+    'register.selectInformant.mother': 'মাতা',
+    'register.selectInformant.father': 'পিতা',
+    'register.selectInformant.parents': 'পিতা ও মাতা ',
+    'register.selectInformant.someoneElse': 'অন্য কেউ',
+    'register.selectInformant.self': 'নিজ (১৮+)',
+    'register.selectInformant.errorMessage':
+      'Please select who is present and applying',
     'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
     'register.selectVitalEvent.registerNewEventHeading':
       'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
