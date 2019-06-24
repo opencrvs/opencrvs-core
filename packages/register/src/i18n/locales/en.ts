@@ -1106,6 +1106,11 @@ export const ENGLISH_STATE: ILanguage = {
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'What is your favorite movie?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
-      'What is your favorite color?'
+      'What is your favorite color?',
+    'register.sysAdminHome.SearchField.title': 'Assigned registration office',
+    'register.sysAdminHome.SearchField.cancel': 'Cancel',
+    'register.sysAdminHome.SearchField.select': 'SELECT',
+    'register.sysAdminHome.SearchField.locationId': 'Id: {locationId}',
+    'register.sysAdminHome.SearchField.editButton': 'Change assigned office'
   }
 }

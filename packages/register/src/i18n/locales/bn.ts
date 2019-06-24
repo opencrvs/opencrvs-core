@@ -1105,6 +1105,12 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার প্রিয় শিক্ষক কে?',
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'আপনার প্রিয় সিনেমা কি?',
-    'register.userSetup.securityQuestions.FAVORITE_COLOR': 'আপনার প্রিয় রং কি?'
+    'register.userSetup.securityQuestions.FAVORITE_COLOR':
+      'আপনার প্রিয় রং কি?',
+    'register.sysAdminHome.SearchField.title': 'নিবন্ধন অফিস',
+    'register.sysAdminHome.SearchField.cancel': 'বাতিল',
+    'register.sysAdminHome.SearchField.select': 'নির্বাচন ',
+    'register.sysAdminHome.SearchField.locationId': 'আইডি: {locationId}',
+    'register.sysAdminHome.SearchField.editButton': 'নিবন্ধন অফিস হালনাগাদ করুন'
   }
 }
