@@ -1111,6 +1111,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.sysAdminHome.SearchField.cancel': 'বাতিল',
     'register.sysAdminHome.SearchField.select': 'নির্বাচন ',
     'register.sysAdminHome.SearchField.locationId': 'আইডি: {locationId}',
-    'register.sysAdminHome.SearchField.editButton': 'নিবন্ধন অফিস হালনাগাদ করুন'
+    'register.sysAdminHome.SearchField.editButton':
+      'নিবন্ধন অফিস হালনাগাদ করুন',
+    'register.sysAdminHome.SearchField.placeHolderText': 'অনুসন্ধান'
   }
 }

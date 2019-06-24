@@ -15,7 +15,7 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { TextInput } from '@opencrvs/components/lib/forms'
+import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
 
 const SelectButton = styled(PrimaryButton)`
   height: 40px;
@@ -101,6 +101,11 @@ const messages = defineMessages({
     id: 'register.sysAdminHome.SearchField.editButton',
     defaultMessage: 'Change assigned office',
     description: 'Edit button text'
+  },
+  placeHolderText: {
+    id: 'register.sysAdminHome.SearchField.placeHolderText',
+    defaultMessage: 'Search',
+    description: 'Place holder text '
   }
 })
 interface IProps {
@@ -178,6 +183,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
   render() {
     const { intl } = this.props
+    const placeHolderText = intl.formatMessage(messages.placeHolderText)
     const locationArray: ILocation[] = [
       {
         id: '309842043',
@@ -235,6 +241,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     return (
       <>
+        {!this.state.showModal && (
+          <InputLabel required={true}>{this.props.fieldLabel}</InputLabel>
+        )}
         {!this.state.showModal && !this.state.isSearchField && (
           <InputSection>
             <TextInput
@@ -253,7 +262,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         )}
         {!this.state.showModal && this.state.isSearchField && (
           <SearchInputWithIcon
-            placeHolderText="search"
+            placeHolderText={placeHolderText}
             searchText={this.state.searchText}
             searchHandler={this.toggleSearchModal}
           />
@@ -285,7 +294,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           >
             <ChildContainer>
               <SearchInputWithIcon
-                placeHolderText="search"
+                placeHolderText={placeHolderText}
                 searchText={this.state.searchText}
                 searchHandler={this.handleSearch}
               />

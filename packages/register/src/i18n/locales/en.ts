@@ -1111,6 +1111,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.sysAdminHome.SearchField.cancel': 'Cancel',
     'register.sysAdminHome.SearchField.select': 'SELECT',
     'register.sysAdminHome.SearchField.locationId': 'Id: {locationId}',
-    'register.sysAdminHome.SearchField.editButton': 'Change assigned office'
+    'register.sysAdminHome.SearchField.editButton': 'Change assigned office',
+    'register.sysAdminHome.SearchField.placeHolderText': 'Search'
   }
 }
