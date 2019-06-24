@@ -33,6 +33,7 @@ export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
+export const SEARCH_FIELD = 'SEARCH_FIELD'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -246,6 +247,11 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   optionSection: IFormSection
 }
 
+export interface ISearchFormField extends IFormFieldBase {
+  type: typeof SEARCH_FIELD
+  onCompleted?: (response: string) => void
+}
+
 export interface IWarningField extends IFormFieldBase {
   type: typeof WARNING
 }
@@ -302,6 +308,7 @@ export type IFormField =
   | IPDFDocumentViewerFormField
   | IDynamicListFormField
   | ILoaderButton
+  | ISearchFormField
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
   IFormFieldWithDynamicDefinitions
@@ -481,6 +488,11 @@ export interface Ii18nImageUploaderWithOptionsFormField
   optionSection: IFormSection
 }
 
+export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
+  type: typeof SEARCH_FIELD
+  onCompleted?: (response: string) => void
+}
+
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
   type: typeof WARNING
 }
@@ -525,6 +537,7 @@ export type Ii18nFormField =
   | Ii18nLinkField
   | Ii18nPDFDocumentViewerFormField
   | Ii18nLoaderButtonField
+  | Ii18nSearchFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
