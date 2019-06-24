@@ -73,6 +73,10 @@ describe('when user is selecting the informant', () => {
       app
         .find('#select_parent_informant')
         .hostNodes()
+        .simulate('change')
+      app
+        .find('#continue')
+        .hostNodes()
         .simulate('click')
 
       expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
