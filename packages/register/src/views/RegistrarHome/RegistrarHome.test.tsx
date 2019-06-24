@@ -63,10 +63,12 @@ const mockUserData = {
   dateOfBirth: '2010-10-10',
   childName: [
     {
+      use: 'en',
       firstNames: 'Iliyas',
       familyName: 'Khan'
     },
     {
+      use: 'bn',
       firstNames: 'ইলিয়াস',
       familyName: 'খান'
     }
@@ -474,7 +476,7 @@ describe('RegistrarHome tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 500)
+      setTimeout(resolve, 100)
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
@@ -666,6 +668,8 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in print tab', async () => {
+    // const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
@@ -708,7 +712,9 @@ describe('RegistrarHome tests', () => {
                       firstNames: 'আহাদ',
                       familyName: 'চৌধুরী'
                     }
-                  ]
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
                 },
                 {
                   id: '54cc5b6e-539b-45a3-9529-8f56b9bc5303',
@@ -736,7 +742,9 @@ describe('RegistrarHome tests', () => {
                       firstNames: '',
                       familyName: 'আসিফ'
                     }
-                  ]
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
                 }
               ]
             }
@@ -823,7 +831,7 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
 
-  it('should show pagination bar in updates tab if items more than 11', async () => {
+  it('should show pagination bar in updates tab if items more than 10', async () => {
     const graphqlMock = [
       {
         request: {
