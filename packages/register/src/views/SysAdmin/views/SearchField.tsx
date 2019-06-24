@@ -62,7 +62,7 @@ interface IItemProps {
 
 const Item = styled.div.attrs<IItemProps>({})`
   display: flex;
-  width: ${({ width }) => (width ? width : 200)}px;
+  width: ${({ width }) => (width ? width : 280)}px;
   padding: 5px 10px;
   justify-content: ${({ isRight }) => (isRight ? 'flex-end' : 'flex-start')};
   align-items: flex-start;
@@ -77,18 +77,18 @@ const InputSection = styled.div`
   }
 `
 const messages = defineMessages({
-  title: {
-    id: 'register.sysAdminHome.SearchField.title',
-    defaultMessage: 'Assigned registration office',
-    description: 'The title'
+  modalTitle: {
+    id: 'register.sysAdminHome.SearchField.modalTitle',
+    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    description: 'Modal title'
   },
-  cancel: {
-    id: 'register.sysAdminHome.SearchField.cancel',
+  modalCancel: {
+    id: 'register.sysAdminHome.SearchField.modalCancel',
     defaultMessage: 'Cancel',
     description: 'The cancel title'
   },
-  select: {
-    id: 'register.sysAdminHome.SearchField.select',
+  modalSelect: {
+    id: 'register.sysAdminHome.SearchField.modalSelect',
     defaultMessage: 'SELECT',
     description: 'The select title'
   },
@@ -111,8 +111,10 @@ const messages = defineMessages({
 interface IProps {
   theme: ITheme
   language: string
+  fieldName: string
   fieldValue: string
   fieldLabel: string
+  isFieldRequired: boolean
   onModalComplete: (value: string) => void
 }
 interface IState {
@@ -157,7 +159,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     this.setState({
       searchText: param || '',
       showModal: !this.state.showModal,
-      isSearchField: true
+      isSearchField: !this.state.isSearchField
     })
   }
 
@@ -165,84 +167,80 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     this.toggleSearchModal()
   }
 
-  onModalComplete = (officeInput: ILocation) => {
-    this.props.onModalComplete(officeInput.id)
+  onModalComplete = (value: ILocation) => {
+    this.props.onModalComplete(value.id)
     this.setState({
       searchText: '',
       showModal: !this.state.showModal,
       isSearchField: false,
-      fieldValue: officeInput.name
+      fieldValue: value.name
     })
   }
 
   handleClick = () => {
     this.setState({
-      isSearchField: true
+      isSearchField: true,
+      searchText: this.state.fieldValue,
+      showModal: true
     })
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, fieldLabel, fieldName, isFieldRequired } = this.props
     const placeHolderText = intl.formatMessage(messages.placeHolderText)
-    const locationArray: ILocation[] = [
+    const locations: ILocation[] = [
       {
-        id: '309842043',
-        name: 'Tunbridge Wells Office',
-        detailedLocation: 'Lamberhurst, Tunbridge Wells TN3 8JN'
+        id: '79776844-b606-40e9-8358-7d82147f702a',
+        name: 'Moktarpur Union Parishad',
+        detailedLocation: 'Moktarpur, Kaliganj, Gazipur, Dhaka'
       },
       {
-        id: '309842042',
-        name: 'Tunbridge Wells Office2',
-        detailedLocation: 'Lamberhurst, Tunbridge Wells TN3 8JN'
+        id: 'd8f5e899-0461-4d58-943f-3a980733a8d3',
+        name: 'Amdia Union Parishad',
+        detailedLocation: 'Amdia, Narsingdi Sadar, Narsingdi, Dhaka'
       },
       {
-        id: '309842041',
-        name: 'Tunbridge Wells Office3',
-        detailedLocation: 'Lamberhurst, Tunbridge Wells TN3 8JN'
+        id: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
+        name: 'Bhurungamari Union Parishad',
+        detailedLocation: 'Bhurungamari, Bhurungamari, Kurigram, Rangpur'
       }
     ]
-    const selectedValue = this.state.selectedValue || locationArray[0].name
-    let selectedLocation: ILocation = locationArray[0]
-    const listItems = locationArray.map(
-      (location: ILocation, index: number) => {
-        if (location.name === selectedValue) {
-          selectedLocation = location
-        }
-        return (
-          <ItemContainer
-            key={'item-container-' + index}
-            selected={location.name === selectedValue}
-          >
-            <Item width={325}>
-              <RadioButton
-                id={'location-' + index}
-                name="location"
-                label={location.name}
-                value={location.name}
-                selected={selectedValue}
-                onChange={this.handleChange}
-              />
-            </Item>
-            <Item width={250}>{location.detailedLocation}</Item>
-            <Item
-              width={295}
-              isRight={true}
-              color={this.props.theme.colors.black}
-            >
-              {location.name === selectedValue &&
-                intl.formatMessage(messages.locationId, {
-                  locationId: location.id
-                })}
-            </Item>
-          </ItemContainer>
-        )
+    const selectedValue = this.state.selectedValue || locations[0].name
+    let selectedLocation: ILocation = locations[0]
+    const listItems = locations.map((location: ILocation, index: number) => {
+      if (location.name === selectedValue) {
+        selectedLocation = location
       }
-    )
+      return (
+        <ItemContainer
+          key={'item-container-' + index}
+          selected={location.name === selectedValue}
+        >
+          <Item>
+            <RadioButton
+              id={'location-' + index}
+              name="location"
+              label={location.name}
+              value={location.name}
+              selected={selectedValue}
+              onChange={this.handleChange}
+            />
+          </Item>
+          <Item width={250}>{location.detailedLocation}</Item>
+          <Item isRight={true} color={this.props.theme.colors.black}>
+            {location.name === selectedValue &&
+              intl.formatMessage(messages.locationId, {
+                locationId: location.id
+              })}
+          </Item>
+        </ItemContainer>
+      )
+    })
 
     return (
       <>
         {!this.state.showModal && (
-          <InputLabel required={true}>{this.props.fieldLabel}</InputLabel>
+          <InputLabel required={isFieldRequired}>{fieldLabel}</InputLabel>
         )}
         {!this.state.showModal && !this.state.isSearchField && (
           <InputSection>
@@ -270,25 +268,27 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         {this.state.showModal && (
           <ResponsiveModal
             id="office-search-modal"
-            title={intl.formatMessage(messages.title)}
+            title={intl.formatMessage(messages.modalTitle, {
+              fieldName: fieldName
+            })}
             width={918}
             contentHeight={280}
             show={true}
             handleClose={this.onModalClose}
             actions={[
               <CancelButton
-                key="cancel"
+                key="modal_cancel"
                 id="modal_cancel"
                 onClick={this.onModalClose}
               >
-                {intl.formatMessage(messages.cancel)}
+                {intl.formatMessage(messages.modalCancel)}
               </CancelButton>,
               <SelectButton
-                key="select"
+                key="modal_select"
                 id="modal_select"
                 onClick={() => this.onModalComplete(selectedLocation)}
               >
-                {intl.formatMessage(messages.select)}
+                {intl.formatMessage(messages.modalSelect)}
               </SelectButton>
             ]}
           >

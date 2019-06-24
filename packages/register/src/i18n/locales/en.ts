@@ -1107,9 +1107,9 @@ export const ENGLISH_STATE: ILanguage = {
       'What is your favorite movie?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
       'What is your favorite color?',
-    'register.sysAdminHome.SearchField.title': 'Assigned registration office',
-    'register.sysAdminHome.SearchField.cancel': 'Cancel',
-    'register.sysAdminHome.SearchField.select': 'SELECT',
+    'register.sysAdminHome.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    'register.sysAdminHome.SearchField.modalCancel': 'Cancel',
+    'register.sysAdminHome.SearchField.modalSelect': 'SELECT',
     'register.sysAdminHome.SearchField.locationId': 'Id: {locationId}',
     'register.sysAdminHome.SearchField.editButton': 'Change assigned office',
     'register.sysAdminHome.SearchField.placeHolderText': 'Search'

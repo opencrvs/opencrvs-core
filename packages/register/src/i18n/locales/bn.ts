@@ -1107,9 +1107,9 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার প্রিয় সিনেমা কি?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
       'আপনার প্রিয় রং কি?',
-    'register.sysAdminHome.SearchField.title': 'নিবন্ধন অফিস',
-    'register.sysAdminHome.SearchField.cancel': 'বাতিল',
-    'register.sysAdminHome.SearchField.select': 'নির্বাচন ',
+    'register.sysAdminHome.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
+    'register.sysAdminHome.SearchField.modalCancel': 'বাতিল',
+    'register.sysAdminHome.SearchField.modalSelect': 'নির্বাচন ',
     'register.sysAdminHome.SearchField.locationId': 'আইডি: {locationId}',
     'register.sysAdminHome.SearchField.editButton':
       'নিবন্ধন অফিস হালনাগাদ করুন',

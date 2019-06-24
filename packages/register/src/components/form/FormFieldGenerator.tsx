@@ -320,7 +320,9 @@ function GeneratedInputField({
   if (fieldDefinition.type === SEARCH_FIELD) {
     return (
       <SearchField
+        fieldName={fieldDefinition.name}
         fieldLabel={fieldDefinition.label}
+        isFieldRequired={fieldDefinition.required as boolean}
         fieldValue={fieldDefinition.initialValue as string}
         onModalComplete={(value: string) =>
           onSetFieldValue(fieldDefinition.name, value)
