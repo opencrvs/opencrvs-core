@@ -1,6 +1,7 @@
-import { IUser, IUserName } from '@user-mgnt/model/user'
-import fetch from 'node-fetch'
 import { FHIR_URL } from '@user-mgnt/constants'
+import { IUser, IUserName } from '@user-mgnt/model/user'
+import UsernameRecord from '@user-mgnt/model/usernameRecord'
+import fetch from 'node-fetch'
 
 export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
   return {
@@ -112,15 +113,28 @@ export function generateUsername(names: IUserName[]) {
     ''
   )
 
-  const username = `${initials}${
+  let proposedUsername = `${initials}${
     initials === '' ? '' : '.'
   }${family.trim().replace(/ /g, '-')}`.toLowerCase()
 
-  if (username.length < 3) {
-    throw new Error(
-      'username cannot be less than 3 characters, please provide more name details'
-    )
+  if (proposedUsername.length < 3) {
+    proposedUsername =
+      proposedUsername + '0'.repeat(3 - proposedUsername.length)
   }
 
-  return username
+  UsernameRecord.findOne({ username: proposedUsername }).then(
+    existingUsername => {
+      if (existingUsername !== null) {
+        proposedUsername += existingUsername.count
+        UsernameRecord.update(
+          { username: proposedUsername },
+          { $set: { count: existingUsername.count + 1 } }
+        )
+      } else {
+        UsernameRecord.create({ username: proposedUsername, count: 1 })
+      }
+    }
+  )
+
+  return proposedUsername
 }
