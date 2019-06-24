@@ -376,7 +376,7 @@ describe('RegistrarHome tests', () => {
     ).toContain('Sent for updates (5)')
   })
 
-  it('renders all items returned from graphql query in reivew tab', async () => {
+  it('renders all items returned from graphql query in review tab', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
@@ -412,10 +412,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '2010-10-10',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -442,10 +444,12 @@ describe('RegistrarHome tests', () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -524,10 +528,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '2010-10-10',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -554,10 +560,12 @@ describe('RegistrarHome tests', () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -691,10 +699,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '1995-09-14',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: 'Ahad',
                       familyName: 'Chowdhury'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'আহাদ',
                       familyName: 'চৌধুরী'
                     }
@@ -717,10 +727,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '1995-09-14',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: '',
                       familyName: 'Asif'
                     },
                     {
+                      use: 'bn',
                       firstNames: '',
                       familyName: 'আসিফ'
                     }
@@ -745,7 +757,7 @@ describe('RegistrarHome tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 2000)
+      setTimeout(resolve, 100)
     })
     testComponent.component.update()
 
@@ -796,6 +808,8 @@ describe('RegistrarHome tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
+
+    console.log(testComponent.component.debug())
 
     expect(
       testComponent.component.find('#pagination').hostNodes()
@@ -933,10 +947,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '2010-10-10',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -963,10 +979,12 @@ describe('RegistrarHome tests', () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -1127,10 +1145,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '2010-10-10',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -1157,10 +1177,12 @@ describe('RegistrarHome tests', () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -1312,10 +1334,12 @@ describe('RegistrarHome tests', () => {
                   dateOfBirth: '2010-10-10',
                   childName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -1342,10 +1366,12 @@ describe('RegistrarHome tests', () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      use: 'en',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      use: 'bn',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
