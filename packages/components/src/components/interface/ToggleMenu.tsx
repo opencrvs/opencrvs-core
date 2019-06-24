@@ -1,6 +1,6 @@
-import React = require('react')
 import styled from 'styled-components'
-import { Button } from '../buttons'
+
+import React = require('react')
 
 const ToggleMenuContainer = styled.div`
   position: relative;
@@ -26,7 +26,7 @@ const MenuContainer = styled.ul`
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
   top: 100%;
   right: 0;
-  padding: 0;
+  padding: 8px 0;
   margin: 0;
   list-style: none;
 `
@@ -34,7 +34,7 @@ const MenuContainer = styled.ul`
 const MenuHeader = styled.li`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
-  padding: 16px 32px 8px 16px;
+  padding: 8px 32px 8px 16px;
   border-bottom: 1px solid rgb(244, 244, 244);
   font-feature-settings: 'pnum' on, 'lnum' on;
 `
@@ -49,7 +49,7 @@ const MenuItem = styled.li`
   padding: 12px 16px;
   height: 48px;
   &:hover {
-    background-color: rgb(244, 244, 244);
+    background-color: ${({ theme }) => theme.colors.dropdownHover};
   }
   &:last-child {
     border: 0;
@@ -61,13 +61,13 @@ const MenuItemLabel = styled.span`
 `
 export interface IToggleMenuItem {
   label: string
-  icon: JSX.Element
+  icon?: JSX.Element
   handler: () => void
 }
 
 interface IProps {
   id: string
-  menuHeader: JSX.Element
+  menuHeader?: JSX.Element
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
 }
@@ -110,11 +110,9 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer>
-          <Button
-            id={`${id}ToggleButton`}
-            onClick={this.showMenu}
-            icon={() => toggleButton}
-          />
+          <Button id={`${id}ToggleButton`} onClick={this.showMenu}>
+            {toggleButton}
+          </Button>
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
@@ -131,3 +129,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     )
   }
 }
+
+const Button = styled.span`
+  cursor: pointer;
+`
