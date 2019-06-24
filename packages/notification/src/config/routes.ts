@@ -8,7 +8,8 @@ import {
 import {
   requestSchema,
   declarationNotificationSchema,
-  registrationNotificationSchema
+  registrationNotificationSchema,
+  userCredentialsNotificationSchema
 } from '@notification/features/sms/payload-schema'
 
 const enum RouteScope {
@@ -101,6 +102,21 @@ export default function getRoutes() {
         },
         validate: {
           payload: registrationNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/userCredentialsSMS',
+      handler: sendDeathRegistrationConfirmation,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user for death registration entry',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: userCredentialsNotificationSchema
         }
       }
     }

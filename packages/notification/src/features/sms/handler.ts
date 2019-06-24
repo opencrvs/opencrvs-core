@@ -40,6 +40,11 @@ interface IRegistrationPayload extends ISMSPayload {
   name: string
 }
 
+interface ICredentialsPayload extends ISMSPayload {
+  username: string
+  password: string
+}
+
 export async function sendBirthDeclarationConfirmation(
   request: HapiRequest,
   h: Hapi.ResponseToolkit
@@ -115,6 +120,28 @@ export async function sendDeathRegistrationConfirmation(
       payload.msisdn,
       request.i18n.__('deathRegistrationNotification', {
         name: payload.name
+      }),
+      /* send unicoded sms if provided local is not in non unicoded set */
+      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
+    )
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function sendUserCredentials(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as ICredentialsPayload
+  try {
+    await sendSMS(
+      payload.msisdn,
+      request.i18n.__('userCredentialsNotification', {
+        username: payload.username,
+        password: payload.password
       }),
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
