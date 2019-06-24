@@ -1,8 +1,7 @@
 import * as Hapi from 'hapi'
-import * as Joi from 'joi'
 
 import User, { IUser } from '@user-mgnt/model/user'
-import { generateSaltedHash } from '@user-mgnt/utils/password'
+import { generateSaltedHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import {
   createFhirPractitioner,
@@ -43,6 +42,7 @@ export default async function createUser(
       user.passwordHash = hash
       delete user.password
     }
+    user.status = 'pending'
     user.practitionerId = practitionerId
   } catch (err) {
     await rollback(token, practitionerId, roleId)
@@ -63,7 +63,3 @@ export default async function createUser(
 
   return h.response().code(201)
 }
-
-export const requestSchema = Joi.object({
-  userId: Joi.string().required()
-})

@@ -10,7 +10,10 @@ interface IIdentifier {
   system: string
   value: string
 }
-
+interface ISecurityQuestionAnswer {
+  questionKey: string
+  answerHash: string
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -27,6 +30,7 @@ export interface IUser {
   scope: string[]
   status: string
   deviceId?: string
+  securityQuestionAnswers?: ISecurityQuestionAnswer[]
   creationDate: number
 }
 

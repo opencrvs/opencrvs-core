@@ -6,17 +6,17 @@ interface ISaltedHash {
   salt: string
 }
 
-export function generatePasswordHash(password: string, salt: string): string {
+export function generateHash(content: string, salt: string): string {
   const hash = createHash('sha512')
   hash.update(salt)
-  hash.update(password)
+  hash.update(content)
   return hash.digest('hex')
 }
 
 export function generateSaltedHash(password: string): ISaltedHash {
   const salt = uuid()
   return {
-    hash: generatePasswordHash(password, salt),
+    hash: generateHash(password, salt),
     salt
   }
 }
