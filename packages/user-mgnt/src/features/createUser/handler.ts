@@ -9,6 +9,7 @@ import {
   postFhir,
   rollback
 } from '@user-mgnt/features/createUser/service'
+import { statuses } from '@user-mgnt/utils/userUtils'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -42,7 +43,7 @@ export default async function createUser(
       user.passwordHash = hash
       delete user.password
     }
-    user.status = 'pending'
+    user.status = statuses.PENDING
     user.practitionerId = practitionerId
   } catch (err) {
     await rollback(token, practitionerId, roleId)

@@ -4,6 +4,7 @@ import { unauthorized } from 'boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
+import { statuses } from '@user-mgnt/utils/userUtils'
 
 interface ISecurityQNA {
   questionKey: string
@@ -31,7 +32,7 @@ export default async function activateUser(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  if (user.status !== 'pending') {
+  if (user.status !== statuses.PENDING) {
     logger.error(
       `User is not in pending state for given userid: ${userUpdateData.userId}`
     )
@@ -42,7 +43,7 @@ export default async function activateUser(
   const { hash, salt } = generateSaltedHash(userUpdateData.password)
   user.salt = salt
   user.passwordHash = hash
-  user.status = 'active'
+  user.status = statuses.ACTIVE
   user.securityQuestionAnswers = userUpdateData.securityQNAs.map(
     securityQNA => {
       return {
@@ -56,7 +57,7 @@ export default async function activateUser(
     // tslint:disable-next-line
     await User.update({ _id: user._id }, user)
   } catch (err) {
-    logger.error(err)
+    logger.error(err.message)
     // return 400 if there is a validation error when updating to mongo
     return h.response().code(400)
   }
