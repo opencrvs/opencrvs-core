@@ -63,5 +63,8 @@ export const colors = {
 
   // Dividers
   dividerLight: colorDictionary.greyPearl,
-  dividerDark: colorDictionary.greyGrey
+  dividerDark: colorDictionary.greyGrey,
+
+  // Scrollbars
+  scrollBarGrey: colorDictionary.greySteel
 }
