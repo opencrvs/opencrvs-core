@@ -1,7 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Button } from '../buttons'
-import { ApplicationIcon, Cross } from '../icons'
+import { TertiaryButton, CircleButton } from '../buttons'
+import { ApplicationIcon, Cross, VerticalThreeDots } from '../icons'
+import { ToggleMenu } from '.'
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 64px;
@@ -22,17 +23,45 @@ const Item = styled.span`
 interface IProps {
   title: string
   goHome?: () => void
+  saveAction?: () => void
+  menuItems?: IToggleMenuItem[]
+}
+
+interface IToggleMenuItem {
+  label: string
+  icon?: JSX.Element
+  handler: () => void
 }
 
 export const EventTopBar = (props: IProps) => {
+  const { goHome, title, saveAction, menuItems } = props
   return (
     <TopBar>
       <Item>
         {' '}
-        <ApplicationIcon /> <TopBarTitle>{props.title}</TopBarTitle>
+        <ApplicationIcon /> <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
-        <Button icon={() => <Cross />} onClick={props.goHome} />
+        {goHome && (
+          <CircleButton onClick={goHome}>
+            <Cross />
+          </CircleButton>
+        )}
+        {saveAction && (
+          <TertiaryButton onClick={saveAction}>SAVE</TertiaryButton>
+        )}
+
+        {menuItems && (
+          <ToggleMenu
+            id="eventToggleMenu"
+            toggleButton={
+              <CircleButton>
+                <VerticalThreeDots />
+              </CircleButton>
+            }
+            menuItems={menuItems}
+          />
+        )}
       </Item>
     </TopBar>
   )
