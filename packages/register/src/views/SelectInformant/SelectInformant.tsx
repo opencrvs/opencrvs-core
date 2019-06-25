@@ -62,7 +62,11 @@ export const messages: {
     defaultMessage: 'Self (18+)',
     description: 'The title that appears when selecting self as informant'
   },
-
+  back: {
+    id: 'menu.back',
+    defaultMessage: 'Back',
+    description: 'Back button in the menu'
+  },
   errorMessage: {
     id: 'register.selectInformant.errorMessage',
     defaultMessage: 'Please select who is present and applying',
@@ -123,16 +127,10 @@ export class SelectInformantView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <Container>
+      <>
         <EventTopBar
           title={intl.formatMessage(messages.newBirthRegistration)}
-          saveAction={this.props.goHome}
-          menuItems={[
-            {
-              label: 'Delete Application',
-              handler: () => alert('delete')
-            }
-          ]}
+          goHome={this.props.goHome}
         />
 
         <BodyContent id="select_informant_view">
@@ -141,7 +139,7 @@ export class SelectInformantView extends React.Component<
             icon={() => <BackArrow />}
             onClick={this.props.goBack}
           >
-            Back
+            {intl.formatMessage(messages.back)}
           </TertiaryButton>
           <Title>{intl.formatMessage(messages.informantTitle)}</Title>
           {this.state.informant === 'error' && (
@@ -225,7 +223,7 @@ export class SelectInformantView extends React.Component<
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
-      </Container>
+      </>
     )
   }
 }
