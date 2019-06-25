@@ -105,7 +105,8 @@ const LinkFormField = styled(Link)`
 
 const FieldGroupTitle = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
-  margin: 48px 0 0;
+  margin-top: 16px;
+  margin-bottom: -2.5em;
 `
 
 type GeneratedInputFieldProps = {

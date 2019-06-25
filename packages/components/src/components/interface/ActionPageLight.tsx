@@ -8,7 +8,7 @@ const ActionContainer = styled.div`
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
+  ${({ theme }) => theme.shadows.mistyShadow};
   display: block;
   justify-content: space-between;
   align-items: center;
