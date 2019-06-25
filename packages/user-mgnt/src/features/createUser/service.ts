@@ -106,7 +106,7 @@ export const rollback = async (
   }
 }
 
-export function generateUsername(names: IUserName[]) {
+export async function generateUsername(names: IUserName[]) {
   const { given = [], family = '' } =
     names.find(name => name.use === 'en') || {}
   const initials = given.reduce(
@@ -123,12 +123,12 @@ export function generateUsername(names: IUserName[]) {
       proposedUsername + '0'.repeat(3 - proposedUsername.length)
   }
 
-  UsernameRecord.findOne({ username: proposedUsername }).then(
-    existingUsername => {
+  await UsernameRecord.findOne({ username: proposedUsername }).then(
+    async existingUsername => {
       if (existingUsername !== null) {
         proposedUsername += existingUsername.count
         UsernameRecord.update(
-          { username: proposedUsername },
+          { username: existingUsername.username },
           { $set: { count: existingUsername.count + 1 } }
         )
       } else {
