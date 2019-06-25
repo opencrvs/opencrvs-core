@@ -1151,6 +1151,10 @@ export const BENGALI_STATE: ILanguage = {
     'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
     'button.confirm': 'অনুমোদন দিন',
     'user.setup.waiting': 'আপনার অ্যাকাউন্ট সংস্থাপন করা হচ্ছে',
-    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।'
+    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।',
+    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.heading':
+      'Who is the main point of contact for this application?',
+    'register.SelectContactPoint.continueButton': 'Continue'
   }
 }

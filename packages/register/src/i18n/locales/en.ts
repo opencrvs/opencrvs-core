@@ -1150,6 +1150,10 @@ export const ENGLISH_STATE: ILanguage = {
     'label.assignedOffice': 'Assigned office',
     'button.confirm': 'Confirm',
     'user.setup.waiting': 'Setting up your account',
-    'error.occured': 'An error occured. Please try again.'
+    'error.occured': 'An error occured. Please try again.',
+    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.heading':
+      'Who is the main point of contact for this application?',
+    'register.SelectContactPoint.continueButton': 'Continue'
   }
 }
