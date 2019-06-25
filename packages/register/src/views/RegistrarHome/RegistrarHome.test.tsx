@@ -1433,4 +1433,80 @@ describe('RegistrarHome tests', () => {
     ).toBe('An error occurred while searching')
     testComponent.component.unmount()
   })
+
+  describe('shows "No result to display" text when no result is received from query', () => {
+    const noResText = 'No result to display'
+    const emptyResult = {
+      data: {
+        searchEvents: {
+          totalItems: 0,
+          results: []
+        }
+      }
+    }
+
+    it('in "progress" tab', async () => {
+      const drafts: never[] | import('../../applications').IApplication = []
+      const emptyStore = createStore().store
+
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
+        emptyStore
+      )
+
+      getItem.mockReturnValue(registerScopeToken)
+      testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      // @ts-ignore
+      testComponent.store.dispatch(storeApplication(drafts))
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      const noRecord = testComponent.component.find('#no-record')
+
+      expect(noRecord.hostNodes()).toHaveLength(1)
+      expect(noRecord.children().text()).toEqual(noResText)
+      testComponent.component.unmount()
+    })
+
+    it('in "review" tab', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: SEARCH_EVENTS,
+            variables: {
+              status: EVENT_STATUS.DECLARED,
+              locationIds: ['123456789'],
+              count: 10,
+              skip: 0
+            }
+          },
+          result: emptyResult
+        }
+      ]
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <RegistrarHome match={{ params: { tabId: 'review' } }} />,
+        store,
+        graphqlMock
+      )
+      getItem.mockReturnValue(registerScopeToken)
+      testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      const noRecord = testComponent.component.find('#no-record')
+
+      expect(noRecord.hostNodes()).toHaveLength(1)
+      expect(noRecord.children().text()).toEqual(noResText)
+      testComponent.component.unmount()
+    })
+  })
 })
