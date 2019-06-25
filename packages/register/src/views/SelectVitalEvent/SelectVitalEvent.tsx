@@ -68,12 +68,7 @@ const Actions = styled.div`
     margin-bottom: 16px;
   }
 `
-const Container = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  position: absolute;
-  width: 100%;
-  height: 100%;
-`
+
 class SelectVitalEventView extends React.Component<
   InjectedIntlProps & {
     goToBirthRegistration: typeof goToBirthRegistration
@@ -99,7 +94,7 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <Container>
+      <>
         <EventTopBar
           title={intl.formatMessage(messages.registerNewEventTitle)}
           goHome={this.props.goHome}
@@ -136,7 +131,7 @@ class SelectVitalEventView extends React.Component<
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
-      </Container>
+      </>
     )
   }
 }
