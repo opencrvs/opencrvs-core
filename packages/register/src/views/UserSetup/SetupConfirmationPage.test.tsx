@@ -6,7 +6,7 @@ import { SetupConfirmationPage } from '@register/views/UserSetup/SetupConfirmati
 
 const getItem = window.localStorage.getItem as jest.Mock
 
-describe('UserSetupPage tests', () => {
+describe('Setup confirmation page tests', () => {
   const { store } = createStore()
   beforeAll(() => {
     getItem.mockReturnValue(validToken)
