@@ -245,6 +245,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         {!this.state.showModal && !this.state.isSearchField && (
           <InputSection>
             <TextInput
+              id={this.props.fieldName + '-id'}
               value={this.state.fieldValue}
               disabled
               className="item"
