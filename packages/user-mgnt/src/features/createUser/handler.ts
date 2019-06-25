@@ -3,7 +3,8 @@ import {
   createFhirPractitionerRole,
   generateUsername,
   postFhir,
-  rollback
+  rollback,
+  sendCredentialsNotification
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser } from '@user-mgnt/model/user'
@@ -24,6 +25,7 @@ export default async function createUser(
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
+  let autoGenPassword = null
   try {
     const practitioner = createFhirPractitioner(user)
     practitionerId = await postFhir(token, practitioner)
@@ -42,7 +44,8 @@ export default async function createUser(
 
     user.status = statuses.PENDING
 
-    const { hash, salt } = generateSaltedHash(generateRandomPassowrd())
+    autoGenPassword = generateRandomPassowrd()
+    const { hash, salt } = generateSaltedHash(autoGenPassword)
     user.salt = salt
     user.passwordHash = hash
 
@@ -65,5 +68,9 @@ export default async function createUser(
     return h.response().code(400)
   }
 
+  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
+    Authorization: request.headers.authorization
+  })
+  delete user.password
   return h.response().code(201)
 }
