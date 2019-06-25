@@ -21,12 +21,16 @@ const Item = styled.span`
   align-items: center;
 `
 interface IProps {
+  id?: string
   title: string
   goHome?: () => void
-  saveAction?: () => void
+  saveAction?: ISaveAction
   menuItems?: IToggleMenuItem[]
 }
-
+interface ISaveAction {
+  handler: () => void
+  label: string
+}
 interface IToggleMenuItem {
   label: string
   icon?: JSX.Element
@@ -48,7 +52,9 @@ export const EventTopBar = (props: IProps) => {
           </CircleButton>
         )}
         {saveAction && (
-          <TertiaryButton onClick={saveAction}>SAVE</TertiaryButton>
+          <TertiaryButton onClick={saveAction.handler} id="save_draft">
+            {saveAction.label}
+          </TertiaryButton>
         )}
 
         {menuItems && (

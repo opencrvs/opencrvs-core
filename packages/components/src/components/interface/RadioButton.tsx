@@ -34,6 +34,7 @@ const Check = styled.span.attrs<{ size?: string }>({})`
   width: 28px;`}
   border-radius: 50%;
   align-items: center;
+
   & > span {
     display: flex;
     ${({ size }) =>
@@ -57,9 +58,13 @@ const Input = styled.input`
   width: 40px;
   height: 40px;
   cursor: pointer;
+  &:focus ~ ${Check} {
+    box-shadow: ${({ theme }) => theme.colors.focus} 0 0 0 4px;
+  }
   /* stylelint-disable */
   &:checked ~ ${Check} > span {
     /* stylelint-enable */
+
     background: ${({ theme }) => theme.colors.copy};
   }
 `
@@ -93,7 +98,7 @@ export class RadioButton extends React.Component<IRadioButton> {
           value={value.toString()}
           onChange={this.onChange}
         />
-        <Check size={size}>
+        <Check size={size} selected={selected}>
           <span />
         </Check>
         <Label size={size} htmlFor={id}>
