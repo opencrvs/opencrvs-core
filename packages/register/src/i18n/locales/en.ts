@@ -1112,6 +1112,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.sysAdminHome.SearchField.modalSelect': 'SELECT',
     'register.sysAdminHome.SearchField.locationId': 'Id: {locationId}',
     'register.sysAdminHome.SearchField.editButton': 'Change assigned office',
-    'register.sysAdminHome.SearchField.placeHolderText': 'Search'
+    'register.sysAdminHome.SearchField.placeHolderText': 'Search',
+    'userSetup.complete.title': 'Account setup complete',
+    'userSetup.complete.instruction':
+      'Now login to your account with your user name and newly created password',
+    'userSetup.complete.button.login': 'Login'
   }
 }

@@ -1113,6 +1113,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.sysAdminHome.SearchField.locationId': 'আইডি: {locationId}',
     'register.sysAdminHome.SearchField.editButton':
       'নিবন্ধন অফিস হালনাগাদ করুন',
-    'register.sysAdminHome.SearchField.placeHolderText': 'অনুসন্ধান'
+    'register.sysAdminHome.SearchField.placeHolderText': 'অনুসন্ধান',
+    'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
+    'userSetup.complete.instruction':
+      'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
+    'userSetup.complete.button.login': 'লগইন'
   }
 }
