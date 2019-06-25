@@ -90,7 +90,6 @@ interface IGridTableProps {
   content: IDynamicValues[]
   columns: IColumn[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
-  expandedContentRows?: IExpandedContentPreference[]
   arrowExpansionButtons?: boolean
   noResultText: string
   hideTableHeader?: boolean
