@@ -1,16 +1,15 @@
-import * as Hapi from 'hapi'
-
-import User, { IUser } from '@user-mgnt/model/user'
-import { generateSaltedHash } from '@user-mgnt/utils/hash'
-import { logger } from '@user-mgnt/logger'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
+  generateUsername,
   postFhir,
-  rollback,
-  generateUsername
+  rollback
 } from '@user-mgnt/features/createUser/service'
+import { logger } from '@user-mgnt/logger'
+import User, { IUser } from '@user-mgnt/model/user'
+import { generateSaltedHash } from '@user-mgnt/utils/hash'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import * as Hapi from 'hapi'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -55,7 +54,7 @@ export default async function createUser(
 
   // save user in user-mgnt data store
   try {
-    user.username = generateUsername(user.name)
+    user.username = await generateUsername(user.name)
     await User.create(user)
   } catch (err) {
     logger.error(err)
