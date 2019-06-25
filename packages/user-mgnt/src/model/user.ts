@@ -1,4 +1,5 @@
 import { model, Schema, Document } from 'mongoose'
+import { statuses } from '@user-mgnt/utils/userUtils'
 
 interface IUserName {
   use: string
@@ -10,7 +11,10 @@ interface IIdentifier {
   system: string
   value: string
 }
-
+interface ISecurityQuestionAnswer {
+  questionKey: string
+  answerHash: string
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -27,6 +31,7 @@ export interface IUser {
   scope: string[]
   status: string
   deviceId?: string
+  securityQuestionAnswers?: ISecurityQuestionAnswer[]
   creationDate: number
 }
 
@@ -74,8 +79,8 @@ const userSchema = new Schema({
   scope: { type: [String], required: true },
   status: {
     type: String,
-    enum: ['pending', 'active', 'disabled'],
-    default: 'pending'
+    enum: [statuses.PENDING, statuses.ACTIVE, statuses.DISABLED],
+    default: statuses.PENDING
   },
   securityQuestionAnswers: [SecurityQuestionAnswerSchema],
   deviceId: String,

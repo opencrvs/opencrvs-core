@@ -10,7 +10,7 @@ beforeEach(async () => {
 })
 
 const token = jwt.sign(
-  { scope: ['register'] },
+  { scope: ['sysadmin'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',

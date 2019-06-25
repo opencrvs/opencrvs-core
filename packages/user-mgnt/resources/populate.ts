@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose'
 
 import User from '../src/model/user'
 import Role from '../src/model/role'
-import { generateSaltedHash } from '../src/utils/password'
+import { generateSaltedHash } from '../src/utils/hash'
 import { MONGO_URL } from '../src/constants'
 mongoose.connect(MONGO_URL)
 
@@ -32,20 +32,7 @@ const fieldAgent = new User({
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const registrationClerk = new User({
@@ -72,20 +59,7 @@ const registrationClerk = new User({
     '4b100ad2-ac0d-4970-85df-d4fb8ed79808',
     'b9958fa4-5c6e-4037-9f6a-fbad315344f9'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_COLOR',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const localRegistrar = new User({
@@ -112,20 +86,7 @@ const localRegistrar = new User({
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const districtRegistrar = new User({
@@ -147,20 +108,7 @@ const districtRegistrar = new User({
   practitionerId: '4522ce59-3742-4989-9159-bea7f45d1d89',
   primaryOfficeId: '95754572-ab6f-407b-b51a-1636cb3d0683',
   catchmentAreaIds: ['b21ce04e-7ccd-4d65-929f-453bc193a736'],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const stateRegistrar = new User({
@@ -182,20 +130,7 @@ const stateRegistrar = new User({
   practitionerId: '936aec8d-f5bf-48f6-a4fd-d1505010ac82',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
   catchmentAreaIds: [],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_COLOR',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const nationalRegistrar = new User({
@@ -217,20 +152,7 @@ const nationalRegistrar = new User({
   practitionerId: '636840d9-3e0a-4f9a-86a2-9c0b542c122d',
   primaryOfficeId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
   catchmentAreaIds: [],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const fieldAgent2 = new User({
@@ -257,20 +179,7 @@ const fieldAgent2 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_COLOR',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const fieldAgent3 = new User({
@@ -297,20 +206,7 @@ const fieldAgent3 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const registrationClerk2 = new User({
@@ -337,20 +233,7 @@ const registrationClerk2 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const registrationClerk3 = new User({
@@ -377,20 +260,7 @@ const registrationClerk3 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const localRegistrar2 = new User({
@@ -417,20 +287,7 @@ const localRegistrar2 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_COLOR',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const localRegistrar3 = new User({
@@ -457,20 +314,7 @@ const localRegistrar3 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const fieldAgent4 = new User({
@@ -497,20 +341,7 @@ const fieldAgent4 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_COLOR',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const registrationClerk4 = new User({
@@ -537,20 +368,7 @@ const registrationClerk4 = new User({
     '441c6133-06ca-4a2b-bf23-024347d340c8',
     '74b72216-ae78-4587-b505-b27b3f109e1b'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_TEACHER',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FIRST_SCHOOL',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const sysAdmin = new User({
@@ -577,20 +395,7 @@ const sysAdmin = new User({
     '7719942b-16a7-474a-8af1-cd0c94c730d2',
     '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
   ],
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FATHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_COLOR',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ]
+  securityQuestionAnswers: []
 })
 
 const users = [
