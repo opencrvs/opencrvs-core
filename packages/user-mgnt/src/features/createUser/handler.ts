@@ -7,7 +7,10 @@ import {
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser } from '@user-mgnt/model/user'
-import { generateSaltedHash } from '@user-mgnt/utils/hash'
+import {
+  generateSaltedHash,
+  generateRandomPassowrd
+} from '@user-mgnt/utils/hash'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Hapi from 'hapi'
 
@@ -37,13 +40,12 @@ export default async function createUser(
       )
     }
 
-    if (user.password) {
-      const { hash, salt } = generateSaltedHash(user.password)
-      user.salt = salt
-      user.passwordHash = hash
-      delete user.password
-    }
     user.status = statuses.PENDING
+
+    const { hash, salt } = generateSaltedHash(generateRandomPassowrd())
+    user.salt = salt
+    user.passwordHash = hash
+
     user.practitionerId = practitionerId
   } catch (err) {
     await rollback(token, practitionerId, roleId)
