@@ -3,7 +3,8 @@ import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
   sendDeathDeclarationConfirmation,
-  sendDeathRegistrationConfirmation
+  sendDeathRegistrationConfirmation,
+  sendUserCredentials
 } from '@notification/features/sms/handler'
 import {
   requestSchema,
@@ -108,10 +109,10 @@ export default function getRoutes() {
     {
       method: 'POST',
       path: '/userCredentialsSMS',
-      handler: sendDeathRegistrationConfirmation,
+      handler: sendUserCredentials,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for death registration entry',
+        description: 'Sends an sms to a user with credentials',
         auth: {
           scope: [RouteScope.REGISTER]
         },
