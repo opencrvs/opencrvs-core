@@ -65,7 +65,7 @@ context('Birth Registration Integration Test', () => {
   })
 
   it('Tests from application to registration using maximum input', () => {
-    // LOGIN
+    // LOGIN AS FIELD WORKER
     cy.login('fieldWorker')
     // CREATE PIN
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
@@ -83,18 +83,18 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_parent_informant').click()
     // APPLICATION FORM
     // CHILD DETAILS
-    cy.get('#firstNames').type('গায়ত্রী')
-    cy.get('#familyName').type('স্পিভক')
-    cy.get('#firstNamesEng').type('Gayatri')
-    cy.get('#familyNameEng').type('Spivak')
-    cy.selectOption('#gender', 'Female', 'Female')
-    cy.get('#childBirthDate-dd').type('01')
-    cy.get('#childBirthDate-mm').type('08')
-    cy.get('#childBirthDate-yyyy').type('2018')
-    cy.selectOption('#attendantAtBirth', 'Midwife', 'Midwife')
+    cy.get('#firstNames').type('মারুফ')
+    cy.get('#familyName').type('হোসাইন')
+    cy.get('#firstNamesEng').type('Maruf')
+    cy.get('#familyNameEng').type('Hossain')
+    cy.selectOption('#gender', 'Male', 'Male')
+    cy.get('#childBirthDate-dd').type('22')
+    cy.get('#childBirthDate-mm').type('10')
+    cy.get('#childBirthDate-yyyy').type('1994')
+    cy.selectOption('#attendantAtBirth', 'Physician', 'Physician')
     cy.selectOption('#birthType', 'Single', 'Single')
     cy.get('#multipleBirth').type('1')
-    cy.get('#weightAtBirth').type('1')
+    cy.get('#weightAtBirth').type('1.5')
     cy.selectOption('#placeOfBirth', 'Hospital', 'Hospital')
     cy.wait(1000)
     cy.get('#next_section').click()
@@ -102,17 +102,17 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#iDType', 'National ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
-    cy.get('#firstNames').type('গায়ত্রী')
-    cy.get('#familyName').type('স্পিভক')
-    cy.get('#firstNamesEng').type('Gayatri')
-    cy.get('#familyNameEng').type('Spivak')
-    cy.get('#motherBirthDate-dd').type('01')
-    cy.get('#motherBirthDate-mm').type('08')
-    cy.get('#motherBirthDate-yyyy').type('2010')
+    cy.get('#firstNames').type('হাবিবা')
+    cy.get('#familyName').type('আক্তার')
+    cy.get('#firstNamesEng').type('Habiba')
+    cy.get('#familyNameEng').type('Aktar')
+    cy.get('#motherBirthDate-dd').type('23')
+    cy.get('#motherBirthDate-mm').type('10')
+    cy.get('#motherBirthDate-yyyy').type('1971')
     cy.selectOption('#maritalStatus', 'Married', 'Married')
-    cy.get('#dateOfMarriage-dd').type('01')
-    cy.get('#dateOfMarriage-mm').type('08')
-    cy.get('#dateOfMarriage-yyyy').type('2018')
+    cy.get('#dateOfMarriage-dd').type('05')
+    cy.get('#dateOfMarriage-mm').type('05')
+    cy.get('#dateOfMarriage-yyyy').type('1990')
     cy.selectOption(
       '#educationalAttainment',
       'Upper secondary',
@@ -133,17 +133,17 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#iDType', 'National ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
-    cy.get('#firstNames').type('গায়ত্রী')
-    cy.get('#familyName').type('স্পিভক')
-    cy.get('#firstNamesEng').type('Gayatri')
-    cy.get('#familyNameEng').type('Spivak')
+    cy.get('#firstNames').type('বোরহান')
+    cy.get('#familyName').type('উদ্দিন')
+    cy.get('#firstNamesEng').type('Borhan')
+    cy.get('#familyNameEng').type('Uddin')
     cy.get('#fatherBirthDate-dd').type('01')
     cy.get('#fatherBirthDate-mm').type('08')
-    cy.get('#fatherBirthDate-yyyy').type('2010')
+    cy.get('#fatherBirthDate-yyyy').type('1966')
     cy.selectOption('#maritalStatus', 'Married', 'Married')
-    cy.get('#dateOfMarriage-dd').type('01')
-    cy.get('#dateOfMarriage-mm').type('08')
-    cy.get('#dateOfMarriage-yyyy').type('2018')
+    cy.get('#dateOfMarriage-dd').type('05')
+    cy.get('#dateOfMarriage-mm').type('05')
+    cy.get('#dateOfMarriage-yyyy').type('1990')
     cy.selectOption(
       '#educationalAttainment',
       'Upper secondary',
@@ -177,7 +177,7 @@ context('Birth Registration Integration Test', () => {
     )
     cy.selectOption('#whoseContactDetails', 'Father', 'Father')
     cy.get('#registrationPhone').type('01711111111')
-    cy.get('#commentsOrNotes').type('note')
+    cy.get('#commentsOrNotes').type('Comments')
     cy.wait(1000)
     cy.get('#next_section').click()
     // DOCUMENTS
@@ -190,5 +190,25 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
+    cy.wait(1000)
+    // LOG OUT
+    cy.get('#mobile_header_left').click()
+    cy.get('.sc-hzDEsm > .sc-fOICqy > .sc-bGbJRg').click()
+    // LOGIN AS REGISTRAR
+    cy.get('#mobile').type('01733333333')
+    cy.get('#password').type('test')
+    cy.get('#login-mobile-submit').click()
+    cy.get('#code').type('000000')
+    cy.get('#login-mobile-submit').click()
+    // LANDING PAGE
+    cy.get('#row_0 > #ActionWrapper > #ListItemAction > #Review').click()
+    cy.wait(500)
+    cy.get('#next_button_child').click()
+    cy.get('#next_button_mother').click()
+    cy.get('#next_button_father').click()
+    cy.get('#registerApplicationBtn').click()
+    // MODAL
+    cy.get('#register_confirm').click()
+    cy.wait(1000)
   })
 })
