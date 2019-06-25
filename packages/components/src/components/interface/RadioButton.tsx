@@ -98,7 +98,7 @@ export class RadioButton extends React.Component<IRadioButton> {
           value={value.toString()}
           onChange={this.onChange}
         />
-        <Check size={size} selected={selected}>
+        <Check size={size}>
           <span />
         </Check>
         <Label size={size} htmlFor={id}>
