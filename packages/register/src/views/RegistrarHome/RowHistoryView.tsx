@@ -11,10 +11,7 @@ import {
   GQLHumanName,
   GQLQuery,
   GQLComment,
-  GQLBirthRegistration,
-  GQLContactPoint,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet
+  GQLBirthRegistration
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   createNamesMap,
