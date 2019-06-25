@@ -425,7 +425,7 @@ describe('Verify handlers', () => {
     const spy = fetch.once('')
 
     const token = jwt.sign(
-      { scope: ['register'] },
+      { scope: ['sysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         algorithm: 'RS256',
@@ -455,7 +455,7 @@ describe('Verify handlers', () => {
     const spy = fetch.once('')
 
     const token = jwt.sign(
-      { scope: ['register'] },
+      { scope: ['sysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         algorithm: 'RS256',
@@ -486,7 +486,7 @@ describe('Verify handlers', () => {
       .mockImplementationOnce(() => Promise.reject(new Error()))
 
     const token = jwt.sign(
-      { scope: ['register'] },
+      { scope: ['sysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         algorithm: 'RS256',

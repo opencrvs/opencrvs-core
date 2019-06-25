@@ -16,7 +16,8 @@ import {
 const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
-  CERTIFY = 'certify'
+  CERTIFY = 'certify',
+  SYSADMIN = 'sysadmin'
 }
 
 export default function getRoutes() {
@@ -114,7 +115,7 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [RouteScope.SYSADMIN]
         },
         validate: {
           payload: userCredentialsNotificationSchema
