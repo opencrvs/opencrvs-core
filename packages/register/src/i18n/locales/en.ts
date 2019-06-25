@@ -1088,6 +1088,20 @@ export const ENGLISH_STATE: ILanguage = {
     'table.column.header.name': 'Name',
     'table.column.header.role': 'Role',
     'table.column.header.type': 'Type',
-    'table.column.header.status': 'Status'
+    'table.column.header.status': 'Status',
+    'register.userSetup.securityQuestions.BIRTH_TOWN':
+      'In what city were you born?',
+    'register.userSetup.securityQuestions.FIRST_SCHOOL':
+      'What is the name of your first school?',
+    'register.userSetup.securityQuestions.MOTHER_NICK_NAME':
+      "What is your mother's nick name?",
+    'register.userSetup.securityQuestions.FATHER_NICK_NAME':
+      "What is your father's nick name?",
+    'register.userSetup.securityQuestions.FAVORITE_TEACHER':
+      'Who is your favorite teacher?',
+    'register.userSetup.securityQuestions.FAVORITE_MOVIE':
+      'What is your favorite movie?',
+    'register.userSetup.securityQuestions.FAVORITE_COLOR':
+      'What is your favorite color?'
   }
 }

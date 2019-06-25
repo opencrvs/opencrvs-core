@@ -65,5 +65,27 @@ export const resolvers: GQLResolver = {
       })
       return await res.json()
     }
+  },
+
+  Mutation: {
+    async activateUser(_, { userId, password, securityQNAs }, authHeader) {
+      const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, password, securityQNAs }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      const response = await res.json()
+      if (response.statusCode !== '201') {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't activate given user"
+          )
+        )
+      }
+      return response
+    }
   }
 }

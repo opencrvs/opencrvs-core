@@ -170,4 +170,46 @@ describe('User root resolvers', () => {
       expect(response.results).toEqual([dummyUserList[2]])
     })
   })
+  describe('activateUser mutation', () => {
+    it('activates the pending user', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '201'
+        })
+      )
+
+      const response = await resolvers.Mutation.activateUser(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          password: 'test',
+          securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+        }
+      )
+
+      expect(response).toEqual({
+        statusCode: '201'
+      })
+    })
+    it('throws error if /activateUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '401'
+        })
+      )
+
+      expect(
+        resolvers.Mutation.activateUser(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            password: 'test',
+            securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          }
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't activate given user"
+      )
+    })
+  })
 })
