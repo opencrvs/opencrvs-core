@@ -581,7 +581,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'Back to homescreen',
     'register.savedRegistration.buttons.newDeclaration': 'New application',
     'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
-
+    'register.selectVitalEvent.saveExitButton': 'SAVE & EXIT',
     'register.selectVitalEvent.registerNewEventTitle': 'New application',
     'register.selectVitalEvent.registerNewEventHeading':
       'What type of event do you want to declare?',
