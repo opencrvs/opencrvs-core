@@ -15,12 +15,23 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { FormTitle, Action } from '@register/views/SysAdmin/views/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Dispatch } from 'redux'
+import { submitUserFormData } from '@register/views/SysAdmin/forms/userReducer'
+import ApolloClient from 'apollo-client'
+import { createUserMutation } from '@register/views/SysAdmin/user/mutations'
+import { draftToGqlTransformer } from '@register/transformer'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
-interface IUserReviewFormProps {
+export interface IUserReviewFormProps {
   section: IFormSection
-  goToCreateUserSection: typeof goToCreateUserSection
-  goBack: typeof goBack
   formData: IFormSectionData
+  client: ApolloClient<unknown>
+}
+
+interface IDispatchProps {
+  goToCreateUserSection: (sec: string, fieldName: string) => void
+  submitForm: () => void
+  goBack: typeof goBack
 }
 
 interface ISectionData {
@@ -43,7 +54,9 @@ const messages = defineMessages({
   }
 })
 
-class UserReviewFormComponent extends React.Component<IFullProps> {
+class UserReviewFormComponent extends React.Component<
+  IFullProps & IDispatchProps
+> {
   transformSectionData = () => {
     const { intl, formData } = this.props
     const dataEntries = Object.entries(formData)
@@ -59,8 +72,7 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
           action: {
             id: `btn${field.name}`,
             label: intl.formatMessage(messages.actionChange),
-            handler: () =>
-              this.props.goToCreateUserSection('userForm', field.name)
+            handler: () => this.props.goToCreateUserSection('user', field.name)
           }
         })
       }
@@ -77,10 +89,6 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
     return foundField
   }
 
-  handleSubmit = () => {
-    console.log('TO DO')
-  }
-
   render() {
     const { intl, section } = this.props
 
@@ -94,7 +102,7 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
           <DataSection key={index} {...sec} />
         ))}
         <Action>
-          <PrimaryButton onClick={this.handleSubmit}>
+          <PrimaryButton onClick={this.props.submitForm}>
             {intl.formatMessage(messages.submit)}
           </PrimaryButton>
         </Action>
@@ -103,7 +111,21 @@ class UserReviewFormComponent extends React.Component<IFullProps> {
   }
 }
 
+const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
+  return {
+    goToCreateUserSection: (sec: string, fieldName: string) =>
+      dispatch(goToCreateUserSection(sec, fieldName)),
+    goBack: () => dispatch(goBack()),
+    submitForm: () => {
+      const variables = draftToGqlTransformer(
+        { sections: [userSection] },
+        { user: props.formData }
+      )
+      dispatch(submitUserFormData(props.client, createUserMutation, variables))
+    }
+  }
+}
 export const UserReviewForm = connect(
   null,
-  { goToCreateUserSection, goBack }
-)(injectIntl(UserReviewFormComponent))
+  mapDispatchToProps
+)(injectIntl<IFullProps & IDispatchProps>(UserReviewFormComponent))

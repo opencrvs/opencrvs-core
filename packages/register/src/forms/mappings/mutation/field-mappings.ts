@@ -327,3 +327,20 @@ export const fieldToPhoneNumberTransformer = (
   ].telecom = [{ system: 'phone', value: draftData[sectionId][field.name] }]
   return transformedData
 }
+
+export const fieldToIdentifierWithTypeTransformer = (
+  identifierType: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = [{}]
+  }
+  sectionData.identifier[0].system = identifierType
+  sectionData.identifier[0].value = draftData[sectionId][field.name]
+  return transformedData
+}

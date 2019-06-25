@@ -1,11 +1,16 @@
-import { LoopReducer, Loop } from 'redux-loop'
+import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 import { IFormSectionData, IForm } from '@register/forms'
 import { Action } from 'redux'
 import { defineMessages } from 'react-intl'
+import ApolloClient from 'apollo-client'
+import { goToHome } from '@register/navigation'
 
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
+const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
+const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
+const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -35,7 +40,9 @@ const initialState: IUserFormState = {
       }
     ]
   },
-  userFormData: {}
+  userFormData: {},
+  submitting: false,
+  submissionError: false
 }
 
 interface IUserFormDataModifyAction {
@@ -56,17 +63,58 @@ export function modifyUserFormData(
   }
 }
 
+interface IUserFormDataSubmitAction {
+  type: typeof SUBMIT_USER_FORM_DATA
+  payload: {
+    client: ApolloClient<unknown>
+    mutation: any
+    variables: object
+  }
+}
+
+export function submitUserFormData(
+  client: ApolloClient<unknown>,
+  mutation: any,
+  variables: object
+): IUserFormDataSubmitAction {
+  return {
+    type: SUBMIT_USER_FORM_DATA,
+    payload: {
+      client,
+      mutation,
+      variables
+    }
+  }
+}
+
 export function clearUserFormData(): Action {
   return {
     type: CLEAR_USER_FORM_DATA
   }
 }
 
-type UserFormAction = IUserFormDataModifyAction | Action
+export function submitSuccess(): Action {
+  return {
+    type: SUBMIT_USER_FORM_DATA_SUCCESS
+  }
+}
+
+export function submitFail(): Action {
+  return {
+    type: SUBMIT_USER_FORM_DATA_FAIL
+  }
+}
+
+type UserFormAction =
+  | IUserFormDataModifyAction
+  | IUserFormDataSubmitAction
+  | Action
 
 export interface IUserFormState {
   userForm: IForm
   userFormData: IFormSectionData
+  submitting: boolean
+  submissionError: boolean
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
@@ -80,10 +128,27 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
     case CLEAR_USER_FORM_DATA:
-      return {
-        ...state,
-        userFormData: {}
-      }
+      return initialState
+    case SUBMIT_USER_FORM_DATA:
+      const {
+        client,
+        mutation,
+        variables
+      } = (action as IUserFormDataSubmitAction).payload
+      return loop(
+        { ...state, submitting: true },
+        Cmd.run(() => client.mutate({ mutation, variables }), {
+          successActionCreator: submitSuccess,
+          failActionCreator: submitFail
+        })
+      )
+    case SUBMIT_USER_FORM_DATA_SUCCESS:
+      return loop(
+        { ...state, submitting: false, submissionError: false },
+        Cmd.list([Cmd.action(clearUserFormData()), Cmd.action(goToHome())])
+      )
+    case SUBMIT_USER_FORM_DATA_FAIL:
+      return { ...state, submitting: false, submissionError: true }
     default:
       return state
   }

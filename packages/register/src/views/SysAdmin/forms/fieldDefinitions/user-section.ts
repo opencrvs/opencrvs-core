@@ -5,6 +5,11 @@ import {
   englishOnlyNameFormat,
   phoneNumberFormat
 } from '@register/utils/validate'
+import {
+  fieldToNameTransformer,
+  fieldNameTransformer,
+  fieldToIdentifierWithTypeTransformer
+} from '@register/forms/mappings/mutation/field-mappings'
 
 const messages = defineMessages({
   userForm: {
@@ -85,7 +90,7 @@ const messages = defineMessages({
 })
 
 export const userSection: IFormSection = {
-  id: 'userForm',
+  id: 'user',
   viewType: 'form',
   name: messages.userForm,
   title: messages.userFormTitle,
@@ -99,36 +104,48 @@ export const userSection: IFormSection = {
       validate: []
     },
     {
-      name: 'firstNameBn',
+      name: 'firstNames',
       type: TEXT,
       label: messages.firstNameBn,
       required: false,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat]
+      validate: [bengaliOnlyNameFormat],
+      mapping: {
+        mutation: fieldToNameTransformer('bn')
+      }
     },
     {
-      name: 'lastNameBn',
+      name: 'familyName',
       type: TEXT,
       label: messages.lastNameBn,
       required: true,
       initialValue: '',
-      validate: [bengaliOnlyNameFormat]
+      validate: [bengaliOnlyNameFormat],
+      mapping: {
+        mutation: fieldToNameTransformer('bn')
+      }
     },
     {
-      name: 'firstNameEn',
+      name: 'firstNamesEng',
       type: TEXT,
       label: messages.firstNameEn,
       required: false,
       initialValue: '',
-      validate: [englishOnlyNameFormat]
+      validate: [englishOnlyNameFormat],
+      mapping: {
+        mutation: fieldToNameTransformer('en', 'firstNames')
+      }
     },
     {
-      name: 'lastNameEn',
+      name: 'familyNameEng',
       type: TEXT,
       label: messages.lastNameEn,
       required: true,
       initialValue: '',
-      validate: [englishOnlyNameFormat]
+      validate: [englishOnlyNameFormat],
+      mapping: {
+        mutation: fieldToNameTransformer('en', 'familyName')
+      }
     },
     {
       name: 'phoneNumber',
@@ -136,7 +153,10 @@ export const userSection: IFormSection = {
       label: messages.phoneNumber,
       required: true,
       initialValue: '',
-      validate: [phoneNumberFormat]
+      validate: [phoneNumberFormat],
+      mapping: {
+        mutation: fieldNameTransformer('mobile')
+      }
     },
     {
       name: 'nid',
@@ -144,7 +164,10 @@ export const userSection: IFormSection = {
       label: messages.NID,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      mapping: {
+        mutation: fieldToIdentifierWithTypeTransformer('NATIONAL_ID')
+      }
     },
     {
       name: 'accountDetails',
@@ -193,7 +216,10 @@ export const userSection: IFormSection = {
       label: messages.registrationOffice,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      mapping: {
+        mutation: fieldNameTransformer('primaryOffice')
+      }
     }
   ]
 }
