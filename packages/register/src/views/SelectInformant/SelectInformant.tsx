@@ -78,12 +78,7 @@ export const messages: {
     description: 'Continue Button Text'
   }
 })
-const Container = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  position: absolute;
-  width: 100%;
-  height: 100%;
-`
+
 const BodyContent = styled.div`
   max-width: 940px;
   margin: auto;
@@ -92,7 +87,7 @@ const BodyContent = styled.div`
 `
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
-  margin: 0;
+  margin-bottom: 16px;
 `
 const Actions = styled.div`
   padding: 32px 0;
@@ -118,10 +113,10 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    if (this.state.informant === 'error') {
-      this.setState({ informant: 'error' })
-    } else {
+    if (this.state.informant.length > 0) {
       this.props.informantRegistration(this.state.informant)
+    } else {
+      this.setState({ informant: 'error' })
     }
   }
   render() {
@@ -143,7 +138,9 @@ export class SelectInformantView extends React.Component<
           </TertiaryButton>
           <Title>{intl.formatMessage(messages.informantTitle)}</Title>
           {this.state.informant === 'error' && (
-            <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
+            <span id="error_text">
+              <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
+            </span>
           )}
           <Actions id="select_parent_informant">
             <RadioButton

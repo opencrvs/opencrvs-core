@@ -71,9 +71,51 @@ describe('when user is selecting the informant', () => {
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration by parent informant view', () => {
       app
-        .find('#select_parent_informant')
+        .find('#select_informant_someone')
         .hostNodes()
         .simulate('change')
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+    })
+  })
+  describe('when click continue without select anything', () => {
+    it('show the error message', () => {
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      expect(app.find('#error_text').hostNodes()).toHaveLength(1)
+    })
+  })
+
+  describe('when traverse list then continue', () => {
+    it('takes user to the birth registration by parent informant view', () => {
+      app
+        .find('#select_informant_mother')
+        .hostNodes()
+        .simulate('change')
+      app
+        .find('#select_informant_father')
+        .hostNodes()
+        .simulate('change')
+      app
+        .find('#select_informant_parents')
+        .hostNodes()
+        .simulate('change')
+      app
+        .find('#select_informant_self')
+        .hostNodes()
+        .simulate('change')
+      app
+        .find('#select_informant_someone')
+        .hostNodes()
+        .simulate('change')
+
       app
         .find('#continue')
         .hostNodes()

@@ -509,7 +509,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.someoneElse': 'Someone Else',
     'register.selectInformant.self': 'Self (18+)',
     'register.selectInformant.errorMessage':
-      'দয়া করে আবেদন করার সময় কে উপস্থিত ছিল সেটা নির্বাচন করুন',
+      'Please select who is present and applying',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
