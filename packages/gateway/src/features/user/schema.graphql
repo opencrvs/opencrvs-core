@@ -41,6 +41,11 @@ type SearchUserResult {
   totalItems: Int
 }
 
+input SecurityQuestionAnswer {
+  questionKey: String
+  answer: String
+}
+
 type Query {
   getUser(userId: String): User
   searchUsers(
@@ -58,4 +63,9 @@ type Query {
 
 type Mutation {
   createUser(user: UserInput!): User!
+  activateUser(
+    userId: String!
+    password: String!
+    securityQNAs: [SecurityQuestionAnswer]!
+  ): String
 }

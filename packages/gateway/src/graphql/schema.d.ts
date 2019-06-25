@@ -561,6 +561,7 @@ export interface GQLMutation {
   markDeathAsRegistered: string
   markDeathAsCertified: string
   createUser: GQLUser
+  activateUser?: string
 }
 
 export interface GQLNotificationInput {
@@ -767,6 +768,11 @@ export interface GQLDeathRegistrationInput {
   causeOfDeath?: string
   createdAt?: GQLDate
   updatedAt?: GQLDate
+}
+
+export interface GQLSecurityQuestionAnswer {
+  questionKey?: string
+  answer?: string
 }
 
 export interface GQLDummy {
@@ -2553,6 +2559,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   createUser?: MutationToCreateUserResolver<TParent>
+  activateUser?: MutationToActivateUserResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2780,6 +2787,20 @@ export interface MutationToCreateUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToCreateUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToActivateUserArgs {
+  userId: string
+  password: string
+  securityQNAs: Array<GQLSecurityQuestionAnswer | null>
+}
+export interface MutationToActivateUserResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToActivateUserArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

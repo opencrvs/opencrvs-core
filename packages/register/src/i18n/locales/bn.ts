@@ -1094,6 +1094,24 @@ export const BENGALI_STATE: ILanguage = {
     'table.column.header.name': 'নাম',
     'table.column.header.role': 'দায়িত্ব',
     'table.column.header.type': 'ধরন',
-    'table.column.header.status': 'অবস্থা'
+    'table.column.header.status': 'অবস্থা',
+    'register.userSetup.securityQuestions.BIRTH_TOWN':
+      'কোন শহরে আপনার জন্ম হয়?',
+    'register.userSetup.securityQuestions.FIRST_SCHOOL':
+      'আপনার প্রথম স্কুলের নাম কি?',
+    'register.userSetup.securityQuestions.MOTHER_NICK_NAME':
+      'আপনার মা এর ডাক নাম কি?',
+    'register.userSetup.securityQuestions.FATHER_NICK_NAME':
+      'আপনার বাবার ডাক নাম কি?',
+    'register.userSetup.securityQuestions.FAVORITE_TEACHER':
+      'আপনার প্রিয় শিক্ষক কে?',
+    'register.userSetup.securityQuestions.FAVORITE_MOVIE':
+      'আপনার প্রিয় সিনেমা কি?',
+    'register.userSetup.securityQuestions.FAVORITE_COLOR':
+      'আপনার প্রিয় রং কি?',
+    'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
+    'userSetup.complete.instruction':
+      'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
+    'userSetup.complete.button.login': 'লগইন'
   }
 }
