@@ -17,13 +17,15 @@ import createUser from '@user-mgnt/features/createUser/handler'
 import getRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
+import activateUser, {
+  requestSchema as activateUserRequestSchema
+} from '@user-mgnt/features/activateUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
-  SYSTEM = 'system',
   SYSADMIN = 'sysadmin'
 }
 
@@ -82,9 +84,10 @@ export const getRoutes = () => {
       config: {
         auth: {
           scope: [
-            RouteScope.SYSTEM,
-            // TODO: need to remove this once system role token is there
+            RouteScope.DECLARE,
             RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN
           ]
         },
@@ -123,11 +126,22 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [
-            RouteScope.SYSTEM,
-            // TODO: need to remove this once system role token is there
-            RouteScope.REGISTER
-          ]
+          scope: [RouteScope.SYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/activateUser',
+      handler: activateUser,
+      config: {
+        tags: ['api'],
+        description: 'Activate an existing pending user',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: activateUserRequestSchema
         }
       }
     },
@@ -137,11 +151,7 @@ export const getRoutes = () => {
       handler: getRoles,
       config: {
         auth: {
-          scope: [
-            RouteScope.SYSTEM,
-            // TODO: need to remove this once system role token is there
-            RouteScope.REGISTER
-          ]
+          scope: [RouteScope.SYSADMIN]
         },
         validate: {
           payload: searchRoleSchema
