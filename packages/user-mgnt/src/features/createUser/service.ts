@@ -1,7 +1,8 @@
-import { FHIR_URL } from '@user-mgnt/constants'
+import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 import { IUser, IUserName } from '@user-mgnt/model/user'
 import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import fetch from 'node-fetch'
+import { logger } from '@user-mgnt/logger'
 
 export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
   return {
@@ -137,4 +138,31 @@ export function generateUsername(names: IUserName[]) {
   )
 
   return proposedUsername
+}
+
+export async function sendCredentialsNotification(
+  msisdn: string,
+  username: string,
+  password: string,
+  authHeader: { Authorization: string }
+) {
+  const url = `${NOTIFICATION_SERVICE_URL}${
+    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
+  }userCredentialsSMS`
+  try {
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        msisdn,
+        username,
+        password
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
+  }
 }
