@@ -12,12 +12,13 @@ type UserIdentifier { # -> identifier
 
 input UserInput {
   name: [HumanNameInput]
+  identifier: [UserIdentifierInput]
   username: String
   mobile: String
   role: String
   email: String
-  primaryOffice: LocationInput
-  catchmentArea: [LocationInput]
+  primaryOffice: String
+  catchmentArea: [String]
 }
 
 type User {
@@ -53,4 +54,8 @@ type Query {
     skip: Int
     sort: String
   ): SearchUserResult
+}
+
+type Mutation {
+  createUser(user: UserInput!): User!
 }

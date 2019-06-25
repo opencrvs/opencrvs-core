@@ -65,5 +65,20 @@ export const resolvers: GQLResolver = {
       })
       return await res.json()
     }
+  },
+
+  Mutation: {
+    async createUser(_, { user }, authHeader) {
+      const res = await fetch(`${USER_MANAGEMENT_URL}createUser`, {
+        method: 'POST',
+        body: JSON.stringify(user),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      return await res.json()
+    }
   }
 }
