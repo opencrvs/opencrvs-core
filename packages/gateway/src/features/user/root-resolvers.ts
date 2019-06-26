@@ -28,7 +28,7 @@ export const resolvers: GQLResolver = {
         locationId = null,
         count = 10,
         skip = 0,
-        sort = 'asc'
+        sort = 'desc'
       },
       authHeader
     ) {
