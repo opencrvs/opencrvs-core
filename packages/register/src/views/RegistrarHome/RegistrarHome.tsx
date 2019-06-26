@@ -21,12 +21,7 @@ import {
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLQuery
-  // GQLEventSearchSet,
-  // GQLBirthEventSearchSet,
-  // GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema.d'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
@@ -60,7 +55,6 @@ import {
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
 import { transformData } from '@register/search/transformer'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
-import { formatDateWithTime } from '@register/utils/date-formatting'
 import styled from 'styled-components'
 import { withTheme } from '@register/styledComponents'
 
@@ -477,9 +471,15 @@ export class RegistrarHomeView extends React.Component<
         ...reg,
         dateOfRegistration:
           (reg.modifiedAt &&
-            moment(formatDateWithTime(reg.modifiedAt)).fromNow()) ||
+            moment(
+              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
           ((reg.createdAt &&
-            moment(formatDateWithTime(reg.createdAt)).fromNow()) ||
+            moment(
+              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
             ''),
         actions
       }
@@ -741,6 +741,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                     currentPage={this.state.reviewCurrentPage}
                     expandable={true}
+                    arrowExpansionButtons={true}
                   />
                 </BodyContent>
               )
@@ -841,6 +842,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                     currentPage={this.state.updatesCurrentPage}
                     expandable={true}
+                    arrowExpansionButtons={true}
                   />
                 </BodyContent>
               )
@@ -904,14 +906,14 @@ export class RegistrarHomeView extends React.Component<
                         label: this.props.intl.formatMessage(
                           messages.listItemName
                         ),
-                        width: 23,
+                        width: 25,
                         key: 'name'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemRegisteredDate
                         ),
-                        width: 22,
+                        width: 25,
                         key: 'dateOfRegistration'
                       },
                       {
@@ -925,7 +927,7 @@ export class RegistrarHomeView extends React.Component<
                         label: this.props.intl.formatMessage(
                           messages.listItemAction
                         ),
-                        width: 9,
+                        width: 10,
                         key: 'actions',
                         alignment: ColumnContentAlignment.CENTER,
                         isActionColumn: true
@@ -944,7 +946,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                     currentPage={this.state.updatesCurrentPage}
                     expandable={true}
-                    // arrowExpansionButtons={true}
+                    arrowExpansionButtons={true}
                   />
                 </BodyContent>
               )
