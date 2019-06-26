@@ -218,7 +218,10 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
         <ActionPageLight
           title={intl.formatMessage(messages.newPassword)}
           goBack={() => {
-            this.props.goToStep(ProtectedAccoutStep.LANDING, {})
+            this.props.goToStep(
+              ProtectedAccoutStep.LANDING,
+              this.props.setupData
+            )
           }}
         >
           <Header>{intl.formatMessage(messages.header)}</Header>

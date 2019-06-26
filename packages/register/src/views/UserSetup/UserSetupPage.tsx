@@ -88,6 +88,7 @@ const messages: {
 
 interface IUserSetupPageProp {
   userDetails: IUserDetails | null
+  setupData: IProtectedAccountSetupData
   goToStep: (
     step: ProtectedAccoutStep,
     data: IProtectedAccountSetupData
@@ -97,7 +98,7 @@ export class UserSetupView extends React.Component<
   IUserSetupPageProp & InjectedIntlProps
 > {
   render() {
-    const { intl, userDetails, goToStep } = this.props
+    const { intl, userDetails, goToStep, setupData } = this.props
     return (
       <Page>
         <Container id="user-setup-landing-page">
@@ -133,7 +134,7 @@ export class UserSetupView extends React.Component<
           </InstructionHolder>
           <NextButton
             id="user-setup-start-button"
-            onClick={() => goToStep(ProtectedAccoutStep.PASSWORD, {})}
+            onClick={() => goToStep(ProtectedAccoutStep.PASSWORD, setupData)}
           >
             {intl.formatMessage(messages.startButtonLabel)}
           </NextButton>

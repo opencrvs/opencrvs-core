@@ -49,7 +49,7 @@ export class ProtectedAccount extends React.Component<
     const { currentStep, setupData } = this.state
     switch (currentStep) {
       case ProtectedAccoutStep.LANDING:
-        return <UserSetupPage goToStep={this.goToStep} />
+        return <UserSetupPage goToStep={this.goToStep} setupData={setupData} />
       case ProtectedAccoutStep.PASSWORD:
         return <CreatePassword goToStep={this.goToStep} setupData={setupData} />
     }
