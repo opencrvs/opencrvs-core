@@ -68,7 +68,7 @@ class UserReviewFormComponent extends React.Component<
           label: intl.formatMessage(field.label),
           value: (formData[field.name] && String(formData[field.name])) || '',
           action: {
-            id: `btn${field.name}`,
+            id: `btn_change_${field.name}`,
             label: intl.formatMessage(messages.actionChange),
             handler: () => this.props.goToCreateUserSection('user', field.name)
           }
@@ -87,12 +87,14 @@ class UserReviewFormComponent extends React.Component<
         title={intl.formatMessage(section.title)}
         goBack={this.props.goBack}
       >
-        <FormTitle>{intl.formatMessage(section.name)}</FormTitle>
+        <FormTitle id={`${section.id}_title`}>
+          {intl.formatMessage(section.name)}
+        </FormTitle>
         {this.transformSectionData().map((sec, index) => (
           <DataSection key={index} {...sec} />
         ))}
         <Action>
-          <PrimaryButton onClick={this.props.submitForm}>
+          <PrimaryButton id="submit_user_form" onClick={this.props.submitForm}>
             {intl.formatMessage(messages.submit)}
           </PrimaryButton>
         </Action>

@@ -88,7 +88,7 @@ class UserFormComponent extends React.Component<IFullProps> {
             }}
           />
           <Action>
-            <PrimaryButton onClick={this.handleFormAction}>
+            <PrimaryButton id="confirm_form" onClick={this.handleFormAction}>
               {intl.formatMessage(messages.continue)}
             </PrimaryButton>
           </Action>

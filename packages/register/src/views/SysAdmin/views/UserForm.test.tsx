@@ -8,9 +8,9 @@ import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/use
 
 const { store } = createStore()
 
-describe('Create new user page tests', async () => {
+describe('Create new user page tests', () => {
   let component: ReactWrapper
-  beforeEach(async () => {
+  beforeEach(() => {
     const testComponent = createTestComponent(
       // @ts-ignore
       <UserForm section={userSection} />,
@@ -22,8 +22,8 @@ describe('Create new user page tests', async () => {
   it('it checks component has loaded', () => {
     // @ts-ignore
     expect(component.containsMatchingElement(ActionPageLight)).toBe(true)
-    component.find('input#firstNameEn').simulate('change', {
-      target: { id: 'firstNameEn', value: 'test' }
+    component.find('input#firstNamesEng').simulate('change', {
+      target: { id: 'firstNamesEng', value: 'test' }
     })
 
     component.unmount()
