@@ -886,7 +886,7 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
 
-  it.only('Should render pagination in progress tab if data is more than 10', async () => {
+  it('Should render pagination in progress tab if data is more than 10', async () => {
     jest.clearAllMocks()
     for (let i = 0; i < 12; i++) {
       const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
