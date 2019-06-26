@@ -1,4 +1,7 @@
-import { formatLongDate } from '@register/utils/date-formatting'
+import {
+  formatLongDate,
+  formatDateWithTime
+} from '@register/utils/date-formatting'
 
 describe('date formatting tests', () => {
   it('formats long date with or without localization', () => {
@@ -7,5 +10,11 @@ describe('date formatting tests', () => {
 
     expect(formatLongDate('2018-11-15', 'bn', 'L')).toBe('১৫-১১-২০১৮')
     expect(formatLongDate('2018-11-15', 'bn', 'LL')).toBe('১৫ নভেম্বর ২০১৮')
+  })
+
+  it('formats date that is in number format', () => {
+    const date = new Date(2019, 6, 26, 11, 58, 34)
+    const int = String(date.getTime())
+    expect(formatDateWithTime(int)).toBe('2019-07-26 11:58:34')
   })
 })
