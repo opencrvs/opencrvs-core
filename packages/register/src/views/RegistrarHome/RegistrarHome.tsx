@@ -62,7 +62,7 @@ import { transformData } from '@register/search/transformer'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
 import { formatDateWithTime } from '@register/utils/date-formatting'
 import styled from 'styled-components'
-import { withTheme } from '@register/styledComponents';
+import { withTheme } from '@register/styledComponents'
 
 export interface IProps extends IButtonProps {
   active?: boolean
