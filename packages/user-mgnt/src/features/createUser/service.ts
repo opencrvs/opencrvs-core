@@ -1,6 +1,8 @@
-import { IUser } from '@user-mgnt/model/user'
+import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
+import { IUser, IUserName } from '@user-mgnt/model/user'
+import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import fetch from 'node-fetch'
-import { FHIR_URL } from '@user-mgnt/constants'
+import { logger } from '@user-mgnt/logger'
 
 export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
   return {
@@ -101,5 +103,66 @@ export const rollback = async (
 
   if (roleId) {
     await deleteFhir(token, 'PractitionerRole', roleId)
+  }
+}
+
+export async function generateUsername(names: IUserName[]) {
+  const { given = [], family = '' } =
+    names.find(name => name.use === 'en') || {}
+  const initials = given.reduce(
+    (accumulated, current) => accumulated + current.trim().charAt(0),
+    ''
+  )
+
+  let proposedUsername = `${initials}${
+    initials === '' ? '' : '.'
+  }${family.trim().replace(/ /g, '-')}`.toLowerCase()
+
+  if (proposedUsername.length < 3) {
+    proposedUsername =
+      proposedUsername + '0'.repeat(3 - proposedUsername.length)
+  }
+
+  await UsernameRecord.findOne({ username: proposedUsername }).then(
+    async existingUsername => {
+      if (existingUsername !== null) {
+        proposedUsername += existingUsername.count
+        UsernameRecord.update(
+          { username: existingUsername.username },
+          { $set: { count: existingUsername.count + 1 } }
+        )
+      } else {
+        UsernameRecord.create({ username: proposedUsername, count: 1 })
+      }
+    }
+  )
+
+  return proposedUsername
+}
+
+export async function sendCredentialsNotification(
+  msisdn: string,
+  username: string,
+  password: string,
+  authHeader: { Authorization: string }
+) {
+  const url = `${NOTIFICATION_SERVICE_URL}${
+    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
+  }userCredentialsSMS`
+  try {
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        msisdn,
+        username,
+        password
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
   }
 }

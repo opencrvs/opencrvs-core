@@ -9,8 +9,9 @@ const Wrapper = styled.div`
   align-items: center;
 `
 
-const Label = styled.label.attrs<{ size?: string }>({})`
-  color: ${({ theme }) => theme.colors.copy};
+const Label = styled.label.attrs<{ size?: string; disabled?: boolean }>({})`
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
   ${({ size, theme }) =>
     size === 'large'
@@ -22,10 +23,12 @@ const Label = styled.label.attrs<{ size?: string }>({})`
     margin-left: 8px;`}
 `
 
-const Check = styled.span.attrs<{ size?: string }>({})`
+const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
   display: flex;
   justify-content: center;
-  border: 2px solid ${({ theme }) => theme.colors.copy};
+  border: 2px solid
+    ${({ theme, disabled }) =>
+      disabled ? theme.colors.disabled : theme.colors.copy};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
@@ -34,6 +37,8 @@ const Check = styled.span.attrs<{ size?: string }>({})`
   width: 28px;`}
   border-radius: 50%;
   align-items: center;
+  ${({ disabled }) => (disabled ? `&:focus { box-shadow:none}` : '')}
+
   & > span {
     display: flex;
     ${({ size }) =>
@@ -50,16 +55,22 @@ const Check = styled.span.attrs<{ size?: string }>({})`
   }
 `
 
-const Input = styled.input`
+const Input = styled.input.attrs<{ disabled?: boolean }>({})`
   position: absolute;
   opacity: 0;
   z-index: 2;
   width: 40px;
   height: 40px;
   cursor: pointer;
+  &:focus ~ ${Check} {
+    box-shadow: ${({ theme, disabled }) =>
+        disabled ? theme.colors.white : theme.colors.focus}
+      0 0 0 4px;
+  }
   /* stylelint-disable */
   &:checked ~ ${Check} > span {
     /* stylelint-enable */
+
     background: ${({ theme }) => theme.colors.copy};
   }
 `
@@ -72,31 +83,35 @@ interface IRadioButton {
   label: string
   value: Value
   selected?: string
+  disabled?: boolean
   size?: string
-  onChange: (value: Value) => void
+  onChange?: (value: Value) => void
 }
 
 export class RadioButton extends React.Component<IRadioButton> {
   onChange = () => {
-    this.props.onChange(this.props.value)
+    if (this.props.onChange) {
+      this.props.onChange(this.props.value)
+    }
   }
   render() {
-    const { id, name, selected, label, value, size } = this.props
+    const { id, name, selected, label, value, size, disabled } = this.props
     return (
       <Wrapper>
         <Input
           id={id}
+          disabled={disabled}
           role="radio"
           checked={value === selected}
           type="radio"
           name={name}
           value={value.toString()}
-          onChange={this.onChange}
+          onChange={disabled ? () => null : this.onChange}
         />
-        <Check size={size}>
-          <span />
+        <Check disabled={disabled} size={size}>
+          {disabled ? '' : <span />}
         </Check>
-        <Label size={size} htmlFor={id}>
+        <Label disabled={disabled} size={size} htmlFor={id}>
           {label}
         </Label>
       </Wrapper>

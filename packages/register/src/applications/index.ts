@@ -114,10 +114,10 @@ const initialState = {
   applications: []
 }
 
-export function createApplication(event: Event) {
+export function createApplication(event: Event, initialData?: IFormData) {
   return {
     id: uuid(),
-    data: {},
+    data: initialData || {},
     event,
     submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
   }

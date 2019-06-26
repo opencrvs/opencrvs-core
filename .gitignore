@@ -19,3 +19,5 @@ build
 !.secrets/.gitignore
 .idea
 data
+
+.vscode/launch.json

@@ -500,6 +500,16 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
+    'register.selectInformant.newBirthRegistration': 'New birth application',
+    'register.selectInformant.informantTitle':
+      'Who is applying for birth registration?',
+    'register.selectInformant.mother': 'Mother',
+    'register.selectInformant.father': 'Father',
+    'register.selectInformant.parents': 'Mother & Father',
+    'register.selectInformant.someoneElse': 'Someone Else',
+    'register.selectInformant.self': 'Self',
+    'register.selectInformant.errorMessage':
+      'Please select who is present and applying',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
@@ -571,21 +581,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'Back to homescreen',
     'register.savedRegistration.buttons.newDeclaration': 'New application',
     'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
-    'register.selectInformant.newBirthRegistration': 'New birth application',
-    'register.selectInformant.informantTitle': 'Who is the informant?',
-    'register.selectInformant.informantDescription':
-      'Tell us who is providing the details, and check what information is needed to submit the form.',
-    'register.selectInformant.parentInformantTitle': 'Parent',
-    'register.selectInformant.parentInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>child, mother</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>father.</strong>',
-    'register.selectInformant.otherInformantTitle': 'Someone else',
-    'register.selectInformant.otherInformantDescription':
-      'Required: Details of the child and informant. Optional: Details of the mother/father.',
-    'register.selectInformant.selfInformantTitle': 'Self (18+)',
-    'register.selectInformant.selfInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
+    'register.selectVitalEvent.saveExitButton': 'SAVE & EXIT',
     'register.selectVitalEvent.registerNewEventTitle': 'New application',
     'register.selectVitalEvent.registerNewEventHeading':
       'What type of event do you want to declare?',
@@ -1107,6 +1103,12 @@ export const ENGLISH_STATE: ILanguage = {
       'What is your favorite movie?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
       'What is your favorite color?',
+    'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    'formFields.SearchField.modalCancel': 'Cancel',
+    'formFields.SearchField.modalSelect': 'SELECT',
+    'formFields.SearchField.locationId': 'Id: {locationId}',
+    'formFields.SearchField.editButton': 'Change assigned office',
+    'formFields.SearchField.placeHolderText': 'Search',
     'userSetup.complete.title': 'Account setup complete',
     'userSetup.complete.instruction':
       'Now login to your account with your user name and newly created password',
