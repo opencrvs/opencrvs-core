@@ -82,7 +82,7 @@ import { FetchButtonField } from '@register/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
 import { gqlToDraftTransformer } from '@register/transformer'
-import { SearchField } from '@register/views/SysAdmin/views/SearchField'
+import { SearchField } from './SearchField'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
