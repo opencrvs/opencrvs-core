@@ -13,8 +13,8 @@ describe('date formatting tests', () => {
   })
 
   it('formats date that is in number format', () => {
-    const date = new Date(2019, 6, 26, 11, 58, 34)
+    const date = new Date(2019, 6, 6, 1, 8, 4)
     const int = String(date.getTime())
-    expect(formatDateWithTime(int)).toBe('2019-07-26 11:58:34')
+    expect(formatDateWithTime(int)).toBe('2019-07-06 01:08:04')
   })
 })
