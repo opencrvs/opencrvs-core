@@ -924,58 +924,6 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
 
-  it('should show pagination bar if items more than 11 in PrintTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: SEARCH_EVENTS,
-          variables: {
-            status: EVENT_STATUS.REGISTERED,
-            locationIds: ['123456789'],
-            count: 10,
-            skip: 0
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 14,
-              results: userData
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
-    expect(
-      testComponent.component.find('#pagination').hostNodes()
-    ).toHaveLength(1)
-
-    testComponent.component
-      .find('#pagination button')
-      .last()
-      .hostNodes()
-      .simulate('click')
-    testComponent.component.unmount()
-  })
-
   it('renders expanded area for ready to review', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
