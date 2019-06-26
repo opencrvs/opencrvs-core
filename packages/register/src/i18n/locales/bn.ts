@@ -1152,9 +1152,15 @@ export const BENGALI_STATE: ILanguage = {
     'button.confirm': 'অনুমোদন দিন',
     'user.setup.waiting': 'আপনার অ্যাকাউন্ট সংস্থাপন করা হচ্ছে',
     'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।',
-    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.title': 'জন্ম আবেদন',
     'register.SelectContactPoint.heading':
-      'Who is the main point of contact for this application?',
-    'register.SelectContactPoint.continueButton': 'Continue'
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম  কে ?',
+    'register.SelectContactPoint.continueButton': 'চালিয়ে যান',
+    'register.SelectContactPoint.motherLabel': 'মা',
+    'register.SelectContactPoint.fatherLabel': 'বাবা',
+    'register.SelectContactPoint.otherLabel': 'অন্য',
+    'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
+    'register.SelectContactPoint.relationShipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.goBack': 'ফিরে যান'
   }
 }

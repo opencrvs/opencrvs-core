@@ -1154,6 +1154,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.title': 'Birth application',
     'register.SelectContactPoint.heading':
       'Who is the main point of contact for this application?',
-    'register.SelectContactPoint.continueButton': 'Continue'
+    'register.SelectContactPoint.continueButton': 'Continue',
+    'register.SelectContactPoint.motherLabel': 'Mother',
+    'register.SelectContactPoint.fatherLabel': 'Father',
+    'register.SelectContactPoint.otherLabel': 'Other',
+    'register.SelectContactPoint.phoneNoLabel': 'Phone number',
+    'register.SelectContactPoint.relationShipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.goBack': 'Back'
   }
 }

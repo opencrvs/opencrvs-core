@@ -2,6 +2,7 @@ export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 export const SELECT_INFORMANT = '/events/birth'
 export const SELECT_PRIMARY_APPLICANT = '/events/birth/parents/primary'
+export const SELECT_MAIN_CONTACT_POINT = '/events/birth/:applicant/contact'
 
 export const DRAFT_BIRTH_PARENT_FORM =
   '/drafts/:applicationId/events/birth/parent'
