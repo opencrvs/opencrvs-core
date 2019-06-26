@@ -10,6 +10,10 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { LightLogo } from '@opencrvs/components/lib/icons'
 import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  ProtectedAccoutStep,
+  IProtectedAccountSetupData
+} from '@register/components/ProtectedAccount'
 
 export const Page = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
@@ -82,11 +86,19 @@ const messages: {
   }
 })
 
+interface IUserSetupPageProp {
+  userDetails: IUserDetails | null
+  setupData: IProtectedAccountSetupData
+  goToStep: (
+    step: ProtectedAccoutStep,
+    data: IProtectedAccountSetupData
+  ) => void
+}
 export class UserSetupView extends React.Component<
-  { userDetails: IUserDetails | null } & InjectedIntlProps
+  IUserSetupPageProp & InjectedIntlProps
 > {
   render() {
-    const { intl, userDetails } = this.props
+    const { intl, userDetails, goToStep, setupData } = this.props
     return (
       <Page>
         <Container id="user-setup-landing-page">
@@ -120,7 +132,10 @@ export class UserSetupView extends React.Component<
           <InstructionHolder>
             {intl.formatMessage(messages.instruction)}
           </InstructionHolder>
-          <NextButton id="user-setup-start-button">
+          <NextButton
+            id="user-setup-start-button"
+            onClick={() => goToStep(ProtectedAccoutStep.PASSWORD, setupData)}
+          >
             {intl.formatMessage(messages.startButtonLabel)}
           </NextButton>
         </Container>
