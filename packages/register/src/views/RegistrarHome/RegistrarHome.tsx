@@ -60,6 +60,9 @@ import {
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
 import { transformData } from '@register/search/transformer'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+import { formatDateWithTime } from '@register/utils/date-formatting'
+import styled from 'styled-components'
+import { withTheme } from '@register/styledComponents';
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -280,33 +283,6 @@ export const EVENT_STATUS = {
   REGISTERED: 'REGISTERED'
 }
 
-function formatDate(date: string): string {
-  const d = new Date(Number(date))
-  let month = String(d.getMonth() + 1)
-  let day = String(d.getDate())
-  let year = String(d.getFullYear())
-  let hour = String(d.getHours())
-  let minute = String(d.getMinutes())
-  let second = String(d.getSeconds())
-
-  if (month.length < 2) {
-    month = '0' + month
-  }
-  if (day.length < 2) {
-    day = '0' + day
-  }
-  if (hour.length < 2) {
-    hour = '0' + hour
-  }
-  if (minute.length < 2) {
-    minute = '0' + minute
-  }
-  if (second.length < 2) {
-    second = '0' + second
-  }
-  return [year, month, day].join('-') + ' ' + [hour, minute, second].join(':')
-}
-
 export class RegistrarHomeView extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
@@ -500,8 +476,10 @@ export class RegistrarHomeView extends React.Component<
       return {
         ...reg,
         dateOfRegistration:
-          (reg.modifiedAt && moment(formatDate(reg.modifiedAt)).fromNow()) ||
-          ((reg.createdAt && moment(formatDate(reg.createdAt)).fromNow()) ||
+          (reg.modifiedAt &&
+            moment(formatDateWithTime(reg.modifiedAt)).fromNow()) ||
+          ((reg.createdAt &&
+            moment(formatDateWithTime(reg.createdAt)).fromNow()) ||
             ''),
         actions
       }
@@ -966,7 +944,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                     currentPage={this.state.updatesCurrentPage}
                     expandable={true}
-                    arrowExpansionButtons={true}
+                    // arrowExpansionButtons={true}
                   />
                 </BodyContent>
               )
