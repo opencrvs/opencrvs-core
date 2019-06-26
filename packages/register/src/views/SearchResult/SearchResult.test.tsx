@@ -363,7 +363,6 @@ describe('SearchResult tests', () => {
     })
 
     testComponent.component.update()
-    testComponent.component.debug()
     expect(
       testComponent.component
         .find('#search-result-error-text')
