@@ -11,7 +11,7 @@ import { LightLogo } from '@opencrvs/components/lib/icons'
 import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
-const Page = styled.div`
+export const Page = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
@@ -20,14 +20,14 @@ const Page = styled.div`
   flex-direction: column;
   text-align: center;
 `
-const Container = styled.div`
+export const Container = styled.div`
   position: relative;
   height: auto;
   padding: 0px;
   margin: 125px auto 0px auto;
   max-width: 460px;
 `
-const LogoContainer = styled.div`
+export const LogoContainer = styled.div`
   flex-direction: row;
   display: flex;
   justify-content: center;

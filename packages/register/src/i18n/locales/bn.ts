@@ -1102,6 +1102,11 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার প্রিয় শিক্ষক কে?',
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'আপনার প্রিয় সিনেমা কি?',
-    'register.userSetup.securityQuestions.FAVORITE_COLOR': 'আপনার প্রিয় রং কি?'
+    'register.userSetup.securityQuestions.FAVORITE_COLOR':
+      'আপনার প্রিয় রং কি?',
+    'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
+    'userSetup.complete.instruction':
+      'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
+    'userSetup.complete.button.login': 'লগইন'
   }
 }

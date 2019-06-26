@@ -1102,6 +1102,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'What is your favorite movie?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
-      'What is your favorite color?'
+      'What is your favorite color?',
+    'userSetup.complete.title': 'Account setup complete',
+    'userSetup.complete.instruction':
+      'Now login to your account with your user name and newly created password',
+    'userSetup.complete.button.login': 'Login'
   }
 }
