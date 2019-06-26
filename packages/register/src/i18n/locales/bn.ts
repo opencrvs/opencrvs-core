@@ -580,7 +580,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectInformant.father': 'পিতা',
     'register.selectInformant.parents': 'পিতা ও মাতা ',
     'register.selectInformant.someoneElse': 'অন্য কেউ',
-    'register.selectInformant.self': 'নিজ (১৮+)',
+    'register.selectInformant.self': 'নিজের',
     'register.selectInformant.errorMessage':
       'Please select who is present and applying',
     'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',

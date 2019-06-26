@@ -507,7 +507,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.father': 'Father',
     'register.selectInformant.parents': 'Mother & Father',
     'register.selectInformant.someoneElse': 'Someone Else',
-    'register.selectInformant.self': 'Self (18+)',
+    'register.selectInformant.self': 'Self',
     'register.selectInformant.errorMessage':
       'Please select who is present and applying',
     'register.form.newBirthRegistration': 'New birth application',

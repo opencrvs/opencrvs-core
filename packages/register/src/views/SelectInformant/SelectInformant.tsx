@@ -59,7 +59,7 @@ export const messages: {
   },
   self: {
     id: 'register.selectInformant.self',
-    defaultMessage: 'Self (18+)',
+    defaultMessage: 'Self',
     description: 'The title that appears when selecting self as informant'
   },
   back: {

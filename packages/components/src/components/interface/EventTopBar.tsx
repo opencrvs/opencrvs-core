@@ -42,7 +42,6 @@ export const EventTopBar = (props: IProps) => {
   return (
     <TopBar>
       <Item>
-        {' '}
         <ApplicationIcon /> <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
