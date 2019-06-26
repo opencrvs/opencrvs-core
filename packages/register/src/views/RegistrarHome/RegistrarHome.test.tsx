@@ -140,7 +140,7 @@ describe('RegistrarHome tests', () => {
       <RegistrarHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'print'
           },
           isExact: true,
           path: '',
@@ -668,8 +668,7 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
   it('renders all items returned from graphql query in print tab', async () => {
-    // const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
+    const TIME_STAMP = '1544188309380'
     const graphqlMock = [
       {
         request: {
@@ -697,8 +696,8 @@ describe('RegistrarHome tests', () => {
                     registeredLocationId:
                       '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
                     duplicates: null,
-                    createdAt: '1560855235444',
-                    modifiedAt: null
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
                   },
                   dateOfBirth: '1995-09-14',
                   childName: [
@@ -727,7 +726,7 @@ describe('RegistrarHome tests', () => {
                     registeredLocationId:
                       '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
                     duplicates: null,
-                    createdAt: '1560495096884',
+                    createdAt: TIME_STAMP,
                     modifiedAt: null
                   },
                   dateOfBirth: '1995-09-14',
@@ -770,10 +769,17 @@ describe('RegistrarHome tests', () => {
     testComponent.component.update()
 
     const data = testComponent.component.find(GridTable).prop('content')
+    const EXPECTED_DATE_OF_REJECTION = moment(
+      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+      'YYYY-MM-DD HH:mm:ss'
+    ).fromNow()
 
     expect(data.length).toBe(2)
     expect(data[1].actions).toBeDefined()
-
+    expect(data[1].id).toBe('54cc5b6e-539b-45a3-9529-8f56b9bc5303')
+    expect(data[1].contactNumber).toBe('01712345678')
+    expect(data[1].dateOfRegistration).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].event).toBe('Birth')
     testComponent.component.unmount()
   })
 
@@ -912,6 +918,60 @@ describe('RegistrarHome tests', () => {
     const pagiBtn = testComponent.component.find('#pagination')
 
     expect(pagiBtn.hostNodes()).toHaveLength(1)
+    testComponent.component
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+    testComponent.component.unmount()
+  })
+
+  it('should show pagination bar if items more than 11 in PrintTab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 14,
+              results: userData
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    console.log(testComponent.component.debug())
+
+    expect(
+      testComponent.component.find('#pagination').hostNodes()
+    ).toHaveLength(1)
+
     testComponent.component
       .find('#pagination button')
       .last()
@@ -1308,6 +1368,196 @@ describe('RegistrarHome tests', () => {
     )
     testComponent.component.unmount()
   })
+  it('renders expanded area for print items', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: '2019333494BW0UTHRR6',
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      use: 'bn',
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: '2019333494DW0UTHR6',
+                    contactNumber: '01622688231',
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: '2007-01-01',
+                    modifiedAt: '2007-01-01'
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      use: 'bn',
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+              registration: {
+                id: '345678',
+                type: 'BIRTH',
+                certificates: null,
+                status: [
+                  {
+                    id:
+                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    timestamp: '2019-04-03T07:08:24.936Z',
+                    user: {
+                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful'
+                        },
+                        {
+                          use: 'bn',
+                          firstNames: '',
+                          familyName: ''
+                        }
+                      ],
+                      role: 'LOCAL_REGISTRAR'
+                    },
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
+                    type: 'REGISTERED',
+                    comments: [
+                      {
+                        comment: 'reason=duplicate&comment=dup'
+                      }
+                    ]
+                  }
+                ],
+                contactPhoneNumber: '01711111111'
+              },
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Mushraful',
+                    familyName: 'Hoque'
+                  }
+                ],
+                birthDate: '01-01-1984'
+              },
+              deceased: null,
+              informant: null
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+    testComponent.component.update()
+    const instance = testComponent.component.find(GridTable).instance() as any
+
+    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#REGISTERED-0').hostNodes().length
+    ).toBe(1)
+    testComponent.component.unmount()
+  })
   it('expanded block renders error text when an error occurs', async () => {
     const graphqlMock = [
       {
@@ -1491,6 +1741,76 @@ describe('RegistrarHome tests', () => {
       const testComponent = createTestComponent(
         // @ts-ignore
         <RegistrarHome match={{ params: { tabId: 'review' } }} />,
+        store,
+        graphqlMock
+      )
+      getItem.mockReturnValue(registerScopeToken)
+      testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      const noRecord = testComponent.component.find('#no-record')
+
+      expect(noRecord.hostNodes()).toHaveLength(1)
+      expect(noRecord.children().text()).toEqual(noResText)
+      testComponent.component.unmount()
+    })
+    it('in "update" tab', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: SEARCH_EVENTS,
+            variables: {
+              status: EVENT_STATUS.REJECTED,
+              locationIds: ['123456789'],
+              count: 10,
+              skip: 0
+            }
+          },
+          result: emptyResult
+        }
+      ]
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
+        store,
+        graphqlMock
+      )
+      getItem.mockReturnValue(registerScopeToken)
+      testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      const noRecord = testComponent.component.find('#no-record')
+
+      expect(noRecord.hostNodes()).toHaveLength(1)
+      expect(noRecord.children().text()).toEqual(noResText)
+      testComponent.component.unmount()
+    })
+    it('in "print" tab', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: SEARCH_EVENTS,
+            variables: {
+              status: EVENT_STATUS.REGISTERED,
+              locationIds: ['123456789'],
+              count: 10,
+              skip: 0
+            }
+          },
+          result: emptyResult
+        }
+      ]
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <RegistrarHome match={{ params: { tabId: 'print' } }} />,
         store,
         graphqlMock
       )

@@ -39,7 +39,7 @@ export const transformData = (data: GQLQuery, intl: InjectedIntl) => {
       id: assignedReg.id,
       name:
         /* eslint-disable no-string-literal */
-        (createNamesMap(names)['en'] as string) ||
+        (createNamesMap(names)[locale] as string) ||
         (createNamesMap(names)['default'] as string) ||
         /* eslint-enable no-string-literal */
         '',
