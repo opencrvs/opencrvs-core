@@ -71,7 +71,7 @@ describe('when user is selecting the informant', () => {
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration by parent informant view', () => {
       app
-        .find('#select_informant_someone')
+        .find('#select_informant_mother')
         .hostNodes()
         .simulate('change')
       app
@@ -103,10 +103,7 @@ describe('when user is selecting the informant', () => {
         .find('#select_informant_father')
         .hostNodes()
         .simulate('change')
-      app
-        .find('#select_informant_parents')
-        .hostNodes()
-        .simulate('change')
+
       app
         .find('#select_informant_self')
         .hostNodes()
@@ -115,7 +112,10 @@ describe('when user is selecting the informant', () => {
         .find('#select_informant_someone')
         .hostNodes()
         .simulate('change')
-
+      app
+        .find('#select_informant_parents')
+        .hostNodes()
+        .simulate('change')
       app
         .find('#continue')
         .hostNodes()
