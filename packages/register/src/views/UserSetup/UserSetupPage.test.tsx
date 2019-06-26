@@ -12,6 +12,7 @@ import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import { checkAuth } from '@register/profile/profileActions'
 import { UserSetupPage } from '@register/views/UserSetup/UserSetupPage'
+import { ProtectedAccount } from '@register/components/ProtectedAccount'
 
 const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
@@ -61,5 +62,20 @@ describe('UserSetupPage tests', () => {
         .hostNodes()
         .text()
     ).toEqual('Sahriar Nafis')
+  })
+  it('go to password page', async () => {
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <ProtectedAccount />,
+      store
+    )
+    const app = testComponent.component
+
+    app
+      .find('#user-setup-start-button')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    expect(app.find('#NewPassword')).toBeDefined()
   })
 })

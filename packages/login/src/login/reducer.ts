@@ -3,15 +3,14 @@ import { push } from 'react-router-redux'
 import * as actions from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import * as routes from '@login/navigation/routes'
-import { REGISTER_APP } from '@login/navigation/routes'
 
 export type LoginState = {
   submitting: boolean
   token: string
-  authenticationDetails: { nonce: string }
+  authenticationDetails: { nonce: string; mobile: string }
   submissionError: boolean
   resentSMS: boolean
-  stepOneDetails: { mobile: string }
+  stepOneDetails: { username: string }
   errorCode?: number
 }
 
@@ -19,11 +18,12 @@ export const initialState: LoginState = {
   submitting: false,
   token: '',
   authenticationDetails: {
-    nonce: ''
+    nonce: '',
+    mobile: ''
   },
   submissionError: false,
   resentSMS: false,
-  stepOneDetails: { mobile: '' }
+  stepOneDetails: { username: '' }
 }
 
 export const loginReducer: LoopReducer<LoginState, actions.Action> = (
@@ -71,7 +71,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false,
           authenticationDetails: {
             ...state.authenticationDetails,
-            nonce: action.payload.nonce
+            nonce: action.payload.nonce,
+            mobile: action.payload.mobile
           }
         },
         (action.payload.token &&

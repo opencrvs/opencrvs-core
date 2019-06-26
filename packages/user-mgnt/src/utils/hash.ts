@@ -6,6 +6,20 @@ interface ISaltedHash {
   salt: string
 }
 
+export function generateRandomPassowrd() {
+  const length = 6
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+  let randomPassword = ''
+  for (let i = 0; i < length; i += 1) {
+    // tslint:disable-next-line
+    randomPassword += charset.charAt(Math.floor(Math.random() * charset.length))
+  }
+
+  return randomPassword
+}
+
 export function generateHash(content: string, salt: string): string {
   const hash = createHash('sha512')
   hash.update(salt)

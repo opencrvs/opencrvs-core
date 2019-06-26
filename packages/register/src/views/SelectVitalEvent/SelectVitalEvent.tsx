@@ -5,15 +5,15 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import {
   goToBirthRegistration,
   goToDeathRegistration,
-  goBack as goBackAction
+  goToRegistrarHomeTab as goHomeAction
 } from '@register/navigation'
 import { Dispatch } from 'redux'
 import { createApplication, storeApplication } from '@register/applications'
 import { Event } from '@register/forms'
-import { Cross, ApplicationIcon } from '@opencrvs/components/lib/icons'
-import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
+
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { RadioButton } from '@opencrvs/components/lib/interface'
+import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 
 export const messages: {
@@ -57,23 +57,7 @@ const BodyContent = styled.div`
   padding: 0 16px;
   position: relative;
 `
-const TopBar = styled.div`
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 64px;
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
-const TopBarTitle = styled.h4`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
-  padding-left: 16px;
-`
-const Item = styled.span`
-  display: flex;
-  align-items: center;
-`
+
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
@@ -84,17 +68,12 @@ const Actions = styled.div`
     margin-bottom: 16px;
   }
 `
-const Container = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  position: absolute;
-  width: 100%;
-  height: 100%;
-`
+
 class SelectVitalEventView extends React.Component<
   InjectedIntlProps & {
     goToBirthRegistration: typeof goToBirthRegistration
     goToDeathRegistration: () => void
-    goBack: typeof goBackAction
+    goHome: () => void
   }
 > {
   state = {
@@ -115,19 +94,12 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <Container>
-        <TopBar>
-          <Item>
-            {' '}
-            <ApplicationIcon />{' '}
-            <TopBarTitle>
-              {intl.formatMessage(messages.registerNewEventTitle)}
-            </TopBarTitle>
-          </Item>
-          <Item>
-            <Button icon={() => <Cross />} onClick={this.props.goBack} />
-          </Item>
-        </TopBar>
+      <>
+        <EventTopBar
+          title={intl.formatMessage(messages.registerNewEventTitle)}
+          goHome={this.props.goHome}
+        />
+
         <BodyContent>
           <Title>{intl.formatMessage(messages.registerNewEventHeading)}</Title>
           {this.state.goTo === 'error' && (
@@ -159,7 +131,7 @@ class SelectVitalEventView extends React.Component<
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
-      </Container>
+      </>
     )
   }
 }
@@ -174,7 +146,7 @@ export const SelectVitalEvent = connect(
         dispatch(storeApplication(application))
         dispatch(goToDeathRegistration(application.id))
       },
-      goBack: () => dispatch(goBackAction())
+      goHome: () => dispatch(goHomeAction('review'))
     }
   }
 )(injectIntl(SelectVitalEventView))

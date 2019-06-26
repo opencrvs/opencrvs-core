@@ -1,6 +1,6 @@
-import React = require('react')
 import styled from 'styled-components'
 import { Cross } from '../icons'
+import React = require('react')
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -23,11 +23,11 @@ const ScreenBlocker = styled.div`
   background-color: ${({ theme }) => theme.colors.menuBackground};
   opacity: 0.8;
 `
-const ModalContent = styled.div`
+const ModalContent = styled.div.attrs<{ width?: number }>({})`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
-  width: 448px;
+  width: ${({ width }) => (width ? width : 448)}px;
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -54,15 +54,25 @@ const Title = styled.h1`
 const Right = styled.span`
   cursor: pointer;
 `
-
-const Body = styled.div`
+const Body = styled.div.attrs<{ height?: number }>({})`
   ${({ theme }) => theme.fonts.bodyStyle};
+  height: ${({ height }) => (height ? height : 250)}px;
+  overflow-y: auto;
   padding: 0 24px 16px;
   padding-right: 64px;
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-grow: 1;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.scrollBarGrey};
+    border-radius: 10px;
   }
 `
 const Footer = styled.div`
@@ -88,13 +98,23 @@ interface IProps {
   id?: string
   title: string
   show: boolean
+  width?: number
+  contentHeight?: number
   actions: JSX.Element[]
   handleClose?: () => void
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
   render() {
-    const { title, show, handleClose, id, actions } = this.props
+    const {
+      title,
+      show,
+      handleClose,
+      id,
+      actions,
+      width,
+      contentHeight
+    } = this.props
 
     if (!show) {
       return null
@@ -103,14 +123,14 @@ export class ResponsiveModal extends React.Component<IProps> {
     return (
       <ModalContainer id={id}>
         <ScreenBlocker />
-        <ModalContent>
+        <ModalContent width={width}>
           <Header>
             <Title>{title}</Title>
             <Right>
               <Cross onClick={handleClose} />
             </Right>
           </Header>
-          <Body>{this.props.children}</Body>
+          <Body height={contentHeight}>{this.props.children}</Body>
           <Footer>
             {actions.map((action, i) => (
               <Action key={i}>{action}</Action>

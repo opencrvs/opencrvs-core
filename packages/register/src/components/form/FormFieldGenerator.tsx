@@ -74,7 +74,8 @@ import {
   ILoaderButton,
   IForm,
   IFormSection,
-  FIELD_GROUP_TITLE
+  FIELD_GROUP_TITLE,
+  SEARCH_FIELD
 } from '@register/forms'
 
 import { IValidationResult } from '@register/utils/validate'
@@ -89,6 +90,7 @@ import { FetchButtonField } from '@register/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
 import { gqlToDraftTransformer } from '@register/transformer'
+import { SearchField } from './SearchField'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -319,6 +321,20 @@ function GeneratedInputField({
         files={value as IFileValue[]}
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
+        }
+      />
+    )
+  }
+
+  if (fieldDefinition.type === SEARCH_FIELD) {
+    return (
+      <SearchField
+        fieldName={fieldDefinition.name}
+        fieldLabel={fieldDefinition.label}
+        isFieldRequired={fieldDefinition.required as boolean}
+        fieldValue={fieldDefinition.initialValue as string}
+        onModalComplete={(value: string) =>
+          onSetFieldValue(fieldDefinition.name, value)
         }
       />
     )

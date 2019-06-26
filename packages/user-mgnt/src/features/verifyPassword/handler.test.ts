@@ -14,7 +14,7 @@ test("verifyPassHandler should throw with 401 when user doesn't exist", async ()
   const res = await server.server.inject({
     method: 'POST',
     url: '/verifyPassword',
-    payload: { mobile: '27555555555', password: 'test' }
+    payload: { username: '27555555555', password: 'test' }
   })
 
   expect(res.result.statusCode).toBe(401)
@@ -34,7 +34,7 @@ test("verifyPassHandler should throw with 401 when password hash doesn't match",
   const res = await server.server.inject({
     method: 'POST',
     url: '/verifyPassword',
-    payload: { mobile: '27555555555', password: 'test' }
+    payload: { username: '27555555555', password: 'test' }
   })
 
   expect(res.result.statusCode).toBe(401)
@@ -53,7 +53,7 @@ test('verifyPassHandler should return 200 and the user scope when the user exist
   const res = await server.server.inject({
     method: 'POST',
     url: '/verifyPassword',
-    payload: { mobile: '27555555555', password: 'test' }
+    payload: { username: '27555555555', password: 'test' }
   })
 
   expect([...res.result.scope]).toMatchObject(['test'])
@@ -66,7 +66,7 @@ test('verifyPassHandler should throw when User.findOne throws', async () => {
   const res = await server.server.inject({
     method: 'POST',
     url: '/verifyPassword',
-    payload: { mobile: '27555555555', password: 'test' }
+    payload: { username: '27555555555', password: 'test' }
   })
   expect(res.result.statusCode).toBe(500)
 
