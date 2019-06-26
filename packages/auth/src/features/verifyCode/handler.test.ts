@@ -23,7 +23,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })
