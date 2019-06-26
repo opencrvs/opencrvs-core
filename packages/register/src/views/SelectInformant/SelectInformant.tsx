@@ -82,7 +82,7 @@ export const messages: {
 const BodyContent = styled.div`
   max-width: 940px;
   margin: auto;
-  padding: 16px;
+  padding: 16px 32px;
   position: relative;
 `
 const Title = styled.h4`
@@ -113,7 +113,7 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    if (this.state.informant.length > 0) {
+    if (this.state.informant.length > 0 && this.state.informant !== 'error') {
       this.props.informantRegistration(this.state.informant)
     } else {
       this.setState({ informant: 'error' })
@@ -194,6 +194,7 @@ export class SelectInformantView extends React.Component<
               label={intl.formatMessage(messages.self)}
               value={INFORMANT.SELF}
               id="select_informant_self"
+              disabled={true}
               selected={
                 this.state.informant === INFORMANT.SELF ? INFORMANT.SELF : ''
               }
@@ -205,6 +206,7 @@ export class SelectInformantView extends React.Component<
               name="birthevent"
               label={intl.formatMessage(messages.someoneElse)}
               value={INFORMANT.SOMEONE_ELSE}
+              disabled={true}
               id="select_informant_someone"
               selected={
                 this.state.informant === INFORMANT.SOMEONE_ELSE
