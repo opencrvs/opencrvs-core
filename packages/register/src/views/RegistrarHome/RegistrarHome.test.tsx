@@ -823,8 +823,6 @@ describe('RegistrarHome tests', () => {
     })
     testComponent.component.update()
 
-    console.log(testComponent.component.debug())
-
     expect(
       testComponent.component.find('#pagination').hostNodes()
     ).toHaveLength(1)
@@ -888,7 +886,7 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
 
-  it('Should render pagination in progress tab if data is more than 10', async () => {
+  it.only('Should render pagination in progress tab if data is more than 10', async () => {
     jest.clearAllMocks()
     for (let i = 0; i < 12; i++) {
       const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -965,8 +963,6 @@ describe('RegistrarHome tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
-
-    console.log(testComponent.component.debug())
 
     expect(
       testComponent.component.find('#pagination').hostNodes()

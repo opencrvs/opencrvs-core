@@ -887,9 +887,6 @@ export class RegistrarHomeView extends React.Component<
                   </ErrorText>
                 )
               }
-
-              console.log('PRINT DATA', data)
-
               return (
                 <BodyContent>
                   <GridTable
