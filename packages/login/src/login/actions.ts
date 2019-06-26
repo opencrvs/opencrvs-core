@@ -96,7 +96,6 @@ export const authenticate = (
     }
   }
   const cleanedData = {
-    // mobile: convertToMSISDN(values.mobile, window.config.COUNTRY),
     username: values.username,
     password: values.password
   }
