@@ -58,17 +58,15 @@ class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
   transformSectionData = () => {
-    const { intl, formData } = this.props
-    const dataEntries = Object.entries(formData)
+    const { intl, section, formData } = this.props
     const sections: ISectionData[] = []
-    dataEntries.forEach(([key, value]: [string, unknown]) => {
-      const field = this.getField(key)
+    section.fields.forEach((field: IFormField) => {
       if (field && field.type === FIELD_GROUP_TITLE) {
         sections.push({ title: intl.formatMessage(field.label), items: [] })
       } else if (field && sections.length > 0) {
         sections[sections.length - 1].items.push({
           label: intl.formatMessage(field.label),
-          value: value as string,
+          value: (formData[field.name] && String(formData[field.name])) || '',
           action: {
             id: `btn${field.name}`,
             label: intl.formatMessage(messages.actionChange),
@@ -79,14 +77,6 @@ class UserReviewFormComponent extends React.Component<
     })
 
     return sections
-  }
-
-  getField = (fieldName: string) => {
-    const { section } = this.props
-    const foundField = section.fields.find(
-      (field: IFormField) => field.name === fieldName
-    )
-    return foundField
   }
 
   render() {
