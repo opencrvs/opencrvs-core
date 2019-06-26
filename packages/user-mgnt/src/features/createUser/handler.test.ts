@@ -1,8 +1,9 @@
 import { createServer } from '@user-mgnt/index'
-import * as jwt from 'jsonwebtoken'
+import User, { IUser } from '@user-mgnt/model/user'
+import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
-import User, { IUser } from '@user-mgnt/model/user'
+import * as jwt from 'jsonwebtoken'
 import mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
@@ -51,9 +52,12 @@ describe('createUser handler', () => {
   it('creates and saves fhir resources and adds user using mongoose', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 200 }]
     )
 
+    mockingoose(UsernameRecord).toReturn(null, 'findOne')
+    mockingoose(UsernameRecord).toReturn(null, 'save')
     mockingoose(User).toReturn(mockUser, 'save')
 
     const res = await server.server.inject({
@@ -96,7 +100,7 @@ describe('createUser handler', () => {
       location: [{ reference: 'Location/321' }]
     }
 
-    expect(fetch.mock.calls.length).toBe(2)
+    expect(fetch.mock.calls.length).toBe(3)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
       expectedPractitioner
     )

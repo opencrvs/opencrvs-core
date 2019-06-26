@@ -421,4 +421,95 @@ describe('Verify handlers', () => {
 
     expect(res.statusCode).toBe(500)
   })
+  it('userCredentials returns OK if the sms gets sent', async () => {
+    const spy = fetch.once('')
+
+    const token = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/userCredentialsSMS',
+      payload: {
+        msisdn: '447789778823',
+        username: 'anik',
+        password: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(200)
+  })
+  it('userCredentials returns 400 if called with no username', async () => {
+    const spy = fetch.once('')
+
+    const token = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/userCredentialsSMS',
+      payload: {
+        msisdn: '447789778823',
+        password: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(400)
+  })
+  it('userCredentials returns 500 the sms is not sent', async () => {
+    const spy = jest
+      .spyOn(service, 'sendSMS')
+      .mockImplementationOnce(() => Promise.reject(new Error()))
+
+    const token = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/userCredentialsSMS',
+      payload: {
+        msisdn: '447789778823',
+        username: 'anik',
+        password: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(500)
+  })
 })

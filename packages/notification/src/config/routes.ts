@@ -3,18 +3,21 @@ import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
   sendDeathDeclarationConfirmation,
-  sendDeathRegistrationConfirmation
+  sendDeathRegistrationConfirmation,
+  sendUserCredentials
 } from '@notification/features/sms/handler'
 import {
   requestSchema,
   declarationNotificationSchema,
-  registrationNotificationSchema
+  registrationNotificationSchema,
+  userCredentialsNotificationSchema
 } from '@notification/features/sms/payload-schema'
 
 const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
-  CERTIFY = 'certify'
+  CERTIFY = 'certify',
+  SYSADMIN = 'sysadmin'
 }
 
 export default function getRoutes() {
@@ -101,6 +104,21 @@ export default function getRoutes() {
         },
         validate: {
           payload: registrationNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/userCredentialsSMS',
+      handler: sendUserCredentials,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: userCredentialsNotificationSchema
         }
       }
     }
