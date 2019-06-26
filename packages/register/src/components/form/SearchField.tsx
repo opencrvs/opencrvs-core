@@ -78,32 +78,32 @@ const InputSection = styled.div`
 `
 const messages = defineMessages({
   modalTitle: {
-    id: 'register.sysAdminHome.SearchField.modalTitle',
+    id: 'formFields.SearchField.modalTitle',
     defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     description: 'Modal title'
   },
   modalCancel: {
-    id: 'register.sysAdminHome.SearchField.modalCancel',
+    id: 'formFields.SearchField.modalCancel',
     defaultMessage: 'Cancel',
     description: 'The cancel title'
   },
   modalSelect: {
-    id: 'register.sysAdminHome.SearchField.modalSelect',
+    id: 'formFields.SearchField.modalSelect',
     defaultMessage: 'SELECT',
     description: 'The select title'
   },
   locationId: {
-    id: 'register.sysAdminHome.SearchField.locationId',
+    id: 'formFields.SearchField.locationId',
     defaultMessage: 'Id: {locationId}',
     description: 'The location Id column'
   },
   editButton: {
-    id: 'register.sysAdminHome.SearchField.editButton',
+    id: 'formFields.SearchField.editButton',
     defaultMessage: 'Change assigned office',
     description: 'Edit button text'
   },
   placeHolderText: {
-    id: 'register.sysAdminHome.SearchField.placeHolderText',
+    id: 'formFields.SearchField.placeHolderText',
     defaultMessage: 'Search',
     description: 'Place holder text '
   }

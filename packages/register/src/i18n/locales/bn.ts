@@ -1107,13 +1107,12 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার প্রিয় সিনেমা কি?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
       'আপনার প্রিয় রং কি?',
-    'register.sysAdminHome.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
-    'register.sysAdminHome.SearchField.modalCancel': 'বাতিল',
-    'register.sysAdminHome.SearchField.modalSelect': 'নির্বাচন ',
-    'register.sysAdminHome.SearchField.locationId': 'আইডি: {locationId}',
-    'register.sysAdminHome.SearchField.editButton':
-      'নিবন্ধন অফিস হালনাগাদ করুন',
-    'register.sysAdminHome.SearchField.placeHolderText': 'অনুসন্ধান',
+    'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
+    'formFields.SearchField.modalCancel': 'বাতিল',
+    'formFields.SearchField.modalSelect': 'নির্বাচন ',
+    'formFields.SearchField.locationId': 'আইডি: {locationId}',
+    'formFields.SearchField.editButton': 'নিবন্ধন অফিস হালনাগাদ করুন',
+    'formFields.SearchField.placeHolderText': 'অনুসন্ধান',
     'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
     'userSetup.complete.instruction':
       'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
