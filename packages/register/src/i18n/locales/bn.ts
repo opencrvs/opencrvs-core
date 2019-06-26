@@ -808,7 +808,7 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
     'certificate.parent.details.label.number': 'সংখ্যা',
-    'certificate.btn.editRegistration': 'নিবন্ধন সম্পাদনা করুন',
+    'certificate.btn.editRegistration': 'নিবন্ধন সম���পাদনা করুন',
     'certificate.txt.isCorrectTxt': 'জন্ম নিবন্ধনটি কি সঠিক?',
     'certificate.txt.confirmationTxt':
       'অনুগ্রহ করে নিশ্চিত করুন যে নিবন্ধনটি পর্যালোচনা হয়েছে তার তথ্য সঠিক এবং আপনি মুদ্রণ করতে প্রস্তুত',
@@ -1105,6 +1105,23 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার প্রিয় শিক্ষক কে?',
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'আপনার প্রিয় সিনেমা কি?',
-    'register.userSetup.securityQuestions.FAVORITE_COLOR': 'আপনার প্রিয় রং কি?'
+    'register.userSetup.securityQuestions.FAVORITE_COLOR':
+      'আপনার প্রিয় রং কি?',
+    'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
+    'userSetup.complete.instruction':
+      'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
+    'userSetup.complete.button.login': 'লগইন',
+    'newPassword.header': 'নতুন একটি পাসওয়ার্ড পছন্দ করুন',
+    'newPassword.instruction':
+      'আমরা আপনাকে একটি অনন্য পাসওয়ার্ড তৈরির সুপারিশ করি - যেটি আপনি অন্য কোনও ওয়েবসাইট বা অ্যাপ্লিকেশনের জন্য ব্যবহার করেন না। বিঃদ্রঃ. আপনি এটি একবার পরিবর্তন করার পরে আপনার পুরানো পাসওয়ার্ড পুনরায় ব্যবহার করতে পারবেন না।',
+    'password.label.new': 'নতুন পাসওয়ার্ড',
+    'password.label.confirm': 'পাসওয়ার্ড নিশ্চিত করুন',
+    'password.validation.msg': 'পাসওয়ার্ড-এ যে বিষয়গুলো অবশ্যই থাকতে হবে:',
+    'password.minLength': 'সর্বনিম্ন {min}-টি অক্ষর',
+    'password.cases': 'বড় হাতের এবং ছোট হাতের অক্ষর',
+    'password.number': 'অন্ততঃ একটি নম্বর',
+    'password.match': 'উল্লেখিত পাসওয়ার্ড মিলেছে',
+    'password.mismatch': 'উল্লেখিত পাসওয়ার্ড মিলে নি',
+    'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়'
   }
 }

@@ -1106,6 +1106,22 @@ export const ENGLISH_STATE: ILanguage = {
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'What is your favorite movie?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
-      'What is your favorite color?'
+      'What is your favorite color?',
+    'userSetup.complete.title': 'Account setup complete',
+    'userSetup.complete.instruction':
+      'Now login to your account with your user name and newly created password',
+    'userSetup.complete.button.login': 'Login',
+    'newPassword.header': 'Choose a new password',
+    'newPassword.instruction':
+      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    'password.label.new': 'New password',
+    'password.label.confirm': 'Confirm password',
+    'password.validation.msg': 'Password must have:',
+    'password.minLength': '{min} characters minimum',
+    'password.cases': 'Contain upper and lower cases',
+    'password.number': 'At least one number',
+    'password.match': 'Passwords match',
+    'password.mismatch': 'Passwords do not match',
+    'error.required.password': 'New password is not valid'
   }
 }
