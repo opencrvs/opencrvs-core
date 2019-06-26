@@ -18,7 +18,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })
@@ -40,7 +40,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })
@@ -58,7 +58,8 @@ describe('authenticate handler receives a request', () => {
         JSON.stringify({
           userId: '1',
           status: 'pending',
-          scope: ['admin']
+          scope: ['admin'],
+          mobile: `+345345343`
         })
       )
       const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
@@ -67,7 +68,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })

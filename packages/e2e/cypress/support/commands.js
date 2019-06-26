@@ -27,11 +27,11 @@
 Cypress.Commands.add('login', (userType, options = {}) => {
   const users = {
     fieldWorker: {
-      mobile: '+8801711111111',
+      username: 'sakibal.hasan',
       password: 'test'
     },
     registrar: {
-      mobile: '+8801733333333',
+      username: 'mohammad.ashraful',
       password: 'test'
     }
   }
@@ -40,7 +40,7 @@ Cypress.Commands.add('login', (userType, options = {}) => {
     url: `${Cypress.env('AUTH_URL')}authenticate`,
     method: 'POST',
     body: {
-      mobile: user.mobile,
+      username: user.username,
       password: user.password
     }
   })

@@ -16,7 +16,7 @@ import { unauthorized } from 'boom'
 import { PRODUCTION, WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
-  mobile: string
+  username: string
   password: string
 }
 
@@ -35,7 +35,7 @@ export default async function authenticateHandler(
   let result
 
   try {
-    result = await authenticate(payload.mobile, payload.password)
+    result = await authenticate(payload.username, payload.password)
   } catch (err) {
     throw unauthorized()
   }
@@ -80,7 +80,7 @@ export default async function authenticateHandler(
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string(),
+  username: Joi.string(),
   password: Joi.string()
 })
 
