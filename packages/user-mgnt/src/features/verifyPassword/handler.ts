@@ -3,7 +3,7 @@ import * as Joi from 'joi'
 import { unauthorized } from 'boom'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generatePasswordHash } from '@user-mgnt/utils/password'
+import { generateHash } from '@user-mgnt/utils/hash'
 
 interface IVerifyPayload {
   mobile: string
@@ -30,7 +30,7 @@ export default async function verifyPassHandler(
     throw unauthorized()
   }
 
-  if (generatePasswordHash(password, user.salt) !== user.passwordHash) {
+  if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
 

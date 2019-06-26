@@ -83,7 +83,6 @@ describe('when user is selecting the vital event', () => {
           .simulate('click')
       })
       it('takes user to the informant selection view', () => {
-        console.log(app.debug())
         expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
       })
     })

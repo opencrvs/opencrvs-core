@@ -10,8 +10,12 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { LightLogo } from '@opencrvs/components/lib/icons'
 import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  ProtectedAccoutStep,
+  IProtectedAccountSetupData
+} from '@register/components/ProtectedAccount'
 
-const Page = styled.div`
+export const Page = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
@@ -20,14 +24,14 @@ const Page = styled.div`
   flex-direction: column;
   text-align: center;
 `
-const Container = styled.div`
+export const Container = styled.div`
   position: relative;
   height: auto;
   padding: 0px;
   margin: 125px auto 0px auto;
   max-width: 460px;
 `
-const LogoContainer = styled.div`
+export const LogoContainer = styled.div`
   flex-direction: row;
   display: flex;
   justify-content: center;
@@ -82,11 +86,19 @@ const messages: {
   }
 })
 
+interface IUserSetupPageProp {
+  userDetails: IUserDetails | null
+  setupData: IProtectedAccountSetupData
+  goToStep: (
+    step: ProtectedAccoutStep,
+    data: IProtectedAccountSetupData
+  ) => void
+}
 export class UserSetupView extends React.Component<
-  { userDetails: IUserDetails | null } & InjectedIntlProps
+  IUserSetupPageProp & InjectedIntlProps
 > {
   render() {
-    const { intl, userDetails } = this.props
+    const { intl, userDetails, goToStep, setupData } = this.props
     return (
       <Page>
         <Container id="user-setup-landing-page">
@@ -120,7 +132,10 @@ export class UserSetupView extends React.Component<
           <InstructionHolder>
             {intl.formatMessage(messages.instruction)}
           </InstructionHolder>
-          <NextButton id="user-setup-start-button">
+          <NextButton
+            id="user-setup-start-button"
+            onClick={() => goToStep(ProtectedAccoutStep.PASSWORD, setupData)}
+          >
             {intl.formatMessage(messages.startButtonLabel)}
           </NextButton>
         </Container>

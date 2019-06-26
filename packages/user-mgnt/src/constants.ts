@@ -2,6 +2,8 @@ export const HOST = process.env.HOST || 'localhost'
 export const PORT = process.env.PORT || 3030
 export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/user-mgnt'
+export const NOTIFICATION_SERVICE_URL =
+  process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||

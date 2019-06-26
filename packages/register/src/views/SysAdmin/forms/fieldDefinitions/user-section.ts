@@ -1,4 +1,9 @@
-import { IFormSection, TEXT, FIELD_GROUP_TITLE } from '@register/forms'
+import {
+  IFormSection,
+  TEXT,
+  FIELD_GROUP_TITLE,
+  SEARCH_FIELD
+} from '@register/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
@@ -189,7 +194,7 @@ export const userSection: IFormSection = {
     },
     {
       name: 'registrationOffice',
-      type: TEXT,
+      type: SEARCH_FIELD,
       label: messages.registrationOffice,
       required: true,
       initialValue: '',

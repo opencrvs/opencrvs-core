@@ -43,7 +43,7 @@ interface IAppProps {
 }
 const MainSection = styled.section`
   flex-grow: 8;
-  padding-bottom: 48px;
+  background: ${({ theme }) => theme.colors.white};
 `
 export const store = createStore()
 

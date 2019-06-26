@@ -1,15 +1,19 @@
-import * as Hapi from 'hapi'
-import * as Joi from 'joi'
-
-import User, { IUser } from '@user-mgnt/model/user'
-import { generateSaltedHash } from '@user-mgnt/utils/password'
-import { logger } from '@user-mgnt/logger'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
+  generateUsername,
   postFhir,
-  rollback
+  rollback,
+  sendCredentialsNotification
 } from '@user-mgnt/features/createUser/service'
+import { logger } from '@user-mgnt/logger'
+import User, { IUser } from '@user-mgnt/model/user'
+import {
+  generateSaltedHash,
+  generateRandomPassowrd
+} from '@user-mgnt/utils/hash'
+import { statuses } from '@user-mgnt/utils/userUtils'
+import * as Hapi from 'hapi'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -21,6 +25,7 @@ export default async function createUser(
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
+  let autoGenPassword = null
   try {
     const practitioner = createFhirPractitioner(user)
     practitionerId = await postFhir(token, practitioner)
@@ -37,12 +42,13 @@ export default async function createUser(
       )
     }
 
-    if (user.password) {
-      const { hash, salt } = generateSaltedHash(user.password)
-      user.salt = salt
-      user.passwordHash = hash
-      delete user.password
-    }
+    user.status = statuses.PENDING
+
+    autoGenPassword = generateRandomPassowrd()
+    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    user.salt = salt
+    user.passwordHash = hash
+
     user.practitionerId = practitionerId
   } catch (err) {
     await rollback(token, practitionerId, roleId)
@@ -53,6 +59,7 @@ export default async function createUser(
 
   // save user in user-mgnt data store
   try {
+    user.username = await generateUsername(user.name)
     await User.create(user)
   } catch (err) {
     logger.error(err)
@@ -61,9 +68,9 @@ export default async function createUser(
     return h.response().code(400)
   }
 
+  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
+    Authorization: request.headers.authorization
+  })
+  delete user.password
   return h.response().code(201)
 }
-
-export const requestSchema = Joi.object({
-  userId: Joi.string().required()
-})

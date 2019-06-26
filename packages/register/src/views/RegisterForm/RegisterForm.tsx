@@ -2,14 +2,13 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { connect } from 'react-redux'
 import Swipeable from 'react-swipeable'
-import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
+import { Modal, EventTopBar } from '@opencrvs/components/lib/interface'
 import {
-  ArrowBack,
-  ArrowForward,
-  DraftSimple,
-  TickLarge
-} from '@opencrvs/components/lib/icons'
+  PrimaryButton,
+  TertiaryButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
+import { TickLarge, BackArrow } from '@opencrvs/components/lib/icons'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
@@ -51,57 +50,15 @@ import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
-import { ViewHeader } from '@register/components/ViewHeader'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
   color: ${({ theme }) => theme.colors.copy};
 `
-const FormActionSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-  margin: 0px -25px;
-`
-const FormAction = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 83px;
-  padding-left: 25px;
-`
-const FormActionDivider = styled.div`
-  border-bottom: 1px inset ${({ theme }) => theme.colors.placeholder};
+const FooterArea = styled.div`
+  margin: 24px 0px 48px;
 `
 
-const FormPrimaryButton = styled(PrimaryButton)`
-  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
-  height: 93px;
-`
-
-const BackButtonContainer = styled.div`
-  cursor: pointer;
-`
-
-const BackButton = styled(PrimaryButton)`
-  width: 69px;
-  height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
-  justify-content: center;
-  border-radius: 21px;
-`
-
-const BackButtonText = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-  text-transform: uppercase;
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 14px;
-`
-
-const DraftButtonContainer = styled.div`
-  cursor: pointer;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
@@ -193,6 +150,16 @@ export const messages: {
     defaultMessage:
       'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
     description: 'The error message shown when a search query fails'
+  },
+  continueButton: {
+    id: 'register.selectVitalEvent.continueButton',
+    defaultMessage: 'Continue',
+    description: 'Continue Button Text'
+  },
+  saveExitButton: {
+    id: 'register.selectVitalEvent.saveExitButton',
+    defaultMessage: 'SAVE & EXIT',
+    description: 'SAVE & EXIT Button Text'
   }
 })
 
@@ -205,6 +172,7 @@ const FormViewContainer = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+  background-color: ${({ theme }) => theme.colors.white};
 `
 
 const Optional = styled.span.attrs<
@@ -458,7 +426,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
   render() {
     const {
       goToPage,
-      goBack,
       intl,
       activeSection,
       setAllFieldsDirty,
@@ -482,7 +449,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <FormViewContainer>
+      <FormViewContainer id="informant_parent_view">
         {isErrorOccured && (
           <ErrorText id="error_message_section">
             {intl.formatMessage(messages.queryError)}
@@ -491,12 +458,31 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
         {!isErrorOccured && (
           <>
-            <ViewHeader
-              id="informant_parent_view"
+            <EventTopBar
               title={intl.formatMessage(title, { event: application.event })}
-            ></ViewHeader>
+              saveAction={{
+                handler: this.onSaveAsDraftClicked,
+                label: intl.formatMessage(messages.saveExitButton)
+              }}
+              menuItems={[
+                {
+                  label: 'Delete Application',
+                  handler: () => {
+                    this.props.deleteApplication(application)
+                    history.push('/')
+                  }
+                }
+              ]}
+            />
             <FormContainer>
               <BodyContent>
+                <TertiaryButton
+                  align={ICON_ALIGNMENT.LEFT}
+                  icon={() => <BackArrow />}
+                  onClick={this.props.goBack}
+                >
+                  {intl.formatMessage(messages.back)}
+                </TertiaryButton>
                 <Swipeable
                   disabled={isReviewSection || !isMobileDevice()}
                   id="swipeable_block"
@@ -529,7 +515,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     />
                   )}
                   {activeSection.viewType === 'form' && (
-                    <Box>
+                    <div>
                       <FormSectionTitle
                         id={`form_section_title_${activeSection.id}`}
                       >
@@ -568,63 +554,28 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           draftData={application.data}
                         />
                       </form>
-                      <FormActionSection>
-                        <FormAction>
-                          {
-                            <BackButtonContainer onClick={goBack}>
-                              <BackButton icon={() => <ArrowBack />} />
-                              <BackButtonText>
-                                {intl.formatMessage(messages.back)}
-                              </BackButtonText>
-                            </BackButtonContainer>
-                          }
-                          {nextSection && (
-                            <FormPrimaryButton
-                              onClick={() =>
-                                goToPage(
-                                  this.props.pageRoute,
-                                  application.id,
-                                  nextSection.id,
-                                  application.event.toLowerCase()
-                                )
-                              }
-                              id="next_section"
-                              icon={() => <ArrowForward />}
-                            >
-                              {intl.formatMessage(messages.next)}
-                            </FormPrimaryButton>
-                          )}
-                        </FormAction>
-                        <FormActionDivider />
-                        <FormAction>
-                          {
-                            <DraftButtonContainer
-                              id="save_as_draft"
-                              onClick={() => this.onSaveAsDraftClicked()}
-                            >
-                              <DraftSimple />
-                              <LinkButton>
-                                {intl.formatMessage(messages.valueSaveAsDraft)}
-                              </LinkButton>
-                            </DraftButtonContainer>
-                          }
-                        </FormAction>
-                      </FormActionSection>
-                    </Box>
+                      {nextSection && (
+                        <FooterArea>
+                          <PrimaryButton
+                            id="next_section"
+                            onClick={() =>
+                              goToPage(
+                                this.props.pageRoute,
+                                application.id,
+                                nextSection.id,
+                                application.event.toLowerCase()
+                              )
+                            }
+                          >
+                            {intl.formatMessage(messages.continueButton)}
+                          </PrimaryButton>
+                        </FooterArea>
+                      )}
+                    </div>
                   )}
                 </Swipeable>
               </BodyContent>
             </FormContainer>
-            <ViewFooter>
-              <FooterAction>
-                <FooterPrimaryButton
-                  id="save_draft"
-                  onClick={() => history.push(CONFIRMATION_SCREEN)}
-                >
-                  {intl.formatMessage(messages.saveDraft)}
-                </FooterPrimaryButton>
-              </FooterAction>
-            </ViewFooter>
           </>
         )}
 
