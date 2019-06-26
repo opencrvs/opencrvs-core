@@ -1107,6 +1107,12 @@ export const ENGLISH_STATE: ILanguage = {
       'What is your favorite movie?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
       'What is your favorite color?',
+    'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    'formFields.SearchField.modalCancel': 'Cancel',
+    'formFields.SearchField.modalSelect': 'SELECT',
+    'formFields.SearchField.locationId': 'Id: {locationId}',
+    'formFields.SearchField.editButton': 'Change assigned office',
+    'formFields.SearchField.placeHolderText': 'Search',
     'userSetup.complete.title': 'Account setup complete',
     'userSetup.complete.instruction':
       'Now login to your account with your user name and newly created password',
