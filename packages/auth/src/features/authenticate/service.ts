@@ -36,14 +36,14 @@ export function isUserInfoNotFoundError(err: Error) {
 }
 
 export async function authenticate(
-  mobile: string,
+  username: string,
   password: string
 ): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyPassword')
 
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ mobile, password })
+    body: JSON.stringify({ username, password })
   })
 
   if (res.status !== 200) {
@@ -55,7 +55,7 @@ export async function authenticate(
     userId: body.id,
     scope: body.scope,
     status: body.status,
-    mobile
+    mobile: body.mobile
   }
 }
 

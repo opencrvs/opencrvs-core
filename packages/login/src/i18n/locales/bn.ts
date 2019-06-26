@@ -3,16 +3,17 @@ export const BENGALI_STATE = {
   messages: {
     'login.stepOneTitle': 'লগইন',
     'login.stepOneInstruction':
-      'অনুগ্রহপূর্বক আপনার মোবাইল নম্বর  এবং পাসওয়ার্ড টাইপ করুন',
+      'অনুগ্রহপূর্বক আপনার ব্যবহারকারীর নাম  এবং পাসওয়ার্ড টাইপ করুন',
+    'login.username': 'ব্যবহারকারীর নাম',
     'login.mobileLabel': 'মোবাইল নম্বর',
     'login.mobilePlaceholder': '01723456789',
     'login.passwordLabel': 'পাসওয়ার্ড',
     'login.verficationCodeLabel': 'ভেরিফিকেশন কোড (৬ সংখ্যার)',
     'login.submit': 'সাবমিট',
     'login.forgotPassword': 'পাসওয়ার্ড ভুলে গেছেন',
-    'login.submissionError': 'মোবাইল নম্বর/পাসওয়ার্ড সঠিক নয়',
+    'login.submissionError': 'ব্যবহারকারীর নাম/পাসওয়ার্ড সঠিক নয়',
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
-    'login.fieldMissing': 'মোবাইল নম্বর/পাসওয়ার্ড দিতে হবে',
+    'login.fieldMissing': 'ব্যবহারকারীর নাম/পাসওয়ার্ড দিতে হবে',
     'login.resentSMS':
       'আমরা আপনার মোবাইল নম্বর, {number} তে একটি নতুন এসএমএস প্রেরণ করেছি',
     'login.stepTwoResendTitle': 'ভেরিফিকেশন কোড পুনঃপ্রেরণ',

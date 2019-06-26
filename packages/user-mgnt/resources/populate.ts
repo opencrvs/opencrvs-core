@@ -16,6 +16,7 @@ const fieldAgent = new User({
       family: 'Hasan'
     }
   ],
+  username: 'sakibal.hasan',
   email: 'test@test.org',
   mobile: '+8801711111111',
   passwordHash: pass.hash,
@@ -43,6 +44,7 @@ const registrationClerk = new User({
       family: 'Tagore'
     }
   ],
+  username: 'robi.tagore',
   email: 'test@test.org',
   mobile: '+8801722222222',
   passwordHash: pass.hash,
@@ -70,6 +72,7 @@ const localRegistrar = new User({
       family: 'Ashraful'
     }
   ],
+  username: 'mohammad.ashraful',
   email: 'test@test.org',
   mobile: '+8801733333333',
   passwordHash: pass.hash,
@@ -97,6 +100,7 @@ const districtRegistrar = new User({
       family: 'Muid Khan'
     }
   ],
+  username: 'muid.khan',
   email: 'test@test.org',
   mobile: '+8801744444444',
   passwordHash: pass.hash,
@@ -119,6 +123,7 @@ const stateRegistrar = new User({
       family: 'Huq'
     }
   ],
+  username: 'nasreen.pervin',
   email: 'test@test.org',
   mobile: '+8801755555555',
   passwordHash: pass.hash,
@@ -141,6 +146,7 @@ const nationalRegistrar = new User({
       family: 'Abdullah'
     }
   ],
+  username: 'mohamed.abu',
   email: 'test@test.org',
   mobile: '+8801766666666',
   passwordHash: pass.hash,
@@ -163,6 +169,7 @@ const fieldAgent2 = new User({
       family: 'Islam'
     }
   ],
+  username: 'ariful.islam',
   email: 'test@test.org',
   mobile: '+8801740012994',
   passwordHash: pass.hash,
@@ -190,6 +197,7 @@ const fieldAgent3 = new User({
       family: 'Alam'
     }
   ],
+  username: 'ashraful.alam',
   email: 'test@test.org',
   mobile: '+8801723438160',
   passwordHash: pass.hash,
@@ -217,6 +225,7 @@ const registrationClerk2 = new User({
       family: 'Khatun'
     }
   ],
+  username: 'lovely.khatun',
   email: 'test@test.org',
   mobile: '+8801797602268',
   passwordHash: pass.hash,
@@ -244,6 +253,7 @@ const registrationClerk3 = new User({
       family: 'Farid'
     }
   ],
+  username: 'seikh.farid',
   email: 'test@test.org',
   mobile: '+8801767332319',
   passwordHash: pass.hash,
@@ -271,6 +281,7 @@ const localRegistrar2 = new User({
       family: 'Alam'
     }
   ],
+  username: 'jahangir.alam',
   email: 'test@test.org',
   mobile: '+8801722038795',
   passwordHash: pass.hash,
@@ -298,6 +309,7 @@ const localRegistrar3 = new User({
       family: 'Rohman'
     }
   ],
+  username: 'mahmudur.rohman',
   email: 'test@test.org',
   mobile: '+8801712142796',
   passwordHash: pass.hash,
@@ -325,6 +337,7 @@ const fieldAgent4 = new User({
       family: 'Arafat'
     }
   ],
+  username: 'abdullah.arafat',
   email: 'test@test.org',
   mobile: '+8801711081454',
   passwordHash: pass.hash,
@@ -352,6 +365,7 @@ const registrationClerk4 = new User({
       family: 'Yasmeen'
     }
   ],
+  username: 'neelima.yasmeen',
   email: 'test@test.org',
   mobile: '+8801610005011',
   passwordHash: pass.hash,
@@ -379,6 +393,7 @@ const sysAdmin = new User({
       family: 'Nafis'
     }
   ],
+  username: 'shahriar.nafis',
   email: 'test@test.org',
   mobile: '+8801721111111',
   passwordHash: pass.hash,
