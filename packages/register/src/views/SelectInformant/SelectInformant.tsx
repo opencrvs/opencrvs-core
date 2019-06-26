@@ -195,10 +195,6 @@ export class SelectInformantView extends React.Component<
               value={INFORMANT.SELF}
               id="select_informant_self"
               disabled={true}
-              selected={
-                this.state.informant === INFORMANT.SELF ? INFORMANT.SELF : ''
-              }
-              onChange={() => this.setState({ informant: INFORMANT.SELF })}
             />
             <RadioButton
               size="large"
@@ -208,14 +204,6 @@ export class SelectInformantView extends React.Component<
               value={INFORMANT.SOMEONE_ELSE}
               disabled={true}
               id="select_informant_someone"
-              selected={
-                this.state.informant === INFORMANT.SOMEONE_ELSE
-                  ? INFORMANT.SOMEONE_ELSE
-                  : ''
-              }
-              onChange={() =>
-                this.setState({ informant: INFORMANT.SOMEONE_ELSE })
-              }
             />
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>

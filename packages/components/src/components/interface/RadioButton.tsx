@@ -85,12 +85,14 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
-  onChange: (value: Value) => void
+  onChange?: (value: Value) => void
 }
 
 export class RadioButton extends React.Component<IRadioButton> {
   onChange = () => {
-    this.props.onChange(this.props.value)
+    if (this.props.onChange) {
+      this.props.onChange(this.props.value)
+    }
   }
   render() {
     const { id, name, selected, label, value, size, disabled } = this.props
