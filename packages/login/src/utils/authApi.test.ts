@@ -10,7 +10,7 @@ describe('authApi', () => {
   })
   it('authenticates with the server and return a nonce!  Love that word!', async () => {
     const data = {
-      mobile: '27845829934',
+      username: '27845829934',
       password: 'test'
     }
 
