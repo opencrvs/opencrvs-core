@@ -225,7 +225,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     this.props.setupData.securityQuestionAnswers = this.prepareSetupData()
 
     if (this.isValidate()) {
-      this.props.goToStep(ProtectedAccoutStep.LANDING, this.props.setupData)
+      this.props.goToStep(ProtectedAccoutStep.REVIEW, this.props.setupData)
     }
   }
 
@@ -236,7 +236,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         {this.state.questionnaire.map(
           (questionnaire: IQuestionnaire, index: number) => {
             return (
-              <QuestionWrapper key={index}>
+              <QuestionWrapper id={`question-${index}-wrapper`} key={index}>
                 <Wrapper>
                   <label>
                     {intl.formatMessage(messages.securityQuestionLabel, {
@@ -258,7 +258,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     touched={this.state.showError}
                   />
                   {this.state.showError && !questionnaire.selectedQuestion && (
-                    <Error>
+                    <Error id={`question-${index}-validation-message`}>
                       {intl.formatMessage(messages.selectSecurityQuestion)}
                     </Error>
                   )}
@@ -279,7 +279,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   />
                   {this.state.showError &&
                     !this.state.questionnaire[index].answer && (
-                      <Error>
+                      <Error id={`answer-${index}-validation-message`}>
                         {intl.formatMessage(messages.enterResponse)}
                       </Error>
                     )}
@@ -289,7 +289,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
           }
         )}
 
-        <PrimaryButton onClick={this.onsubmit}>
+        <PrimaryButton id="submit-security-question" onClick={this.onsubmit}>
           {intl.formatMessage(messages.continue)}
         </PrimaryButton>
       </form>
