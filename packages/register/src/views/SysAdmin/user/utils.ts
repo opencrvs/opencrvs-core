@@ -48,7 +48,7 @@ export const mockIncompleteFormData = {
   nid: '1014881922',
   phoneNumber: '',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'Field Agent',
+  role: 'FIELD_AGENT',
   userDetails: '',
   username: ''
 }
@@ -64,7 +64,7 @@ export const mockCompleteFormData = {
   nid: '1014881922',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'Field Agent',
+  role: 'FIELD_AGENT',
   userDetails: '',
   username: ''
 }
