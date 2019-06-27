@@ -75,7 +75,6 @@ describe('SearchResult tests', () => {
     const graphqlMock = [
       {
         request: {
-          operationName: null,
           query: SEARCH_EVENTS,
           variables: {
             locationIds: ['123456789'],
@@ -245,7 +244,7 @@ describe('SearchResult tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 200)
     })
     testComponent.component.update()
     const data = testComponent.component.find(DataTable).prop('data')
