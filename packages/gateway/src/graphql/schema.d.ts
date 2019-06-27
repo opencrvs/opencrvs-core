@@ -503,6 +503,7 @@ export interface GQLBirthRegistrationWithIn45D {
 
 export interface GQLEventCount {
   declared?: number
+  registered?: number
   rejected?: number
 }
 
@@ -2402,10 +2403,15 @@ export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
 
 export interface GQLEventCountTypeResolver<TParent = any> {
   declared?: EventCountToDeclaredResolver<TParent>
+  registered?: EventCountToRegisteredResolver<TParent>
   rejected?: EventCountToRejectedResolver<TParent>
 }
 
 export interface EventCountToDeclaredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventCountToRegisteredResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
