@@ -62,6 +62,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
+    cy.wait(3000)
   })
 
   it('Tests from application to registration using maximum input', () => {
@@ -95,7 +96,15 @@ context('Birth Registration Integration Test', () => {
     cy.selectOption('#birthType', 'Single', 'Single')
     cy.get('#multipleBirth').type('1')
     cy.get('#weightAtBirth').type('1.5')
-    cy.selectOption('#placeOfBirth', 'Hospital', 'Hospital')
+    cy.selectOption('#placeOfBirth', 'Private Home', 'Private Home')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
@@ -119,13 +128,22 @@ context('Birth Registration Integration Test', () => {
       'Upper secondary'
     )
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
-    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
-    cy.get('#addressLine2Permanent').type('My street')
+    cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
+    cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
+    cy.selectOption('#addressLine4Permanent', 'Matlab Uttar', 'Matlab Uttar')
+    cy.selectOption('#addressLine3Permanent', 'Satnal', 'Satnal')
+    cy.get('#addressLine2Permanent').type('Ruhitarpar')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')
+    cy.get('#currentAddressSameAsPermanent_false').click()
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
     // FATHER DETAILS
@@ -190,7 +208,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.wait(1000)
+    cy.wait(3000)
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('.sc-hzDEsm > .sc-fOICqy > .sc-bGbJRg').click()
