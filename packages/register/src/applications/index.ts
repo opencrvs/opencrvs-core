@@ -3,7 +3,8 @@ import { storage } from '@register/storage'
 import { v4 as uuid } from 'uuid'
 import { Event, IFormData, IFormFieldValue } from '@register/forms'
 import { GO_TO_PAGE, Action as NavigationAction } from '@register/navigation'
-import { IUserDetails } from '@register/utils/userUtils'
+import { getCurrentUserID } from '@register/utils/userUtils'
+import { USER_DATA } from '@register/utils/constants'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -99,6 +100,7 @@ export type Action =
 
 export interface IUserData {
   userID: string
+  userPIN?: string
   applications: IApplication[]
 }
 
@@ -177,22 +179,18 @@ function writeApplication(
   return { type: WRITE_APPLICATION, payload: { application } }
 }
 
-export async function getCurrentUserID(): Promise<string> {
-  const userDetails = await storage.getItem('USER_DETAILS')
-  if (!userDetails) {
-    return ''
-  }
-  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
-}
-
 export async function getApplicationsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
-  const storageTable = await storage.getItem('USER_DATA')
+  const storageTable = await storage.getItem(USER_DATA)
   if (!storageTable) {
     return '{}'
   }
 
   const currentUserID = await getCurrentUserID()
+  if (!currentUserID) {
+    return '[]'
+  }
+
   const allUserData = JSON.parse(storageTable) as IUserData[]
   if (!allUserData.length) {
     // No user-data at all
@@ -219,7 +217,10 @@ export async function writeApplicationByUser(
   applicationsState: IApplicationsState
 ) {
   const uID = applicationsState.userID || (await getCurrentUserID())
-  const userData = await storage.getItem('USER_DATA')
+  if (!uID) {
+    return
+  }
+  const userData = await storage.getItem(USER_DATA)
   if (!userData) {
     // No storage option found
     storage.configStorage('OpenCRVS')
@@ -237,7 +238,7 @@ export async function writeApplicationByUser(
       applications: applicationsState.applications
     })
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  storage.setItem(USER_DATA, JSON.stringify(allUserData))
 }
 
 export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (

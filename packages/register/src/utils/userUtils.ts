@@ -130,3 +130,8 @@ export async function storeUserDetails(userDetails: IUserDetails) {
 export async function removeUserDetails() {
   storage.removeItem(USER_DETAILS)
 }
+
+export async function getCurrentUserID(): Promise<string> {
+  const userDetails = await storage.getItem(USER_DETAILS)
+  return (userDetails && JSON.parse(userDetails).userMgntUserID) || ''
+}

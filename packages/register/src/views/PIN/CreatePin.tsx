@@ -7,6 +7,9 @@ import { storage } from '@opencrvs/register/src/storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 import messages from '@register/views/PIN/messages'
 import * as ReactDOM from 'react-dom'
+import { IUserData } from '@register/applications'
+import { getCurrentUserID } from '@register/utils/userUtils'
+import { USER_DATA } from '@register/utils/constants'
 
 const Container = styled.div`
   display: flex;
@@ -97,8 +100,25 @@ class CreatePinComponent extends React.Component<IProps> {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(pin, salt)
 
-    // TODO: this should be moved to the user object when the support for multiple user has been added
-    await storage.setItem('pin', hash)
+    const currentUserID = await getCurrentUserID()
+    if (!currentUserID) {
+      return
+    }
+    const userData = (await storage.getItem(USER_DATA)) || '[]'
+    const allUserData = JSON.parse(userData) as IUserData[]
+    const currentUserData = allUserData.find(
+      user => user.userID === currentUserID
+    )
+    if (currentUserData) {
+      currentUserData.userPIN = hash
+    } else {
+      allUserData.push({
+        userID: currentUserID,
+        userPIN: hash,
+        applications: []
+      })
+    }
+    await storage.setItem(USER_DATA, JSON.stringify(allUserData))
 
     this.props.onComplete()
   }
