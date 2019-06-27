@@ -14,7 +14,6 @@ import {
   storeApplication,
   setInitialApplications,
   IUserData,
-  getCurrentUserID,
   getApplicationsOfCurrentUser,
   writeApplicationByUser
 } from '@register/applications'
@@ -35,7 +34,12 @@ import { clone } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from '@register/storage'
-import { IUserDetails } from '@register/utils/userUtils'
+import {
+  IUserDetails,
+  USER_DETAILS,
+  getCurrentUserID
+} from '@register/utils/userUtils'
+import { USER_DATA } from '@register/utils/constants'
 
 describe('when user logs in', async () => {
   // Some mock data
@@ -68,8 +72,8 @@ describe('when user logs in', async () => {
   // @ts-ignore
   storage.getItem = jest.fn((key: string): string => {
     switch (key) {
-      case 'USER_DATA':
-      case 'USER_DETAILS':
+      case USER_DATA:
+      case USER_DETAILS:
         return indexedDB[key]
       default:
         return 'undefined'
@@ -80,8 +84,8 @@ describe('when user logs in', async () => {
   // @ts-ignore
   storage.setItem = jest.fn((key: string, value: string) => {
     switch (key) {
-      case 'USER_DATA':
-      case 'USER_DETAILS':
+      case USER_DATA:
+      case USER_DETAILS:
         indexedDB[key] = value
       default:
         break
@@ -89,7 +93,7 @@ describe('when user logs in', async () => {
   })
 
   it('should read userID correctly', async () => {
-    const uID = await getCurrentUserID() // reads from USER_DETAILS and returns the userMgntUserID, if exists
+    const uID = await getCurrentUserID()
     expect(uID).toEqual('shakib75')
   })
 
@@ -124,7 +128,7 @@ describe('when there is no user-data saved', () => {
     // @ts-ignore
     storage.getItem = jest.fn((key: string): string => {
       switch (key) {
-        case 'USER_DATA':
+        case USER_DATA:
           return '[]'
         case 'USER_DETAILS':
           return '{ "userMgntUserID": "tamimIq" }'
