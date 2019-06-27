@@ -93,7 +93,9 @@ describe('SearchResult tests', () => {
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'DECLARED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
@@ -103,10 +105,12 @@ describe('SearchResult tests', () => {
                   dateOfDeath: '2007-01-01',
                   deceasedName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Iliyas',
                       familyName: 'Khan'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'ইলিয়াস',
                       familyName: 'খান'
                     }
@@ -120,7 +124,9 @@ describe('SearchResult tests', () => {
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
                   type: 'Death',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'REJECTED',
                     trackingId: 'DXMJPYA',
                     registrationNumber: null,
@@ -134,10 +140,12 @@ describe('SearchResult tests', () => {
                   dateOfDeath: '2010-01-01',
                   deceasedName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Zahir',
                       familyName: 'Raihan'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'জহির',
                       familyName: 'রায়হান'
                     }
@@ -151,7 +159,9 @@ describe('SearchResult tests', () => {
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
                   type: 'Birth',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'REGISTERED',
                     trackingId: 'BQRZWDR',
                     registrationNumber: '2019333494BQRZWDR2',
@@ -161,10 +171,12 @@ describe('SearchResult tests', () => {
                   dateOfBirth: '2010-01-01',
                   childName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Fokrul',
                       familyName: 'Islam'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'ফকরুল',
                       familyName: 'ইসলাম'
                     }
@@ -178,7 +190,9 @@ describe('SearchResult tests', () => {
                 {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
                   type: 'Birth',
+                  __typename: 'X',
                   registration: {
+                    __typename: 'X',
                     status: 'CERTIFIED',
                     trackingId: 'B3DBJMP',
                     registrationNumber: '2019333494B3DBJMP5',
@@ -188,10 +202,12 @@ describe('SearchResult tests', () => {
                   dateOfBirth: '2008-01-01',
                   childName: [
                     {
+                      __typename: 'X',
                       firstNames: 'Rafiq',
                       familyName: 'Islam'
                     },
                     {
+                      __typename: 'X',
                       firstNames: 'রফিক',
                       familyName: 'ইসলাম'
                     }
@@ -202,7 +218,8 @@ describe('SearchResult tests', () => {
                   dateOfDeath: '',
                   deceasedName: []
                 }
-              ]
+              ],
+              __typename: 'EventSearchResultSet'
             }
           }
         }
@@ -228,7 +245,7 @@ describe('SearchResult tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 500)
     })
     testComponent.component.update()
     const data = testComponent.component.find(DataTable).prop('data')
