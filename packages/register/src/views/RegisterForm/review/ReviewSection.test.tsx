@@ -39,7 +39,7 @@ draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: { fathersDetailsExist: true, addressSameAsMother: false },
   documents: {
-    imageUploader: [{ title: 'dummy', description: 'dummy', data: '' }]
+    imageUploader: { title: 'dummy', description: 'dummy', data: '' }
   }
 }
 

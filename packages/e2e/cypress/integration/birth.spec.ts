@@ -21,7 +21,8 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#continue').click()
-    cy.get('#select_parent_informant').click()
+    cy.get('#select_informant_parents').click()
+    cy.get('#continue').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#familyName').type('স্পিভক')
@@ -81,7 +82,8 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#continue').click()
-    cy.get('#select_parent_informant').click()
+    cy.get('#select_informant_parents').click()
+    cy.get('#continue').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('মারুফ')

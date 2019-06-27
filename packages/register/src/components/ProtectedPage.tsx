@@ -7,7 +7,7 @@ import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS } from '@register/utils/userUtils'
-import { UserSetupPage } from '@register/views/UserSetup/UserSetupPage'
+import { ProtectedAccount } from '@register/components/ProtectedAccount'
 export const SCREEN_LOCK = 'screenLock'
 
 interface IProtectPageState {
@@ -82,7 +82,7 @@ class ProtectedPageComponent extends React.Component<
   render() {
     const { pendingUser, secured, pinExists } = this.state
     return (
-      (pendingUser && <UserSetupPage />) ||
+      (pendingUser && <ProtectedAccount />) ||
       (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
       (isMobileDevice() && (
         <PageVisibility onChange={this.handleVisibilityChange}>

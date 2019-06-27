@@ -18,12 +18,12 @@ describe('actions', () => {
       const action = {
         type: actions.AUTHENTICATE,
         payload: {
-          mobile: '+8801711111111',
+          username: '+8801711111111',
           password: 'test'
         }
       }
       expect(
-        actions.authenticate({ mobile: '01711111111', password: 'test' })
+        actions.authenticate({ username: '+8801711111111', password: 'test' })
       ).toEqual(action)
     })
   })
@@ -52,7 +52,7 @@ describe('reducer', () => {
       submissionError: false,
       resentSMS: false,
       stepOneDetails: {
-        mobile: '+447111111111',
+        username: '+447111111111',
         password: 'test'
       }
     }
@@ -60,7 +60,7 @@ describe('reducer', () => {
     const action = {
       type: actions.AUTHENTICATE,
       payload: {
-        mobile: '+447111111111',
+        username: '+447111111111',
         password: 'test'
       }
     }
@@ -107,7 +107,8 @@ describe('reducer', () => {
       submissionError: false,
       resentSMS: true,
       authenticationDetails: {
-        nonce: '1234'
+        nonce: '1234',
+        mobile: ''
       }
     }
     const action = {
@@ -155,18 +156,9 @@ describe('reducer', () => {
       type: actions.AUTHENTICATE_VALIDATE,
       payload: 500
     }
-    expect(actions.authenticate({ mobile: '', password: 'test' })).toEqual(
+    expect(actions.authenticate({ username: '', password: 'test' })).toEqual(
       action
     )
-  })
-  it('return error code when validate mobile no format is checked', async () => {
-    const action = {
-      type: actions.AUTHENTICATE_VALIDATE,
-      payload: 503
-    }
-    expect(
-      actions.authenticate({ mobile: 'sd7111111111', password: 'test' })
-    ).toEqual(action)
   })
   it('AUTHENTICATE_VALIDATE return errorCode', async () => {
     const expectedState = {

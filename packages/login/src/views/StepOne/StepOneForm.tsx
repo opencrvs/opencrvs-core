@@ -35,21 +35,6 @@ export const messages: {
     defaultMessage: 'Please enter your mobile number and password.',
     description: 'The instruction that appears in step one of the form'
   },
-  mobileLabel: {
-    id: 'login.mobileLabel',
-    defaultMessage: 'Mobile number',
-    description: 'The label that appears on the mobile number input'
-  },
-  mobilePlaceholder: {
-    id: 'login.mobilePlaceholder',
-    defaultMessage: '07XXXXXXXXX',
-    description: 'The placeholder that appears on the mobile number input'
-  },
-  passwordLabel: {
-    id: 'login.passwordLabel',
-    defaultMessage: 'Password',
-    description: 'The label that appears on the password input'
-  },
   submit: {
     id: 'login.submit',
     defaultMessage: 'Submit',
@@ -168,31 +153,31 @@ export type FullProps = InjectedIntlProps &
   InjectedFormProps<IAuthenticationData, IStepOneForm> &
   IStepOneForm
 
-const mobileField = stepOneFields.mobile
+const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
 
 type Props = WrappedFieldProps & InjectedIntlProps
 
-const MobileInput = injectIntl((props: Props) => {
+const UserNameInput = injectIntl((props: Props) => {
   const { intl, meta, input, ...otherProps } = props
 
   return (
     <InputField
-      {...mobileField}
+      {...userNameField}
       {...otherProps}
       touched={meta.touched}
-      label={intl.formatMessage(mobileField.label)}
+      label={intl.formatMessage(userNameField.label)}
       optionalLabel={intl.formatMessage(messages.optionalLabel)}
       ignoreMediaQuery
       hideAsterisk
       mode={THEME_MODE.DARK}
     >
       <TextInput
-        {...mobileField}
+        {...userNameField}
         {...input}
         touched={Boolean(meta.touched)}
         error={Boolean(meta.error)}
-        type="tel"
+        type="text"
         ignoreMediaQuery
       />
     </InputField>
@@ -255,9 +240,9 @@ export class StepOneForm extends React.Component<FullProps> {
         <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
           <FieldWrapper>
             <Field
-              name={mobileField.name}
-              validate={mobileField.validate}
-              component={MobileInput as React.ComponentClass<any>}
+              name={userNameField.name}
+              validate={userNameField.validate}
+              component={UserNameInput as React.ComponentClass<any>}
             />
           </FieldWrapper>
           <FieldWrapper>

@@ -4,6 +4,7 @@ import {
   HOME,
   SEARCH_RESULT,
   DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_BIRTH_APPLICANT_FORM,
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
@@ -122,6 +123,13 @@ export function goToBirthRegistrationAsParent(applicationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
       applicationId: applicationId.toString()
+    })
+  )
+}
+export function goToApplicationContact(informant: string) {
+  return push(
+    formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
+      informant: informant.toString()
     })
   )
 }

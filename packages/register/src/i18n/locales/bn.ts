@@ -503,6 +503,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': 'নতুন জন্ম ঘোষণা',
+    'register.selectVitalEvent.saveExitButton': 'সংরক্ষণ করে বেরিয়ে যান ',
     'register.form.newVitalEventRegistration':
       'নতুন {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewEventRegistration':
@@ -571,21 +572,17 @@ export const BENGALI_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.savedRegistration.buttons.newDeclaration': 'নতুন আবেদন',
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশে ফেরত যান',
+
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
-    'register.selectInformant.informantTitle': 'তথ্যদাতা কে?',
-    'register.selectInformant.informantDescription':
-      'কে ঘোষণা ফর্মের প্রয়োজনীয় ও বিস্তারিত তথ্য উপাত্ত প্রদান করিবেন',
-    'register.selectInformant.parentInformantTitle': 'পিতামাতা',
-    'register.selectInformant.parentInformantDescription':
-      '<strong>প্রয়োজনীয়</strong>: শিশু এবং মায়ের বিবরণ' +
-      '<br /><strong>ঐচ্ছিক</strong>: বাবা বিস্তারিত বিবরণ',
-    'register.selectInformant.otherInformantTitle': 'অন্য কেউ',
-    'register.selectInformant.otherInformantDescription':
-      'প্রয়োজনীয়: শিশু এবং তথ্যপ্রদানকারীর বিবরণ. ঐচ্ছিক: মা / বাবা বিস্তারিত বিবরণ.',
-    'register.selectInformant.selfInformantTitle': 'নিজ (১৮+)',
-    'register.selectInformant.selfInformantDescription':
-      '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
-      '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
+    'register.selectInformant.informantTitle':
+      'কে জন্ম নিবন্ধনের জন্য আবেদন করছে?',
+    'register.selectInformant.mother': 'মাতা',
+    'register.selectInformant.father': 'পিতা',
+    'register.selectInformant.parents': 'পিতা ও মাতা ',
+    'register.selectInformant.someoneElse': 'অন্য কেউ',
+    'register.selectInformant.self': 'নিজের',
+    'register.selectInformant.errorMessage':
+      'Please select who is present and applying',
     'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
     'register.selectVitalEvent.registerNewEventHeading':
       'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
@@ -808,7 +805,7 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
     'certificate.parent.details.label.number': 'সংখ্যা',
-    'certificate.btn.editRegistration': 'নিবন্ধন সম্পাদনা করুন',
+    'certificate.btn.editRegistration': 'নিবন্ধন সম���পাদনা করুন',
     'certificate.txt.isCorrectTxt': 'জন্ম নিবন্ধনটি কি সঠিক?',
     'certificate.txt.confirmationTxt':
       'অনুগ্রহ করে নিশ্চিত করুন যে নিবন্ধনটি পর্যালোচনা হয়েছে তার তথ্য সঠিক এবং আপনি মুদ্রণ করতে প্রস্তুত',
@@ -1107,9 +1104,27 @@ export const BENGALI_STATE: ILanguage = {
       'আপনার প্রিয় সিনেমা কি?',
     'register.userSetup.securityQuestions.FAVORITE_COLOR':
       'আপনার প্রিয় রং কি?',
+    'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
+    'formFields.SearchField.modalCancel': 'বাতিল',
+    'formFields.SearchField.modalSelect': 'নির্বাচন ',
+    'formFields.SearchField.locationId': 'আইডি: {locationId}',
+    'formFields.SearchField.editButton': 'নিবন্ধন অফিস হালনাগাদ করুন',
+    'formFields.SearchField.placeHolderText': 'অনুসন্ধান',
     'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
     'userSetup.complete.instruction':
       'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
-    'userSetup.complete.button.login': 'লগইন'
+    'userSetup.complete.button.login': 'লগইন',
+    'newPassword.header': 'নতুন একটি পাসওয়ার্ড পছন্দ করুন',
+    'newPassword.instruction':
+      'আমরা আপনাকে একটি অনন্য পাসওয়ার্ড তৈরির সুপারিশ করি - যেটি আপনি অন্য কোনও ওয়েবসাইট বা অ্যাপ্লিকেশনের জন্য ব্যবহার করেন না। বিঃদ্রঃ. আপনি এটি একবার পরিবর্তন করার পরে আপনার পুরানো পাসওয়ার্ড পুনরায় ব্যবহার করতে পারবেন না।',
+    'password.label.new': 'নতুন পাসওয়ার্ড',
+    'password.label.confirm': 'পাসওয়ার্ড নিশ্চিত করুন',
+    'password.validation.msg': 'পাসওয়ার্ড-এ যে বিষয়গুলো অবশ্যই থাকতে হবে:',
+    'password.minLength': 'সর্বনিম্ন {min}-টি অক্ষর',
+    'password.cases': 'বড় হাতের এবং ছোট হাতের অক্ষর',
+    'password.number': 'অন্ততঃ একটি নম্বর',
+    'password.match': 'উল্লেখিত পাসওয়ার্ড মিলেছে',
+    'password.mismatch': 'উল্লেখিত পাসওয়ার্ড মিলে নি',
+    'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়'
   }
 }
