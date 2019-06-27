@@ -6,7 +6,7 @@ context('Login', () => {
   })
 
   it('takes user to the registration app once correct credentials are given', () => {
-    cy.get('#mobile').type('01711111111')
+    cy.get('#username').type('sakibal.hasan')
     cy.get('#password').type('test')
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')

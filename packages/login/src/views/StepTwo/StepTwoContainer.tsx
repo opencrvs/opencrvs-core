@@ -24,7 +24,7 @@ const mapStateToProps = (store: IStoreState): IProps => {
     submissionError: getSubmissionError(store),
     resentSMS: getResentSMS(store),
     submitting: getsubmitting(store),
-    stepOneDetails: { mobile: store.login.stepOneDetails.mobile }
+    stepOneDetails: { mobile: store.login.authenticationDetails.mobile }
   }
 }
 

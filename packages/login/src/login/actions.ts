@@ -1,12 +1,10 @@
 import { AxiosError } from 'axios'
 import { RouterAction } from 'react-router-redux'
-import { convertToMSISDN } from '@login/utils/dataCleanse'
 import {
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
 } from '@login/utils/authApi'
-import { phoneNumberFormat } from '@login/utils/validate'
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
@@ -91,21 +89,14 @@ export type Action =
 export const authenticate = (
   values: IAuthenticationData
 ): AuthenticationDataAction | AuthenticationFieldValidationAction => {
-  if (!values.mobile || !values.password) {
+  if (!values.username || !values.password) {
     return {
       type: AUTHENTICATE_VALIDATE,
       payload: 500
     }
   }
-  const validate = phoneNumberFormat(values.mobile)
-  if (validate) {
-    return {
-      type: AUTHENTICATE_VALIDATE,
-      payload: 503
-    }
-  }
   const cleanedData = {
-    mobile: convertToMSISDN(values.mobile, window.config.COUNTRY),
+    username: values.username,
     password: values.password
   }
 
