@@ -1087,6 +1087,17 @@ export const ENGLISH_STATE: ILanguage = {
     'button.continue': 'Continue',
     'createUser.buttons.submit': 'Create user',
     'createUser.preview.title': 'Please review the new users details',
+    'register.securityquestion.title': 'Security questions',
+    'register.securityquestion.heading': 'Set your security questions',
+    'register.securityquestion.description':
+      'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
+    'register.securityquestion.select': 'Select',
+    'register.securityquestion.selectSecurityQuestion':
+      'Select a security question',
+    'register.securityquestion.enterResponse':
+      'Enter a response to your chosen security question',
+    'register.securityquestion.securityQuestionLabel':
+      'Security question {count}',
     'table.column.header.name': 'Name',
     'table.column.header.role': 'Role',
     'table.column.header.type': 'Type',
