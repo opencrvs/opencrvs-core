@@ -15,8 +15,18 @@ import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import { getLanguage } from '@register/i18n/selectors'
 import { IStoreState } from '@register/store'
-import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
+import { TextInput, InputField } from '@opencrvs/components/lib/forms'
 import { BackArrow } from '@opencrvs/components/lib/icons'
+import { phoneNumberFormat } from '@register/utils/validate'
+import {
+  MOTHER_FIELD_STRING,
+  FATHER_FIELD_STRING,
+  OTHER_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING,
+  CONTACT_POINT_FIELD_STRING,
+  PHONE_NO_FIELD_STRING
+} from '@register/utils/constants'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 
 const messages = defineMessages({
   title: {
@@ -46,7 +56,7 @@ const messages = defineMessages({
   },
   otherLabel: {
     id: 'register.SelectContactPoint.otherLabel',
-    defaultMessage: 'Other',
+    defaultMessage: 'Someone else',
     description: 'Other Label'
   },
   phoneNoLabel: {
@@ -54,8 +64,8 @@ const messages = defineMessages({
     defaultMessage: 'Phone number',
     description: 'Phone No Label'
   },
-  relationShipLabel: {
-    id: 'register.SelectContactPoint.relationShipLabel',
+  relationshipLabel: {
+    id: 'register.SelectContactPoint.relationshipLabel',
     defaultMessage: 'RelationShip to child',
     description: 'RelationShip Label'
   },
@@ -63,6 +73,21 @@ const messages = defineMessages({
     id: 'register.SelectContactPoint.goBack',
     defaultMessage: 'Back',
     description: 'Back button text'
+  },
+  phoneNoError: {
+    id: 'register.SelectContactPoint.phoneNoError',
+    defaultMessage: 'Not a valid mobile number',
+    description: 'Phone no error text'
+  },
+  error: {
+    id: 'register.SelectContactPoint.error',
+    defaultMessage: 'Please select a main point of contact',
+    description: 'Error text'
+  },
+  relationshipPlaceHolder: {
+    id: 'register.SelectContactPoint.relationshipPlaceHolder',
+    defaultMessage: 'eg. Grandmother',
+    description: 'Relationship place holder'
   }
 })
 
@@ -95,16 +120,18 @@ const ChildContainer = styled.div`
   padding-left: 33px;
   border-left: 4px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;
-`
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 16px 0;
+
+  > div {
+    padding: 16px 0;
+  }
 `
 interface IState {
   selected: string
   phoneNumber: string
   relationShip: string
+  isPhoneNoError: boolean
+  touched: boolean
+  isError: boolean
 }
 
 type IProps = InjectedIntlProps & {
@@ -118,13 +145,48 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     this.state = {
       selected: '',
       phoneNumber: '',
-      relationShip: ''
+      relationShip: '',
+      isPhoneNoError: false,
+      touched: false,
+      isError: false
     }
   }
+
+  handlePhoneNoChange = (value: string) => {
+    let invalidPhoneNo = false
+    if (phoneNumberFormat(value)) {
+      invalidPhoneNo = true
+    }
+    this.setState({
+      isPhoneNoError: invalidPhoneNo ? true : false,
+      phoneNumber: value,
+      touched: true,
+      isError: false
+    })
+  }
+
+  handleSubmit = () => {
+    if (!this.state.phoneNumber || this.state.isPhoneNoError) {
+      this.setState({
+        isError: true
+      })
+    }
+  }
+
+  handleContactPointChange = (value: string) =>
+    this.setState({
+      selected: value,
+      phoneNumber: '',
+      touched: false,
+      isError: false
+    })
 
   render() {
     const { intl } = this.props
     const isSmallSizedInput = true
+    const phoneNoError = this.state.isPhoneNoError
+      ? intl.formatMessage(messages.phoneNoError)
+      : ''
 
     return (
       <Container>
@@ -140,109 +202,123 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           >
             {intl.formatMessage(messages.goBack)}
           </TertiaryButton>
+          {this.state.isError && (
+            <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
+          )}
           <Title>{intl.formatMessage(messages.heading)}</Title>
           <Actions id="select_main_contact_point">
             <RadioButton
-              size="large"
-              name="mother"
-              label={intl.formatMessage(messages.motherLabel)}
-              value="mother"
               id="contact_mother"
+              size={RADIO_BUTTON_LARGE_STRING}
+              name={CONTACT_POINT_FIELD_STRING}
+              label={intl.formatMessage(messages.motherLabel)}
+              value={MOTHER_FIELD_STRING}
               selected={this.state.selected}
               onChange={() =>
-                this.setState({ selected: 'mother', phoneNumber: '' })
+                this.handleContactPointChange(MOTHER_FIELD_STRING)
               }
             />
 
-            {this.state.selected === 'mother' && (
+            {this.state.selected === MOTHER_FIELD_STRING && (
               <ChildContainer>
-                <InputContainer>
-                  <InputLabel>
-                    {intl.formatMessage(messages.phoneNoLabel)}
-                  </InputLabel>
+                <InputField
+                  id="phone_number"
+                  label={intl.formatMessage(messages.phoneNoLabel)}
+                  touched={this.state.touched}
+                  error={phoneNoError}
+                  hideAsterisk={true}
+                >
                   <TextInput
-                    name="phoneNumber"
+                    name={PHONE_NO_FIELD_STRING}
                     isSmallSized={isSmallSizedInput}
-                    onChange={e =>
-                      this.setState({ phoneNumber: e.target.value })
-                    }
+                    onChange={e => this.handlePhoneNoChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={this.state.isPhoneNoError}
                   />
-                </InputContainer>
+                </InputField>
               </ChildContainer>
             )}
 
             <RadioButton
-              size="large"
-              name="contactPoint"
-              label={intl.formatMessage(messages.fatherLabel)}
-              value="father"
               id="contact_father"
+              size={RADIO_BUTTON_LARGE_STRING}
+              name={CONTACT_POINT_FIELD_STRING}
+              label={intl.formatMessage(messages.fatherLabel)}
+              value={FATHER_FIELD_STRING}
               selected={this.state.selected}
               onChange={() =>
-                this.setState({ selected: 'father', phoneNumber: '' })
+                this.handleContactPointChange(FATHER_FIELD_STRING)
               }
             />
 
-            {this.state.selected === 'father' && (
+            {this.state.selected === FATHER_FIELD_STRING && (
               <ChildContainer>
-                <InputContainer>
-                  <InputLabel>
-                    {intl.formatMessage(messages.phoneNoLabel)}
-                  </InputLabel>
+                <InputField
+                  id="phone_number"
+                  label={intl.formatMessage(messages.phoneNoLabel)}
+                  touched={this.state.touched}
+                  error={phoneNoError}
+                  hideAsterisk={true}
+                >
                   <TextInput
-                    name="phoneNumber"
+                    name={PHONE_NO_FIELD_STRING}
                     isSmallSized={isSmallSizedInput}
-                    onChange={e =>
-                      this.setState({ phoneNumber: e.target.value })
-                    }
+                    onChange={e => this.handlePhoneNoChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={this.state.isPhoneNoError}
                   />
-                </InputContainer>
+                </InputField>
               </ChildContainer>
             )}
 
             <RadioButton
-              size="large"
-              name="contactPoint"
-              label={intl.formatMessage(messages.otherLabel)}
-              value="other"
               id="contact_other"
+              size={RADIO_BUTTON_LARGE_STRING}
+              name={CONTACT_POINT_FIELD_STRING}
+              label={intl.formatMessage(messages.otherLabel)}
+              value={OTHER_FIELD_STRING}
               selected={this.state.selected}
-              onChange={() =>
-                this.setState({ selected: 'other', phoneNumber: '' })
-              }
+              onChange={() => this.handleContactPointChange(OTHER_FIELD_STRING)}
             />
 
-            {this.state.selected === 'other' && (
+            {this.state.selected === OTHER_FIELD_STRING && (
               <ChildContainer>
-                <InputContainer>
-                  <InputLabel>
-                    {intl.formatMessage(messages.relationShipLabel)}
-                  </InputLabel>
+                <InputField
+                  id="relationship"
+                  label={intl.formatMessage(messages.relationshipLabel)}
+                  touched={this.state.touched}
+                  hideAsterisk={true}
+                >
                   <TextInput
                     name="relationship"
-                    placeholder="eg. Grandmother"
+                    placeholder={intl.formatMessage(
+                      messages.relationshipPlaceHolder
+                    )}
                     isSmallSized={isSmallSizedInput}
-                    onChange={e =>
-                      this.setState({ relationShip: e.target.value })
-                    }
+                    onChange={e => this.handlePhoneNoChange(e.target.value)}
+                    touched={this.state.touched}
                   />
-                </InputContainer>
-                <InputContainer>
-                  <InputLabel>
-                    {intl.formatMessage(messages.phoneNoLabel)}
-                  </InputLabel>
+                </InputField>
+
+                <InputField
+                  id="phone_number"
+                  label={intl.formatMessage(messages.phoneNoLabel)}
+                  touched={this.state.touched}
+                  error={phoneNoError}
+                  hideAsterisk={true}
+                >
                   <TextInput
-                    name="phoneNumber"
+                    name={PHONE_NO_FIELD_STRING}
                     isSmallSized={isSmallSizedInput}
-                    onChange={e =>
-                      this.setState({ phoneNumber: e.target.value })
-                    }
+                    onChange={e => this.handlePhoneNoChange(e.target.value)}
+                    touched={this.state.touched}
+                    error={this.state.isPhoneNoError}
                   />
-                </InputContainer>
+                </InputField>
               </ChildContainer>
             )}
           </Actions>
-          <PrimaryButton id="continue" onClick={console.log}>
+          <PrimaryButton id="continue" onClick={this.handleSubmit}>
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
