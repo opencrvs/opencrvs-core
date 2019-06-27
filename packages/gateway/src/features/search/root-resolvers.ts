@@ -54,6 +54,36 @@ export const resolvers: GQLResolver = {
         results:
           (searchResult && searchResult.hits && searchResult.hits.hits) || []
       }
+    },
+    async countEvents(_, { locationIds }, authHeader) {
+      const searchCriteria: ISearchCriteria =
+        (locationIds && {
+          applicationLocationId: locationIds.join(',')
+        }) ||
+        {}
+      const declaredCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: 'DECLARED'
+      }
+      const declaredResult = await postSearch(authHeader, declaredCriteria)
+
+      const rejectedCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: 'REJECTED'
+      }
+      const rejecteddResult = await postSearch(authHeader, rejectedCriteria)
+      return {
+        declared:
+          (declaredResult &&
+            declaredResult.hits &&
+            declaredResult.hits.total) ||
+          0,
+        rejected:
+          (rejecteddResult &&
+            rejecteddResult.hits &&
+            rejecteddResult.hits.total) ||
+          0
+      }
     }
   }
 }
