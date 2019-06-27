@@ -33,7 +33,6 @@ import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
-import { SecurityQuestion } from '@register/views/SecurityQuestion/SecurityQuestionView'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 
 interface IAppProps {
@@ -165,11 +164,6 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.USER_FORM}
                                   component={UserForm}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SECURITY_QUESTION}
-                                  component={SecurityQuestion}
                                 />
                               </Switch>
                             </ProtectedPage>
