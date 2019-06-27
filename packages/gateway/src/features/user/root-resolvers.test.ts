@@ -214,6 +214,17 @@ describe('User root resolvers', () => {
   })
 
   describe('createUser mutation', () => {
+    const user = {
+      name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
+      identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
+      username: 'mohammad.ashraful',
+      mobile: '+8801733333333',
+      email: 'test@test.org',
+      role: 'LOCAL_REGISTRAR',
+      status: 'active',
+      primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
+    }
+
     it('creats user', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -221,52 +232,11 @@ describe('User root resolvers', () => {
         })
       )
 
-      const response = await resolvers.Mutation.createUser(
-        {},
-        {
-          username: 'mohammad.ashraful',
-          mobile: '+8801733333333',
-          email: 'test@test.org',
-          role: 'LOCAL_REGISTRAR',
-          status: 'active',
-          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-          locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-          count: 10,
-          skip: 0,
-          sort: 'desc'
-        }
-      )
+      const response = await resolvers.Mutation.createUser({}, { user })
 
       expect(response).toEqual({
         statusCode: '201'
       })
-    })
-    it('throws error if /createUser sends anything but 201', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          statusCode: '401'
-        })
-      )
-
-      expect(
-        resolvers.Mutation.createUser(
-          {},
-          {
-            username: 'mohammad.ashraful',
-            mobile: '+8801733333333',
-            email: 'test@test.org',
-            role: 'LOCAL_REGISTRAR',
-            status: 'active',
-            primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-            locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
-            count: 10,
-            skip: 0,
-            sort: 'desc'
-          }
-        )
-      ).rejects.toThrowError(
-        "Something went wrong on user-mgnt service. Couldn't create user"
-      )
     })
   })
 })

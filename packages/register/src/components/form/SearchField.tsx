@@ -108,14 +108,15 @@ const messages = defineMessages({
     description: 'Place holder text '
   }
 })
+
 interface IProps {
   theme: ITheme
   language: string
   fieldName: string
-  fieldValue: string
+  fieldValue: { [key: string]: string }
   fieldLabel: string
   isFieldRequired: boolean
-  onModalComplete: (value: string) => void
+  onModalComplete: (label: string, value: string) => void
 }
 interface IState {
   searchText: string
@@ -139,7 +140,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       selectedValue: '',
       showModal: false,
       isSearchField: this.props.fieldValue ? false : true,
-      fieldValue: this.props.fieldValue || ''
+      fieldValue: this.props.fieldValue.label || ''
     }
   }
 
@@ -168,7 +169,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
   }
 
   onModalComplete = (value: ILocation) => {
-    this.props.onModalComplete(value.id)
+    this.props.onModalComplete(value.name, value.id)
     this.setState({
       searchText: '',
       showModal: !this.state.showModal,

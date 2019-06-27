@@ -713,6 +713,7 @@ export interface GQLUserInput {
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>
+  device?: string
 }
 
 export interface GQLUserIdentifierInput {

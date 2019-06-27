@@ -91,6 +91,7 @@ import { FetchButtonField } from '@register/components/form/FetchButton'
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
 import { gqlToDraftTransformer } from '@register/transformer'
 import { SearchField } from './SearchField'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -332,9 +333,9 @@ function GeneratedInputField({
         fieldName={fieldDefinition.name}
         fieldLabel={fieldDefinition.label}
         isFieldRequired={fieldDefinition.required as boolean}
-        fieldValue={fieldDefinition.initialValue as string}
-        onModalComplete={(value: string) =>
-          onSetFieldValue(fieldDefinition.name, value)
+        fieldValue={fieldDefinition.initialValue as IDynamicValues}
+        onModalComplete={(label: string, value: string) =>
+          onSetFieldValue(fieldDefinition.name, { label, value })
         }
       />
     )

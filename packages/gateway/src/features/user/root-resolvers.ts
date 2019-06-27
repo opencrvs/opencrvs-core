@@ -1,7 +1,14 @@
-import { GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLResolver,
+  GQLUserInput,
+  GQLHumanNameInput
+} from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import { IUserSearchPayload } from '@gateway/features/user/type-resovlers'
+import {
+  IUserSearchPayload,
+  IUserPayload
+} from '@gateway/features/user/type-resovlers'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -71,22 +78,14 @@ export const resolvers: GQLResolver = {
     async createUser(_, { user }, authHeader) {
       const res = await fetch(`${USER_MANAGEMENT_URL}createUser`, {
         method: 'POST',
-        body: JSON.stringify(user),
+        body: JSON.stringify(createUserPayload(user)),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
         }
       })
 
-      const response = await res.json()
-      if (response.statusCode !== '201') {
-        return await Promise.reject(
-          new Error(
-            "Something went wrong on user-mgnt service. Couldn't create user"
-          )
-        )
-      }
-      return response
+      return await res.json()
     },
     async activateUser(_, { userId, password, securityQNAs }, authHeader) {
       const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
@@ -108,5 +107,20 @@ export const resolvers: GQLResolver = {
       }
       return response
     }
+  }
+}
+
+function createUserPayload(user: GQLUserInput): IUserPayload {
+  return {
+    name: (user.name as GQLHumanNameInput[]).map((name: GQLHumanNameInput) => ({
+      use: name.use as string,
+      family: name.familyName as string,
+      given: (name.firstNames || '').split(' ') as string[]
+    })),
+    role: user.role as string,
+    identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
+    primaryOfficeId: user.primaryOffice as string,
+    email: user.email || '',
+    mobile: user.mobile as string
   }
 }

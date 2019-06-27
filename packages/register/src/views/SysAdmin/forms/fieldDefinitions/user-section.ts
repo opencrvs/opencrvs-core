@@ -2,7 +2,8 @@ import {
   IFormSection,
   TEXT,
   FIELD_GROUP_TITLE,
-  SEARCH_FIELD
+  SEARCH_FIELD,
+  SELECT_WITH_OPTIONS
 } from '@register/forms'
 import { defineMessages } from 'react-intl'
 import {
@@ -13,8 +14,10 @@ import {
 import {
   fieldToNameTransformer,
   fieldNameTransformer,
-  fieldToIdentifierWithTypeTransformer
+  fieldToIdentifierWithTypeTransformer,
+  fieldNameValueTransformer
 } from '@register/forms/mappings/mutation/field-mappings'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 const messages = defineMessages({
   userForm: {
@@ -193,11 +196,20 @@ export const userSection: IFormSection = {
     },
     {
       name: 'role',
-      type: TEXT,
+      type: SELECT_WITH_OPTIONS,
       label: messages.userRole,
       required: true,
       initialValue: '',
-      validate: []
+      validate: [],
+      options: [
+        { label: roleMessages.FIELD_AGENT, value: 'FIELD_AGENT' },
+        { label: roleMessages.REGISTRATION_CLERK, value: 'REGISTRATION_CLERK' },
+        { label: roleMessages.LOCAL_REGISTRAR, value: 'LOCAL_REGISTRAR' },
+        { label: roleMessages.DISTRICT_REGISTRAR, value: 'DISTRICT_REGISTRAR' },
+        { label: roleMessages.STATE_REGISTRAR, value: 'STATE_REGISTRAR' },
+        { label: roleMessages.NATIONAL_REGISTRAR, value: 'NATIONAL_REGISTRAR' },
+        { label: roleMessages.LOCAL_SYSTEM_ADMIN, value: 'LOCAL_SYSTEM_ADMIN' }
+      ]
     },
     {
       name: 'device',
@@ -223,7 +235,7 @@ export const userSection: IFormSection = {
       initialValue: '',
       validate: [],
       mapping: {
-        mutation: fieldNameTransformer('primaryOffice')
+        mutation: fieldNameValueTransformer('primaryOffice')
       }
     }
   ]

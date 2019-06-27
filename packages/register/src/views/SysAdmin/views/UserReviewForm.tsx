@@ -21,6 +21,8 @@ import ApolloClient from 'apollo-client'
 import { createUserMutation } from '@register/views/SysAdmin/user/mutations'
 import { draftToGqlTransformer } from '@register/transformer'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -58,7 +60,7 @@ class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
   transformSectionData = () => {
-    const { intl, section, formData } = this.props
+    const { intl, section } = this.props
     const sections: ISectionData[] = []
     section.fields.forEach((field: IFormField) => {
       if (field && field.type === FIELD_GROUP_TITLE) {
@@ -66,7 +68,7 @@ class UserReviewFormComponent extends React.Component<
       } else if (field && sections.length > 0) {
         sections[sections.length - 1].items.push({
           label: intl.formatMessage(field.label),
-          value: (formData[field.name] && String(formData[field.name])) || '',
+          value: this.getValue(field),
           action: {
             id: `btn_change_${field.name}`,
             label: intl.formatMessage(messages.actionChange),
@@ -77,6 +79,17 @@ class UserReviewFormComponent extends React.Component<
     })
 
     return sections
+  }
+
+  getValue = (field: IFormField) => {
+    const { intl, formData } = this.props
+    return formData[field.name]
+      ? typeof formData[field.name] !== 'object'
+        ? field.name === 'role'
+          ? intl.formatMessage(roleMessages[formData.role as string])
+          : String(formData[field.name])
+        : (formData[field.name] as IDynamicValues).label
+      : ''
   }
 
   render() {
