@@ -4,7 +4,9 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 import {
   goBack as goBackAction,
-  goToHome as goToHomeAction
+  goToHome as goToHomeAction,
+  goToBirthRegistration,
+  goToBirthRegistrationAsParent
 } from '@register/navigation'
 import {
   PrimaryButton,
@@ -27,6 +29,13 @@ import {
   PHONE_NO_FIELD_STRING
 } from '@register/utils/constants'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import {
+  IApplication,
+  createApplication,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
+import { RouteComponentProps } from 'react-router'
 
 const messages = defineMessages({
   title: {
@@ -134,11 +143,14 @@ interface IState {
   isError: boolean
 }
 
-type IProps = InjectedIntlProps & {
-  language: string
-  goBack: typeof goBackAction
-  goToHome: typeof goToHomeAction
-}
+type IProps = InjectedIntlProps &
+  RouteComponentProps<{ applicant: string }> & {
+    language: string
+    goBack: typeof goBackAction
+    goToHome: typeof goToHomeAction
+    storeApplication: typeof storeApplication
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  }
 class SelectContactPointView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
@@ -166,7 +178,17 @@ class SelectContactPointView extends React.Component<IProps, IState> {
   }
 
   handleSubmit = () => {
-    if (!this.state.phoneNumber || this.state.isPhoneNoError) {
+    if (this.state.phoneNumber && !this.state.isPhoneNoError) {
+      const application: IApplication = createApplication(Event.BIRTH)
+      application.data['registration'] = {
+        presentAtBirthRegistration: this.props.match.params.applicant,
+        registrationPhone: this.state.phoneNumber,
+        whoseContactDetails: this.state.selected
+      }
+
+      this.props.storeApplication(application)
+      this.props.goToBirthRegistrationAsParent(application.id)
+    } else {
       this.setState({
         isError: true
       })
@@ -337,6 +359,8 @@ export const SelectContactPoint = connect(
   mapStateToProps,
   {
     goBack: goBackAction,
-    goToHome: goToHomeAction
+    goToHome: goToHomeAction,
+    storeApplication,
+    goToBirthRegistrationAsParent
   }
 )(injectIntl(SelectContactPointView))
