@@ -213,9 +213,9 @@ context('Birth Registration Integration Test', () => {
     cy.wait(3000)
     // LOG OUT
     cy.get('#mobile_header_left').click()
-    cy.get('.sc-hzDEsm > .sc-fOICqy > .sc-bGbJRg').click()
-    // LOGIN AS REGISTRAR
-    cy.get('#mobile').type('01733333333')
+    cy.get('#mobile_menu_item_4').click()
+    // LOGIN AS LOCAL REGISTRAR
+    cy.get('#username').type('mohammad.ashraful')
     cy.get('#password').type('test')
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')
