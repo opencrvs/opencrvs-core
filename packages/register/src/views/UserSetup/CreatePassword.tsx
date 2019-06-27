@@ -208,7 +208,10 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
       this.state.newPassword === this.state.confirmPassword
     ) {
       this.props.setupData.password = this.state.newPassword
-      this.props.goToStep(ProtectedAccoutStep.LANDING, this.props.setupData)
+      this.props.goToStep(
+        ProtectedAccoutStep.SECURITY_QUESTION,
+        this.props.setupData
+      )
     }
   }
   render = () => {

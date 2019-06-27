@@ -11,6 +11,11 @@ import {
   QUESTION_KEYS,
   questionMessages
 } from '@register/utils/userSecurityQuestions'
+import {
+  ProtectedAccoutStep,
+  IProtectedAccountSetupData,
+  ISecurityQuestionAnswer
+} from '@register/components/ProtectedAccount'
 
 const messages = defineMessages({
   title: {
@@ -51,7 +56,11 @@ const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
 
 type IProps = {
-  goBack: () => void
+  setupData: IProtectedAccountSetupData
+  goToStep: (
+    step: ProtectedAccoutStep,
+    data: IProtectedAccountSetupData
+  ) => void
 } & InjectedIntlProps
 
 type IQuestion = {
@@ -109,7 +118,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     super(props)
 
     this.state = {
-      questionnaire: this.preparequestionnaire(),
+      questionnaire: this.prepareQuestionnaire(),
       refresher: Date.now(),
       showError: false
     }
@@ -132,7 +141,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     return result
   }
 
-  preparequestionnaire = (): IQuestionnaire[] => {
+  prepareQuestionnaire = (): IQuestionnaire[] => {
     let i
     const questionnaire = []
     for (i = 0; i < VISIBLE_QUESTION; i++) {
@@ -145,7 +154,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     return questionnaire
   }
 
-  onQuestionSelect = (value: string, index: number) => {
+  onQuestionSelect = (value: string, index: number): void => {
     const questionnaire = this.state.questionnaire
     questionnaire[index].selectedQuestion = value
 
@@ -182,10 +191,28 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
   onAnswerChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number
-  ) => {
+  ): void => {
     const questionnaire = this.state.questionnaire
     questionnaire[index].answer = event.target.value
     this.setState({ questionnaire })
+  }
+
+  isValidate = (): boolean => {
+    let isValid = true
+    this.state.questionnaire.forEach((questionnaire: IQuestionnaire) => {
+      if (!questionnaire.selectedQuestion || !questionnaire.answer) {
+        isValid = false
+        return
+      }
+    })
+    return isValid
+  }
+
+  prepareSetupData = (): ISecurityQuestionAnswer[] => {
+    return this.state.questionnaire.map((questionnaire: IQuestionnaire) => ({
+      questionKey: questionnaire.selectedQuestion,
+      answer: questionnaire.answer
+    }))
   }
 
   onsubmit = (
@@ -195,7 +222,11 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
   ) => {
     e.preventDefault()
     this.setState({ showError: true })
-    console.log(this.state.questionnaire)
+    this.props.setupData.securityQuestionAnswers = this.prepareSetupData()
+
+    if (this.isValidate()) {
+      this.props.goToStep(ProtectedAccoutStep.LANDING, this.props.setupData)
+    }
   }
 
   showQuestionnaire = () => {
@@ -269,7 +300,12 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     const { intl } = this.props
     return (
       <ActionPageLight
-        goBack={this.props.goBack}
+        goBack={() => {
+          this.props.goToStep(
+            ProtectedAccoutStep.PASSWORD,
+            this.props.setupData
+          )
+        }}
         title={intl.formatMessage(messages.title)}
       >
         <H3>{intl.formatMessage(messages.heading)}</H3>
@@ -280,9 +316,4 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
   }
 }
 
-export const SecurityQuestion = connect(
-  null,
-  {
-    goBack
-  }
-)(injectIntl(SecurityQuestionView))
+export const SecurityQuestion = injectIntl(SecurityQuestionView)
