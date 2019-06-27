@@ -49,3 +49,11 @@ export const FIELD_AGENT_HOME_TAB_IN_PROGRESS = 'progress'
 export const FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW = 'review'
 export const FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES = 'updates'
 export const UNION_LOCATION_CODE = 'UNION'
+
+export const MOTHER_FIELD_STRING = 'mother'
+export const FATHER_FIELD_STRING = 'father'
+export const OTHER_FIELD_STRING = 'other'
+export const PHONE_NO_FIELD_STRING = 'phoneNo'
+export const CONTACT_POINT_FIELD_STRING = 'contactPoint'
+
+export const RADIO_BUTTON_LARGE_STRING = 'large'
