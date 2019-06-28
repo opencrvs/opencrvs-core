@@ -74,12 +74,13 @@ describe('when user is selecting the informant', () => {
         .find('#select_informant_mother')
         .hostNodes()
         .simulate('change')
+
       app
         .find('#continue')
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+      expect(window.location.pathname).toBe('/events/birth/mother/contact')
     })
   })
   describe('when click continue without select anything', () => {
@@ -121,7 +122,7 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+      expect(window.location.pathname).toBe('/events/birth/parents/contact')
     })
   })
 

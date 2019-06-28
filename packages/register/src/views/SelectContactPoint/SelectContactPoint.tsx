@@ -226,6 +226,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     return (
       <Container>
         <EventTopBar
+          id="title"
           title={intl.formatMessage(messages.title)}
           goHome={this.props.goToHome}
         />

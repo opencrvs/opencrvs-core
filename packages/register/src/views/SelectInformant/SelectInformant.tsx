@@ -94,7 +94,7 @@ const Actions = styled.div`
 enum INFORMANT {
   FATHER = 'father',
   MOTHER = 'mother',
-  BOTH_PARENTS = 'both_parents',
+  BOTH_PARENTS = 'parents',
   SELF = 'self',
   SOMEONE_ELSE = 'other'
 }
