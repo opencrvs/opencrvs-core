@@ -5,7 +5,6 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
-  goToBirthRegistration,
   goToBirthRegistrationAsParent
 } from '@register/navigation'
 import {
@@ -181,7 +180,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     if (this.state.phoneNumber && !this.state.isPhoneNoError) {
       const application: IApplication = createApplication(Event.BIRTH)
       application.data['registration'] = {
-        presentAtBirthRegistration: this.props.match.params.applicant,
+        presentAtBirthRegistration: 'BOTH_PARENTS',
         registrationPhone: this.state.phoneNumber,
         whoseContactDetails: this.state.selected
       }
