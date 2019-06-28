@@ -27,6 +27,7 @@ export interface GQLQuery {
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
   fetchBirthRegistrationMetrics?: GQLBirthRegistrationMetrics
+  countEvents?: GQLEventCount
   searchEvents?: GQLEventSearchResultSet
   getRoles?: Array<GQLRole | null>
 }
@@ -500,6 +501,11 @@ export interface GQLBirthRegistrationWithIn45D {
   totalEstimate?: number
 }
 
+export interface GQLEventCount {
+  declared?: number
+  rejected?: number
+}
+
 export interface GQLEventSearchResultSet {
   results?: Array<GQLEventSearchSet | null>
   totalItems?: number
@@ -843,6 +849,7 @@ export interface GQLResolver {
   BirthKeyFiguresData?: GQLBirthKeyFiguresDataTypeResolver
   BirthRegistrationByAgeMetrics?: GQLBirthRegistrationByAgeMetricsTypeResolver
   BirthRegistrationWithIn45D?: GQLBirthRegistrationWithIn45DTypeResolver
+  EventCount?: GQLEventCountTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -877,6 +884,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchBirthRegistrationMetrics?: QueryToFetchBirthRegistrationMetricsResolver<
     TParent
   >
+  countEvents?: QueryToCountEventsResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
 }
@@ -1139,6 +1147,18 @@ export interface QueryToFetchBirthRegistrationMetricsResolver<
   (
     parent: TParent,
     args: QueryToFetchBirthRegistrationMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToCountEventsArgs {
+  locationIds?: Array<string | null>
+}
+export interface QueryToCountEventsResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToCountEventsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2386,6 +2406,19 @@ export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventCountTypeResolver<TParent = any> {
+  declared?: EventCountToDeclaredResolver<TParent>
+  rejected?: EventCountToRejectedResolver<TParent>
+}
+
+export interface EventCountToDeclaredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventCountToRejectedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

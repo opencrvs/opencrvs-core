@@ -7,7 +7,7 @@ const Container = styled.div`
 `
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
-  margin: 0 0 0 8px;
+  margin-bottom: 16px;
 `
 interface IProps {
   title: string

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { Button } from './Button'
 
 export const LinkButton = styled(Button)`
-  ${({ theme }) => theme.fonts.regularFont};
+  ${({ theme }) => theme.fonts.bodyStyle}
   color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
   height: auto;
