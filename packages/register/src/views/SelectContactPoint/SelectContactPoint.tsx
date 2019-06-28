@@ -226,7 +226,6 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     return (
       <Container>
         <EventTopBar
-          id="title"
           title={intl.formatMessage(messages.title)}
           goHome={this.props.goToHome}
         />
@@ -239,7 +238,9 @@ class SelectContactPointView extends React.Component<IProps, IState> {
             {intl.formatMessage(messages.goBack)}
           </TertiaryButton>
           {this.state.isError && (
-            <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
+            <span id="error_text">
+              <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
+            </span>
           )}
           <Title>{intl.formatMessage(messages.heading)}</Title>
           <Actions id="select_main_contact_point">
