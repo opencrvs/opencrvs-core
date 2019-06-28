@@ -210,7 +210,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.wait(3000)
+    cy.wait(6000)
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
@@ -221,7 +221,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
-    cy.get('#row_0 > #ActionWrapper > #ListItemAction > #Review').click()
+    cy.get('#Review').first().click()
     cy.wait(500)
     cy.get('#next_button_child').click()
     cy.get('#next_button_mother').click()
