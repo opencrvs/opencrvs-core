@@ -48,6 +48,7 @@ interface IAction {
 }
 
 export interface IDataProps {
+  id?: string
   label: string
   value?: string
   placeHolder?: string
@@ -56,10 +57,10 @@ export interface IDataProps {
 
 export class DataRow extends React.Component<IDataProps> {
   render() {
-    const { label, value, placeHolder, action } = this.props
+    const { id, label, value, placeHolder, action } = this.props
 
     return (
-      <Container>
+      <Container id={id}>
         <DataContainer>
           <Label>{label}</Label>
           {value && <Value>{value}</Value>}

@@ -22,13 +22,10 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
-import {
-  QUESTION_KEYS,
-  questionMessages
-} from '@register/utils/userSecurityQuestions'
+import { questionMessages } from '@register/utils/userSecurityQuestions'
 import { Check } from '@opencrvs/components/lib/icons'
 
-const activateUserMutation = gql`
+export const activateUserMutation = gql`
   mutation submitActivateUser(
     $userId: String!
     $password: String!
@@ -72,9 +69,13 @@ const messages = defineMessages({
     id: 'label.assignedOffice',
     defaultMessage: 'Assigned office'
   },
-  labelRoleType: {
-    id: 'label.roleType',
-    defaultMessage: 'Role / Type'
+  labelRole: {
+    id: 'table.column.header.role',
+    defaultMessage: 'Role'
+  },
+  labelType: {
+    id: 'table.column.header.type',
+    defaultMessage: 'Type'
   },
   actionChange: {
     id: 'action.change',
@@ -172,9 +173,9 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       (userDetails &&
         (userDetails.type
           ? `${intl.formatMessage(
-              typeMessages[userDetails.type as string]
-            )} / ${intl.formatMessage(
               roleMessages[userDetails.role as string]
+            )} / ${intl.formatMessage(
+              typeMessages[userDetails.type as string]
             )}`
           : `${intl.formatMessage(
               roleMessages[userDetails.role as string]
@@ -191,10 +192,11 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
     this.props.setupData.securityQuestionAnswers &&
       this.props.setupData.securityQuestionAnswers.forEach(e => {
         answeredQuestions.push({
+          id: `Question_${e.questionKey}`,
           label: intl.formatMessage(questionMessages[e.questionKey]),
           value: e.answer,
           action: {
-            id: `Question_${e.questionKey}`,
+            id: `Question_Action_${e.questionKey}`,
             label: intl.formatMessage(messages.actionChange),
             handler: () =>
               this.props.goToStep(
@@ -206,6 +208,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       })
     const items = [
       {
+        id: 'BengaliName',
         label: intl.formatMessage(messages.labelBanglaName),
         value: bengaliName,
         action: {
@@ -214,6 +217,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         }
       },
       {
+        id: 'EnglishName',
         label: intl.formatMessage(messages.labelEnglishName),
         value: englishName,
         action: {
@@ -222,6 +226,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         }
       },
       {
+        id: 'UserPhone',
         label: intl.formatMessage(messages.labelPhone),
         value: '01711111111',
         action: {
@@ -230,11 +235,15 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         }
       },
       {
+        id: 'RegisterOffice',
         label: intl.formatMessage(messages.labelAssignedOffice),
         value: primaryOffice
       },
       {
-        label: intl.formatMessage(messages.labelRoleType),
+        id: 'RoleType',
+        label: `${intl.formatMessage(
+          messages.labelRole
+        )} / ${intl.formatMessage(messages.labelType)}`,
         value: typeRole
       },
       ...answeredQuestions
@@ -255,10 +264,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       <ActionPageLight
         title={intl.formatMessage(messages.title)}
         goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.SECURITY_QUESTION,
-            this.props.setupData
-          )
+          this.props.goToStep(ProtectedAccoutStep.SECURITY_QUESTION, {})
         }}
       >
         <Header>{intl.formatMessage(messages.header)}</Header>
@@ -270,7 +276,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
             </WarningMessage>
           )}
         </GlobalError>
-        <div>
+        <div id="UserSetupData">
           {items.map((item: IDataProps, index: number) => (
             <DataRow key={index} {...item} />
           ))}
@@ -279,17 +285,14 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
           mutation={activateUserMutation}
           variables={{ ...this.props.setupData }}
           onCompleted={() => onCompleted()}
-          onError={onError}
+          onError={() => onError()}
         >
-          {(
-            submitActivateUser: any,
-            { loading, data }: { loading: any; data?: any }
-          ) => {
+          {(submitActivateUser: any, { loading }: { loading: any }) => {
             if (loading) {
               return (
                 <LoaderOverlay>
                   <Loader
-                    id={`setup_submit_waiting`}
+                    id="setup_submit_waiting"
                     marginPercent={20}
                     spinnerDiameter={60}
                     loadingText={intl.formatMessage(messages.wiating)}
@@ -315,11 +318,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const UserSetupReview = connect(
-  function mapStateToProps(state: IStoreState) {
-    return {
-      userDetails: getUserDetails(state)
-    }
-  },
-  null
-)(injectIntl(UserSetupReviewComponent))
+export const UserSetupReview = connect((state: IStoreState) => ({
+  language: state.i18n.language,
+  userDetails: getUserDetails(state)
+}))(injectIntl(UserSetupReviewComponent))

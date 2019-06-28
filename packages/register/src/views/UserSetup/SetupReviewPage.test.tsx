@@ -1,49 +1,174 @@
 import * as React from 'react'
-import { createTestComponent } from '@register/tests/util'
+import { createTestComponent, userDetails } from '@register/tests/util'
+import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
 import { createStore } from '@register/store'
-import { CreatePassword } from './CreatePassword'
-import { ReactWrapper } from 'enzyme'
+import { UserSetupReview, activateUserMutation } from './SetupReviewPage'
+import { merge } from 'lodash'
+import { DataRow } from '@opencrvs/components/lib/interface'
 
 const { store } = createStore()
 
-describe('Settings page tests', async () => {
-  let component: ReactWrapper
+describe('SetupReviewPage page tests', async () => {
   beforeEach(async () => {
+    store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+  })
+  it('render page', async () => {
+    store.dispatch(
+      getStorageUserDetailsSuccess(
+        JSON.stringify({ ...userDetails, type: 'CHA' })
+      )
+    )
     const testComponent = createTestComponent(
       // @ts-ignore
-      <CreatePassword />,
+      <UserSetupReview
+        setupData={{
+          userId: 'ba7022f0ff4822',
+          password: 'password',
+          securityQuestionAnswers: [
+            { questionKey: 'BIRTH_TOWN', answer: 'test' }
+          ]
+        }}
+        goToStep={() => {}}
+      />,
       store
     )
-    component = testComponent.component
+
+    expect(testComponent.component.find('#UserSetupData')).toBeDefined()
+    testComponent.component.unmount()
+  })
+  it('render page without type', async () => {
+    store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupReview
+        setupData={{
+          userId: 'ba7022f0ff4822',
+          password: 'password',
+          securityQuestionAnswers: [
+            { questionKey: 'BIRTH_TOWN', answer: 'test' }
+          ]
+        }}
+        goToStep={() => {}}
+      />,
+      store
+    )
+
+    const role = testComponent.component
+      .find('#RoleType')
+      .hostNodes()
+      .childAt(0)
+      .childAt(0)
+      .childAt(1)
+      .text()
+    expect(role).toEqual('Field Agent')
+    testComponent.component.unmount()
+  })
+  it('clicks question to change', async () => {
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupReview
+        setupData={{
+          userId: 'ba7022f0ff4822',
+          password: 'password',
+          securityQuestionAnswers: [
+            { questionKey: 'BIRTH_TOWN', answer: 'test' }
+          ]
+        }}
+        goToStep={() => {}}
+      />,
+      store
+    )
+
+    testComponent.component
+      .find('#Question_Action_BIRTH_TOWN')
+      .hostNodes()
+      .simulate('click')
+
+    testComponent.component.unmount()
+  })
+  it('submit user setup for activation', async () => {
+    const mock = [
+      {
+        request: {
+          query: activateUserMutation,
+          variables: {
+            userId: 'ba7022f0ff4822',
+            password: 'password',
+            securityQuestionAnswers: [
+              { questionKey: 'BIRTH_TOWN', answer: 'test' }
+            ]
+          }
+        },
+        result: {
+          data: []
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupReview
+        setupData={{
+          userId: 'ba7022f0ff4822',
+          password: 'password',
+          securityQuestionAnswers: [
+            { questionKey: 'BIRTH_TOWN', answer: 'test' }
+          ]
+        }}
+      />,
+      store,
+      mock
+    )
+
+    testComponent.component.find('button#Confirm').simulate('click')
+
+    testComponent.component.unmount()
   })
 
-  it('it shows passwords missmatch error when Continue button is pressed', () => {
-    // @ts-ignore
-    component.find('input#NewPassword').simulate('change', {
-      target: { id: 'NewPassword', value: '0crvsPassword' }
+  it('it shows error if error occurs', async () => {
+    const graphqlErrorMock = [
+      {
+        request: {
+          query: activateUserMutation,
+          variables: {
+            userId: 'ba7022f0ff4822',
+            password: 'password',
+            securityQuestionAnswers: [
+              { questionKey: 'BIRTH_TOWN', answer: 'test' }
+            ]
+          }
+        },
+        error: new Error('boom!')
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupReview
+        setupData={{
+          userId: 'ba7022f0ff4822',
+          password: 'password',
+          securityQuestionAnswers: [
+            { questionKey: 'BIRTH_TOWN', answer: 'test' }
+          ]
+        }}
+      />,
+      store,
+      graphqlErrorMock
+    )
+
+    testComponent.component.find('button#Confirm').simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
     })
-    component.find('input#ConfirmPassword').simulate('change', {
-      target: { id: 'ConfirmPassword', value: 'missmatch' }
-    })
-    component.find('button#Confirm').simulate('click')
+    testComponent.component.update()
     expect(
-      component
+      testComponent.component
         .find('#GlobalError')
         .hostNodes()
         .text()
-    ).toEqual('Passwords do not match')
+    ).toBe('An error occured. Please try again.')
 
-    component.unmount()
-  })
-  it('it shows passwords required error when Continue button is pressed', () => {
-    component.find('button#Continue').simulate('click')
-    expect(
-      component
-        .find('#GlobalError')
-        .hostNodes()
-        .text()
-    ).toEqual('New password is not valid')
-
-    component.unmount()
+    testComponent.component.unmount()
   })
 })

@@ -1142,7 +1142,6 @@ export const ENGLISH_STATE: ILanguage = {
     'userSetupReview.instruction':
       'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
     'label.assignedOffice': 'Assigned office',
-    'label.roleType': 'Role / Type',
     'button.confirm': 'Confirm',
     'user.setup.waiting': 'Setting up your account',
     'error.occured': 'An error occured. Please try again.'
