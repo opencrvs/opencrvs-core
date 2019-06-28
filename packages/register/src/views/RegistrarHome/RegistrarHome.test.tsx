@@ -973,6 +973,8 @@ describe('RegistrarHome tests', () => {
     testComponent.component.unmount()
   })
   it('should show pagination bar in Print if items more than 11', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
@@ -988,7 +990,68 @@ describe('RegistrarHome tests', () => {
           data: {
             searchEvents: {
               totalItems: 14,
-              results: userData
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: '2019333494BBONT7U7',
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: '2019333494B8I0NEB9',
+                    contactNumber: '01622688231',
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: null
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
             }
           }
         }
@@ -1158,7 +1221,8 @@ describe('RegistrarHome tests', () => {
                     type: 'DECLARED',
                     comments: null
                   }
-                ]
+                ],
+                contactPhoneNumber: null
               },
               child: null,
               deceased: {
@@ -1359,7 +1423,8 @@ describe('RegistrarHome tests', () => {
                       }
                     ]
                   }
-                ]
+                ],
+                contactPhoneNumber: '01622688231'
               },
               child: {
                 name: [
@@ -1406,6 +1471,196 @@ describe('RegistrarHome tests', () => {
     expect(testComponent.component.find('#REJECTED-0').hostNodes().length).toBe(
       1
     )
+    testComponent.component.unmount()
+  })
+  it('renders expanded area for ready to print', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: '2007-01-01',
+                    modifiedAt: '2007-01-01'
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+              registration: {
+                id: '345678',
+                type: 'BIRTH',
+                certificates: null,
+                status: [
+                  {
+                    id:
+                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    timestamp: '2019-04-03T07:08:24.936Z',
+                    user: {
+                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful'
+                        },
+                        {
+                          use: 'bn',
+                          firstNames: '',
+                          familyName: ''
+                        }
+                      ],
+                      role: 'LOCAL_REGISTRAR'
+                    },
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
+                    type: 'REGISTERED',
+                    comments: [
+                      {
+                        comment: 'reason=duplicate&comment=dup'
+                      }
+                    ]
+                  }
+                ],
+                contactPhoneNumber: '01622688231'
+              },
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Mushraful',
+                    familyName: 'Hoque'
+                  }
+                ],
+                birthDate: '01-01-1984'
+              },
+              deceased: null,
+              informant: null
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+    testComponent.component.update()
+    const instance = testComponent.component.find(GridTable).instance() as any
+
+    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#REGISTERED-0').hostNodes().length
+    ).toBe(1)
     testComponent.component.unmount()
   })
   it('expanded block renders error text when an error occurs', async () => {

@@ -102,6 +102,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
             comment
           }
         }
+        contactPhoneNumber
       }
       ... on BirthRegistration {
         child {
