@@ -46,7 +46,7 @@ export const colors = {
   copy: colorDictionary.blackStormy,
   placeholder: colorDictionary.greyDarkSteel,
   background: colorDictionary.greyPearl,
-  disabled: colorDictionary.greySmoky,
+  disabled: colorDictionary.greyGrey,
   success: colorDictionary.greenPeaPea,
   white: colorDictionary.white,
   black: colorDictionary.black,
@@ -66,5 +66,5 @@ export const colors = {
 
   // Dividers
   dividerLight: colorDictionary.greyPearl,
-  dividerDark: colorDictionary.greyGrey
+  dividerDark: colorDictionary.greySmoky
 }
