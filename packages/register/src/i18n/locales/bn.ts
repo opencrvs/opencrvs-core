@@ -591,6 +591,12 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectVitalEvent.continueButton': 'পরবর্তী',
     'register.selectVitalEvent.errorMessage':
       'দয়া করে একটি ইভেন্ট নির্বাচন করুন',
+    'register.primaryApplicant.registerNewEventHeading':
+      'এই আবেদনটির প্রধান আবেদনকারী কে?',
+    'register.primaryApplicant.description':
+      'এই ব্যক্তিটি এই আবেদনটির নির্ভুল তথ্য প্রদান করার জন্য দায়ী',
+    'register.primaryApplicant.errorMessage':
+      'দয়া করে প্রাথমিক আবেদনকারী কে তা নির্বাচন করুন ',
     'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
