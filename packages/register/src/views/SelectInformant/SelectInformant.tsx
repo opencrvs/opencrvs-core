@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -7,22 +8,15 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import {
-  createApplication,
-  setInitialApplications,
-  storeApplication
-} from '@register/applications'
-import { Event } from '@register/forms'
-import {
-  goBack as goBackAction,
+  goBack,
   goToBirthRegistrationAsParent,
-  goToPrimaryApplicant as goToPrimaryApplicantAction,
-  goToHome
+  goToHome,
+  goToMainContactPonit,
+  goToPrimaryApplicant
 } from '@register/navigation'
 import styled from '@register/styledComponents'
-import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Dispatch } from 'redux'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -98,30 +92,28 @@ const Actions = styled.div`
   }
 `
 enum INFORMANT {
-  FATHER = 'FATHER',
-  MOTHER = 'MOTHER',
-  BOTH_PARENTS = 'BOTH_PARENTS',
-  SELF = 'SELF',
-  SOMEONE_ELSE = 'SOMEONE_ELSE'
+  FATHER = 'father',
+  MOTHER = 'mother',
+  BOTH_PARENTS = 'parents',
+  SELF = 'self',
+  SOMEONE_ELSE = 'other'
 }
 export class SelectInformantView extends React.Component<
   {
-    informantRegistration: (informant: string) => void
-    goToBirthRegistration: () => void
-    goToPrimaryApplicant: () => void
-    goHome: () => void
-    goBack: () => void
+    language: string
+    goBack: typeof goBack
+    goToHome: typeof goToHome
+    goToMainContactPonit: typeof goToMainContactPonit
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+    goToPrimaryApplicant: typeof goToPrimaryApplicant
   } & InjectedIntlProps
 > {
   state = {
     informant: ''
   }
   handleContinue = () => {
-    if (
-      this.state.informant === INFORMANT.FATHER ||
-      this.state.informant === INFORMANT.MOTHER
-    ) {
-      this.props.goToBirthRegistration()
+    if (this.state.informant.length > 0 && this.state.informant !== 'error') {
+      this.props.goToMainContactPonit(this.state.informant)
     } else if (this.state.informant === INFORMANT.BOTH_PARENTS) {
       this.props.goToPrimaryApplicant()
     } else {
@@ -134,7 +126,7 @@ export class SelectInformantView extends React.Component<
       <>
         <EventTopBar
           title={intl.formatMessage(messages.newBirthRegistration)}
-          goHome={this.props.goHome}
+          goHome={this.props.goToHome}
         />
 
         <BodyContent id="select_informant_view">
@@ -226,21 +218,11 @@ export class SelectInformantView extends React.Component<
 
 export const SelectInformant = connect(
   null,
-  function mapDispatchToProps(dispatch: Dispatch) {
-    return {
-      goToPrimaryApplicant: () => {
-        dispatch(goToPrimaryApplicantAction())
-      },
-      goToBirthRegistration: () => {
-        const application = createApplication(Event.BIRTH)
-        dispatch(storeApplication(application))
-        dispatch(goToBirthRegistrationAsParent(application.id))
-      },
-      goHome: () => {
-        dispatch(setInitialApplications())
-        dispatch(goToHome())
-      },
-      goBack: () => dispatch(goBackAction())
-    }
+  {
+    goBack,
+    goToHome,
+    goToMainContactPonit,
+    goToBirthRegistrationAsParent,
+    goToPrimaryApplicant
   }
 )(injectIntl(SelectInformantView))

@@ -16,7 +16,8 @@ import {
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
   USER_FORM,
-  SELECT_PRIMARY_APPLICANT
+  SELECT_PRIMARY_APPLICANT,
+  SELECT_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -76,6 +77,15 @@ type GoToSysAdminHome = {
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
 }
+
+export function goToMainContactPonit(applicant: string) {
+  return push(
+    formatUrl(SELECT_MAIN_CONTACT_POINT, {
+      applicant
+    })
+  )
+}
+
 export function goToEvents() {
   return push(SELECT_VITAL_EVENT)
 }
