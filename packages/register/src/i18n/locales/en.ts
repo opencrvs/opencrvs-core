@@ -1135,6 +1135,10 @@ export const ENGLISH_STATE: ILanguage = {
     'password.number': 'At least one number',
     'password.match': 'Passwords match',
     'password.mismatch': 'Passwords do not match',
-    'error.required.password': 'New password is not valid'
+    'error.required.password': 'New password is not valid',
+    'register.registrarHome.readyToPrint': 'Ready to print',
+    'register.registrarHome.registrationNumber': 'Registration no.',
+    'register.registrarHome.results.registeredDate': 'Application registered',
+    'register.registrarHome.printButton': 'Print'
   }
 }

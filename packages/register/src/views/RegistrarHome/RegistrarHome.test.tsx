@@ -64,11 +64,13 @@ const mockUserData = {
   childName: [
     {
       firstNames: 'Iliyas',
-      familyName: 'Khan'
+      familyName: 'Khan',
+      use: 'en'
     },
     {
       firstNames: 'ইলিয়াস',
-      familyName: 'খান'
+      familyName: 'খান',
+      use: 'bn'
     }
   ],
   // TODO: When fragmentMatching work is completed, remove unnecessary result objects
@@ -77,11 +79,13 @@ const mockUserData = {
     name: [
       {
         firstNames: 'Iliyas',
-        familyName: 'Khan'
+        familyName: 'Khan',
+        use: 'en'
       },
       {
         firstNames: 'ইলিয়াস',
-        familyName: 'খান'
+        familyName: 'খান',
+        use: 'bn'
       }
     ],
     birthDate: '2010-10-10'
@@ -212,6 +216,7 @@ describe('RegistrarHome tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              registered: 7,
               rejected: 5
             }
           }
@@ -280,6 +285,7 @@ describe('RegistrarHome tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              registered: 7,
               rejected: 5
             }
           }
@@ -330,6 +336,7 @@ describe('RegistrarHome tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              registered: 7,
               rejected: 5
             }
           }
@@ -368,6 +375,58 @@ describe('RegistrarHome tests', () => {
         .text()
     ).toContain('Sent for updates (5)')
   })
+  it('check ready to print applications count', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['123456789']
+          }
+        },
+        result: {
+          data: {
+            countEvents: {
+              declared: 10,
+              registered: 7,
+              rejected: 5
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome
+        match={{
+          params: {
+            tabId: 'print'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftCount={1}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    const app = testComponent.component
+    expect(
+      app
+        .find('#tab_print')
+        .hostNodes()
+        .text()
+    ).toContain('Ready to print (7)')
+  })
   it('renders all items returned from graphql query in ready for reivew', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
@@ -405,11 +464,13 @@ describe('RegistrarHome tests', () => {
                   childName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ],
                   dateOfDeath: null,
@@ -435,11 +496,13 @@ describe('RegistrarHome tests', () => {
                   deceasedName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ]
                 }
@@ -517,11 +580,13 @@ describe('RegistrarHome tests', () => {
                   childName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ],
                   dateOfDeath: null,
@@ -547,11 +612,13 @@ describe('RegistrarHome tests', () => {
                   deceasedName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ]
                 }
@@ -577,7 +644,6 @@ describe('RegistrarHome tests', () => {
       setTimeout(resolve, 200)
     })
     testComponent.component.update()
-    console.log(testComponent.component.debug())
     const data = testComponent.component.find(GridTable).prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -646,6 +712,122 @@ describe('RegistrarHome tests', () => {
     expect(data[1].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Birth')
     expect(data[1].actions).toBeDefined()
+
+    testComponent.component.unmount()
+  })
+  it('renders all items returned from graphql query in ready for print', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: '2019333494BBONT7U7',
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: '2019333494B8I0NEB9',
+                    contactNumber: '01622688231',
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: null
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 500)
+    })
+    testComponent.component.update()
+    const data = testComponent.component.find(GridTable).prop('content')
+    const EXPECTED_DATE_OF_APPLICATION = moment(
+      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
+      'YYYY-MM-DD HH:mm:ss'
+    ).fromNow()
+
+    expect(data.length).toBe(2)
+    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    expect(data[0].dateOfRegistration).toBe(EXPECTED_DATE_OF_APPLICATION)
+    expect(data[0].trackingId).toBe('BW0UTHR')
+    expect(data[0].event).toBe('Birth')
+    expect(data[0].actions).toBeDefined()
 
     testComponent.component.unmount()
   })
@@ -790,6 +972,56 @@ describe('RegistrarHome tests', () => {
       .simulate('click')
     testComponent.component.unmount()
   })
+  it('should show pagination bar in Print if items more than 11', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 14,
+              results: userData
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    expect(
+      testComponent.component.find('#pagination').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+
+    testComponent.component.unmount()
+  })
   it('renders expanded area for ready to review', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
@@ -826,11 +1058,13 @@ describe('RegistrarHome tests', () => {
                   childName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ],
                   dateOfDeath: null,
@@ -856,11 +1090,13 @@ describe('RegistrarHome tests', () => {
                   deceasedName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ]
                 }
@@ -1019,11 +1255,13 @@ describe('RegistrarHome tests', () => {
                   childName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ],
                   dateOfDeath: null,
@@ -1049,11 +1287,13 @@ describe('RegistrarHome tests', () => {
                   deceasedName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ]
                 }
@@ -1203,11 +1443,13 @@ describe('RegistrarHome tests', () => {
                   childName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ],
                   dateOfDeath: null,
@@ -1233,11 +1475,13 @@ describe('RegistrarHome tests', () => {
                   deceasedName: [
                     {
                       firstNames: 'Iliyas',
-                      familyName: 'Khan'
+                      familyName: 'Khan',
+                      use: 'en'
                     },
                     {
                       firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
+                      familyName: 'খান',
+                      use: 'bn'
                     }
                   ]
                 }

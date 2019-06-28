@@ -248,7 +248,6 @@ describe('when user is previewing the form data', () => {
         })
 
         it('Should be able to click SEND FOR REVIEW Button', () => {
-          // console.log(app.debug())
           expect(
             app
               .find('#submit_form')
