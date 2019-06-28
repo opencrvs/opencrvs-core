@@ -116,18 +116,15 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    switch (this.state.informant) {
-      case INFORMANT.FATHER:
-        this.props.goToBirthRegistration()
-        break
-      case INFORMANT.BOTH_PARENTS:
-        this.props.goToPrimaryApplicant()
-        break
-      case INFORMANT.MOTHER:
-        this.props.goToBirthRegistration()
-        break
-      default:
-        this.setState({ informant: 'error' })
+    if (
+      this.state.informant === INFORMANT.FATHER ||
+      this.state.informant === INFORMANT.MOTHER
+    ) {
+      this.props.goToBirthRegistration()
+    } else if (this.state.informant === INFORMANT.BOTH_PARENTS) {
+      this.props.goToPrimaryApplicant()
+    } else {
+      this.setState({ informant: 'error' })
     }
   }
   render() {
@@ -149,9 +146,9 @@ export class SelectInformantView extends React.Component<
           </TertiaryButton>
           <Title>{intl.formatMessage(messages.informantTitle)}</Title>
           {this.state.informant === 'error' && (
-            <span id="error_text">
-              <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
-            </span>
+            <ErrorText id="error_text">
+              {intl.formatMessage(messages.errorMessage)}
+            </ErrorText>
           )}
           <Actions id="select_parent_informant">
             <RadioButton
@@ -230,9 +227,6 @@ export const SelectInformant = connect(
   null,
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
-      informantRegistration: (informant: string) => {
-        dispatch(goToRegistration(informant))
-      },
       goToPrimaryApplicant: () => {
         dispatch(goToPrimaryApplicantAction())
       },
