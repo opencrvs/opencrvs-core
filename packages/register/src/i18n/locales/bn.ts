@@ -1092,6 +1092,17 @@ export const BENGALI_STATE: ILanguage = {
     'label.userDevice': 'ডিভাইস',
     'label.registrationOffice': 'নিবন্ধন অফিস',
     'button.continue': 'অগ্রসর হোন',
+    'register.securityquestion.title': 'নিরাপত্তা প্রশ্ন',
+    'register.securityquestion.heading': 'আপনার নিরাপত্তা প্রশ্ন সেট করুন',
+    'register.securityquestion.description':
+      'নীচের ড্রপডাউন তালিকা থেকে আপনার পছন্দের প্রশ্ন নির্বাচন করুন।',
+    'register.securityquestion.select': 'নির্বাচন করুন',
+    'register.securityquestion.selectSecurityQuestion':
+      'একটি নিরাপত্তা প্রশ্ন নির্বাচন করুন',
+    'register.securityquestion.enterResponse':
+      'আপনার নির্বাচিত নিরাপত্তা প্রশ্নের একটি প্রতিক্রিয়া লিখুন',
+    'register.securityquestion.securityQuestionLabel':
+      'নিরাপত্তা প্রশ্ন {count}',
     'table.column.header.name': 'নাম',
     'table.column.header.role': 'দায়িত্ব',
     'table.column.header.type': 'ধরন',

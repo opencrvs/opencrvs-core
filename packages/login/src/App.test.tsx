@@ -26,7 +26,7 @@ describe('Login app step one', () => {
     beforeEach(() => {
       app = createTestApp()
       app
-        .find('input#mobile')
+        .find('input#username')
         .simulate('change', { target: { value: '01711111111' } })
 
       app
@@ -62,13 +62,14 @@ describe('Login app step one', () => {
       })
     })
 
-    it('redirects user to verification code form once mobile number and password are accepted', async () => {
+    it('redirects user to verification code form once username and password are accepted', async done => {
       moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
         status: 200,
         responseText: "{ nonce: '12345' }"
       })
       app.find('form#STEP_ONE').simulate('submit')
       await wait()
+      done()
       app.update()
       expect(app.find('form#STEP_TWO')).toHaveLength(1)
     })

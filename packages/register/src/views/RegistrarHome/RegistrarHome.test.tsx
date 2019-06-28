@@ -210,7 +210,7 @@ describe('RegistrarHome tests', () => {
         },
         result: {
           data: {
-            countEventRegistrations: {
+            countEvents: {
               declared: 10,
               rejected: 5
             }
@@ -278,7 +278,7 @@ describe('RegistrarHome tests', () => {
         },
         result: {
           data: {
-            countEventRegistrations: {
+            countEvents: {
               declared: 10,
               rejected: 5
             }
@@ -328,7 +328,7 @@ describe('RegistrarHome tests', () => {
         },
         result: {
           data: {
-            countEventRegistrations: {
+            countEvents: {
               declared: 10,
               rejected: 5
             }
