@@ -2,7 +2,7 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
-import { find } from 'lodash'
+import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -124,8 +124,10 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
       refresher: Date.now(),
       showError: false
     }
+  }
 
-    this.getQuestionList()
+  componentDidMount = () => {
+    this.removeDuplicateQuestions()
   }
 
   getQuestionList = (): IQuestion[] => {
@@ -145,21 +147,42 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
 
   prepareQuestionnaire = (): IQuestionnaire[] => {
     let i
-    const questionnaire = []
+    const questionnaire: IQuestionnaire[] = []
     for (i = 0; i < VISIBLE_QUESTION; i++) {
       const selectedQuestion =
-        this.props.setupData.securityQuestionAnswers &&
-        this.props.setupData.securityQuestionAnswers[i].questionKey
+        at(
+          this.props,
+          `setupData.securityQuestionAnswers.${i}.questionKey`
+        )[0] || EMPTY_VALUE
       const selectedAnswer =
-        this.props.setupData.securityQuestionAnswers &&
-        this.props.setupData.securityQuestionAnswers[i].answer
+        at(this.props, `setupData.securityQuestionAnswers.${i}.answer`)[0] ||
+        EMPTY_VALUE
+
       questionnaire.push({
         questionList: this.getQuestionList(),
-        selectedQuestion: selectedQuestion || EMPTY_VALUE,
-        answer: selectedAnswer || EMPTY_VALUE
-      })
+        selectedQuestion: selectedQuestion,
+        answer: selectedAnswer
+      } as IQuestionnaire)
     }
     return questionnaire
+  }
+
+  removeDuplicateQuestions = (): void => {
+    const questionnaire = this.state.questionnaire
+    this.state.questionnaire.forEach(
+      (iquestionnaire: IQuestionnaire, index: number) => {
+        questionnaire[index].questionList = this.getQuestionList().filter(
+          (question: IQuestion) => {
+            return (
+              iquestionnaire.selectedQuestion === question.value ||
+              !find(questionnaire, { selectedQuestion: question.value })
+            )
+          }
+        )
+      }
+    )
+
+    this.setState({ questionnaire })
   }
 
   onQuestionSelect = (value: string, index: number): void => {
