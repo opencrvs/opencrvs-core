@@ -62,7 +62,7 @@ export default async function activateUser(
     return h.response().code(400)
   }
 
-  return h.response().code(201)
+  return h.response({ userId: user.id }).code(201)
 }
 const securityQNASchema = Joi.object({
   questionKey: Joi.string().required(),

@@ -54,8 +54,8 @@ export const messages: {
   },
   labelBanglaName: {
     id: 'label.nameBN',
-    defaultMessage: 'Bangla name',
-    description: 'Bangla name label'
+    defaultMessage: 'Bengali name',
+    description: 'Bengali name label'
   },
   labelPhone: {
     id: 'label.phone',

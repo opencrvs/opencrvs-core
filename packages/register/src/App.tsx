@@ -42,7 +42,7 @@ interface IAppProps {
 }
 const MainSection = styled.section`
   flex-grow: 8;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.background};
 `
 export const store = createStore()
 

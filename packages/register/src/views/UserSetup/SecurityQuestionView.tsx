@@ -1,10 +1,8 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
-import { goBack } from '@register/navigation'
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
-import { cloneDeep, find } from 'lodash'
+import { find } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -37,6 +35,10 @@ const messages = defineMessages({
   selectSecurityQuestion: {
     id: 'register.securityquestion.selectSecurityQuestion',
     defaultMessage: 'Select a security question'
+  },
+  answer: {
+    id: 'register.securityquestion.answer',
+    defaultMessage: 'Answer'
   },
   enterResponse: {
     id: 'register.securityquestion.enterResponse',
@@ -145,10 +147,16 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     let i
     const questionnaire = []
     for (i = 0; i < VISIBLE_QUESTION; i++) {
+      const selectedQuestion =
+        this.props.setupData.securityQuestionAnswers &&
+        this.props.setupData.securityQuestionAnswers[i].questionKey
+      const selectedAnswer =
+        this.props.setupData.securityQuestionAnswers &&
+        this.props.setupData.securityQuestionAnswers[i].answer
       questionnaire.push({
         questionList: this.getQuestionList(),
-        selectedQuestion: EMPTY_VALUE,
-        answer: EMPTY_VALUE
+        selectedQuestion: selectedQuestion || EMPTY_VALUE,
+        answer: selectedAnswer || EMPTY_VALUE
       })
     }
     return questionnaire
@@ -265,7 +273,8 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                 </Wrapper>
                 <Wrapper>
                   <label>
-                    Answer<Error>*</Error>
+                    {intl.formatMessage(messages.answer)}
+                    <Error>*</Error>
                   </label>
                   <FullWidthInput
                     id={`answer-${index}`}
@@ -301,10 +310,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     return (
       <ActionPageLight
         goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.PASSWORD,
-            this.props.setupData
-          )
+          this.props.goToStep(ProtectedAccoutStep.PASSWORD, {})
         }}
         title={intl.formatMessage(messages.title)}
       >

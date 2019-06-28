@@ -16,8 +16,10 @@ const DataContainer = styled.div`
   ${({ theme }) => theme.fonts.bigBody};
   display: flex;
   flex-grow: 1;
+  max-width: 90%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
+    width: 100%;
   }
 `
 const Label = styled.label`
@@ -36,6 +38,7 @@ const PlaceHolder = styled.div`
 `
 const Action = styled.div`
   width: auto;
+  margin-left: auto;
 `
 interface IAction {
   id?: string

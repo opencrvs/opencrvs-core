@@ -1101,6 +1101,7 @@ export const BENGALI_STATE: ILanguage = {
     'table.column.header.role': 'দায়িত্ব',
     'table.column.header.type': 'ধরন',
     'table.column.header.status': 'অবস্থা',
+    'register.securityquestion.answer': 'উত্তর',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'কোন শহরে আপনার জন্ম হয়?',
     'register.userSetup.securityQuestions.FIRST_SCHOOL':

@@ -1022,7 +1022,7 @@ export const ENGLISH_STATE: ILanguage = {
     'account.title': 'Account',
     'system.title': 'System',
     'label.nameEN': 'English name',
-    'label.nameBN': 'Bangla name',
+    'label.nameBN': 'Bengali name',
     'label.phone': 'Phone number',
     'label.role': 'Role',
     'label.password': 'Password',
@@ -1076,8 +1076,8 @@ export const ENGLISH_STATE: ILanguage = {
     'user.section.userDetails': 'User details',
     'user.section.accountDetails': 'Account details',
     'user.section.assignedRegisterOffice': 'Assigned Register Office',
-    'label.firstNameBN': 'Bangla first name',
-    'label.lastNameBN': 'Bangla last name',
+    'label.firstNameBN': 'Bengali first name',
+    'label.lastNameBN': 'Bengali last name',
     'label.firstNameEN': 'English first name',
     'label.lastNameEN': 'English last name',
     'label.NID': 'NID',
@@ -1100,6 +1100,7 @@ export const ENGLISH_STATE: ILanguage = {
     'table.column.header.role': 'Role',
     'table.column.header.type': 'Type',
     'table.column.header.status': 'Status',
+    'register.securityquestion.answer': 'Answer',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'In what city were you born?',
     'register.userSetup.securityQuestions.FIRST_SCHOOL':
@@ -1135,6 +1136,15 @@ export const ENGLISH_STATE: ILanguage = {
     'password.number': 'At least one number',
     'password.match': 'Passwords match',
     'password.mismatch': 'Passwords do not match',
-    'error.required.password': 'New password is not valid'
+    'error.required.password': 'New password is not valid',
+    'userSetup.review.title': 'Your details',
+    'userSetup.review.header': 'Confirm your details',
+    'userSetupReview.instruction':
+      'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
+    'label.assignedOffice': 'Assigned office',
+    'label.roleType': 'Role / Type',
+    'button.confirm': 'Confirm',
+    'user.setup.waiting': 'Setting up your account',
+    'error.occured': 'An error occured. Please try again.'
   }
 }
