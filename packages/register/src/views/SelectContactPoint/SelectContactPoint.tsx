@@ -20,9 +20,6 @@ import { TextInput, InputField } from '@opencrvs/components/lib/forms'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { phoneNumberFormat } from '@register/utils/validate'
 import {
-  MOTHER_FIELD_STRING,
-  FATHER_FIELD_STRING,
-  OTHER_FIELD_STRING,
   RADIO_BUTTON_LARGE_STRING,
   CONTACT_POINT_FIELD_STRING,
   PHONE_NO_FIELD_STRING
@@ -133,6 +130,19 @@ const ChildContainer = styled.div`
     padding: 16px 0;
   }
 `
+
+const PresentAtBirthRegistration = {
+  mother: 'MOTHER_ONLY',
+  father: 'FATHER_ONLY',
+  parents: 'BOTH_PARENTS',
+  other: 'OTHER'
+}
+
+enum ContactPoint {
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
+  OTHER = 'OTHER'
+}
 interface IState {
   selected: string
   phoneNumber: string
@@ -180,7 +190,11 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     if (this.state.phoneNumber && !this.state.isPhoneNoError) {
       const application: IApplication = createApplication(Event.BIRTH)
       application.data['registration'] = {
-        presentAtBirthRegistration: 'BOTH_PARENTS',
+        presentAtBirthRegistration:
+          // @ts-ignore
+          PresentAtBirthRegistration[
+            this.props.match.params.applicant as string
+          ],
         registrationPhone: this.state.phoneNumber,
         whoseContactDetails: this.state.selected
       }
@@ -233,14 +247,14 @@ class SelectContactPointView extends React.Component<IProps, IState> {
               size={RADIO_BUTTON_LARGE_STRING}
               name={CONTACT_POINT_FIELD_STRING}
               label={intl.formatMessage(messages.motherLabel)}
-              value={MOTHER_FIELD_STRING}
+              value={ContactPoint.MOTHER}
               selected={this.state.selected}
               onChange={() =>
-                this.handleContactPointChange(MOTHER_FIELD_STRING)
+                this.handleContactPointChange(ContactPoint.MOTHER)
               }
             />
 
-            {this.state.selected === MOTHER_FIELD_STRING && (
+            {this.state.selected === ContactPoint.MOTHER && (
               <ChildContainer>
                 <InputField
                   id="phone_number"
@@ -265,14 +279,14 @@ class SelectContactPointView extends React.Component<IProps, IState> {
               size={RADIO_BUTTON_LARGE_STRING}
               name={CONTACT_POINT_FIELD_STRING}
               label={intl.formatMessage(messages.fatherLabel)}
-              value={FATHER_FIELD_STRING}
+              value={ContactPoint.FATHER}
               selected={this.state.selected}
               onChange={() =>
-                this.handleContactPointChange(FATHER_FIELD_STRING)
+                this.handleContactPointChange(ContactPoint.FATHER)
               }
             />
 
-            {this.state.selected === FATHER_FIELD_STRING && (
+            {this.state.selected === ContactPoint.FATHER && (
               <ChildContainer>
                 <InputField
                   id="phone_number"
@@ -297,12 +311,12 @@ class SelectContactPointView extends React.Component<IProps, IState> {
               size={RADIO_BUTTON_LARGE_STRING}
               name={CONTACT_POINT_FIELD_STRING}
               label={intl.formatMessage(messages.otherLabel)}
-              value={OTHER_FIELD_STRING}
+              value={ContactPoint.OTHER}
               selected={this.state.selected}
-              onChange={() => this.handleContactPointChange(OTHER_FIELD_STRING)}
+              onChange={() => this.handleContactPointChange(ContactPoint.OTHER)}
             />
 
-            {this.state.selected === OTHER_FIELD_STRING && (
+            {this.state.selected === ContactPoint.OTHER && (
               <ChildContainer>
                 <InputField
                   id="relationship"

@@ -94,7 +94,7 @@ const Actions = styled.div`
 enum INFORMANT {
   FATHER = 'father',
   MOTHER = 'mother',
-  BOTH_PARENTS = 'parents',
+  BOTH_PARENTS = 'both_parents',
   SELF = 'self',
   SOMEONE_ELSE = 'other'
 }
@@ -112,9 +112,12 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    if (this.state.informant.length > 0 && this.state.informant !== 'error') {
+    if (this.state.informant && this.state.informant !== 'error') {
       this.props.goToMainContactPonit(this.state.informant)
-    } else if (this.state.informant === INFORMANT.BOTH_PARENTS) {
+    } else if (
+      this.state.informant &&
+      this.state.informant === INFORMANT.BOTH_PARENTS
+    ) {
       this.props.goToPrimaryApplicant()
     } else {
       this.setState({ informant: 'error' })
