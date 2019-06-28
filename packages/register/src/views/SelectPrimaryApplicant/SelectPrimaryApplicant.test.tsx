@@ -102,5 +102,16 @@ describe('when user is selecting the vital event', () => {
         expect(history.location.pathname).toContain('events/birth')
       })
     })
+    describe('when selects "Father"', () => {
+      beforeEach(() => {
+        app
+          .find('#continue')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('shows error message', () => {
+        expect(app.find('#error_text')).toHaveLength(1)
+      })
+    })
   })
 })

@@ -99,15 +99,10 @@ class SelectPrimaryApplicantView extends React.Component<
     goTo: ''
   }
   handleContinue = () => {
-    switch (this.state.goTo) {
-      case 'mother':
-        this.props.goToBirthRegistration()
-        break
-      case 'father':
-        this.props.goToBirthRegistration()
-        break
-      default:
-        this.setState({ goTo: 'error' })
+    if (this.state.goTo === 'mother' || this.state.goTo === 'father') {
+      this.props.goToBirthRegistration()
+    } else {
+      this.setState({ goTo: 'error' })
     }
   }
   render() {
@@ -132,7 +127,9 @@ class SelectPrimaryApplicantView extends React.Component<
             {intl.formatMessage(messages.primaryApplicantDescription)}
           </Description>
           {this.state.goTo === 'error' && (
-            <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
+            <ErrorText id="error_text">
+              {intl.formatMessage(messages.errorMessage)}
+            </ErrorText>
           )}
           <Actions id="primary_applicant_selection_view">
             <RadioButton
