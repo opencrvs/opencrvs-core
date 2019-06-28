@@ -300,7 +300,7 @@ const getSectionExpansionConfig = (
   const sections = getViewableSection(registerForm)
   const sectionExpansionConfig: ISectionExpansion[] = []
   sections.map((section: IFormSection, index: number) => {
-    sectionExpansionConfig.push({
+    return sectionExpansionConfig.push({
       id: section.id,
       expanded: index === 0,
       visited: index === 0
@@ -459,6 +459,7 @@ const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
       value: label,
       label
     })
+    return null
   })
   return {
     selectOptions,

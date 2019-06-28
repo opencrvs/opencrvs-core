@@ -36,16 +36,12 @@ import {
   modifyApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
-import {
-  FooterAction,
-  FooterPrimaryButton,
-  ViewFooter
-} from '@register/components/interface/footer'
+
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import { getOfflineState } from '@register/offline/selectors'
 import { IOfflineDataState } from '@register/offline/reducer'
-import { CONFIRMATION_SCREEN, HOME } from '@register/navigation/routes'
+import { HOME } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
@@ -388,7 +384,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   ) => {
     const result: IFormSection[] = []
     sections.map((section: IFormSection) => {
-      result.push(
+      return result.push(
         merge(
           {
             disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled

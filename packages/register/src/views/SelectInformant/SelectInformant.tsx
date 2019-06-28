@@ -10,7 +10,6 @@ import {
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import {
-  goToApplicationContact as goToRegistration,
   goToRegistrarHomeTab as goHomeAction,
   goBack as goBackAction,
   goToBirthRegistrationAsParent

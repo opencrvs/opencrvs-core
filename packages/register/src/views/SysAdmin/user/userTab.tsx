@@ -124,6 +124,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
           menu: <VerticalThreeDots />
         }
       }
+      return {}
     })
   }
 
