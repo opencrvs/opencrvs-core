@@ -104,11 +104,7 @@ describe('when user logs in', async () => {
 
   it("should save the draft inside the current user's array of drafts", async () => {
     const draft4 = createApplication(Event.DEATH)
-    await writeApplicationByUser({
-      userID: currentUserData.userID,
-      initialApplicationsLoaded: true,
-      applications: [...currentUserData.applications, draft4]
-    })
+    await writeApplicationByUser(currentUserData.userID, draft4)
 
     // Now, let's check if the new draft is added
     const details = await getApplicationsOfCurrentUser()

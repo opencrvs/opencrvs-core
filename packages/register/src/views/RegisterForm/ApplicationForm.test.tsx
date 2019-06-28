@@ -110,7 +110,7 @@ describe('when user has starts a new application', () => {
       app.update()
     })
 
-    describe('when user types in something', () => {
+    describe('when user types in something and press continue', () => {
       beforeEach(async () => {
         app
           .find('#firstNames')
@@ -118,6 +118,12 @@ describe('when user has starts a new application', () => {
           .simulate('change', {
             target: { id: 'firstNames', value: 'hello' }
           })
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
         await flushPromises()
         app.update()
       })
