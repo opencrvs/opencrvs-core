@@ -135,7 +135,7 @@ const Container = styled.div`
 const SettingsTitle = styled.div`
   ${({ theme }) => theme.fonts.h1Style};
   height: 72px;
-  margin-left: 24px;
+  margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
