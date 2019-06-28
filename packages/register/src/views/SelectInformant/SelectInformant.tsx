@@ -11,9 +11,10 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import {
   goToApplicationContact as goToRegistration,
+  goToBirthRegistrationAsParent,
   goToRegistrarHomeTab as goHomeAction,
   goBack as goBackAction,
-  goToBirthRegistrationAsParent
+  goToPrimaryApplicant as goToPrimaryApplicantAction
 } from '@register/navigation'
 import { createApplication, storeApplication } from '@register/applications'
 import { Event } from '@register/forms'
@@ -105,6 +106,8 @@ enum INFORMANT {
 export class SelectInformantView extends React.Component<
   {
     informantRegistration: (informant: string) => void
+    goToBirthRegistration: () => void
+    goToPrimaryApplicant: () => void
     goHome: () => void
     goBack: () => void
   } & InjectedIntlProps
@@ -113,10 +116,18 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    if (this.state.informant.length > 0 && this.state.informant !== 'error') {
-      this.props.informantRegistration(this.state.informant)
-    } else {
-      this.setState({ informant: 'error' })
+    switch (this.state.informant) {
+      case INFORMANT.FATHER:
+        this.props.goToBirthRegistration()
+        break
+      case INFORMANT.BOTH_PARENTS:
+        this.props.goToPrimaryApplicant()
+        break
+      case INFORMANT.MOTHER:
+        this.props.goToBirthRegistration()
+        break
+      default:
+        this.setState({ informant: 'error' })
     }
   }
   render() {
@@ -219,14 +230,17 @@ export const SelectInformant = connect(
   null,
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
-      informantRegistration: () => {
+      informantRegistration: (informant: string) => {
+        dispatch(goToRegistration(informant))
+      },
+      goToPrimaryApplicant: () => {
+        dispatch(goToPrimaryApplicantAction())
+      },
+      goToBirthRegistration: () => {
         const application = createApplication(Event.BIRTH)
         dispatch(storeApplication(application))
         dispatch(goToBirthRegistrationAsParent(application.id))
       },
-      // informantRegistration: (informant: string) => {
-      //   dispatch(goToRegistration(informant))
-      // },
       goHome: () => dispatch(goHomeAction('review')),
       goBack: () => dispatch(goBackAction())
     }

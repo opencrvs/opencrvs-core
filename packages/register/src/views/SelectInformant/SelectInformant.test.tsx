@@ -96,7 +96,7 @@ describe('when user is selecting the informant', () => {
   describe('when traverse list then continue', () => {
     it('takes user to the birth registration by parent informant view', () => {
       app
-        .find('#select_informant_mother')
+        .find('#select_informant_parents')
         .hostNodes()
         .simulate('change')
       app
@@ -113,7 +113,7 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('change')
       app
-        .find('#select_informant_parents')
+        .find('#select_informant_mother')
         .hostNodes()
         .simulate('change')
       app
