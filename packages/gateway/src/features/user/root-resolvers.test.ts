@@ -172,10 +172,14 @@ describe('User root resolvers', () => {
   })
   describe('activateUser mutation', () => {
     it('activates the pending user', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          statusCode: '201'
-        })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
       )
 
       const response = await resolvers.Mutation.activateUser(
@@ -188,7 +192,7 @@ describe('User root resolvers', () => {
       )
 
       expect(response).toEqual({
-        statusCode: '201'
+        userId: 'ba7022f0ff4822'
       })
     })
     it('throws error if /activateUser sends anything but 201', async () => {
