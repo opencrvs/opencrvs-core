@@ -850,7 +850,7 @@ export class RegistrarHomeView extends React.Component<
               status: EVENT_STATUS.REGISTERED,
               locationIds: [registrarUnion],
               count: this.pageSize,
-              skip: (this.state.updatesCurrentPage - 1) * this.pageSize
+              skip: (this.state.printCurrentPage - 1) * this.pageSize
             }}
           >
             {({
