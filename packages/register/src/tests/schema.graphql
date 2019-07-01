@@ -473,14 +473,20 @@ type Mutation {
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): ID!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
+  markBirthAsVerified(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): ID!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsVerified(id: ID!, details: DeathRegistrationInput): DeathRegistration
+  markDeathAsVerified(
+    id: ID!
+    details: DeathRegistrationInput
+  ): DeathRegistration
   markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
 }
@@ -569,25 +575,87 @@ input PersonInput {
   educationalAttainment: EducationType
 }
 
+type EventCount {
+  declared: Int
+  rejected: Int
+}
+
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
-  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): BirthRegResultSet
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): DeathRegResultSet
+  listDeathRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
-  listEventRegistrations(locationIds: [String], status: String, from: Date, to: Date, count: Int, skip: Int): EventRegResultSet
+  listEventRegistrations(
+    locationIds: [String]
+    status: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): EventRegResultSet
   countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   getUser(userId: String): User
-  searchUsers(username: String, mobile: String, active: Boolean, role: String, primaryOfficeId: String, locationId: String, count: Int, skip: Int, sort: String): SearchUserResult
-  fetchBirthRegistrationMetrics(timeStart: String!, timeEnd: String!, locationId: String!): BirthRegistrationMetrics
-  searchEvents(locationIds: [String], trackingId: String, registrationNumber: String, contactNumber: String, sort: String): EventSearchResultSet
-  getRoles(title: String, value: String, type: String, active: Boolean, sortBy: String, sortOrder: String): [Role]
+  searchUsers(
+    username: String
+    mobile: String
+    active: Boolean
+    role: String
+    primaryOfficeId: String
+    locationId: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchUserResult
+  fetchBirthRegistrationMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+  ): BirthRegistrationMetrics
+  countEvents(locationIds: [String]): EventCount
+  searchEvents(
+    locationIds: [String]
+    trackingId: String
+    registrationNumber: String
+    contactNumber: String
+    sort: String
+  ): EventSearchResultSet
+  getRoles(
+    title: String
+    value: String
+    type: String
+    active: Boolean
+    sortBy: String
+    sortOrder: String
+  ): [Role]
 }
 
 type Registration {

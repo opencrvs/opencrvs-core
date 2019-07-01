@@ -34,6 +34,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
+import { SelectPrimaryApplicant } from './views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -81,6 +82,11 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.SELECT_VITAL_EVENT}
                                   component={SelectVitalEvent}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_PRIMARY_APPLICANT}
+                                  component={SelectPrimaryApplicant}
                                 />
                                 <ProtectedRoute
                                   exact

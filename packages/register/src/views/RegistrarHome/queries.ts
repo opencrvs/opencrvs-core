@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 
 export const COUNT_REGISTRATION_QUERY = gql`
   query data($locationIds: [String]) {
-    countEventRegistrations(locationIds: $locationIds) {
+    countEvents(locationIds: $locationIds) {
       declared
       rejected
     }
