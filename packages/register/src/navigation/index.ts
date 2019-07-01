@@ -15,7 +15,8 @@ import {
   APPLICATION_DETAIL,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
-  USER_FORM
+  USER_FORM,
+  SELECT_PRIMARY_APPLICANT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -133,7 +134,9 @@ export function goToApplicationContact(informant: string) {
     })
   )
 }
-
+export function goToPrimaryApplicant() {
+  return push(formatUrl(SELECT_PRIMARY_APPLICANT, {}))
+}
 export function goToReviewDuplicate(applicationId: string) {
   return push(
     formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })

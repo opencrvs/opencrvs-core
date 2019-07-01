@@ -21,6 +21,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { roleMessages } from '@register/utils/roleTypeMessages'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { goToSettings } from '@register/navigation'
+import { string } from 'joi'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -92,7 +93,9 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
         }
       ) as GQLHumanName
 
-      userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      if (nameObj) {
+        userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      }
 
       userRole =
         userDetails.role &&
