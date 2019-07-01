@@ -238,9 +238,9 @@ class SelectContactPointView extends React.Component<IProps, IState> {
             {intl.formatMessage(messages.goBack)}
           </TertiaryButton>
           {this.state.isError && (
-            <span id="error_text">
-              <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
-            </span>
+            <ErrorText id="error_text">
+              {intl.formatMessage(messages.error)}
+            </ErrorText>
           )}
           <Title>{intl.formatMessage(messages.heading)}</Title>
           <Actions id="select_main_contact_point">
