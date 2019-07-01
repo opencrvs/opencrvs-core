@@ -53,7 +53,7 @@ export function ListItemAction(props: IListItemActionProps) {
           <ListItemSingleAction
             isFullHeight={isFullHeight}
             key={action.label as string}
-            id={action.label as string}
+            id={`${id}-${action.label as string}`}
             onClick={action.handler}
           >
             {action.label}

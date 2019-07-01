@@ -153,14 +153,13 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     const type = (registration && registration.type) || ''
     let name
     let dateOfEvent
-    let contactNumber: string
+    let contactNumber: string | undefined | null
     if (type.toLowerCase() === 'birth') {
       const birthReg = data && (data.fetchRegistration as GQLBirthRegistration)
       name = (birthReg.child && birthReg.child.name) || []
       dateOfEvent = birthReg.child && birthReg.child.birthDate
       contactNumber =
-        (birthReg.registration && birthReg.registration.contactPhoneNumber) ||
-        ''
+        birthReg.registration && birthReg.registration.contactPhoneNumber
     } else {
       const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
       name = (deathReg.deceased && deathReg.deceased.name) || []
@@ -170,12 +169,11 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         deathReg.deceased.deceased.deathDate
       const informant = deathReg && deathReg.informant
       contactNumber =
-        (informant &&
-          informant.individual &&
-          informant.individual.telecom &&
-          informant.individual.telecom[0] &&
-          (informant.individual.telecom[0] as GQLContactPoint).value) ||
-        ''
+        informant &&
+        informant.individual &&
+        informant.individual.telecom &&
+        informant.individual.telecom[0] &&
+        (informant.individual.telecom[0] as GQLContactPoint).value
     }
 
     return {

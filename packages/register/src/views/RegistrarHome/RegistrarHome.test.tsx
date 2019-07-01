@@ -266,6 +266,10 @@ describe('RegistrarHome tests', () => {
       .find('#tab_updates')
       .hostNodes()
       .simulate('click')
+    app
+      .find('#tab_print')
+      .hostNodes()
+      .simulate('click')
   })
 
   it('check drafts count', async () => {
@@ -1663,6 +1667,7 @@ describe('RegistrarHome tests', () => {
     ).toBe(1)
     testComponent.component.unmount()
   })
+
   it('expanded block renders error text when an error occurs', async () => {
     const graphqlMock = [
       {
@@ -1786,6 +1791,130 @@ describe('RegistrarHome tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
+    testComponent.component.unmount()
+  })
+
+  it('redirects to print form if print button is clicked', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['123456789']
+          }
+        },
+        result: {
+          data: {
+            countEvents: {
+              declared: 10,
+              registered: 2,
+              rejected: 5
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: '2007-01-01',
+                    modifiedAt: '2007-01-01'
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    testComponent.component
+      .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Print')
+      .hostNodes()
+      .simulate('click')
     testComponent.component.unmount()
   })
 })
