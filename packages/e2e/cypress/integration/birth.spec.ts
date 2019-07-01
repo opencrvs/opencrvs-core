@@ -223,14 +223,23 @@ context('Birth Registration Integration Test', () => {
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
-    cy.get('#Review').first().click()
-    cy.wait(500)
-    cy.get('#next_button_child').click()
-    cy.get('#next_button_mother').click()
-    cy.get('#next_button_father').click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#register_confirm').click()
-    cy.wait(1000)
+    cy.wait(3000)
+    cy.get('#row_0').then($listItem => {
+      if ($listItem.find('#Review').length) {
+        cy.log('Birth review found')
+
+        cy.get('#Review').first().click()
+        cy.wait(500)
+        cy.get('#next_button_child').click()
+        cy.get('#next_button_mother').click()
+        cy.get('#next_button_father').click()
+        cy.get('#registerApplicationBtn').click()
+        // MODAL
+        cy.get('#register_confirm').click()
+        cy.wait(1000)
+      } else {
+        cy.log('Birth review not found')
+      }
+    })
   })
 })
