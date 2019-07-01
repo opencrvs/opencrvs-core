@@ -144,6 +144,34 @@ describe('when user has starts a new application', () => {
         app.update()
         expect(window.location.href).toContain('/')
       })
+      it('check toggle menu toggle button handler', async () => {
+        app
+          .find('#eventToggleMenuToggleButton')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(app.find('#eventToggleMenuSubMenu').hostNodes().length).toEqual(
+          1
+        )
+      })
+      it('check toggle menu item handler', async () => {
+        app
+          .find('#eventToggleMenuToggleButton')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+
+        app
+          .find('#eventToggleMenuItem0')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+
+        expect(window.location.href).toContain('/')
+      })
     })
 
     describe('when user enters childBirthDate and clicks to documents page', () => {
