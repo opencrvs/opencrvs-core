@@ -78,10 +78,14 @@ export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
 }
 
-export function goToMainContactPoint(presentAtReg: string) {
+export function goToMainContactPoint(
+  presentAtReg: string,
+  applicant: string = presentAtReg
+) {
   return push(
     formatUrl(SELECT_MAIN_CONTACT_POINT, {
-      presentAtReg
+      presentAtReg,
+      applicant
     })
   )
 }

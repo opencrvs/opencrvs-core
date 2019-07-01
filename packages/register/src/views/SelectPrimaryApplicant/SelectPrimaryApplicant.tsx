@@ -97,7 +97,7 @@ class SelectPrimaryApplicantView extends React.Component<
   }
   handleContinue = () => {
     if (this.state.goTo === 'mother' || this.state.goTo === 'father') {
-      this.props.goToMainContactPoint('parents')
+      this.props.goToMainContactPoint('parents', this.state.goTo)
     } else {
       this.setState({ goTo: 'error' })
     }

@@ -152,9 +152,13 @@ interface IState {
   touched: boolean
   isError: boolean
 }
+interface IMatch {
+  presentAtReg: string
+  applicant: string
+}
 
 type IProps = InjectedIntlProps &
-  RouteComponentProps<{ presentAtReg: string }> & {
+  RouteComponentProps<IMatch> & {
     language: string
     goBack: typeof goBackAction
     goToHome: typeof goToHomeAction
