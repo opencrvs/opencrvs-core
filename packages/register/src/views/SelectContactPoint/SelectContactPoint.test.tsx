@@ -15,8 +15,6 @@ import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
 import * as CommonUtils from '@register/utils/commonUtils'
 import * as fetchAny from 'jest-fetch-mock'
-import { async } from 'q'
-import { change } from 'redux-form'
 
 const fetch = fetchAny as any
 
@@ -80,7 +78,7 @@ describe('when user is selecting the informant', () => {
       await flushPromises()
       app.update()
 
-      expect(app.find('#phone_number').text()).toBe('Phone number')
+      expect(app.find('#phone_number_input').hostNodes().length).toBe(1)
     })
 
     it('when selects Father it opens phone number input', async () => {
@@ -92,19 +90,121 @@ describe('when user is selecting the informant', () => {
       await flushPromises()
       app.update()
 
-      expect(app.find('#phone_number').text()).toBe('Phone number')
+      expect(app.find('#phone_number_input').hostNodes().length).toBe(1)
     })
 
-    it('when selects someone elese it opens phone number input', async () => {
+    it('goes to form page while after giving mother mobile no', async () => {
       app
-        .find('#contact_other')
+        .find('#contact_mother')
         .hostNodes()
         .simulate('change')
 
       await flushPromises()
       app.update()
 
-      expect(app.find('#phone_number').text()).toBe('Phone number')
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '01656972106' }
+        })
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      expect(window.location.pathname).toContain('events/birth/parent')
+    })
+
+    it('goes to form page while after giving father mobile no', async () => {
+      app
+        .find('#contact_father')
+        .hostNodes()
+        .simulate('change')
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '01656972106' }
+        })
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      expect(window.location.pathname).toContain('events/birth/parent')
+    })
+
+    it('show error while giving invalid mother mobile no', async () => {
+      app
+        .find('#contact_mother')
+        .hostNodes()
+        .simulate('change')
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '016562106' }
+        })
+
+      await flushPromises()
+      app.update()
+
+      expect(
+        app
+          .find('#phone_number_error')
+          .hostNodes()
+          .text()
+      ).toBe('Not a valid mobile number')
+    })
+
+    it('show error while giving invalid father mobile no', async () => {
+      app
+        .find('#contact_father')
+        .hostNodes()
+        .simulate('change')
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '016562106' }
+        })
+
+      await flushPromises()
+      app.update()
+
+      expect(
+        app
+          .find('#phone_number_error')
+          .hostNodes()
+          .text()
+      ).toBe('Not a valid mobile number')
     })
 
     it('show error without selecting any input', async () => {

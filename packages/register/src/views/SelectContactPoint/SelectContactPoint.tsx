@@ -266,6 +266,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                   hideAsterisk={true}
                 >
                   <TextInput
+                    id="phone_number_input"
                     name={PHONE_NO_FIELD_STRING}
                     isSmallSized={isSmallSizedInput}
                     onChange={e => this.handlePhoneNoChange(e.target.value)}
@@ -298,6 +299,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                   hideAsterisk={true}
                 >
                   <TextInput
+                    id="phone_number_input"
                     name={PHONE_NO_FIELD_STRING}
                     isSmallSized={isSmallSizedInput}
                     onChange={e => this.handlePhoneNoChange(e.target.value)}
@@ -310,6 +312,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
 
             <RadioButton
               id="contact_other"
+              disabled={true}
               size={RADIO_BUTTON_LARGE_STRING}
               name={CONTACT_POINT_FIELD_STRING}
               label={intl.formatMessage(messages.otherLabel)}
@@ -327,6 +330,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                   hideAsterisk={true}
                 >
                   <TextInput
+                    id="relationship_input"
                     name="relationship"
                     placeholder={intl.formatMessage(
                       messages.relationshipPlaceHolder
@@ -345,6 +349,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                   hideAsterisk={true}
                 >
                   <TextInput
+                    id="phone_number_input"
                     name={PHONE_NO_FIELD_STRING}
                     isSmallSized={isSmallSizedInput}
                     onChange={e => this.handlePhoneNoChange(e.target.value)}
