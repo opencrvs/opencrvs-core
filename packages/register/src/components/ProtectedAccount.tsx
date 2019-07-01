@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { UserSetupPage } from '@register/views/UserSetup/UserSetupPage'
 import { CreatePassword } from '@register/views/UserSetup/CreatePassword'
+import { SecurityQuestion } from '@register/views/SecurityQuestion/SecurityQuestionView'
 export const SCREEN_LOCK = 'screenLock'
 
 export enum ProtectedAccoutStep {
@@ -10,7 +11,7 @@ export enum ProtectedAccoutStep {
   REVIEW,
   CONFIRMATION
 }
-interface ISecurityQuestionAnswer {
+export interface ISecurityQuestionAnswer {
   questionKey: string
   answer: string
 }
@@ -29,8 +30,8 @@ export class ProtectedAccount extends React.Component<
   {},
   IProtectAccountState
 > {
-  constructor() {
-    super({})
+  constructor(props: {}) {
+    super(props)
     this.state = {
       currentStep: ProtectedAccoutStep.LANDING,
       setupData: {}
@@ -52,6 +53,10 @@ export class ProtectedAccount extends React.Component<
         return <UserSetupPage goToStep={this.goToStep} setupData={setupData} />
       case ProtectedAccoutStep.PASSWORD:
         return <CreatePassword goToStep={this.goToStep} setupData={setupData} />
+      case ProtectedAccoutStep.SECURITY_QUESTION:
+        return (
+          <SecurityQuestion goToStep={this.goToStep} setupData={setupData} />
+        )
     }
   }
 }

@@ -506,7 +506,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {data.countEventRegistrations.declared})
+                    {data.countEvents.declared})
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}
@@ -519,7 +519,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.sentForUpdates)} (
-                    {data.countEventRegistrations.rejected})
+                    {data.countEvents.rejected})
                   </IconTab>
                 </TopBar>
               </>

@@ -184,4 +184,64 @@ describe('Search root resolvers', () => {
       expect(result.totalItems).toBe(0)
     })
   })
+  describe('countEvents()', () => {
+    it('returns counts for different statuses of events', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            hits: {
+              total: 2,
+              hits: [
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} }
+              ]
+            }
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }),
+          { status: 200 }
+        ]
+      )
+      const result = await resolvers.Query.countEvents(
+        {},
+        {
+          locationIds: ['1']
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.declared).toBe(2)
+      expect(result.rejected).toBe(1)
+    })
+  })
+  it('in case of invalid respose from elastic, returns 0 as count for different statuses of events', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          hits: {}
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          hits: {}
+        }),
+        { status: 200 }
+      ]
+    )
+    const result = await resolvers.Query.countEvents(
+      {},
+      {
+        locationIds: ['1']
+      }
+    )
+
+    expect(result).toBeDefined()
+    expect(result.declared).toBe(0)
+    expect(result.rejected).toBe(0)
+  })
 })
