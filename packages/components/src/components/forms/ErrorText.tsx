@@ -6,7 +6,6 @@ import styled from 'styled-components'
 interface IErrorTextProps {
   id?: string
   children: string
-  id?: string
   ignoreMediaQuery?: boolean
 }
 

@@ -78,7 +78,7 @@ export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
 }
 
-export function goToMainContactPonit(presentAtReg: string) {
+export function goToMainContactPoint(presentAtReg: string) {
   return push(
     formatUrl(SELECT_MAIN_CONTACT_POINT, {
       presentAtReg

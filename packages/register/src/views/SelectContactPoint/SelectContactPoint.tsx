@@ -136,7 +136,7 @@ const PresentAtBirthRegistration = {
   father: 'FATHER_ONLY',
   parents: 'BOTH_PARENTS',
   other: 'OTHER',
-  self: 'SELF'
+  self: 'INFORMANT_ONLY'
 }
 
 enum ContactPoint {

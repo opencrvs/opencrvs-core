@@ -9,9 +9,9 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import {
   goBack,
-  goToBirthRegistrationAsParent,
+  goToMainContactPoint,
   goToHome,
-  goToMainContactPonit,
+  goToBirthRegistrationAsParent,
   goToPrimaryApplicant
 } from '@register/navigation'
 import styled from '@register/styledComponents'
@@ -100,10 +100,9 @@ enum INFORMANT {
 }
 export class SelectInformantView extends React.Component<
   {
-    language: string
     goBack: typeof goBack
     goToHome: typeof goToHome
-    goToMainContactPonit: typeof goToMainContactPonit
+    goToMainContactPoint: typeof goToMainContactPoint
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     goToPrimaryApplicant: typeof goToPrimaryApplicant
   } & InjectedIntlProps
@@ -112,13 +111,14 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    if (this.state.informant && this.state.informant !== 'error') {
-      this.props.goToMainContactPonit(this.state.informant)
-    } else if (
+    if (
       this.state.informant &&
+      this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
       this.props.goToPrimaryApplicant()
+    } else if (this.state.informant && this.state.informant !== 'error') {
+      this.props.goToMainContactPoint(this.state.informant)
     } else {
       this.setState({ informant: 'error' })
     }
@@ -224,7 +224,7 @@ export const SelectInformant = connect(
   {
     goBack,
     goToHome,
-    goToMainContactPonit,
+    goToMainContactPoint,
     goToBirthRegistrationAsParent,
     goToPrimaryApplicant
   }

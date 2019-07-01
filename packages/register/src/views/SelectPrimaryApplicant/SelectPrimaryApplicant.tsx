@@ -4,13 +4,10 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 import {
   goToBirthRegistrationAsParent,
-  goToRegistrarHomeTab as goHomeAction,
-  goBack as goBackAction
+  goBack,
+  goToHome,
+  goToMainContactPoint
 } from '@register/navigation'
-import { Dispatch } from 'redux'
-import { createApplication, storeApplication } from '@register/applications'
-import { Event } from '@register/forms'
-
 import {
   PrimaryButton,
   TertiaryButton,
@@ -89,10 +86,10 @@ const Description = styled.p`
 `
 class SelectPrimaryApplicantView extends React.Component<
   InjectedIntlProps & {
-    goToBirthRegistration: () => void
-
-    goHome: () => void
-    goBack: () => void
+    goBack: typeof goBack
+    goToHome: typeof goToHome
+    goToMainContactPoint: typeof goToMainContactPoint
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   }
 > {
   state = {
@@ -100,7 +97,7 @@ class SelectPrimaryApplicantView extends React.Component<
   }
   handleContinue = () => {
     if (this.state.goTo === 'mother' || this.state.goTo === 'father') {
-      this.props.goToBirthRegistration()
+      this.props.goToMainContactPoint('parents')
     } else {
       this.setState({ goTo: 'error' })
     }
@@ -111,7 +108,7 @@ class SelectPrimaryApplicantView extends React.Component<
       <>
         <EventTopBar
           title={intl.formatMessage(messages.registerNewEventTitle)}
-          goHome={this.props.goHome}
+          goHome={this.props.goToHome}
         />
 
         <BodyContent>
@@ -164,15 +161,10 @@ class SelectPrimaryApplicantView extends React.Component<
 
 export const SelectPrimaryApplicant = connect(
   null,
-  function mapDispatchToProps(dispatch: Dispatch) {
-    return {
-      goToBirthRegistration: () => {
-        const application = createApplication(Event.BIRTH)
-        dispatch(storeApplication(application))
-        dispatch(goToBirthRegistrationAsParent(application.id))
-      },
-      goHome: () => dispatch(goHomeAction('review')),
-      goBack: () => dispatch(goBackAction())
-    }
+  {
+    goBack,
+    goToHome,
+    goToMainContactPoint,
+    goToBirthRegistrationAsParent
   }
 )(injectIntl(SelectPrimaryApplicantView))
