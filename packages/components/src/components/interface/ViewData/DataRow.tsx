@@ -7,7 +7,7 @@ const Container = styled.div`
   flex-direction: row;
   flex-wrap: nowrap;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
-  padding: 16px 8px;
+  padding: 16px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
   }

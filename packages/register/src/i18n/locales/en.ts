@@ -510,6 +510,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.self': 'Self',
     'register.selectInformant.errorMessage':
       'Please select who is present and applying',
+    'register.primaryApplicant.registerNewEventHeading':
+      'Who is the primary applicant for this application?',
+    'register.primaryApplicant.description':
+      'This person is responsible for providing accurate information in this application. ',
+    'register.primaryApplicant.errorMessage':
+      'Please select who is the primary applicant',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
