@@ -135,7 +135,8 @@ const PresentAtBirthRegistration = {
   mother: 'MOTHER_ONLY',
   father: 'FATHER_ONLY',
   parents: 'BOTH_PARENTS',
-  other: 'OTHER'
+  other: 'OTHER',
+  self: 'SELF'
 }
 
 enum ContactPoint {
@@ -191,9 +192,13 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       const application: IApplication = createApplication(Event.BIRTH)
       application.data['registration'] = {
         presentAtBirthRegistration:
-          // @ts-ignore
           PresentAtBirthRegistration[
-            this.props.match.params.applicant as string
+            this.props.match.params.applicant as
+              | 'mother'
+              | 'father'
+              | 'parents'
+              | 'other'
+              | 'self'
           ],
         registrationPhone: this.state.phoneNumber,
         whoseContactDetails: this.state.selected
