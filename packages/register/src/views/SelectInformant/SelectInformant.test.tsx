@@ -1,20 +1,20 @@
-import {
-  createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from '@register/tests/util'
 import { SELECT_INFORMANT } from '@register/navigation/routes'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import { Store } from 'redux'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
+import {
+  assign,
+  createTestApp,
+  flushPromises,
+  getItem,
+  mockOfflineData,
+  setItem,
+  validToken
+} from '@register/tests/util'
 import * as CommonUtils from '@register/utils/commonUtils'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
 import * as fetchAny from 'jest-fetch-mock'
+import { Store } from 'redux'
 
 const fetch = fetchAny as any
 
@@ -139,6 +139,17 @@ describe('when user is selecting the informant', () => {
       expect(
         app.find('#primary_applicant_selection_view').hostNodes()
       ).toHaveLength(1)
+    })
+  })
+
+  describe('when clicked on cross button', () => {
+    it('go back to home page', async () => {
+      app
+        .find('#crcl-btn')
+        .hostNodes()
+        .simulate('click')
+
+      expect(window.location.href).toContain('/')
     })
   })
 })
