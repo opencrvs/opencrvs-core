@@ -154,7 +154,7 @@ interface IState {
 }
 
 type IProps = InjectedIntlProps &
-  RouteComponentProps<{ applicant: string }> & {
+  RouteComponentProps<{ presentAtReg: string }> & {
     language: string
     goBack: typeof goBackAction
     goToHome: typeof goToHomeAction
@@ -193,7 +193,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       application.data['registration'] = {
         presentAtBirthRegistration:
           PresentAtBirthRegistration[
-            this.props.match.params.applicant as
+            this.props.match.params.presentAtReg as
               | 'mother'
               | 'father'
               | 'parents'

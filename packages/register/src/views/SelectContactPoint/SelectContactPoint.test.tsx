@@ -50,7 +50,9 @@ describe('when user is selecting the informant', () => {
   })
 
   beforeEach(async () => {
-    history.replace(SELECT_MAIN_CONTACT_POINT.replace(':applicant', 'mother'))
+    history.replace(
+      SELECT_MAIN_CONTACT_POINT.replace(':presentAtReg', 'mother')
+    )
     await flushPromises()
     app.update()
     app
@@ -120,7 +122,7 @@ describe('when user is selecting the informant', () => {
       await flushPromises()
       app.update()
 
-      expect(window.location.pathname).toContain('events/birth/parent')
+      expect(window.location.pathname).toContain('events/birth')
     })
 
     it('goes to form page while after giving father mobile no', async () => {
@@ -150,7 +152,7 @@ describe('when user is selecting the informant', () => {
       await flushPromises()
       app.update()
 
-      expect(window.location.pathname).toContain('events/birth/parent')
+      expect(window.location.pathname).toContain('events/birth')
     })
 
     it('show error while giving invalid mother mobile no', async () => {
