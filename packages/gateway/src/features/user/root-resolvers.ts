@@ -78,7 +78,7 @@ export const resolvers: GQLResolver = {
         }
       })
       const response = await res.json()
-      if (response.statusCode !== '201') {
+      if (res.status !== 201) {
         return await Promise.reject(
           new Error(
             "Something went wrong on user-mgnt service. Couldn't activate given user"

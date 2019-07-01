@@ -67,7 +67,7 @@ describe('UserSetupPage tests', () => {
         .text()
     ).toEqual('Sahriar Nafis')
   })
-  it('renders page successfully without type and userId', async () => {
+  it('renders page successfully without type', async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -87,6 +87,22 @@ describe('UserSetupPage tests', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
       <ProtectedAccount />,
+      store
+    )
+    const app = testComponent.component
+
+    app
+      .find('#user-setup-start-button')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    expect(app.find('#NewPassword')).toBeDefined()
+  })
+  it('go to password page without userDetails', async () => {
+    store.dispatch(getStorageUserDetailsSuccess('null'))
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupPage goToStep={() => {}} />,
       store
     )
     const app = testComponent.component
