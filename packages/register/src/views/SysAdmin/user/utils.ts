@@ -65,6 +65,7 @@ export const mockCompleteFormData = {
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'FIELD_AGENT',
+  type: 'HOSPITAL',
   userDetails: '',
   username: ''
 }

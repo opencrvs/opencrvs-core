@@ -30,6 +30,7 @@ export interface IUserPayload
     given: string[]
   }[]
   role: string
+  type: string
 }
 export interface IUserSearchPayload {
   username?: string

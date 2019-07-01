@@ -716,6 +716,7 @@ export interface GQLUserInput {
   username?: string
   mobile?: string
   role?: string
+  type?: string
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>

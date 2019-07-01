@@ -1029,6 +1029,7 @@ export const BENGALI_STATE: ILanguage = {
     'label.nameBN': 'বাংলার নাম',
     'label.phone': 'ফোন নম্বর',
     'label.role': 'দায়িত্ব',
+    'label.type': 'ধরণ',
     'label.password': 'পাসওয়ার্ড',
     'label.pin': 'পিন',
     'label.language': 'ভাষা',

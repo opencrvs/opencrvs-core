@@ -1,7 +1,8 @@
 import {
   GQLResolver,
   GQLUserInput,
-  GQLHumanNameInput
+  GQLHumanNameInput,
+  GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
@@ -85,6 +86,13 @@ export const resolvers: GQLResolver = {
         }
       })
 
+      if (res.status !== 201) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't create user"
+          )
+        )
+      }
       return await res.json()
     },
     async activateUser(_, { userId, password, securityQNAs }, authHeader) {
@@ -118,7 +126,8 @@ function createUserPayload(user: GQLUserInput): IUserPayload {
       given: (name.firstNames || '').split(' ') as string[]
     })),
     role: user.role as string,
-    identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
+    type: user.type as string,
+    identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: user.email || '',
     mobile: user.mobile as string

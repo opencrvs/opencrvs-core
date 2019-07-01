@@ -22,7 +22,7 @@ import { createUserMutation } from '@register/views/SysAdmin/user/mutations'
 import { draftToGqlTransformer } from '@register/transformer'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -87,6 +87,8 @@ class UserReviewFormComponent extends React.Component<
       ? typeof formData[field.name] !== 'object'
         ? field.name === 'role'
           ? intl.formatMessage(roleMessages[formData.role as string])
+          : field.name === 'type'
+          ? intl.formatMessage(typeMessages[formData.type as string])
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''

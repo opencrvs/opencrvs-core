@@ -16,6 +16,7 @@ input UserInput {
   username: String
   mobile: String
   role: String
+  type: String
   email: String
   primaryOffice: String
   catchmentArea: [String]

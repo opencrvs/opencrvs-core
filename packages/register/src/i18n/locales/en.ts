@@ -1025,6 +1025,7 @@ export const ENGLISH_STATE: ILanguage = {
     'label.nameBN': 'Bangla name',
     'label.phone': 'Phone number',
     'label.role': 'Role',
+    'label.type': 'Type',
     'label.password': 'Password',
     'label.pin': 'PIN',
     'label.language': 'Language',

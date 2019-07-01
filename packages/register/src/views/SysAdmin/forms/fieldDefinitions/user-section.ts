@@ -17,7 +17,7 @@ import {
   fieldToIdentifierWithTypeTransformer,
   fieldNameValueTransformer
 } from '@register/forms/mappings/mutation/field-mappings'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 
 const messages = defineMessages({
   userForm: {
@@ -84,6 +84,11 @@ const messages = defineMessages({
     id: 'label.role',
     defaultMessage: 'Role',
     description: 'User role'
+  },
+  userType: {
+    id: 'label.type',
+    defaultMessage: 'Type',
+    description: 'User type'
   },
   userDevice: {
     id: 'label.userDevice',
@@ -209,6 +214,28 @@ export const userSection: IFormSection = {
         { label: roleMessages.STATE_REGISTRAR, value: 'STATE_REGISTRAR' },
         { label: roleMessages.NATIONAL_REGISTRAR, value: 'NATIONAL_REGISTRAR' },
         { label: roleMessages.LOCAL_SYSTEM_ADMIN, value: 'LOCAL_SYSTEM_ADMIN' }
+      ]
+    },
+    {
+      name: 'type',
+      type: SELECT_WITH_OPTIONS,
+      label: messages.userType,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { label: typeMessages.HOSPITAL, value: 'HOSPITAL' },
+        { label: typeMessages.CHA, value: 'CHA' },
+        { label: typeMessages.ENTREPENEUR, value: 'ENTREPENEUR' },
+        { label: typeMessages.DATA_ENTRY_CLERK, value: 'DATA_ENTRY_CLERK' },
+        { label: typeMessages.SECRETARY, value: 'SECRETARY' },
+        { label: typeMessages.CHAIRMAN, value: 'CHAIRMAN' },
+        { label: typeMessages.MAYOR, value: 'MAYOR' },
+        { label: typeMessages.LOCAL_SYSTEM_ADMIN, value: 'LOCAL_SYSTEM_ADMIN' },
+        {
+          label: typeMessages.NATIONAL_SYSTEM_ADMIN,
+          value: 'NATIONAL_SYSTEM_ADMIN'
+        }
       ]
     },
     {
