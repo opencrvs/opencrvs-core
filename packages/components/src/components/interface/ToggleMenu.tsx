@@ -117,7 +117,11 @@ export class ToggleMenu extends React.Component<IProps, IState> {
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
               {menuItems.map((mi: IToggleMenuItem, index) => (
-                <MenuItem key={`${id}-${index}`} onClick={mi.handler}>
+                <MenuItem
+                  id={`${id}Item${index}`}
+                  key={`${id}-${index}`}
+                  onClick={mi.handler}
+                >
                   {mi.icon && mi.icon}
                   <MenuItemLabel>{mi.label}</MenuItemLabel>
                 </MenuItem>

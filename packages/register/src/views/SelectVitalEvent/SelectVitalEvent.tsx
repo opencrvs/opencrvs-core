@@ -1,20 +1,22 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import {
+  createApplication,
+  setInitialApplications,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import {
   goToBirthRegistration,
   goToDeathRegistration,
-  goToRegistrarHomeTab as goHomeAction
+  goToHome
 } from '@register/navigation'
-import { Dispatch } from 'redux'
-import { createApplication, storeApplication } from '@register/applications'
-import { Event } from '@register/forms'
-
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -146,7 +148,10 @@ export const SelectVitalEvent = connect(
         dispatch(storeApplication(application))
         dispatch(goToDeathRegistration(application.id))
       },
-      goHome: () => dispatch(goHomeAction('review'))
+      goHome: () => {
+        dispatch(setInitialApplications())
+        dispatch(goToHome())
+      }
     }
   }
 )(injectIntl(SelectVitalEventView))

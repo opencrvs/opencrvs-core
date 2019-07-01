@@ -1,27 +1,28 @@
-import * as React from 'react'
-
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-
 import {
+  ICON_ALIGNMENT,
   PrimaryButton,
-  TertiaryButton,
-  ICON_ALIGNMENT
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  goToApplicationContact as goToRegistration,
-  goToBirthRegistrationAsParent,
-  goToRegistrarHomeTab as goHomeAction,
-  goBack as goBackAction,
-  goToPrimaryApplicant as goToPrimaryApplicantAction
-} from '@register/navigation'
-import { createApplication, storeApplication } from '@register/applications'
-import { Event } from '@register/forms'
-import styled from '@register/styledComponents'
-import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import {
+  createApplication,
+  setInitialApplications,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
+import {
+  goBack as goBackAction,
+  goToBirthRegistrationAsParent,
+  goToPrimaryApplicant as goToPrimaryApplicantAction,
+  goToHome
+} from '@register/navigation'
+import styled from '@register/styledComponents'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -235,7 +236,10 @@ export const SelectInformant = connect(
         dispatch(storeApplication(application))
         dispatch(goToBirthRegistrationAsParent(application.id))
       },
-      goHome: () => dispatch(goHomeAction('review')),
+      goHome: () => {
+        dispatch(setInitialApplications())
+        dispatch(goToHome())
+      },
       goBack: () => dispatch(goBackAction())
     }
   }
