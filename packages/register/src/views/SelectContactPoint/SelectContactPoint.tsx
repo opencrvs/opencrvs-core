@@ -32,6 +32,7 @@ import {
 } from '@register/applications'
 import { Event } from '@register/forms'
 import { RouteComponentProps } from 'react-router'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 
 const messages = defineMessages({
   title: {
@@ -96,12 +97,6 @@ const messages = defineMessages({
   }
 })
 
-const BodyContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  padding: 16px 32px;
-  position: relative;
-`
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
@@ -217,6 +212,31 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     }
   }
 
+  renderPhoneNumberField = (): JSX.Element => {
+    return (
+      <InputField
+        id="phone_number"
+        label={this.props.intl.formatMessage(messages.phoneNoLabel)}
+        touched={this.state.touched}
+        error={
+          this.state.isPhoneNoError
+            ? this.props.intl.formatMessage(messages.phoneNoError)
+            : ''
+        }
+        hideAsterisk={true}
+      >
+        <TextInput
+          id="phone_number_input"
+          name={PHONE_NO_FIELD_STRING}
+          isSmallSized={true}
+          onChange={e => this.handlePhoneNoChange(e.target.value)}
+          touched={this.state.touched}
+          error={this.state.isPhoneNoError}
+        />
+      </InputField>
+    )
+  }
+
   handleContactPointChange = (value: string) =>
     this.setState({
       selected: value,
@@ -227,10 +247,6 @@ class SelectContactPointView extends React.Component<IProps, IState> {
 
   render() {
     const { intl } = this.props
-    const isSmallSizedInput = true
-    const phoneNoError = this.state.isPhoneNoError
-      ? intl.formatMessage(messages.phoneNoError)
-      : ''
 
     return (
       <Container>
@@ -266,24 +282,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
             />
 
             {this.state.selected === ContactPoint.MOTHER && (
-              <ChildContainer>
-                <InputField
-                  id="phone_number"
-                  label={intl.formatMessage(messages.phoneNoLabel)}
-                  touched={this.state.touched}
-                  error={phoneNoError}
-                  hideAsterisk={true}
-                >
-                  <TextInput
-                    id="phone_number_input"
-                    name={PHONE_NO_FIELD_STRING}
-                    isSmallSized={isSmallSizedInput}
-                    onChange={e => this.handlePhoneNoChange(e.target.value)}
-                    touched={this.state.touched}
-                    error={this.state.isPhoneNoError}
-                  />
-                </InputField>
-              </ChildContainer>
+              <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
             )}
 
             <RadioButton
@@ -299,24 +298,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
             />
 
             {this.state.selected === ContactPoint.FATHER && (
-              <ChildContainer>
-                <InputField
-                  id="phone_number"
-                  label={intl.formatMessage(messages.phoneNoLabel)}
-                  touched={this.state.touched}
-                  error={phoneNoError}
-                  hideAsterisk={true}
-                >
-                  <TextInput
-                    id="phone_number_input"
-                    name={PHONE_NO_FIELD_STRING}
-                    isSmallSized={isSmallSizedInput}
-                    onChange={e => this.handlePhoneNoChange(e.target.value)}
-                    touched={this.state.touched}
-                    error={this.state.isPhoneNoError}
-                  />
-                </InputField>
-              </ChildContainer>
+              <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
             )}
 
             <RadioButton
@@ -344,28 +326,12 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                     placeholder={intl.formatMessage(
                       messages.relationshipPlaceHolder
                     )}
-                    isSmallSized={isSmallSizedInput}
+                    isSmallSized={true}
                     onChange={e => this.handlePhoneNoChange(e.target.value)}
                     touched={this.state.touched}
                   />
                 </InputField>
-
-                <InputField
-                  id="phone_number"
-                  label={intl.formatMessage(messages.phoneNoLabel)}
-                  touched={this.state.touched}
-                  error={phoneNoError}
-                  hideAsterisk={true}
-                >
-                  <TextInput
-                    id="phone_number_input"
-                    name={PHONE_NO_FIELD_STRING}
-                    isSmallSized={isSmallSizedInput}
-                    onChange={e => this.handlePhoneNoChange(e.target.value)}
-                    touched={this.state.touched}
-                    error={this.state.isPhoneNoError}
-                  />
-                </InputField>
+                {this.renderPhoneNumberField()}
               </ChildContainer>
             )}
           </Actions>

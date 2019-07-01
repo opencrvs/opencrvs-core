@@ -1,52 +1,50 @@
+import * as React from 'react'
+import { RouteComponentProps } from 'react-router'
+import { connect } from 'react-redux'
+import Swipeable from 'react-swipeable'
+import { Modal, EventTopBar } from '@opencrvs/components/lib/interface'
 import {
-  ICON_ALIGNMENT,
   PrimaryButton,
-  TertiaryButton
+  TertiaryButton,
+  ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
-import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
+import { TickLarge, BackArrow } from '@opencrvs/components/lib/icons'
 import { BodyContent } from '@opencrvs/components/lib/layout'
+import { isNull, isUndefined, merge } from 'lodash'
+// @ts-ignore - Required for mocking
+import debounce from 'lodash/debounce'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import styled from '@register/styledComponents'
+import {
+  goToPage as goToPageAction,
+  goBack as goBackAction
+} from '@register/navigation'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  IFormSectionData,
+  Event,
+  Action
+} from '@register/forms'
+import { FormFieldGenerator } from '@register/components/form'
+import { IStoreState } from '@register/store'
 import {
   deleteApplication,
   IApplication,
   IPayload,
   modifyApplication,
-  SUBMISSION_STATUS,
-  writeApplication
+  SUBMISSION_STATUS
 } from '@register/applications'
-import { FormFieldGenerator } from '@register/components/form'
+import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
-import {
-  Action,
-  Event,
-  IForm,
-  IFormField,
-  IFormSection,
-  IFormSectionData
-} from '@register/forms'
-import {
-  goBack as goBackAction,
-  goToHome,
-  goToPage as goToPageAction
-} from '@register/navigation'
-import { HOME } from '@register/navigation/routes'
-import { toggleDraftSavedNotification } from '@register/notification/actions'
-import { IOfflineDataState } from '@register/offline/reducer'
 import { getOfflineState } from '@register/offline/selectors'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { HOME } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
-import { IStoreState } from '@register/store'
-import styled from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { isMobileDevice } from '@register/utils/commonUtils'
-import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge } from 'lodash'
-// @ts-ignore - Required for mocking
-import debounce from 'lodash/debounce'
-import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import Swipeable from 'react-swipeable'
+import { toggleDraftSavedNotification } from '@register/notification/actions'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -161,7 +159,7 @@ export const messages: {
 })
 
 const FormContainer = styled.div`
-  padding: 35px 25px;
+  padding: 32px 0px;
   padding-bottom: 0;
 `
 
@@ -241,8 +239,6 @@ export interface IFormProps {
 type DispatchProps = {
   goToPage: typeof goToPageAction
   goBack: typeof goBackAction
-  goToHome: typeof goToHome
-  writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
@@ -418,23 +414,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onSaveAsDraftClicked = () => {
-    this.props.writeApplication(this.props.application)
-    this.props.goToHome()
+    this.props.history.push('/')
     this.props.toggleDraftSavedNotification()
-  }
-
-  continueButtonHandler = (
-    pageRoute: string,
-    applicationId: string,
-    pageId: string,
-    event: string
-  ) => {
-    this.props.writeApplication(this.props.application)
-    this.props.goToPage(pageRoute, applicationId, pageId, event)
   }
 
   render() {
     const {
+      goToPage,
       intl,
       setAllFieldsDirty,
       application,
@@ -486,7 +472,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   label: 'Delete Application',
                   handler: () => {
                     this.props.deleteApplication(application)
-                    this.props.goToHome()
+                    history.push('/')
                   }
                 }
               ]}
@@ -575,14 +561,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         <FooterArea>
                           <PrimaryButton
                             id="next_section"
-                            onClick={() => {
-                              this.continueButtonHandler(
+                            onClick={() =>
+                              goToPage(
                                 this.props.pageRoute,
                                 application.id,
                                 nextSection.id,
                                 application.event.toLowerCase()
                               )
-                            }}
+                            }
                           >
                             {intl.formatMessage(messages.continueButton)}
                           </PrimaryButton>
@@ -762,12 +748,10 @@ export const RegisterForm = connect<
 >(
   mapStateToProps,
   {
-    writeApplication,
     modifyApplication,
     deleteApplication,
     goToPage: goToPageAction,
     goBack: goBackAction,
-    goToHome,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {
       console.log(values)

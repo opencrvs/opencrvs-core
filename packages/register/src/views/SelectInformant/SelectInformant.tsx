@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -7,14 +6,16 @@ import {
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   goBack,
-  goToMainContactPoint,
-  goToHome,
   goToBirthRegistrationAsParent,
+  goToHome,
+  goToMainContactPoint,
   goToPrimaryApplicant
 } from '@register/navigation'
 import styled from '@register/styledComponents'
+import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 
@@ -75,12 +76,6 @@ export const messages: {
   }
 })
 
-const BodyContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  padding: 16px 32px;
-  position: relative;
-`
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;

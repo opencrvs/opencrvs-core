@@ -1,6 +1,7 @@
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   createApplication,
   setInitialApplications,
@@ -52,13 +53,6 @@ export const messages: {
     description: 'Error Message to show when no event is being selected'
   }
 })
-
-const BodyContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  padding: 0 16px;
-  position: relative;
-`
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};

@@ -1,5 +1,4 @@
-import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled from 'styled-components'
 
 export const Content = styled.section`
   flex: 1;
@@ -12,5 +11,6 @@ export const Content = styled.section`
 export const BodyContent = styled.div`
   max-width: 940px;
   margin: auto;
+  padding: 16px 32px;
   position: relative;
 `
