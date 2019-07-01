@@ -186,7 +186,8 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     })
   }
 
-  handleSubmit = () => {
+  handleSubmit = (e: any) => {
+    e.preventDefault()
     if (this.state.phoneNumber && !this.state.isPhoneNoError) {
       const application: IApplication = createApplication(Event.BIRTH)
       application.data['registration'] = {
@@ -200,7 +201,8 @@ class SelectContactPointView extends React.Component<IProps, IState> {
               | 'self'
           ],
         registrationPhone: this.state.phoneNumber,
-        whoseContactDetails: this.state.selected
+        whoseContactDetails: this.state.selected,
+        applicant: this.props.match.params.applicant
       }
 
       this.props.storeApplication(application)
@@ -227,6 +229,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       >
         <TextInput
           id="phone_number_input"
+          type="tel"
           name={PHONE_NO_FIELD_STRING}
           isSmallSized={true}
           onChange={e => this.handlePhoneNoChange(e.target.value)}
@@ -262,82 +265,91 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           >
             {intl.formatMessage(messages.goBack)}
           </TertiaryButton>
+
+          <Title>{intl.formatMessage(messages.heading)}</Title>
           {this.state.isError && (
             <ErrorText id="error_text">
               {intl.formatMessage(messages.error)}
             </ErrorText>
           )}
-          <Title>{intl.formatMessage(messages.heading)}</Title>
-          <Actions id="select_main_contact_point">
-            <RadioButton
-              id="contact_mother"
-              size={RADIO_BUTTON_LARGE_STRING}
-              name={CONTACT_POINT_FIELD_STRING}
-              label={intl.formatMessage(messages.motherLabel)}
-              value={ContactPoint.MOTHER}
-              selected={this.state.selected}
-              onChange={() =>
-                this.handleContactPointChange(ContactPoint.MOTHER)
-              }
-            />
+          <form>
+            <Actions id="select_main_contact_point">
+              <RadioButton
+                id="contact_mother"
+                size={RADIO_BUTTON_LARGE_STRING}
+                name={CONTACT_POINT_FIELD_STRING}
+                label={intl.formatMessage(messages.motherLabel)}
+                value={ContactPoint.MOTHER}
+                selected={this.state.selected}
+                onChange={() =>
+                  this.handleContactPointChange(ContactPoint.MOTHER)
+                }
+              />
 
-            {this.state.selected === ContactPoint.MOTHER && (
-              <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
-            )}
+              {this.state.selected === ContactPoint.MOTHER && (
+                <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
+              )}
 
-            <RadioButton
-              id="contact_father"
-              size={RADIO_BUTTON_LARGE_STRING}
-              name={CONTACT_POINT_FIELD_STRING}
-              label={intl.formatMessage(messages.fatherLabel)}
-              value={ContactPoint.FATHER}
-              selected={this.state.selected}
-              onChange={() =>
-                this.handleContactPointChange(ContactPoint.FATHER)
-              }
-            />
+              <RadioButton
+                id="contact_father"
+                size={RADIO_BUTTON_LARGE_STRING}
+                name={CONTACT_POINT_FIELD_STRING}
+                label={intl.formatMessage(messages.fatherLabel)}
+                value={ContactPoint.FATHER}
+                selected={this.state.selected}
+                onChange={() =>
+                  this.handleContactPointChange(ContactPoint.FATHER)
+                }
+              />
 
-            {this.state.selected === ContactPoint.FATHER && (
-              <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
-            )}
+              {this.state.selected === ContactPoint.FATHER && (
+                <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
+              )}
 
-            <RadioButton
-              id="contact_other"
-              disabled={true}
-              size={RADIO_BUTTON_LARGE_STRING}
-              name={CONTACT_POINT_FIELD_STRING}
-              label={intl.formatMessage(messages.otherLabel)}
-              value={ContactPoint.OTHER}
-              selected={this.state.selected}
-              onChange={() => this.handleContactPointChange(ContactPoint.OTHER)}
-            />
+              <RadioButton
+                id="contact_other"
+                disabled={true}
+                size={RADIO_BUTTON_LARGE_STRING}
+                name={CONTACT_POINT_FIELD_STRING}
+                label={intl.formatMessage(messages.otherLabel)}
+                value={ContactPoint.OTHER}
+                selected={this.state.selected}
+                onChange={() =>
+                  this.handleContactPointChange(ContactPoint.OTHER)
+                }
+              />
 
-            {this.state.selected === ContactPoint.OTHER && (
-              <ChildContainer>
-                <InputField
-                  id="relationship"
-                  label={intl.formatMessage(messages.relationshipLabel)}
-                  touched={this.state.touched}
-                  hideAsterisk={true}
-                >
-                  <TextInput
-                    id="relationship_input"
-                    name="relationship"
-                    placeholder={intl.formatMessage(
-                      messages.relationshipPlaceHolder
-                    )}
-                    isSmallSized={true}
-                    onChange={e => this.handlePhoneNoChange(e.target.value)}
+              {this.state.selected === ContactPoint.OTHER && (
+                <ChildContainer>
+                  <InputField
+                    id="relationship"
+                    label={intl.formatMessage(messages.relationshipLabel)}
                     touched={this.state.touched}
-                  />
-                </InputField>
-                {this.renderPhoneNumberField()}
-              </ChildContainer>
-            )}
-          </Actions>
-          <PrimaryButton id="continue" onClick={this.handleSubmit}>
-            {intl.formatMessage(messages.continueButton)}
-          </PrimaryButton>
+                    hideAsterisk={true}
+                  >
+                    <TextInput
+                      id="relationship_input"
+                      name="relationship"
+                      placeholder={intl.formatMessage(
+                        messages.relationshipPlaceHolder
+                      )}
+                      isSmallSized={true}
+                      onChange={e => this.handlePhoneNoChange(e.target.value)}
+                      touched={this.state.touched}
+                    />
+                  </InputField>
+                  {this.renderPhoneNumberField()}
+                </ChildContainer>
+              )}
+            </Actions>
+            <PrimaryButton
+              id="continue"
+              type="submit"
+              onClick={this.handleSubmit}
+            >
+              {intl.formatMessage(messages.continueButton)}
+            </PrimaryButton>
+          </form>
         </BodyContent>
       </Container>
     )
