@@ -105,6 +105,15 @@ interface IProps {
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
+  toggleScroll = () => {
+    const body = document.querySelector('body') as HTMLBodyElement
+    if (this.props.show) {
+      body.style.overflow = 'hidden'
+    } else {
+      body.style.removeProperty('overflow')
+    }
+  }
+
   render() {
     const {
       title,
@@ -116,6 +125,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       contentHeight
     } = this.props
 
+    this.toggleScroll()
     if (!show) {
       return null
     }
