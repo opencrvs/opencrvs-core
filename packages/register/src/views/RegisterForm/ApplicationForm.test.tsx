@@ -127,12 +127,22 @@ describe('when user has starts a new application', () => {
         await flushPromises()
         app.update()
       })
-      it('stores the value to a new draft', () => {
+      it('stores the value to a new draft and move to next section', () => {
         const mockCalls = (storage.setItem as jest.Mock).mock.calls
         const userData = mockCalls[mockCalls.length - 1]
         const storedApplications = JSON.parse(userData[userData.length - 1])[0]
           .applications
         expect(storedApplications[0].data.child.firstNames).toEqual('hello')
+        expect(window.location.href).toContain('mother')
+      })
+      it('redirect to home when pressed save and exit button', async () => {
+        app
+          .find('#save_draft')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(window.location.href).toContain('/')
       })
     })
 
