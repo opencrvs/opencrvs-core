@@ -28,7 +28,8 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import {
   IApplication,
   createApplication,
-  storeApplication
+  storeApplication,
+  setInitialApplications
 } from '@register/applications'
 import { Event } from '@register/forms'
 import { RouteComponentProps } from 'react-router'
@@ -159,6 +160,7 @@ type IProps = InjectedIntlProps &
     goToHome: typeof goToHomeAction
     storeApplication: typeof storeApplication
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+    setInitialApplications: typeof setInitialApplications
   }
 class SelectContactPointView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -255,7 +257,10 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       <Container>
         <EventTopBar
           title={intl.formatMessage(messages.title)}
-          goHome={this.props.goToHome}
+          goHome={() => {
+            this.props.setInitialApplications()
+            this.props.goToHome()
+          }}
         />
         <BodyContent>
           <TertiaryButton
@@ -368,6 +373,7 @@ export const SelectContactPoint = connect(
     goBack: goBackAction,
     goToHome: goToHomeAction,
     storeApplication,
-    goToBirthRegistrationAsParent
+    goToBirthRegistrationAsParent,
+    setInitialApplications
   }
 )(injectIntl(SelectContactPointView))
