@@ -1,10 +1,8 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
-import { goBack } from '@register/navigation'
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
-import { cloneDeep, find } from 'lodash'
+import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -37,6 +35,10 @@ const messages = defineMessages({
   selectSecurityQuestion: {
     id: 'register.securityquestion.selectSecurityQuestion',
     defaultMessage: 'Select a security question'
+  },
+  answer: {
+    id: 'register.securityquestion.answer',
+    defaultMessage: 'Answer'
   },
   enterResponse: {
     id: 'register.securityquestion.enterResponse',
@@ -122,8 +124,10 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
       refresher: Date.now(),
       showError: false
     }
+  }
 
-    this.getQuestionList()
+  componentDidMount = () => {
+    this.removeDuplicateQuestions()
   }
 
   getQuestionList = (): IQuestion[] => {
@@ -143,15 +147,42 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
 
   prepareQuestionnaire = (): IQuestionnaire[] => {
     let i
-    const questionnaire = []
+    const questionnaire: IQuestionnaire[] = []
     for (i = 0; i < VISIBLE_QUESTION; i++) {
+      const selectedQuestion =
+        at(
+          this.props,
+          `setupData.securityQuestionAnswers.${i}.questionKey`
+        )[0] || EMPTY_VALUE
+      const selectedAnswer =
+        at(this.props, `setupData.securityQuestionAnswers.${i}.answer`)[0] ||
+        EMPTY_VALUE
+
       questionnaire.push({
         questionList: this.getQuestionList(),
-        selectedQuestion: EMPTY_VALUE,
-        answer: EMPTY_VALUE
-      })
+        selectedQuestion: selectedQuestion,
+        answer: selectedAnswer
+      } as IQuestionnaire)
     }
     return questionnaire
+  }
+
+  removeDuplicateQuestions = (): void => {
+    const questionnaire = this.state.questionnaire
+    this.state.questionnaire.forEach(
+      (iquestionnaire: IQuestionnaire, index: number) => {
+        questionnaire[index].questionList = this.getQuestionList().filter(
+          (question: IQuestion) => {
+            return (
+              iquestionnaire.selectedQuestion === question.value ||
+              !find(questionnaire, { selectedQuestion: question.value })
+            )
+          }
+        )
+      }
+    )
+
+    this.setState({ questionnaire })
   }
 
   onQuestionSelect = (value: string, index: number): void => {
@@ -265,7 +296,8 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                 </Wrapper>
                 <Wrapper>
                   <label>
-                    Answer<Error>*</Error>
+                    {intl.formatMessage(messages.answer)}
+                    <Error>*</Error>
                   </label>
                   <FullWidthInput
                     id={`answer-${index}`}
@@ -301,10 +333,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     return (
       <ActionPageLight
         goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.PASSWORD,
-            this.props.setupData
-          )
+          this.props.goToStep(ProtectedAccoutStep.PASSWORD, {})
         }}
         title={intl.formatMessage(messages.title)}
       >

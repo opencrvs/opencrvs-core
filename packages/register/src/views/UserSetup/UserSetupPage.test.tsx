@@ -3,14 +3,18 @@ import {
   createTestComponent,
   flushPromises,
   validToken,
-  mockUserResponse
+  mockUserResponse,
+  userDetails
 } from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
-import { checkAuth } from '@register/profile/profileActions'
+import {
+  checkAuth,
+  getStorageUserDetailsSuccess
+} from '@register/profile/profileActions'
 import { UserSetupPage } from '@register/views/UserSetup/UserSetupPage'
 import { ProtectedAccount } from '@register/components/ProtectedAccount'
 
@@ -63,10 +67,42 @@ describe('UserSetupPage tests', () => {
         .text()
     ).toEqual('Sahriar Nafis')
   })
+  it('renders page successfully without type', async () => {
+    store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupPage />,
+      store
+    )
+    const app = testComponent.component
+    expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
+    expect(
+      app
+        .find('#user-setup-name-holder')
+        .hostNodes()
+        .text()
+    ).toEqual('Shakib Al Hasan')
+  })
   it('go to password page', async () => {
     const testComponent = createTestComponent(
       // @ts-ignore
       <ProtectedAccount />,
+      store
+    )
+    const app = testComponent.component
+
+    app
+      .find('#user-setup-start-button')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    expect(app.find('#NewPassword')).toBeDefined()
+  })
+  it('go to password page without userDetails', async () => {
+    store.dispatch(getStorageUserDetailsSuccess('null'))
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <UserSetupPage goToStep={() => {}} />,
       store
     )
     const app = testComponent.component

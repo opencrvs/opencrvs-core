@@ -1,20 +1,20 @@
-import {
-  createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from '@register/tests/util'
 import { SELECT_INFORMANT } from '@register/navigation/routes'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import { Store } from 'redux'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
+import {
+  assign,
+  createTestApp,
+  flushPromises,
+  getItem,
+  mockOfflineData,
+  setItem,
+  validToken
+} from '@register/tests/util'
 import * as CommonUtils from '@register/utils/commonUtils'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
 import * as fetchAny from 'jest-fetch-mock'
+import { Store } from 'redux'
 
 const fetch = fetchAny as any
 
@@ -74,12 +74,15 @@ describe('when user is selecting the informant', () => {
         .find('#select_informant_mother')
         .hostNodes()
         .simulate('change')
+
       app
         .find('#continue')
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+      expect(window.location.pathname).toBe(
+        '/events/birth/mother/mother/contact'
+      )
     })
   })
   describe('when click continue without select anything', () => {
@@ -89,7 +92,12 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#error_text')).toHaveLength(1)
+      expect(
+        app
+          .find('#error_text')
+          .hostNodes()
+          .text()
+      ).toBe('Please select who is present and applying')
     })
   })
 
@@ -121,7 +129,9 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+      expect(window.location.pathname).toBe(
+        '/events/birth/mother/mother/contact'
+      )
     })
   })
 
@@ -139,6 +149,17 @@ describe('when user is selecting the informant', () => {
       expect(
         app.find('#primary_applicant_selection_view').hostNodes()
       ).toHaveLength(1)
+    })
+  })
+
+  describe('when clicked on cross button', () => {
+    it('go back to home page', async () => {
+      app
+        .find('#crcl-btn')
+        .hostNodes()
+        .simulate('click')
+
+      expect(window.location.href).toContain('/')
     })
   })
 })

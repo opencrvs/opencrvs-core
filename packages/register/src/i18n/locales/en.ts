@@ -1028,7 +1028,7 @@ export const ENGLISH_STATE: ILanguage = {
     'account.title': 'Account',
     'system.title': 'System',
     'label.nameEN': 'English name',
-    'label.nameBN': 'Bangla name',
+    'label.nameBN': 'Bengali name',
     'label.phone': 'Phone number',
     'label.role': 'Role',
     'label.password': 'Password',
@@ -1082,8 +1082,8 @@ export const ENGLISH_STATE: ILanguage = {
     'user.section.userDetails': 'User details',
     'user.section.accountDetails': 'Account details',
     'user.section.assignedRegisterOffice': 'Assigned Register Office',
-    'label.firstNameBN': 'Bangla first name',
-    'label.lastNameBN': 'Bangla last name',
+    'label.firstNameBN': 'Bengali first name',
+    'label.lastNameBN': 'Bengali last name',
     'label.firstNameEN': 'English first name',
     'label.lastNameEN': 'English last name',
     'label.NID': 'NID',
@@ -1106,6 +1106,7 @@ export const ENGLISH_STATE: ILanguage = {
     'table.column.header.role': 'Role',
     'table.column.header.type': 'Type',
     'table.column.header.status': 'Status',
+    'register.securityquestion.answer': 'Answer',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'In what city were you born?',
     'register.userSetup.securityQuestions.FIRST_SCHOOL':
@@ -1145,6 +1146,27 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.readyToPrint': 'Ready to print',
     'register.registrarHome.registrationNumber': 'Registration no.',
     'register.registrarHome.results.registeredDate': 'Application registered',
-    'register.registrarHome.printButton': 'Print'
+    'register.registrarHome.printButton': 'Print',
+    'userSetup.review.title': 'Your details',
+    'userSetup.review.header': 'Confirm your details',
+    'userSetupReview.instruction':
+      'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
+    'label.assignedOffice': 'Assigned office',
+    'button.confirm': 'Confirm',
+    'user.setup.waiting': 'Setting up your account',
+    'error.occured': 'An error occured. Please try again.',
+    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.heading':
+      'Who is the main point of contact for this application?',
+    'register.SelectContactPoint.continueButton': 'Continue',
+    'register.SelectContactPoint.motherLabel': 'Mother',
+    'register.SelectContactPoint.fatherLabel': 'Father',
+    'register.SelectContactPoint.otherLabel': 'Someone else',
+    'register.SelectContactPoint.phoneNoLabel': 'Phone number',
+    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.goBack': 'Back',
+    'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
+    'register.SelectContactPoint.error': 'Please select a main point of contact'
   }
 }

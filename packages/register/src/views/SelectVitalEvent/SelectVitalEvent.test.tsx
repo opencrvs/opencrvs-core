@@ -102,5 +102,19 @@ describe('when user is selecting the vital event', () => {
         expect(history.location.pathname).toContain('events/death')
       })
     })
+
+    describe('when clicked on cross button', () => {
+      beforeEach(async () => {
+        app
+          .find('#crcl-btn')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+      })
+      it('go back to home page', async () => {
+        expect(window.location.href).toContain('/')
+      })
+    })
   })
 })

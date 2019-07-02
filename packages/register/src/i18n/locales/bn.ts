@@ -1107,6 +1107,7 @@ export const BENGALI_STATE: ILanguage = {
     'table.column.header.role': 'দায়িত্ব',
     'table.column.header.type': 'ধরন',
     'table.column.header.status': 'অবস্থা',
+    'register.securityquestion.answer': 'উত্তর',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'কোন শহরে আপনার জন্ম হয়?',
     'register.userSetup.securityQuestions.FIRST_SCHOOL':
@@ -1146,6 +1147,28 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.readyToPrint': 'মুদ্রণের জন্য প্রস্তুত',
     'register.registrarHome.registrationNumber': 'নিবন্ধন নম্বর',
     'register.registrarHome.results.registeredDate': 'নিবন্ধনের তারিখ',
-    'register.registrarHome.printButton': 'মুদ্রণ'
+    'register.registrarHome.printButton': 'মুদ্রণ',
+    'userSetup.review.title': 'আপনার বৃত্তান্ত',
+    'userSetup.review.header': 'আপনার বৃত্তান্ত নিশ্চিত করুন',
+    'userSetupReview.instruction':
+      'আপনার অ্যাকাউন্টের সঠিক বিবরণ নিশ্চিত করতে নীচের তথ্যগুলো যাচাই করুন এবং প্রয়োজনীয় পরিবর্তন করে আপনার অ্যাকাউন্টের সঠিক তথ্য নিশ্চিত করুন।',
+    'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
+    'button.confirm': 'অনুমোদন দিন',
+    'user.setup.waiting': 'আপনার অ্যাকাউন্ট সংস্থাপন করা হচ্ছে',
+    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।',
+    'register.SelectContactPoint.title': 'জন্ম আবেদন',
+    'register.SelectContactPoint.heading':
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম  কে ?',
+    'register.SelectContactPoint.continueButton': 'চালিয়ে যান',
+    'register.SelectContactPoint.motherLabel': 'মা',
+    'register.SelectContactPoint.fatherLabel': 'বাবা',
+    'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
+    'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
+    'register.SelectContactPoint.relationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.goBack': 'ফিরে যান',
+    'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
+    'register.SelectContactPoint.error':
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
   }
 }

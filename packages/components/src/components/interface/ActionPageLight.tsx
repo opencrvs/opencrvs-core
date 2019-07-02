@@ -9,13 +9,14 @@ const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
-  display: block;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
 `
 const BodyContent = styled.div`
   max-width: 940px;
+  width: 100%;
   height: 64px;
   margin: auto;
   padding: 24px 0px;
@@ -52,10 +53,10 @@ const Container = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
   padding: 24px 32px;
-  margin: 36px auto 0;
+  margin: 32px auto 0;
   max-width: 940px;
+  background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 0;
     padding: 24px;

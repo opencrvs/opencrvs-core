@@ -35,6 +35,7 @@ import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { SelectPrimaryApplicant } from './views/SelectPrimaryApplicant/SelectPrimaryApplicant'
+import { SelectContactPoint } from './views/SelectContactPoint/SelectContactPoint'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -43,7 +44,7 @@ interface IAppProps {
 }
 const MainSection = styled.section`
   flex-grow: 8;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.background};
 `
 export const store = createStore()
 
@@ -170,6 +171,11 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.USER_FORM}
                                   component={UserForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_MAIN_CONTACT_POINT}
+                                  component={SelectContactPoint}
                                 />
                               </Switch>
                             </ProtectedPage>

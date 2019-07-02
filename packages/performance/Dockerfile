@@ -15,6 +15,8 @@ ENV REACT_APP_LANGUAGE=en
 COPY package.json package.json
 COPY packages/performance/package.json packages/performance/package.json
 COPY packages/components/package.json packages/components/package.json
+# Copy any relevant patches
+COPY patches patches
 # TODO remove the following two once compoennts dependency on gateway is removed
 COPY packages/gateway/package.json packages/gateway/package.json
 COPY packages/commons/package.json packages/commons/package.json

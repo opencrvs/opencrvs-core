@@ -290,7 +290,8 @@ type FullProps = IProps & InjectedIntlProps
 
 const getViewableSection = (registerForm: IForm): IFormSection[] => {
   return registerForm.sections.filter(
-    ({ id, viewType }) => id !== 'documents' && viewType === 'form'
+    ({ id, viewType }) =>
+      id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
   )
 }
 
