@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Warning } from '../icons'
-import { Paragraph } from '../typography'
 
 interface IWarningProps {
   children: string
@@ -11,6 +10,7 @@ interface IWarningProps {
 const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   flex-direction: row;
   display: flex;
+  margin: 24px 0;
 
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
@@ -20,9 +20,8 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
       : ''
   }}
 `
-const StyledParagraph = styled(Paragraph)`
-  margin: 3px 10px;
-  line-height: 1.6em;
+const StyledParagraph = styled.div`
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 export function WarningMessage(props: IWarningProps) {

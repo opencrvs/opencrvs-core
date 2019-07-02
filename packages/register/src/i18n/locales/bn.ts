@@ -1107,6 +1107,7 @@ export const BENGALI_STATE: ILanguage = {
     'table.column.header.role': 'দায়িত্ব',
     'table.column.header.type': 'ধরন',
     'table.column.header.status': 'অবস্থা',
+    'register.securityquestion.answer': 'উত্তর',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'কোন শহরে আপনার জন্ম হয়?',
     'register.userSetup.securityQuestions.FIRST_SCHOOL':
@@ -1142,6 +1143,14 @@ export const BENGALI_STATE: ILanguage = {
     'password.number': 'অন্ততঃ একটি নম্বর',
     'password.match': 'উল্লেখিত পাসওয়ার্ড মিলেছে',
     'password.mismatch': 'উল্লেখিত পাসওয়ার্ড মিলে নি',
-    'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়'
+    'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়',
+    'userSetup.review.title': 'আপনার বৃত্তান্ত',
+    'userSetup.review.header': 'আপনার বৃত্তান্ত নিশ্চিত করুন',
+    'userSetupReview.instruction':
+      'আপনার অ্যাকাউন্টের সঠিক বিবরণ নিশ্চিত করতে নীচের তথ্যগুলো যাচাই করুন এবং প্রয়োজনীয় পরিবর্তন করে আপনার অ্যাকাউন্টের সঠিক তথ্য নিশ্চিত করুন।',
+    'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
+    'button.confirm': 'অনুমোদন দিন',
+    'user.setup.waiting': 'আপনার অ্যাকাউন্ট সংস্থাপন করা হচ্ছে',
+    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।'
   }
 }

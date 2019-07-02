@@ -10,6 +10,8 @@ import {
   Container,
   LogoContainer
 } from '@register/views/UserSetup/UserSetupPage'
+import { storage } from '@register/storage'
+import { USER_DETAILS } from '@register/utils/userUtils'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -49,6 +51,9 @@ export class SetupConfirmationView extends React.Component<
     redirectToAuthentication: typeof redirectToAuthentication
   } & InjectedIntlProps
 > {
+  async componentDidMount() {
+    await storage.removeItem(USER_DETAILS)
+  }
   render() {
     const { intl } = this.props
     return (

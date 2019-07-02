@@ -2,6 +2,7 @@ import * as Hapi from 'hapi'
 import { internal } from 'boom'
 import { sendSMS } from '@notification/features/sms/service'
 import { NON_UNICODED_LANGUAGES } from '@notification/constants'
+import { logger } from '@notification/logger'
 
 export type HapiRequest = Hapi.Request & {
   i18n: {
@@ -136,6 +137,9 @@ export async function sendUserCredentials(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as ICredentialsPayload
+  // TODO: need to remove this once dev env check code is here
+  logger.info(`Username: ${payload.username}`)
+  logger.info(`Password: ${payload.password}`)
   try {
     await sendSMS(
       payload.msisdn,

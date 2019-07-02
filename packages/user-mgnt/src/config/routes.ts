@@ -138,7 +138,13 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Activate an existing pending user',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN
+          ]
         },
         validate: {
           payload: activateUserRequestSchema

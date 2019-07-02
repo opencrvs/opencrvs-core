@@ -39,13 +39,13 @@ const messages = defineMessages({
   },
   firstNameBn: {
     id: 'label.firstNameBN',
-    defaultMessage: 'Bangla first name',
-    description: 'Bangla first name'
+    defaultMessage: 'Bengali first name',
+    description: 'Bengali first name'
   },
   lastNameBn: {
     id: 'label.lastNameBN',
-    defaultMessage: 'Bangla last name',
-    description: 'Bangla last name'
+    defaultMessage: 'Bengali last name',
+    description: 'Bengali last name'
   },
   firstNameEn: {
     id: 'label.firstNameEN',

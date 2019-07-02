@@ -4,7 +4,7 @@ import {
   flushPromises,
   selectOption
 } from '@register/tests/util'
-import { SecurityQuestion } from '@register/views/SecurityQuestion/SecurityQuestionView'
+import { SecurityQuestion } from '@register/views/UserSetup/SecurityQuestionView'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 

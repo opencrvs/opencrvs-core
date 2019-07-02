@@ -98,7 +98,7 @@ export class UserSetupView extends React.Component<
   IUserSetupPageProp & InjectedIntlProps
 > {
   render() {
-    const { intl, userDetails, goToStep, setupData } = this.props
+    const { intl, userDetails, goToStep } = this.props
     return (
       <Page>
         <Container id="user-setup-landing-page">
@@ -134,7 +134,11 @@ export class UserSetupView extends React.Component<
           </InstructionHolder>
           <NextButton
             id="user-setup-start-button"
-            onClick={() => goToStep(ProtectedAccoutStep.PASSWORD, setupData)}
+            onClick={() =>
+              goToStep(ProtectedAccoutStep.PASSWORD, {
+                userId: (userDetails && userDetails.userMgntUserID) || ''
+              })
+            }
           >
             {intl.formatMessage(messages.startButtonLabel)}
           </NextButton>
