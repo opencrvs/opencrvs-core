@@ -904,21 +904,21 @@ export class RegistrarHomeView extends React.Component<
                         label: this.props.intl.formatMessage(
                           messages.listItemRegisteredDate
                         ),
-                        width: 25,
+                        width: 24,
                         key: 'dateOfRegistration'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.registrationNumber
                         ),
-                        width: 26,
+                        width: 25,
                         key: 'registrationNumber'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemAction
                         ),
-                        width: 10,
+                        width: 12,
                         key: 'actions',
                         alignment: ColumnContentAlignment.CENTER,
                         isActionColumn: true
