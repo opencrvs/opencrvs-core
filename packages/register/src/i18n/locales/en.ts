@@ -530,6 +530,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
     'register.home.header.STATE_REGISTRAR': 'State Registrar',
     'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.LOCAL_SYSTEM_NATIONAL': 'System admin (national)',
+    'register.home.header.PERFORMANCE_OVERSIGHT': 'Performance Oversight',
+    'register.home.header.PERFORMANCE_MANAGEMENT': 'Performance Management',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
@@ -1071,6 +1074,10 @@ export const ENGLISH_STATE: ILanguage = {
     'userSetup.type.MAYOR': 'Mayor',
     'userSetup.type.LOCAL_SYSTEM_ADMIN': 'System admin (local)',
     'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
+    'userSetup.type.CABINET_DIVISION': 'Cabinet Division',
+    'userSetup.type.HEALTH_DIVISION': 'Health Division',
+    'userSetup.type.ORG_DIVISION': 'ORG Division',
+    'userSetup.type.BBS': 'BBS',
     'userSetup.landing.button.start': 'Start',
     'user.form.name': 'User',
     'user.title.create': 'Create new user',

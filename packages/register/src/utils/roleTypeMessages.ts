@@ -37,6 +37,21 @@ export const roleMessages: {
     id: 'register.home.header.LOCAL_SYSTEM_ADMIN',
     defaultMessage: 'Sysadmin',
     description: 'The description for Sysadmin role'
+  },
+  LOCAL_SYSTEM_NATIONAL: {
+    id: 'register.home.header.LOCAL_SYSTEM_NATIONAL',
+    defaultMessage: 'System admin (national)',
+    description: 'The description for System admin (national)'
+  },
+  PERFORMANCE_OVERSIGHT: {
+    id: 'register.home.header.PERFORMANCE_OVERSIGHT',
+    defaultMessage: 'Performance Oversight',
+    description: 'The description for Performance Oversight role'
+  },
+  PERFORMANCE_MANAGEMENT: {
+    id: 'register.home.header.PERFORMANCE_MANAGEMENT',
+    defaultMessage: 'Performance Management',
+    description: 'The description for Performance Management role'
   }
 })
 
@@ -87,5 +102,25 @@ export const typeMessages: {
     id: 'userSetup.type.NATIONAL_SYSTEM_ADMIN',
     defaultMessage: 'System admin (national)',
     description: 'The description for NATIONAL_SYSTEM_ADMIN type'
+  },
+  CABINET_DIVISION: {
+    id: 'userSetup.type.CABINET_DIVISION',
+    defaultMessage: 'Cabinet Division',
+    description: 'The description for CABINET_DIVISION type'
+  },
+  HEALTH_DIVISION: {
+    id: 'userSetup.type.HEALTH_DIVISION',
+    defaultMessage: 'Health Division',
+    description: 'The description for HEALTH_DIVISION type'
+  },
+  ORG_DIVISION: {
+    id: 'userSetup.type.ORG_DIVISION',
+    defaultMessage: 'ORG Division',
+    description: 'The description for ORG_DIVISION type'
+  },
+  BBS: {
+    id: 'userSetup.type.BBS',
+    defaultMessage: 'BBS',
+    description: 'The description for BBS type'
   }
 })

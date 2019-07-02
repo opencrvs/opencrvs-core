@@ -523,6 +523,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
     'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
     'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক',
+    'register.home.header.LOCAL_SYSTEM_NATIONAL': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'register.home.header.PERFORMANCE_OVERSIGHT': 'কর্মক্ষমতা তত্ত্বাবধান',
+    'register.home.header.PERFORMANCE_MANAGEMENT': 'কর্মক্ষমতা ব্যবস্থাপনা',
     'register.notification.newContentAvailable':
       'কিছু তথ্য হালনাগাদ করা হয়েছে, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
@@ -1072,6 +1075,10 @@ export const BENGALI_STATE: ILanguage = {
     'userSetup.type.MAYOR': 'মেয়র',
     'userSetup.type.LOCAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (স্থানীয়)',
     'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'userSetup.type.CABINET_DIVISION': 'মন্ত্রিপরিষদ বিভাগ',
+    'userSetup.type.HEALTH_DIVISION': 'স্বাস্থ্য বিভাগ',
+    'userSetup.type.ORG_DIVISION': 'ORG বিভাগ',
+    'userSetup.type.BBS': 'পরিসংখ্যান ব্যুরো বাংলাদেশ',
     'userSetup.landing.button.start': 'শুরু',
     'user.form.name': 'ব্যবহারকারী',
     'user.title.create': 'নতুন ব্যবহারকারী তৈরি',
