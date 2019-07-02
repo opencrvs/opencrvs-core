@@ -73,12 +73,6 @@ const messages = {
 const Container = styled(BodyContent)`
   padding-top: 32px;
 `
-const SmallSpinner = styled(Spinner)`
-  background: ${({ theme }) =>
-    `linear-gradient(to right,${theme.colors.white} 10%,${theme.colors.primary} 42%)`};
-  width: 24px;
-  height: 24px;
-`
 
 interface IState {
   sentForReviewPageNo: number
@@ -112,12 +106,12 @@ class Outbox extends React.Component<IFullProps, IState> {
         break
       case SUBMISSION_STATUS.SUBMITTING:
         iconId = `registering${index}`
-        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS.REGISTERING:
         iconId = `registering${index}`
-        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRegistering)
         break
       case SUBMISSION_STATUS.READY_TO_REJECT:
@@ -127,7 +121,7 @@ class Outbox extends React.Component<IFullProps, IState> {
         break
       case SUBMISSION_STATUS.REJECTING:
         iconId = `rejecting${index}`
-        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusRejecting)
         break
       case SUBMISSION_STATUS.FAILED_NETWORK:

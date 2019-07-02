@@ -1,9 +1,10 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { Button } from '../../buttons'
-import { InvertSpinner } from '../InvertSpinner'
+import { Spinner } from '../Spinner'
 import { KeyboardArrowUp, KeyboardArrowDown, Outbox } from '../../icons'
 import { colors } from '../../colors'
+import { ITheme } from 'src/components/theme'
 
 export interface IState {
   expand: boolean
@@ -12,6 +13,7 @@ export interface IState {
 interface IProps {
   processingText: string
   outboxText: string
+  theme: ITheme
 }
 const NotificationBar = styled.div`
   padding: 8px 16px;
@@ -44,7 +46,7 @@ const Text = styled.span`
   margin-left: 16px;
 `
 
-export class ExpandableNotification extends React.Component<IProps, IState> {
+class ExpandableNotificationComponent extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
@@ -69,7 +71,11 @@ export class ExpandableNotification extends React.Component<IProps, IState> {
               </>
             ) : (
               <>
-                <InvertSpinner id="InvertSpinner" size="24px" />
+                <Spinner
+                  id="Spinner"
+                  size={24}
+                  baseColor={this.props.theme.colors.background}
+                />
                 <Text>{processingText}</Text>
               </>
             )}
@@ -91,3 +97,4 @@ export class ExpandableNotification extends React.Component<IProps, IState> {
     )
   }
 }
+export const ExpandableNotification = withTheme(ExpandableNotificationComponent)
