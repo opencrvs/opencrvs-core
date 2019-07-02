@@ -1160,6 +1160,19 @@ export const ENGLISH_STATE: ILanguage = {
     'label.assignedOffice': 'Assigned office',
     'button.confirm': 'Confirm',
     'user.setup.waiting': 'Setting up your account',
-    'error.occured': 'An error occured. Please try again.'
+    'error.occured': 'An error occured. Please try again.',
+    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.heading':
+      'Who is the main point of contact for this application?',
+    'register.SelectContactPoint.continueButton': 'Continue',
+    'register.SelectContactPoint.motherLabel': 'Mother',
+    'register.SelectContactPoint.fatherLabel': 'Father',
+    'register.SelectContactPoint.otherLabel': 'Someone else',
+    'register.SelectContactPoint.phoneNoLabel': 'Phone number',
+    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.goBack': 'Back',
+    'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
+    'register.SelectContactPoint.error': 'Please select a main point of contact'
   }
 }

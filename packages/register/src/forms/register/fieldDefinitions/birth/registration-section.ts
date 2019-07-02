@@ -130,7 +130,7 @@ const messages: {
 
 export const registrationSection: IFormSection = {
   id: 'registration',
-  viewType: 'form',
+  viewType: 'hidden',
   name: messages.registrationTab,
   title: messages.registrationTitle,
   fields: [

@@ -8,6 +8,7 @@ export interface ICustomProps {
   ignoreMediaQuery?: boolean
   hideBorder?: boolean
   autocomplete?: boolean
+  isSmallSized?: boolean
 }
 
 export type ITextInputProps = ICustomProps &
@@ -73,10 +74,14 @@ const StyledInput = styled.input.attrs<ITextInputProps>({})`
     text-align: center;
   }
 
-  ${({ ignoreMediaQuery, theme }) => {
+  ${({ ignoreMediaQuery, isSmallSized, theme }) => {
     return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
+      ? isSmallSized
+        ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 234px;
+      }`
+        : `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 535px;
       }`
       : ''
   }}

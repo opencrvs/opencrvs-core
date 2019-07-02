@@ -16,7 +16,17 @@ module.exports = {
     jest: true
   },
   rules: {
-    'prettier/prettier': ['error', { singleQuote: true }],
+    'prettier/prettier': [
+      'error',
+      {
+        printWidth: 80,
+        singleQuote: true,
+        useTabs: false,
+        tabWidth: 2,
+        trailingComma: 'none',
+        semi: false
+      }
+    ],
     'no-console': 'off',
     'no-return-assign': 'off',
     'no-unreachable': 2,

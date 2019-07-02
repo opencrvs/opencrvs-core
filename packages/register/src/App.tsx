@@ -35,6 +35,7 @@ import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from './views/SysAdmin/views/CreateNewUser'
 import { SelectPrimaryApplicant } from './views/SelectPrimaryApplicant/SelectPrimaryApplicant'
+import { SelectContactPoint } from './views/SelectContactPoint/SelectContactPoint'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -175,6 +176,11 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.CREATE_USER_SECTION}
                                   component={CreateNewUser}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_MAIN_CONTACT_POINT}
+                                  component={SelectContactPoint}
                                 />
                               </Switch>
                             </ProtectedPage>

@@ -219,12 +219,6 @@ describe('when user has starts a new application', () => {
             .simulate('click')
           await flushPromises()
           app.update()
-          app
-            .find('#next_section')
-            .hostNodes()
-            .simulate('click')
-          await flushPromises()
-          app.update()
         })
 
         it('renders list of document requirements', () => {
@@ -414,12 +408,6 @@ describe('when user has starts a new application', () => {
     })
     describe('when user is in document page', () => {
       beforeEach(async () => {
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
         app
           .find('#next_section')
           .hostNodes()
