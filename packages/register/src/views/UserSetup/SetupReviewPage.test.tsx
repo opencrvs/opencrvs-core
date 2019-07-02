@@ -2,9 +2,8 @@ import * as React from 'react'
 import { createTestComponent, userDetails } from '@register/tests/util'
 import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/profileActions'
 import { createStore } from '@register/store'
-import { UserSetupReview, activateUserMutation } from './SetupReviewPage'
-import { merge } from 'lodash'
-import { DataRow } from '@opencrvs/components/lib/interface'
+import { UserSetupReview } from './SetupReviewPage'
+import { activateUserMutation } from './queries'
 
 const { store } = createStore()
 
