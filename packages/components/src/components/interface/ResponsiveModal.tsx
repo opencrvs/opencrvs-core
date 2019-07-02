@@ -43,7 +43,7 @@ const Header = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px 0px 24px;
+  padding: 0 8px 0px 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ theme }) => theme.shadows.mistyShadow};
     margin-bottom: 16px;
