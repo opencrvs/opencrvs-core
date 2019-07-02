@@ -1,26 +1,28 @@
-import * as React from 'react'
-
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-
 import {
+  ICON_ALIGNMENT,
   PrimaryButton,
-  TertiaryButton,
-  ICON_ALIGNMENT
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  goToApplicationContact as goToRegistration,
-  goToRegistrarHomeTab as goHomeAction,
-  goBack as goBackAction,
-  goToBirthRegistrationAsParent
-} from '@register/navigation'
-import { createApplication, storeApplication } from '@register/applications'
-import { Event } from '@register/forms'
-import styled from '@register/styledComponents'
-import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import {
+  createApplication,
+  setInitialApplications,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
+import {
+  goBack as goBackAction,
+  goToBirthRegistrationAsParent,
+  goToPrimaryApplicant as goToPrimaryApplicantAction,
+  goToHome
+} from '@register/navigation'
+import styled from '@register/styledComponents'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -105,6 +107,8 @@ enum INFORMANT {
 export class SelectInformantView extends React.Component<
   {
     informantRegistration: (informant: string) => void
+    goToBirthRegistration: () => void
+    goToPrimaryApplicant: () => void
     goHome: () => void
     goBack: () => void
   } & InjectedIntlProps
@@ -113,8 +117,13 @@ export class SelectInformantView extends React.Component<
     informant: ''
   }
   handleContinue = () => {
-    if (this.state.informant.length > 0 && this.state.informant !== 'error') {
-      this.props.informantRegistration(this.state.informant)
+    if (
+      this.state.informant === INFORMANT.FATHER ||
+      this.state.informant === INFORMANT.MOTHER
+    ) {
+      this.props.goToBirthRegistration()
+    } else if (this.state.informant === INFORMANT.BOTH_PARENTS) {
+      this.props.goToPrimaryApplicant()
     } else {
       this.setState({ informant: 'error' })
     }
@@ -138,9 +147,9 @@ export class SelectInformantView extends React.Component<
           </TertiaryButton>
           <Title>{intl.formatMessage(messages.informantTitle)}</Title>
           {this.state.informant === 'error' && (
-            <span id="error_text">
-              <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
-            </span>
+            <ErrorText id="error_text">
+              {intl.formatMessage(messages.errorMessage)}
+            </ErrorText>
           )}
           <Actions id="select_parent_informant">
             <RadioButton
@@ -219,15 +228,18 @@ export const SelectInformant = connect(
   null,
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
-      informantRegistration: () => {
+      goToPrimaryApplicant: () => {
+        dispatch(goToPrimaryApplicantAction())
+      },
+      goToBirthRegistration: () => {
         const application = createApplication(Event.BIRTH)
         dispatch(storeApplication(application))
         dispatch(goToBirthRegistrationAsParent(application.id))
       },
-      // informantRegistration: (informant: string) => {
-      //   dispatch(goToRegistration(informant))
-      // },
-      goHome: () => dispatch(goHomeAction('review')),
+      goHome: () => {
+        dispatch(setInitialApplications())
+        dispatch(goToHome())
+      },
       goBack: () => dispatch(goBackAction())
     }
   }

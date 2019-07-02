@@ -1,6 +1,7 @@
+import * as React from 'react'
 import styled from 'styled-components'
 import { Cross } from '../icons'
-import React = require('react')
+import { CircleButton } from '../buttons'
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -42,7 +43,7 @@ const Header = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 8px 0px 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ theme }) => theme.shadows.mistyShadow};
     margin-bottom: 16px;
@@ -50,9 +51,6 @@ const Header = styled.div`
 `
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
-`
-const Right = styled.span`
-  cursor: pointer;
 `
 const Body = styled.div.attrs<{ height?: number }>({})`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -105,6 +103,15 @@ interface IProps {
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
+  toggleScroll = () => {
+    const body = document.querySelector('body') as HTMLBodyElement
+    if (this.props.show) {
+      body.style.overflow = 'hidden'
+    } else {
+      body.style.removeProperty('overflow')
+    }
+  }
+
   render() {
     const {
       title,
@@ -116,6 +123,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       contentHeight
     } = this.props
 
+    this.toggleScroll()
     if (!show) {
       return null
     }
@@ -126,9 +134,9 @@ export class ResponsiveModal extends React.Component<IProps> {
         <ModalContent width={width}>
           <Header>
             <Title>{title}</Title>
-            <Right>
-              <Cross onClick={handleClose} />
-            </Right>
+            <CircleButton onClick={handleClose}>
+              <Cross />
+            </CircleButton>
           </Header>
           <Body height={contentHeight}>{this.props.children}</Body>
           <Footer>

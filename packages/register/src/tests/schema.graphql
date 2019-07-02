@@ -468,6 +468,11 @@ enum MaritalStatusType {
   NOT_STATED
 }
 
+input SecurityQuestionAnswer {
+  questionKey: String
+  answer: String
+}
+
 type Mutation {
   createNotification(details: NotificationInput!): Notification!
   voidNotification(id: ID!): Notification
@@ -489,6 +494,11 @@ type Mutation {
   ): DeathRegistration
   markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  activateUser(
+    userId: String!
+    password: String!
+    securityQNAs: [SecurityQuestionAnswer]!
+  ): String
 }
 
 type Notification {

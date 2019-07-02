@@ -7,7 +7,7 @@ import {
   flushPromises,
   setItem
 } from '@register/tests/util'
-import { SELECT_VITAL_EVENT } from '@register/navigation/routes'
+import { SELECT_PRIMARY_APPLICANT } from '@register/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
@@ -48,9 +48,9 @@ describe('when user is selecting the vital event', () => {
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
 
-  describe('when user is in vital event selection view', () => {
+  describe('when user is in primary applicant selection view', () => {
     beforeEach(async () => {
-      history.replace(SELECT_VITAL_EVENT)
+      history.replace(SELECT_PRIMARY_APPLICANT)
       app.update()
       app
         .find('#createPinBtn')
@@ -68,12 +68,12 @@ describe('when user is selecting the vital event', () => {
       app.update()
     })
     it('lists the options', () => {
-      expect(app.find('#select_vital_event_view')).toHaveLength(2)
+      expect(app.find('#primary_applicant_selection_view')).toHaveLength(2)
     })
-    describe('when selects "Birth"', () => {
+    describe('when selects "Mother"', () => {
       beforeEach(() => {
         app
-          .find('#select_birth_event')
+          .find('#select_mother_event')
           .hostNodes()
           .simulate('change')
 
@@ -82,15 +82,15 @@ describe('when user is selecting the vital event', () => {
           .hostNodes()
           .simulate('click')
       })
-      it('takes user to the informant selection view', () => {
-        expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
+      it('takes user to the birth selection view', () => {
+        expect(history.location.pathname).toContain('events/birth')
       })
     })
 
-    describe('when selects "Death"', () => {
+    describe('when selects "Father"', () => {
       beforeEach(() => {
         app
-          .find('#select_death_event')
+          .find('#select_father_event')
           .hostNodes()
           .simulate('change')
         app
@@ -99,21 +99,18 @@ describe('when user is selecting the vital event', () => {
           .simulate('click')
       })
       it('takses user to the death registration form', () => {
-        expect(history.location.pathname).toContain('events/death')
+        expect(history.location.pathname).toContain('events/birth')
       })
     })
-
-    describe('when clicked on cross button', () => {
-      beforeEach(async () => {
+    describe('when selects "Father"', () => {
+      beforeEach(() => {
         app
-          .find('#crcl-btn')
+          .find('#continue')
           .hostNodes()
           .simulate('click')
-        await flushPromises()
-        app.update()
       })
-      it('go back to home page', async () => {
-        expect(window.location.href).toContain('/')
+      it('shows error message', () => {
+        expect(app.find('#error_text')).toHaveLength(1)
       })
     })
   })
