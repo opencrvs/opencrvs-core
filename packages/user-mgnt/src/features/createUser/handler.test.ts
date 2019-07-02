@@ -9,7 +9,7 @@ import mockingoose from 'mockingoose'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin'] },
+  { scope: ['sysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',
