@@ -3,13 +3,15 @@ import {
   TEXT,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD,
-  SELECT_WITH_OPTIONS
+  SELECT_WITH_OPTIONS,
+  SELECT_WITH_DYNAMIC_OPTIONS
 } from '@register/forms'
 import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
-  phoneNumberFormat
+  phoneNumberFormat,
+  validIDNumber
 } from '@register/utils/validate'
 import {
   fieldToNameTransformer,
@@ -17,7 +19,7 @@ import {
   fieldToIdentifierWithTypeTransformer,
   fieldNameValueTransformer
 } from '@register/forms/mappings/mutation/field-mappings'
-import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
+import { NATIONAL_ID } from '@register/forms/identity'
 
 const messages = defineMessages({
   userForm: {
@@ -177,7 +179,7 @@ export const userSection: IFormSection = {
       label: messages.NID,
       required: true,
       initialValue: '',
-      validate: [],
+      validate: [validIDNumber(NATIONAL_ID)],
       mapping: {
         mutation: fieldToIdentifierWithTypeTransformer('NATIONAL_ID')
       }
@@ -206,37 +208,19 @@ export const userSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { label: roleMessages.FIELD_AGENT, value: 'FIELD_AGENT' },
-        { label: roleMessages.REGISTRATION_CLERK, value: 'REGISTRATION_CLERK' },
-        { label: roleMessages.LOCAL_REGISTRAR, value: 'LOCAL_REGISTRAR' },
-        { label: roleMessages.DISTRICT_REGISTRAR, value: 'DISTRICT_REGISTRAR' },
-        { label: roleMessages.STATE_REGISTRAR, value: 'STATE_REGISTRAR' },
-        { label: roleMessages.NATIONAL_REGISTRAR, value: 'NATIONAL_REGISTRAR' },
-        { label: roleMessages.LOCAL_SYSTEM_ADMIN, value: 'LOCAL_SYSTEM_ADMIN' }
-      ]
+      options: []
     },
     {
       name: 'type',
-      type: SELECT_WITH_OPTIONS,
+      type: SELECT_WITH_DYNAMIC_OPTIONS,
       label: messages.userType,
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { label: typeMessages.HOSPITAL, value: 'HOSPITAL' },
-        { label: typeMessages.CHA, value: 'CHA' },
-        { label: typeMessages.ENTREPENEUR, value: 'ENTREPENEUR' },
-        { label: typeMessages.DATA_ENTRY_CLERK, value: 'DATA_ENTRY_CLERK' },
-        { label: typeMessages.SECRETARY, value: 'SECRETARY' },
-        { label: typeMessages.CHAIRMAN, value: 'CHAIRMAN' },
-        { label: typeMessages.MAYOR, value: 'MAYOR' },
-        { label: typeMessages.LOCAL_SYSTEM_ADMIN, value: 'LOCAL_SYSTEM_ADMIN' },
-        {
-          label: typeMessages.NATIONAL_SYSTEM_ADMIN,
-          value: 'NATIONAL_SYSTEM_ADMIN'
-        }
-      ]
+      dynamicOptions: {
+        dependency: 'role',
+        options: {}
+      }
     },
     {
       name: 'device',

@@ -8,7 +8,8 @@ import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
 import {
   mockIncompleteFormData,
   mockCompleteFormData,
-  mockUserGraphqlOperation
+  mockUserGraphqlOperation,
+  mockFetchRoleGraphqlOperation
 } from '@register/views/SysAdmin/user/utils'
 
 describe('create new user tests', () => {
@@ -29,13 +30,17 @@ describe('create new user tests', () => {
             url: ''
           }}
         />,
-        store
+        store,
+        [mockFetchRoleGraphqlOperation]
       ).component
     })
 
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
-      store.dispatch(modifyUserFormData(mockIncompleteFormData))
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
       testComponent.update()
+      store.dispatch(modifyUserFormData(mockIncompleteFormData))
 
       testComponent
         .find('#confirm_form')
@@ -56,6 +61,11 @@ describe('create new user tests', () => {
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
       store.dispatch(modifyUserFormData(mockCompleteFormData))
 
       testComponent
@@ -84,7 +94,7 @@ describe('create new user tests', () => {
           }}
         />,
         store,
-        [mockUserGraphqlOperation]
+        [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
       ).component
     })
 

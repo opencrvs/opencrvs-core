@@ -5,7 +5,9 @@ import { Action } from 'redux'
 import { defineMessages } from 'react-intl'
 import ApolloClient from 'apollo-client'
 import { goToHome } from '@register/navigation'
+import { transformRoleDataToDefinitions } from '@register/views/SysAdmin/user/utils'
 
+const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
@@ -41,8 +43,24 @@ const initialState: IUserFormState = {
     ]
   },
   userFormData: {},
-  submitting: false,
+  submitting: true,
   submissionError: false
+}
+
+interface IUpdateUserFormFieldDefsAction {
+  type: typeof UPDATE_FORM_FIELD_DEFINITIONS
+  payload: {
+    data: object
+  }
+}
+
+export function updateUserFormFieldDefinitions(
+  data: object
+): IUpdateUserFormFieldDefsAction {
+  return {
+    type: UPDATE_FORM_FIELD_DEFINITIONS,
+    payload: { data }
+  }
 }
 
 interface IUserFormDataModifyAction {
@@ -122,6 +140,21 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   action: UserFormAction
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
+    case UPDATE_FORM_FIELD_DEFINITIONS:
+      const { data } = (action as IUpdateUserFormFieldDefsAction).payload
+      const updatedFields = transformRoleDataToDefinitions(
+        state.userForm.sections[0].fields,
+        data
+      )
+      const updatedSection = { ...userSection, fields: updatedFields }
+
+      return {
+        ...state,
+        submitting: false,
+        userForm: {
+          sections: [updatedSection, ...state.userForm.sections]
+        }
+      }
     case MODIFY_USER_FORM_DATA:
       return {
         ...state,
