@@ -20,24 +20,10 @@ import { createNamesMap } from '@register/utils/data-formatting'
 import { IUserDetails } from '@register/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
-import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
 import { questionMessages } from '@register/utils/userSecurityQuestions'
 import { Check } from '@opencrvs/components/lib/icons'
-
-export const activateUserMutation = gql`
-  mutation submitActivateUser(
-    $userId: String!
-    $password: String!
-    $securityQuestionAnswers: [SecurityQuestionAnswer]!
-  ) {
-    activateUser(
-      userId: $userId
-      password: $password
-      securityQNAs: $securityQuestionAnswers
-    )
-  }
-`
+import { activateUserMutation } from '@register/views/UserSetup/queries'
 
 const messages = defineMessages({
   title: {
@@ -119,7 +105,6 @@ const ConfirmButton = styled(PrimaryButton)`
 
 const LoaderOverlay = styled.div`
   background: ${({ theme }) => theme.colors.white};
-  /* border: 1px solid; */
   position: fixed;
   top: 0;
   left: 0;
