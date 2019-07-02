@@ -133,6 +133,8 @@ export async function generateUsername(names: IUserName[]) {
           { username: existingUsername.username },
           { $set: { count: existingUsername.count + 1 } }
         )
+          .then(() => logger.info('Successfully updated'))
+          .catch(err => logger.error(`Failed: ${err}`))
       } else {
         UsernameRecord.create({ username: proposedUsername, count: 1 })
       }
