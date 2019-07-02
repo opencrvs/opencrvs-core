@@ -15,7 +15,8 @@ import {
   APPLICATION_DETAIL,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
-  USER_FORM,
+  CREATE_USER,
+  CREATE_USER_SECTION,
   SELECT_PRIMARY_APPLICANT,
   SELECT_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
@@ -197,8 +198,33 @@ export function goToSettings() {
   return push(SETTINGS)
 }
 
-export function goToUserForm() {
-  return push(USER_FORM)
+export function goToCreateNewUser() {
+  return push(CREATE_USER)
+}
+
+export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
+type GoToCreateUserSection = {
+  type: typeof GO_TO_CREATE_USER_SECTION
+  payload: {
+    sectionId: string
+    userFormFieldNameHash?: string
+    formHistoryState?: IDynamicValues
+  }
+}
+
+export function goToCreateUserSection(
+  sectionId: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+): GoToCreateUserSection {
+  return {
+    type: GO_TO_CREATE_USER_SECTION,
+    payload: {
+      sectionId,
+      userFormFieldNameHash: fieldNameHash,
+      formHistoryState: historyState
+    }
+  }
 }
 
 export function goToPage(
@@ -270,6 +296,22 @@ export function navigationReducer(state: INavigationState, action: any) {
         state,
         Cmd.action(
           push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
+        )
+      )
+    case GO_TO_CREATE_USER_SECTION:
+      const {
+        sectionId,
+        userFormFieldNameHash,
+        formHistoryState
+      } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(CREATE_USER_SECTION, { sectionId }) +
+              (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
+            formHistoryState
+          )
         )
       )
   }

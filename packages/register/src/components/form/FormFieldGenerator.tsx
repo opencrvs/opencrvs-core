@@ -1,5 +1,13 @@
 import * as React from 'react'
-import { withFormik, FastField, Field, FormikProps, FieldProps } from 'formik'
+import {
+  withFormik,
+  FastField,
+  Field,
+  FormikProps,
+  FieldProps,
+  FormikTouched,
+  FormikValues
+} from 'formik'
 import { isEqual } from 'lodash'
 import {
   InjectedIntlProps,
@@ -83,6 +91,7 @@ import { FetchButtonField } from '@register/components/form/FetchButton'
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
 import { gqlToDraftTransformer } from '@register/transformer'
 import { SearchField } from './SearchField'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -99,7 +108,8 @@ const LinkFormField = styled(Link)`
 
 const FieldGroupTitle = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
-  margin: 48px 0 0;
+  margin-top: 16px;
+  margin-bottom: -2.5em;
 `
 
 type GeneratedInputFieldProps = {
@@ -323,9 +333,9 @@ function GeneratedInputField({
         fieldName={fieldDefinition.name}
         fieldLabel={fieldDefinition.label}
         isFieldRequired={fieldDefinition.required as boolean}
-        fieldValue={fieldDefinition.initialValue as string}
-        onModalComplete={(value: string) =>
-          onSetFieldValue(fieldDefinition.name, value)
+        fieldValue={fieldDefinition.initialValue as IDynamicValues}
+        onModalComplete={(label: string, value: string) =>
+          onSetFieldValue(fieldDefinition.name, { label, value })
         }
       />
     )
@@ -362,6 +372,7 @@ const mapFieldsToValues = (fields: IFormField[]) =>
     {}
   )
 
+type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
   fields: IFormField[]
   id: string
@@ -369,6 +380,7 @@ interface IFormSectionProps {
   offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
+  onSetTouched?: (func: ISetTouchedFunction) => void
 }
 
 type Props = IFormSectionProps &
@@ -399,6 +411,10 @@ class FormSectionComponent extends React.Component<Props> {
   async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
+    }
+
+    if (this.props.onSetTouched) {
+      this.props.onSetTouched(this.props.setTouched)
     }
   }
 

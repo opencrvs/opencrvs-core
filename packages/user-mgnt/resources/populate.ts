@@ -435,49 +435,49 @@ User.collection.insertMany(users)
 const fieldAgentRole = new Role({
   title: 'Field Agent',
   value: 'FIELD_AGENT',
-  types: ['Hospital', 'CHA'],
+  types: ['HOSPITAL', 'CHA'],
   active: true
 })
 
 const regitstrationAgentRole = new Role({
   title: 'Registration Agent',
   value: 'REGISTRATION_CLERK',
-  types: ['Entrepeneur', 'Data entry clerk'],
+  types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK'],
   active: true
 })
 
 const regitstrarRole = new Role({
   title: 'Registrar',
   value: 'LOCAL_REGISTRAR',
-  types: ['Secretary', 'Chairman', 'Mayor'],
+  types: ['SECRETARY', 'CHAIRMAN', 'MAYOR'],
   active: true
 })
 
 const sysAdminLocalRole = new Role({
   title: 'System admin (local)',
   value: 'LOCAL_SYSTEM_ADMIN',
-  types: ['System admin (local)'],
+  types: ['LOCAL_SYSTEM_ADMIN'],
   active: true
 })
 
 const sysAdminNationalRole = new Role({
   title: 'System admin (national)',
   value: 'LOCAL_SYSTEM_NATIONAL',
-  types: ['System admin (national)'],
+  types: ['NATIONAL_SYSTEM_ADMIN'],
   active: true
 })
 
 const performanceOversightRole = new Role({
   title: 'Performance Oversight',
   value: 'PERFORMANCE_OVERSIGHT',
-  types: ['Cabinet Division', 'BBS'],
+  types: ['CABINET_DIVISION', 'BBS'],
   active: true
 })
 
 const performanceMgntRole = new Role({
   title: 'Performance Management',
   value: 'PERFORMANCE_MANAGEMENT',
-  types: ['Health Division', 'ORG Division'],
+  types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
   active: true
 })
 

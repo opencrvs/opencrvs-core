@@ -11,7 +11,7 @@ describe('Search Field component', () => {
         fieldName="registrationOffice"
         isFieldRequired={true}
         fieldLabel="registrationOffice"
-        fieldValue=""
+        fieldValue={{ label: '', value: '' }}
         onModalComplete={mock}
       />
     </IntlProvider>

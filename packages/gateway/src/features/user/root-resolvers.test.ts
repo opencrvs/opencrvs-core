@@ -216,4 +216,46 @@ describe('User root resolvers', () => {
       )
     })
   })
+
+  describe('createUser mutation', () => {
+    const user = {
+      name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
+      identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
+      username: 'mohammad.ashraful',
+      mobile: '+8801733333333',
+      email: 'test@test.org',
+      role: 'LOCAL_REGISTRAR',
+      type: 'HOSPITAL',
+      status: 'active',
+      primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
+    }
+
+    it('creates user', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+
+      const response = await resolvers.Mutation.createUser({}, { user })
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('should throw error when /createUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '201'
+        }),
+        { status: 400 }
+      )
+
+      expect(resolvers.Mutation.createUser({}, { user })).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't create user"
+      )
+    })
+  })
 })

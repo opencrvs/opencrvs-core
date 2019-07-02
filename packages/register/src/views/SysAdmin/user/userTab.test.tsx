@@ -91,7 +91,7 @@ describe('User tab tests', async () => {
       await flushPromises()
 
       testComponent.component.update()
-      expect(window.location.href).toContain('/user-form')
+      expect(window.location.href).toContain('/createUser')
     })
   })
 

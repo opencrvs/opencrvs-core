@@ -21,7 +21,7 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { messages, UserStatus } from './utils'
-import { goToUserForm } from '@register/navigation'
+import { goToCreateNewUser } from '@register/navigation'
 import { connect } from 'react-redux'
 
 const UserTable = styled.div`
@@ -80,7 +80,7 @@ const Status = (statusProps: IStatusProps) => {
 }
 
 interface IProps extends InjectedIntlProps {
-  goToUserForm: typeof goToUserForm
+  goToCreateNewUser: typeof goToCreateNewUser
 }
 
 interface IState {
@@ -128,7 +128,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
   }
 
   onClickAddUser = () => {
-    this.props.goToUserForm()
+    this.props.goToCreateNewUser()
   }
 
   onPageChange = (newPageNumber: number) => {
@@ -223,5 +223,5 @@ class UserTabComponent extends React.Component<IProps, IState> {
 
 export const UserTab = connect(
   null,
-  { goToUserForm }
+  { goToCreateNewUser }
 )(injectIntl(UserTabComponent))
