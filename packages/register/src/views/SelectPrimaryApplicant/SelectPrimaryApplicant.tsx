@@ -17,6 +17,7 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import { BackArrow } from '@opencrvs/components/lib/icons'
+import { Container } from '@opencrvs/components/lib/layout'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -105,7 +106,7 @@ class SelectPrimaryApplicantView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <>
+      <Container>
         <EventTopBar
           title={intl.formatMessage(messages.registerNewEventTitle)}
           goHome={this.props.goToHome}
@@ -154,7 +155,7 @@ class SelectPrimaryApplicantView extends React.Component<
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
-      </>
+      </Container>
     )
   }
 }

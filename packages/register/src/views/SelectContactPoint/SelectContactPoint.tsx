@@ -33,7 +33,7 @@ import {
 } from '@register/applications'
 import { Event } from '@register/forms'
 import { RouteComponentProps } from 'react-router'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 
 const messages = defineMessages({
   title: {
@@ -110,12 +110,7 @@ const Actions = styled.div`
     padding-bottom: 8px;
   }
 `
-const Container = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  position: absolute;
-  width: 100%;
-  height: 100%;
-`
+
 const ChildContainer = styled.div`
   margin-left: 18px;
   padding-left: 33px;

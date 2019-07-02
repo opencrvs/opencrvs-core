@@ -161,7 +161,6 @@ export const messages: {
 })
 
 const FormContainer = styled.div`
-  padding: 32px 0px;
   padding-bottom: 0;
 `
 

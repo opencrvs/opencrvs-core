@@ -6,7 +6,7 @@ import {
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   goBack,
   goToBirthRegistrationAsParent,
@@ -121,7 +121,7 @@ export class SelectInformantView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <>
+      <Container>
         <EventTopBar
           title={intl.formatMessage(messages.newBirthRegistration)}
           goHome={this.props.goToHome}
@@ -209,7 +209,7 @@ export class SelectInformantView extends React.Component<
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
-      </>
+      </Container>
     )
   }
 }
