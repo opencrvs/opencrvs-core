@@ -14,6 +14,7 @@ import {
 } from '@user-mgnt/utils/hash'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Hapi from 'hapi'
+import * as _ from 'lodash'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -58,9 +59,10 @@ export default async function createUser(
   }
 
   // save user in user-mgnt data store
+  let userModelObject
   try {
     user.username = await generateUsername(user.name)
-    await User.create(user)
+    userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)
     await rollback(token, practitionerId, roleId)
@@ -71,6 +73,7 @@ export default async function createUser(
   sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
     Authorization: request.headers.authorization
   })
-  delete user.password
-  return h.response().code(201)
+
+  const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
+  return h.response(resUser).code(201)
 }

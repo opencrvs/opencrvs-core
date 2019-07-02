@@ -566,6 +566,7 @@ export interface GQLMutation {
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsRegistered: string
   markDeathAsCertified: string
+  createUser: GQLUser
   activateUser?: string
 }
 
@@ -711,12 +712,21 @@ export interface GQLRegWorkflowInput {
 
 export interface GQLUserInput {
   name?: Array<GQLHumanNameInput | null>
+  identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
   role?: string
+  type?: string
   email?: string
-  primaryOffice?: GQLLocationInput
-  catchmentArea?: Array<GQLLocationInput | null>
+  primaryOffice?: string
+  catchmentArea?: Array<string | null>
+  device?: string
+}
+
+export interface GQLUserIdentifierInput {
+  use?: string
+  system?: string
+  value?: string
 }
 
 export interface GQLCommentInput {
@@ -2583,6 +2593,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
+  createUser?: MutationToCreateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
 }
 
@@ -2799,6 +2810,18 @@ export interface MutationToMarkDeathAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkDeathAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateUserArgs {
+  user: GQLUserInput
+}
+export interface MutationToCreateUserResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToCreateUserArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

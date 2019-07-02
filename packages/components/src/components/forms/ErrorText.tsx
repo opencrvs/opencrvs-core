@@ -4,8 +4,8 @@ import { Paragraph } from '../typography'
 import styled from 'styled-components'
 
 interface IErrorTextProps {
-  children: string
   id?: string
+  children: string
   ignoreMediaQuery?: boolean
 }
 
@@ -30,7 +30,7 @@ const StyledParagraph = styled(Paragraph)`
 
 export function ErrorText(props: IErrorTextProps) {
   return (
-    <Container ignoreMediaQuery={props.ignoreMediaQuery}>
+    <Container id={props.id} ignoreMediaQuery={props.ignoreMediaQuery}>
       <Warning />
       <StyledParagraph>{props.children}</StyledParagraph>
     </Container>

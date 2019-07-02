@@ -23,6 +23,12 @@ context('Birth Registration Integration Test', () => {
     cy.get('#continue').click()
     cy.get('#select_informant_father').click()
     cy.get('#continue').click()
+
+    // SELECT MAIN CONTACT POINT
+    cy.get('#contact_mother').click()
+    cy.get('#phone_number_input').type('01526972106')
+    cy.get('#continue').click()
+
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#familyName').type('স্পিভক')
@@ -49,10 +55,13 @@ context('Birth Registration Integration Test', () => {
     cy.get('#fathersDetailsExist_false').click()
     cy.wait(1000)
     cy.get('#next_section').click()
+
+    /*
     // APPLICATION DETAILS
     cy.get('#registrationPhone').type('01711111111')
     cy.wait(1000)
     cy.get('#next_section').click()
+    */
     // DOCUMENTS
     cy.wait(1000)
     cy.get('#next_section').click()
@@ -86,6 +95,12 @@ context('Birth Registration Integration Test', () => {
     cy.get('#continue').click()
     cy.get('#select_mother_event').click()
     cy.get('#continue').click()
+
+    // SELECT MAIN CONTACT POINT
+    cy.get('#contact_mother').click()
+    cy.get('#phone_number_input').type('01526972106')
+    cy.get('#continue').click()
+
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('মারুফ')
@@ -191,6 +206,8 @@ context('Birth Registration Integration Test', () => {
     cy.get('#postCodePermanent').type('1024')
     cy.wait(1000)
     cy.get('#next_section').click()
+
+    /*
     // APPLICATION DETAILS
     cy.selectOption(
       '#presentAtBirthRegistration',
@@ -202,6 +219,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#commentsOrNotes').type('Comments')
     cy.wait(1000)
     cy.get('#next_section').click()
+    */
     // DOCUMENTS
     cy.wait(1000)
     cy.get('#next_section').click()

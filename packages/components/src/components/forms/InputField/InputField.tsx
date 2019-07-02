@@ -45,7 +45,7 @@ export interface IInputFieldProps {
   error?: string
   prefix?: string | JSX.Element
   postfix?: string | JSX.Element
-  optionalLabel: string
+  optionalLabel?: string
   children: React.ReactNode
   ignoreMediaQuery?: boolean
   hideAsterisk?: boolean

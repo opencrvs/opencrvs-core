@@ -82,8 +82,10 @@ describe('when user is selecting the vital event', () => {
           .hostNodes()
           .simulate('click')
       })
-      it('takes user to the birth selection view', () => {
-        expect(history.location.pathname).toContain('events/birth')
+      it('takes user to the contact selection view', () => {
+        expect(history.location.pathname).toContain(
+          'events/birth/parents/mother/contact'
+        )
       })
     })
 
@@ -98,8 +100,10 @@ describe('when user is selecting the vital event', () => {
           .hostNodes()
           .simulate('click')
       })
-      it('takses user to the death registration form', () => {
-        expect(history.location.pathname).toContain('events/birth')
+      it('takses user to the contact selection form', () => {
+        expect(history.location.pathname).toContain(
+          'events/birth/parents/father/contact'
+        )
       })
     })
     describe('when selects "Father"', () => {
@@ -110,7 +114,12 @@ describe('when user is selecting the vital event', () => {
           .simulate('click')
       })
       it('shows error message', () => {
-        expect(app.find('#error_text')).toHaveLength(1)
+        expect(
+          app
+            .find('#error_text')
+            .hostNodes()
+            .text()
+        ).toBe('Please select who is the primary applicant')
       })
     })
   })

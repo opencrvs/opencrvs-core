@@ -1,14 +1,18 @@
-import * as React from 'react'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-import styled from '@register/styledComponents'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@register/components/form'
 import { IFormSection, IFormSectionData } from '@register/forms'
-import { IStoreState } from '@register/store'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { goToHome } from '@register/navigation'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { hasFormError } from '@register/forms/utils'
+import { goToCreateUserSection, goToHome } from '@register/navigation'
+import styled from '@register/styledComponents'
+import {
+  modifyUserFormData,
+  clearUserFormData
+} from '@register/views/SysAdmin/forms/userReducer'
+import { FormikTouched, FormikValues } from 'formik'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
 
 const messages = defineMessages({
   continue: {
@@ -18,60 +22,73 @@ const messages = defineMessages({
   }
 })
 
-const FormTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1Style};
+export const FormTitle = styled.div`
+  ${({ theme }) => theme.fonts.h2Style};
   height: 72px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
-
-const Action = styled.div`
+export const Action = styled.div`
   margin-top: 32px;
 `
-type State = {
-  data: IFormSectionData
-}
-
 type IProps = {
-  userForm: IFormSection
+  section: IFormSection
+  goToHome: typeof goToHome
+  modifyUserFormData: typeof modifyUserFormData
+  goToCreateUserSection: typeof goToCreateUserSection
+  clearUserFormData: typeof clearUserFormData
+  formData: IFormSectionData
 }
 
-type IFullProps = InjectedIntlProps & IProps & { dispatch: Dispatch }
+type IFullProps = InjectedIntlProps & IProps
 
-class UserFormComponent extends React.Component<IFullProps, State> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      data: {}
+class UserFormComponent extends React.Component<IFullProps> {
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+
+  handleFormAction = () => {
+    const { section, formData } = this.props
+    if (hasFormError(section.fields, formData)) {
+      this.showAllValidationErrors()
+    } else {
+      this.props.goToCreateUserSection('preview')
     }
   }
 
-  storeData = (documentData: IFormSectionData) => {
-    this.setState({
-      data: documentData
-    })
+  showAllValidationErrors = () => {
+    const touched = this.props.section.fields.reduce(
+      (memo, { name }) => ({ ...memo, [name]: true }),
+      {}
+    )
+    this.setAllFormFieldsTouched(touched)
+  }
+
+  handleBackAction = () => {
+    this.props.goToHome()
+    this.props.clearUserFormData()
   }
 
   render = () => {
-    const { dispatch, userForm, intl } = this.props
+    const { section, intl } = this.props
+
     return (
       <>
         <ActionPageLight
-          title={intl.formatMessage(userForm.title)}
-          goBack={() => {
-            dispatch(goToHome())
-          }}
+          title={intl.formatMessage(section.title)}
+          goBack={this.handleBackAction}
         >
-          <FormTitle>{intl.formatMessage(userForm.title)}</FormTitle>
+          <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
           <FormFieldGenerator
-            id={userForm.id}
-            onChange={this.storeData}
+            id={section.id}
+            onChange={this.props.modifyUserFormData}
             setAllFieldsDirty={false}
-            fields={userForm.fields}
+            fields={section.fields}
+            onSetTouched={setTouchedFunc => {
+              this.setAllFormFieldsTouched = setTouchedFunc
+            }}
           />
           <Action>
-            <PrimaryButton>
+            <PrimaryButton id="confirm_form" onClick={this.handleFormAction}>
               {intl.formatMessage(messages.continue)}
             </PrimaryButton>
           </Action>
@@ -81,12 +98,7 @@ class UserFormComponent extends React.Component<IFullProps, State> {
   }
 }
 
-function mapStatetoProps(state: IStoreState) {
-  return {
-    userForm: state.userForm.userForm
-  }
-}
-
-export const UserForm = connect((state: IStoreState) => mapStatetoProps)(
-  injectIntl<IFullProps>(UserFormComponent)
-)
+export const UserForm = connect(
+  null,
+  { modifyUserFormData, goToCreateUserSection, goToHome, clearUserFormData }
+)(injectIntl<IFullProps>(UserFormComponent))

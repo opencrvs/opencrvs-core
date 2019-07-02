@@ -26,11 +26,10 @@ import {
 } from '@register/forms'
 import {
   goBack as goBackAction,
-  goToPage as goToPageAction,
-  goToFieldAgentHomeTab,
-  goToHome
+  goToHome,
+  goToPage as goToPageAction
 } from '@register/navigation'
-import { HOME, FIELD_AGENT_HOME_TAB } from '@register/navigation/routes'
+import { HOME } from '@register/navigation/routes'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { IOfflineDataState } from '@register/offline/reducer'
 import { getOfflineState } from '@register/offline/selectors'
@@ -48,7 +47,6 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import Swipeable from 'react-swipeable'
-import { FIELD_AGENT_HOME_TAB_IN_PROGRESS } from '@register/utils/constants'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -163,7 +161,6 @@ export const messages: {
 })
 
 const FormContainer = styled.div`
-  padding: 35px 25px;
   padding-bottom: 0;
 `
 
@@ -437,8 +434,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
+      goToPage,
       intl,
-      activeSection,
       setAllFieldsDirty,
       application,
       history,
@@ -449,6 +446,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     } = this.props
 
     const isReviewForm = application.review
+    let activeSection: IFormSection = this.props.activeSection
+
+    if (activeSection.viewType === 'hidden') {
+      const nextSec = getNextSection(registerForm.sections, activeSection)
+      if (nextSec) {
+        activeSection = nextSec
+      }
+    }
+
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
       ? messages.reviewEventRegistration
@@ -685,7 +691,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
-function replaceInitialValues(fields: IFormField[], sectionValues: any) {
+export function replaceInitialValues(fields: IFormField[], sectionValues: any) {
   return fields.map(field => ({
     ...field,
     initialValue:

@@ -172,10 +172,14 @@ describe('User root resolvers', () => {
   })
   describe('activateUser mutation', () => {
     it('activates the pending user', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          statusCode: '201'
-        })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
       )
 
       const response = await resolvers.Mutation.activateUser(
@@ -188,7 +192,7 @@ describe('User root resolvers', () => {
       )
 
       expect(response).toEqual({
-        statusCode: '201'
+        userId: 'ba7022f0ff4822'
       })
     })
     it('throws error if /activateUser sends anything but 201', async () => {
@@ -209,6 +213,48 @@ describe('User root resolvers', () => {
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't activate given user"
+      )
+    })
+  })
+
+  describe('createUser mutation', () => {
+    const user = {
+      name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
+      identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
+      username: 'mohammad.ashraful',
+      mobile: '+8801733333333',
+      email: 'test@test.org',
+      role: 'LOCAL_REGISTRAR',
+      type: 'HOSPITAL',
+      status: 'active',
+      primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
+    }
+
+    it('creates user', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+
+      const response = await resolvers.Mutation.createUser({}, { user })
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('should throw error when /createUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '201'
+        }),
+        { status: 400 }
+      )
+
+      expect(resolvers.Mutation.createUser({}, { user })).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't create user"
       )
     })
   })

@@ -74,12 +74,15 @@ describe('when user is selecting the informant', () => {
         .find('#select_informant_mother')
         .hostNodes()
         .simulate('change')
+
       app
         .find('#continue')
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+      expect(window.location.pathname).toBe(
+        '/events/birth/mother/mother/contact'
+      )
     })
   })
   describe('when click continue without select anything', () => {
@@ -89,7 +92,12 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#error_text')).toHaveLength(1)
+      expect(
+        app
+          .find('#error_text')
+          .hostNodes()
+          .text()
+      ).toBe('Please select who is present and applying')
     })
   })
 
@@ -121,7 +129,9 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(app.find('#informant_parent_view').hostNodes()).toHaveLength(1)
+      expect(window.location.pathname).toBe(
+        '/events/birth/mother/mother/contact'
+      )
     })
   })
 

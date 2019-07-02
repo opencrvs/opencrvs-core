@@ -213,12 +213,6 @@ describe('when user is previewing the form data', () => {
           .simulate('click')
         await flushPromises()
         app.update()
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
       })
 
       it('check whether submit button is enabled or not', () => {

@@ -358,7 +358,7 @@ export interface IConditionals {
   otherRelationship: IConditional
 }
 
-export type ViewType = 'form' | 'preview' | 'review'
+export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 export type IFormSectionMutationMapFunction = (
   transFormedData: any,
