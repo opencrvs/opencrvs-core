@@ -267,43 +267,42 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
             searchHandler={this.toggleSearchModal}
           />
         )}
-        {this.state.showModal && (
-          <ResponsiveModal
-            id="office-search-modal"
-            title={intl.formatMessage(messages.modalTitle, {
-              fieldName: fieldName
-            })}
-            width={918}
-            contentHeight={280}
-            show={true}
-            handleClose={this.onModalClose}
-            actions={[
-              <CancelButton
-                key="modal_cancel"
-                id="modal_cancel"
-                onClick={this.onModalClose}
-              >
-                {intl.formatMessage(messages.modalCancel)}
-              </CancelButton>,
-              <SelectButton
-                key="modal_select"
-                id="modal_select"
-                onClick={() => this.onModalComplete(selectedLocation)}
-              >
-                {intl.formatMessage(messages.modalSelect)}
-              </SelectButton>
-            ]}
-          >
-            <ChildContainer>
-              <SearchInputWithIcon
-                placeHolderText={placeHolderText}
-                searchText={this.state.searchText}
-                searchHandler={this.handleSearch}
-              />
-              <ListContainer>{listItems}</ListContainer>
-            </ChildContainer>
-          </ResponsiveModal>
-        )}
+
+        <ResponsiveModal
+          id="office-search-modal"
+          title={intl.formatMessage(messages.modalTitle, {
+            fieldName: fieldName
+          })}
+          width={918}
+          contentHeight={280}
+          show={this.state.showModal}
+          handleClose={this.onModalClose}
+          actions={[
+            <CancelButton
+              key="modal_cancel"
+              id="modal_cancel"
+              onClick={this.onModalClose}
+            >
+              {intl.formatMessage(messages.modalCancel)}
+            </CancelButton>,
+            <SelectButton
+              key="modal_select"
+              id="modal_select"
+              onClick={() => this.onModalComplete(selectedLocation)}
+            >
+              {intl.formatMessage(messages.modalSelect)}
+            </SelectButton>
+          ]}
+        >
+          <ChildContainer>
+            <SearchInputWithIcon
+              placeHolderText={placeHolderText}
+              searchText={this.state.searchText}
+              searchHandler={this.handleSearch}
+            />
+            <ListContainer>{listItems}</ListContainer>
+          </ChildContainer>
+        </ResponsiveModal>
       </>
     )
   }
