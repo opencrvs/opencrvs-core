@@ -1,6 +1,7 @@
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   createApplication,
   setInitialApplications,
@@ -53,13 +54,6 @@ export const messages: {
   }
 })
 
-const BodyContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  padding: 0 16px;
-  position: relative;
-`
-
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
@@ -96,7 +90,7 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <>
+      <Container>
         <EventTopBar
           title={intl.formatMessage(messages.registerNewEventTitle)}
           goHome={this.props.goHome}
@@ -133,7 +127,7 @@ class SelectVitalEventView extends React.Component<
             {intl.formatMessage(messages.continueButton)}
           </PrimaryButton>
         </BodyContent>
-      </>
+      </Container>
     )
   }
 }

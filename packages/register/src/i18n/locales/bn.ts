@@ -1151,6 +1151,20 @@ export const BENGALI_STATE: ILanguage = {
     'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
     'button.confirm': 'অনুমোদন দিন',
     'user.setup.waiting': 'আপনার অ্যাকাউন্ট সংস্থাপন করা হচ্ছে',
-    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।'
+    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।',
+    'register.SelectContactPoint.title': 'জন্ম আবেদন',
+    'register.SelectContactPoint.heading':
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম  কে ?',
+    'register.SelectContactPoint.continueButton': 'চালিয়ে যান',
+    'register.SelectContactPoint.motherLabel': 'মা',
+    'register.SelectContactPoint.fatherLabel': 'বাবা',
+    'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
+    'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
+    'register.SelectContactPoint.relationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.goBack': 'ফিরে যান',
+    'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
+    'register.SelectContactPoint.error':
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
   }
 }
