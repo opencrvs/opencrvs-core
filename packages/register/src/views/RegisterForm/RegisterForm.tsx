@@ -384,7 +384,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   ) => {
     const result: IFormSection[] = []
     sections.map((section: IFormSection) => {
-      return result.push(
+      result.push(
         merge(
           {
             disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled
