@@ -1120,18 +1120,19 @@ export const BENGALI_STATE: ILanguage = {
     'register.securityquestion.answer': 'উত্তর',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'কোন শহরে আপনার জন্ম হয়?',
-    'register.userSetup.securityQuestions.FIRST_SCHOOL':
-      'আপনার প্রথম স্কুলের নাম কি?',
-    'register.userSetup.securityQuestions.MOTHER_NICK_NAME':
-      'আপনার মা এর ডাক নাম কি?',
-    'register.userSetup.securityQuestions.FATHER_NICK_NAME':
-      'আপনার বাবার ডাক নাম কি?',
+    'register.userSetup.securityQuestions.HIGH_SCHOOL':
+      'আপনার উচ্চ বিদ্যালয় নাম কি?',
+    'register.userSetup.securityQuestions.MOTHER_NAME': 'আপনার মা এর নাম কি?',
     'register.userSetup.securityQuestions.FAVORITE_TEACHER':
-      'আপনার প্রিয় শিক্ষক কে?',
+      'আপনার প্রিয় স্কুল শিক্ষকের নাম কি?',
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'আপনার প্রিয় সিনেমা কি?',
-    'register.userSetup.securityQuestions.FAVORITE_COLOR':
-      'আপনার প্রিয় রং কি?',
+    'register.userSetup.securityQuestions.FAVORITE_SONG':
+      'আপনার প্রিয় গান কি?',
+    'register.userSetup.securityQuestions.FAVORITE_FOOD':
+      'আপনার প্রিয় খাদ্য কি?',
+    'register.userSetup.securityQuestions.FIRST_CHILD_NAME':
+      'আপনার প্রথম সন্তানের নাম কি?',
     'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
     'formFields.SearchField.modalCancel': 'বাতিল',
     'formFields.SearchField.modalSelect': 'নির্বাচন ',

@@ -1118,19 +1118,21 @@ export const ENGLISH_STATE: ILanguage = {
     'table.column.header.status': 'Status',
     'register.securityquestion.answer': 'Answer',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
-      'In what city were you born?',
-    'register.userSetup.securityQuestions.FIRST_SCHOOL':
-      'What is the name of your first school?',
-    'register.userSetup.securityQuestions.MOTHER_NICK_NAME':
-      "What is your mother's nick name?",
-    'register.userSetup.securityQuestions.FATHER_NICK_NAME':
-      "What is your father's nick name?",
+      'What city were you born in?',
+    'register.userSetup.securityQuestions.HIGH_SCHOOL':
+      'What is the name of your high school?',
+    'register.userSetup.securityQuestions.MOTHER_NAME':
+      "What is your mother's name?",
     'register.userSetup.securityQuestions.FAVORITE_TEACHER':
-      'Who is your favorite teacher?',
+      'What is the name of your favorite school teacher?',
     'register.userSetup.securityQuestions.FAVORITE_MOVIE':
       'What is your favorite movie?',
-    'register.userSetup.securityQuestions.FAVORITE_COLOR':
-      'What is your favorite color?',
+    'register.userSetup.securityQuestions.FAVORITE_SONG':
+      'What is your favorite song?',
+    'register.userSetup.securityQuestions.FAVORITE_FOOD':
+      'What is your favorite food?',
+    'register.userSetup.securityQuestions.FIRST_CHILD_NAME':
+      "What is your first child's name?",
     'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     'formFields.SearchField.modalCancel': 'Cancel',
     'formFields.SearchField.modalSelect': 'SELECT',
