@@ -42,6 +42,7 @@ type DeathEventSearchSet implements EventSearchSet {
 
 type EventCount {
   declared: Int
+  registered: Int
   rejected: Int
 }
 

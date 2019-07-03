@@ -153,11 +153,13 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     const type = (registration && registration.type) || ''
     let name
     let dateOfEvent
-    let contactInfo: GQLContactPoint | undefined | null
+    let contactNumber: string | undefined | null
     if (type.toLowerCase() === 'birth') {
       const birthReg = data && (data.fetchRegistration as GQLBirthRegistration)
       name = (birthReg.child && birthReg.child.name) || []
       dateOfEvent = birthReg.child && birthReg.child.birthDate
+      contactNumber =
+        birthReg.registration && birthReg.registration.contactPhoneNumber
     } else {
       const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
       name = (deathReg.deceased && deathReg.deceased.name) || []
@@ -166,11 +168,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         deathReg.deceased.deceased &&
         deathReg.deceased.deceased.deathDate
       const informant = deathReg && deathReg.informant
-      contactInfo =
+      contactNumber =
         informant &&
         informant.individual &&
         informant.individual.telecom &&
-        informant.individual.telecom[0]
+        informant.individual.telecom[0] &&
+        (informant.individual.telecom[0] as GQLContactPoint).value
     }
 
     return {
@@ -182,6 +185,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
           )) ||
         '',
+      contactNumber,
       statuses:
         (registration &&
           registration.status &&
@@ -221,8 +225,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     (status.comments as GQLComment[]) || [],
                     REJECT_COMMENTS
                   )) ||
-                '',
-              informantContactNumber: contactInfo && contactInfo.value
+                ''
             }
           })) ||
         []
@@ -326,6 +329,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     </label>
                     <BoldSpan>{transformedData.dateOfEvent}</BoldSpan>
                   </ExpansionContainer>
+                  <ExpansionContainer>
+                    <label>
+                      {intl.formatMessage(messages.informantContact)}:
+                    </label>
+                    <BoldSpan>{transformedData.contactNumber}</BoldSpan>
+                  </ExpansionContainer>
                 </BorderedPaddedContent>
                 <>
                   {transformedData.statuses
@@ -334,8 +343,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         practitionerName,
                         practitionerRole,
                         rejectReasons,
-                        rejectComments,
-                        informantContactNumber
+                        rejectComments
                       } = status
                       const type = status.type as string
                       const officeName = status.officeName as string
@@ -354,14 +362,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                                 )}
                                 value={timestamp}
                               />
-                              {type === DECLARED && informantContactNumber && (
-                                <LabelValue
-                                  label={intl.formatMessage(
-                                    messages.informantContact
-                                  )}
-                                  value={informantContactNumber}
-                                />
-                              )}
                               <ValueContainer>
                                 <StyledLabel>
                                   {this.props.intl.formatMessage(

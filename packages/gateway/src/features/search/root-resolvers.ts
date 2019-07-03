@@ -67,21 +67,32 @@ export const resolvers: GQLResolver = {
       }
       const declaredResult = await postSearch(authHeader, declaredCriteria)
 
+      const registeredCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: 'REGISTERED'
+      }
+      const registeredResult = await postSearch(authHeader, registeredCriteria)
+
       const rejectedCriteria: ISearchCriteria = {
         ...searchCriteria,
         status: 'REJECTED'
       }
-      const rejecteddResult = await postSearch(authHeader, rejectedCriteria)
+      const rejectedResult = await postSearch(authHeader, rejectedCriteria)
       return {
         declared:
           (declaredResult &&
             declaredResult.hits &&
             declaredResult.hits.total) ||
           0,
+        registered:
+          (registeredResult &&
+            registeredResult.hits &&
+            registeredResult.hits.total) ||
+          0,
         rejected:
-          (rejecteddResult &&
-            rejecteddResult.hits &&
-            rejecteddResult.hits.total) ||
+          (rejectedResult &&
+            rejectedResult.hits &&
+            rejectedResult.hits.total) ||
           0
       }
     }

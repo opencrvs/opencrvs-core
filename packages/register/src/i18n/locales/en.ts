@@ -1153,6 +1153,10 @@ export const ENGLISH_STATE: ILanguage = {
     'password.match': 'Passwords match',
     'password.mismatch': 'Passwords do not match',
     'error.required.password': 'New password is not valid',
+    'register.registrarHome.readyToPrint': 'Ready to print',
+    'register.registrarHome.registrationNumber': 'Registration no.',
+    'register.registrarHome.results.registeredDate': 'Application registered',
+    'register.registrarHome.printButton': 'Print',
     'userSetup.review.title': 'Your details',
     'userSetup.review.header': 'Confirm your details',
     'userSetupReview.instruction':
