@@ -523,7 +523,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
     'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
     'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক',
-    'register.home.header.LOCAL_SYSTEM_NATIONAL': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'register.home.header.NATIONAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (জাতীয়)',
     'register.home.header.PERFORMANCE_OVERSIGHT': 'কর্মক্ষমতা তত্ত্বাবধান',
     'register.home.header.PERFORMANCE_MANAGEMENT': 'কর্মক্ষমতা ব্যবস্থাপনা',
     'register.notification.newContentAvailable':

@@ -38,8 +38,8 @@ export const roleMessages: {
     defaultMessage: 'Sysadmin',
     description: 'The description for Sysadmin role'
   },
-  LOCAL_SYSTEM_NATIONAL: {
-    id: 'register.home.header.LOCAL_SYSTEM_NATIONAL',
+  NATIONAL_SYSTEM_ADMIN: {
+    id: 'register.home.header.NATIONAL_SYSTEM_ADMIN',
     defaultMessage: 'System admin (national)',
     description: 'The description for System admin (national)'
   },

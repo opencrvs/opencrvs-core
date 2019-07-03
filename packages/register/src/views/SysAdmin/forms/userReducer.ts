@@ -4,8 +4,8 @@ import { IFormSectionData, IForm } from '@register/forms'
 import { Action } from 'redux'
 import { defineMessages } from 'react-intl'
 import ApolloClient from 'apollo-client'
-import { goToHome } from '@register/navigation'
 import { transformRoleDataToDefinitions } from '@register/views/SysAdmin/user/utils'
+import { HOME } from '@register/navigation/routes'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -178,7 +178,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case SUBMIT_USER_FORM_DATA_SUCCESS:
       return loop(
         { ...state, submitting: false, submissionError: false },
-        Cmd.list([Cmd.action(clearUserFormData()), Cmd.action(goToHome())])
+        Cmd.list([
+          Cmd.action(clearUserFormData()),
+          Cmd.run(() => window.location.assign(HOME))
+        ])
       )
     case SUBMIT_USER_FORM_DATA_FAIL:
       return { ...state, submitting: false, submissionError: true }

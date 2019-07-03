@@ -120,7 +120,7 @@ export const mockFetchRoleGraphqlOperation = {
         },
         {
           title: 'System admin (national)',
-          value: 'LOCAL_SYSTEM_NATIONAL',
+          value: 'NATIONAL_SYSTEM_ADMIN',
           types: ['NATIONAL_SYSTEM_ADMIN']
         },
         {

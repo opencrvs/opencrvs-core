@@ -536,7 +536,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
     'register.home.header.STATE_REGISTRAR': 'State Registrar',
     'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
-    'register.home.header.LOCAL_SYSTEM_NATIONAL': 'System admin (national)',
+    'register.home.header.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
     'register.home.header.PERFORMANCE_OVERSIGHT': 'Performance Oversight',
     'register.home.header.PERFORMANCE_MANAGEMENT': 'Performance Management',
     'register.notification.newContentAvailable':
