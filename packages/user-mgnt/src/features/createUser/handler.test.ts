@@ -183,6 +183,34 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
+  it('send 500 if mongoose operation throws error', async () => {
+    fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
+
+    mockingoose(UsernameRecord).toReturn(
+      { username: 'jw.doe', count: 1 },
+      'findOne'
+    )
+    mockingoose(UsernameRecord).toReturn(
+      new Error('Failed to update'),
+      'update'
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/createUser',
+      payload: mockUser,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(500)
+    mockingoose.resetAll()
+  })
+
   /*it('returns an error and rollsback if the user object is invalid', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],

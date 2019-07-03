@@ -51,6 +51,8 @@ export default async function createUser(
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
+
+    user.username = await generateUsername(user.name)
   } catch (err) {
     await rollback(token, practitionerId, roleId)
     logger.error(err)
@@ -61,7 +63,6 @@ export default async function createUser(
   // save user in user-mgnt data store
   let userModelObject
   try {
-    user.username = await generateUsername(user.name)
     userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)
