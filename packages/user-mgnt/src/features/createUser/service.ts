@@ -43,9 +43,11 @@ export const createFhirPractitionerRole = (
         ]
       }
     ],
-    location: user.catchmentAreaIds.concat(user.primaryOfficeId).map(id => ({
-      reference: `Location/${id}`
-    }))
+    location: (user.catchmentAreaIds || [])
+      .concat(user.primaryOfficeId)
+      .map(id => ({
+        reference: `Location/${id}`
+      }))
   }
 }
 

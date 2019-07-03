@@ -110,7 +110,7 @@ describe('when user has starts a new application', () => {
       app.update()
     })
 
-    describe('when user types in something', () => {
+    describe('when user types in something and press continue', () => {
       beforeEach(async () => {
         app
           .find('#firstNames')
@@ -120,13 +120,57 @@ describe('when user has starts a new application', () => {
           })
         await flushPromises()
         app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
       })
-      it('stores the value to a new draft', () => {
+      it('stores the value to a new draft and move to next section', () => {
         const mockCalls = (storage.setItem as jest.Mock).mock.calls
         const userData = mockCalls[mockCalls.length - 1]
         const storedApplications = JSON.parse(userData[userData.length - 1])[0]
           .applications
         expect(storedApplications[0].data.child.firstNames).toEqual('hello')
+        expect(window.location.href).toContain('mother')
+      })
+      it('redirect to home when pressed save and exit button', async () => {
+        app
+          .find('#save_draft')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(window.location.href).toContain('/')
+      })
+      it('check toggle menu toggle button handler', async () => {
+        app
+          .find('#eventToggleMenuToggleButton')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(app.find('#eventToggleMenuSubMenu').hostNodes().length).toEqual(
+          1
+        )
+      })
+      it('check toggle menu item handler', async () => {
+        app
+          .find('#eventToggleMenuToggleButton')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+
+        app
+          .find('#eventToggleMenuItem0')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+
+        expect(window.location.href).toContain('/')
       })
     })
 
@@ -157,12 +201,6 @@ describe('when user has starts a new application', () => {
 
       describe('when user goes to documents page', () => {
         beforeEach(async () => {
-          app
-            .find('#next_section')
-            .hostNodes()
-            .simulate('click')
-          await flushPromises()
-          app.update()
           app
             .find('#next_section')
             .hostNodes()
@@ -370,12 +408,6 @@ describe('when user has starts a new application', () => {
     })
     describe('when user is in document page', () => {
       beforeEach(async () => {
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
         app
           .find('#next_section')
           .hostNodes()

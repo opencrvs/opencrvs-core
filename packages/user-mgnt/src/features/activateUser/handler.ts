@@ -61,8 +61,7 @@ export default async function activateUser(
     // return 400 if there is a validation error when updating to mongo
     return h.response().code(400)
   }
-
-  return h.response().code(201)
+  return h.response({ userId: user._id }).code(201)
 }
 const securityQNASchema = Joi.object({
   questionKey: Joi.string().required(),

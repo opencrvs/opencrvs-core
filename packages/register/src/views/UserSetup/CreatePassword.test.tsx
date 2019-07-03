@@ -6,19 +6,18 @@ import { ReactWrapper } from 'enzyme'
 
 const { store } = createStore()
 
-describe('Settings page tests', async () => {
+describe('CreatePassword page tests', async () => {
   let component: ReactWrapper
   beforeEach(async () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <CreatePassword />,
+      <CreatePassword goToStep={() => {}} setupData={{ userId: '123' }} />,
       store
     )
     component = testComponent.component
   })
 
   it('it shows passwords missmatch error when Continue button is pressed', () => {
-    // @ts-ignore
     component.find('input#NewPassword').simulate('change', {
       target: { id: 'NewPassword', value: '0crvsPassword' }
     })
@@ -32,6 +31,17 @@ describe('Settings page tests', async () => {
         .hostNodes()
         .text()
     ).toEqual('Passwords do not match')
+
+    component.unmount()
+  })
+  it('it passes validations', () => {
+    component.find('input#NewPassword').simulate('change', {
+      target: { id: 'NewPassword', value: '0crvsPassword' }
+    })
+    component.find('input#ConfirmPassword').simulate('change', {
+      target: { id: 'ConfirmPassword', value: '0crvsPassword' }
+    })
+    component.find('button#Continue').simulate('click')
 
     component.unmount()
   })

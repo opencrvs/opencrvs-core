@@ -12,12 +12,15 @@ type UserIdentifier { # -> identifier
 
 input UserInput {
   name: [HumanNameInput]
+  identifier: [UserIdentifierInput]
   username: String
   mobile: String
   role: String
+  type: String
   email: String
-  primaryOffice: LocationInput
-  catchmentArea: [LocationInput]
+  primaryOffice: String
+  catchmentArea: [String]
+  device: String
 }
 
 type User {
@@ -61,6 +64,7 @@ type Query {
 }
 
 type Mutation {
+  createUser(user: UserInput!): User!
   activateUser(
     userId: String!
     password: String!

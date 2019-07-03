@@ -54,8 +54,8 @@ export const messages: {
   },
   labelBanglaName: {
     id: 'label.nameBN',
-    defaultMessage: 'Bangla name',
-    description: 'Bangla name label'
+    defaultMessage: 'Bengali name',
+    description: 'Bengali name label'
   },
   labelPhone: {
     id: 'label.phone',
@@ -135,7 +135,7 @@ const Container = styled.div`
 const SettingsTitle = styled.div`
   ${({ theme }) => theme.fonts.h1Style};
   height: 72px;
-  margin-left: 24px;
+  margin-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }

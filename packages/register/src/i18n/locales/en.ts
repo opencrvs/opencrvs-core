@@ -510,6 +510,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.self': 'Self',
     'register.selectInformant.errorMessage':
       'Please select who is present and applying',
+    'register.primaryApplicant.registerNewEventHeading':
+      'Who is the primary applicant for this application?',
+    'register.primaryApplicant.description':
+      'This person is responsible for providing accurate information in this application. ',
+    'register.primaryApplicant.errorMessage':
+      'Please select who is the primary applicant',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
@@ -530,6 +536,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
     'register.home.header.STATE_REGISTRAR': 'State Registrar',
     'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.LOCAL_SYSTEM_NATIONAL': 'System admin (national)',
+    'register.home.header.PERFORMANCE_OVERSIGHT': 'Performance Oversight',
+    'register.home.header.PERFORMANCE_MANAGEMENT': 'Performance Management',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
@@ -1022,9 +1031,10 @@ export const ENGLISH_STATE: ILanguage = {
     'account.title': 'Account',
     'system.title': 'System',
     'label.nameEN': 'English name',
-    'label.nameBN': 'Bangla name',
+    'label.nameBN': 'Bengali name',
     'label.phone': 'Phone number',
     'label.role': 'Role',
+    'label.type': 'Type',
     'label.password': 'Password',
     'label.pin': 'PIN',
     'label.language': 'Language',
@@ -1070,14 +1080,18 @@ export const ENGLISH_STATE: ILanguage = {
     'userSetup.type.MAYOR': 'Mayor',
     'userSetup.type.LOCAL_SYSTEM_ADMIN': 'System admin (local)',
     'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
+    'userSetup.type.CABINET_DIVISION': 'Cabinet Division',
+    'userSetup.type.HEALTH_DIVISION': 'Health Division',
+    'userSetup.type.ORG_DIVISION': 'ORG Division',
+    'userSetup.type.BBS': 'BBS',
     'userSetup.landing.button.start': 'Start',
     'user.form.name': 'User',
     'user.title.create': 'Create new user',
     'user.section.userDetails': 'User details',
     'user.section.accountDetails': 'Account details',
     'user.section.assignedRegisterOffice': 'Assigned Register Office',
-    'label.firstNameBN': 'Bangla first name',
-    'label.lastNameBN': 'Bangla last name',
+    'label.firstNameBN': 'Bengali first name',
+    'label.lastNameBN': 'Bengali last name',
     'label.firstNameEN': 'English first name',
     'label.lastNameEN': 'English last name',
     'label.NID': 'NID',
@@ -1085,6 +1099,8 @@ export const ENGLISH_STATE: ILanguage = {
     'label.userDevice': 'Device',
     'label.registrationOffice': 'Registration Office',
     'button.continue': 'Continue',
+    'createUser.buttons.submit': 'Create user',
+    'createUser.preview.title': 'Please review the new users details',
     'register.securityquestion.title': 'Security questions',
     'register.securityquestion.heading': 'Set your security questions',
     'register.securityquestion.description':
@@ -1100,6 +1116,7 @@ export const ENGLISH_STATE: ILanguage = {
     'table.column.header.role': 'Role',
     'table.column.header.type': 'Type',
     'table.column.header.status': 'Status',
+    'register.securityquestion.answer': 'Answer',
     'register.userSetup.securityQuestions.BIRTH_TOWN':
       'In what city were you born?',
     'register.userSetup.securityQuestions.FIRST_SCHOOL':
@@ -1135,6 +1152,27 @@ export const ENGLISH_STATE: ILanguage = {
     'password.number': 'At least one number',
     'password.match': 'Passwords match',
     'password.mismatch': 'Passwords do not match',
-    'error.required.password': 'New password is not valid'
+    'error.required.password': 'New password is not valid',
+    'userSetup.review.title': 'Your details',
+    'userSetup.review.header': 'Confirm your details',
+    'userSetupReview.instruction':
+      'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
+    'label.assignedOffice': 'Assigned office',
+    'button.confirm': 'Confirm',
+    'user.setup.waiting': 'Setting up your account',
+    'error.occured': 'An error occured. Please try again.',
+    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.heading':
+      'Who is the main point of contact for this application?',
+    'register.SelectContactPoint.continueButton': 'Continue',
+    'register.SelectContactPoint.motherLabel': 'Mother',
+    'register.SelectContactPoint.fatherLabel': 'Father',
+    'register.SelectContactPoint.otherLabel': 'Someone else',
+    'register.SelectContactPoint.phoneNoLabel': 'Phone number',
+    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.goBack': 'Back',
+    'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
+    'register.SelectContactPoint.error': 'Please select a main point of contact'
   }
 }

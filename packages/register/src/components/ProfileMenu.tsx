@@ -92,7 +92,9 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
         }
       ) as GQLHumanName
 
-      userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      if (nameObj) {
+        userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      }
 
       userRole =
         userDetails.role &&

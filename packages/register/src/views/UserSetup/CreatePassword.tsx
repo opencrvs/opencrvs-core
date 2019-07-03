@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -204,8 +203,10 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
     }))
 
     if (
-      this.state.newPassword.length > 0 &&
-      this.state.newPassword === this.state.confirmPassword
+      this.state.passwordMatched &&
+      this.state.hasCases &&
+      this.state.hasNumber &&
+      this.state.validLength
     ) {
       this.props.setupData.password = this.state.newPassword
       this.props.goToStep(
@@ -222,7 +223,7 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
           title={intl.formatMessage(messages.newPassword)}
           goBack={() => {
             this.props.goToStep(
-              ProtectedAccoutStep.LANDING,
+              ProtectedAccoutStep.REVIEW,
               this.props.setupData
             )
           }}
@@ -323,7 +324,4 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
   }
 }
 
-export const CreatePassword = connect(
-  null,
-  {}
-)(injectIntl(CreatePasswordComponent))
+export const CreatePassword = injectIntl(CreatePasswordComponent)

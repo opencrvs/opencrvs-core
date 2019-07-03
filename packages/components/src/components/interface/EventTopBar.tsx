@@ -46,7 +46,7 @@ export const EventTopBar = (props: IProps) => {
       </Item>
       <Item>
         {goHome && (
-          <CircleButton onClick={goHome}>
+          <CircleButton id="crcl-btn" onClick={goHome}>
             <Cross />
           </CircleButton>
         )}

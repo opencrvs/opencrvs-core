@@ -16,7 +16,9 @@ import {
   IUserData,
   getCurrentUserID,
   getApplicationsOfCurrentUser,
-  writeApplicationByUser
+  writeApplicationByUser,
+  deleteApplicationByUser,
+  IApplication
 } from '@register/applications'
 import { v4 as uuid } from 'uuid'
 import { createStore } from '@register/store'
@@ -102,19 +104,35 @@ describe('when user logs in', async () => {
     expect(currentUserDrafts.find(draft => draft.id === draft3.id)).toBeFalsy()
   })
 
-  it("should save the draft inside the current user's array of drafts", async () => {
-    const draft4 = createApplication(Event.DEATH)
-    await writeApplicationByUser({
-      userID: currentUserData.userID,
-      initialApplicationsLoaded: true,
-      applications: [...currentUserData.applications, draft4]
+  describe('Application in index db', () => {
+    let draft: IApplication
+
+    beforeAll(async () => {
+      draft = createApplication(Event.DEATH)
+      await writeApplicationByUser(currentUserData.userID, draft)
     })
 
-    // Now, let's check if the new draft is added
-    const details = await getApplicationsOfCurrentUser()
-    const currentUserDrafts = (JSON.parse(details) as IUserData).applications
-    expect(currentUserDrafts.length).toBe(3)
-    expect(currentUserDrafts.find(draft => draft.id === draft4.id)).toBeTruthy()
+    it("should save the draft inside the current user's array of drafts", async () => {
+      // Now, let's check if the new draft is added
+      const details = await getApplicationsOfCurrentUser()
+      const currentUserDrafts = (JSON.parse(details) as IUserData).applications
+      expect(currentUserDrafts.length).toBe(3)
+      expect(
+        currentUserDrafts.find(draft => draft.id === draft.id)
+      ).toBeTruthy()
+    })
+
+    it("should delete the draft from the current user's array of applications", async () => {
+      await deleteApplicationByUser(currentUserData.userID, draft)
+
+      // Now, let's check if the new draft is added
+      const details = await getApplicationsOfCurrentUser()
+      const currentUserDrafts = (JSON.parse(details) as IUserData).applications
+      expect(currentUserDrafts.length).toBe(2)
+      expect(
+        currentUserDrafts.find(cDraft => cDraft.id === draft.id)
+      ).toBeFalsy()
+    })
   })
 })
 
