@@ -1154,6 +1154,10 @@ export const BENGALI_STATE: ILanguage = {
     'password.match': 'উল্লেখিত পাসওয়ার্ড মিলেছে',
     'password.mismatch': 'উল্লেখিত পাসওয়ার্ড মিলে নি',
     'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়',
+    'register.registrarHome.readyToPrint': 'মুদ্রণের জন্য প্রস্তুত',
+    'register.registrarHome.registrationNumber': 'নিবন্ধন নম্বর',
+    'register.registrarHome.results.registeredDate': 'নিবন্ধনের তারিখ',
+    'register.registrarHome.printButton': 'মুদ্রণ',
     'userSetup.review.title': 'আপনার বৃত্তান্ত',
     'userSetup.review.header': 'আপনার বৃত্তান্ত নিশ্চিত করুন',
     'userSetupReview.instruction':

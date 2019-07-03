@@ -4,6 +4,7 @@ export const COUNT_REGISTRATION_QUERY = gql`
   query data($locationIds: [String]) {
     countEvents(locationIds: $locationIds) {
       declared
+      registered
       rejected
     }
   }
@@ -48,6 +49,7 @@ export const SEARCH_EVENTS = gql`
           childName {
             firstNames
             familyName
+            use
           }
         }
         ... on DeathEventSearchSet {
@@ -55,6 +57,7 @@ export const SEARCH_EVENTS = gql`
           deceasedName {
             firstNames
             familyName
+            use
           }
         }
       }
@@ -99,6 +102,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
             comment
           }
         }
+        contactPhoneNumber
       }
       ... on BirthRegistration {
         child {

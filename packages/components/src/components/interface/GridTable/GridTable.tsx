@@ -151,7 +151,8 @@ export class GridTable extends React.Component<
             expanded={
               this.state.expanded.findIndex(id => id === itemId) >= 0 || false
             }
-            id="ListItemAction"
+            arrowExpansion={true}
+            id={`ListItemAction-${itemId}`}
             onExpand={() => this.toggleExpanded(itemId)}
           />
         </ActionWrapper>
