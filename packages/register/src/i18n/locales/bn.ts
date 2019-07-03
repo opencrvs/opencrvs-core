@@ -1114,6 +1114,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.securityquestion.securityQuestionLabel':
       'নিরাপত্তা প্রশ্ন {count}',
     'table.column.header.name': 'নাম',
+    'table.column.header.username': 'ব্যবহারকারীর নাম',
     'table.column.header.role': 'দায়িত্ব',
     'table.column.header.type': 'ধরন',
     'table.column.header.status': 'অবস্থা',

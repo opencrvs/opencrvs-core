@@ -1113,6 +1113,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.securityquestion.securityQuestionLabel':
       'Security question {count}',
     'table.column.header.name': 'Name',
+    'table.column.header.username': 'Username',
     'table.column.header.role': 'Role',
     'table.column.header.type': 'Type',
     'table.column.header.status': 'Status',
