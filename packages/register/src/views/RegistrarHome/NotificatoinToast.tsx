@@ -32,6 +32,9 @@ interface IProps {
 }
 type IFullProps = IProps & InjectedIntlProps
 class NotificationToast extends React.Component<IFullProps> {
+  constructor(props: IFullProps) {
+    super(props)
+  }
   render() {
     const outboxData = this.props.application.filter(
       item =>

@@ -12,7 +12,6 @@ export const phoneNumberToFieldTransformer = (
       if (tel.system === 'phone' && tel.value) {
         transformedData[sectionId][field.name] = tel.value
       }
-      return tel
     })
   }
   return transformedData
