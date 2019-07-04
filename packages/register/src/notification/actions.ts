@@ -8,6 +8,11 @@ export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
 export const SESSION_EXPIRED = 'AUTH/SESSION_EXPIRED'
 export const TOGGLE_DRAFT_SAVED_NOTIFICATION = 'TOGGLE_DRAFT_SAVED_NOTIFICATION'
 
+export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
+export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
+export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
+export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
+
 export type ShowNewContentAvailableAction = {
   type: typeof SHOW_NEW_CONTENT_AVAILABLE
   payload: { waitingSW: ServiceWorker }
@@ -38,6 +43,28 @@ export type HideConfigurationErrorAction = {
 
 export type toggleDraftSavedNotificationAction = {
   type: typeof TOGGLE_DRAFT_SAVED_NOTIFICATION
+}
+
+export type ShowSubmitFormSuccessToast = {
+  type: typeof SHOW_SUBMIT_FORM_SUCCESS_TOAST
+  payload: {
+    data: string
+  }
+}
+
+export type HideSubmitFormSuccessToast = {
+  type: typeof HIDE_SUBMIT_FORM_SUCCESS_TOAST
+}
+
+export type ShowSubmitFormErrorToast = {
+  type: typeof SHOW_SUBMIT_FORM_ERROR_TOAST
+  payload: {
+    data: string
+  }
+}
+
+export type HideSubmitFormErrorToast = {
+  type: typeof HIDE_SUBMIT_FORM_ERROR_TOAST
 }
 
 export const showConfigurationErrorNotification = (): ShowConfigurationErrorAction => ({
@@ -84,6 +111,28 @@ export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
   type: SESSION_EXPIRED
 })
 
+export const showSubmitFormSuccessToast = (
+  data: string
+): ShowSubmitFormSuccessToast => ({
+  type: SHOW_SUBMIT_FORM_SUCCESS_TOAST,
+  payload: { data }
+})
+
+export const hideSubmitFormSuccessToast = (): HideSubmitFormSuccessToast => ({
+  type: HIDE_SUBMIT_FORM_SUCCESS_TOAST
+})
+
+export const showSubmitFormErrorToast = (
+  data: string
+): ShowSubmitFormErrorToast => ({
+  type: SHOW_SUBMIT_FORM_ERROR_TOAST,
+  payload: { data }
+})
+
+export const hideSubmitFormErrorToast = (): HideSubmitFormErrorToast => ({
+  type: HIDE_SUBMIT_FORM_ERROR_TOAST
+})
+
 export type Action =
   | ShowNewContentAvailableAction
   | HideNewContentAvailableAction
@@ -93,3 +142,7 @@ export type Action =
   | ShowConfigurationErrorAction
   | HideConfigurationErrorAction
   | toggleDraftSavedNotificationAction
+  | ShowSubmitFormSuccessToast
+  | HideSubmitFormSuccessToast
+  | ShowSubmitFormErrorToast
+  | HideSubmitFormErrorToast
