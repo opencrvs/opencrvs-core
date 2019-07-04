@@ -35,6 +35,7 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
+    user.role = user.role ? user.role : 'FIELD_AGENT'
     const role = createFhirPractitionerRole(user, practitionerId)
     roleId = await postFhir(token, role)
     if (!roleId) {
@@ -44,7 +45,7 @@ export default async function createUser(
     }
 
     user.status = statuses.PENDING
-    user.scope = user.role ? roleScopeMapping[user.role] : ['declare']
+    user.scope = roleScopeMapping[user.role]
     autoGenPassword = generateRandomPassowrd()
     const { hash, salt } = generateSaltedHash(autoGenPassword)
     user.salt = salt

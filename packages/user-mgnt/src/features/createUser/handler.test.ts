@@ -63,7 +63,24 @@ describe('createUser handler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',
-      payload: mockUser,
+      payload: {
+        name: [
+          {
+            use: 'en',
+            given: ['John', 'William'],
+            family: 'Doe'
+          }
+        ],
+        username: 'j.doe1',
+        identifiers: [{ system: 'NID', value: '1234' }],
+        email: 'j.doe@gmail.com',
+        mobile: '+880123445568',
+        type: 'SOME_TYPE',
+        primaryOfficeId: '321',
+        catchmentAreaIds: [],
+        deviceId: 'D444',
+        password: 'test'
+      },
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -87,7 +104,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/roles',
-              code: 'LOCAL_REGISTRAR'
+              code: 'FIELD_AGENT'
             }
           ]
         },
@@ -182,36 +199,4 @@ describe('createUser handler', () => {
     expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(500)
   })
-
-  /*it('returns an error and rollsback if the user object is invalid', async () => {
-    fetch.mockResponses(
-      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
-      ['', { status: 200 }],
-      ['', { status: 200 }]
-    )
-    // tslint:disable-next-line
-    const copyMockUser = Object.assign({}, mockUser)
-    delete copyMockUser.password
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/createUser',
-      payload: copyMockUser,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(fetch.mock.calls.length).toBe(4)
-    expect(fetch.mock.calls[2][0]).toEqual(
-      'http://localhost:5001/fhir/Practitioner/123'
-    )
-    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
-    expect(fetch.mock.calls[3][0]).toEqual(
-      'http://localhost:5001/fhir/PractitionerRole/123'
-    )
-    expect(fetch.mock.calls[3][1].method).toEqual('DELETE')
-    expect(res.statusCode).toBe(400)
-  })*/
 })
