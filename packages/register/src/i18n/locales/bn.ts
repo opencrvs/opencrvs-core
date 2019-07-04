@@ -531,6 +531,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.notification.declarationsSynced':
       'ইন্টারনেট সংযোগ ফিরে আসায় আমরা {syncCount} টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি',
     'register.notification.draftsSaved': 'আপনার খসড়া সংরক্ষণ করা হয়েছে',
+    'register.notification.userFormSuccess': 'নতুন ব্যবহারকারী তৈরি করা হয়েছে',
+    'register.notification.userFormFail': 'দুঃখিত কিছু ভুল হয়েছে',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
     'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'নিবন্ধন সম্পন্ন',
