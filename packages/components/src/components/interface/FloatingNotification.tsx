@@ -88,7 +88,11 @@ export class FloatingNotification extends React.Component<IProps> {
           {type === NOTIFICATION_TYPE.ERROR && <Error />}
           <NotificationMessage>{children}</NotificationMessage>
         </Content>
-        <Cancel onClick={callback} className={callback ? ' clickable' : ''}>
+        <Cancel
+          id={`${id}Cancel`}
+          onClick={callback}
+          className={callback ? ' clickable' : ''}
+        >
           <CrossLarge />
         </Cancel>
       </NotificationContainer>
