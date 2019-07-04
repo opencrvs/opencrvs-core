@@ -61,6 +61,19 @@ describe('Username generation', () => {
     const username = await generateUsername(names)
     expect(username).toBe('wu0')
   })
+
+  it('generates valid username with given and family names with appended number', async () => {
+    mockingoose(UsernameRecord).toReturn(new Error(), 'findOne')
+    const names = [{ given: ['John', 'Evan'], family: 'Doe', use: 'en' }]
+    let error
+    try {
+      await generateUsername(names)
+    } catch (err) {
+      error = err
+    }
+    expect(error).toEqual(new Error('Failed username generation'))
+    mockingoose.resetAll()
+  })
 })
 
 describe('User credentials notification', () => {
