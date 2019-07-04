@@ -6,6 +6,11 @@ import { defineMessages } from 'react-intl'
 import ApolloClient from 'apollo-client'
 import { goToHome } from '@register/navigation'
 import { transformRoleDataToDefinitions } from '@register/views/SysAdmin/user/utils'
+import {
+  showSubmitFormSuccessToast,
+  showSubmitFormErrorToast
+} from '@register/notification/actions'
+import { SEARCH_USERS } from '@register/sysadmin/user/queries'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -13,6 +18,11 @@ const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
+
+enum TOAST_MESSAGES {
+  SUCCESS = 'userFormSuccess',
+  FAIL = 'userFormFail'
+}
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -170,18 +180,35 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       } = (action as IUserFormDataSubmitAction).payload
       return loop(
         { ...state, submitting: true },
-        Cmd.run(() => client.mutate({ mutation, variables }), {
-          successActionCreator: submitSuccess,
-          failActionCreator: submitFail
-        })
+        Cmd.run(
+          () =>
+            client.mutate({
+              mutation,
+              variables,
+              refetchQueries: [
+                { query: SEARCH_USERS, variables: { count: 10, skip: 0 } }
+              ]
+            }),
+          {
+            successActionCreator: submitSuccess,
+            failActionCreator: submitFail
+          }
+        )
       )
     case SUBMIT_USER_FORM_DATA_SUCCESS:
       return loop(
         { ...state, submitting: false, submissionError: false },
-        Cmd.list([Cmd.action(clearUserFormData()), Cmd.action(goToHome())])
+        Cmd.list([
+          Cmd.action(clearUserFormData()),
+          Cmd.action(goToHome()),
+          Cmd.action(showSubmitFormSuccessToast(TOAST_MESSAGES.SUCCESS))
+        ])
       )
     case SUBMIT_USER_FORM_DATA_FAIL:
-      return { ...state, submitting: false, submissionError: true }
+      return loop(
+        { ...state, submitting: false, submissionError: true },
+        Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+      )
     default:
       return state
   }

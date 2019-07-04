@@ -193,15 +193,6 @@ export const userSection: IFormSection = {
       validate: []
     },
     {
-      name: 'username',
-      type: TEXT,
-      label: messages.username,
-      required: false,
-      disabled: true,
-      initialValue: '',
-      validate: []
-    },
-    {
       name: 'role',
       type: SELECT_WITH_OPTIONS,
       label: messages.userRole,

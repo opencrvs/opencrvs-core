@@ -462,7 +462,7 @@ const sysAdminLocalRole = new Role({
 
 const sysAdminNationalRole = new Role({
   title: 'System admin (national)',
-  value: 'LOCAL_SYSTEM_NATIONAL',
+  value: 'NATIONAL_SYSTEM_ADMIN',
   types: ['NATIONAL_SYSTEM_ADMIN'],
   active: true
 })
