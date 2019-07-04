@@ -530,15 +530,15 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
-    'register.home.header.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
-    'register.home.header.PERFORMANCE_OVERSIGHT': 'Performance Oversight',
-    'register.home.header.PERFORMANCE_MANAGEMENT': 'Performance Management',
+    'register.home.header.fieldAgent': 'Field Agent',
+    'register.home.header.registrationClerk': 'Registration Clerk',
+    'register.home.header.localRegistrar': 'Registrar',
+    'register.home.header.districtRegistrar': 'District Registrar',
+    'register.home.header.stateRegistrar': 'State Registrar',
+    'register.home.header.nationalRegistrar': 'National Registrar',
+    'register.home.header.nationalSystemAdmin': 'System admin (national)',
+    'register.home.header.performanceOversight': 'Performance Oversight',
+    'register.home.header.performanceManagement': 'Performance Management',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
@@ -1063,7 +1063,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.sysAdminHome.users': 'Users',
     'register.sysAdminHome.devices': 'Devices',
     'register.sysAdminHome.config': 'Config',
-    'register.home.header.LOCAL_SYSTEM_ADMIN': 'Sysadmin',
+    'register.home.header.localSystemAdmin': 'Sysadmin',
     'register.home.header.systemTitle': 'System',
     'register.home.header.settingsTitle': 'Settings',
     'register.home.header.helpTitle': 'Help',
@@ -1071,19 +1071,19 @@ export const ENGLISH_STATE: ILanguage = {
     'userSetup.landing.title': 'Welcome to OpenCRVS',
     'userSetup.landing.instruction':
       'You just a few steps away from completing your account set up.',
-    'userSetup.type.HOSPITAL': 'Hospital',
-    'userSetup.type.CHA': 'CHA',
-    'userSetup.type.ENTREPENEUR': 'Entrepeneur',
-    'userSetup.type.DATA_ENTRY_CLERK': 'Data entry clerk',
-    'userSetup.type.SECRETARY': 'Secretary',
-    'userSetup.type.CHAIRMAN': 'Chairman',
-    'userSetup.type.MAYOR': 'Mayor',
-    'userSetup.type.LOCAL_SYSTEM_ADMIN': 'System admin (local)',
-    'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'System admin (national)',
-    'userSetup.type.CABINET_DIVISION': 'Cabinet Division',
-    'userSetup.type.HEALTH_DIVISION': 'Health Division',
-    'userSetup.type.ORG_DIVISION': 'ORG Division',
-    'userSetup.type.BBS': 'BBS',
+    'userSetup.type.hospital': 'Hospital',
+    'userSetup.type.cha': 'CHA',
+    'userSetup.type.entrepeneur': 'Entrepeneur',
+    'userSetup.type.dataEntryClerk': 'Data entry clerk',
+    'userSetup.type.secretary': 'Secretary',
+    'userSetup.type.chairman': 'Chairman',
+    'userSetup.type.mayor': 'Mayor',
+    'userSetup.type.localSystemAdmin': 'System admin (local)',
+    'userSetup.type.nationalSystemAdmin': 'System admin (national)',
+    'userSetup.type.cabinetDivision': 'Cabinet Division',
+    'userSetup.type.healthDivision': 'Health Division',
+    'userSetup.type.orgDivision': 'ORG Division',
+    'userSetup.type.bbs': 'BBS',
     'userSetup.landing.button.start': 'Start',
     'user.form.name': 'User',
     'user.title.create': 'Create new user',
@@ -1118,21 +1118,21 @@ export const ENGLISH_STATE: ILanguage = {
     'table.column.header.type': 'Type',
     'table.column.header.status': 'Status',
     'register.securityquestion.answer': 'Answer',
-    'register.userSetup.securityQuestions.BIRTH_TOWN':
+    'register.userSetup.securityQuestions.birthTown':
       'What city were you born in?',
-    'register.userSetup.securityQuestions.HIGH_SCHOOL':
+    'register.userSetup.securityQuestions.hightSchool':
       'What is the name of your high school?',
-    'register.userSetup.securityQuestions.MOTHER_NAME':
+    'register.userSetup.securityQuestions.motherName':
       "What is your mother's name?",
-    'register.userSetup.securityQuestions.FAVORITE_TEACHER':
+    'register.userSetup.securityQuestions.favoriteTeacher':
       'What is the name of your favorite school teacher?',
-    'register.userSetup.securityQuestions.FAVORITE_MOVIE':
+    'register.userSetup.securityQuestions.favoriteMovie':
       'What is your favorite movie?',
-    'register.userSetup.securityQuestions.FAVORITE_SONG':
+    'register.userSetup.securityQuestions.favoriteSong':
       'What is your favorite song?',
-    'register.userSetup.securityQuestions.FAVORITE_FOOD':
+    'register.userSetup.securityQuestions.favoriteFood':
       'What is your favorite food?',
-    'register.userSetup.securityQuestions.FIRST_CHILD_NAME':
+    'register.userSetup.securityQuestions.firstChildName':
       "What is your first child's name?",
     'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     'formFields.SearchField.modalCancel': 'Cancel',

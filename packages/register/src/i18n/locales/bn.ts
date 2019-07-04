@@ -517,15 +517,15 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
-    'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
-    'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
-    'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
-    'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
-    'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
-    'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক',
-    'register.home.header.NATIONAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (জাতীয়)',
-    'register.home.header.PERFORMANCE_OVERSIGHT': 'কর্মক্ষমতা তত্ত্বাবধান',
-    'register.home.header.PERFORMANCE_MANAGEMENT': 'কর্মক্ষমতা ব্যবস্থাপনা',
+    'register.home.header.fieldAgent': 'মাঠকর্মী',
+    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.localRegistrar': 'নিবন্ধক',
+    'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
+    'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',
+    'register.home.header.nationalRegistrar': 'জাতীয় নিবন্ধক',
+    'register.home.header.nationalSystemAdmin': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'register.home.header.performanceOversight': 'কর্মক্ষমতা তত্ত্বাবধান',
+    'register.home.header.performanceManagement': 'কর্মক্ষমতা ব্যবস্থাপনা',
     'register.notification.newContentAvailable':
       'কিছু তথ্য হালনাগাদ করা হয়েছে, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
@@ -1064,7 +1064,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.sysAdminHome.users': 'ইউজারস',
     'register.sysAdminHome.devices': 'ডিভাইসেস',
     'register.sysAdminHome.config': 'কনফিগ',
-    'register.home.header.LOCAL_SYSTEM_ADMIN': 'সিস এডমিন ',
+    'register.home.header.localSystemAdmin': 'সিস এডমিন ',
     'register.home.header.systemTitle': 'সিস্টেম',
     'register.home.header.settingsTitle': 'সেটিংস',
     'register.home.header.helpTitle': 'সাহায্য',
@@ -1072,19 +1072,19 @@ export const BENGALI_STATE: ILanguage = {
     'userSetup.landing.title': 'OpenCRVS এ স্বাগতম',
     'userSetup.landing.instruction':
       'আপনি আপনার অ্যাকাউন্ট সেট আপ সম্পূর্ণ করার মাত্র কয়েক পদক্ষেপ দূরে।',
-    'userSetup.type.HOSPITAL': 'হাসপাতাল',
-    'userSetup.type.CHA': 'CHA',
-    'userSetup.type.ENTREPENEUR': 'উদ্যোক্তা',
-    'userSetup.type.DATA_ENTRY_CLERK': 'ডাটা এন্ট্রি কেরানি',
-    'userSetup.type.SECRETARY': 'সচিব',
-    'userSetup.type.CHAIRMAN': 'চেয়ারম্যান',
-    'userSetup.type.MAYOR': 'মেয়র',
-    'userSetup.type.LOCAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (স্থানীয়)',
-    'userSetup.type.NATIONAL_SYSTEM_ADMIN': 'সিস্টেম অ্যাডমিন (জাতীয়)',
-    'userSetup.type.CABINET_DIVISION': 'মন্ত্রিপরিষদ বিভাগ',
-    'userSetup.type.HEALTH_DIVISION': 'স্বাস্থ্য বিভাগ',
-    'userSetup.type.ORG_DIVISION': 'ORG বিভাগ',
-    'userSetup.type.BBS': 'পরিসংখ্যান ব্যুরো বাংলাদেশ',
+    'userSetup.type.hospital': 'হাসপাতাল',
+    'userSetup.type.cha': 'CHA',
+    'userSetup.type.entrepeneur': 'উদ্যোক্তা',
+    'userSetup.type.dataEntryClerk': 'ডাটা এন্ট্রি কেরানি',
+    'userSetup.type.secretary': 'সচিব',
+    'userSetup.type.chairman': 'চেয়ারম্যান',
+    'userSetup.type.mayor': 'মেয়র',
+    'userSetup.type.localSystemAdmin': 'সিস্টেম অ্যাডমিন (স্থানীয়)',
+    'userSetup.type.nationalSystemAdmin': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'userSetup.type.cabinetDivision': 'মন্ত্রিপরিষদ বিভাগ',
+    'userSetup.type.healthDivision': 'স্বাস্থ্য বিভাগ',
+    'userSetup.type.orgDivision': 'ORG বিভাগ',
+    'userSetup.type.bbs': 'পরিসংখ্যান ব্যুরো বাংলাদেশ',
     'userSetup.landing.button.start': 'শুরু',
     'user.form.name': 'ব্যবহারকারী',
     'user.title.create': 'নতুন ব্যবহারকারী তৈরি',
@@ -1119,20 +1119,19 @@ export const BENGALI_STATE: ILanguage = {
     'table.column.header.type': 'ধরন',
     'table.column.header.status': 'অবস্থা',
     'register.securityquestion.answer': 'উত্তর',
-    'register.userSetup.securityQuestions.BIRTH_TOWN':
+    'register.userSetup.securityQuestions.birthTown':
       'কোন শহরে আপনার জন্ম হয়?',
-    'register.userSetup.securityQuestions.HIGH_SCHOOL':
+    'register.userSetup.securityQuestions.hightSchool':
       'আপনার উচ্চ বিদ্যালয় নাম কি?',
-    'register.userSetup.securityQuestions.MOTHER_NAME': 'আপনার মা এর নাম কি?',
-    'register.userSetup.securityQuestions.FAVORITE_TEACHER':
+    'register.userSetup.securityQuestions.motherName': 'আপনার মা এর নাম কি?',
+    'register.userSetup.securityQuestions.favoriteTeacher':
       'আপনার প্রিয় স্কুল শিক্ষকের নাম কি?',
-    'register.userSetup.securityQuestions.FAVORITE_MOVIE':
+    'register.userSetup.securityQuestions.favoriteMovie':
       'আপনার প্রিয় সিনেমা কি?',
-    'register.userSetup.securityQuestions.FAVORITE_SONG':
-      'আপনার প্রিয় গান কি?',
-    'register.userSetup.securityQuestions.FAVORITE_FOOD':
+    'register.userSetup.securityQuestions.favoriteSong': 'আপনার প্রিয় গান কি?',
+    'register.userSetup.securityQuestions.favoriteFood':
       'আপনার প্রিয় খাদ্য কি?',
-    'register.userSetup.securityQuestions.FIRST_CHILD_NAME':
+    'register.userSetup.securityQuestions.firstChildName':
       'আপনার প্রথম সন্তানের নাম কি?',
     'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
     'formFields.SearchField.modalCancel': 'বাতিল',
