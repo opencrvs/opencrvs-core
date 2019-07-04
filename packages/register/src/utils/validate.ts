@@ -16,8 +16,6 @@ import {
   PASSPORT
 } from '@register/forms/identity'
 
-import { string } from 'joi'
-
 export interface IValidationResult {
   message: FormattedMessage.MessageDescriptor
   props?: { [key: string]: MessageValue }

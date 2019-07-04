@@ -12,7 +12,7 @@ import {
   generateSaltedHash,
   generateRandomPassowrd
 } from '@user-mgnt/utils/hash'
-import { statuses } from '@user-mgnt/utils/userUtils'
+import { statuses, hasDemoScope } from '@user-mgnt/utils/userUtils'
 import * as Hapi from 'hapi'
 import * as _ from 'lodash'
 
@@ -45,12 +45,14 @@ export default async function createUser(
 
     user.status = statuses.PENDING
 
-    autoGenPassword = generateRandomPassowrd()
+    autoGenPassword = generateRandomPassowrd(hasDemoScope(request))
     const { hash, salt } = generateSaltedHash(autoGenPassword)
     user.salt = salt
     user.passwordHash = hash
 
     user.practitionerId = practitionerId
+
+    user.username = await generateUsername(user.name)
   } catch (err) {
     await rollback(token, practitionerId, roleId)
     logger.error(err)
@@ -61,7 +63,6 @@ export default async function createUser(
   // save user in user-mgnt data store
   let userModelObject
   try {
-    user.username = await generateUsername(user.name)
     userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)

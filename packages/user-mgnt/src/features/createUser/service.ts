@@ -125,19 +125,24 @@ export async function generateUsername(names: IUserName[]) {
       proposedUsername + '0'.repeat(3 - proposedUsername.length)
   }
 
-  await UsernameRecord.findOne({ username: proposedUsername }).then(
-    async existingUsername => {
-      if (existingUsername !== null) {
-        proposedUsername += existingUsername.count
-        UsernameRecord.update(
-          { username: existingUsername.username },
-          { $set: { count: existingUsername.count + 1 } }
-        )
-      } else {
-        UsernameRecord.create({ username: proposedUsername, count: 1 })
-      }
+  try {
+    const record = await UsernameRecord.findOne({
+      username: proposedUsername
+    }).exec()
+
+    if (record !== null) {
+      proposedUsername += record.count
+      await UsernameRecord.update(
+        { username: record.username },
+        { $set: { count: record.count + 1 } }
+      ).exec()
+    } else {
+      await UsernameRecord.create({ username: proposedUsername, count: 1 })
     }
-  )
+  } catch (err) {
+    logger.error(`Failed username generation: ${err}`)
+    throw new Error('Failed username generation')
+  }
 
   return proposedUsername
 }
