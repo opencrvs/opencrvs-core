@@ -41,7 +41,7 @@ describe('Security Question Page', async () => {
   })
 
   it('Should remove the validation message', async () => {
-    selectOption(component, '#question-0', 'What city were you born in?')
+    selectOption(component, '#question-0', 'In what city were you born?')
     component
       .find('#answer-0')
       .hostNodes()

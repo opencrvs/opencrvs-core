@@ -22,11 +22,6 @@ export const messages = defineMessages({
     defaultMessage: 'Name',
     description: 'Title for column'
   },
-  username: {
-    id: 'table.column.header.username',
-    defaultMessage: 'Username',
-    description: 'Title for column'
-  },
   role: {
     id: 'table.column.header.role',
     defaultMessage: 'Role',
@@ -125,7 +120,7 @@ export const mockFetchRoleGraphqlOperation = {
         },
         {
           title: 'System admin (national)',
-          value: 'NATIONAL_SYSTEM_ADMIN',
+          value: 'LOCAL_SYSTEM_NATIONAL',
           types: ['NATIONAL_SYSTEM_ADMIN']
         },
         {

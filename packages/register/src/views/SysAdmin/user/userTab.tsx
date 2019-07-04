@@ -24,10 +24,6 @@ import { messages, UserStatus } from './utils'
 import { goToCreateNewUser } from '@register/navigation'
 import { connect } from 'react-redux'
 
-const UserTabBodyContent = styled(BodyContent)`
-  max-width: 1050px;
-`
-
 const UserTable = styled.div`
   margin-top: 30px;
 `
@@ -122,7 +118,6 @@ class UserTabComponent extends React.Component<IProps, IState> {
         return {
           photo: <AvatarSmall />,
           name,
-          username: user.username,
           role: user.role && intl.formatMessage(roleMessages[user.role]),
           type: user.type && intl.formatMessage(typeMessages[user.type]),
           status: <Status status={status} />,
@@ -151,27 +146,22 @@ class UserTabComponent extends React.Component<IProps, IState> {
       },
       {
         label: intl.formatMessage(messages.name),
-        width: 25,
+        width: 35,
         key: 'name'
       },
       {
-        label: intl.formatMessage(messages.username),
-        width: 20,
-        key: 'username'
-      },
-      {
         label: intl.formatMessage(messages.role),
-        width: 18,
+        width: 23,
         key: 'role'
       },
       {
         label: intl.formatMessage(messages.type),
-        width: 17,
+        width: 20,
         key: 'type'
       },
       {
         label: intl.formatMessage(messages.status),
-        width: 8,
+        width: 10,
         key: 'status'
       },
       {
@@ -199,7 +189,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
           }
           return (
             <UserTable>
-              <UserTabBodyContent id="user_list">
+              <BodyContent id="user_list">
                 <TableHeader>
                   Users (
                   {(data && data.searchUsers && data.searchUsers.totalItems) ||
@@ -223,7 +213,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
                   }
                   currentPage={this.state.usersPageNo}
                 />
-              </UserTabBodyContent>
+              </BodyContent>
             </UserTable>
           )
         }}

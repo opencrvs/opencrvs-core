@@ -12,11 +12,7 @@ import {
   generateSaltedHash,
   generateRandomPassowrd
 } from '@user-mgnt/utils/hash'
-import {
-  statuses,
-  roleScopeMapping,
-  hasDemoScope
-} from '@user-mgnt/utils/userUtils'
+import { statuses, hasDemoScope } from '@user-mgnt/utils/userUtils'
 import * as Hapi from 'hapi'
 import * as _ from 'lodash'
 
@@ -39,7 +35,6 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
-    user.role = user.role ? user.role : 'FIELD_AGENT'
     const role = createFhirPractitionerRole(user, practitionerId)
     roleId = await postFhir(token, role)
     if (!roleId) {
@@ -49,9 +44,8 @@ export default async function createUser(
     }
 
     user.status = statuses.PENDING
-    user.scope = roleScopeMapping[user.role]
-    autoGenPassword = generateRandomPassowrd(hasDemoScope(request))
 
+    autoGenPassword = generateRandomPassowrd(hasDemoScope(request))
     const { hash, salt } = generateSaltedHash(autoGenPassword)
     user.salt = salt
     user.passwordHash = hash

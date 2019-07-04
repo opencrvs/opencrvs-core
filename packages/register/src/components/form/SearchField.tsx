@@ -191,17 +191,17 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     const placeHolderText = intl.formatMessage(messages.placeHolderText)
     const locations: ILocation[] = [
       {
-        id: '454b4008-7ffd-4808-9ed4-4613d4047021',
+        id: '79776844-b606-40e9-8358-7d82147f702a',
         name: 'Moktarpur Union Parishad',
         detailedLocation: 'Moktarpur, Kaliganj, Gazipur, Dhaka'
       },
       {
-        id: '759a0452-ef5b-4853-95d0-2f231c22e230',
+        id: 'd8f5e899-0461-4d58-943f-3a980733a8d3',
         name: 'Amdia Union Parishad',
         detailedLocation: 'Amdia, Narsingdi Sadar, Narsingdi, Dhaka'
       },
       {
-        id: '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
+        id: '3e7a3524-e0d2-4a5b-959a-845efbe1fca8',
         name: 'Bhurungamari Union Parishad',
         detailedLocation: 'Bhurungamari, Bhurungamari, Kurigram, Rangpur'
       }

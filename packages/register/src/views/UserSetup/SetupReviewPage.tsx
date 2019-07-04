@@ -249,10 +249,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       <ActionPageLight
         title={intl.formatMessage(messages.title)}
         goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.SECURITY_QUESTION,
-            this.props.setupData
-          )
+          this.props.goToStep(ProtectedAccoutStep.SECURITY_QUESTION, {})
         }}
       >
         <Header>{intl.formatMessage(messages.header)}</Header>

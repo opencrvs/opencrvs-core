@@ -335,10 +335,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     return (
       <ActionPageLight
         goBack={() => {
-          this.props.goToStep(
-            ProtectedAccoutStep.PASSWORD,
-            this.props.setupData
-          )
+          this.props.goToStep(ProtectedAccoutStep.PASSWORD, {})
         }}
         title={intl.formatMessage(messages.title)}
       >

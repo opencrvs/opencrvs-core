@@ -223,7 +223,7 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
           title={intl.formatMessage(messages.newPassword)}
           goBack={() => {
             this.props.goToStep(
-              ProtectedAccoutStep.LANDING,
+              ProtectedAccoutStep.REVIEW,
               this.props.setupData
             )
           }}
