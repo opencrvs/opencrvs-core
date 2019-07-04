@@ -30,11 +30,7 @@
     "deploy:bn-prod": "SSH_USER=mishealth SSH_HOST=172.16.17.54 LOG_LOCATION=/home/mishealth bash deploy.sh --clear-data=no --restore-metadata=yes opencrvsbd.org",
     "db:backup:create": "DEV=true ./infrastructure/backup-metadata.sh",
     "db:backup:restore": "DEV=true ./infrastructure/restore-metadata.sh",
-    "db:clear:all": "DEV=true ./infrastructure/clear-all-data.sh",
-    "cov:register": "cd packages/register && yarn open:cov",
-    "cov:login": "cd packages/login && yarn open:cov",
-    "cov:performance": "cd packages/performance && yarn open:cov",
-    "cy": "cd packages/e2e && yarn open"
+    "db:clear:all": "DEV=true ./infrastructure/clear-all-data.sh"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

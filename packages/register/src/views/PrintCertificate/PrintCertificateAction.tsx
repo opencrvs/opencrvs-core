@@ -440,7 +440,6 @@ class PrintCertificateActionComponent extends React.Component<
       if (field.type === PDF_DOCUMENT_VIEWER) {
         field.initialValue = this.state.certificatePdf
       }
-      return field
     })
     return form
   }
@@ -1015,7 +1014,6 @@ class PrintCertificateActionComponent extends React.Component<
                       ) {
                         field.initialValue = paymentAmount
                       }
-                      return field
                     })
 
                     paymentFormSection.fields.map(field => {
@@ -1027,7 +1025,6 @@ class PrintCertificateActionComponent extends React.Component<
                         field.initialValue = eventDateDiff.toString()
                         field.label = messages[`${event}Service`]
                       }
-                      return field
                     })
 
                     const registrant: Registrant = this.setRegistrant(

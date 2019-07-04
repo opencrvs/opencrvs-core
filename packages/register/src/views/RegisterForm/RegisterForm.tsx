@@ -14,7 +14,6 @@ import {
   SUBMISSION_STATUS,
   writeApplication
 } from '@register/applications'
-
 import { FormFieldGenerator } from '@register/components/form'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
@@ -30,9 +29,9 @@ import {
   goToHome,
   goToPage as goToPageAction
 } from '@register/navigation'
+import { HOME } from '@register/navigation/routes'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { IOfflineDataState } from '@register/offline/reducer'
-import { HOME } from '@register/navigation/routes'
 import { getOfflineState } from '@register/offline/selectors'
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
