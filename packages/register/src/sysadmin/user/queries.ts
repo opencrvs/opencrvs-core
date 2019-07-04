@@ -11,7 +11,6 @@ export const SEARCH_USERS = gql`
           firstNames
           familyName
         }
-        username
         role
         type
         status

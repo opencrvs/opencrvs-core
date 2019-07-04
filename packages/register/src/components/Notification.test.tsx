@@ -135,48 +135,4 @@ describe('when app notifies the user', () => {
       })
     })
   })
-
-  describe('When user submits a form', () => {
-    describe('In case of successful submission', () => {
-      beforeEach(() => {
-        const action = actions.showSubmitFormSuccessToast('userFormSuccess')
-        store.dispatch(action)
-        app.update()
-      })
-
-      it('shows submit success toast', () => {
-        expect(app.find('#submissionSuccessToast').hostNodes()).toHaveLength(1)
-      })
-
-      it('clicking cancel button should hide the toast', () => {
-        app
-          .find('#submissionSuccessToastCancel')
-          .hostNodes()
-          .simulate('click')
-        app.update()
-        expect(store.getState().notification.submitFormSuccessToast).toBe(null)
-      })
-    })
-
-    describe('In case of failed submission', () => {
-      beforeEach(() => {
-        const action = actions.showSubmitFormErrorToast('userFormFail')
-        store.dispatch(action)
-        app.update()
-      })
-
-      it('shows submit fail toast', () => {
-        expect(app.find('#submissionErrorToast').hostNodes()).toHaveLength(1)
-      })
-
-      it('clicking cancel button should hide the toast', () => {
-        app
-          .find('#submissionErrorToastCancel')
-          .hostNodes()
-          .simulate('click')
-        app.update()
-        expect(store.getState().notification.submitFormErrorToast).toBe(null)
-      })
-    })
-  })
 })

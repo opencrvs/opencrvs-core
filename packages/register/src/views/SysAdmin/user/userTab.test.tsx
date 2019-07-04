@@ -157,7 +157,6 @@ describe('User tab tests', async () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
                     role: 'REGISTRATION_CLERK',
                     type: 'ENTREPENEUR',
                     status: 'active'
@@ -171,7 +170,6 @@ describe('User tab tests', async () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
                     status: 'active'
@@ -185,7 +183,6 @@ describe('User tab tests', async () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
                     status: 'pending'
@@ -199,7 +196,6 @@ describe('User tab tests', async () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
                     status: 'active'
@@ -213,7 +209,6 @@ describe('User tab tests', async () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
                     status: 'disabled'
@@ -267,7 +262,6 @@ describe('User tab tests', async () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
                     role: 'REGISTRATION_CLERK',
                     type: 'ENTREPENEUR',
                     status: 'active'
@@ -281,7 +275,6 @@ describe('User tab tests', async () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
                     status: 'active'
@@ -295,7 +288,6 @@ describe('User tab tests', async () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
                     status: 'pending'
@@ -309,7 +301,6 @@ describe('User tab tests', async () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
                     status: 'active'
@@ -323,7 +314,6 @@ describe('User tab tests', async () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
                     status: 'disabled'
@@ -374,7 +364,6 @@ describe('User tab tests', async () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
                     role: 'REGISTRATION_CLERK',
                     type: 'ENTREPENEUR',
                     status: 'active'
@@ -388,7 +377,6 @@ describe('User tab tests', async () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
                     status: 'active'
@@ -402,7 +390,6 @@ describe('User tab tests', async () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
                     status: 'active'
@@ -416,7 +403,6 @@ describe('User tab tests', async () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
                     status: 'active'
@@ -430,7 +416,6 @@ describe('User tab tests', async () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
                     status: 'active'
@@ -444,7 +429,6 @@ describe('User tab tests', async () => {
                         familyName: 'Alam'
                       }
                     ],
-                    username: 'ma.alam',
                     role: 'FIELD_AGENT',
                     type: 'CHA',
                     status: 'active'
@@ -458,7 +442,6 @@ describe('User tab tests', async () => {
                         familyName: 'Khatun'
                       }
                     ],
-                    username: 'l.khatun',
                     role: 'REGISTRATION_CLERK',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
@@ -472,7 +455,6 @@ describe('User tab tests', async () => {
                         familyName: 'Abdullah'
                       }
                     ],
-                    username: 'ma.abdullah',
                     role: 'NATIONAL_REGISTRAR',
                     type: 'SECRETARY',
                     status: 'active'
@@ -486,7 +468,6 @@ describe('User tab tests', async () => {
                         familyName: 'Farid'
                       }
                     ],
-                    username: 'ms.farid',
                     role: 'REGISTRATION_CLERK',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
@@ -500,7 +481,6 @@ describe('User tab tests', async () => {
                         familyName: 'Alam'
                       }
                     ],
-                    username: 'mj.alam',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
                     status: 'active'
@@ -556,7 +536,6 @@ describe('User tab tests', async () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
                     role: 'REGISTRATION_CLERK',
                     type: 'ENTREPENEUR',
                     status: 'active'
@@ -570,7 +549,6 @@ describe('User tab tests', async () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
                     status: 'active'
@@ -584,7 +562,6 @@ describe('User tab tests', async () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
                     status: 'active'
@@ -598,7 +575,6 @@ describe('User tab tests', async () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
                     status: 'active'
@@ -612,7 +588,6 @@ describe('User tab tests', async () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
                     status: 'active'
@@ -626,7 +601,6 @@ describe('User tab tests', async () => {
                         familyName: 'Alam'
                       }
                     ],
-                    username: 'ma.alam',
                     role: 'FIELD_AGENT',
                     type: 'CHA',
                     status: 'active'
@@ -640,7 +614,6 @@ describe('User tab tests', async () => {
                         familyName: 'Khatun'
                       }
                     ],
-                    username: 'l.khatun',
                     role: 'REGISTRATION_CLERK',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
@@ -654,7 +627,6 @@ describe('User tab tests', async () => {
                         familyName: 'Abdullah'
                       }
                     ],
-                    username: 'ma.abdullah',
                     role: 'NATIONAL_REGISTRAR',
                     type: 'SECRETARY',
                     status: 'active'
@@ -668,7 +640,6 @@ describe('User tab tests', async () => {
                         familyName: 'Farid'
                       }
                     ],
-                    username: 'ms.farid',
                     role: 'REGISTRATION_CLERK',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
@@ -682,7 +653,6 @@ describe('User tab tests', async () => {
                         familyName: 'Alam'
                       }
                     ],
-                    username: 'mj.alam',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
                     status: 'active'
