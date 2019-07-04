@@ -136,6 +136,7 @@ export class UserSetupView extends React.Component<
             id="user-setup-start-button"
             onClick={() =>
               goToStep(ProtectedAccoutStep.PASSWORD, {
+                ...this.props.setupData,
                 userId: (userDetails && userDetails.userMgntUserID) || ''
               })
             }
