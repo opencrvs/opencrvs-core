@@ -36,15 +36,16 @@
     "io-ts": "^1.2.1",
     "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
+    "lint-staged": "^7.1.0",
     "node-fetch": "^2.6.0",
     "redis": "^2.8.0",
     "typescript": "^3.0.1",
-    "lint-staged": "^7.1.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
+    "@types/fhir": "^0.0.30",
     "@types/jest": "^24.0.13",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
