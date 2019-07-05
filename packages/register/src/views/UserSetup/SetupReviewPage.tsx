@@ -158,15 +158,10 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
 
     const typeRole =
       (userDetails &&
-        (userDetails.type
-          ? `${intl.formatMessage(
-              roleMessages[userDetails.role as string]
-            )} / ${intl.formatMessage(
-              typeMessages[userDetails.type as string]
-            )}`
-          : `${intl.formatMessage(
-              roleMessages[userDetails.role as string]
-            )}`)) ||
+        ((userDetails.type &&
+          `${intl.formatMessage(typeMessages[userDetails.type])}`) ||
+          (userDetails.role &&
+            `${intl.formatMessage(roleMessages[userDetails.role])}`))) ||
       ''
 
     const primaryOffice =
