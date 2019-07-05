@@ -154,6 +154,8 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         (createNamesMap(userDetails.name as GQLHumanName[])['bn'] as string)) ||
       ''
 
+    const mobile = (userDetails && (userDetails.mobile as string)) || ''
+
     const typeRole =
       (userDetails &&
         (userDetails.type
@@ -213,7 +215,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       {
         id: 'UserPhone',
         label: intl.formatMessage(messages.labelPhone),
-        value: '01711111111',
+        value: mobile,
         action: {
           label: intl.formatMessage(messages.actionChange),
           disabled: true
