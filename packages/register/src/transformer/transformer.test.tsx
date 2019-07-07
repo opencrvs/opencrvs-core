@@ -219,5 +219,21 @@ describe('when draft data is transformed to graphql', () => {
 
       expect(draftToGqlTransformer(form, data).father).toBeUndefined()
     })
+    it('Raise inProgress flag if in-complete data is givent', () => {
+      const data = {
+        child: {},
+        father: {},
+        mother: {},
+        registration: {
+          presentAtBirthRegistration: 'MOTHER_ONLY',
+          registrationPhone: '01736478884',
+          whoseContactDetails: 'MOTHER'
+        },
+        documents: {}
+      }
+      expect(draftToGqlTransformer(form, data).registration.inProgress).toEqual(
+        true
+      )
+    })
   })
 })
