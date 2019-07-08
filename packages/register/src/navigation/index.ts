@@ -197,10 +197,10 @@ export function goToDeathRegistration(applicationId: string) {
   )
 }
 
-export function goToRegistrarHomeTab(tabId: string) {
+export function goToRegistrarHomeTab(tabId: string, selectorId?: string) {
   return {
     type: GO_TO_REGISTRAR_HOME,
-    payload: { tabId }
+    payload: { tabId, selectorId }
   }
 }
 
@@ -324,11 +324,19 @@ export function navigationReducer(state: INavigationState, action: any) {
         )
       )
     case GO_TO_REGISTRAR_HOME:
-      const { tabId: RegistrarHomeTabId } = action.payload
+      const {
+        tabId: RegistrarHomeTabId,
+        selectorId: RegistrarHomeSelectorId = ''
+      } = action.payload
       return loop(
         state,
         Cmd.action(
-          push(formatUrl(REGISTRAR_HOME_TAB, { tabId: RegistrarHomeTabId }))
+          push(
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: RegistrarHomeTabId,
+              selectorId: RegistrarHomeSelectorId
+            })
+          )
         )
       )
     case GO_TO_FIELD_AGENT_HOME:
