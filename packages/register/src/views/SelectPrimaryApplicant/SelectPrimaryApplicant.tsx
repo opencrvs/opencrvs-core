@@ -1,23 +1,25 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import styled from '@register/styledComponents'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 import {
-  goToBirthRegistrationAsParent,
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { Container } from '@opencrvs/components/lib/layout'
+import { IApplication, modifyApplication } from '@register/applications'
+import {
   goBack,
+  goToBirthRegistrationAsParent,
   goToHome,
   goToMainContactPoint
 } from '@register/navigation'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
-import styled from '@register/styledComponents'
-import { BackArrow } from '@opencrvs/components/lib/icons'
-import { Container } from '@opencrvs/components/lib/layout'
+import { IStoreState } from '@register/store'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -85,20 +87,39 @@ const Actions = styled.div`
 const Description = styled.p`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
+interface IMatchProps {
+  applicationId: string
+}
 class SelectPrimaryApplicantView extends React.Component<
-  InjectedIntlProps & {
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    goToMainContactPoint: typeof goToMainContactPoint
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-  }
+  InjectedIntlProps &
+    RouteComponentProps<IMatchProps> & {
+      application: IApplication
+      modifyApplication: typeof modifyApplication
+      goBack: typeof goBack
+      goToHome: typeof goToHome
+      goToMainContactPoint: typeof goToMainContactPoint
+      goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+    }
 > {
   state = {
     goTo: ''
   }
   handleContinue = () => {
     if (this.state.goTo === 'mother' || this.state.goTo === 'father') {
-      this.props.goToMainContactPoint('parents', this.state.goTo)
+      const application = this.props.application
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data['registration'],
+            ...{
+              applicant: this.state.goTo
+            }
+          }
+        }
+      })
+      this.props.goToMainContactPoint(this.props.match.params.applicationId)
     } else {
       this.setState({ goTo: 'error' })
     }
@@ -160,12 +181,25 @@ class SelectPrimaryApplicantView extends React.Component<
   }
 }
 
+const mapStateToProps = (
+  store: IStoreState,
+  props: RouteComponentProps<{ applicationId: string }>
+) => {
+  const { match } = props
+  return {
+    application: store.applicationsState.applications.find(
+      ({ id }) => id === match.params.applicationId
+    ) as IApplication
+  }
+}
+
 export const SelectPrimaryApplicant = connect(
-  null,
+  mapStateToProps,
   {
     goBack,
     goToHome,
     goToMainContactPoint,
-    goToBirthRegistrationAsParent
+    goToBirthRegistrationAsParent,
+    modifyApplication
   }
 )(injectIntl(SelectPrimaryApplicantView))

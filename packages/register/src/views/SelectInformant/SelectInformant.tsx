@@ -1,3 +1,8 @@
+import * as React from 'react'
+import styled from '@register/styledComponents'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -7,6 +12,7 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { IApplication, modifyApplication } from '@register/applications'
 import {
   goBack,
   goToBirthRegistrationAsParent,
@@ -14,10 +20,7 @@ import {
   goToMainContactPoint,
   goToPrimaryApplicant
 } from '@register/navigation'
-import styled from '@register/styledComponents'
-import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
+import { IStoreState } from '@register/store'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -87,20 +90,27 @@ const Actions = styled.div`
   }
 `
 enum INFORMANT {
-  FATHER = 'father',
-  MOTHER = 'mother',
-  BOTH_PARENTS = 'parents',
-  SELF = 'self',
-  SOMEONE_ELSE = 'other'
+  FATHER = 'FATHER_ONLY',
+  MOTHER = 'MOTHER_ONLY',
+  BOTH_PARENTS = 'BOTH_PARENTS',
+  SELF = 'INFORMANT_ONLY',
+  SOMEONE_ELSE = 'OTHER'
+}
+
+interface IMatchProps {
+  applicationId: string
 }
 export class SelectInformantView extends React.Component<
   {
+    application: IApplication
+    modifyApplication: typeof modifyApplication
     goBack: typeof goBack
     goToHome: typeof goToHome
     goToMainContactPoint: typeof goToMainContactPoint
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     goToPrimaryApplicant: typeof goToPrimaryApplicant
-  } & InjectedIntlProps
+  } & InjectedIntlProps &
+    RouteComponentProps<IMatchProps>
 > {
   state = {
     informant: ''
@@ -111,9 +121,37 @@ export class SelectInformantView extends React.Component<
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
-      this.props.goToPrimaryApplicant()
+      const application = this.props.application
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data['registration'],
+            ...{
+              presentAtBirthRegistration: this.state.informant
+            }
+          }
+        }
+      })
+      this.props.goToPrimaryApplicant(this.props.match.params.applicationId)
     } else if (this.state.informant && this.state.informant !== 'error') {
-      this.props.goToMainContactPoint(this.state.informant)
+      const application = this.props.application
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data['registration'],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: this.state.informant
+            }
+          }
+        }
+      })
+
+      this.props.goToMainContactPoint(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
@@ -214,13 +252,26 @@ export class SelectInformantView extends React.Component<
   }
 }
 
+const mapStateToProps = (
+  store: IStoreState,
+  props: RouteComponentProps<{ applicationId: string }>
+) => {
+  const { match } = props
+  return {
+    application: store.applicationsState.applications.find(
+      ({ id }) => id === match.params.applicationId
+    ) as IApplication
+  }
+}
+
 export const SelectInformant = connect(
-  null,
+  mapStateToProps,
   {
     goBack,
     goToHome,
     goToMainContactPoint,
     goToBirthRegistrationAsParent,
-    goToPrimaryApplicant
+    goToPrimaryApplicant,
+    modifyApplication
   }
 )(injectIntl(SelectInformantView))
