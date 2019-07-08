@@ -166,3 +166,19 @@ export function getEventType(fhirBundle: fhir.Bundle) {
   }
   throw new Error('Invalid FHIR bundle found')
 }
+
+export function isInProgressApplication(fhirBundle: fhir.Bundle) {
+  const taskEntry =
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry => entry.resource && entry.resource.resourceType === 'Task'
+    )
+
+  return (
+    (taskEntry &&
+      taskEntry.resource &&
+      (taskEntry.resource as fhir.Task).status === 'draft') ||
+    false
+  )
+}

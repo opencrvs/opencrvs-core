@@ -1619,6 +1619,17 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, `${regNumber}`, fieldValue)
     },
+    inProgress: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: boolean,
+      context: any
+    ) => {
+      if (fieldValue) {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        taskResource.status = 'draft'
+      }
+      return
+    },
     paperFormID: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,

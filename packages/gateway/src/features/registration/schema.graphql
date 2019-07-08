@@ -1,4 +1,5 @@
 enum RegStatus {
+  IN_PROGRESS
   DECLARED
   REGISTERED
   CERTIFIED
@@ -251,6 +252,7 @@ input RegistrationInput {
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
+  inProgress: Boolean
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -270,6 +272,7 @@ type Registration { # -> Task
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
+  inProgress: Boolean # -> .status ('draft' | 'requested')
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [ID]
