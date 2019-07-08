@@ -14,10 +14,14 @@ import fetch, { RequestInit } from 'node-fetch'
 import { logger } from '@workflow/logger'
 import { isUserAuthorized } from '@workflow/features/events/auth'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
-import { getEventType } from '@workflow/features/registration/utils'
+import {
+  getEventType,
+  isInProgressApplication
+} from '@workflow/features/registration/utils'
 import { hasRegisterScope } from '@workflow/utils/authUtils'
 
 export enum Events {
+  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration',
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_NEW_REG = '/events/birth/new-registration',
@@ -25,6 +29,7 @@ export enum Events {
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
+  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration',
   DEATH_NEW_DEC = '/events/death/new-declaration',
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_NEW_REG = '/events/death/new-registration',
@@ -60,7 +65,9 @@ function detectEvent(request: Hapi.Request): Events {
             if (hasRegisterScope(request)) {
               return Events.BIRTH_NEW_REG
             }
-            return Events.BIRTH_NEW_DEC
+            return isInProgressApplication(fhirBundle)
+              ? Events.BIRTH_IN_PROGRESS_DEC
+              : Events.BIRTH_NEW_DEC
           }
         } else if (eventType === EVENT_TYPE.DEATH) {
           if (firstEntry.id) {
@@ -73,7 +80,9 @@ function detectEvent(request: Hapi.Request): Events {
             if (hasRegisterScope(request)) {
               return Events.DEATH_NEW_REG
             }
-            return Events.DEATH_NEW_DEC
+            return isInProgressApplication(fhirBundle)
+              ? Events.DEATH_IN_PROGRESS_DEC
+              : Events.DEATH_NEW_DEC
           }
         }
       }
@@ -149,6 +158,10 @@ export async function fhirWorkflowEventHandler(
   let response
 
   switch (event) {
+    case Events.BIRTH_IN_PROGRESS_DEC:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_IN_PROGRESS_DEC, request)
+      break
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
@@ -156,6 +169,10 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_REG, request)
+      break
+    case Events.DEATH_IN_PROGRESS_DEC:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.DEATH_IN_PROGRESS_DEC, request)
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)

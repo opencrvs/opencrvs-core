@@ -282,6 +282,7 @@ export interface GQLRegistration {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
+  inProgress?: boolean
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
   duplicates?: Array<string | null>
@@ -304,6 +305,7 @@ export interface GQLRegWorkflow {
 }
 
 export enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
@@ -698,6 +700,7 @@ export interface GQLRegistrationInput {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
+  inProgress?: boolean
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
@@ -1798,6 +1801,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
+  inProgress?: RegistrationToInProgressResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
   certificates?: RegistrationToCertificatesResolver<TParent>
   duplicates?: RegistrationToDuplicatesResolver<TParent>
@@ -1856,6 +1860,13 @@ export interface RegistrationToStatusResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToInProgressResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
