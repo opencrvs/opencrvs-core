@@ -1235,6 +1235,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.son': 'পুত্র',
     'register.SelectContactPoint.daughter': 'কন্যা',
     'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
-    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
+    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান',
+    'tab.inProgress.selector.own.drafts': 'আপনার',
+    'tab.inProgress.selector.field.agents': 'মাঠ কর্মী'
   }
 }

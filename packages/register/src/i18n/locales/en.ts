@@ -1244,6 +1244,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.son': 'Son',
     'register.SelectContactPoint.daughter': 'Daughter',
     'register.SelectContactPoint.extendedFamily': 'Extended family',
-    'register.selectVitalEvent.backToReviewButton': 'Back to review'
+    'register.selectVitalEvent.backToReviewButton': 'Back to review',
+    'tab.inProgress.selector.own.drafts': 'Yours',
+    'tab.inProgress.selector.field.agents': 'Field agents'
   }
 }

@@ -2,7 +2,9 @@ import {
   Button,
   IButtonProps,
   ICON_ALIGNMENT,
-  FloatingActionButton
+  FloatingActionButton,
+  PrimaryButton,
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import {
   StatusOrange,
@@ -155,6 +157,16 @@ const messages: {
     defaultMessage: 'In progress',
     description: 'The title of In progress'
   },
+  inProgressOwnDrafts: {
+    id: 'tab.inProgress.selector.own.drafts',
+    defaultMessage: 'Yours',
+    description: 'The title of In progress own drafts'
+  },
+  inProgressFieldAgents: {
+    id: 'tab.inProgress.selector.field.agents',
+    defaultMessage: 'Field agents',
+    description: 'The title of In progress field agents'
+  },
   readyForReview: {
     id: 'register.registrarHome.readyForReview',
     defaultMessage: 'Ready for review',
@@ -258,6 +270,7 @@ interface IBaseRegistrarHomeProps {
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
   tabId: string
+  selectorId: string
   drafts: IApplication[]
   goToEvents: typeof goToEventsAction
 }
@@ -279,6 +292,10 @@ const TAB_ID = {
   readyForReview: 'review',
   sentForUpdates: 'updates',
   readyForPrint: 'print'
+}
+const SELECTOR_ID = {
+  ownDrafts: 'you',
+  fieldAgentDrafts: 'field-agents'
 }
 
 export const EVENT_STATUS = {
@@ -523,7 +540,7 @@ export class RegistrarHomeView extends React.Component<
   }
 
   render() {
-    const { theme, intl, userDetails, tabId, drafts } = this.props
+    const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
 
@@ -633,42 +650,103 @@ export class RegistrarHomeView extends React.Component<
         </Query>
         {tabId === TAB_ID.inProgress && (
           <BodyContent>
-            <GridTable
-              content={this.transformDraftContent()}
-              columns={[
-                {
-                  label: this.props.intl.formatMessage(messages.listItemType),
-                  width: 15,
-                  key: 'event'
-                },
-                {
-                  label: this.props.intl.formatMessage(messages.listItemName),
-                  width: 35,
-                  key: 'name'
-                },
-                {
-                  label: this.props.intl.formatMessage(
-                    messages.listItemModificationDate
-                  ),
-                  width: 35,
-                  key: 'dateOfModification'
-                },
-                {
-                  label: this.props.intl.formatMessage(messages.listItemAction),
-                  width: 15,
-                  key: 'actions',
-                  isActionColumn: true,
-                  alignment: ColumnContentAlignment.CENTER
+            {(selectorId === SELECTOR_ID.ownDrafts && (
+              <PrimaryButton
+                id={`selector_${SELECTOR_ID.ownDrafts}`}
+                key={SELECTOR_ID.ownDrafts}
+                onClick={() =>
+                  this.props.goToRegistrarHomeTab(
+                    TAB_ID.inProgress,
+                    SELECTOR_ID.ownDrafts
+                  )
                 }
-              ]}
-              noResultText={intl.formatMessage(messages.dataTableNoResults)}
-              onPageChange={(currentPage: number) => {
-                this.onPageChange(currentPage)
-              }}
-              pageSize={this.pageSize}
-              totalItems={drafts && drafts.length}
-              currentPage={this.state.progressCurrentPage}
-            />
+              >
+                {intl.formatMessage(messages.inProgressOwnDrafts)} (
+                {drafts && drafts.length})
+              </PrimaryButton>
+            )) || (
+              <SecondaryButton
+                id={`selector_${SELECTOR_ID.ownDrafts}`}
+                key={SELECTOR_ID.ownDrafts}
+                onClick={() =>
+                  this.props.goToRegistrarHomeTab(
+                    TAB_ID.inProgress,
+                    SELECTOR_ID.ownDrafts
+                  )
+                }
+              >
+                {intl.formatMessage(messages.inProgressOwnDrafts)} (
+                {drafts && drafts.length})
+              </SecondaryButton>
+            )}
+
+            {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
+              <PrimaryButton
+                id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+                key={SELECTOR_ID.fieldAgentDrafts}
+                onClick={() =>
+                  this.props.goToRegistrarHomeTab(
+                    TAB_ID.inProgress,
+                    SELECTOR_ID.fieldAgentDrafts
+                  )
+                }
+              >
+                {intl.formatMessage(messages.inProgressFieldAgents)} (0)
+              </PrimaryButton>
+            )) || (
+              <SecondaryButton
+                id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+                key={SELECTOR_ID.fieldAgentDrafts}
+                onClick={() =>
+                  this.props.goToRegistrarHomeTab(
+                    TAB_ID.inProgress,
+                    SELECTOR_ID.fieldAgentDrafts
+                  )
+                }
+              >
+                {intl.formatMessage(messages.inProgressFieldAgents)} (0)
+              </SecondaryButton>
+            )}
+            {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+              <GridTable
+                content={this.transformDraftContent()}
+                columns={[
+                  {
+                    label: this.props.intl.formatMessage(messages.listItemType),
+                    width: 15,
+                    key: 'event'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(messages.listItemName),
+                    width: 35,
+                    key: 'name'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(
+                      messages.listItemModificationDate
+                    ),
+                    width: 35,
+                    key: 'dateOfModification'
+                  },
+                  {
+                    label: this.props.intl.formatMessage(
+                      messages.listItemAction
+                    ),
+                    width: 15,
+                    key: 'actions',
+                    isActionColumn: true,
+                    alignment: ColumnContentAlignment.CENTER
+                  }
+                ]}
+                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                onPageChange={(currentPage: number) => {
+                  this.onPageChange(currentPage)
+                }}
+                pageSize={this.pageSize}
+                totalItems={drafts && drafts.length}
+                currentPage={this.state.progressCurrentPage}
+              />
+            )}
           </BodyContent>
         )}
         {tabId === TAB_ID.readyForReview && (
@@ -988,7 +1066,7 @@ export class RegistrarHomeView extends React.Component<
 
 function mapStateToProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string }>
+  props: RouteComponentProps<{ tabId: string; selectorId: string }>
 ) {
   const { match } = props
   return {
@@ -996,6 +1074,7 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
+    selectorId: (match && match.params && match.params.selectorId) || '',
     drafts: state.applicationsState.applications
   }
 }
