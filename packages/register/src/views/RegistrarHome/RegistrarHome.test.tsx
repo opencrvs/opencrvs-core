@@ -17,7 +17,9 @@ import {
 } from '@register/views/RegistrarHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import {
+  SUBMISSION_STATUS,
   storeApplication,
+  createApplication,
   createReviewApplication
 } from '@register/applications'
 import { Event } from '@register/forms'
@@ -273,7 +275,7 @@ describe('RegistrarHome tests', () => {
 
   it('check drafts count', async () => {
     jest.clearAllMocks()
-    const draft = createReviewApplication(uuid(), {}, Event.BIRTH)
+    const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
 
     const graphqlMock = [
@@ -669,6 +671,7 @@ describe('RegistrarHome tests', () => {
         id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
         event: 'birth',
         modifiedOn: TIME_STAMP,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
         data: {
           child: {
             familyNameEng: 'Anik',
@@ -680,6 +683,7 @@ describe('RegistrarHome tests', () => {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         event: 'death',
         modifiedOn: TIME_STAMP,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
         data: {
           deceased: {
             familyNameEng: 'Anik',
