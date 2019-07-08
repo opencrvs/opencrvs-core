@@ -21,6 +21,7 @@ import {
   goToPrimaryApplicant
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -122,8 +123,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       informant:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['registration'] &&
-          (this.props.application.data['registration']
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
             .presentAtBirthRegistration as string)) ||
         ''
     }
@@ -135,28 +136,28 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
-      const application = this.props.application
+      const { application, goToPrimaryApplicant } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
           ...application.data,
           registration: {
-            ...application.data['registration'],
+            ...application.data[registrationSection.id],
             ...{
               presentAtBirthRegistration: this.state.informant
             }
           }
         }
       })
-      this.props.goToPrimaryApplicant(this.props.match.params.applicationId)
+      goToPrimaryApplicant(this.props.match.params.applicationId)
     } else if (this.state.informant && this.state.informant !== 'error') {
-      const application = this.props.application
+      const { application, goToMainContactPoint } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
           ...application.data,
           registration: {
-            ...application.data['registration'],
+            ...application.data[registrationSection.id],
             ...{
               presentAtBirthRegistration: this.state.informant,
               applicant: this.state.informant
@@ -165,7 +166,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       })
 
-      this.props.goToMainContactPoint(this.props.match.params.applicationId)
+      goToMainContactPoint(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }

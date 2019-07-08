@@ -20,6 +20,7 @@ import {
   goToMainContactPoint
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -116,8 +117,9 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
       applicant:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['registration'] &&
-          (this.props.application.data['registration'].applicant as string)) ||
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
+            .applicant as string)) ||
         ''
     }
   }
@@ -126,20 +128,20 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
       this.state.applicant === APPLICANT.MOTHER ||
       this.state.applicant === APPLICANT.FATHER
     ) {
-      const application = this.props.application
+      const { application, goToMainContactPoint } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
           ...application.data,
           registration: {
-            ...application.data['registration'],
+            ...application.data[registrationSection.id],
             ...{
               applicant: this.state.applicant
             }
           }
         }
       })
-      this.props.goToMainContactPoint(this.props.match.params.applicationId)
+      goToMainContactPoint(this.props.match.params.applicationId)
     } else {
       this.setState({ applicant: 'error' })
     }

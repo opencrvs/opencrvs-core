@@ -33,6 +33,7 @@ import {
   RADIO_BUTTON_LARGE_STRING
 } from '@register/utils/constants'
 import { phoneNumberFormat } from '@register/utils/validate'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 
 const messages = defineMessages({
   title: {
@@ -203,7 +204,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         data: {
           ...application.data,
           registration: {
-            ...application.data['registration'],
+            ...application.data[registrationSection.id],
             ...{
               registrationPhone: this.state.phoneNumber,
               whoseContactDetails: this.state.selected
