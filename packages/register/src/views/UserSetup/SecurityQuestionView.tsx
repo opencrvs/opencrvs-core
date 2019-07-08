@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
 import { find, at } from 'lodash'
@@ -212,7 +211,6 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
       })
 
       elem.questionList = newQuestionList
-      return elem
     })
 
     this.setState(() => ({
@@ -335,7 +333,10 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     return (
       <ActionPageLight
         goBack={() => {
-          this.props.goToStep(ProtectedAccoutStep.PASSWORD, {})
+          this.props.goToStep(
+            ProtectedAccoutStep.PASSWORD,
+            this.props.setupData
+          )
         }}
         title={intl.formatMessage(messages.title)}
       >

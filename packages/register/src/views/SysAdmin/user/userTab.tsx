@@ -24,6 +24,10 @@ import { messages, UserStatus } from './utils'
 import { goToCreateNewUser } from '@register/navigation'
 import { connect } from 'react-redux'
 
+const UserTabBodyContent = styled(BodyContent)`
+  max-width: 1050px;
+`
+
 const UserTable = styled.div`
   margin-top: 30px;
 `
@@ -118,13 +122,13 @@ class UserTabComponent extends React.Component<IProps, IState> {
         return {
           photo: <AvatarSmall />,
           name,
+          username: user.username,
           role: user.role && intl.formatMessage(roleMessages[user.role]),
           type: user.type && intl.formatMessage(typeMessages[user.type]),
           status: <Status status={status} />,
           menu: <VerticalThreeDots />
         }
       }
-      return {}
     })
   }
 
@@ -146,22 +150,27 @@ class UserTabComponent extends React.Component<IProps, IState> {
       },
       {
         label: intl.formatMessage(messages.name),
-        width: 35,
+        width: 25,
         key: 'name'
       },
       {
+        label: intl.formatMessage(messages.username),
+        width: 20,
+        key: 'username'
+      },
+      {
         label: intl.formatMessage(messages.role),
-        width: 23,
+        width: 18,
         key: 'role'
       },
       {
         label: intl.formatMessage(messages.type),
-        width: 20,
+        width: 17,
         key: 'type'
       },
       {
         label: intl.formatMessage(messages.status),
-        width: 10,
+        width: 8,
         key: 'status'
       },
       {
@@ -189,7 +198,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
           }
           return (
             <UserTable>
-              <BodyContent id="user_list">
+              <UserTabBodyContent id="user_list">
                 <TableHeader>
                   Users (
                   {(data && data.searchUsers && data.searchUsers.totalItems) ||
@@ -213,7 +222,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
                   }
                   currentPage={this.state.usersPageNo}
                 />
-              </BodyContent>
+              </UserTabBodyContent>
             </UserTable>
           )
         }}

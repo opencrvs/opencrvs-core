@@ -8,8 +8,8 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
-  goToBirthRegistrationAsParent,
   goBack,
+  goToBirthRegistrationAsParent,
   goToHome,
   goToMainContactPoint,
   goToPrimaryApplicant

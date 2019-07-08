@@ -155,7 +155,6 @@ export const getFieldValidation = (
         )
         const fun = element.validator(...params)
         validate.push(fun)
-        return element
       }
     )
   }
@@ -314,12 +313,12 @@ export const getConditionalActionsForField = (
     return []
   }
 
-  return (
-    field.conditionals
-      // eslint-disable-next-line no-eval
-      .filter(conditional => eval(conditional.expression))
-      .map((conditional: IConditional) => conditional.action)
-  )
+  return field.conditionals
+    .filter(conditional =>
+      /* eslint-disable-line  no-eval */
+      eval(conditional.expression)
+    )
+    .map((conditional: IConditional) => conditional.action)
 }
 
 export const hasFormError = (
