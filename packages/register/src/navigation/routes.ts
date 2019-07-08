@@ -1,9 +1,9 @@
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 export const SELECT_INFORMANT =
-  '/drafts/:applicationId/events/birth/registration/present_at'
+  '/drafts/:applicationId/events/birth/registration/informant'
 export const SELECT_PRIMARY_APPLICANT =
-  '/drafts/:applicationId/events/birth/registration/parents'
+  '/drafts/:applicationId/events/birth/registration/applicant'
 export const SELECT_MAIN_CONTACT_POINT =
   '/drafts/:applicationId/events/birth/registration/contact'
 

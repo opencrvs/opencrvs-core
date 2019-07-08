@@ -90,22 +90,42 @@ const Description = styled.p`
 interface IMatchProps {
   applicationId: string
 }
-class SelectPrimaryApplicantView extends React.Component<
-  InjectedIntlProps &
-    RouteComponentProps<IMatchProps> & {
-      application: IApplication
-      modifyApplication: typeof modifyApplication
-      goBack: typeof goBack
-      goToHome: typeof goToHome
-      goToMainContactPoint: typeof goToMainContactPoint
-      goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+
+type IFullProps = InjectedIntlProps &
+  RouteComponentProps<IMatchProps> & {
+    application: IApplication
+    modifyApplication: typeof modifyApplication
+    goBack: typeof goBack
+    goToHome: typeof goToHome
+    goToMainContactPoint: typeof goToMainContactPoint
+    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  }
+
+interface IState {
+  applicant: string
+}
+
+enum APPLICANT {
+  FATHER = 'FATHER_ONLY',
+  MOTHER = 'MOTHER_ONLY'
+}
+class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      applicant:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data['registration'] &&
+          (this.props.application.data['registration'].applicant as string)) ||
+        ''
     }
-> {
-  state = {
-    goTo: ''
   }
   handleContinue = () => {
-    if (this.state.goTo === 'mother' || this.state.goTo === 'father') {
+    if (
+      this.state.applicant === APPLICANT.MOTHER ||
+      this.state.applicant === APPLICANT.FATHER
+    ) {
       const application = this.props.application
       this.props.modifyApplication({
         ...application,
@@ -114,14 +134,14 @@ class SelectPrimaryApplicantView extends React.Component<
           registration: {
             ...application.data['registration'],
             ...{
-              applicant: this.state.goTo
+              applicant: this.state.applicant
             }
           }
         }
       })
       this.props.goToMainContactPoint(this.props.match.params.applicationId)
     } else {
-      this.setState({ goTo: 'error' })
+      this.setState({ applicant: 'error' })
     }
   }
   render() {
@@ -145,7 +165,7 @@ class SelectPrimaryApplicantView extends React.Component<
           <Description>
             {intl.formatMessage(messages.primaryApplicantDescription)}
           </Description>
-          {this.state.goTo === 'error' && (
+          {this.state.applicant === 'error' && (
             <ErrorText id="error_text">
               {intl.formatMessage(messages.errorMessage)}
             </ErrorText>
@@ -156,20 +176,20 @@ class SelectPrimaryApplicantView extends React.Component<
               key="motherevent"
               name="motherevent"
               label={intl.formatMessage(messages.mother)}
-              value="mother"
+              value={APPLICANT.MOTHER}
               id="select_mother_event"
-              selected={this.state.goTo === 'mother' ? 'mother' : ''}
-              onChange={() => this.setState({ goTo: 'mother' })}
+              selected={this.state.applicant}
+              onChange={() => this.setState({ applicant: APPLICANT.MOTHER })}
             />
             <RadioButton
               size="large"
               key="fatherevent"
               name="fatherevent"
               label={intl.formatMessage(messages.father)}
-              value="father"
+              value={APPLICANT.FATHER}
               id="select_father_event"
-              selected={this.state.goTo === 'father' ? 'father' : ''}
-              onChange={() => this.setState({ goTo: 'father' })}
+              selected={this.state.applicant}
+              onChange={() => this.setState({ applicant: APPLICANT.FATHER })}
             />
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>

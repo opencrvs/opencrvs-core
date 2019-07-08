@@ -100,21 +100,35 @@ enum INFORMANT {
 interface IMatchProps {
   applicationId: string
 }
-export class SelectInformantView extends React.Component<
-  {
-    application: IApplication
-    modifyApplication: typeof modifyApplication
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    goToMainContactPoint: typeof goToMainContactPoint
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    goToPrimaryApplicant: typeof goToPrimaryApplicant
-  } & InjectedIntlProps &
-    RouteComponentProps<IMatchProps>
-> {
-  state = {
-    informant: ''
+
+type IFullProps = {
+  application: IApplication
+  modifyApplication: typeof modifyApplication
+  goBack: typeof goBack
+  goToHome: typeof goToHome
+  goToMainContactPoint: typeof goToMainContactPoint
+  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  goToPrimaryApplicant: typeof goToPrimaryApplicant
+} & InjectedIntlProps &
+  RouteComponentProps<IMatchProps>
+
+interface IState {
+  informant: string
+}
+export class SelectInformantView extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      informant:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data['registration'] &&
+          (this.props.application.data['registration']
+            .presentAtBirthRegistration as string)) ||
+        ''
+    }
   }
+
   handleContinue = () => {
     if (
       this.state.informant &&
