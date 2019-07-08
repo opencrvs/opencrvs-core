@@ -135,6 +135,7 @@ function formatRoleCode(str: string) {
   sections.map(section => {
     section = section.charAt(0) + section.slice(1).toLowerCase()
     formattedString.push(section)
+    return section
   })
 
   return formattedString.join(' ')
