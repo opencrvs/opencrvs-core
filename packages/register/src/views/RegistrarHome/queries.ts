@@ -9,6 +9,18 @@ export const COUNT_REGISTRATION_QUERY = gql`
     }
   }
 `
+
+export const COUNT_REGISTRATION_QUERY_BY_STATUS = gql`
+  query data($locationIds: [String], $status: String) {
+    countEventRegistrationsByStatus(
+      locationIds: $locationIds
+      status: $status
+    ) {
+      count
+    }
+  }
+`
+
 export const SEARCH_EVENTS = gql`
   query(
     $sort: String

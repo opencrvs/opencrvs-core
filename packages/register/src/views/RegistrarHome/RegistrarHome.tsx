@@ -26,7 +26,10 @@ import {
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import styled, { ITheme, withTheme } from '@register/styledComponents'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import {
+  GQLQuery,
+  GQLEventRegCount
+} from '@opencrvs/gateway/src/graphql/schema.d'
 import moment from 'moment'
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
@@ -50,17 +53,21 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
-import { IStoreState } from '@register/store'
+import { IStoreState, AppStore } from '@register/store'
 import { Scope } from '@register/utils/authUtils'
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import {
   COUNT_REGISTRATION_QUERY,
-  SEARCH_EVENTS
+  SEARCH_EVENTS,
+  COUNT_REGISTRATION_QUERY_BY_STATUS
 } from '@register/views/RegistrarHome/queries'
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
 import { transformData } from '@register/search/transformer'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+import ApolloClient from 'apollo-client'
+import { createClient } from '@register/utils/apolloClient'
+import { async } from 'q'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -299,6 +306,7 @@ const SELECTOR_ID = {
 }
 
 export const EVENT_STATUS = {
+  IN_PROGRESS: 'IN_PROGRESS',
   DECLARED: 'DECLARED',
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED'
@@ -307,9 +315,13 @@ export class RegistrarHomeView extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
+  private client: ApolloClient<{}>
+  private fieldAgentDraftsCount = 0
+
   pageSize = 10
-  constructor(props: IRegistrarHomeProps) {
+  constructor(props: IRegistrarHomeProps, store: AppStore) {
     super(props)
+    this.client = createClient(store)
     this.state = {
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
@@ -520,6 +532,176 @@ export class RegistrarHomeView extends React.Component<
     })
   }
 
+  renderInProgressTabWithCount = (
+    tabId: string,
+    drafts: IApplication[],
+    registrarUnion: string
+  ) => {
+    const { intl } = this.props
+
+    return (
+      <Query
+        query={COUNT_REGISTRATION_QUERY_BY_STATUS}
+        variables={{
+          locationIds: [registrarUnion],
+          status: EVENT_STATUS.IN_PROGRESS
+        }}
+      >
+        {({
+          loading,
+          error,
+          data
+        }: {
+          loading: any
+          error?: any
+          data: any
+        }) => {
+          if (error) {
+            Sentry.captureException(error)
+            return (
+              <ErrorText id="search-result-error-text-count">
+                {intl.formatMessage(messages.queryError)}
+              </ErrorText>
+            )
+          }
+
+          return (
+            <IconTab
+              id={`tab_${TAB_ID.inProgress}`}
+              key={TAB_ID.inProgress}
+              active={tabId === TAB_ID.inProgress}
+              align={ICON_ALIGNMENT.LEFT}
+              icon={() => <StatusProgress />}
+              onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
+            >
+              {intl.formatMessage(messages.inProgress)} (
+              {(drafts &&
+                drafts.filter(
+                  draft =>
+                    draft.submissionStatus ===
+                    SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+                ).length +
+                  ((data &&
+                    data.countEventRegistrationsByStatus &&
+                    data.countEventRegistrationsByStatus.count) ||
+                    0)) ||
+                0}
+              )
+            </IconTab>
+          )
+        }}
+      </Query>
+    )
+  }
+
+  renderInProgressSelectorsWithCounts = (
+    selectorId: string,
+    drafts: IApplication[],
+    registrarUnion: string
+  ) => {
+    const { intl } = this.props
+
+    return (
+      <Query
+        query={COUNT_REGISTRATION_QUERY_BY_STATUS}
+        variables={{
+          locationIds: [registrarUnion],
+          status: EVENT_STATUS.IN_PROGRESS
+        }}
+      >
+        {({
+          loading,
+          error,
+          data
+        }: {
+          loading: any
+          error?: any
+          data: any
+        }) => {
+          if (error) {
+            Sentry.captureException(error)
+            return (
+              <ErrorText id="search-result-error-text-count">
+                {intl.formatMessage(messages.queryError)}
+              </ErrorText>
+            )
+          }
+          return (
+            <>
+              {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+                <PrimaryButton
+                  id={`selector_${SELECTOR_ID.ownDrafts}`}
+                  key={SELECTOR_ID.ownDrafts}
+                  onClick={() =>
+                    this.props.goToRegistrarHomeTab(
+                      TAB_ID.inProgress,
+                      SELECTOR_ID.ownDrafts
+                    )
+                  }
+                >
+                  {intl.formatMessage(messages.inProgressOwnDrafts)} (
+                  {drafts && drafts.length})
+                </PrimaryButton>
+              )) || (
+                <SecondaryButton
+                  id={`selector_${SELECTOR_ID.ownDrafts}`}
+                  key={SELECTOR_ID.ownDrafts}
+                  onClick={() =>
+                    this.props.goToRegistrarHomeTab(
+                      TAB_ID.inProgress,
+                      SELECTOR_ID.ownDrafts
+                    )
+                  }
+                >
+                  {intl.formatMessage(messages.inProgressOwnDrafts)} (
+                  {drafts && drafts.length})
+                </SecondaryButton>
+              )}
+
+              {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
+                <PrimaryButton
+                  id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+                  key={SELECTOR_ID.fieldAgentDrafts}
+                  onClick={() =>
+                    this.props.goToRegistrarHomeTab(
+                      TAB_ID.inProgress,
+                      SELECTOR_ID.fieldAgentDrafts
+                    )
+                  }
+                >
+                  {intl.formatMessage(messages.inProgressFieldAgents)} (
+                  {(data &&
+                    data.countEventRegistrationsByStatus &&
+                    data.countEventRegistrationsByStatus.count) ||
+                    0}
+                  )
+                </PrimaryButton>
+              )) || (
+                <SecondaryButton
+                  id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+                  key={SELECTOR_ID.fieldAgentDrafts}
+                  onClick={() =>
+                    this.props.goToRegistrarHomeTab(
+                      TAB_ID.inProgress,
+                      SELECTOR_ID.fieldAgentDrafts
+                    )
+                  }
+                >
+                  {intl.formatMessage(messages.inProgressFieldAgents)} (
+                  {(data &&
+                    data.countEventRegistrationsByStatus &&
+                    data.countEventRegistrationsByStatus.count) ||
+                    0}
+                  )
+                </SecondaryButton>
+              )}
+            </>
+          )
+        }}
+      </Query>
+    )
+  }
+
   onPageChange = (newPageNumber: number) => {
     if (this.props.tabId === TAB_ID.inProgress) {
       this.setState({ progressCurrentPage: newPageNumber })
@@ -584,26 +766,11 @@ export class RegistrarHomeView extends React.Component<
             return (
               <>
                 <TopBar>
-                  <IconTab
-                    id={`tab_${TAB_ID.inProgress}`}
-                    key={TAB_ID.inProgress}
-                    active={tabId === TAB_ID.inProgress}
-                    align={ICON_ALIGNMENT.LEFT}
-                    icon={() => <StatusProgress />}
-                    onClick={() =>
-                      this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
-                    }
-                  >
-                    {intl.formatMessage(messages.inProgress)} (
-                    {(drafts &&
-                      drafts.filter(
-                        draft =>
-                          draft.submissionStatus ===
-                          SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                      ).length) ||
-                      0}
-                    )
-                  </IconTab>
+                  {this.renderInProgressTabWithCount(
+                    tabId,
+                    drafts,
+                    registrarUnion as string
+                  )}
                   <IconTab
                     id={`tab_${TAB_ID.readyForReview}`}
                     key={TAB_ID.readyForReview}
@@ -650,62 +817,10 @@ export class RegistrarHomeView extends React.Component<
         </Query>
         {tabId === TAB_ID.inProgress && (
           <BodyContent>
-            {(selectorId === SELECTOR_ID.ownDrafts && (
-              <PrimaryButton
-                id={`selector_${SELECTOR_ID.ownDrafts}`}
-                key={SELECTOR_ID.ownDrafts}
-                onClick={() =>
-                  this.props.goToRegistrarHomeTab(
-                    TAB_ID.inProgress,
-                    SELECTOR_ID.ownDrafts
-                  )
-                }
-              >
-                {intl.formatMessage(messages.inProgressOwnDrafts)} (
-                {drafts && drafts.length})
-              </PrimaryButton>
-            )) || (
-              <SecondaryButton
-                id={`selector_${SELECTOR_ID.ownDrafts}`}
-                key={SELECTOR_ID.ownDrafts}
-                onClick={() =>
-                  this.props.goToRegistrarHomeTab(
-                    TAB_ID.inProgress,
-                    SELECTOR_ID.ownDrafts
-                  )
-                }
-              >
-                {intl.formatMessage(messages.inProgressOwnDrafts)} (
-                {drafts && drafts.length})
-              </SecondaryButton>
-            )}
-
-            {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
-              <PrimaryButton
-                id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-                key={SELECTOR_ID.fieldAgentDrafts}
-                onClick={() =>
-                  this.props.goToRegistrarHomeTab(
-                    TAB_ID.inProgress,
-                    SELECTOR_ID.fieldAgentDrafts
-                  )
-                }
-              >
-                {intl.formatMessage(messages.inProgressFieldAgents)} (0)
-              </PrimaryButton>
-            )) || (
-              <SecondaryButton
-                id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-                key={SELECTOR_ID.fieldAgentDrafts}
-                onClick={() =>
-                  this.props.goToRegistrarHomeTab(
-                    TAB_ID.inProgress,
-                    SELECTOR_ID.fieldAgentDrafts
-                  )
-                }
-              >
-                {intl.formatMessage(messages.inProgressFieldAgents)} (0)
-              </SecondaryButton>
+            {this.renderInProgressSelectorsWithCounts(
+              selectorId,
+              drafts,
+              registrarUnion as string
             )}
             {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
               <GridTable
