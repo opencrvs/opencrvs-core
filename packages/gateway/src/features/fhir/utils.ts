@@ -36,6 +36,7 @@ import {
 import { ISearchCriteria } from '@gateway/features/search/type-resovlers'
 import { ITimeRange } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
+import { logger } from '@gateway/logger'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -830,4 +831,38 @@ export function isTaskResponse(resBody: fhir.Bundle): boolean {
     throw new Error(`FHIR did not send a valid response`)
   }
   return resBody.entry[0].response.location.indexOf('Task') > -1
+}
+
+export async function setInformantReference(
+  sectionCode: string,
+  relatedPerson: fhir.RelatedPerson,
+  fhirBundle: ITemplatedBundle,
+  context: any
+) {
+  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
+  if (section && section.entry) {
+    const personSectionEntry = section.entry[0]
+    const personEntry = fhirBundle.entry.find(
+      entry => entry.fullUrl === personSectionEntry.reference
+    )
+    if (!personEntry) {
+      logger.error('Expected person entry not found on the bundle')
+      return
+    }
+    relatedPerson.patient = {
+      reference: personEntry.fullUrl
+    }
+  } else {
+    const composition = await fetchFHIR(
+      `/Composition/${fhirBundle.entry[0].resource.id}`,
+      context.authHeader
+    )
+
+    const sec = findCompositionSection(sectionCode, composition)
+    if (sec && sec.entry) {
+      relatedPerson.patient = {
+        reference: sec.entry[0].reference
+      }
+    }
+  }
 }
