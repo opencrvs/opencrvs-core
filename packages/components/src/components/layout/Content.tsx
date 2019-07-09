@@ -20,3 +20,9 @@ export const Container = styled.div`
   width: 100%;
   height: calc(100% - 40px);
 `
+export const FullBodyContent = styled.div`
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+`

@@ -5,7 +5,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
 import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyContent, FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -492,24 +492,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
               ]}
             />
             <FormContainer>
-              <BodyContent>
-                <TertiaryButton
-                  align={ICON_ALIGNMENT.LEFT}
-                  icon={() => <BackArrow />}
-                  onClick={this.props.goBack}
-                >
-                  {intl.formatMessage(messages.back)}
-                </TertiaryButton>
-                <Swipeable
-                  disabled={isReviewSection || !isMobileDevice()}
-                  id="swipeable_block"
-                  trackMouse
-                  delta={50}
-                  onSwiped={(e: any, deltaX: number, deltaY: number) =>
-                    this.makeSwipe(deltaX, deltaY)
-                  }
-                >
-                  {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+              <Swipeable
+                disabled={isReviewSection || !isMobileDevice()}
+                id="swipeable_block"
+                trackMouse
+                delta={50}
+                onSwiped={(e: any, deltaX: number, deltaY: number) =>
+                  this.makeSwipe(deltaX, deltaY)
+                }
+              >
+                {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+                  <FullBodyContent>
                     <ReviewSection
                       pageRoute={this.props.pageRoute}
                       draft={application}
@@ -519,9 +512,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         this.props.deleteApplication(application)
                         history.push('/')
                       }}
+                      onChangeReviewForm={this.modifyApplication}
                     />
-                  )}
-                  {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                  </FullBodyContent>
+                )}
+                {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                  <FullBodyContent>
                     <ReviewSection
                       pageRoute={this.props.pageRoute}
                       draft={application}
@@ -529,9 +525,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         this.toggleRejectForm()
                       }}
                       registerClickEvent={this.registerApplication}
+                      onChangeReviewForm={this.modifyApplication}
                     />
-                  )}
-                  {activeSection.viewType === 'form' && (
+                  </FullBodyContent>
+                )}
+                {activeSection.viewType === 'form' && (
+                  <BodyContent>
+                    <TertiaryButton
+                      align={ICON_ALIGNMENT.LEFT}
+                      icon={() => <BackArrow />}
+                      onClick={this.props.goBack}
+                    >
+                      {intl.formatMessage(messages.back)}
+                    </TertiaryButton>
                     <div>
                       <FormSectionTitle
                         id={`form_section_title_${activeSection.id}`}
@@ -589,9 +595,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         </FooterArea>
                       )}
                     </div>
-                  )}
-                </Swipeable>
-              </BodyContent>
+                  </BodyContent>
+                )}
+              </Swipeable>
             </FormContainer>
           </>
         )}

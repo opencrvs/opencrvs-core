@@ -25,6 +25,8 @@ const DataContainer = styled.div`
 const Label = styled.label`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   flex: 1;
+  margin-right: 16px;
+  max-width: 40%;
 `
 const Value = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
@@ -50,7 +52,7 @@ interface IAction {
 export interface IDataProps {
   id?: string
   label: string
-  value?: string
+  value?: React.ReactNode
   placeHolder?: string
   action?: IAction
 }
