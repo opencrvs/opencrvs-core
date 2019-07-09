@@ -73,7 +73,7 @@ export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
               id="login-submitting-spinner"
               baseColor={
                 getTheme(window.config.COUNTRY, window.config.LANGUAGE).colors
-                  .gradientDark
+                  .white
               }
             />
           ) : (

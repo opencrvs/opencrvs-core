@@ -430,7 +430,6 @@ class FieldAgentHomeView extends React.Component<
                           <Loader
                             id="require_updates_loader"
                             marginPercent={20}
-                            spinnerDiameter={60}
                             loadingText={intl.formatMessage(
                               messages.requireUpdatesLoading
                             )}
