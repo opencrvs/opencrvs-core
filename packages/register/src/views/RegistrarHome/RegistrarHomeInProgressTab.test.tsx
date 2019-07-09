@@ -278,6 +278,27 @@ describe('RegistrarHome In Progress tab related tests', () => {
         }
       },
       {
+        id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
+        event: 'birth',
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+        data: {
+          child: {
+            familyNameEng: 'Hoque'
+          }
+        }
+      },
+      {
+        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be9',
+        event: 'birth',
+        modifiedOn: TIME_STAMP,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+        data: {
+          child: {
+            familyName: 'অনিক'
+          }
+        }
+      },
+      {
         id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
         event: 'death',
         modifiedOn: TIME_STAMP,
@@ -290,6 +311,34 @@ describe('RegistrarHome In Progress tab related tests', () => {
             familyName: 'অনিক'
           }
         }
+      },
+      {
+        id: 'cc66d69c-7f0a-4047-9283-f066571830f2',
+        event: 'death',
+        modifiedOn: TIME_STAMP,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+        data: {
+          deceased: {
+            familyNameEng: 'Hoque'
+          }
+        }
+      },
+      {
+        id: 'cc66d69c-7f0a-4047-9283-f066571830f3',
+        event: 'death',
+        modifiedOn: TIME_STAMP,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+        data: {
+          deceased: {
+            familyName: 'অনিক'
+          }
+        }
+      },
+      {
+        id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
+        event: 'death',
+        modifiedOn: TIME_STAMP,
+        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
     ]
     // @ts-ignore

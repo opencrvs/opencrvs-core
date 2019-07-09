@@ -2,8 +2,6 @@ import * as React from 'react'
 import { createTestComponent, mockUserResponse } from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { v4 as uuid } from 'uuid'
-
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import {
@@ -17,12 +15,6 @@ import {
   SEARCH_EVENTS
 } from '@register/views/RegistrarHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
-import {
-  SUBMISSION_STATUS,
-  storeApplication,
-  createApplication,
-  createReviewApplication
-} from '@register/applications'
 import moment from 'moment'
 
 const registerScopeToken =
