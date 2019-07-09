@@ -3,11 +3,11 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
-  createApplication,
-  setInitialApplications,
-  storeApplication
+  /* createApplication, */
+  setInitialApplications
+  /* storeApplication */
 } from '@register/applications'
-import { Event } from '@register/forms'
+// import { Event } from '@register/forms'
 import {
   goToBirthRegistration,
   goToDeathRegistration,
@@ -137,11 +137,12 @@ export const SelectVitalEvent = connect(
   function mapDispatchToProps(dispatch: Dispatch) {
     return {
       goToBirthRegistration: () => dispatch(goToBirthRegistration()),
-      goToDeathRegistration: () => {
+      goToDeathRegistration: () => dispatch(goToDeathRegistration()),
+      /*goToDeathRegistration: () => {
         const application = createApplication(Event.DEATH)
         dispatch(storeApplication(application))
         dispatch(goToDeathRegistration(application.id))
-      },
+      },*/
       goHome: () => {
         dispatch(setInitialApplications())
         dispatch(goToHome())

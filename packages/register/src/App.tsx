@@ -91,7 +91,12 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.SELECT_INFORMANT}
+                                  path={routes.SELECT_BIRTH_INFORMANT}
+                                  component={SelectInformant}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_DEATH_INFORMANT}
                                   component={SelectInformant}
                                 />
                                 <ProtectedRoute

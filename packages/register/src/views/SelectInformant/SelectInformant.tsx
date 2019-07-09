@@ -18,6 +18,8 @@ import styled from '@register/styledComponents'
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router'
+import { IStoreState } from '@opencrvs/register/src/store'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -27,10 +29,16 @@ export const messages: {
     defaultMessage: 'New birth application',
     description: 'The message that appears for new birth registrations'
   },
-  informantTitle: {
-    id: 'register.selectInformant.informantTitle',
+  birthInformantTitle: {
+    id: 'register.selectInformant.birthInformantTitle',
     defaultMessage: 'Who is applying for birth registration?',
-    description: 'The title that appears when asking for the informant'
+    description: 'The title that appears when asking for the birth informant'
+  },
+  deathInformantTitle: {
+    id: 'register.selectInformant.deathInformantTitle',
+    defaultMessage:
+      'What relationship does the applicant have to the deceased?',
+    description: 'The title that appears when asking for the death informant'
   },
   mother: {
     id: 'register.selectInformant.mother',
@@ -91,17 +99,16 @@ enum INFORMANT {
   MOTHER = 'mother',
   BOTH_PARENTS = 'parents',
   SELF = 'self',
+  SPOUSE = 'spouse',
+  SON = 'son',
+  DAUGHTER = 'daughter',
+  EXTENDED_FAMILY = 'extendedFamily',
+  OTHER = 'other',
   SOMEONE_ELSE = 'other'
 }
-export class SelectInformantView extends React.Component<
-  {
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    goToMainContactPoint: typeof goToMainContactPoint
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    goToPrimaryApplicant: typeof goToPrimaryApplicant
-  } & InjectedIntlProps
-> {
+
+type IPageProps = IDispatchProps & InjectedIntlProps & RouteComponentProps<{}>
+export class SelectInformantView extends React.Component<IPageProps> {
   state = {
     informant: ''
   }
@@ -120,6 +127,7 @@ export class SelectInformantView extends React.Component<
   }
   render() {
     const { intl } = this.props
+    console.log(this.props.location.pathname.includes('birth'))
     return (
       <Container>
         <EventTopBar
@@ -135,7 +143,12 @@ export class SelectInformantView extends React.Component<
           >
             {intl.formatMessage(messages.back)}
           </TertiaryButton>
-          <Title>{intl.formatMessage(messages.informantTitle)}</Title>
+
+          <Title>
+            {this.props.location.pathname.includes('birth')
+              ? intl.formatMessage(messages.birthInformantTitle)
+              : intl.formatMessage(messages.deathInformantTitle)}
+          </Title>
           {this.state.informant === 'error' && (
             <ErrorText id="error_text">
               {intl.formatMessage(messages.errorMessage)}
@@ -214,13 +227,23 @@ export class SelectInformantView extends React.Component<
   }
 }
 
-export const SelectInformant = connect(
-  null,
-  {
-    goBack,
-    goToHome,
-    goToMainContactPoint,
-    goToBirthRegistrationAsParent,
-    goToPrimaryApplicant
-  }
-)(injectIntl(SelectInformantView))
+interface IDispatchProps {
+  goBack: typeof goBack
+  goToHome: typeof goToHome
+  goToMainContactPoint: typeof goToMainContactPoint
+  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  goToPrimaryApplicant: typeof goToPrimaryApplicant
+}
+
+export const SelectInformant = withRouter(
+  connect<{}, IDispatchProps, IPageProps, IStoreState>(
+    null,
+    {
+      goBack,
+      goToHome,
+      goToMainContactPoint,
+      goToBirthRegistrationAsParent,
+      goToPrimaryApplicant
+    }
+  )(injectIntl(SelectInformantView))
+) as any

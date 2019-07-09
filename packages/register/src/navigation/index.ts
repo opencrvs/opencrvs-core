@@ -1,6 +1,7 @@
 import { push, goBack as back, replace } from 'react-router-redux'
 import {
-  SELECT_INFORMANT,
+  SELECT_BIRTH_INFORMANT,
+  SELECT_DEATH_INFORMANT,
   HOME,
   SEARCH_RESULT,
   DRAFT_BIRTH_PARENT_FORM,
@@ -76,7 +77,11 @@ type GoToSysAdminHome = {
 }
 
 export function goToBirthRegistration() {
-  return push(SELECT_INFORMANT)
+  return push(SELECT_BIRTH_INFORMANT)
+}
+
+export function goToDeathRegistration() {
+  return push(SELECT_DEATH_INFORMANT)
 }
 
 export function goToMainContactPoint(
@@ -167,11 +172,11 @@ export function goToPrintCertificate(registrationId: string, event: string) {
   )
 }
 
-export function goToDeathRegistration(applicationId: string) {
+/* export function goToDeathRegistration(applicationId: string) {
   return push(
     formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
   )
-}
+}*/
 
 export function goToRegistrarHomeTab(tabId: string) {
   return {

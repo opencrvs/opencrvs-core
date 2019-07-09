@@ -579,8 +579,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশে ফেরত যান',
 
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
-    'register.selectInformant.informantTitle':
+    'register.selectInformant.birthInformantTitle':
       'কে জন্ম নিবন্ধনের জন্য আবেদন করছে?',
+    'register.selectInformant.deathInformantTitle':
+      'What relationship does the applicant have to the deceased?',
     'register.selectInformant.mother': 'মাতা',
     'register.selectInformant.father': 'পিতা',
     'register.selectInformant.parents': 'পিতা ও মাতা ',
