@@ -456,16 +456,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 />
               </FullBodyContent>
             )}
-            <BodyContent>
-              <TertiaryButton
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <BackArrow />}
-                onClick={this.props.goBack}
-              >
-                {intl.formatMessage(messages.back)}
-              </TertiaryButton>
-              {activeSection.viewType === 'form' && (
-                <>
+
+            {activeSection.viewType === 'form' && (
+              <>
+                <BodyContent>
+                  <TertiaryButton
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <BackArrow />}
+                    onClick={this.props.goBack}
+                  >
+                    {intl.formatMessage(messages.back)}
+                  </TertiaryButton>
                   <FormSectionTitle
                     id={`form_section_title_${activeSection.id}`}
                   >
@@ -521,9 +522,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       </PrimaryButton>
                     </FooterArea>
                   )}
-                </>
-              )}
-            </BodyContent>
+                </BodyContent>
+              </>
+            )}
           </>
         )}
 
