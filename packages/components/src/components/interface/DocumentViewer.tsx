@@ -1,43 +1,24 @@
 import * as React from 'react'
 import * as Sticky from 'react-stickynode'
 import styled from 'styled-components'
-import { SupportingDocument } from './../icons'
 import { Select, ISelectOption as SelectComponentOptions } from './../forms'
 import { DocumentImage } from './components/DocumentImage'
-import { isEqual } from 'lodash'
 
-const Header = styled.div`
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-`
-
-const Box = styled.div`
-  padding: 14px 18px;
-`
-const Icon = styled.div`
-  margin-right: 15px;
-`
-const TitleContainer = styled.div`
-  width: 276px;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
-`
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-`
 const SelectContainer = styled.div`
-  width: 70%;
+  background-color: ${({ theme }) => theme.colors.lightGreyBackground};
+  width: 200px;
+  margin-top: 10px;
+  margin-left: 10px;
 `
-const WhiteBackground = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-
+const Container = styled.div`
+  background-color: ${({ theme }) => theme.colors.background};
+  border: 2px solid ${({ theme }) => theme.colors.white};
+  box-sizing: border-box;
+  height: 550px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
-
 export interface IDocumentViewerOptions {
   selectOptions: SelectComponentOptions[]
   documentOptions: SelectComponentOptions[]
@@ -72,43 +53,34 @@ export class DocumentViewer extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { title, tagline, options, icon } = this.props
+    const { options } = this.props
     return (
       <Sticky enabled={true} top="#form_tabs_container">
-        <WhiteBackground>
-          <Box>
-            <Header>
-              <Icon>{icon || <SupportingDocument />}</Icon>
-              <TitleContainer>
-                <Title>{title}</Title>
-                {tagline}
-              </TitleContainer>
-            </Header>
-
-            <SelectContainer>
-              <Select
-                id="selectDocument"
-                options={options.selectOptions}
-                value={this.state.selectedOption as string}
-                onChange={(val: string) => {
-                  const imgArray = options.documentOptions.filter(doc => {
-                    return doc.label === val
+        <Container>
+          <SelectContainer>
+            <Select
+              id="selectDocument"
+              options={options.selectOptions}
+              isSmallSized={true}
+              color="inherit"
+              value={this.state.selectedOption as string}
+              onChange={(val: string) => {
+                const imgArray = options.documentOptions.filter(doc => {
+                  return doc.label === val
+                })
+                if (imgArray[0]) {
+                  this.setState({
+                    selectedOption: val,
+                    selectedDocument: imgArray[0].value
                   })
-                  if (imgArray[0]) {
-                    this.setState({
-                      selectedOption: val,
-                      selectedDocument: imgArray[0].value
-                    })
-                  }
-                }}
-              />
-            </SelectContainer>
-          </Box>
-
+                }
+              }}
+            />
+          </SelectContainer>
           {this.state.selectedDocument && (
             <DocumentImage image={this.state.selectedDocument} />
           )}
-        </WhiteBackground>
+        </Container>
       </Sticky>
     )
   }
