@@ -1,10 +1,10 @@
 {
   "name": "@opencrvs/register",
-  "version": "1.0.0-alpha.1.0",
+  "version": "1.0.0-alpha.1.1",
   "private": true,
   "dependencies": {
     "@craco/craco": "^5.2.1",
-    "@opencrvs/components": "^1.0.0-alpha.1.0",
+    "@opencrvs/components": "^1.0.0-alpha.1.1",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -50,7 +50,6 @@
     "react-router-redux": "next",
     "react-scripts": "^3.0.1",
     "react-stickynode": "^2.0.1",
-    "react-swipeable": "^4.3.0",
     "redux": "^4.0.1",
     "redux-loop": "^5.0.0",
     "redux-sentry-middleware": "^0.0.15",

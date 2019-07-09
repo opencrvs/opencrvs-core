@@ -98,6 +98,7 @@ test('should build a minimal FHIR registration document without error', async ()
         paperFormID: '12345678',
         trackingId: 'B123456',
         registrationNumber: '201923324512345671',
+        inProgress: true,
         status: [
           {
             comments: [
@@ -340,6 +341,7 @@ test('should build a minimal FHIR registration document without error', async ()
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
     valueString: '01733333333'
   })
+  expect(fhir.entry[4].resource.status).toEqual('draft')
   expect(fhir.entry[4].resource.lastModified).toEqual(
     '2018-10-31T09:45:05+10:00'
   )
