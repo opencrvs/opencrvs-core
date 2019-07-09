@@ -5,7 +5,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
 import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -159,17 +159,6 @@ export const messages: {
     description: 'SAVE & EXIT Button Text'
   }
 })
-
-const FormContainer = styled.div`
-  padding-bottom: 0;
-`
-
-const FormViewContainer = styled.div`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  background-color: ${({ theme }) => theme.colors.white};
-`
 
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
@@ -434,7 +423,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
-      goToPage,
       intl,
       setAllFieldsDirty,
       application,
@@ -466,7 +454,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <FormViewContainer id="informant_parent_view">
+      <Container id="informant_parent_view">
         {isErrorOccured && (
           <ErrorText id="error_message_section">
             {intl.formatMessage(messages.queryError)}
@@ -491,108 +479,106 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 }
               ]}
             />
-            <FormContainer>
-              <BodyContent>
-                <TertiaryButton
-                  align={ICON_ALIGNMENT.LEFT}
-                  icon={() => <BackArrow />}
-                  onClick={this.props.goBack}
-                >
-                  {intl.formatMessage(messages.back)}
-                </TertiaryButton>
-                <Swipeable
-                  disabled={isReviewSection || !isMobileDevice()}
-                  id="swipeable_block"
-                  trackMouse
-                  delta={50}
-                  onSwiped={(e: any, deltaX: number, deltaY: number) =>
-                    this.makeSwipe(deltaX, deltaY)
-                  }
-                >
-                  {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-                    <ReviewSection
-                      pageRoute={this.props.pageRoute}
-                      draft={application}
-                      submitClickEvent={this.submitForm}
-                      saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                      deleteApplicationClickEvent={() => {
-                        this.props.deleteApplication(application)
-                        history.push('/')
-                      }}
-                    />
-                  )}
-                  {activeSection.viewType === VIEW_TYPE.REVIEW && (
-                    <ReviewSection
-                      pageRoute={this.props.pageRoute}
-                      draft={application}
-                      rejectApplicationClickEvent={() => {
-                        this.toggleRejectForm()
-                      }}
-                      registerClickEvent={this.registerApplication}
-                    />
-                  )}
-                  {activeSection.viewType === 'form' && (
-                    <div>
-                      <FormSectionTitle
-                        id={`form_section_title_${activeSection.id}`}
-                      >
-                        {intl.formatMessage(activeSection.title)}
-                        {activeSection.optional && (
-                          <Optional
-                            id={`form_section_opt_label_${activeSection.id}`}
-                            disabled={activeSection.disabled}
-                          >
-                            &nbsp;&nbsp;•&nbsp;
-                            {intl.formatMessage(messages.optionalLabel)}
-                          </Optional>
-                        )}
-                      </FormSectionTitle>
-                      {activeSection.notice && (
-                        <Notice id={`form_section_notice_${activeSection.id}`}>
-                          {intl.formatMessage(activeSection.notice)}
-                        </Notice>
+            <BodyContent>
+              <TertiaryButton
+                align={ICON_ALIGNMENT.LEFT}
+                icon={() => <BackArrow />}
+                onClick={this.props.goBack}
+              >
+                {intl.formatMessage(messages.back)}
+              </TertiaryButton>
+              <Swipeable
+                disabled={isReviewSection || !isMobileDevice()}
+                id="swipeable_block"
+                trackMouse
+                delta={50}
+                onSwiped={(e: any, deltaX: number, deltaY: number) =>
+                  this.makeSwipe(deltaX, deltaY)
+                }
+              >
+                {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+                  <ReviewSection
+                    pageRoute={this.props.pageRoute}
+                    draft={application}
+                    submitClickEvent={this.submitForm}
+                    saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
+                    deleteApplicationClickEvent={() => {
+                      this.props.deleteApplication(application)
+                      history.push('/')
+                    }}
+                  />
+                )}
+                {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                  <ReviewSection
+                    pageRoute={this.props.pageRoute}
+                    draft={application}
+                    rejectApplicationClickEvent={() => {
+                      this.toggleRejectForm()
+                    }}
+                    registerClickEvent={this.registerApplication}
+                  />
+                )}
+                {activeSection.viewType === 'form' && (
+                  <div>
+                    <FormSectionTitle
+                      id={`form_section_title_${activeSection.id}`}
+                    >
+                      {intl.formatMessage(activeSection.title)}
+                      {activeSection.optional && (
+                        <Optional
+                          id={`form_section_opt_label_${activeSection.id}`}
+                          disabled={activeSection.disabled}
+                        >
+                          &nbsp;&nbsp;•&nbsp;
+                          {intl.formatMessage(messages.optionalLabel)}
+                        </Optional>
                       )}
-                      <form
-                        id={`form_section_id_${activeSection.id}`}
-                        onSubmit={handleSubmit}
-                      >
-                        <FormFieldGenerator
-                          id={activeSection.id}
-                          onChange={values => {
-                            debouncedModifyApplication(
-                              values,
-                              activeSection,
-                              application
+                    </FormSectionTitle>
+                    {activeSection.notice && (
+                      <Notice id={`form_section_notice_${activeSection.id}`}>
+                        {intl.formatMessage(activeSection.notice)}
+                      </Notice>
+                    )}
+                    <form
+                      id={`form_section_id_${activeSection.id}`}
+                      onSubmit={handleSubmit}
+                    >
+                      <FormFieldGenerator
+                        id={activeSection.id}
+                        onChange={values => {
+                          debouncedModifyApplication(
+                            values,
+                            activeSection,
+                            application
+                          )
+                        }}
+                        setAllFieldsDirty={setAllFieldsDirty}
+                        fields={activeSection.fields}
+                        offlineResources={offlineResources}
+                        draftData={application.data}
+                      />
+                    </form>
+                    {nextSection && (
+                      <FooterArea>
+                        <PrimaryButton
+                          id="next_section"
+                          onClick={() => {
+                            this.continueButtonHandler(
+                              this.props.pageRoute,
+                              application.id,
+                              nextSection.id,
+                              application.event.toLowerCase()
                             )
                           }}
-                          setAllFieldsDirty={setAllFieldsDirty}
-                          fields={activeSection.fields}
-                          offlineResources={offlineResources}
-                          draftData={application.data}
-                        />
-                      </form>
-                      {nextSection && (
-                        <FooterArea>
-                          <PrimaryButton
-                            id="next_section"
-                            onClick={() => {
-                              this.continueButtonHandler(
-                                this.props.pageRoute,
-                                application.id,
-                                nextSection.id,
-                                application.event.toLowerCase()
-                              )
-                            }}
-                          >
-                            {intl.formatMessage(messages.continueButton)}
-                          </PrimaryButton>
-                        </FooterArea>
-                      )}
-                    </div>
-                  )}
-                </Swipeable>
-              </BodyContent>
-            </FormContainer>
+                        >
+                          {intl.formatMessage(messages.continueButton)}
+                        </PrimaryButton>
+                      </FooterArea>
+                    )}
+                  </div>
+                )}
+              </Swipeable>
+            </BodyContent>
           </>
         )}
 
@@ -686,7 +672,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             application={application}
           />
         )}
-      </FormViewContainer>
+      </Container>
     )
   }
 }
