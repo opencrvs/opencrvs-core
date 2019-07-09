@@ -130,7 +130,7 @@ enum ContactPoint {
 interface IState {
   selected: string
   phoneNumber: string
-  relationShip: string
+  relationship: string
   isPhoneNoError: boolean
   touched: boolean
   isError: boolean
@@ -170,7 +170,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           (this.props.application.data['registration']
             .registrationPhone as string)) ||
         '',
-      relationShip: '',
+      relationship: '',
       isPhoneNoError: false,
       touched: false,
       isError: false

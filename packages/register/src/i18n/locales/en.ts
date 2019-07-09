@@ -514,8 +514,11 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.son': 'Son',
     'register.selectInformant.daughter': 'Daughter',
     'register.selectInformant.extendedFamily': 'Extended family',
-    'register.selectInformant.errorMessage':
+    'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying',
+    'register.selectInformant.deathErrorMessage':
+      'Please select the relationship to the deceased and any relevant contact details.',
+    'register.selectInformant.relationshipLabel': 'Relationship to deceased',
     'register.primaryApplicant.registerNewEventHeading':
       'Who is the primary applicant for this application?',
     'register.primaryApplicant.description':

@@ -23,12 +23,19 @@ import {
   goBack,
   goToHome,
   goToMainContactPoint,
-  goToPrimaryApplicant
+  goToPrimaryApplicant,
+  goToDeathRegistration
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { IRadioOption as RadioComponentOption } from '@opencrvs/components/lib/forms'
+import {
+  InputField,
+  TextInput,
+  IRadioOption as RadioComponentOption
+} from '@opencrvs/components/lib/forms'
 import { Event } from '@register/forms'
+import { phoneNumberFormat } from '@register/utils/validate'
+import { PHONE_NO_FIELD_STRING } from '@register/utils/constants'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -102,15 +109,41 @@ export const messages: {
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   },
-  errorMessage: {
-    id: 'register.selectInformant.errorMessage',
+  birthErrorMessage: {
+    id: 'register.selectInformant.birthErrorMessage',
     defaultMessage: 'Please select who is present and applying',
-    description: 'Error Message to show when no event is being selected'
+    description: 'Error Message to show when no informant is selected for birth'
+  },
+  deathErrorMessage: {
+    id: 'register.selectInformant.deathErrorMessage',
+    defaultMessage:
+      'Please select the relationship to the deceased and any relevant contact details.',
+    description: 'Error Message to show when no informant is selected for death'
   },
   continueButton: {
     id: 'register.selectVitalEvent.continueButton',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
+  },
+  phoneNoLabel: {
+    id: 'register.SelectContactPoint.phoneNoLabel',
+    defaultMessage: 'Phone number',
+    description: 'Phone No Label'
+  },
+  relationshipLabel: {
+    id: 'register.selectInformant.relationshipLabel',
+    defaultMessage: 'Relationship to deceased',
+    description: 'Relationship Label used for death informant'
+  },
+  phoneNoError: {
+    id: 'register.SelectContactPoint.phoneNoError',
+    defaultMessage: 'Not a valid mobile number',
+    description: 'Phone no error text'
+  },
+  error: {
+    id: 'register.SelectContactPoint.error',
+    defaultMessage: 'Please select a main point of contact',
+    description: 'Error text'
   }
 })
 
@@ -122,6 +155,17 @@ const Actions = styled.div`
   padding: 32px 0;
   & div:not(:last-child) {
     margin-bottom: 16px;
+  }
+`
+
+const ChildContainer = styled.div`
+  margin-left: 18px;
+  padding-left: 33px;
+  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  padding-top: 0px !important;
+
+  > div {
+    padding: 16px 0;
   }
 `
 
@@ -263,12 +307,18 @@ type IFullProps = {
   goToHome: typeof goToHome
   goToMainContactPoint: typeof goToMainContactPoint
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  goToDeathRegistration: typeof goToDeathRegistration
   goToPrimaryApplicant: typeof goToPrimaryApplicant
 } & InjectedIntlProps &
   RouteComponentProps<IMatchProps>
 
 interface IState {
   informant: string
+  phoneNumber: string
+  relationship: string
+  isPhoneNoError: boolean
+  touched: boolean
+  isError: boolean
 }
 
 export class SelectInformantView extends React.Component<IFullProps, IState> {
@@ -281,7 +331,18 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           this.props.application.data[registrationSection.id] &&
           (this.props.application.data[registrationSection.id]
             .presentAtBirthRegistration as string)) ||
-        ''
+        '',
+      phoneNumber:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
+            .registrationPhone as string)) ||
+        '',
+      relationship: '',
+      isPhoneNoError: false,
+      touched: false,
+      isError: false
     }
   }
 
@@ -305,7 +366,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       })
       goToPrimaryApplicant(this.props.match.params.applicationId)
-    } else if (this.state.informant && this.state.informant !== 'error') {
+    } else if (
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant !== INFORMANT.SOMEONE_ELSE
+    ) {
       const { application, goToMainContactPoint } = this.props
       this.props.modifyApplication({
         ...application,
@@ -322,9 +387,81 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       })
 
       goToMainContactPoint(this.props.match.params.applicationId)
+    } else if (
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant === INFORMANT.SOMEONE_ELSE &&
+      this.state.phoneNumber &&
+      !this.state.isPhoneNoError &&
+      this.state.relationship !== ''
+    ) {
+      const { application, goToDeathRegistration } = this.props
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: this.state.informant,
+              registrationPhone: this.state.phoneNumber,
+              whoseContactDetails: this.state.relationship,
+              applicantOtherRelationship: this.state.relationship
+            }
+          }
+        }
+      })
+
+      goToDeathRegistration(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
+  }
+  handleRelationshipChange = (value: string) => {
+    this.setState({
+      relationship: value,
+      touched: true,
+      isError: false
+    })
+  }
+  handlePhoneNoChange = (value: string) => {
+    let invalidPhoneNo = false
+    if (phoneNumberFormat(value)) {
+      invalidPhoneNo = true
+    }
+    this.setState({
+      isPhoneNoError: invalidPhoneNo ? true : false,
+      phoneNumber: value,
+      touched: true,
+      isError: false
+    })
+  }
+  renderPhoneNumberField = (): JSX.Element => {
+    return (
+      <InputField
+        id="phone_number"
+        label={this.props.intl.formatMessage(messages.phoneNoLabel)}
+        touched={this.state.touched}
+        error={
+          this.state.isPhoneNoError
+            ? this.props.intl.formatMessage(messages.phoneNoError)
+            : ''
+        }
+        hideAsterisk={true}
+      >
+        <TextInput
+          id="phone_number_input"
+          type="tel"
+          name={PHONE_NO_FIELD_STRING}
+          isSmallSized={true}
+          value={this.state.phoneNumber}
+          onChange={e => this.handlePhoneNoChange(e.target.value)}
+          touched={this.state.touched}
+          error={this.state.isPhoneNoError}
+        />
+      </InputField>
+    )
   }
   render() {
     const { intl } = this.props
@@ -332,7 +469,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       ? Event.BIRTH
       : Event.DEATH
     const infornantFields = setInformantFields(intl, event)
-    console.log(this.props.location.pathname.includes('birth'))
     return (
       <Container>
         <EventTopBar
@@ -350,13 +486,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           </TertiaryButton>
 
           <Title>
-            {this.props.location.pathname.includes(Event.BIRTH)
+            {event === Event.BIRTH
               ? intl.formatMessage(messages.birthInformantTitle)
               : intl.formatMessage(messages.deathInformantTitle)}
           </Title>
           {this.state.informant === 'error' && (
             <ErrorText id="error_text">
-              {intl.formatMessage(messages.errorMessage)}
+              {event === Event.BIRTH
+                ? intl.formatMessage(messages.birthErrorMessage)
+                : intl.formatMessage(messages.deathErrorMessage)}
             </ErrorText>
           )}
           <Actions id="select_parent_informant">
@@ -383,6 +521,28 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                 />
               )
             })}
+            {this.state.informant === INFORMANT.SOMEONE_ELSE &&
+              event === Event.DEATH && (
+                <ChildContainer>
+                  <InputField
+                    id="relationship"
+                    label={intl.formatMessage(messages.relationshipLabel)}
+                    touched={this.state.touched}
+                    hideAsterisk={true}
+                  >
+                    <TextInput
+                      id="relationship_input"
+                      name="relationship"
+                      isSmallSized={true}
+                      onChange={e =>
+                        this.handleRelationshipChange(e.target.value)
+                      }
+                      touched={this.state.touched}
+                    />
+                  </InputField>
+                  {this.renderPhoneNumberField()}
+                </ChildContainer>
+              )}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(messages.continueButton)}
@@ -414,6 +574,7 @@ export const SelectInformant = withRouter(
       goToMainContactPoint,
       goToBirthRegistrationAsParent,
       goToPrimaryApplicant,
+      goToDeathRegistration,
       modifyApplication
     }
   )(injectIntl(SelectInformantView))
