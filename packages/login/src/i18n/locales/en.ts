@@ -2,20 +2,20 @@ export const ENGLISH_STATE = {
   lang: 'en',
   messages: {
     'login.stepOneTitle': 'Login',
-    'login.stepOneInstruction': 'Please enter your mobile number and password.',
+    'login.stepOneInstruction': 'Please enter your User name and password.',
+    'login.username': 'User Name',
     'login.mobileLabel': 'Mobile number',
     'login.mobilePlaceholder': '07123456789',
     'login.passwordLabel': 'Password',
     'login.submit': 'Submit',
     'login.forgotPassword': 'Forgot password',
-    'login.submissionError':
-      'Sorry that mobile number and password did not work.',
+    'login.submissionError': 'Sorry that User name and password did not work.',
     'login.codeSubmissionError': 'Sorry that code did not work.',
     'login.tooManyLoginAttemptError':
       'Too many login attempts. You can try again after one minute.',
     'login.tooManyCodeAttemptError':
       'Too many code entry attempts. You can try again after one minute.',
-    'login.fieldMissing': 'Mobile No/Password required',
+    'login.fieldMissing': 'User name/Password required',
     'login.resentSMS': 'We just resent you another code to {number}',
     'login.stepTwoResendTitle': 'Verification code resent',
     'login.resendMobile': 'Resend SMS',

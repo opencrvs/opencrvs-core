@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
-import * as service from './service'
-import { createServer } from '../..'
+import * as service from '@notification/features/sms/service'
+import { createServer } from '@notification/index'
+import * as fetchAny from 'jest-fetch-mock'
 
+const fetch = fetchAny as any
 describe('Verify handlers', () => {
   let server: any
 
@@ -410,6 +411,97 @@ describe('Verify handlers', () => {
       payload: {
         msisdn: '447789778823',
         name: 'অনিক'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(500)
+  })
+  it('userCredentials returns OK if the sms gets sent', async () => {
+    const spy = fetch.once('')
+
+    const token = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/userCredentialsSMS',
+      payload: {
+        msisdn: '447789778823',
+        username: 'anik',
+        password: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(200)
+  })
+  it('userCredentials returns 400 if called with no username', async () => {
+    const spy = fetch.once('')
+
+    const token = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/userCredentialsSMS',
+      payload: {
+        msisdn: '447789778823',
+        password: 'B123456'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(spy).toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(400)
+  })
+  it('userCredentials returns 500 the sms is not sent', async () => {
+    const spy = jest
+      .spyOn(service, 'sendSMS')
+      .mockImplementationOnce(() => Promise.reject(new Error()))
+
+    const token = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:notification-user'
+      }
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/userCredentialsSMS',
+      payload: {
+        msisdn: '447789778823',
+        username: 'anik',
+        password: 'B123456'
       },
       headers: {
         Authorization: `Bearer ${token}`

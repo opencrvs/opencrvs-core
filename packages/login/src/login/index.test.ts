@@ -1,12 +1,16 @@
 import * as moxios from 'moxios'
-import * as actions from './actions'
-import { initialState } from './reducer'
-import { createStore, AppStore } from '../store'
+import * as actions from '@login/login/actions'
+import { initialState } from '@login/login/reducer'
+import { createStore, AppStore } from '@login/store'
 import { resolve } from 'url'
-import { client } from '../utils/authApi'
+import { client } from '@login/utils/authApi'
 
-import { getSubmissionError, getResentSMS, getsubmitting } from './selectors'
-import { mockState } from '../tests/util'
+import {
+  getSubmissionError,
+  getResentSMS,
+  getsubmitting
+} from '@login/login/selectors'
+import { mockState } from '@login/tests/util'
 
 describe('actions', () => {
   describe('authenticate', () => {
@@ -14,12 +18,12 @@ describe('actions', () => {
       const action = {
         type: actions.AUTHENTICATE,
         payload: {
-          mobile: '+8801711111111',
+          username: '+8801711111111',
           password: 'test'
         }
       }
       expect(
-        actions.authenticate({ mobile: '01711111111', password: 'test' })
+        actions.authenticate({ username: '+8801711111111', password: 'test' })
       ).toEqual(action)
     })
   })
@@ -48,7 +52,7 @@ describe('reducer', () => {
       submissionError: false,
       resentSMS: false,
       stepOneDetails: {
-        mobile: '+447111111111',
+        username: '+447111111111',
         password: 'test'
       }
     }
@@ -56,7 +60,7 @@ describe('reducer', () => {
     const action = {
       type: actions.AUTHENTICATE,
       payload: {
-        mobile: '+447111111111',
+        username: '+447111111111',
         password: 'test'
       }
     }
@@ -103,7 +107,8 @@ describe('reducer', () => {
       submissionError: false,
       resentSMS: true,
       authenticationDetails: {
-        nonce: '1234'
+        nonce: '1234',
+        mobile: ''
       }
     }
     const action = {
@@ -151,18 +156,9 @@ describe('reducer', () => {
       type: actions.AUTHENTICATE_VALIDATE,
       payload: 500
     }
-    expect(actions.authenticate({ mobile: '', password: 'test' })).toEqual(
+    expect(actions.authenticate({ username: '', password: 'test' })).toEqual(
       action
     )
-  })
-  it('return error code when validate mobile no format is checked', async () => {
-    const action = {
-      type: actions.AUTHENTICATE_VALIDATE,
-      payload: 503
-    }
-    expect(
-      actions.authenticate({ mobile: 'sd7111111111', password: 'test' })
-    ).toEqual(action)
   })
   it('AUTHENTICATE_VALIDATE return errorCode', async () => {
     const expectedState = {

@@ -27,6 +27,7 @@ export interface GQLQuery {
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
   fetchBirthRegistrationMetrics?: GQLBirthRegistrationMetrics
+  countEvents?: GQLEventCount
   searchEvents?: GQLEventSearchResultSet
   getRoles?: Array<GQLRole | null>
 }
@@ -281,6 +282,7 @@ export interface GQLRegistration {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
+  inProgress?: boolean
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
   duplicates?: Array<string | null>
@@ -303,6 +305,7 @@ export interface GQLRegWorkflow {
 }
 
 export enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
@@ -317,8 +320,9 @@ export interface GQLUser {
   username?: string
   mobile?: string
   role?: string
+  type?: string
   email?: string
-  active?: boolean
+  status?: string
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
 }
@@ -499,6 +503,12 @@ export interface GQLBirthRegistrationWithIn45D {
   totalEstimate?: number
 }
 
+export interface GQLEventCount {
+  declared?: number
+  registered?: number
+  rejected?: number
+}
+
 export interface GQLEventSearchResultSet {
   results?: Array<GQLEventSearchSet | null>
   totalItems?: number
@@ -559,6 +569,8 @@ export interface GQLMutation {
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsRegistered: string
   markDeathAsCertified: string
+  createUser: GQLUser
+  activateUser?: string
 }
 
 export interface GQLNotificationInput {
@@ -688,6 +700,7 @@ export interface GQLRegistrationInput {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
+  inProgress?: boolean
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
@@ -703,13 +716,21 @@ export interface GQLRegWorkflowInput {
 
 export interface GQLUserInput {
   name?: Array<GQLHumanNameInput | null>
+  identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
   role?: string
+  type?: string
   email?: string
-  active?: boolean
-  primaryOffice?: GQLLocationInput
-  catchmentArea?: Array<GQLLocationInput | null>
+  primaryOffice?: string
+  catchmentArea?: Array<string | null>
+  device?: string
+}
+
+export interface GQLUserIdentifierInput {
+  use?: string
+  system?: string
+  value?: string
 }
 
 export interface GQLCommentInput {
@@ -759,6 +780,11 @@ export interface GQLDeathRegistrationInput {
   causeOfDeath?: string
   createdAt?: GQLDate
   updatedAt?: GQLDate
+}
+
+export interface GQLSecurityQuestionAnswer {
+  questionKey?: string
+  answer?: string
 }
 
 export interface GQLDummy {
@@ -828,6 +854,7 @@ export interface GQLResolver {
   BirthKeyFiguresData?: GQLBirthKeyFiguresDataTypeResolver
   BirthRegistrationByAgeMetrics?: GQLBirthRegistrationByAgeMetricsTypeResolver
   BirthRegistrationWithIn45D?: GQLBirthRegistrationWithIn45DTypeResolver
+  EventCount?: GQLEventCountTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -862,6 +889,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchBirthRegistrationMetrics?: QueryToFetchBirthRegistrationMetricsResolver<
     TParent
   >
+  countEvents?: QueryToCountEventsResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
 }
@@ -1095,7 +1123,7 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
 export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
-  active?: boolean
+  status?: string
   role?: string
   primaryOfficeId?: string
   locationId?: string
@@ -1124,6 +1152,18 @@ export interface QueryToFetchBirthRegistrationMetricsResolver<
   (
     parent: TParent,
     args: QueryToFetchBirthRegistrationMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToCountEventsArgs {
+  locationIds?: Array<string | null>
+}
+export interface QueryToCountEventsResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToCountEventsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -1761,6 +1801,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
+  inProgress?: RegistrationToInProgressResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
   certificates?: RegistrationToCertificatesResolver<TParent>
   duplicates?: RegistrationToDuplicatesResolver<TParent>
@@ -1819,6 +1860,13 @@ export interface RegistrationToStatusResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToInProgressResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -1889,8 +1937,9 @@ export interface GQLUserTypeResolver<TParent = any> {
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
   role?: UserToRoleResolver<TParent>
+  type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
-  active?: UserToActiveResolver<TParent>
+  status?: UserToStatusResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
 }
@@ -1923,11 +1972,15 @@ export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface UserToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface UserToEmailResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToActiveResolver<TParent = any, TResult = any> {
+export interface UserToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2369,6 +2422,24 @@ export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLEventCountTypeResolver<TParent = any> {
+  declared?: EventCountToDeclaredResolver<TParent>
+  registered?: EventCountToRegisteredResolver<TParent>
+  rejected?: EventCountToRejectedResolver<TParent>
+}
+
+export interface EventCountToDeclaredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventCountToRegisteredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventCountToRejectedResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLEventSearchResultSetTypeResolver<TParent = any> {
   results?: EventSearchResultSetToResultsResolver<TParent>
   totalItems?: EventSearchResultSetToTotalItemsResolver<TParent>
@@ -2539,6 +2610,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
+  createUser?: MutationToCreateUserResolver<TParent>
+  activateUser?: MutationToActivateUserResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2754,6 +2827,32 @@ export interface MutationToMarkDeathAsCertifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkDeathAsCertifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateUserArgs {
+  user: GQLUserInput
+}
+export interface MutationToCreateUserResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToCreateUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToActivateUserArgs {
+  userId: string
+  password: string
+  securityQNAs: Array<GQLSecurityQuestionAnswer | null>
+}
+export interface MutationToActivateUserResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToActivateUserArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

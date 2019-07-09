@@ -46,7 +46,7 @@ export const colors = {
   copy: colorDictionary.blackStormy,
   placeholder: colorDictionary.greyDarkSteel,
   background: colorDictionary.greyPearl,
-  disabled: colorDictionary.greySmoky,
+  disabled: colorDictionary.greyGrey,
   success: colorDictionary.greenPeaPea,
   white: colorDictionary.white,
   black: colorDictionary.black,
@@ -60,8 +60,12 @@ export const colors = {
   gradientDark: colorDictionary.nightshadeDark,
   gradientLight: colorDictionary.nightshadeLight,
   secondaryLabel: colorDictionary.darkSteel,
+  previewBackground: colorDictionary.greyBlackMetal,
+
+  // Grey Scrollbar
+  scrollBarGrey: colorDictionary.greySteel,
 
   // Dividers
   dividerLight: colorDictionary.greyPearl,
-  dividerDark: colorDictionary.greyGrey
+  dividerDark: colorDictionary.greySmoky
 }

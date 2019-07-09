@@ -1,8 +1,8 @@
-import { Event } from 'src/forms'
-import * as moment from 'moment'
+import { Event } from '@register/forms'
+import moment from 'moment'
 
-const MONTH_IN_DAYS: number = 30
-const YEAR_IN_DAYS: number = 365
+const MONTH_IN_DAYS = 30
+const YEAR_IN_DAYS = 365
 
 interface IRange {
   start: number
@@ -44,6 +44,7 @@ export const dayRange: IDayRange = {
     [Event.BIRTH]: ranges,
     [Event.DEATH]: ranges
   },
+  // @ts-ignore
   getValue
 }
 

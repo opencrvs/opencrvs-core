@@ -1,5 +1,7 @@
-import { resolvers } from './root-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { resolvers } from '@gateway/features/search/root-resolvers'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -181,5 +183,86 @@ describe('Search root resolvers', () => {
       expect(result.results).toEqual([])
       expect(result.totalItems).toBe(0)
     })
+  })
+  describe('countEvents()', () => {
+    it('returns counts for different statuses of events', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            hits: {
+              total: 2,
+              hits: [
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} }
+              ]
+            }
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            hits: {
+              total: 3,
+              hits: [
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} }
+              ]
+            }
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }),
+          { status: 200 }
+        ]
+      )
+      const result = await resolvers.Query.countEvents(
+        {},
+        {
+          locationIds: ['1']
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.declared).toBe(2)
+      expect(result.registered).toBe(3)
+      expect(result.rejected).toBe(1)
+    })
+  })
+  it('in case of invalid respose from elastic, returns 0 as count for different statuses of events', async () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          hits: {}
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          hits: {}
+        }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({
+          hits: {}
+        }),
+        { status: 200 }
+      ]
+    )
+    const result = await resolvers.Query.countEvents(
+      {},
+      {
+        locationIds: ['1']
+      }
+    )
+
+    expect(result).toBeDefined()
+    expect(result.declared).toBe(0)
+    expect(result.registered).toBe(0)
+    expect(result.rejected).toBe(0)
   })
 })

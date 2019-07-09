@@ -1,21 +1,24 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from 'src/store'
-import { createTestComponent } from 'src/tests/util'
+import { createStore } from '@register/store'
+import { createTestComponent } from '@register/tests/util'
 import { RejectRegistrationForm } from '@opencrvs/register/src/components/review/RejectRegistrationForm'
-import { Event } from 'src/forms'
+import { Event } from '@register/forms'
+import { createApplication } from '@register/applications'
 
 const { store } = createStore()
 const mockHandler = jest.fn()
 
 describe('reject registration form', () => {
   let rejectFormComponent: ReactWrapper<{}, {}>
+  const draftApplication = createApplication(Event.BIRTH)
   beforeEach(async () => {
     const testComponent = createTestComponent(
       <RejectRegistrationForm
         onBack={mockHandler}
         duplicate={true}
         confirmRejectionEvent={mockHandler}
+        application={draftApplication}
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
         event={Event.BIRTH}
       />,

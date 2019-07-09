@@ -1,5 +1,5 @@
-import { getUserDetails, getUserLocation } from './userUtils'
-import { user, userDetails } from '../tests/util'
+import { getUserDetails, getUserLocation } from '@performance/utils/userUtils'
+import { user, userDetails } from '@performance/tests/util'
 import { cloneDeep } from 'lodash'
 
 describe('getUserDetails', () => {

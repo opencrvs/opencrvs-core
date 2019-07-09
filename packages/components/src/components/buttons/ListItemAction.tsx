@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Button, IButtonProps } from './Button'
 import { ExpansionButton } from './ExpansionButton'
+import { ArrowExpansionButton } from './ArrowExpansionButton'
 import { IAction } from '../interface/ListItem'
 import { TertiaryButton } from './TertiaryButton'
 
@@ -18,21 +18,34 @@ const ListItemSingleAction = styled(TertiaryButton).attrs<{
 }>({})`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
-const ExpansionSec = styled(ExpansionButton).attrs<{ isFullHeight?: boolean }>(
-  {}
-)`
+const ExpansionSecion = styled(ExpansionButton).attrs<{
+  isFullHeight?: boolean
+}>({})`
+  ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
+`
+const ArrowExpansionSecion = styled(ArrowExpansionButton).attrs<{
+  isFullHeight?: boolean
+}>({})`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
 interface IListItemActionProps {
   actions: IAction[]
   id?: string
   expanded?: boolean
+  arrowExpansion?: boolean
   isFullHeight?: boolean
   onExpand?: () => void
 }
 
 export function ListItemAction(props: IListItemActionProps) {
-  const { actions, expanded, onExpand, id, isFullHeight } = props
+  const {
+    actions,
+    expanded,
+    arrowExpansion,
+    onExpand,
+    id,
+    isFullHeight
+  } = props
   return (
     <Container id={id}>
       {actions &&
@@ -40,19 +53,26 @@ export function ListItemAction(props: IListItemActionProps) {
           <ListItemSingleAction
             isFullHeight={isFullHeight}
             key={action.label as string}
-            id={action.label as string}
+            id={`${id}-${action.label as string}`}
             onClick={action.handler}
           >
             {action.label}
           </ListItemSingleAction>
         ))}
-      {onExpand && (
-        <ExpansionSec
-          isFullHeight={isFullHeight}
-          expanded={expanded}
-          onClick={onExpand}
-        />
-      )}
+      {onExpand &&
+        ((arrowExpansion && (
+          <ArrowExpansionSecion
+            isFullHeight={isFullHeight}
+            expanded={expanded}
+            onClick={onExpand}
+          />
+        )) || (
+          <ExpansionSecion
+            isFullHeight={isFullHeight}
+            expanded={expanded}
+            onClick={onExpand}
+          />
+        ))}
     </Container>
   )
 }

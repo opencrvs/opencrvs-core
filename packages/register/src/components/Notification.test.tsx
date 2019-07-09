@@ -6,21 +6,23 @@ import {
   getItem,
   flushPromises,
   setItem
-} from 'src/tests/util'
+} from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
-import * as actions from 'src/notification/actions'
-import * as i18nActions from 'src/i18n/actions'
-import * as CommonUtils from 'src/utils/commonUtils'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import * as fetchAny from 'jest-fetch-mock'
+import { storage } from '@register/storage'
+import * as actions from '@register/notification/actions'
+import * as i18nActions from '@register/i18n/actions'
+import * as CommonUtils from '@register/utils/commonUtils'
+
+const fetch = fetchAny as any
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -130,6 +132,50 @@ describe('when app notifies the user', () => {
         expect(
           store.getState().notification.backgroundSyncMessageVisible
         ).toEqual(false)
+      })
+    })
+  })
+
+  describe('When user submits a form', () => {
+    describe('In case of successful submission', () => {
+      beforeEach(() => {
+        const action = actions.showSubmitFormSuccessToast('userFormSuccess')
+        store.dispatch(action)
+        app.update()
+      })
+
+      it('shows submit success toast', () => {
+        expect(app.find('#submissionSuccessToast').hostNodes()).toHaveLength(1)
+      })
+
+      it('clicking cancel button should hide the toast', () => {
+        app
+          .find('#submissionSuccessToastCancel')
+          .hostNodes()
+          .simulate('click')
+        app.update()
+        expect(store.getState().notification.submitFormSuccessToast).toBe(null)
+      })
+    })
+
+    describe('In case of failed submission', () => {
+      beforeEach(() => {
+        const action = actions.showSubmitFormErrorToast('userFormFail')
+        store.dispatch(action)
+        app.update()
+      })
+
+      it('shows submit fail toast', () => {
+        expect(app.find('#submissionErrorToast').hostNodes()).toHaveLength(1)
+      })
+
+      it('clicking cancel button should hide the toast', () => {
+        app
+          .find('#submissionErrorToastCancel')
+          .hostNodes()
+          .simulate('click')
+        app.update()
+        expect(store.getState().notification.submitFormErrorToast).toBe(null)
       })
     })
   })

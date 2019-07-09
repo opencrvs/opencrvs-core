@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { FACILITIES_SOURCE } from '../../../constants'
+import { FACILITIES_SOURCE } from '@resources/constants'
 import * as csv2json from 'csv2json'
 const crvsOfficeSourceJSON = `${FACILITIES_SOURCE}crvs-facilities.json`
 const healthFacilitySourceJSON = `${FACILITIES_SOURCE}health-facilities.json`

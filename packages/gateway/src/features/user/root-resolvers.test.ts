@@ -1,5 +1,7 @@
-import { resolvers } from './root-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import { resolvers } from '@gateway/features/user/root-resolvers'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -25,7 +27,7 @@ describe('User root resolvers', () => {
             'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
           salt: '12345',
           role: 'FIELD_AGENT',
-          active: true,
+          status: 'active',
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           catchmentAreaIds: [
@@ -63,7 +65,7 @@ describe('User root resolvers', () => {
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
         role: 'FIELD_AGENT',
-        active: true,
+        status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
         catchmentAreaIds: [
@@ -89,7 +91,7 @@ describe('User root resolvers', () => {
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
         role: 'FIELD_AGENT',
-        active: true,
+        status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
         catchmentAreaIds: [
@@ -115,7 +117,7 @@ describe('User root resolvers', () => {
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
         role: 'LOCAL_REGISTRAR',
-        active: true,
+        status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
         catchmentAreaIds: [
@@ -155,7 +157,7 @@ describe('User root resolvers', () => {
           mobile: '+8801733333333',
           email: 'test@test.org',
           role: 'LOCAL_REGISTRAR',
-          active: true,
+          status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
           count: 10,
@@ -166,6 +168,94 @@ describe('User root resolvers', () => {
 
       expect(response.totalItems).toBe(1)
       expect(response.results).toEqual([dummyUserList[2]])
+    })
+  })
+  describe('activateUser mutation', () => {
+    it('activates the pending user', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      const response = await resolvers.Mutation.activateUser(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          password: 'test',
+          securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+        }
+      )
+
+      expect(response).toEqual({
+        userId: 'ba7022f0ff4822'
+      })
+    })
+    it('throws error if /activateUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '401'
+        })
+      )
+
+      expect(
+        resolvers.Mutation.activateUser(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            password: 'test',
+            securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          }
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't activate given user"
+      )
+    })
+  })
+
+  describe('createUser mutation', () => {
+    const user = {
+      name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
+      identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
+      username: 'mohammad.ashraful',
+      mobile: '+8801733333333',
+      email: 'test@test.org',
+      role: 'LOCAL_REGISTRAR',
+      type: 'HOSPITAL',
+      status: 'active',
+      primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
+    }
+
+    it('creates user', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+
+      const response = await resolvers.Mutation.createUser({}, { user })
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('should throw error when /createUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '201'
+        }),
+        { status: 400 }
+      )
+
+      expect(resolvers.Mutation.createUser({}, { user })).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't create user"
+      )
     })
   })
 })

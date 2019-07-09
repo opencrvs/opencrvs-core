@@ -6,17 +6,20 @@ import {
 } from '@opencrvs/register/src/applications'
 import { Event } from '@opencrvs/register/src/forms'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from '@opencrvs/register/src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/register/src/navigation/routes'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
-import { queries } from 'src/profile/queries'
-import { createStore } from 'src/store'
-import { createTestComponent, mockUserResponseWithName } from 'src/tests/util'
-import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/birth/queries'
-import { GET_DEATH_REGISTRATION_FOR_REVIEW } from 'src/views/DataProvider/death/queries'
+import { queries } from '@register/profile/queries'
+import { createStore } from '@register/store'
+import {
+  createTestComponent,
+  mockUserResponseWithName
+} from '@register/tests/util'
+import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/birth/queries'
+import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/death/queries'
 import { v4 as uuid } from 'uuid'
-import { ReviewForm } from './ReviewForm'
+import { ReviewForm } from '@register/views/RegisterForm/ReviewForm'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -58,7 +61,7 @@ describe('ReviewForm tests', async () => {
         registerForm={form}
         scope={scope}
         event={application.event}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -220,7 +223,7 @@ describe('ReviewForm tests', async () => {
         staticContext={mock}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -380,7 +383,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -481,7 +484,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -508,7 +511,7 @@ describe('ReviewForm tests', async () => {
       .find(RegisterForm)
       .prop('application') as IApplication
 
-    expect(data.data.documents.image_uploader).toEqual([
+    expect(data.data.documents.imageUploader).toEqual([
       {
         optionValues: ['Mother', 'Birth Registration'],
         type: 'image/jpeg',
@@ -639,7 +642,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -717,7 +720,7 @@ describe('ReviewForm tests', async () => {
         scope={scope}
         event={application.event}
         registerForm={form}
-        tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
             applicationId: application.id,
@@ -948,7 +951,7 @@ describe('ReviewForm tests', async () => {
           staticContext={mock}
           event={application.event}
           registerForm={getReviewForm(store.getState()).death}
-          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
               applicationId: application.id,
@@ -1196,7 +1199,7 @@ describe('ReviewForm tests', async () => {
           staticContext={mock}
           event={application.event}
           registerForm={getReviewForm(store.getState()).death}
-          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
               applicationId: application.id,
@@ -1286,7 +1289,7 @@ describe('ReviewForm tests', async () => {
           scope={scope}
           event={application.event}
           registerForm={form}
-          tabRoute={REVIEW_EVENT_PARENT_FORM_TAB}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
               draftId: application.id,

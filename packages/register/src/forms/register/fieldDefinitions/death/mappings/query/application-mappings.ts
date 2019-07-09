@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from 'src/forms'
+import { IFormField, IFormData } from '@register/forms'
 import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
 
 export const phoneNumberToFieldTransformer = (
@@ -12,6 +12,7 @@ export const phoneNumberToFieldTransformer = (
       if (tel.system === 'phone' && tel.value) {
         transformedData[sectionId][field.name] = tel.value
       }
+      return tel
     })
   }
   return transformedData

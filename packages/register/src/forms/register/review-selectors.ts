@@ -1,5 +1,5 @@
-import { IReviewFormState } from './reviewReducer'
-import { IStoreState } from 'src/store'
+import { IReviewFormState } from '@register/forms/register/reviewReducer'
+import { IStoreState } from '@register/store'
 
 const getPartialState = (store: IStoreState): IReviewFormState =>
   store.reviewForm

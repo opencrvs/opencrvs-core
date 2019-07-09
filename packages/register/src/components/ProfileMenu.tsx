@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import {
   injectIntl,
   InjectedIntlProps,
@@ -13,13 +13,14 @@ import {
   LogoutBlack,
   AvatarSmall
 } from '@opencrvs/components/lib/icons'
-import { IStoreState } from 'src/store'
-import { IUserDetails } from 'src/utils/userUtils'
-import { getLanguage } from 'src/i18n/selectors'
-import { getUserDetails } from 'src/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { IUserDetails } from '@register/utils/userUtils'
+import { getLanguage } from '@register/i18n/selectors'
+import { getUserDetails } from '@register/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { redirectToAuthentication } from 'src/profile/profileActions'
-import { goToSettings } from 'src/navigation'
+import { roleMessages } from '@register/utils/roleTypeMessages'
+import { redirectToAuthentication } from '@register/profile/profileActions'
+import { goToSettings } from '@register/navigation'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -34,11 +35,6 @@ const UserRole = styled.div`
 `
 
 const messages = defineMessages({
-  LOCAL_SYSTEM_ADMIN: {
-    id: 'register.home.header.LOCAL_SYSTEM_ADMIN',
-    defaultMessage: 'Sysadmin',
-    description: 'The description for Sysadmin role'
-  },
   settings: {
     id: 'menu.items.settings',
     defaultMessage: 'Settings',
@@ -48,42 +44,12 @@ const messages = defineMessages({
     id: 'menu.items.logout',
     defaultMessage: 'Log out',
     description: 'Menu item logout'
-  },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
   }
 })
 
 interface IProps {
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   goToSettings: typeof goToSettings
 }
@@ -113,22 +79,26 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   getMenuHeader = (
     intl: InjectedIntl,
     language: string,
-    userDetails: IUserDetails
+    userDetails: IUserDetails | null
   ): JSX.Element => {
     let userName
     let userRole
 
-    if (userDetails) {
-      const nameObj =
-        userDetails.name &&
-        (userDetails.name.find(
-          (storedName: GQLHumanName) => storedName.use === language
-        ) as GQLHumanName)
-      userName =
-        nameObj && `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+    if (userDetails && userDetails.name) {
+      const nameObj = userDetails.name.find(
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
+      ) as GQLHumanName
+
+      if (nameObj) {
+        userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      }
+
       userRole =
         userDetails.role &&
-        intl.formatMessage(messages[userDetails.role as string])
+        intl.formatMessage(roleMessages[userDetails.role as string])
     } else {
       userName = ''
       userRole = ''

@@ -1,24 +1,30 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { authenticate, storeUserInformation } from './service'
+import {
+  authenticate,
+  storeUserInformation,
+  createToken
+} from '@auth/features/authenticate/service'
 import {
   generateVerificationCode,
   sendVerificationCode,
   generateNonce,
   storeVerificationCode
-} from 'src/features/verifyCode/service'
-import { logger } from 'src/logger'
+} from '@auth/features/verifyCode/service'
+import { logger } from '@auth/logger'
 import { unauthorized } from 'boom'
-import { PRODUCTION } from 'src/constants'
+import { PRODUCTION, WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
-  mobile: string
+  username: string
   password: string
 }
 
 interface IAuthResponse {
   nonce: string
   mobile: string
+  status: string
+  token?: string
 }
 
 export default async function authenticateHandler(
@@ -29,7 +35,7 @@ export default async function authenticateHandler(
   let result
 
   try {
-    result = await authenticate(payload.mobile, payload.password)
+    result = await authenticate(payload.username, payload.password)
   } catch (err) {
     throw unauthorized()
   }
@@ -56,15 +62,31 @@ export default async function authenticateHandler(
     await sendVerificationCode(result.mobile, verificationCode)
   }
 
-  return { mobile: result.mobile, nonce }
+  const respose: IAuthResponse = {
+    mobile: result.mobile,
+    status: result.status,
+    nonce
+  }
+
+  if (respose.status && respose.status === 'pending') {
+    respose.token = await createToken(
+      result.userId,
+      result.scope,
+      WEB_USER_JWT_AUDIENCES,
+      JWT_ISSUER
+    )
+  }
+  return respose
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string(),
+  username: Joi.string(),
   password: Joi.string()
 })
 
 export const responseSchema = Joi.object({
   nonce: Joi.string(),
-  mobile: Joi.string()
+  mobile: Joi.string(),
+  status: Joi.string(),
+  token: Joi.string().optional()
 })

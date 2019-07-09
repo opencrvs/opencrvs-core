@@ -1,4 +1,4 @@
-import { Events } from './handler'
+import { Events } from '@workflow/features/events/handler'
 
 const enum Scopes {
   DECLARE = 'declare',
@@ -8,12 +8,14 @@ const enum Scopes {
 
 function getEventToScopeMap() {
   return {
+    [Events.BIRTH_IN_PROGRESS_DEC]: [Scopes.DECLARE],
     [Events.BIRTH_NEW_DEC]: [Scopes.DECLARE, Scopes.REGISTER],
     [Events.BIRTH_NEW_REG]: [Scopes.REGISTER],
     [Events.BIRTH_UPDATE_DEC]: [],
     [Events.BIRTH_MARK_REG]: [Scopes.REGISTER],
     [Events.BIRTH_MARK_CERT]: [Scopes.CERTIFY],
     [Events.BIRTH_MARK_VOID]: [Scopes.DECLARE, Scopes.REGISTER, Scopes.CERTIFY],
+    [Events.DEATH_IN_PROGRESS_DEC]: [Scopes.DECLARE],
     [Events.DEATH_NEW_DEC]: [Scopes.DECLARE, Scopes.REGISTER],
     [Events.DEATH_NEW_REG]: [Scopes.REGISTER],
     [Events.DEATH_UPDATE_DEC]: [],

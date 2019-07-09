@@ -1,6 +1,7 @@
 import { model, Schema, Document } from 'mongoose'
+import { statuses } from '@user-mgnt/utils/userUtils'
 
-interface IUserName {
+export interface IUserName {
   use: string
   family: string
   given: string[]
@@ -10,7 +11,10 @@ interface IIdentifier {
   system: string
   value: string
 }
-
+interface ISecurityQuestionAnswer {
+  questionKey: string
+  answerHash: string
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -25,13 +29,15 @@ export interface IUser {
   primaryOfficeId: string
   catchmentAreaIds: string[]
   scope: string[]
-  active: boolean
+  status: string
   deviceId?: string
+  securityQuestionAnswers?: ISecurityQuestionAnswer[]
   creationDate: number
 }
 
 export interface IUserModel extends IUser, Document {}
 
+// tslint:disable-next-line
 const UserNameSchema = new Schema(
   {
     use: String,
@@ -40,11 +46,19 @@ const UserNameSchema = new Schema(
   },
   { _id: false }
 )
-
+// tslint:disable-next-line
 const IdentifierSchema = new Schema(
   {
     system: String,
     value: String
+  },
+  { _id: false }
+)
+// tslint:disable-next-line
+const SecurityQuestionAnswerSchema = new Schema(
+  {
+    questionKey: String,
+    answerHash: String
   },
   { _id: false }
 )
@@ -63,7 +77,12 @@ const userSchema = new Schema({
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
   scope: { type: [String], required: true },
-  active: { type: Boolean, default: true },
+  status: {
+    type: String,
+    enum: [statuses.PENDING, statuses.ACTIVE, statuses.DISABLED],
+    default: statuses.PENDING
+  },
+  securityQuestionAnswers: [SecurityQuestionAnswerSchema],
   deviceId: String,
   creationDate: { type: Number, default: Date.now }
 })

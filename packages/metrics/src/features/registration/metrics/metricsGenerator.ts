@@ -1,4 +1,4 @@
-import { readPoints } from 'src/influxdb/client'
+import { readPoints } from '@metrics/influxdb/client'
 import {
   ageIntervals,
   calculateInterval,
@@ -6,16 +6,16 @@ import {
   fetchEstimateByLocation,
   IPoint,
   LABEL_FOMRAT
-} from 'src/features/registration/metrics/utils'
+} from '@metrics/features/registration/metrics/utils'
 import * as moment from 'moment'
-import { IAuthHeader } from '..'
+import { IAuthHeader } from '@metrics/features/registration'
 import {
   MALE,
   FEMALE,
   WITHIN_45_DAYS,
   WITHIN_45_DAYS_TO_1_YEAR,
   WITHIN_1_YEAR
-} from './constants'
+} from '@metrics/features/registration/metrics/constants'
 
 interface IGroupedByGender {
   total: number
@@ -44,9 +44,8 @@ export async function regByAge(timeStart: string, timeEnd: string) {
   const metricsData: any[] = []
   for (const ageInterval of ageIntervals) {
     const points = await readPoints(
-      `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > ${
-        ageInterval.minAgeInDays
-      } AND age_in_days <= ${ageInterval.maxAgeInDays}`
+      // tslint:disable-next-line
+      `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > ${ageInterval.minAgeInDays} AND age_in_days <= ${ageInterval.maxAgeInDays}`
     )
 
     metricsData.push({
@@ -71,8 +70,8 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
 
   const total =
     (points &&
-      points.reduce((total: IPoint, point: IPoint) => ({
-        count: total.count + point.count
+      points.reduce((pointsTotal: IPoint, point: IPoint) => ({
+        count: pointsTotal.count + point.count
       }))) ||
     0
   const label = LABEL_FOMRAT[interval]

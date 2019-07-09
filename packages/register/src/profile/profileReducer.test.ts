@@ -1,8 +1,8 @@
-import * as actions from './profileActions'
-import { initialState } from './profileReducer'
-import { createStore, AppStore } from '../store'
-import { mockUserResponse } from 'src/tests/util'
-import { storage } from 'src/storage'
+import * as actions from '@register/profile/profileActions'
+import { initialState } from '@register/profile/profileReducer'
+import { createStore, AppStore } from '@register/store'
+import { mockUserResponse } from '@register/tests/util'
+import { storage } from '@register/storage'
 
 storage.removeItem = jest.fn()
 

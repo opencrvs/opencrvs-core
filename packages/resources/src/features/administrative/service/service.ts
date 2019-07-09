@@ -1,7 +1,7 @@
-import { FHIR_URL } from 'src/constants'
+import { FHIR_URL } from '@resources/constants'
 import fetch from 'node-fetch'
-import { generateLocationResource } from 'src/features/facilities/scripts/service'
-import { ILocation } from 'src/features/utils/bn'
+import { generateLocationResource } from '@resources/features/facilities/scripts/service'
+import { ILocation } from '@resources/features/utils/bn'
 
 export interface ILocationDataResponse {
   data: ILocation[]

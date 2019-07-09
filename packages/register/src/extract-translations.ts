@@ -1,9 +1,10 @@
+/* eslint-disable */
 import * as fs from 'fs'
-import * as glob from 'glob'
+import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { ENGLISH_STATE } from './i18n/locales/en'
-import { BENGALI_STATE } from './i18n/locales/bn'
+import { ENGLISH_STATE } from '@register/i18n/locales/en'
+import { BENGALI_STATE } from '@register/i18n/locales/bn'
 import { Parser } from 'json2csv'
 
 interface ITranslationCSVItem {
@@ -30,9 +31,10 @@ function buildTranslationsCSVData(
   const data: ITranslationCSVItem[] = []
   Object.keys(source).forEach(key => {
     const translation: ITranslationCSVItem = {
+      // eslint-disable-next-line @typescript-eslint/camelcase
       Translation_Key: key,
       Value: translations[key],
-      // tslint:disable-next-line:no-string-literal
+      // eslint-disable-line no-string-literal
       Description: source[key]['description']
     }
     data.push(translation)
@@ -44,7 +46,7 @@ async function extractMessages() {
   let results: any[] = []
   const pattern = 'src/**/*.@(tsx|ts)'
   try {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-line no-console
     console.log(`${chalk.yellow('Checking translations in application ...')}`)
     glob(pattern, (err: any, files) => {
       if (err) {
@@ -56,7 +58,7 @@ async function extractMessages() {
         res = main(contents)
         results = results.concat(res)
       })
-      const reactIntlSource = {}
+      const reactIntlSource: IReactIntlSource = {}
 
       results.forEach(r => {
         reactIntlSource[r.id] = {
@@ -72,7 +74,7 @@ async function extractMessages() {
       Object.keys(reactIntlSource).forEach(key => {
         if (!englishTranslations.hasOwnProperty(key)) {
           missingKeys = true
-          // tslint:disable-next-line:no-console
+          // eslint-disable-line no-console
           console.log(
             `${chalk.red(
               `No translation key exists for message id: ${chalk.white(
@@ -83,7 +85,7 @@ async function extractMessages() {
         }
         if (!bengaliTranslations.hasOwnProperty(key)) {
           missingKeys = true
-          // tslint:disable-next-line:no-console
+          // eslint-disable-line no-console
           console.log(
             `${chalk.redBright(
               `No translation key exists for message id: ${chalk.white(
@@ -95,7 +97,7 @@ async function extractMessages() {
       })
 
       if (missingKeys) {
-        // tslint:disable-next-line:no-console
+        // eslint-disable-line no-console
         console.log(
           `${chalk.red('WARNING: ')}${chalk.yellow(
             'Fix missing keys in locale files first.'
@@ -118,7 +120,7 @@ async function extractMessages() {
       fs.writeFileSync(`src/i18n/locales/en.csv`, englishLanguageCSV)
     })
   } catch (err) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-line no-console
     console.log(err)
     process.exit(1)
     return

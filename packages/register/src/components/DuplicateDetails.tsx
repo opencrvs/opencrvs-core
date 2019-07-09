@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, Chip } from '@opencrvs/components/lib/interface'
-import styled from 'src/styled-components'
+import styled from '@register/styledComponents'
 import {
   StatusGray,
   StatusOrange,
@@ -12,10 +12,10 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { goToTab as goToTabAction } from 'src/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
+import { goToPage as goToPageAction } from '@register/navigation'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import Moment from 'react-moment'
-import { getRejectionReasonDisplayValue } from 'src/views/SearchResult/SearchResult'
+import { getRejectionReasonDisplayValue } from '@register/views/SearchResult/SearchResult'
 
 export enum Event {
   BIRTH = 'BIRTH',
@@ -23,6 +23,7 @@ export enum Event {
 }
 
 export enum Action {
+  IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
@@ -63,10 +64,12 @@ interface IProps {
   }
   notDuplicateHandler?: () => void
   rejectHandler?: () => void
-  gotoTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   name: {
     id: 'register.duplicates.details.name',
     defaultMessage: 'Name',
@@ -392,8 +395,8 @@ class DuplicateDetailsClass extends React.Component<
             <PrimaryButton
               id={`review_link_${data.id}`}
               onClick={() => {
-                this.props.gotoTab(
-                  REVIEW_EVENT_PARENT_FORM_TAB,
+                this.props.goToPage(
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
                   data.id,
                   'review',
                   'birth',
@@ -426,6 +429,6 @@ class DuplicateDetailsClass extends React.Component<
 export const DuplicateDetails = connect(
   null,
   {
-    gotoTab: goToTabAction
+    goToPage: goToPageAction
   }
 )(injectIntl<IProps>(DuplicateDetailsClass))

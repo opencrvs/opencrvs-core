@@ -1,5 +1,5 @@
-import { getAuthenticated, getScope } from './profileSelectors'
-import { getInitialState } from '../tests/util'
+import { getAuthenticated, getScope } from '@register/profile/profileSelectors'
+import { getInitialState } from '@register/tests/util'
 
 describe('profileSelectors', () => {
   describe('selectors', () => {

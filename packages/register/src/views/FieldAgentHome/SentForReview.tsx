@@ -11,18 +11,18 @@ import {
   SUBMISSION_STATUS,
   IApplication,
   deleteApplication
-} from 'src/applications'
+} from '@register/applications'
 import {
   StatusSubmitted,
   StatusFailed24 as StatusFailed,
   StatusWaiting,
   StatusPendingOffline
 } from '@opencrvs/components/lib/icons'
-import { sentenceCase } from 'src/utils/data-formatting'
+import { sentenceCase } from '@register/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { calculateDays } from '../PrintCertificate/calculatePrice'
-import styled from 'src/styled-components'
-import { goToApplicationDetails } from 'src/navigation'
+import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
+import styled from '@register/styledComponents'
+import { goToApplicationDetails } from '@register/navigation'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -70,11 +70,6 @@ const messages = {
   }
 }
 
-// Might add a size prop to our Spinner lib component
-const SmallSpinner = styled(Spinner)`
-  width: 24px;
-  height: 24px;
-`
 interface ISentForReviewProps {
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
@@ -113,13 +108,12 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
     let icon: () => React.ReactNode
     let statusText: string
-    let overwriteStatusIfOffline: boolean = true
+    let overwriteStatusIfOffline = true
     let iconId: string
-
     switch (status) {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
         iconId = `submitting${index}`
-        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
@@ -221,13 +215,12 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           index,
           draft.trackingId
         )
-
         return {
           id: draft.id,
           event: (draft.event && sentenceCase(draft.event)) || '',
           name: name || '',
-          submission_status: statusText || '',
-          status_indicator: icon ? [icon()] : null,
+          submissionStatus: statusText || '',
+          statusIndicator: icon ? [icon()] : null,
           rowClickHandler: [
             {
               label: 'rowClickHandler',
@@ -271,7 +264,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             {
               label: this.props.intl.formatMessage(messages.submissionStatus),
               width: 35,
-              key: 'submission_status',
+              key: 'submissionStatus',
               color: getTheme(window.config.COUNTRY, window.config.LANGUAGE)
                 .colors.secondaryLabel
             },
@@ -279,7 +272,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               label: '',
               width: 5,
               alignment: ColumnContentAlignment.CENTER,
-              key: 'status_indicator'
+              key: 'statusIndicator'
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}

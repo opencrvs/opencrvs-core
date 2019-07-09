@@ -7,25 +7,6 @@ const InputHeader = styled.div`
   display: flex;
   justify-content: space-between;
 `
-
-const Optional = styled.span.attrs<
-  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.placeholder};
-  flex-grow: 0;
-`
-
-const Required = styled.span.attrs<
-  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
-  color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.error};
-  flex-grow: 0;
-`
-
 const ComponentWrapper = styled.span`
   display: flex;
 `
@@ -64,7 +45,7 @@ export interface IInputFieldProps {
   error?: string
   prefix?: string | JSX.Element
   postfix?: string | JSX.Element
-  optionalLabel: string
+  optionalLabel?: string
   children: React.ReactNode
   ignoreMediaQuery?: boolean
   hideAsterisk?: boolean
@@ -116,11 +97,10 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
               disabled={this.props.disabled}
               ignoreMediaQuery={ignoreMediaQuery}
               color={color}
+              required={required}
+              hideAsterisk={hideAsterisk}
             >
               {label}
-              {required && !hideAsterisk && (
-                <Required disabled={this.props.disabled}>&nbsp;*</Required>
-              )}
             </InputLabel>
           )}
         </InputHeader>

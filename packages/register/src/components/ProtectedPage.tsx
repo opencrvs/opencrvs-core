@@ -1,17 +1,19 @@
 import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
-import { SecureAccount } from 'src/views/SecureAccount/SecureAccountView'
-import { Unlock } from 'src/views/Unlock/Unlock'
-import { storage } from 'src/storage'
+import { SecureAccount } from '@register/views/SecureAccount/SecureAccountView'
+import { Unlock } from '@register/views/Unlock/Unlock'
+import { storage } from '@register/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
-import { isMobileDevice } from 'src/utils/commonUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-
+import { USER_DETAILS } from '@register/utils/userUtils'
+import { ProtectedAccount } from '@register/components/ProtectedAccount'
 export const SCREEN_LOCK = 'screenLock'
 
 interface IProtectPageState {
   secured: boolean
   pinExists: boolean
+  pendingUser: boolean
 }
 class ProtectedPageComponent extends React.Component<
   RouteComponentProps<{}>,
@@ -21,7 +23,8 @@ class ProtectedPageComponent extends React.Component<
     super(props)
     this.state = {
       secured: true,
-      pinExists: true
+      pinExists: true,
+      pendingUser: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -39,6 +42,12 @@ class ProtectedPageComponent extends React.Component<
       newState.pinExists = true
     } else {
       newState.pinExists = false
+    }
+    const userDetails = JSON.parse(
+      (await storage.getItem(USER_DETAILS)) || '{}'
+    )
+    if (userDetails && userDetails.status && userDetails.status === 'pending') {
+      newState.pendingUser = true
     }
     this.setState(newState)
   }
@@ -71,8 +80,9 @@ class ProtectedPageComponent extends React.Component<
   }
 
   render() {
-    const { secured, pinExists } = this.state
+    const { pendingUser, secured, pinExists } = this.state
     return (
+      (pendingUser && <ProtectedAccount />) ||
       (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
       (isMobileDevice() && (
         <PageVisibility onChange={this.handleVisibilityChange}>

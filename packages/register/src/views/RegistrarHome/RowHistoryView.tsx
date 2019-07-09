@@ -17,8 +17,8 @@ import {
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
+} from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 import {
   LANG_EN,
   REJECTED,
@@ -28,14 +28,15 @@ import {
   CERTIFICATE_DATE_FORMAT,
   DECLARED,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
-} from 'src/utils/constants'
-import { messages } from 'src/search/messages'
-import * as moment from 'moment'
+} from '@register/utils/constants'
+import { messages } from '@register/search/messages'
+import moment from 'moment'
 import {
   StatusGreen,
   StatusOrange,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -106,7 +107,7 @@ const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
-  margin-top: 100px;
+  margin: 25px;
 `
 
 function LabelValue({ label, value }: { label: string; value: string }) {
@@ -134,6 +135,7 @@ function formatRoleCode(str: string) {
   sections.map(section => {
     section = section.charAt(0) + section.slice(1).toLowerCase()
     formattedString.push(section)
+    return section
   })
 
   return formattedString.join(' ')
@@ -152,11 +154,13 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     const type = (registration && registration.type) || ''
     let name
     let dateOfEvent
-    let contactInfo: GQLContactPoint | undefined | null
+    let contactNumber: string | undefined | null
     if (type.toLowerCase() === 'birth') {
       const birthReg = data && (data.fetchRegistration as GQLBirthRegistration)
       name = (birthReg.child && birthReg.child.name) || []
       dateOfEvent = birthReg.child && birthReg.child.birthDate
+      contactNumber =
+        birthReg.registration && birthReg.registration.contactPhoneNumber
     } else {
       const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
       name = (deathReg.deceased && deathReg.deceased.name) || []
@@ -165,11 +169,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         deathReg.deceased.deceased &&
         deathReg.deceased.deceased.deathDate
       const informant = deathReg && deathReg.informant
-      contactInfo =
+      contactNumber =
         informant &&
         informant.individual &&
         informant.individual.telecom &&
-        informant.individual.telecom[0]
+        informant.individual.telecom[0] &&
+        (informant.individual.telecom[0] as GQLContactPoint).value
     }
 
     return {
@@ -181,6 +186,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
           )) ||
         '',
+      contactNumber,
       statuses:
         (registration &&
           registration.status &&
@@ -198,7 +204,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
-                      messages[status.user.role as string]
+                      roleMessages[status.user.role as string]
                     )
                   : '',
               officeName:
@@ -220,8 +226,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     (status.comments as GQLComment[]) || [],
                     REJECT_COMMENTS
                   )) ||
-                '',
-              informantContactNumber: contactInfo && contactInfo.value
+                ''
             }
           })) ||
         []
@@ -280,7 +285,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             id: this.props.eventId
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data?: any
+          }) => {
             if (error) {
               Sentry.captureException(error)
               return (
@@ -317,6 +330,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     </label>
                     <BoldSpan>{transformedData.dateOfEvent}</BoldSpan>
                   </ExpansionContainer>
+                  <ExpansionContainer>
+                    <label>
+                      {intl.formatMessage(messages.informantContact)}:
+                    </label>
+                    <BoldSpan>{transformedData.contactNumber}</BoldSpan>
+                  </ExpansionContainer>
                 </BorderedPaddedContent>
                 <>
                   {transformedData.statuses
@@ -325,8 +344,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         practitionerName,
                         practitionerRole,
                         rejectReasons,
-                        rejectComments,
-                        informantContactNumber
+                        rejectComments
                       } = status
                       const type = status.type as string
                       const officeName = status.officeName as string
@@ -345,14 +363,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                                 )}
                                 value={timestamp}
                               />
-                              {type === DECLARED && informantContactNumber && (
-                                <LabelValue
-                                  label={intl.formatMessage(
-                                    messages.informantContact
-                                  )}
-                                  value={informantContactNumber}
-                                />
-                              )}
                               <ValueContainer>
                                 <StyledLabel>
                                   {this.props.intl.formatMessage(

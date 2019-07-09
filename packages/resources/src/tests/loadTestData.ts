@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import chalk from 'chalk'
-import { TEST_SOURCE } from '../constants'
-import { sendToFhir } from '../features/utils/bn'
+import { TEST_SOURCE } from '@resources/constants'
+import { sendToFhir } from '@resources/features/utils/bn'
 import { Response } from 'node-fetch'
 
 // tslint:disable-next-line:no-console
@@ -27,6 +27,7 @@ async function importTestData(
       'location'
     ) as string
     location.id = locationHeader.split('/')[3]
+    // tslint:disable-next-line:no-console
     console.log('Location saved: ', locationHeader.split('/')[3])
     newLocations.push(location)
   }

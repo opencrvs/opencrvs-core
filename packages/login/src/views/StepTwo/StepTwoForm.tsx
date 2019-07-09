@@ -1,8 +1,7 @@
-import { Field, WrappedFieldProps } from 'redux-form'
+import { Field, WrappedFieldProps, InjectedFormProps } from 'redux-form'
 import * as React from 'react'
 import styled from 'styled-components'
 import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
-import { InjectedFormProps } from 'redux-form'
 
 import {
   TextInput,
@@ -11,7 +10,7 @@ import {
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
-import { stepTwoFields } from './stepTwoFields'
+import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
 
 import {
   Title,
@@ -21,14 +20,16 @@ import {
   LogoContainer,
   StyledButton,
   FieldWrapper
-} from '../StepOne/StepOneForm'
+} from '@login/views/StepOne/StepOneForm'
 
-import { IVerifyCodeNumbers } from '../../login/actions'
-import { Ii18nReduxFormFieldProps } from '../../utils/fieldUtils'
+import { IVerifyCodeNumbers } from '@login/login/actions'
+import { Ii18nReduxFormFieldProps } from '@login/utils/fieldUtils'
 
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
     defaultMessage: 'Verify your mobile',
@@ -95,6 +96,10 @@ export interface IDispatchProps {
 }
 
 type IStepTwoForm = IProps & IDispatchProps
+
+export type FullProps = InjectedIntlProps &
+  InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
+  IStepTwoForm
 const CodeInput = injectIntl(
   (
     props: WrappedFieldProps & {
@@ -125,11 +130,7 @@ const CodeInput = injectIntl(
   }
 )
 
-export class StepTwoForm extends React.Component<
-  InjectedIntlProps &
-    InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
-    IStepTwoForm
-> {
+export class StepTwoForm extends React.Component<FullProps> {
   render() {
     const {
       intl,

@@ -1,4 +1,4 @@
-import { roleTypeResolvers } from './type-resovlers'
+import { roleTypeResolvers } from '@gateway/features/role/type-resovlers'
 import * as fetch from 'jest-fetch-mock'
 
 beforeEach(() => {

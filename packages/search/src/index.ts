@@ -8,9 +8,9 @@ import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from './constants'
-import getPlugins from './config/plugins'
-import { getRoutes } from './config/routes'
+} from '@search/constants'
+import getPlugins from '@search/config/plugins'
+import { getRoutes } from '@search/config/routes'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 

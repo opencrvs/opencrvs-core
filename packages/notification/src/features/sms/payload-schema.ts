@@ -17,3 +17,9 @@ export const registrationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   name: Joi.string().required()
 })
+
+export const userCredentialsNotificationSchema = Joi.object({
+  msisdn: Joi.string().required(),
+  username: Joi.string().required(),
+  password: Joi.string().required()
+})

@@ -5,7 +5,7 @@ import {
   minLength,
   isNumber,
   phoneNumberFormat
-} from './validate'
+} from '@login/utils/validate'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {

@@ -1,50 +1,22 @@
-import { LinkButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  ArrowBack,
-  ArrowForward,
-  DraftSimple,
-  TickLarge
-} from '@opencrvs/components/lib/icons'
-import { Box, Modal } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-import * as Sentry from '@sentry/browser'
-import { isNull, isUndefined, merge } from 'lodash'
-// @ts-ignore - Required for mocking
-import * as debounce from 'lodash/debounce'
-import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import * as Swipeable from 'react-swipeable'
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
+import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
+  IPayload,
   modifyApplication,
-  SUBMISSION_STATUS
-} from 'src/applications'
-import {
-  FooterAction,
-  FooterPrimaryButton,
-  ViewFooter
-} from 'src/components/interface/footer'
-import { RejectRegistrationForm } from 'src/components/review/RejectRegistrationForm'
-import { CONFIRMATION_SCREEN, HOME } from 'src/navigation/routes'
-import { toggleDraftSavedNotification } from 'src/notification/actions'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { getOfflineState } from 'src/offline/selectors'
-import { getScope } from 'src/profile/profileSelectors'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
-import { isMobileDevice } from 'src/utils/commonUtils'
-import {
-  DECLARATION,
-  DUPLICATION,
-  OFFLINE,
-  REGISTERED,
-  REGISTRATION,
-  REJECTION
-} from 'src/utils/constants'
-import { FormFieldGenerator, ViewHeaderWithTabs } from '../../components/form'
+  SUBMISSION_STATUS,
+  writeApplication
+} from '@register/applications'
+
+import { FormFieldGenerator } from '@register/components/form'
+import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
   Action,
   Event,
@@ -52,64 +24,37 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData
-} from '../../forms'
+} from '@register/forms'
 import {
   goBack as goBackAction,
-  goToTab as goToTabAction
-} from '../../navigation'
-import styled from '../../styled-components'
-import { ReviewSection } from '../../views/RegisterForm/review/ReviewSection'
-import { StickyFormTabs } from './StickyFormTabs'
+  goToHome,
+  goToPage as goToPageAction
+} from '@register/navigation'
+import { toggleDraftSavedNotification } from '@register/notification/actions'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { HOME } from '@register/navigation/routes'
+import { getOfflineState } from '@register/offline/selectors'
+import { getScope } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import { Scope } from '@register/utils/authUtils'
+import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
+import { isNull, isUndefined, merge } from 'lodash'
+// @ts-ignore - Required for mocking
+import debounce from 'lodash/debounce'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
   color: ${({ theme }) => theme.colors.copy};
 `
-const FormActionSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-  margin: 0px -25px;
-`
-const FormAction = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 83px;
-  padding-left: 25px;
-`
-const FormActionDivider = styled.div`
-  border-bottom: 1px inset ${({ theme }) => theme.colors.placeholder};
+const FooterArea = styled.div`
+  margin: 24px 0px 48px;
 `
 
-const FormPrimaryButton = styled(PrimaryButton)`
-  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
-  height: 93px;
-`
-
-const BackButtonContainer = styled.div`
-  cursor: pointer;
-`
-
-const BackButton = styled(PrimaryButton)`
-  width: 69px;
-  height: 42px;
-  background: ${({ theme }) => theme.colors.primary};
-  justify-content: center;
-  border-radius: 21px;
-`
-
-const BackButtonText = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-  text-transform: uppercase;
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  margin-left: 14px;
-`
-
-const DraftButtonContainer = styled.div`
-  cursor: pointer;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
@@ -124,7 +69,9 @@ const CancelButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
 `
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newBirthRegistration: {
     id: 'register.form.newBirthRegistration',
     defaultMessage: 'New birth application',
@@ -199,19 +146,18 @@ export const messages = defineMessages({
     defaultMessage:
       'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
     description: 'The error message shown when a search query fails'
+  },
+  continueButton: {
+    id: 'register.selectVitalEvent.continueButton',
+    defaultMessage: 'Continue',
+    description: 'Continue Button Text'
+  },
+  saveExitButton: {
+    id: 'register.selectVitalEvent.saveExitButton',
+    defaultMessage: 'SAVE & EXIT',
+    description: 'SAVE & EXIT Button Text'
   }
 })
-
-const FormContainer = styled.div`
-  padding: 35px 25px;
-  padding-bottom: 0;
-`
-
-const FormViewContainer = styled.div`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-`
 
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
@@ -241,8 +187,8 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-function getActiveSectionId(form: IForm, viewParams: { tabId?: string }) {
-  return viewParams.tabId || form.sections[0].id
+function getActiveSectionId(form: IForm, viewParams: { pageId?: string }) {
+  return viewParams.pageId || form.sections[0].id
 }
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
@@ -257,31 +203,18 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
-function getPreviousSection(
-  sections: IFormSection[],
-  fromSection: IFormSection
-) {
-  const currentIndex = sections.findIndex(
-    (section: IFormSection) => section.id === fromSection.id
-  )
-
-  if (currentIndex === 0) {
-    return null
-  }
-
-  return sections[currentIndex - 1]
-}
-
 export interface IFormProps {
   application: IApplication
   registerForm: IForm
-  tabRoute: string
+  pageRoute: string
   duplicate?: boolean
 }
 
 type DispatchProps = {
-  goToTab: typeof goToTabAction
+  goToPage: typeof goToPageAction
   goBack: typeof goBackAction
+  goToHome: typeof goToHome
+  writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
@@ -294,17 +227,19 @@ type Props = {
   offlineResources: IOfflineDataState
 }
 
-type FullProps = IFormProps &
+export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
+  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
+    pageId: string
+    applicationId: string
+  }>
 
 type State = {
   showSubmitModal: boolean
   showRegisterModal: boolean
   isDataAltered: boolean
   rejectFormOpen: boolean
-  selectedTabId: string
   hasError: boolean
 }
 const VIEW_TYPE = {
@@ -312,43 +247,11 @@ const VIEW_TYPE = {
   PREVIEW: 'preview'
 }
 
-interface IFullName {
-  fullNameInBn: string
-  fullNameInEng: string
-}
-
-const getFullName = (childData: IFormSectionData): IFullName => {
-  let fullNameInBn = ''
-  let fullNameInEng = ''
-
-  if (childData.firstNames) {
-    fullNameInBn = `${String(childData.firstNames)} ${String(
-      childData.familyName
-    )}`
-  } else {
-    fullNameInBn = String(childData.familyName)
-  }
-
-  if (childData.firstNamesEng) {
-    fullNameInEng = `${String(childData.firstNamesEng)} ${String(
-      childData.familyNameEng
-    )}`
-  } else if (childData.familyNameEng) {
-    fullNameInEng = String(childData.familyNameEng)
-  }
-
-  return {
-    fullNameInBn,
-    fullNameInEng
-  }
-}
-
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
       showSubmitModal: false,
-      selectedTabId: '',
       isDataAltered: false,
       rejectFormOpen: false,
       showRegisterModal: false,
@@ -380,115 +283,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  rejectSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: application.data.registration.trackingId,
-      eventName: REJECTION,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      eventType: event,
-      trackingSection: true,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-
-    this.props.deleteApplication(application)
-  }
-
-  successfulSubmission = (response: string) => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const eventName = this.userHasRegisterScope() ? REGISTRATION : DECLARATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  offlineSubmission = () => {
-    const {
-      history,
-      application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackingSection: true,
-      eventName: OFFLINE,
-      eventType: event,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng
-    })
-    this.props.deleteApplication(application)
-  }
-
-  successfullyRegistered = (response: string) => {
-    const {
-      history,
-      application: application,
-      application: { event }
-    } = this.props
-    const personData =
-      event === Event.DEATH
-        ? this.props.application.data.deceased
-        : this.props.application.data.child
-    const fullName = getFullName(personData)
-    const duplicate = history.location.state && history.location.state.duplicate
-    const eventName = duplicate ? DUPLICATION : REGISTRATION
-
-    history.push(CONFIRMATION_SCREEN, {
-      trackNumber: response,
-      trackingSection: true,
-      eventName,
-      eventType: event,
-      actionName: REGISTERED,
-      fullNameInBn: fullName.fullNameInBn,
-      fullNameInEng: fullName.fullNameInEng,
-      duplicateContextId:
-        history.location.state && history.location.state.duplicateContextId
-    })
-    this.props.deleteApplication(application)
-  }
-
-  registrationOnError = (error: Error) => {
-    Sentry.captureException(error)
-    this.setState({
-      showRegisterModal: false,
-      hasError: true
-    })
-  }
-
   submitForm = () => {
     this.setState({ showSubmitModal: true })
   }
@@ -496,10 +290,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
-    action: string
+    action: string,
+    payload?: IPayload
   ) => {
     application.submissionStatus = submissionStatus
     application.action = action
+    application.payload = payload
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
   }
@@ -518,43 +314,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.setState((prevState: State) => ({
       showRegisterModal: !prevState.showRegisterModal
     }))
-  }
-
-  makeSwipe(deltaX: number, deltaY: number) {
-    if (Math.abs(deltaX) > Math.abs(deltaY * 4)) {
-      if (deltaX > 0) {
-        this.onSwiped(
-          this.props.application.id,
-          getNextSection(
-            this.props.registerForm.sections,
-            this.props.activeSection
-          ),
-          this.props.tabRoute,
-          this.props.application.event.toLowerCase()
-        )
-      } else {
-        this.onSwiped(
-          this.props.application.id,
-          getPreviousSection(
-            this.props.registerForm.sections,
-            this.props.activeSection
-          ),
-          this.props.tabRoute,
-          this.props.application.event.toLowerCase()
-        )
-      }
-    }
-  }
-
-  onSwiped = (
-    applicationId: string,
-    selectedSection: IFormSection | null,
-    tabRoute: string,
-    event: string
-  ): void => {
-    if (selectedSection) {
-      this.props.goToTab(tabRoute, applicationId, selectedSection.id, event)
-    }
   }
 
   generateSectionListForReview = (
@@ -594,16 +353,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onSaveAsDraftClicked = () => {
-    this.props.history.push('/')
+    this.props.writeApplication(this.props.application)
+    this.props.goToHome()
     this.props.toggleDraftSavedNotification()
+  }
+
+  continueButtonHandler = (
+    pageRoute: string,
+    applicationId: string,
+    pageId: string,
+    event: string
+  ) => {
+    this.props.writeApplication(this.props.application)
+    this.props.goToPage(pageRoute, applicationId, pageId, event)
   }
 
   render() {
     const {
-      goToTab,
-      goBack,
       intl,
-      activeSection,
       setAllFieldsDirty,
       application,
       history,
@@ -614,24 +381,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
     } = this.props
 
     const isReviewForm = application.review
+    let activeSection: IFormSection = this.props.activeSection
+
+    if (activeSection.viewType === 'hidden') {
+      const nextSec = getNextSection(registerForm.sections, activeSection)
+      if (nextSec) {
+        activeSection = nextSec
+      }
+    }
+
     const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
       ? messages.reviewEventRegistration
       : activeSection.viewType === VIEW_TYPE.PREVIEW
       ? messages.previewEventRegistration
       : messages.newVitalEventRegistration
-    const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
-    const sectionForReview = isReviewForm
-      ? this.generateSectionListForReview(
-          isReviewSection,
-          registerForm.sections
-        )
-      : registerForm.sections
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <FormViewContainer>
+      <Container id="informant_parent_view">
         {isErrorOccured && (
           <ErrorText id="error_message_section">
             {intl.formatMessage(messages.queryError)}
@@ -640,155 +409,112 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
         {!isErrorOccured && (
           <>
-            <ViewHeaderWithTabs
-              id="informant_parent_view"
+            <EventTopBar
               title={intl.formatMessage(title, { event: application.event })}
-            >
-              <StickyFormTabs
-                sections={sectionForReview}
-                activeTabId={activeSection.id}
-                onTabClick={(tabId: string) =>
-                  goToTab(
-                    this.props.tabRoute,
-                    application.id,
-                    tabId,
-                    application.event.toLowerCase()
-                  )
-                }
-              />
-            </ViewHeaderWithTabs>
-            <FormContainer>
-              <BodyContent>
-                <Swipeable
-                  disabled={isReviewSection || !isMobileDevice()}
-                  id="swipeable_block"
-                  trackMouse
-                  delta={50}
-                  onSwiped={(e: any, deltaX: number, deltaY: number) =>
-                    this.makeSwipe(deltaX, deltaY)
+              saveAction={{
+                handler: this.onSaveAsDraftClicked,
+                label: intl.formatMessage(messages.saveExitButton)
+              }}
+              menuItems={[
+                {
+                  label: 'Delete Application',
+                  handler: () => {
+                    this.props.deleteApplication(application)
+                    this.props.goToHome()
                   }
-                >
-                  {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-                    <ReviewSection
-                      tabRoute={this.props.tabRoute}
-                      draft={application}
-                      submitClickEvent={this.submitForm}
-                      saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                      deleteApplicationClickEvent={() => {
-                        this.props.deleteApplication(application)
-                        history.push('/')
-                      }}
-                    />
-                  )}
-                  {activeSection.viewType === VIEW_TYPE.REVIEW && (
-                    <ReviewSection
-                      tabRoute={this.props.tabRoute}
-                      draft={application}
-                      rejectApplicationClickEvent={() => {
-                        this.toggleRejectForm()
-                      }}
-                      registerClickEvent={this.registerApplication}
-                    />
-                  )}
-                  {activeSection.viewType === 'form' && (
-                    <Box>
-                      <FormSectionTitle
-                        id={`form_section_title_${activeSection.id}`}
+                }
+              ]}
+            />
+            <BodyContent>
+              <TertiaryButton
+                align={ICON_ALIGNMENT.LEFT}
+                icon={() => <BackArrow />}
+                onClick={this.props.goBack}
+              >
+                {intl.formatMessage(messages.back)}
+              </TertiaryButton>
+              {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={application}
+                  submitClickEvent={this.submitForm}
+                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
+                  deleteApplicationClickEvent={() => {
+                    this.props.deleteApplication(application)
+                    history.push('/')
+                  }}
+                />
+              )}
+              {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={application}
+                  rejectApplicationClickEvent={() => {
+                    this.toggleRejectForm()
+                  }}
+                  registerClickEvent={this.registerApplication}
+                />
+              )}
+              {activeSection.viewType === 'form' && (
+                <>
+                  <FormSectionTitle
+                    id={`form_section_title_${activeSection.id}`}
+                  >
+                    {intl.formatMessage(activeSection.title)}
+                    {activeSection.optional && (
+                      <Optional
+                        id={`form_section_opt_label_${activeSection.id}`}
+                        disabled={activeSection.disabled}
                       >
-                        {intl.formatMessage(activeSection.title)}
-                        {activeSection.optional && (
-                          <Optional
-                            id={`form_section_optional_label_${
-                              activeSection.id
-                            }`}
-                            disabled={activeSection.disabled}
-                          >
-                            &nbsp;&nbsp;•&nbsp;
-                            {intl.formatMessage(messages.optionalLabel)}
-                          </Optional>
-                        )}
-                      </FormSectionTitle>
-                      {activeSection.notice && (
-                        <Notice id={`form_section_notice_${activeSection.id}`}>
-                          {intl.formatMessage(activeSection.notice)}
-                        </Notice>
-                      )}
-                      <form
-                        id={`form_section_id_${activeSection.id}`}
-                        onSubmit={handleSubmit}
-                      >
-                        <FormFieldGenerator
-                          id={activeSection.id}
-                          onChange={values => {
-                            debouncedModifyApplication(
-                              values,
-                              activeSection,
-                              application
-                            )
-                          }}
-                          setAllFieldsDirty={setAllFieldsDirty}
-                          fields={activeSection.fields}
-                          offlineResources={offlineResources}
-                          draftData={application.data}
-                        />
-                      </form>
-                      <FormActionSection>
-                        <FormAction>
-                          {
-                            <BackButtonContainer onClick={goBack}>
-                              <BackButton icon={() => <ArrowBack />} />
-                              <BackButtonText>
-                                {intl.formatMessage(messages.back)}
-                              </BackButtonText>
-                            </BackButtonContainer>
-                          }
-                          {nextSection && (
-                            <FormPrimaryButton
-                              onClick={() =>
-                                goToTab(
-                                  this.props.tabRoute,
-                                  application.id,
-                                  nextSection.id,
-                                  application.event.toLowerCase()
-                                )
-                              }
-                              id="next_section"
-                              icon={() => <ArrowForward />}
-                            >
-                              {intl.formatMessage(messages.next)}
-                            </FormPrimaryButton>
-                          )}
-                        </FormAction>
-                        <FormActionDivider />
-                        <FormAction>
-                          {
-                            <DraftButtonContainer
-                              id="save_as_draft"
-                              onClick={() => this.onSaveAsDraftClicked()}
-                            >
-                              <DraftSimple />
-                              <LinkButton>
-                                {intl.formatMessage(messages.valueSaveAsDraft)}
-                              </LinkButton>
-                            </DraftButtonContainer>
-                          }
-                        </FormAction>
-                      </FormActionSection>
-                    </Box>
+                        &nbsp;&nbsp;•&nbsp;
+                        {intl.formatMessage(messages.optionalLabel)}
+                      </Optional>
+                    )}
+                  </FormSectionTitle>
+                  {activeSection.notice && (
+                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                      {intl.formatMessage(activeSection.notice)}
+                    </Notice>
                   )}
-                </Swipeable>
-              </BodyContent>
-            </FormContainer>
-            <ViewFooter>
-              <FooterAction>
-                <FooterPrimaryButton
-                  id="save_draft"
-                  onClick={() => history.push(CONFIRMATION_SCREEN)}
-                >
-                  {intl.formatMessage(messages.saveDraft)}
-                </FooterPrimaryButton>
-              </FooterAction>
-            </ViewFooter>
+                  <form
+                    id={`form_section_id_${activeSection.id}`}
+                    onSubmit={handleSubmit}
+                  >
+                    <FormFieldGenerator
+                      id={activeSection.id}
+                      onChange={values => {
+                        debouncedModifyApplication(
+                          values,
+                          activeSection,
+                          application
+                        )
+                      }}
+                      setAllFieldsDirty={setAllFieldsDirty}
+                      fields={activeSection.fields}
+                      offlineResources={offlineResources}
+                      draftData={application.data}
+                    />
+                  </form>
+                  {nextSection && (
+                    <FooterArea>
+                      <PrimaryButton
+                        id="next_section"
+                        onClick={() => {
+                          this.continueButtonHandler(
+                            this.props.pageRoute,
+                            application.id,
+                            nextSection.id,
+                            application.event.toLowerCase()
+                          )
+                        }}
+                      >
+                        {intl.formatMessage(messages.continueButton)}
+                      </PrimaryButton>
+                    </FooterArea>
+                  )}
+                </>
+              )}
+            </BodyContent>
           </>
         )}
 
@@ -875,18 +601,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
-            confirmRejectionEvent={this.rejectSubmission}
+            confirmRejectionEvent={this.confirmSubmission}
             duplicate={duplicate}
             draftId={application.id}
             event={this.getEvent()}
+            application={application}
           />
         )}
-      </FormViewContainer>
+      </Container>
     )
   }
 }
 
-function replaceInitialValues(fields: IFormField[], sectionValues: object) {
+export function replaceInitialValues(fields: IFormField[], sectionValues: any) {
   return fields.map(field => ({
     ...field,
     initialValue:
@@ -901,7 +628,7 @@ function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
     Props &
-    RouteComponentProps<{ tabId: string; applicationId: string }>
+    RouteComponentProps<{ pageId: string; applicationId: string }>
 ) {
   const { match, registerForm, application } = props
 
@@ -912,7 +639,7 @@ function mapStateToProps(
   )
 
   if (!activeSection) {
-    throw new Error(`Configuration for tab "${match.params.tabId}" missing!`)
+    throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
 
   if (!application) {
@@ -949,15 +676,22 @@ function mapStateToProps(
   }
 }
 
-export const RegisterForm = connect<Props, DispatchProps>(
+export const RegisterForm = connect<
+  Props,
+  DispatchProps,
+  FullProps,
+  IStoreState
+>(
   mapStateToProps,
   {
+    writeApplication,
     modifyApplication,
     deleteApplication,
-    goToTab: goToTabAction,
+    goToPage: goToPageAction,
     goBack: goBackAction,
+    goToHome,
     toggleDraftSavedNotification,
-    handleSubmit: values => {
+    handleSubmit: (values: any) => {
       console.log(values)
     }
   }

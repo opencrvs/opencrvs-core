@@ -1,5 +1,5 @@
-import { getDeathMutationMappings } from './mutations'
-import { Action } from 'src/forms'
+import { getDeathMutationMappings } from '@register/views/DataProvider/death/mutations'
+import { Action } from '@register/forms'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {
@@ -7,6 +7,8 @@ describe('When calling getDeathQueryMappings', () => {
     expect(query).not.toBe(null)
     if (query && query.dataKey) {
       expect(query.dataKey).toEqual('markDeathAsCertified')
+    } else {
+      throw new Error('Failed')
     }
   })
 

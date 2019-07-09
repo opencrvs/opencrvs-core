@@ -1,5 +1,13 @@
 import * as React from 'react'
-import { withFormik, FastField, Field, FormikProps, FieldProps } from 'formik'
+import {
+  withFormik,
+  FastField,
+  Field,
+  FormikProps,
+  FieldProps,
+  FormikTouched,
+  FormikValues
+} from 'formik'
 import { isEqual } from 'lodash'
 import {
   InjectedIntlProps,
@@ -27,9 +35,9 @@ import {
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData
-} from 'src/forms/utils'
+} from '@register/forms/utils'
 
-import styled, { keyframes } from 'src/styled-components'
+import styled, { keyframes } from '@register/styledComponents'
 
 import {
   IFormField,
@@ -65,21 +73,25 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   IForm,
-  IFormSection
-} from 'src/forms'
+  IFormSection,
+  FIELD_GROUP_TITLE,
+  SEARCH_FIELD
+} from '@register/forms'
 
-import { IValidationResult } from 'src/utils/validate'
-import { IOfflineDataState } from 'src/offline/reducer'
-import { getValidationErrorsForForm } from 'src/forms/validation'
-import { InputField } from 'src/components/form/InputField'
-import { SubSectionDivider } from 'src/components/form/SubSectionDivider'
+import { IValidationResult } from '@register/utils/validate'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { getValidationErrorsForForm } from '@register/forms/validation'
+import { InputField } from '@register/components/form/InputField'
+import { SubSectionDivider } from '@register/components/form/SubSectionDivider'
 
-import { FormList } from './FormList'
-import { ImageUploadField } from './ImageUploadField'
-import { FetchButtonField } from './FetchButton'
+import { FormList } from '@register/components/form/FormList'
+import { ImageUploadField } from '@register/components/form/ImageUploadField'
+import { FetchButtonField } from '@register/components/form/FetchButton'
 
-import { InformativeRadioGroup } from '../../views/PrintCertificate/InformativeRadioGroup'
-import { gqlToDraftTransformer } from 'src/transformer'
+import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
+import { gqlToDraftTransformer } from '@register/transformer'
+import { SearchField } from './SearchField'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -91,7 +103,13 @@ const FormItem = styled.div`
   animation: ${fadeIn} 500ms;
 `
 const LinkFormField = styled(Link)`
-  font-size: 15px;
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+const FieldGroupTitle = styled.div`
+  ${({ theme }) => theme.fonts.h4Style};
+  margin-top: 16px;
+  margin-bottom: -2.5em;
 `
 
 type GeneratedInputFieldProps = {
@@ -238,6 +256,9 @@ function GeneratedInputField({
       />
     )
   }
+  if (fieldDefinition.type === FIELD_GROUP_TITLE) {
+    return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
+  }
   if (fieldDefinition.type === PARAGRAPH) {
     const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
 
@@ -306,6 +327,20 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === SEARCH_FIELD) {
+    return (
+      <SearchField
+        fieldName={fieldDefinition.name}
+        fieldLabel={fieldDefinition.label}
+        isFieldRequired={fieldDefinition.required as boolean}
+        fieldValue={fieldDefinition.initialValue as IDynamicValues}
+        onModalComplete={(label: string, value: string) =>
+          onSetFieldValue(fieldDefinition.name, { label, value })
+        }
+      />
+    )
+  }
+
   if (fieldDefinition.type === FETCH_BUTTON) {
     return (
       <FetchButtonField
@@ -337,6 +372,7 @@ const mapFieldsToValues = (fields: IFormField[]) =>
     {}
   )
 
+type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
   fields: IFormField[]
   id: string
@@ -344,11 +380,16 @@ interface IFormSectionProps {
   offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
+  onSetTouched?: (func: ISetTouchedFunction) => void
 }
 
 type Props = IFormSectionProps &
   FormikProps<IFormSectionData> &
   InjectedIntlProps
+
+interface IQueryData {
+  [key: string]: any
+}
 
 class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
@@ -370,6 +411,10 @@ class FormSectionComponent extends React.Component<Props> {
   async componentDidMount() {
     if (this.props.setAllFieldsDirty) {
       this.showValidationErrors(this.props.fields)
+    }
+
+    if (this.props.onSetTouched) {
+      this.props.onSetTouched(this.props.setTouched)
     }
   }
 
@@ -491,7 +536,7 @@ class FormSectionComponent extends React.Component<Props> {
                       sections: [section]
                     } as IForm
 
-                    const queryData = {}
+                    const queryData: IQueryData = {}
                     queryData[this.props.id] = response
 
                     const transformedData = gqlToDraftTransformer(

@@ -2,7 +2,7 @@ import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
 
-import User, { IUserModel } from 'src/model/user'
+import User, { IUserModel } from '@user-mgnt/model/user'
 
 interface IVerifyPayload {
   userId: string
@@ -17,6 +17,7 @@ export default async function getUserMobile(
   h: Hapi.ResponseToolkit
 ) {
   const { userId } = request.payload as IVerifyPayload
+  // tslint:disable-next-line
   const user: IUserModel | null = await User.findById(userId)
 
   if (!user) {

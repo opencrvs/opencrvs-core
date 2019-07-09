@@ -1,112 +1,155 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import styled from '@register/styledComponents'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { Action, ActionList } from '@opencrvs/components/lib/buttons'
+import { connect } from 'react-redux'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import {
+  createApplication,
+  IApplication,
+  setInitialApplications,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
+import {
+  goBack,
+  goToBirthInformant,
+  goToDeathRegistration,
+  goToHome
+} from '@register/navigation'
 
-import { ViewHeader } from 'src/components/ViewHeader'
-import { goToBirthRegistration, goToDeathRegistration } from 'src/navigation'
-import { Dispatch } from 'redux'
-import { createApplication, storeApplication } from 'src/applications'
-import { Event } from 'src/forms'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   registerNewEventTitle: {
     id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New vital event application',
+    defaultMessage: 'New application',
     description: 'The title that appears on the select vital event page'
   },
-  registerNewEventDesc: {
-    id: 'register.selectVitalEvent.registerNewEventDesc',
-    defaultMessage: 'Start by selecting the event you want to declare.',
-    description: 'The description that appears on the select vital event page'
+  registerNewEventHeading: {
+    id: 'register.selectVitalEvent.registerNewEventHeading',
+    defaultMessage: 'What type of event do you want to declare?',
+    description: 'The section heading on the page'
   },
-  birthActionTitle: {
-    id: 'register.selectVitalEvent.birthActionTitle',
+  birth: {
+    id: 'register.selectVitalEvent.birth',
     defaultMessage: 'Birth',
-    description: 'The title for the birth event on an action component'
+    description: 'Birth Text'
   },
-  deathActionTitle: {
-    id: 'register.selectVitalEvent.deathActionTitle',
+  death: {
+    id: 'register.selectVitalEvent.death',
     defaultMessage: 'Death',
-    description: 'The title for the death event on an action component'
+    description: 'Death text'
   },
-  marriageActionTitle: {
-    id: 'register.selectVitalEvent.marriageActionTitle',
-    defaultMessage: 'Marriage',
-    description: 'The title for the marriage event on an action component'
+  continueButton: {
+    id: 'register.selectVitalEvent.continueButton',
+    defaultMessage: 'Continue',
+    description: 'Continue Button Text'
   },
-  divorceActionTitle: {
-    id: 'register.selectVitalEvent.divorceActionTitle',
-    defaultMessage: 'Divorce',
-    description: 'The title for the divorce event on an action component'
-  },
-  adoptionActionTitle: {
-    id: 'register.selectVitalEvent.adoptionActionTitle',
-    defaultMessage: 'Adoption',
-    description: 'The title for the adoption event on an action component'
+  errorMessage: {
+    id: 'register.selectVitalEvent.errorMessage',
+    defaultMessage: 'Please select the type of event',
+    description: 'Error Message to show when no event is being selected'
   }
 })
 
+const Title = styled.h4`
+  ${({ theme }) => theme.fonts.h4Style};
+  margin-bottom: 16px;
+`
+const Actions = styled.div`
+  padding: 32px 0;
+  & div:first-child {
+    margin-bottom: 16px;
+  }
+`
+
 class SelectVitalEventView extends React.Component<
   InjectedIntlProps & {
-    goToBirthRegistration: typeof goToBirthRegistration
-    goToDeathRegistration: () => void
+    goBack: typeof goBack
+    goToHome: typeof goToHome
+    storeApplication: typeof storeApplication
+    goToBirthInformant: typeof goToBirthInformant
+    goToDeathRegistration: typeof goToDeathRegistration
+    setInitialApplications: typeof setInitialApplications
   }
 > {
+  state = {
+    goTo: ''
+  }
+  handleContinue = () => {
+    let application: IApplication
+    switch (this.state.goTo) {
+      case 'birth':
+        application = createApplication(Event.BIRTH)
+        this.props.storeApplication(application)
+        this.props.goToBirthInformant(application.id)
+
+        break
+      case 'death':
+        application = createApplication(Event.DEATH)
+        this.props.storeApplication(application)
+        this.props.goToDeathRegistration(application.id)
+        break
+      default:
+        this.setState({ goTo: 'error' })
+    }
+  }
   render() {
     const { intl } = this.props
     return (
-      <>
-        <ViewHeader
+      <Container>
+        <EventTopBar
           title={intl.formatMessage(messages.registerNewEventTitle)}
-          description={intl.formatMessage(messages.registerNewEventDesc)}
-          id="select_vital_event_view"
+          goHome={this.props.goToHome}
         />
-        <ActionList>
-          <BodyContent>
-            <Action
+
+        <BodyContent>
+          <Title>{intl.formatMessage(messages.registerNewEventHeading)}</Title>
+          {this.state.goTo === 'error' && (
+            <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
+          )}
+          <Actions id="select_vital_event_view">
+            <RadioButton
+              size="large"
+              key="birthevent"
+              name="birthevent"
+              label={intl.formatMessage(messages.birth)}
+              value="birth"
               id="select_birth_event"
-              title={intl.formatMessage(messages.birthActionTitle)}
-              onClick={this.props.goToBirthRegistration}
+              selected={this.state.goTo === 'birth' ? 'birth' : ''}
+              onChange={() => this.setState({ goTo: 'birth' })}
             />
-            <Action
+            <RadioButton
+              size="large"
+              key="deathevent"
+              name="deathevent"
+              label={intl.formatMessage(messages.death)}
+              value="death"
               id="select_death_event"
-              title={intl.formatMessage(messages.deathActionTitle)}
-              onClick={this.props.goToDeathRegistration}
+              selected={this.state.goTo === 'death' ? 'death' : ''}
+              onChange={() => this.setState({ goTo: 'death' })}
             />
-            <Action
-              id="select_marriage_event"
-              title={intl.formatMessage(messages.marriageActionTitle)}
-              disabled
-            />
-            <Action
-              id="select_divorce_event"
-              title={intl.formatMessage(messages.divorceActionTitle)}
-              disabled
-            />
-            <Action
-              id="select_adoption_event"
-              title={intl.formatMessage(messages.adoptionActionTitle)}
-              disabled
-            />
-          </BodyContent>
-        </ActionList>
-      </>
+          </Actions>
+          <PrimaryButton id="continue" onClick={this.handleContinue}>
+            {intl.formatMessage(messages.continueButton)}
+          </PrimaryButton>
+        </BodyContent>
+      </Container>
     )
   }
 }
 
 export const SelectVitalEvent = connect(
   null,
-  function mapDispatchToProps(dispatch: Dispatch) {
-    return {
-      goToBirthRegistration: () => dispatch(goToBirthRegistration()),
-      goToDeathRegistration: () => {
-        const application = createApplication(Event.DEATH)
-        dispatch(storeApplication(application))
-        dispatch(goToDeathRegistration(application.id))
-      }
-    }
+  {
+    goBack,
+    goToHome,
+    storeApplication,
+    goToBirthInformant,
+    goToDeathRegistration,
+    setInitialApplications
   }
 )(injectIntl(SelectVitalEventView))

@@ -1,15 +1,24 @@
-import * as Hapi from 'hapi'
-import * as Joi from 'joi'
-
-import User, { IUser } from 'src/model/user'
-import { generateSaltedHash } from 'src/utils/password'
-import { logger } from 'src/logger'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
+  generateUsername,
   postFhir,
-  rollback
-} from './service'
+  rollback,
+  sendCredentialsNotification
+} from '@user-mgnt/features/createUser/service'
+import { logger } from '@user-mgnt/logger'
+import User, { IUser } from '@user-mgnt/model/user'
+import {
+  generateSaltedHash,
+  generateRandomPassowrd
+} from '@user-mgnt/utils/hash'
+import {
+  statuses,
+  roleScopeMapping,
+  hasDemoScope
+} from '@user-mgnt/utils/userUtils'
+import * as Hapi from 'hapi'
+import * as _ from 'lodash'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -21,6 +30,7 @@ export default async function createUser(
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null
+  let autoGenPassword = null
   try {
     const practitioner = createFhirPractitioner(user)
     practitionerId = await postFhir(token, practitioner)
@@ -29,6 +39,7 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
+    user.role = user.role ? user.role : 'FIELD_AGENT'
     const role = createFhirPractitionerRole(user, practitionerId)
     roleId = await postFhir(token, role)
     if (!roleId) {
@@ -37,13 +48,17 @@ export default async function createUser(
       )
     }
 
-    if (user.password) {
-      const { hash, salt } = generateSaltedHash(user.password)
-      user.salt = salt
-      user.passwordHash = hash
-      delete user.password
-    }
+    user.status = statuses.PENDING
+    user.scope = roleScopeMapping[user.role]
+    autoGenPassword = generateRandomPassowrd(hasDemoScope(request))
+
+    const { hash, salt } = generateSaltedHash(autoGenPassword)
+    user.salt = salt
+    user.passwordHash = hash
+
     user.practitionerId = practitionerId
+
+    user.username = await generateUsername(user.name)
   } catch (err) {
     await rollback(token, practitionerId, roleId)
     logger.error(err)
@@ -52,8 +67,9 @@ export default async function createUser(
   }
 
   // save user in user-mgnt data store
+  let userModelObject
   try {
-    await User.create(user)
+    userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)
     await rollback(token, practitionerId, roleId)
@@ -61,9 +77,10 @@ export default async function createUser(
     return h.response().code(400)
   }
 
-  return h.response().code(201)
-}
+  sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
+    Authorization: request.headers.authorization
+  })
 
-export const requestSchema = Joi.object({
-  userId: Joi.string().required()
-})
+  const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
+  return h.response(resUser).code(201)
+}

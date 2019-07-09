@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from 'src/forms'
+import { IFormField, IFormData } from '@register/forms'
 
 export const eventLocationMutationTransformer = (
   lineNumber: number = 0,

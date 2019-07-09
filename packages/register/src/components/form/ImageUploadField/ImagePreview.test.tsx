@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { createShallowRenderedComponent } from 'src/tests/util'
-import { ImagePreview } from './ImagePreview'
+import { createShallowRenderedComponent } from '@register/tests/util'
+import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
 
 describe('image upload component', () => {
   const mock = jest.fn()
@@ -12,6 +12,7 @@ describe('image upload component', () => {
         data: 'dummy base64 data'
       }}
       goBack={mock}
+      onDelete={mock}
     />
   )
 

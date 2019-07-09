@@ -31,7 +31,9 @@ interface IUsersListProps {
   users: User[]
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   title: { // 1.
     id: "usersList.title",
     defaultMessage: "Users:",

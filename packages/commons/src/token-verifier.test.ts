@@ -1,5 +1,7 @@
 import { verifyToken, validateFunc } from './token-verifier'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchMock from 'jest-fetch-mock'
+
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 describe('Token verifier module', () => {
   describe('.verifyToken()', () => {

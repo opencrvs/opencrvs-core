@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as fetch from 'jest-fetch-mock'
 import { createServer } from '../..'
 import {
   testFhirBundle,
@@ -16,9 +15,15 @@ import {
   testFhirBundleWithIdsForDeath,
   motherMock,
   compositionMock,
-  testDeathFhirBundle
-} from '../../test/utils'
+  testDeathFhirBundle,
+  testInProgressFhirBundle,
+  testInProgressDeathFhirBundle
+} from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
+
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 describe('Verify handler', () => {
   let server: any
@@ -81,6 +86,39 @@ describe('Verify handler', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    it('returns OK for a correctly authenticated user  with in-progress birth declaration', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testInProgressFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
     it('returns OK for a correctly authenticated user with death declaration', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -110,6 +148,39 @@ describe('Verify handler', () => {
         method: 'POST',
         url: '/fhir',
         payload: testDeathFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('returns OK for a correctly authenticated user  with in-progress death declaration', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Patient/12423/_history/1' }
+            }
+          ]
+        })
+      )
+
+      const token = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testInProgressDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -818,19 +889,29 @@ describe('markBirthAsCertifiedHandler handler', () => {
       })
     )
     const testCertificateFhirBundle = cloneDeep(testFhirBundleWithIds)
-    testCertificateFhirBundle.entry[1].resource.identifier.push({
-      system: 'http://opencrvs.org/specs/id/birth-registration-number',
-      value: '12345678'
-    })
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCertificateFhirBundle,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
+    if (
+      testCertificateFhirBundle &&
+      testCertificateFhirBundle.entry &&
+      testCertificateFhirBundle.entry[1] &&
+      testCertificateFhirBundle.entry[1].resource &&
+      testCertificateFhirBundle.entry[1].resource.identifier
+    ) {
+      const identifiers = testCertificateFhirBundle.entry[1].resource
+        .identifier as fhir.Identifier[]
+      identifiers.push({
+        system: 'http://opencrvs.org/specs/id/birth-registration-number',
+        value: '12345678'
+      })
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testCertificateFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    }
   })
   it('returns OK with full fhir bundle as payload for death', async () => {
     const token = jwt.sign(
@@ -854,19 +935,29 @@ describe('markBirthAsCertifiedHandler handler', () => {
       })
     )
     const testCertificateFhirBundle = cloneDeep(testFhirBundleWithIdsForDeath)
-    testCertificateFhirBundle.entry[1].resource.identifier.push({
-      system: 'http://opencrvs.org/specs/id/death-registration-number',
-      value: '12345678'
-    })
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: testCertificateFhirBundle,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
+    if (
+      testCertificateFhirBundle &&
+      testCertificateFhirBundle.entry &&
+      testCertificateFhirBundle.entry[1] &&
+      testCertificateFhirBundle.entry[1].resource &&
+      testCertificateFhirBundle.entry[1].resource.identifier
+    ) {
+      const identifiers = testCertificateFhirBundle.entry[1].resource
+        .identifier as fhir.Identifier[]
+      identifiers.push({
+        system: 'http://opencrvs.org/specs/id/death-registration-number',
+        value: '12345678'
+      })
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testCertificateFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    }
   })
 })
 

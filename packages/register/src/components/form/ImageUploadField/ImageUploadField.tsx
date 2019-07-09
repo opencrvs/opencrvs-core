@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import styled from 'styled-components'
+import styled from '@register/styledComponents'
 import { IconAction } from '@opencrvs/components/lib/buttons'
 import { Camera } from '@opencrvs/components/lib/icons'
 import { IActionProps } from '@opencrvs/components/lib/buttons/Action'
 import { ActionTitle } from '@opencrvs/components/lib/buttons/IconAction'
 import { FileItem } from '@opencrvs/components/lib/files'
-import { IFormSection, IFileValue } from 'src/forms'
-import { ImageUploadOption } from './ImageUploadOption'
-import { ImagePreview } from './ImagePreview'
+import { IFormSection, IFileValue } from '@register/forms'
+import { ImageUploadOption } from '@register/components/form/ImageUploadField/ImageUploadOption'
+import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
 
 const Container = styled.div`
   width: 100%;
@@ -44,7 +44,9 @@ const FileViewerLabel = styled.label`
 const FileItemContainer = styled.div`
   margin-top: 12px;
 `
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',
@@ -79,32 +81,40 @@ type IProps = {
 }
 type IFullProps = IActionProps & InjectedIntlProps & IProps
 
-type IFullFileValues = IFileValue & {
+interface IFullFileValues extends IFileValue {
   title: string
   description: string
 }
+
+interface ITempFullFileValues extends IFileValue {
+  title?: string
+  description?: string
+}
 /* feels weired may need to change a bit */
-function augmentFile(file: IFullFileValues): IFullFileValues {
+function augmentFile(file: IFileValue): IFullFileValues {
+  const augmentedFile: ITempFullFileValues = file
   if (file.optionValues) {
-    file.title = file.optionValues[0].toString()
+    augmentedFile.title = file.optionValues[0].toString()
     if (file.optionValues.length > 1) {
-      file.description = file.optionValues[1].toString()
+      augmentedFile.description = file.optionValues[1].toString()
     }
   }
-  return file
+  return augmentedFile as IFullFileValues
 }
 class ImageUploadComponent extends React.Component<
   IFullProps,
   {
     showNestedOptionSection: boolean
     previewImage: IFileValue | null
+    previewIndex: number
   }
 > {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
       showNestedOptionSection: false,
-      previewImage: null
+      previewImage: null,
+      previewIndex: 0
     }
   }
 
@@ -119,13 +129,14 @@ class ImageUploadComponent extends React.Component<
   }
 
   onDelete = (index: number): void => {
+    this.closePreviewSection()
     const files = this.props.files ? this.props.files : []
     files.splice(index, 1)
     this.props.onComplete(files)
   }
 
-  onPreview = (file: IFileValue): void => {
-    this.setState({ previewImage: file })
+  onPreview = (file: IFileValue, index: number): void => {
+    this.setState({ previewImage: file, previewIndex: index })
   }
 
   onComplete = (file: IFileValue) => {
@@ -138,16 +149,17 @@ class ImageUploadComponent extends React.Component<
     const { title, optionSection, files, intl } = this.props
     const fileList =
       files &&
-      files.map((file: IFullFileValues, index: number) => {
+      files.map((file: IFileValue, index: number) => {
+        const augmentedFile: IFullFileValues = augmentFile(file)
         return (
           <FileItemContainer key={index}>
             <FileItem
               id={`file_item_${index}`}
-              file={augmentFile(file)}
+              file={augmentedFile}
               deleteLabel={intl.formatMessage(messages.delete)}
               onDelete={() => this.onDelete(index)}
               previewLabel={intl.formatMessage(messages.preview)}
-              onPreview={() => this.onPreview(file)}
+              onPreview={() => this.onPreview(file, index)}
             />
           </FileItemContainer>
         )
@@ -184,9 +196,9 @@ class ImageUploadComponent extends React.Component<
         {this.state.previewImage && (
           <ImagePreview
             previewImage={this.state.previewImage}
-            title={intl.formatMessage(messages.preview)}
-            backLabel={intl.formatMessage(messages.back)}
+            title={augmentFile(this.state.previewImage).title}
             goBack={this.closePreviewSection}
+            onDelete={() => this.onDelete(0)}
           />
         )}
       </Container>

@@ -1,5 +1,5 @@
-import { GQLResolver } from 'src/graphql/schema'
-import { fetchFHIR } from 'src/features/fhir/utils'
+import { GQLResolver, GQLUserIdentifierInput } from '@gateway/graphql/schema'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 interface IUserModelData {
   _id: string
@@ -7,16 +7,35 @@ interface IUserModelData {
   name: string
   email: string
   mobile: string
-  active: boolean
+  status: string
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
 }
 
+export interface IUserPayload
+  extends Omit<
+    IUserModelData,
+    | '_id'
+    | 'catchmentAreaIds'
+    | 'status'
+    | 'practitionerId'
+    | 'username'
+    | 'name'
+  > {
+  identifiers: GQLUserIdentifierInput[]
+  name: {
+    use: string
+    family: string
+    given: string[]
+  }[]
+  role: string
+  type: string
+}
 export interface IUserSearchPayload {
   username?: string
   mobile?: string
-  active?: boolean
+  status?: string
   role?: string
   primaryOfficeId?: string
   locationId?: string

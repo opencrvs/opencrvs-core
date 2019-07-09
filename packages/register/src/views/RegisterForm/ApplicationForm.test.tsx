@@ -10,28 +10,30 @@ import {
   getFileFromBase64String,
   validImageB64String,
   inValidImageB64String
-} from 'src/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from 'src/navigation/routes'
+} from '@register/tests/util'
+import { DRAFT_BIRTH_PARENT_FORM } from '@register/navigation/routes'
 import {
   storeApplication,
   createApplication,
   IApplication
-} from 'src/applications'
+} from '@register/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from 'src/offline/actions'
-import * as fetch from 'jest-fetch-mock'
-import { storage } from 'src/storage'
-import { Event } from 'src/forms'
-import * as CommonUtils from 'src/utils/commonUtils'
+import { getOfflineDataSuccess } from '@register/offline/actions'
+import { storage } from '@register/storage'
+import { Event } from '@register/forms'
+import * as CommonUtils from '@register/utils/commonUtils'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
 
 beforeEach(() => {
-  history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/')
   assign.mockClear()
 })
 
@@ -108,7 +110,7 @@ describe('when user has starts a new application', () => {
       app.update()
     })
 
-    describe('when user types in something', () => {
+    describe('when user types in something and press continue', () => {
       beforeEach(async () => {
         app
           .find('#firstNames')
@@ -118,17 +120,61 @@ describe('when user has starts a new application', () => {
           })
         await flushPromises()
         app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
       })
-      it('stores the value to a new draft', () => {
+      it('stores the value to a new draft and move to next section', () => {
         const mockCalls = (storage.setItem as jest.Mock).mock.calls
         const userData = mockCalls[mockCalls.length - 1]
         const storedApplications = JSON.parse(userData[userData.length - 1])[0]
           .applications
         expect(storedApplications[0].data.child.firstNames).toEqual('hello')
+        expect(window.location.href).toContain('mother')
+      })
+      it('redirect to home when pressed save and exit button', async () => {
+        app
+          .find('#save_draft')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(window.location.href).toContain('/')
+      })
+      it('check toggle menu toggle button handler', async () => {
+        app
+          .find('#eventToggleMenuToggleButton')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(app.find('#eventToggleMenuSubMenu').hostNodes().length).toEqual(
+          1
+        )
+      })
+      it('check toggle menu item handler', async () => {
+        app
+          .find('#eventToggleMenuToggleButton')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+
+        app
+          .find('#eventToggleMenuItem0')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+
+        expect(window.location.href).toContain('/')
       })
     })
 
-    describe('when user enters childBirthDate and clicks to documents tab', () => {
+    describe('when user enters childBirthDate and clicks to documents page', () => {
       beforeEach(async () => {
         Date.now = jest.fn(() => 1549607679507) // 08-02-2019
         app
@@ -153,10 +199,22 @@ describe('when user has starts a new application', () => {
         app.update()
       })
 
-      describe('when user goes to documents tab', () => {
+      describe('when user goes to documents page', () => {
         beforeEach(async () => {
           app
-            .find('#tab_documents')
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+          app
+            .find('#next_section')
             .hostNodes()
             .simulate('click')
           await flushPromises()
@@ -182,90 +240,12 @@ describe('when user has starts a new application', () => {
       })
     })
 
-    describe('when user swipes left from the "child" section', () => {
+    describe('when user clicks the "mother" page', () => {
       beforeEach(async () => {
         app
-          .find('#swipeable_block')
-          .hostNodes()
-          .simulate('touchStart', {
-            touches: [
-              {
-                clientX: 150,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchMove', {
-            changedTouches: [
-              {
-                clientX: 100,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchEnd', {
-            changedTouches: [
-              {
-                clientX: 50,
-                clientY: 20
-              }
-            ]
-          })
-        await flushPromises()
-        app.update()
-      })
-      it('changes to the mother details section', () => {
-        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
-          1
-        )
-      })
-    })
-
-    describe('when user swipes right from the "child" section', () => {
-      beforeEach(async () => {
-        app
-          .find('#swipeable_block')
-          .hostNodes()
-          .simulate('touchStart', {
-            touches: [
-              {
-                clientX: 50,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchMove', {
-            changedTouches: [
-              {
-                clientX: 100,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchEnd', {
-            changedTouches: [
-              {
-                clientX: 150,
-                clientY: 20
-              }
-            ]
-          })
-        await flushPromises()
-        app.update()
-      })
-      it('user still stays in the child details section', () => {
-        expect(app.find('#form_section_title_child').hostNodes()).toHaveLength(
-          1
-        )
-      })
-    })
-    describe('when user clicks the "mother" tab', () => {
-      beforeEach(async () => {
-        app
-          .find('#tab_mother')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
-
         await flushPromises()
         app.update()
       })
@@ -273,44 +253,6 @@ describe('when user has starts a new application', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
           1
         )
-      })
-      describe('when user swipes right from the "mother" section', () => {
-        beforeEach(async () => {
-          app
-            .find('#swipeable_block')
-            .hostNodes()
-            .simulate('touchStart', {
-              touches: [
-                {
-                  clientX: 50,
-                  clientY: 20
-                }
-              ]
-            })
-            .simulate('touchMove', {
-              changedTouches: [
-                {
-                  clientX: 100,
-                  clientY: 20
-                }
-              ]
-            })
-            .simulate('touchEnd', {
-              changedTouches: [
-                {
-                  clientX: 150,
-                  clientY: 20
-                }
-              ]
-            })
-          await flushPromises()
-          app.update()
-        })
-        it('changes to the child details section', () => {
-          expect(
-            app.find('#form_section_title_child').hostNodes()
-          ).toHaveLength(1)
-        })
       })
     })
     describe('when user clicks "next" button', () => {
@@ -328,13 +270,18 @@ describe('when user has starts a new application', () => {
         )
       })
     })
-    describe('when user clicks the "father" tab', () => {
+    describe('when user clicks the "father" page', () => {
       beforeEach(async () => {
         app
-          .find('#tab_father')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
-
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
         await flushPromises()
         app.update()
       })
@@ -344,23 +291,34 @@ describe('when user has starts a new application', () => {
         )
       })
     })
-    describe('when user is in document tab', () => {
+    describe('when user is in document page', () => {
       beforeEach(async () => {
         app
-          .find('#tab_documents')
+          .find('#next_section')
           .hostNodes()
           .simulate('click')
-
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
         await flushPromises()
         app.update()
       })
       it('image upload field is rendered', () => {
-        expect(app.find('#image_uploader').hostNodes()).toHaveLength(1)
+        expect(app.find('#imageUploader').hostNodes()).toHaveLength(1)
       })
       describe('when user clicks image upload field', () => {
         beforeEach(async () => {
           app
-            .find('#image_uploader')
+            .find('#imageUploader')
             .hostNodes()
             .simulate('click')
 

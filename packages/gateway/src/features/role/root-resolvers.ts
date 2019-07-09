@@ -1,7 +1,7 @@
-import { GQLResolver } from 'src/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from 'src/constants'
-import { IRoleSearchPayload } from 'src/features/role/type-resovlers'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { IRoleSearchPayload } from '@gateway/features/role/type-resovlers'
 
 export const resolvers: GQLResolver = {
   Query: {

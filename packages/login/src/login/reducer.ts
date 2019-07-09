@@ -1,18 +1,16 @@
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
 import { push } from 'react-router-redux'
-import * as actions from './actions'
-import { authApi } from '../utils/authApi'
-import * as routes from '../navigation/routes'
-import { ITokenPayload, getTokenPayload } from '../utils/authUtils'
-import { REGISTER_APP } from '../navigation/routes'
+import * as actions from '@login/login/actions'
+import { authApi } from '@login/utils/authApi'
+import * as routes from '@login/navigation/routes'
 
 export type LoginState = {
   submitting: boolean
   token: string
-  authenticationDetails: { nonce: string }
+  authenticationDetails: { nonce: string; mobile: string }
   submissionError: boolean
   resentSMS: boolean
-  stepOneDetails: { mobile: string }
+  stepOneDetails: { username: string }
   errorCode?: number
 }
 
@@ -20,11 +18,12 @@ export const initialState: LoginState = {
   submitting: false,
   token: '',
   authenticationDetails: {
-    nonce: ''
+    nonce: '',
+    mobile: ''
   },
   submissionError: false,
   resentSMS: false,
-  stepOneDetails: { mobile: '' }
+  stepOneDetails: { username: '' }
 }
 
 export const loginReducer: LoopReducer<LoginState, actions.Action> = (
@@ -42,8 +41,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           stepOneDetails: action.payload
         },
         Cmd.run<
-          | actions.AuthenticateResponseAction
-          | actions.AuthenticationFailedAction
+          actions.AuthenticationFailedAction,
+          actions.AuthenticateResponseAction
         >(authApi.authenticate, {
           successActionCreator: actions.completeAuthentication,
           failActionCreator: actions.failAuthentication,
@@ -67,15 +66,22 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
       return loop(
         {
           ...state,
-          submitting: false,
+          submitting: action.payload.token ? true : false,
           submissionError: false,
           resentSMS: false,
           authenticationDetails: {
             ...state.authenticationDetails,
-            nonce: action.payload.nonce
+            nonce: action.payload.nonce,
+            mobile: action.payload.mobile
           }
         },
-        Cmd.action(push(routes.STEP_TWO))
+        (action.payload.token &&
+          Cmd.run(() => {
+            window.location.assign(
+              `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
+            )
+          })) ||
+          Cmd.action(push(routes.STEP_TWO))
       )
     case actions.RESEND_SMS:
       return loop(
@@ -84,13 +90,14 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           submissionError: false,
           resentSMS: false
         },
-        Cmd.run<
-          actions.ResendSMSCompleteAction | actions.ResendSMSFailedAction
-        >(authApi.resendSMS, {
-          successActionCreator: actions.completeSMSResend,
-          failActionCreator: actions.failSMSResend,
-          args: [state.authenticationDetails.nonce]
-        })
+        Cmd.run<actions.ResendSMSFailedAction, actions.ResendSMSCompleteAction>(
+          authApi.resendSMS,
+          {
+            successActionCreator: actions.completeSMSResend,
+            failActionCreator: actions.failSMSResend,
+            args: [state.authenticationDetails.nonce]
+          }
+        )
       )
     case actions.RESEND_SMS_FAILED:
       return { ...state, resentSMS: false, submissionError: true }
@@ -114,7 +121,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false
         },
         Cmd.run<
-          actions.VerifyCodeCompleteAction | actions.VerifyCodeFailedAction
+          actions.VerifyCodeFailedAction,
+          actions.VerifyCodeCompleteAction
         >(authApi.verifyCode, {
           successActionCreator: actions.completeVerifyCode,
           failActionCreator: actions.failVerifyCode,
@@ -124,54 +132,29 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
     case actions.VERIFY_CODE_FAILED:
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
-      const decoded: ITokenPayload = getTokenPayload(
-        action.payload.token
-      ) as ITokenPayload
-      const isPerformanceUser = decoded.scope.indexOf('performance') > -1
-      if (isPerformanceUser) {
-        return loop(
-          {
-            ...state,
-            stepSubmitting: false,
-            submissionError: false,
-            resentSMS: false,
-            token: action.payload.token
-          },
-          Cmd.action(push(routes.MANAGER))
-        )
-      } else {
-        return loop(
-          {
-            ...state,
-            stepSubmitting: false,
-            submissionError: false,
-            resentSMS: false,
-            token: action.payload.token
-          },
-          Cmd.run(() => {
-            window.location.assign(
-              `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
-            )
-          })
-        )
-      }
+      return loop(
+        {
+          ...state,
+          stepSubmitting: false,
+          submissionError: false,
+          resentSMS: false,
+          token: action.payload.token
+        },
+        Cmd.run(() => {
+          window.location.assign(
+            `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
+          )
+        })
+      )
     case actions.GOTO_APP:
-      let redirectUrl: string
-      if (action.payload === REGISTER_APP) {
-        redirectUrl = `${window.config.REGISTER_APP_URL}registrar-home?token=${
-          state.token
-        }`
-      } else {
-        redirectUrl = `${window.config.PERFORMANCE_APP_URL}?token=${
-          state.token
-        }`
-      }
       return loop(
         {
           ...state
         },
         Cmd.run(() => {
-          window.location.assign(redirectUrl)
+          window.location.assign(
+            `${window.config.REGISTER_APP_URL}?token=${state.token}`
+          )
         })
       )
     default:

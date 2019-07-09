@@ -1,6 +1,7 @@
-import React = require('react')
+import * as React from 'react'
 import styled from 'styled-components'
 import { Cross } from '../icons'
+import { CircleButton } from '../buttons'
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -23,11 +24,11 @@ const ScreenBlocker = styled.div`
   background-color: ${({ theme }) => theme.colors.menuBackground};
   opacity: 0.8;
 `
-const ModalContent = styled.div`
+const ModalContent = styled.div.attrs<{ width?: number }>({})`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
-  width: 448px;
+  width: ${({ width }) => (width ? width : 448)}px;
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -42,7 +43,7 @@ const Header = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 8px 0px 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ theme }) => theme.shadows.mistyShadow};
     margin-bottom: 16px;
@@ -51,18 +52,25 @@ const Header = styled.div`
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
 `
-const Right = styled.span`
-  cursor: pointer;
-`
-
-const Body = styled.div`
+const Body = styled.div.attrs<{ height?: number }>({})`
   ${({ theme }) => theme.fonts.bodyStyle};
+  height: ${({ height }) => (height ? height : 250)}px;
+  overflow-y: auto;
   padding: 0 24px 16px;
   padding-right: 64px;
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-grow: 1;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.scrollBarGrey};
+    border-radius: 10px;
   }
 `
 const Footer = styled.div`
@@ -88,14 +96,34 @@ interface IProps {
   id?: string
   title: string
   show: boolean
+  width?: number
+  contentHeight?: number
   actions: JSX.Element[]
   handleClose?: () => void
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
-  render() {
-    const { title, show, handleClose, id, actions } = this.props
+  toggleScroll = () => {
+    const body = document.querySelector('body') as HTMLBodyElement
+    if (this.props.show) {
+      body.style.overflow = 'hidden'
+    } else {
+      body.style.removeProperty('overflow')
+    }
+  }
 
+  render() {
+    const {
+      title,
+      show,
+      handleClose,
+      id,
+      actions,
+      width,
+      contentHeight
+    } = this.props
+
+    this.toggleScroll()
     if (!show) {
       return null
     }
@@ -103,14 +131,14 @@ export class ResponsiveModal extends React.Component<IProps> {
     return (
       <ModalContainer id={id}>
         <ScreenBlocker />
-        <ModalContent>
+        <ModalContent width={width}>
           <Header>
             <Title>{title}</Title>
-            <Right>
-              <Cross onClick={handleClose} />
-            </Right>
+            <CircleButton onClick={handleClose}>
+              <Cross />
+            </CircleButton>
           </Header>
-          <Body>{this.props.children}</Body>
+          <Body height={contentHeight}>{this.props.children}</Body>
           <Footer>
             {actions.map((action, i) => (
               <Action key={i}>{action}</Action>

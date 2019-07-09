@@ -1,6 +1,6 @@
-import { GQLResolver } from 'src/graphql/schema'
-import { postSearch } from 'src/features/fhir/utils'
-import { ISearchCriteria } from './type-resovlers'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { postSearch } from '@gateway/features/fhir/utils'
+import { ISearchCriteria } from '@gateway/features/search/type-resovlers'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -53,6 +53,47 @@ export const resolvers: GQLResolver = {
           (searchResult && searchResult.hits && searchResult.hits.total) || 0,
         results:
           (searchResult && searchResult.hits && searchResult.hits.hits) || []
+      }
+    },
+    async countEvents(_, { locationIds }, authHeader) {
+      const searchCriteria: ISearchCriteria =
+        (locationIds && {
+          applicationLocationId: locationIds.join(',')
+        }) ||
+        {}
+      const declaredCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: 'DECLARED'
+      }
+      const declaredResult = await postSearch(authHeader, declaredCriteria)
+
+      const registeredCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: 'REGISTERED'
+      }
+      const registeredResult = await postSearch(authHeader, registeredCriteria)
+
+      const rejectedCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: 'REJECTED'
+      }
+      const rejectedResult = await postSearch(authHeader, rejectedCriteria)
+      return {
+        declared:
+          (declaredResult &&
+            declaredResult.hits &&
+            declaredResult.hits.total) ||
+          0,
+        registered:
+          (registeredResult &&
+            registeredResult.hits &&
+            registeredResult.hits.total) ||
+          0,
+        rejected:
+          (rejectedResult &&
+            rejectedResult.hits &&
+            rejectedResult.hits.total) ||
+          0
       }
     }
   }

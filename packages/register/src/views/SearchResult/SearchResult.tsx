@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import styled, { ITheme, withTheme } from '@register/styledComponents'
 import {
   GQLComment,
   GQLDeathRegistration,
@@ -25,26 +25,27 @@ import {
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import * as Sentry from '@sentry/browser'
-import * as moment from 'moment'
+import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IViewHeadingProps } from 'src/components/ViewHeading'
+import { IViewHeadingProps } from '@register/components/ViewHeading'
 import {
   goToEvents as goToEventsAction,
   goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
-} from 'src/navigation'
-import { REVIEW_EVENT_PARENT_FORM_TAB } from 'src/navigation/routes'
-import { getScope, getUserDetails } from 'src/profile/profileSelectors'
-import { messages as rejectionMessages } from 'src/review/reject-registration'
-import { messages } from 'src/search/messages'
-import { SEARCH_EVENTS } from 'src/search/queries'
-import { transformData } from 'src/search/transformer'
-import { IStoreState } from 'src/store'
-import { Scope } from 'src/utils/authUtils'
+  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToPage as goToPageAction
+} from '@register/navigation'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+import { getScope, getUserDetails } from '@register/profile/profileSelectors'
+import { messages as rejectionMessages } from '@register/review/reject-registration'
+import { messages } from '@register/search/messages'
+import { SEARCH_EVENTS } from '@register/search/queries'
+import { transformData } from '@register/search/transformer'
+import { IStoreState } from '@register/store'
+import { Scope } from '@register/utils/authUtils'
 import {
   CERTIFICATE_DATE_FORMAT,
   DECLARED,
@@ -57,17 +58,21 @@ import {
   BRN_DRN_TEXT,
   PHONE_TEXT,
   SEARCH_RESULT_SORT
-} from 'src/utils/constants'
+} from '@register/utils/constants'
 import {
   createNamesMap,
   extractCommentFragmentValue
-} from 'src/utils/data-formatting'
-import { formatLongDate } from 'src/utils/date-formatting'
-import { IGQLLocation, IIdentifier, IUserDetails } from 'src/utils/userUtils'
-import styled, { withTheme } from 'styled-components'
-import { goToTab as goToTabAction } from '../../navigation'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { Header } from 'src/components/interface/Header/Header'
+} from '@register/utils/data-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
+import {
+  IGQLLocation,
+  IIdentifier,
+  IUserDetails
+} from '@register/utils/userUtils'
+
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
+import { Header } from '@register/components/interface/Header/Header'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -164,8 +169,9 @@ function formatRoleCode(str: string) {
   const sections = str.split('_')
   const formattedString: string[] = []
   sections.map(section => {
-    section = section.charAt(0) + section.slice(1).toLowerCase()
-    formattedString.push(section)
+    return formattedString.push(
+      section.charAt(0) + section.slice(1).toLowerCase()
+    )
   })
 
   return formattedString.join(' ')
@@ -223,10 +229,10 @@ const StatusIcon = styled.div`
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope
+  scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails
-  gotoTab: typeof goToTabAction
+  userDetails: IUserDetails | null
+  goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
 }
@@ -357,7 +363,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         practitionerRole:
           status && status.user && status.user.role
             ? this.props.intl.formatMessage(
-                messages[status.user.role as string]
+                roleMessages[status.user.role as string]
               )
             : '',
         officeName:
@@ -407,7 +413,15 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
             id
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
             const { intl, language } = this.props
             moment.locale(language)
             if (error) {
@@ -510,9 +524,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     item: { [key: string]: string & Array<{ [key: string]: string }> },
     key: number
   ): JSX.Element => {
-    const applicationIsRegistered = item.declaration_status === 'REGISTERED'
-    const applicationIsCertified = item.declaration_status === 'CERTIFIED'
-    const applicationIsRejected = item.declaration_status === 'REJECTED'
+    const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
+    const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
+    const applicationIsRejected = item.declarationStatus === 'REJECTED'
     const info = []
     const status = []
     const icons = []
@@ -544,7 +558,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     } else {
       info.push({
         label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
-        value: item.tracking_id
+        value: item.trackingId
       })
     }
 
@@ -553,13 +567,13 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       label: this.getEventLabel(item.event)
     })
     status.push({
-      icon: this.getDeclarationStatusIcon(item.declaration_status),
-      label: this.getDeclarationStatusLabel(item.declaration_status)
+      icon: this.getDeclarationStatusIcon(item.declarationStatus),
+      label: this.getDeclarationStatusLabel(item.declarationStatus)
     })
 
-    if (applicationIsRejected && item.rejection_reasons) {
-      const reasons = item.rejection_reasons.split(',')
-      const rejectComment = item.rejection_comment
+    if (applicationIsRejected && item.rejectionReasons) {
+      const reasons = item.rejectionReasons.split(',')
+      const rejectComment = item.rejectionComment
 
       info.push({
         label: this.props.intl.formatMessage(
@@ -569,7 +583,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           reasons &&
           reasons
             .reduce(
-              (prev, curr) => [
+              (prev: string[], curr) => [
                 ...prev,
                 this.props.intl.formatMessage(
                   getRejectionReasonDisplayValue(curr)
@@ -614,8 +628,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.review),
           handler: () =>
-            this.props.gotoTab(
-              REVIEW_EVENT_PARENT_FORM_TAB,
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
               item.id,
               'review',
               item.event.toLowerCase()
@@ -625,8 +639,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         listItemActions.push({
           label: this.props.intl.formatMessage(messages.reject),
           handler: () =>
-            this.props.gotoTab(
-              REVIEW_EVENT_PARENT_FORM_TAB,
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
               item.id,
               'review',
               item.event.toLowerCase()
@@ -649,7 +663,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     if (applicationIsRegistered) {
       expansionActions.push(
         <StyledSecondaryButton
-          id={`editBtn_${item.tracking_id}`}
+          id={`editBtn_${item.trackingId}`}
           disabled={true}
         >
           <Edit />
@@ -728,13 +742,20 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   contactNumber: searchType === PHONE_TEXT ? searchText : ''
                 }}
               >
-                {({ loading, error, data }) => {
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: any
+                  error?: any
+                  data: any
+                }) => {
                   if (loading) {
                     return (
                       <Loader
                         id="search_loader"
                         marginPercent={35}
-                        spinnerDiameter={60}
                         loadingText={intl.formatMessage(messages.searchingFor, {
                           param: searchText
                         })}
@@ -799,7 +820,7 @@ export const SearchResult = connect(
   }),
   {
     goToEvents: goToEventsAction,
-    gotoTab: goToTabAction,
+    goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }

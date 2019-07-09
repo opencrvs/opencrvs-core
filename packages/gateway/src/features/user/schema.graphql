@@ -12,13 +12,15 @@ type UserIdentifier { # -> identifier
 
 input UserInput {
   name: [HumanNameInput]
+  identifier: [UserIdentifierInput]
   username: String
   mobile: String
   role: String
+  type: String
   email: String
-  active: Boolean
-  primaryOffice: LocationInput
-  catchmentArea: [LocationInput]
+  primaryOffice: String
+  catchmentArea: [String]
+  device: String
 }
 
 type User {
@@ -29,8 +31,9 @@ type User {
   username: String
   mobile: String
   role: String
+  type: String
   email: String
-  active: Boolean
+  status: String
   primaryOffice: Location
   catchmentArea: [Location]
 }
@@ -40,12 +43,17 @@ type SearchUserResult {
   totalItems: Int
 }
 
+input SecurityQuestionAnswer {
+  questionKey: String
+  answer: String
+}
+
 type Query {
   getUser(userId: String): User
   searchUsers(
     username: String
     mobile: String
-    active: Boolean
+    status: String
     role: String
     primaryOfficeId: String
     locationId: String
@@ -53,4 +61,13 @@ type Query {
     skip: Int
     sort: String
   ): SearchUserResult
+}
+
+type Mutation {
+  createUser(user: UserInput!): User!
+  activateUser(
+    userId: String!
+    password: String!
+    securityQNAs: [SecurityQuestionAnswer]!
+  ): String
 }

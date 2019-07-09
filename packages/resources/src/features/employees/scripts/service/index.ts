@@ -1,13 +1,13 @@
 import { Response } from 'node-fetch'
-import { ORG_URL } from '../../../../constants'
+import { ORG_URL } from '@resources/constants'
 import {
   getLocationIDByDescription,
   getUpazilaID,
   getFromFhir,
-  sendToFhir
-} from '../../../utils/bn'
+  sendToFhir,
+  titleCase
+} from '@resources/features/utils/bn'
 import chalk from 'chalk'
-import { titleCase } from '../../../utils/bn'
 
 interface ITestPractitioner {
   division: string

@@ -1,8 +1,8 @@
 import * as React from 'react'
-import * as Sticky from 'react-stickynode'
-import { IFormSection } from '../../forms'
-import styled from '../../styled-components'
-import { FormTabs } from '../../components/form'
+import Sticky from 'react-stickynode'
+import { IFormSection } from '@register/forms'
+import styled from '@register/styledComponents'
+import { FormTabs } from '@register/components/form'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
 
 const StickyFormTabsContainer = styled.div`

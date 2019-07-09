@@ -1,4 +1,4 @@
-import { ILanguage } from '../reducer'
+import { ILanguage } from '@register/i18n/reducer'
 
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
@@ -503,6 +503,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': 'নতুন জন্ম ঘোষণা',
+    'register.selectVitalEvent.saveExitButton': 'সংরক্ষণ করে বেরিয়ে যান ',
     'register.form.newVitalEventRegistration':
       'নতুন {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewEventRegistration':
@@ -516,17 +517,22 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.submitButton': 'জমা দিন',
-    'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
-    'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
-    'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
-    'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
-    'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
-    'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক',
+    'register.home.header.fieldAgent': 'মাঠকর্মী',
+    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.localRegistrar': 'নিবন্ধক',
+    'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
+    'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',
+    'register.home.header.nationalRegistrar': 'জাতীয় নিবন্ধক',
+    'register.home.header.nationalSystemAdmin': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'register.home.header.performanceOversight': 'কর্মক্ষমতা তত্ত্বাবধান',
+    'register.home.header.performanceManagement': 'কর্মক্ষমতা ব্যবস্থাপনা',
     'register.notification.newContentAvailable':
       'কিছু তথ্য হালনাগাদ করা হয়েছে, রিফ্রেশ করতে এখানে ক্লিক করুন।',
     'register.notification.declarationsSynced':
       'ইন্টারনেট সংযোগ ফিরে আসায় আমরা {syncCount} টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি',
     'register.notification.draftsSaved': 'আপনার খসড়া সংরক্ষণ করা হয়েছে',
+    'register.notification.userFormSuccess': 'নতুন ব্যবহারকারী তৈরি করা হয়েছে',
+    'register.notification.userFormFail': 'দুঃখিত কিছু ভুল হয়েছে',
     'register.savedRegistration.online.title': 'তথ্য বিবরনী জমাদান',
     'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'নিবন্ধন সম্পন্ন',
@@ -571,23 +577,31 @@ export const BENGALI_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.savedRegistration.buttons.newDeclaration': 'নতুন আবেদন',
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশে ফেরত যান',
+
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
-    'register.selectInformant.informantTitle': 'তথ্যদাতা কে?',
-    'register.selectInformant.informantDescription':
-      'কে ঘোষণা ফর্মের প্রয়োজনীয় ও বিস্তারিত তথ্য উপাত্ত প্রদান করিবেন',
-    'register.selectInformant.parentInformantTitle': 'পিতামাতা',
-    'register.selectInformant.parentInformantDescription':
-      '<strong>প্রয়োজনীয়</strong>: শিশু এবং মায়ের বিবরণ' +
-      '<br /><strong>ঐচ্ছিক</strong>: বাবা বিস্তারিত বিবরণ',
-    'register.selectInformant.otherInformantTitle': 'অন্য কেউ',
-    'register.selectInformant.otherInformantDescription':
-      'প্রয়োজনীয়: শিশু এবং তথ্যপ্রদানকারীর বিবরণ. ঐচ্ছিক: মা / বাবা বিস্তারিত বিবরণ.',
-    'register.selectInformant.selfInformantTitle': 'নিজ (১৮+)',
-    'register.selectInformant.selfInformantDescription':
-      '<strong>প্রয়োজনীয়</strong>: ব্যক্তি এবং তথ্য প্রদানকারীর বিবরণ।' +
-      '<br /><strong>ঐচ্ছিক</strong>: মা / বাবা বিস্তারিত বিবরণ',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'একটি নতুন গুরুত্বপূর্ণ ইভেন্ট ঘোষণা',
+    'register.selectInformant.informantTitle':
+      'কে জন্ম নিবন্ধনের জন্য আবেদন করছে?',
+    'register.selectInformant.mother': 'মাতা',
+    'register.selectInformant.father': 'পিতা',
+    'register.selectInformant.parents': 'পিতা ও মাতা ',
+    'register.selectInformant.someoneElse': 'অন্য কেউ',
+    'register.selectInformant.self': 'নিজের',
+    'register.selectInformant.errorMessage':
+      'Please select who is present and applying',
+    'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
+    'register.selectVitalEvent.birth': 'জন্ম',
+    'register.selectVitalEvent.death': 'মৃত্যু',
+    'register.selectVitalEvent.continueButton': 'পরবর্তী',
+    'register.selectVitalEvent.errorMessage':
+      'দয়া করে একটি ইভেন্ট নির্বাচন করুন',
+    'register.primaryApplicant.registerNewEventHeading':
+      'এই আবেদনটির প্রধান আবেদনকারী কে?',
+    'register.primaryApplicant.description':
+      'এই ব্যক্তিটি এই আবেদনটির নির্ভুল তথ্য প্রদান করার জন্য দায়ী',
+    'register.primaryApplicant.errorMessage':
+      'দয়া করে প্রাথমিক আবেদনকারী কে তা নির্বাচন করুন ',
     'register.home.buttons.registerNewEvent': 'নতুন ঘোষণা',
     'register.home.buttons.mydraft': 'আমার খসড়া',
     'register.home.buttons.pendingSubimissions': 'অসম্পূর্ণ জমাগুলি',
@@ -802,7 +816,7 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
     'certificate.parent.details.label.number': 'সংখ্যা',
-    'certificate.btn.editRegistration': 'নিবন্ধন সম্পাদনা করুন',
+    'certificate.btn.editRegistration': 'নিবন্ধন সম���পাদনা করুন',
     'certificate.txt.isCorrectTxt': 'জন্ম নিবন্ধনটি কি সঠিক?',
     'certificate.txt.confirmationTxt':
       'অনুগ্রহ করে নিশ্চিত করুন যে নিবন্ধনটি পর্যালোচনা হয়েছে তার তথ্য সঠিক এবং আপনি মুদ্রণ করতে প্রস্তুত',
@@ -1026,6 +1040,7 @@ export const BENGALI_STATE: ILanguage = {
     'label.nameBN': 'বাংলার নাম',
     'label.phone': 'ফোন নম্বর',
     'label.role': 'দায়িত্ব',
+    'label.type': 'ধরণ',
     'label.password': 'পাসওয়ার্ড',
     'label.pin': 'পিন',
     'label.language': 'ভাষা',
@@ -1043,16 +1058,130 @@ export const BENGALI_STATE: ILanguage = {
     'register.fieldAgentHome.requireUpdatesLoading':
       'আপনার  আবেদন চেক করা হচ্ছে ',
     'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
+    'system.user.queryError':
+      'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি এই মুহূর্তে লোড করা সম্ভব হচ্ছে না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ করুন, অথবা পুনরায় চেষ্টা করুন।',
     'register.sysAdminHome.overview': 'ওভারভিউ',
     'register.sysAdminHome.offices': 'অফিস',
     'register.sysAdminHome.network': 'নেটওয়ার্ক',
     'register.sysAdminHome.users': 'ইউজারস',
     'register.sysAdminHome.devices': 'ডিভাইসেস',
     'register.sysAdminHome.config': 'কনফিগ',
-    'register.home.header.LOCAL_SYSTEM_ADMIN': 'সিস এডমিন ',
+    'register.home.header.localSystemAdmin': 'সিস এডমিন ',
     'register.home.header.systemTitle': 'সিস্টেম',
     'register.home.header.settingsTitle': 'সেটিংস',
     'register.home.header.helpTitle': 'সাহায্য',
-    'register.home.header.logoutTitle': 'লগআউট'
+    'register.home.header.logoutTitle': 'লগআউট',
+    'userSetup.landing.title': 'OpenCRVS এ স্বাগতম',
+    'userSetup.landing.instruction':
+      'আপনি আপনার অ্যাকাউন্ট সেট আপ সম্পূর্ণ করার মাত্র কয়েক পদক্ষেপ দূরে।',
+    'userSetup.type.hospital': 'হাসপাতাল',
+    'userSetup.type.cha': 'CHA',
+    'userSetup.type.entrepeneur': 'উদ্যোক্তা',
+    'userSetup.type.dataEntryClerk': 'ডাটা এন্ট্রি কেরানি',
+    'userSetup.type.secretary': 'সচিব',
+    'userSetup.type.chairman': 'চেয়ারম্যান',
+    'userSetup.type.mayor': 'মেয়র',
+    'userSetup.type.localSystemAdmin': 'সিস্টেম অ্যাডমিন (স্থানীয়)',
+    'userSetup.type.nationalSystemAdmin': 'সিস্টেম অ্যাডমিন (জাতীয়)',
+    'userSetup.type.cabinetDivision': 'মন্ত্রিপরিষদ বিভাগ',
+    'userSetup.type.healthDivision': 'স্বাস্থ্য বিভাগ',
+    'userSetup.type.orgDivision': 'ORG বিভাগ',
+    'userSetup.type.bbs': 'পরিসংখ্যান ব্যুরো বাংলাদেশ',
+    'userSetup.landing.button.start': 'শুরু',
+    'user.form.name': 'ব্যবহারকারী',
+    'user.title.create': 'নতুন ব্যবহারকারী তৈরি',
+    'user.section.userDetails': 'ব্যক্তিগত তথ্য',
+    'user.section.accountDetails': 'অ্যাকাউন্ট তথ্য',
+    'user.section.assignedRegisterOffice': 'নির্ধারিত নিবন্ধ অফিস',
+    'label.firstNameBN': 'বাংলা নামের প্রথম অংশ',
+    'label.lastNameBN': 'বাংলা নামের শেষাংশ',
+    'label.firstNameEN': 'ইংরেজি নামের প্রথম অংশ',
+    'label.lastNameEN': 'ইংরেজি নামের শেষাংশ',
+    'label.NID': 'জাতীয় পরিচয় নম্বর',
+    'label.username': 'ব্যবহারকারীর নাম',
+    'label.userDevice': 'ডিভাইস',
+    'label.registrationOffice': 'নিবন্ধন অফিস',
+    'button.continue': 'অগ্রসর হোন',
+    'createUser.buttons.submit': 'ব্যবহারকারী যুক্ত করুন',
+    'createUser.preview.title': 'নতুন ব্যবহারকারীর বিবরণ পর্যালোচনা করুন',
+    'register.securityquestion.title': 'নিরাপত্তা প্রশ্ন',
+    'register.securityquestion.heading': 'আপনার নিরাপত্তা প্রশ্ন সেট করুন',
+    'register.securityquestion.description':
+      'নীচের ড্রপডাউন তালিকা থেকে আপনার পছন্দের প্রশ্ন নির্বাচন করুন।',
+    'register.securityquestion.select': 'নির্বাচন করুন',
+    'register.securityquestion.selectSecurityQuestion':
+      'একটি নিরাপত্তা প্রশ্ন নির্বাচন করুন',
+    'register.securityquestion.enterResponse':
+      'আপনার নির্বাচিত নিরাপত্তা প্রশ্নের একটি প্রতিক্রিয়া লিখুন',
+    'register.securityquestion.securityQuestionLabel':
+      'নিরাপত্তা প্রশ্ন {count}',
+    'table.column.header.name': 'নাম',
+    'table.column.header.username': 'ব্যবহারকারীর নাম',
+    'table.column.header.role': 'দায়িত্ব',
+    'table.column.header.type': 'ধরন',
+    'table.column.header.status': 'অবস্থা',
+    'register.securityquestion.answer': 'উত্তর',
+    'register.userSetup.securityQuestions.birthTown':
+      'কোন শহরে আপনার জন্ম হয়?',
+    'register.userSetup.securityQuestions.hightSchool':
+      'আপনার উচ্চ বিদ্যালয় নাম কি?',
+    'register.userSetup.securityQuestions.motherName': 'আপনার মা এর নাম কি?',
+    'register.userSetup.securityQuestions.favoriteTeacher':
+      'আপনার প্রিয় স্কুল শিক্ষকের নাম কি?',
+    'register.userSetup.securityQuestions.favoriteMovie':
+      'আপনার প্রিয় সিনেমা কি?',
+    'register.userSetup.securityQuestions.favoriteSong': 'আপনার প্রিয় গান কি?',
+    'register.userSetup.securityQuestions.favoriteFood':
+      'আপনার প্রিয় খাদ্য কি?',
+    'register.userSetup.securityQuestions.firstChildName':
+      'আপনার প্রথম সন্তানের নাম কি?',
+    'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
+    'formFields.SearchField.modalCancel': 'বাতিল',
+    'formFields.SearchField.modalSelect': 'নির্বাচন ',
+    'formFields.SearchField.locationId': 'আইডি: {locationId}',
+    'formFields.SearchField.editButton': 'নিবন্ধন অফিস হালনাগাদ করুন',
+    'formFields.SearchField.placeHolderText': 'অনুসন্ধান',
+    'userSetup.complete.title': 'অ্যাকাউন্ট সেটআপ সম্পূর্ণ',
+    'userSetup.complete.instruction':
+      'এখন আপনার ব্যবহারকারীর নাম এবং নতুন তৈরি পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে লগইন করুন',
+    'userSetup.complete.button.login': 'লগইন',
+    'newPassword.header': 'নতুন একটি পাসওয়ার্ড পছন্দ করুন',
+    'newPassword.instruction':
+      'আমরা আপনাকে একটি অনন্য পাসওয়ার্ড তৈরির সুপারিশ করি - যেটি আপনি অন্য কোনও ওয়েবসাইট বা অ্যাপ্লিকেশনের জন্য ব্যবহার করেন না। বিঃদ্রঃ. আপনি এটি একবার পরিবর্তন করার পরে আপনার পুরানো পাসওয়ার্ড পুনরায় ব্যবহার করতে পারবেন না।',
+    'password.label.new': 'নতুন পাসওয়ার্ড',
+    'password.label.confirm': 'পাসওয়ার্ড নিশ্চিত করুন',
+    'password.validation.msg': 'পাসওয়ার্ড-এ যে বিষয়গুলো অবশ্যই থাকতে হবে:',
+    'password.minLength': 'সর্বনিম্ন {min}-টি অক্ষর',
+    'password.cases': 'বড় হাতের এবং ছোট হাতের অক্ষর',
+    'password.number': 'অন্ততঃ একটি নম্বর',
+    'password.match': 'উল্লেখিত পাসওয়ার্ড মিলেছে',
+    'password.mismatch': 'উল্লেখিত পাসওয়ার্ড মিলে নি',
+    'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়',
+    'register.registrarHome.readyToPrint': 'মুদ্রণের জন্য প্রস্তুত',
+    'register.registrarHome.registrationNumber': 'নিবন্ধন নম্বর',
+    'register.registrarHome.results.registeredDate': 'নিবন্ধনের তারিখ',
+    'register.registrarHome.printButton': 'মুদ্রণ',
+    'userSetup.review.title': 'আপনার বৃত্তান্ত',
+    'userSetup.review.header': 'আপনার বৃত্তান্ত নিশ্চিত করুন',
+    'userSetupReview.instruction':
+      'আপনার অ্যাকাউন্টের সঠিক বিবরণ নিশ্চিত করতে নীচের তথ্যগুলো যাচাই করুন এবং প্রয়োজনীয় পরিবর্তন করে আপনার অ্যাকাউন্টের সঠিক তথ্য নিশ্চিত করুন।',
+    'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
+    'button.confirm': 'অনুমোদন দিন',
+    'user.setup.waiting': 'আপনার অ্যাকাউন্ট সংস্থাপন করা হচ্ছে',
+    'error.occured': 'একটি ত্রুটি ঘটেছে. অনুগ্রহপূর্বক আবার চেষ্টা করুন।',
+    'register.SelectContactPoint.title': 'জন্ম আবেদন',
+    'register.SelectContactPoint.heading':
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম  কে ?',
+    'register.SelectContactPoint.continueButton': 'চালিয়ে যান',
+    'register.SelectContactPoint.motherLabel': 'মা',
+    'register.SelectContactPoint.fatherLabel': 'বাবা',
+    'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
+    'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
+    'register.SelectContactPoint.relationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.goBack': 'ফিরে যান',
+    'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
+    'register.SelectContactPoint.error':
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
   }
 }

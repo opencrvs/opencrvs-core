@@ -93,6 +93,7 @@ export const testFhirBundle = {
       resource: {
         resourceType: 'Task',
         status: 'requested',
+        intent: '',
         focus: {
           reference: 'urn:uuid:888'
         },
@@ -1472,6 +1473,135 @@ export const testDeathFhirBundle = {
         valueCodeableConcept: {
           coding: [
             { system: 'http://hl7.org/fhir/ValueSet/icd-10', code: 'age' }
+          ]
+        }
+      }
+    }
+  ],
+  meta: { lastUpdated: '2019-02-11' }
+}
+
+export const testInProgressFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: `urn:uuid:888`,
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '0ab5e4cd-a49b-4bf3-b03a-08b2e65e642a'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'birth-declaration'
+            }
+          ],
+          text: 'Birth Declaration'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        subject: {},
+        date: '2018-05-23T14:44:58+02:00',
+        author: [],
+        title: 'Birth Declaration',
+        section: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      resource: {
+        resourceType: 'Task',
+        status: 'draft',
+        intent: '',
+        focus: {
+          reference: 'urn:uuid:888'
+        },
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'birth-registration'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '+8801622688231'
+          }
+        ]
+      }
+    }
+  ]
+}
+
+export const testInProgressDeathFhirBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:98df1315-47fd-4fc8-a505-9439ad7c6778',
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '98df1315-47fd-4fc8-a505-9439ad7c6778'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'death-declaration'
+            }
+          ],
+          text: 'Death Declaration'
+        },
+        class: {
+          coding: [
+            { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Death Declaration',
+        section: [],
+        subject: {},
+        date: '2019-02-11',
+        author: []
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      resource: {
+        resourceType: 'Task',
+        status: 'draft',
+        intent: '',
+        focus: {
+          reference: 'urn:uuid:888'
+        },
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'death-registration'
+            }
           ]
         }
       }

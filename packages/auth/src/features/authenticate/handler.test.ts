@@ -1,8 +1,9 @@
-import * as fetch from 'jest-fetch-mock'
-import { createServerWithEnvironment } from 'src/tests/util'
+import * as fetchAny from 'jest-fetch-mock'
+import { createServerWithEnvironment } from '@auth/tests/util'
 import { createServer } from '../..'
-import * as codeService from 'src/features/verifyCode/service'
+import * as codeService from '@auth/features/verifyCode/service'
 
+const fetch = fetchAny as any
 describe('authenticate handler receives a request', () => {
   let server: any
 
@@ -17,7 +18,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })
@@ -31,6 +32,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
+          status: 'active',
           scope: ['admin']
         })
       )
@@ -38,7 +40,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })
@@ -55,7 +57,9 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
-          scope: ['admin']
+          status: 'pending',
+          scope: ['admin'],
+          mobile: `+345345343`
         })
       )
       const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
@@ -64,7 +68,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })

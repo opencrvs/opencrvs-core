@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import { ADMIN_STRUCTURE_SOURCE } from '../../../constants'
+import { ADMIN_STRUCTURE_SOURCE } from '@resources/constants'
 import * as csv2json from 'csv2json'
 const divisionsJSON = `${ADMIN_STRUCTURE_SOURCE}statistics/divisions.json`
 const districtsJSON = `${ADMIN_STRUCTURE_SOURCE}statistics/districts.json`

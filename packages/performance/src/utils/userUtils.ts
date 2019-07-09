@@ -1,17 +1,25 @@
 import {
   GQLLocation,
   GQLUser,
-  GQLHumanName
+  GQLHumanName,
+  GQLIdentifier
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/performance/src/storage'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
+export interface ILocation {
+  id: string
+  identifier?: IIdentifier[]
+  name?: string
+  status?: string
+}
+
 export interface IIdentifier {
   system: string
   value: string
 }
-export interface ILocation {
+export interface IGQLLocation {
   id: string
   identifier?: IIdentifier[]
   name?: string
@@ -41,23 +49,30 @@ export function getUserDetails(user: GQLUser): IUserDetails {
       status: primaryOffice.status
     }
   }
-  userDetails.catchmentArea =
-    catchmentArea &&
-    catchmentArea.map((cArea: GQLLocation) => {
-      return {
-        id: cArea.id,
-        name: cArea.name,
-        status: cArea.status,
-        identifier:
-          cArea.identifier &&
-          cArea.identifier.map((identifier: IIdentifier) => {
-            return {
-              system: identifier.system,
-              value: identifier.value
-            }
-          })
+  if (catchmentArea) {
+    const areaWithLocations: GQLLocation[] = catchmentArea as GQLLocation[]
+    const potentialCatchmentAreas = areaWithLocations.map(
+      (cArea: GQLLocation) => {
+        if (cArea.identifier) {
+          const identifiers: GQLIdentifier[] = cArea.identifier as GQLIdentifier[]
+          return {
+            id: cArea.id,
+            name: cArea.name,
+            status: cArea.status,
+            identifier: identifiers.map((identifier: GQLIdentifier) => {
+              return {
+                system: identifier.system,
+                value: identifier.value
+              }
+            })
+          }
+        }
       }
-    })
+    ) as IGQLLocation[]
+    if (potentialCatchmentAreas !== undefined) {
+      userDetails.catchmentArea = potentialCatchmentAreas
+    }
+  }
   return userDetails
 }
 

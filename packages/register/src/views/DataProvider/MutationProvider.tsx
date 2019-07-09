@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { Event, Action, IForm } from 'src/forms'
-import { getBirthMutationMappings } from './birth/mutations'
-import { getDeathMutationMappings } from './death/mutations'
+import { Event, Action, IForm } from '@register/forms'
+import { getBirthMutationMappings } from '@register/views/DataProvider/birth/mutations'
+import { getDeathMutationMappings } from '@register/views/DataProvider/death/mutations'
 import { Mutation } from 'react-apollo'
-import { IApplication } from 'src/applications'
+import { IApplication } from '@register/applications'
 
 interface IMutationProviderProps {
   event: Event
@@ -56,10 +56,15 @@ class MutationProviderComponent extends React.Component<IProps> {
       <Mutation
         mutation={eventMutationMapping.mutation}
         variables={eventMutationMapping.variables || null}
-        onCompleted={data => onCompleted(data[eventMutationMapping.dataKey])}
+        onCompleted={(data: any) =>
+          onCompleted(data[eventMutationMapping.dataKey])
+        }
         onError={onError}
       >
-        {(submitMutation, { loading, data }) => {
+        {(
+          submitMutation: any,
+          { loading, data }: { loading: any; data?: any }
+        ) => {
           return (
             <MutationContext.Provider
               // @ts-ignore

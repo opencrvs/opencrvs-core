@@ -7,19 +7,22 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
-import { Mutation } from 'react-apollo'
-import styled from 'src/styled-components'
+import { Mutation, Query } from 'react-apollo'
+import styled from '@register/styledComponents'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
-import { SEARCH_RESULT } from 'src/navigation/routes'
-import { DuplicateDetails, Action } from 'src/components/DuplicateDetails'
-import { Event } from 'src/forms'
-import { NotDuplicateConfirmation } from 'src/views/Duplicates/NotDuplicateConfirmation'
+import { SEARCH_RESULT } from '@register/navigation/routes'
+import { DuplicateDetails, Action } from '@register/components/DuplicateDetails'
+import { Event } from '@register/forms'
+import { NotDuplicateConfirmation } from '@register/views/Duplicates/NotDuplicateConfirmation'
 import { RouteComponentProps } from 'react-router'
-import { Query } from 'react-apollo'
+
 import gql from 'graphql-tag'
-import { createNamesMap } from 'src/utils/data-formatting'
+import {
+  createNamesMap,
+  extractCommentFragmentValue
+} from '@register/utils/data-formatting'
 import { connect } from 'react-redux'
-import { IStoreState } from 'src/store'
+import { IStoreState } from '@register/store'
 import {
   GQLBirthRegistration,
   GQLHumanName,
@@ -30,15 +33,17 @@ import {
   GQLRegStatus,
   GQLComment
 } from '@opencrvs/gateway/src/graphql/schema'
-import { formatLongDate } from 'src/utils/date-formatting'
+import { formatLongDate } from '@register/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
-import { extractCommentFragmentValue } from 'src/utils/data-formatting'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 interface IMatchParams {
   applicationId: string
 }
 
-const messages = defineMessages({
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   title: {
     id: 'register.duplicates.title',
     defaultMessage: 'Possible duplicates found',
@@ -80,36 +85,6 @@ const messages = defineMessages({
     id: 'register.duplicates.female',
     defaultMessage: 'Female',
     description: 'The duplicates text for female'
-  },
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
   },
   queryError: {
     id: 'register.duplicates.queryError',
@@ -369,6 +344,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           (rec.registration &&
             rec.registration.status &&
             rec.registration.status
+              // @ts-ignore
               .map((status: GQLRegWorkflow, index: number) => {
                 let reasonString = ''
                 if (status.comments) {
@@ -387,7 +363,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                     (status.user &&
                       (status.user as GQLUser).role &&
                       intl.formatMessage(
-                        messages[(status.user as GQLUser).role as string]
+                        roleMessages[(status.user as GQLUser).role as string]
                       )) ||
                     '',
                   office:
@@ -446,7 +422,15 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId
           }}
         >
-          {({ loading, error, data }) => {
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: any
+            error?: any
+            data: any
+          }) => {
             if (loading) {
               return <StyledSpinner id="review-duplicates-spinner" />
             }
@@ -480,10 +464,13 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               )
             }
 
-            const gqlVars = duplicateIds.reduce((vars, id, i) => {
-              vars[`duplicate${i}Id`] = id
-              return vars
-            }, {})
+            const gqlVars = duplicateIds.reduce(
+              (vars: { [key: string]: string }, id, i) => {
+                vars[`duplicate${i}Id`] = id
+                return vars
+              },
+              {}
+            )
             return (
               <Query
                 query={createDuplicateDetailsQuery(duplicateIds)}
@@ -493,6 +480,10 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   loading: loadingDetails,
                   error: errorDetails,
                   data: dataDetails
+                }: {
+                  loading: any
+                  error?: any
+                  data: any
                 }) => {
                   if (loadingDetails) {
                     return <StyledSpinner id="review-duplicates-spinner" />
@@ -555,9 +546,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: this.state.selectedCompositionID,
             reason: 'duplicate'
           }}
-          onCompleted={data => this.successfulRejection(data.markEventAsVoided)}
+          onCompleted={(data: any) =>
+            this.successfulRejection(data.markEventAsVoided)
+          }
         >
-          {submitEventAsRejected => {
+          {(submitEventAsRejected: any) => {
             return (
               <Modal
                 title={intl.formatMessage(messages.rejectDescription)}
@@ -594,11 +587,11 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId,
             duplicateId: this.state.selectedCompositionID
           }}
-          onCompleted={data =>
+          onCompleted={(data: any) =>
             this.successfulDuplicateRemoval(data.notADuplicate)
           }
         >
-          {(submitNotADuplicateMutation, { data }) => {
+          {(submitNotADuplicateMutation: any, { data }: { data?: any }) => {
             return (
               <NotDuplicateConfirmation
                 handleYes={() => submitNotADuplicateMutation()}

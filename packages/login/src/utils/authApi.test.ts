@@ -1,4 +1,4 @@
-import { authApi, client } from './authApi'
+import { authApi, client } from '@login/utils/authApi'
 import * as moxios from 'moxios'
 
 describe('authApi', () => {
@@ -10,7 +10,7 @@ describe('authApi', () => {
   })
   it('authenticates with the server and return a nonce!  Love that word!', async () => {
     const data = {
-      mobile: '27845829934',
+      username: '27845829934',
       password: 'test'
     }
 

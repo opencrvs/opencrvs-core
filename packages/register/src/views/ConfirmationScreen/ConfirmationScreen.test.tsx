@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { createTestComponent, wait } from '../../tests/util'
-import { ConfirmationScreen } from './ConfirmationScreen'
+import { createTestComponent, wait } from '@register/tests/util'
+import { ConfirmationScreen } from '@register/views/ConfirmationScreen/ConfirmationScreen'
 import { ReactWrapper } from 'enzyme'
-import { createStore } from '../../store'
+import { createStore } from '@register/store'
 import {
   DECLARATION,
   OFFLINE,
@@ -12,7 +12,7 @@ import {
   DUPLICATION,
   BIRTH,
   DEATH
-} from 'src/utils/constants'
+} from '@register/utils/constants'
 
 const fullNameInBn = 'টম ব্র্যাডি'
 const fullNameInEng = 'Tom Brady'

@@ -1,37 +1,40 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { InjectedIntlProps } from 'react-intl'
 import {
   RegisterForm,
-  IFormProps
+  IFormProps,
+  FullProps
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import {
-  DRAFT_BIRTH_PARENT_FORM_TAB,
-  DRAFT_DEATH_FORM_TAB
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { connect } from 'react-redux'
-import { Event } from 'src/forms'
-import { Scope } from 'src/utils/authUtils'
+import { Event, IForm } from '@register/forms'
+import { IApplication } from '@register/applications'
 
-type IProps = IFormProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{}>
-
-const tabRoute: { [key in Event]: string } = {
-  birth: DRAFT_BIRTH_PARENT_FORM_TAB,
-  death: DRAFT_DEATH_FORM_TAB
+const pageRoute: { [key in Event]: string } = {
+  birth: DRAFT_BIRTH_PARENT_FORM_PAGE,
+  death: DRAFT_DEATH_FORM_PAGE
 }
-export class ApplicationFormView extends React.Component<IProps> {
+export class ApplicationFormView extends React.Component<FullProps> {
   render() {
     return <RegisterForm {...this.props} />
   }
 }
 
+interface StateProps {
+  application: IApplication
+  registerForm: IForm
+  pageRoute: string
+}
+
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string; applicationId: string }>
-) {
+  props: RouteComponentProps<{ pageId: string; applicationId: string }>
+): StateProps {
   const { match } = props
   const application = state.applicationsState.applications.find(
     ({ id }) => id === match.params.applicationId
@@ -52,10 +55,13 @@ function mapStatetoProps(
   return {
     application,
     registerForm,
-    tabRoute: tabRoute[event]
+    pageRoute: pageRoute[event]
   }
 }
 
-export const ApplicationForm = connect<IFormProps>(mapStatetoProps)(
-  ApplicationFormView
-)
+export const ApplicationForm = connect<
+  StateProps,
+  {},
+  IFormProps & RouteComponentProps<{ pageId: string; applicationId: string }>,
+  IStoreState
+>(mapStatetoProps)(ApplicationFormView)

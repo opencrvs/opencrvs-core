@@ -1,19 +1,19 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { IUserDetails } from 'src/utils/userUtils'
-import { IStoreState } from 'src/store'
-import { getLanguage } from 'src/i18n/selectors'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-import { Header } from 'src/components/interface/Header/Header'
+import { Button } from '@opencrvs/components/lib/buttons'
 import { TopBar } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { withTheme } from 'styled-components'
-import { Button } from '@opencrvs/components/lib/buttons'
-import styled from 'src/styled-components'
+import { Header } from '@register/components/interface/Header/Header'
+import { getLanguage } from '@register/i18n/selectors'
+import { goToSysAdminHomeTab as goToSysAdminHomeTabAction } from '@register/navigation'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import styled, { withTheme } from '@register/styledComponents'
+import { SYS_ADMIN_ROLES } from '@register/utils/constants'
+import { IUserDetails } from '@register/utils/userUtils'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { goToSysAdminHomeTab as goToSysAdminHomeTabAction } from 'src/navigation'
-import { SYS_ADMIN_ROLES } from 'src/utils/constants'
+import { UserTab } from './user/userTab'
 
 const Tab = styled(Button).attrs<{ active: boolean }>({})`
   color: ${({ theme }) => theme.colors.copy};
@@ -83,7 +83,7 @@ const TAB_ID = {
 type IProps = {
   title: string
   language: string
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   theme: ITheme
   goToSysAdminHomeTab: typeof goToSysAdminHomeTabAction
 }
@@ -154,6 +154,8 @@ class SysAdminHomeView extends React.Component<IFulProps> {
                 {intl.formatMessage(messages.configTab)}
               </Tab>
             </TopBar>
+
+            {tabId === TAB_ID.users && <UserTab />}
           </>
         )}
       </>

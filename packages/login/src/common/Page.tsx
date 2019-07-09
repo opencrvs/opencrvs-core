@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
-import { LoginHeader } from './LoginHeader'
+import { LoginHeader } from '@login/common/LoginHeader'
 
 export interface IPage {
   submitting: boolean

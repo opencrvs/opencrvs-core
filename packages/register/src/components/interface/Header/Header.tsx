@@ -22,17 +22,18 @@ import {
   BRN,
   Phone,
   ArrowBack,
+  Plus,
   SystemBlack,
   SystemBlue
 } from '@opencrvs/components/lib/icons'
 import { IconButton } from '@opencrvs/components/lib/buttons'
-import { storage } from 'src/storage'
-import { SCREEN_LOCK } from 'src/components/ProtectedPage'
+import { storage } from '@register/storage'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { connect } from 'react-redux'
-import { getUserDetails } from 'src/profile/profileSelectors'
-import { IUserDetails } from '../../../utils/userUtils'
-import { redirectToAuthentication } from 'src/profile/profileActions'
-import { IStoreState } from 'src/store'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IUserDetails } from '@register/utils/userUtils'
+import { redirectToAuthentication } from '@register/profile/profileActions'
+import { IStoreState } from '@register/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
 import {
@@ -40,21 +41,21 @@ import {
   goToPerformance,
   goToSearchResult,
   goToSearch,
-  goToSettings
-} from 'src/navigation'
-import { ProfileMenu } from 'src/components/ProfileMenu'
+  goToSettings,
+  goToEvents as goToEventsAction
+} from '@register/navigation'
+import { ProfileMenu } from '@register/components/ProfileMenu'
 import {
   TRACKING_ID_TEXT,
   BRN_DRN_TEXT,
   PHONE_TEXT,
   SYS_ADMIN_ROLES
-} from 'src/utils/constants'
-import { Plus } from '@opencrvs/components/lib/icons'
-import styled from 'src/styled-components'
-import { goToEvents as goToEventsAction } from 'src/navigation'
+} from '@register/utils/constants'
+import styled from 'styled-components'
+import { roleMessages } from '@register/utils/roleTypeMessages'
 
 type IProps = InjectedIntlProps & {
-  userDetails: IUserDetails
+  userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
   title?: string
@@ -74,42 +75,9 @@ interface IState {
   showLogoutModal: boolean
 }
 
-const messages = defineMessages({
-  FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
-    defaultMessage: 'Field Agent',
-    description: 'The description for FIELD_AGENT role'
-  },
-  LOCAL_SYSTEM_ADMIN: {
-    id: 'register.home.header.LOCAL_SYSTEM_ADMIN',
-    defaultMessage: 'Sysadmin',
-    description: 'The description for Sysadmin role'
-  },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
-  },
-  LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
-    defaultMessage: 'Registrar',
-    description: 'The description for LOCAL_REGISTRAR role'
-  },
-  DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
-    defaultMessage: 'District Registrar',
-    description: 'The description for DISTRICT_REGISTRAR role'
-  },
-  STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
-    defaultMessage: 'State Registrar',
-    description: 'The description for STATE_REGISTRAR role'
-  },
-  NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
-    defaultMessage: 'National Registrar',
-    description: 'The description for NATIONAL_REGISTRAR role'
-  },
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   typeTrackingId: {
     id: 'register.home.header.typeTrackingId',
     defaultMessage: 'Tracking ID',
@@ -201,14 +169,19 @@ class HeaderComp extends React.Component<IProps, IState> {
     let name = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName) => storedName.use === language
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === language
+        }
       ) as GQLHumanName
-      name = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      name = nameObj
+        ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+        : ''
     }
 
     const role =
       userDetails && userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
+        ? intl.formatMessage(roleMessages[userDetails.role])
         : ''
 
     let menuItems = [
@@ -216,7 +189,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
         label: this.props.intl.formatMessage(messages.applicationTitle),
-        onClick: goToHome
+        onClick: this.props.goToHomeAction
       },
       {
         icon: <StatsBlack />,
@@ -255,7 +228,7 @@ class HeaderComp extends React.Component<IProps, IState> {
           icon: <SystemBlack />,
           iconHover: <SystemBlue />,
           label: this.props.intl.formatMessage(messages.systemTitle),
-          onClick: goToHome
+          onClick: this.props.goToHomeAction
         },
         {
           icon: <SettingsBlack />,
@@ -403,7 +376,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       ? {
           mobileLeft: {
             icon: () => <ArrowBack />,
-            handler: () => history.back()
+            handler: () => window.history.back()
           },
           mobileBody: this.renderSearchInput(this.props, true)
         }

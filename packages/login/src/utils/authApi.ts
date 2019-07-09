@@ -8,7 +8,7 @@ export interface ICodeVerifyData {
 }
 
 export interface IAuthenticationData {
-  mobile: string
+  username: string
   password: string
 }
 
@@ -18,6 +18,8 @@ export const client = axios.create({
 
 export interface IAuthenticateResponse {
   nonce: string
+  token?: string
+  mobile: string
 }
 
 export interface ITokenResponse {

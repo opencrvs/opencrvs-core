@@ -1,13 +1,13 @@
 import fetch from 'node-fetch'
-import { set, get, del } from 'src/database'
+import { set, get, del } from '@auth/database'
 import {
   NOTIFICATION_SERVICE_URL,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
   JWT_ISSUER
-} from 'src/constants'
+} from '@auth/constants'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
-import { createToken } from 'src/features/authenticate/service'
+import { createToken } from '@auth/features/authenticate/service'
 
 interface ICodeDetails {
   code: string
@@ -29,7 +29,7 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  // TODO lets come back to how these are generated
+  // tslint:disable-next-line
   const code = Math.floor(100000 + Math.random() * 900000).toString()
 
   await storeVerificationCode(nonce, code)

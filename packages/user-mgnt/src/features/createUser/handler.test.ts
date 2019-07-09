@@ -1,14 +1,15 @@
-import { createServer } from '../..'
-import * as jwt from 'jsonwebtoken'
+import { createServer } from '@user-mgnt/index'
+import User, { IUser } from '@user-mgnt/model/user'
+import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
-import { IUser } from '../../model/user'
-import User from '../../model/user'
+import * as jwt from 'jsonwebtoken'
+import mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['system'] },
+  { scope: ['sysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',
@@ -43,6 +44,7 @@ describe('createUser handler', () => {
   let server: any
 
   beforeEach(async () => {
+    mockingoose.resetAll()
     server = await createServer()
     fetch.resetMocks()
   })
@@ -50,15 +52,35 @@ describe('createUser handler', () => {
   it('creates and saves fhir resources and adds user using mongoose', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
+      ['', { status: 200 }]
     )
 
-    const spy = jest.spyOn(User, 'create').mockResolvedValueOnce({})
+    mockingoose(UsernameRecord).toReturn(null, 'findOne')
+    mockingoose(UsernameRecord).toReturn(null, 'save')
+    mockingoose(User).toReturn(mockUser, 'save')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',
-      payload: mockUser,
+      payload: {
+        name: [
+          {
+            use: 'en',
+            given: ['John', 'William'],
+            family: 'Doe'
+          }
+        ],
+        username: 'j.doe1',
+        identifiers: [{ system: 'NID', value: '1234' }],
+        email: 'j.doe@gmail.com',
+        mobile: '+880123445568',
+        type: 'SOME_TYPE',
+        primaryOfficeId: '321',
+        catchmentAreaIds: [],
+        deviceId: 'D444',
+        password: 'test'
+      },
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -82,7 +104,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/roles',
-              code: 'LOCAL_REGISTRAR'
+              code: 'FIELD_AGENT'
             }
           ]
         },
@@ -95,7 +117,7 @@ describe('createUser handler', () => {
       location: [{ reference: 'Location/321' }]
     }
 
-    expect(fetch.mock.calls.length).toBe(2)
+    expect(fetch.mock.calls.length).toBe(3)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
       expectedPractitioner
     )
@@ -103,7 +125,6 @@ describe('createUser handler', () => {
       expectedPractitionerROle
     )
 
-    expect(spy).toBeCalled()
     expect(res.statusCode).toBe(201)
   })
 
@@ -179,35 +200,31 @@ describe('createUser handler', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('returns an error and rollsback if the user object is invalid', async () => {
+  it('send 500 if mongoose operation throws error', async () => {
     fetch.mockResponses(
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
-      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
-      ['', { status: 200 }],
-      ['', { status: 200 }]
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )
 
-    const copyMockUser = Object.assign({}, mockUser)
-    delete copyMockUser.password
+    mockingoose(UsernameRecord).toReturn(
+      { username: 'jw.doe', count: 1 },
+      'findOne'
+    )
+    mockingoose(UsernameRecord).toReturn(
+      new Error('Failed to update'),
+      'update'
+    )
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/createUser',
-      payload: copyMockUser,
+      payload: mockUser,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
 
-    expect(fetch.mock.calls.length).toBe(4)
-    expect(fetch.mock.calls[2][0]).toEqual(
-      'http://localhost:5001/fhir/Practitioner/123'
-    )
-    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
-    expect(fetch.mock.calls[3][0]).toEqual(
-      'http://localhost:5001/fhir/PractitionerRole/123'
-    )
-    expect(fetch.mock.calls[3][1].method).toEqual('DELETE')
-    expect(res.statusCode).toBe(400)
+    expect(res.statusCode).toBe(500)
+    mockingoose.resetAll()
   })
 })

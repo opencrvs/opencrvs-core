@@ -3,15 +3,15 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import * as Hapi from 'hapi'
 import * as DotEnv from 'dotenv'
-import { getPlugins } from 'src/config/plugins'
-import { getServer } from 'src/config/server'
-import { getLogger } from 'src/utils/logger'
-import { getRoutes } from 'src/config/routes'
+import { getPlugins } from '@gateway/config/plugins'
+import { getServer } from '@gateway/config/server'
+import { getLogger } from '@gateway/utils/logger'
+import { getRoutes } from '@gateway/config/routes'
 import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL
-} from 'src/constants'
+} from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 

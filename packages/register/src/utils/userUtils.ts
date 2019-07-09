@@ -1,7 +1,8 @@
 import {
   GQLLocation,
   GQLUser,
-  GQLHumanName
+  GQLHumanName,
+  GQLIdentifier
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/register/src/storage'
 
@@ -22,6 +23,8 @@ export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
   role?: string
+  type?: string
+  status?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
@@ -34,6 +37,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     primaryOffice,
     name,
     role,
+    type,
+    status,
     userMgntUserID,
     practitionerId
   } = user
@@ -52,6 +57,12 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   if (role) {
     userDetails.role = role
   }
+  if (type) {
+    userDetails.type = type
+  }
+  if (status) {
+    userDetails.status = status
+  }
   if (primaryOffice) {
     userDetails.primaryOffice = {
       id: primaryOffice.id,
@@ -59,23 +70,33 @@ export function getUserDetails(user: GQLUser): IUserDetails {
       status: primaryOffice.status
     }
   }
-  userDetails.catchmentArea =
-    catchmentArea &&
-    catchmentArea.map((cArea: GQLLocation) => {
-      return {
-        id: cArea.id,
-        name: cArea.name,
-        status: cArea.status,
-        identifier:
-          cArea.identifier &&
-          cArea.identifier.map((identifier: IIdentifier) => {
-            return {
-              system: identifier.system,
-              value: identifier.value
-            }
-          })
+
+  if (catchmentArea) {
+    const areaWithLocations: GQLLocation[] = catchmentArea as GQLLocation[]
+    const potentialCatchmentAreas = areaWithLocations.map(
+      (cArea: GQLLocation) => {
+        if (cArea.identifier) {
+          const identifiers: GQLIdentifier[] = cArea.identifier as GQLIdentifier[]
+          return {
+            id: cArea.id,
+            name: cArea.name,
+            status: cArea.status,
+            identifier: identifiers.map((identifier: GQLIdentifier) => {
+              return {
+                system: identifier.system,
+                value: identifier.value
+              }
+            })
+          }
+        }
+        return {}
       }
-    })
+    ) as IGQLLocation[]
+    if (potentialCatchmentAreas !== undefined) {
+      userDetails.catchmentArea = potentialCatchmentAreas
+    }
+  }
+
   return userDetails
 }
 

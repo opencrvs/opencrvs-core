@@ -1,4 +1,4 @@
-import transformObj, { IFieldBuilders } from 'src/features/transformation'
+import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { v4 as uuid } from 'uuid'
 import {
   createCompositionTemplate,
@@ -33,7 +33,7 @@ import {
   INFORMANT_TITLE,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE
-} from 'src/features/fhir/templates'
+} from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
   selectOrCreateObservationResource,
@@ -51,13 +51,13 @@ import {
   selectOrCreateEncounterLocationRef,
   selectOrCreateInformantSection,
   selectOrCreateInformantResource
-} from 'src/features/fhir/utils'
+} from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
   EVENT_TYPE
-} from '../fhir/constants'
-import { IAuthHeader } from 'src/common-types'
+} from '@gateway/features/fhir/constants'
+import { IAuthHeader } from '@gateway/common-types'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -1619,6 +1619,17 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, `${regNumber}`, fieldValue)
     },
+    inProgress: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: boolean,
+      context: any
+    ) => {
+      if (fieldValue) {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        taskResource.status = 'draft'
+      }
+      return
+    },
     paperFormID: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2449,6 +2460,7 @@ export async function updateFHIRTaskBundle(
 
 export interface ITemplatedComposition extends fhir.Composition {
   section: fhir.CompositionSection[]
+  [key: string]: any
 }
 
 export interface ICompositionBundleEntry extends fhir.BundleEntry {

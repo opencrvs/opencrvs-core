@@ -1,0 +1,17 @@
+overwrite: true
+schema:
+  - http://localhost:7070/graphql:
+      headers:
+        Authorization: { { token } }
+documents: 'src/tests/'
+generates:
+  src/tests/types.d.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-apollo'
+      - 'typescript-graphql-files-modules'
+      - 'fragment-matcher'
+  src/tests/graphql.schema.json:
+    plugins:
+      - 'introspection'

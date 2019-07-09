@@ -3,7 +3,7 @@ import {
   IFormData,
   IAttachment,
   IFormFieldQueryMapFunction
-} from '../..'
+} from '@register/forms'
 import {
   GQLHumanName,
   GQLAddress,
@@ -12,6 +12,10 @@ import {
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep } from 'lodash'
+
+interface IName {
+  [key: string]: any
+}
 
 export const nameToFieldTransformer = (
   language: string,
@@ -22,7 +26,7 @@ export const nameToFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  const selectedName =
+  const selectedName: IName | undefined =
     queryData[sectionId] &&
     queryData[sectionId].name &&
     (queryData[sectionId].name as GQLHumanName[]).find(
@@ -101,6 +105,9 @@ export const identifierToFieldTransformer = (identifierField: string) => (
     queryData[sectionId].identifier[0][identifierField]
   return transformedData
 }
+interface IAddress {
+  [key: string]: any
+}
 
 export const addressToFieldTransformer = (
   addressType: string,
@@ -112,7 +119,7 @@ export const addressToFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  const address =
+  const address: IAddress | undefined =
     queryData[sectionId] &&
     queryData[sectionId].address &&
     (queryData[sectionId].address as GQLAddress[]).find(
@@ -277,7 +284,7 @@ export const eventLocationQueryTransformer = (
     return transformedData
   }
   const eventLocation = queryData.eventLocation as fhir.Location
-  const address = eventLocation.address as fhir.Address
+  const address = eventLocation.address as IAddress
   const line = address.line as string[]
   if (lineNumber > 0) {
     transformedData[sectionId][field.name] = line[lineNumber - 1]

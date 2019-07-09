@@ -1,4 +1,4 @@
-import { ILanguage } from '../reducer'
+import { ILanguage } from '@register/i18n/reducer'
 
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
@@ -500,6 +500,22 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
+    'register.selectInformant.newBirthRegistration': 'New birth application',
+    'register.selectInformant.informantTitle':
+      'Who is applying for birth registration?',
+    'register.selectInformant.mother': 'Mother',
+    'register.selectInformant.father': 'Father',
+    'register.selectInformant.parents': 'Mother & Father',
+    'register.selectInformant.someoneElse': 'Someone Else',
+    'register.selectInformant.self': 'Self',
+    'register.selectInformant.errorMessage':
+      'Please select who is present and applying',
+    'register.primaryApplicant.registerNewEventHeading':
+      'Who is the primary applicant for this application?',
+    'register.primaryApplicant.description':
+      'This person is responsible for providing accurate information in this application. ',
+    'register.primaryApplicant.errorMessage':
+      'Please select who is the primary applicant',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
@@ -514,17 +530,22 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.submitButton': 'Submit',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
-    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar',
+    'register.home.header.fieldAgent': 'Field Agent',
+    'register.home.header.registrationClerk': 'Registration Clerk',
+    'register.home.header.localRegistrar': 'Registrar',
+    'register.home.header.districtRegistrar': 'District Registrar',
+    'register.home.header.stateRegistrar': 'State Registrar',
+    'register.home.header.nationalRegistrar': 'National Registrar',
+    'register.home.header.nationalSystemAdmin': 'System admin (national)',
+    'register.home.header.performanceOversight': 'Performance Oversight',
+    'register.home.header.performanceManagement': 'Performance Management',
     'register.notification.newContentAvailable':
       "We've made some updates, click here to refresh.",
     'register.notification.declarationsSynced':
       'As you have connectivity, we have synced {syncCount} new birth applications.',
     'register.notification.draftsSaved': 'Your draft has been saved',
+    'register.notification.userFormSuccess': 'New user created',
+    'register.notification.userFormFail': 'Sorry! Something went wrong',
     'register.savedRegistration.online.title': 'Application submitted',
     'register.rejectionTitle': 'Application rejected',
     'register.completeRegistration.online.title': 'Registration complete',
@@ -571,23 +592,14 @@ export const ENGLISH_STATE: ILanguage = {
     'register.savedRegistration.buttons.back': 'Back to homescreen',
     'register.savedRegistration.buttons.newDeclaration': 'New application',
     'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
-    'register.selectInformant.newBirthRegistration': 'New birth application',
-    'register.selectInformant.informantTitle': 'Who is the informant?',
-    'register.selectInformant.informantDescription':
-      'Tell us who is providing the details, and check what information is needed to submit the form.',
-    'register.selectInformant.parentInformantTitle': 'Parent',
-    'register.selectInformant.parentInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>child, mother</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>father.</strong>',
-    'register.selectInformant.otherInformantTitle': 'Someone else',
-    'register.selectInformant.otherInformantDescription':
-      'Required: Details of the child and informant. Optional: Details of the mother/father.',
-    'register.selectInformant.selfInformantTitle': 'Self (18+)',
-    'register.selectInformant.selfInformantDescription':
-      '<strong>Required</strong>: Details of the <strong>individual</strong> and <strong>informant</strong>.' +
-      '<br /><strong>Optional</strong>: Details of the <strong>mother/father</strong>',
-    'register.selectVitalEvent.registerNewEventTitle':
-      'New vital event application',
+    'register.selectVitalEvent.saveExitButton': 'SAVE & EXIT',
+    'register.selectVitalEvent.registerNewEventTitle': 'New application',
+    'register.selectVitalEvent.registerNewEventHeading':
+      'What type of event do you want to declare?',
+    'register.selectVitalEvent.birth': 'Birth',
+    'register.selectVitalEvent.death': 'Death',
+    'register.selectVitalEvent.continueButton': 'Continue',
+    'register.selectVitalEvent.errorMessage': 'Please select the type of event',
     'register.home.buttons.mydraft': 'My draft',
     'register.home.buttons.registerNewEvent': 'New application',
     'register.home.buttons.pendingSubimissions': 'Pending submissions',
@@ -1021,9 +1033,10 @@ export const ENGLISH_STATE: ILanguage = {
     'account.title': 'Account',
     'system.title': 'System',
     'label.nameEN': 'English name',
-    'label.nameBN': 'Bangla name',
+    'label.nameBN': 'Bengali name',
     'label.phone': 'Phone number',
     'label.role': 'Role',
+    'label.type': 'Type',
     'label.password': 'Password',
     'label.pin': 'PIN',
     'label.language': 'Language',
@@ -1045,16 +1058,130 @@ export const ENGLISH_STATE: ILanguage = {
       'Checking your applications',
     'register.fieldAgentHome.queryError':
       'An error occured while loading applications',
+    'system.user.queryError': 'An error occured while loading system users',
     'register.sysAdminHome.overview': 'Overview',
     'register.sysAdminHome.offices': 'Offices',
     'register.sysAdminHome.network': 'Network',
     'register.sysAdminHome.users': 'Users',
     'register.sysAdminHome.devices': 'Devices',
     'register.sysAdminHome.config': 'Config',
-    'register.home.header.LOCAL_SYSTEM_ADMIN': 'Sysadmin',
+    'register.home.header.localSystemAdmin': 'Sysadmin',
     'register.home.header.systemTitle': 'System',
     'register.home.header.settingsTitle': 'Settings',
     'register.home.header.helpTitle': 'Help',
-    'register.home.header.logoutTitle': 'Logout'
+    'register.home.header.logoutTitle': 'Logout',
+    'userSetup.landing.title': 'Welcome to OpenCRVS',
+    'userSetup.landing.instruction':
+      'You just a few steps away from completing your account set up.',
+    'userSetup.type.hospital': 'Hospital',
+    'userSetup.type.cha': 'CHA',
+    'userSetup.type.entrepeneur': 'Entrepeneur',
+    'userSetup.type.dataEntryClerk': 'Data entry clerk',
+    'userSetup.type.secretary': 'Secretary',
+    'userSetup.type.chairman': 'Chairman',
+    'userSetup.type.mayor': 'Mayor',
+    'userSetup.type.localSystemAdmin': 'System admin (local)',
+    'userSetup.type.nationalSystemAdmin': 'System admin (national)',
+    'userSetup.type.cabinetDivision': 'Cabinet Division',
+    'userSetup.type.healthDivision': 'Health Division',
+    'userSetup.type.orgDivision': 'ORG Division',
+    'userSetup.type.bbs': 'BBS',
+    'userSetup.landing.button.start': 'Start',
+    'user.form.name': 'User',
+    'user.title.create': 'Create new user',
+    'user.section.userDetails': 'User details',
+    'user.section.accountDetails': 'Account details',
+    'user.section.assignedRegisterOffice': 'Assigned Register Office',
+    'label.firstNameBN': 'Bengali first name',
+    'label.lastNameBN': 'Bengali last name',
+    'label.firstNameEN': 'English first name',
+    'label.lastNameEN': 'English last name',
+    'label.NID': 'NID',
+    'label.username': 'Username',
+    'label.userDevice': 'Device',
+    'label.registrationOffice': 'Registration Office',
+    'button.continue': 'Continue',
+    'createUser.buttons.submit': 'Create user',
+    'createUser.preview.title': 'Please review the new users details',
+    'register.securityquestion.title': 'Security questions',
+    'register.securityquestion.heading': 'Set your security questions',
+    'register.securityquestion.description':
+      'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
+    'register.securityquestion.select': 'Select',
+    'register.securityquestion.selectSecurityQuestion':
+      'Select a security question',
+    'register.securityquestion.enterResponse':
+      'Enter a response to your chosen security question',
+    'register.securityquestion.securityQuestionLabel':
+      'Security question {count}',
+    'table.column.header.name': 'Name',
+    'table.column.header.username': 'Username',
+    'table.column.header.role': 'Role',
+    'table.column.header.type': 'Type',
+    'table.column.header.status': 'Status',
+    'register.securityquestion.answer': 'Answer',
+    'register.userSetup.securityQuestions.birthTown':
+      'What city were you born in?',
+    'register.userSetup.securityQuestions.hightSchool':
+      'What is the name of your high school?',
+    'register.userSetup.securityQuestions.motherName':
+      "What is your mother's name?",
+    'register.userSetup.securityQuestions.favoriteTeacher':
+      'What is the name of your favorite school teacher?',
+    'register.userSetup.securityQuestions.favoriteMovie':
+      'What is your favorite movie?',
+    'register.userSetup.securityQuestions.favoriteSong':
+      'What is your favorite song?',
+    'register.userSetup.securityQuestions.favoriteFood':
+      'What is your favorite food?',
+    'register.userSetup.securityQuestions.firstChildName':
+      "What is your first child's name?",
+    'formFields.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    'formFields.SearchField.modalCancel': 'Cancel',
+    'formFields.SearchField.modalSelect': 'SELECT',
+    'formFields.SearchField.locationId': 'Id: {locationId}',
+    'formFields.SearchField.editButton': 'Change assigned office',
+    'formFields.SearchField.placeHolderText': 'Search',
+    'userSetup.complete.title': 'Account setup complete',
+    'userSetup.complete.instruction':
+      'Now login to your account with your user name and newly created password',
+    'userSetup.complete.button.login': 'Login',
+    'newPassword.header': 'Choose a new password',
+    'newPassword.instruction':
+      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    'password.label.new': 'New password',
+    'password.label.confirm': 'Confirm password',
+    'password.validation.msg': 'Password must have:',
+    'password.minLength': '{min} characters minimum',
+    'password.cases': 'Contain upper and lower cases',
+    'password.number': 'At least one number',
+    'password.match': 'Passwords match',
+    'password.mismatch': 'Passwords do not match',
+    'error.required.password': 'New password is not valid',
+    'register.registrarHome.readyToPrint': 'Ready to print',
+    'register.registrarHome.registrationNumber': 'Registration no.',
+    'register.registrarHome.results.registeredDate': 'Application registered',
+    'register.registrarHome.printButton': 'Print',
+    'userSetup.review.title': 'Your details',
+    'userSetup.review.header': 'Confirm your details',
+    'userSetupReview.instruction':
+      'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
+    'label.assignedOffice': 'Assigned office',
+    'button.confirm': 'Confirm',
+    'user.setup.waiting': 'Setting up your account',
+    'error.occured': 'An error occured. Please try again.',
+    'register.SelectContactPoint.title': 'Birth application',
+    'register.SelectContactPoint.heading':
+      'Who is the main point of contact for this application?',
+    'register.SelectContactPoint.continueButton': 'Continue',
+    'register.SelectContactPoint.motherLabel': 'Mother',
+    'register.SelectContactPoint.fatherLabel': 'Father',
+    'register.SelectContactPoint.otherLabel': 'Someone else',
+    'register.SelectContactPoint.phoneNoLabel': 'Phone number',
+    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.goBack': 'Back',
+    'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
+    'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
+    'register.SelectContactPoint.error': 'Please select a main point of contact'
   }
 }

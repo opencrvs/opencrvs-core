@@ -6,33 +6,36 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
+import styled, { ThemeProvider } from '@register/styledComponents'
+import { I18nContainer } from '@register/i18n/components/I18nContainer'
+import { createStore, AppStore } from '@register/store'
+import { ProtectedRoute } from '@register/components/ProtectedRoute'
+import * as routes from '@register/navigation/routes'
+import { NotificationComponent } from '@register/components/Notification'
+import { Page } from '@register/components/Page'
+import { ProtectedPage } from '@register/components/ProtectedPage'
+import { SelectVitalEvent } from '@register/views/SelectVitalEvent/SelectVitalEvent'
+import { SelectInformant } from '@register/views/SelectInformant/SelectInformant'
+import { ApplicationForm } from '@register/views/RegisterForm/ApplicationForm'
+import { ReviewForm } from '@register/views/RegisterForm/ReviewForm'
+import { SearchResult } from '@register/views/SearchResult/SearchResult'
+import ScrollToTop from '@register/components/ScrollToTop'
+import { createClient } from '@register/utils/apolloClient'
+import { ReviewDuplicates } from '@register/views/Duplicates/ReviewDuplicates'
+import { SessionExpireConfirmation } from '@register/components/SessionExpireConfirmation'
+import { ConfirmationScreen } from '@register/views/ConfirmationScreen/ConfirmationScreen'
+import { PrintCertificateAction } from '@register/views/PrintCertificate/PrintCertificateAction'
+import { ErrorBoundary } from '@register/components/ErrorBoundary'
+import { Details } from '@register/views/Home/Details'
+import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
+import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
+import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
-import ScrollToTop from 'src/components/ScrollToTop'
-import { createClient } from 'src/utils/apolloClient'
-import { Details } from 'src/views/Home/Details'
-import styled, { ThemeProvider } from 'styled-components'
-import { ErrorBoundary } from './components/ErrorBoundary'
-import { NotificationComponent } from './components/Notification'
-import { Page } from './components/Page'
-import { ProtectedPage } from './components/ProtectedPage'
-import { ProtectedRoute } from './components/ProtectedRoute'
-import { SessionExpireConfirmation } from './components/SessionExpireConfirmation'
-import { StyledErrorBoundary } from './components/StyledErrorBoundary'
-import { I18nContainer } from './i18n/components/I18nContainer'
-import * as routes from './navigation/routes'
-import { AppStore, createStore } from './store'
-import { ConfirmationScreen } from './views/ConfirmationScreen/ConfirmationScreen'
-import { ReviewDuplicates } from './views/Duplicates/ReviewDuplicates'
-import { FieldAgentHome } from './views/FieldAgentHome/FieldAgentHome'
-import { PrintCertificateAction } from './views/PrintCertificate/PrintCertificateAction'
-import { ApplicationForm } from './views/RegisterForm/ApplicationForm'
-import { ReviewForm } from './views/RegisterForm/ReviewForm'
-import { RegistrarHome } from './views/RegistrarHome/RegistrarHome'
-import { SearchResult } from './views/SearchResult/SearchResult'
-import { SelectInformant } from './views/SelectInformant/SelectInformant'
-import { SelectVitalEvent } from './views/SelectVitalEvent/SelectVitalEvent'
-import { SettingsPage } from './views/Settings/SettingsPage'
-import { SysAdminHome } from './views/SysAdmin/SysAdminHome'
+import { SettingsPage } from '@register/views/Settings/SettingsPage'
+import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
+import { CreateNewUser } from './views/SysAdmin/views/CreateNewUser'
+import { SelectPrimaryApplicant } from './views/SelectPrimaryApplicant/SelectPrimaryApplicant'
+import { SelectContactPoint } from './views/SelectContactPoint/SelectContactPoint'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -41,7 +44,7 @@ interface IAppProps {
 }
 const MainSection = styled.section`
   flex-grow: 8;
-  padding-bottom: 48px;
+  background: ${({ theme }) => theme.colors.background};
 `
 export const store = createStore()
 
@@ -83,6 +86,11 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
+                                  path={routes.SELECT_PRIMARY_APPLICANT}
+                                  component={SelectPrimaryApplicant}
+                                />
+                                <ProtectedRoute
+                                  exact
                                   path={routes.SELECT_INFORMANT}
                                   component={SelectInformant}
                                 />
@@ -93,7 +101,7 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.DRAFT_BIRTH_PARENT_FORM_TAB}
+                                  path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
@@ -103,12 +111,12 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.DRAFT_DEATH_FORM_TAB}
+                                  path={routes.DRAFT_DEATH_FORM_PAGE}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.REVIEW_EVENT_PARENT_FORM_TAB}
+                                  path={routes.REVIEW_EVENT_PARENT_FORM_PAGE}
                                   component={ReviewForm}
                                 />
                                 <ProtectedRoute
@@ -158,6 +166,21 @@ export class App extends React.Component<IAppProps> {
                                   exact
                                   path={routes.SYS_ADMIN_HOME_TAB}
                                   component={SysAdminHome}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.CREATE_USER}
+                                  component={CreateNewUser}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.CREATE_USER_SECTION}
+                                  component={CreateNewUser}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_MAIN_CONTACT_POINT}
+                                  component={SelectContactPoint}
                                 />
                               </Switch>
                             </ProtectedPage>

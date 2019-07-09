@@ -1,15 +1,12 @@
 import { defineMessages } from 'react-intl'
 
-export const messages = defineMessages({
-  mobileLabel: {
-    id: 'login.mobileLabel',
-    defaultMessage: 'Mobile number',
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
+  username: {
+    id: 'login.username',
+    defaultMessage: 'User Name',
     description: 'The label that appears on the mobile number input'
-  },
-  mobilePlaceholder: {
-    id: 'login.mobilePlaceholder',
-    defaultMessage: '07XXXXXXXXX',
-    description: 'The placeholder that appears on the mobile number input'
   },
   passwordLabel: {
     id: 'login.passwordLabel',
@@ -19,15 +16,15 @@ export const messages = defineMessages({
 })
 
 export const stepOneFields = {
-  mobile: {
-    id: 'mobile',
-    name: 'mobile',
-    maxLength: 11,
+  username: {
+    id: 'username',
+    name: 'username',
+    // maxLength: 11,
     validate: [],
     disabled: false,
-    type: 'tel',
+    type: 'text',
     focusInput: false,
-    label: messages.mobileLabel
+    label: messages.username
   },
   password: {
     id: 'password',

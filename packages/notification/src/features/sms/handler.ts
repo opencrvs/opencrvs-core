@@ -1,7 +1,8 @@
 import * as Hapi from 'hapi'
 import { internal } from 'boom'
-import { sendSMS } from './service'
-import { NON_UNICODED_LANGUAGES } from 'src/constants'
+import { sendSMS } from '@notification/features/sms/service'
+import { NON_UNICODED_LANGUAGES } from '@notification/constants'
+import { logger } from '@notification/logger'
 
 export type HapiRequest = Hapi.Request & {
   i18n: {
@@ -38,6 +39,11 @@ interface IDeclarationPayload extends ISMSPayload {
 
 interface IRegistrationPayload extends ISMSPayload {
   name: string
+}
+
+interface ICredentialsPayload extends ISMSPayload {
+  username: string
+  password: string
 }
 
 export async function sendBirthDeclarationConfirmation(
@@ -115,6 +121,31 @@ export async function sendDeathRegistrationConfirmation(
       payload.msisdn,
       request.i18n.__('deathRegistrationNotification', {
         name: payload.name
+      }),
+      /* send unicoded sms if provided local is not in non unicoded set */
+      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
+    )
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function sendUserCredentials(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as ICredentialsPayload
+  // TODO: need to remove this once dev env check code is here
+  logger.info(`Username: ${payload.username}`)
+  logger.info(`Password: ${payload.password}`)
+  try {
+    await sendSMS(
+      payload.msisdn,
+      request.i18n.__('userCredentialsNotification', {
+        username: payload.username,
+        password: payload.password
       }),
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0

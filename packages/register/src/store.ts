@@ -14,10 +14,13 @@ import {
   RouterState
 } from 'react-router-redux'
 
-import { profileReducer, ProfileState } from './profile/profileReducer'
-import { offlineDataReducer, IOfflineDataState } from './offline/reducer'
-import { intlReducer, IntlState } from './i18n/reducer'
-import { applicationsReducer, IApplicationsState } from 'src/applications'
+import { profileReducer, ProfileState } from '@register/profile/profileReducer'
+import {
+  offlineDataReducer,
+  IOfflineDataState
+} from '@register/offline/reducer'
+import { intlReducer, IntlState } from '@register/i18n/reducer'
+import { applicationsReducer, IApplicationsState } from '@register/applications'
 import {
   reviewReducer,
   IReviewFormState
@@ -25,19 +28,26 @@ import {
 import {
   registerFormReducer,
   IRegisterFormState
-} from './forms/register/reducer'
-import { navigationReducer, INavigationState } from 'src/navigation'
+} from '@register/forms/register/reducer'
+import { navigationReducer, INavigationState } from '@register/navigation'
 import {
   notificationReducer,
   NotificationState
-} from 'src/notification/reducer'
+} from '@register/notification/reducer'
 import {
   IRejectState,
   rejectReducer
 } from '@opencrvs/register/src/review/reducer'
-import { IPrintFormState, printReducer } from './forms/certificate/printReducer'
+import {
+  IPrintFormState,
+  printReducer
+} from '@register/forms/certificate/printReducer'
 import * as Sentry from '@sentry/browser'
-import * as createSentryMiddleware from 'redux-sentry-middleware'
+import createSentryMiddleware from 'redux-sentry-middleware'
+import {
+  userFormReducer,
+  IUserFormState
+} from '@register/views/SysAdmin/forms/userReducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -51,6 +61,7 @@ export interface IStoreState {
   printCertificateForm: IPrintFormState
   reject: IRejectState
   offline: IOfflineDataState
+  userForm: IUserFormState
 }
 
 const reducers = combineReducers<IStoreState>({
@@ -64,7 +75,8 @@ const reducers = combineReducers<IStoreState>({
   reviewForm: reviewReducer,
   reject: rejectReducer,
   printCertificateForm: printReducer,
-  offline: offlineDataReducer
+  offline: offlineDataReducer,
+  userForm: userFormReducer
 })
 
 const enhancedCreateStore = createReduxStore as StoreCreator

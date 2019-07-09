@@ -2,22 +2,30 @@ import * as Hapi from 'hapi'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
-} from 'src/features/verifyPassword/handler'
+} from '@user-mgnt/features/verifyPassword/handler'
 import getUserMobile, {
   requestSchema as userIdSchema,
   responseSchema as resMobileSchema
-} from 'src/features/getUserMobile/handler'
-import searchUsers, { searchSchema } from 'src/features/searchUsers/handler'
-import getUser, { getUserRequestSchema } from 'src/features/getUser/handler'
-import createUser from 'src/features/createUser/handler'
-import getRoles, { searchRoleSchema } from 'src/features/getRoles/handler'
+} from '@user-mgnt/features/getUserMobile/handler'
+import searchUsers, {
+  searchSchema
+} from '@user-mgnt/features/searchUsers/handler'
+import getUser, {
+  getUserRequestSchema
+} from '@user-mgnt/features/getUser/handler'
+import createUser from '@user-mgnt/features/createUser/handler'
+import getRoles, {
+  searchRoleSchema
+} from '@user-mgnt/features/getRoles/handler'
+import activateUser, {
+  requestSchema as activateUserRequestSchema
+} from '@user-mgnt/features/activateUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
-  SYSTEM = 'system',
   SYSADMIN = 'sysadmin'
 }
 
@@ -76,9 +84,10 @@ export const getRoutes = () => {
       config: {
         auth: {
           scope: [
-            RouteScope.SYSTEM,
-            // TODO: need to remove this once system role token is there
+            RouteScope.DECLARE,
             RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN
           ]
         },
@@ -117,11 +126,28 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
+          scope: [RouteScope.SYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/activateUser',
+      handler: activateUser,
+      config: {
+        tags: ['api'],
+        description: 'Activate an existing pending user',
+        auth: {
           scope: [
-            RouteScope.SYSTEM,
-            // TODO: need to remove this once system role token is there
-            RouteScope.REGISTER
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN
           ]
+        },
+        validate: {
+          payload: activateUserRequestSchema
         }
       }
     },
@@ -131,11 +157,7 @@ export const getRoutes = () => {
       handler: getRoles,
       config: {
         auth: {
-          scope: [
-            RouteScope.SYSTEM,
-            // TODO: need to remove this once system role token is there
-            RouteScope.REGISTER
-          ]
+          scope: [RouteScope.SYSADMIN]
         },
         validate: {
           payload: searchRoleSchema

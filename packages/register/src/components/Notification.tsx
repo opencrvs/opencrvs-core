@@ -1,21 +1,24 @@
 import * as React from 'react'
 
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
-import { RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router'
+
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
   Notification,
-  NOTIFICATION_TYPE
+  NOTIFICATION_TYPE,
+  FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import {
   hideNewContentAvailableNotification,
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
-  toggleDraftSavedNotification
-} from 'src/notification/actions'
+  toggleDraftSavedNotification,
+  hideSubmitFormSuccessToast,
+  hideSubmitFormErrorToast
+} from '@register/notification/actions'
 
 type NotificationProps = {
   language?: string
@@ -25,16 +28,22 @@ type NotificationProps = {
   syncCount: number
   waitingSW: ServiceWorker | null
   saveDraftClicked: boolean
+  submitFormSuccessToast: string | null
+  submitFormErrorToast: string | null
 }
 
 type DispatchProps = {
   hideNewContentAvailableNotification: typeof hideNewContentAvailableNotification
   hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
   hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
+  hideSubmitFormSuccessToast: typeof hideSubmitFormSuccessToast
+  hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
 
-export const messages = defineMessages({
+export const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
   newContentAvailable: {
     id: 'register.notification.newContentAvailable',
     defaultMessage: "We've made some updates, click here to refresh.",
@@ -53,6 +62,18 @@ export const messages = defineMessages({
     defaultMessage: 'Your draft has been saved',
     description:
       'The message that appears in notification when save drafts button is clicked'
+  },
+  userFormSuccess: {
+    id: 'register.notification.userFormSuccess',
+    defaultMessage: 'New user created',
+    description:
+      'The message that appears in notification when a new user is created'
+  },
+  userFormFail: {
+    id: 'register.notification.userFormFail',
+    defaultMessage: 'Sorry! Something went wrong',
+    description:
+      'The message that appears in notification when a new user creation fails'
   }
 })
 
@@ -67,7 +88,7 @@ class Component extends React.Component<
       this.props.waitingSW.postMessage('skipWaiting')
     }
     this.props.hideNewContentAvailableNotification()
-    location.reload()
+    window.location.reload()
   }
 
   hideBackgroundSyncedNotification = () => {
@@ -82,6 +103,14 @@ class Component extends React.Component<
     this.props.toggleDraftSavedNotification()
   }
 
+  hideSubmitFormSuccessToast = () => {
+    this.props.hideSubmitFormSuccessToast()
+  }
+
+  hideSubmitFormErrorToast = () => {
+    this.props.hideSubmitFormErrorToast()
+  }
+
   render() {
     const {
       children,
@@ -90,7 +119,9 @@ class Component extends React.Component<
       configurationErrorVisible,
       syncCount,
       intl,
-      saveDraftClicked
+      saveDraftClicked,
+      submitFormSuccessToast,
+      submitFormErrorToast
     } = this.props
 
     return (
@@ -136,6 +167,29 @@ class Component extends React.Component<
             {intl.formatMessage(messages.draftsSaved)}
           </Notification>
         )}
+
+        {submitFormSuccessToast && (
+          <FloatingNotification
+            id="submissionSuccessToast"
+            show={Boolean(submitFormSuccessToast)}
+            type={NOTIFICATION_TYPE.SUCCESS}
+            callback={this.hideSubmitFormSuccessToast}
+          >
+            {intl.formatMessage(messages[submitFormSuccessToast])}
+          </FloatingNotification>
+        )}
+
+        {submitFormErrorToast && (
+          <FloatingNotification
+            id="submissionErrorToast"
+            show={Boolean(submitFormErrorToast)}
+            type={NOTIFICATION_TYPE.ERROR}
+            callback={this.hideSubmitFormErrorToast}
+          >
+            {intl.formatMessage(messages[submitFormErrorToast])}
+          </FloatingNotification>
+        )}
+
         {/* More notification types can be added here */}
       </div>
     )
@@ -151,18 +205,22 @@ const mapStateToProps = (store: IStoreState) => {
     configurationErrorVisible: store.notification.configurationErrorVisible,
     syncCount: store.notification.syncCount,
     waitingSW: store.notification.waitingSW,
-    saveDraftClicked: store.notification.saveDraftClicked
+    saveDraftClicked: store.notification.saveDraftClicked,
+    submitFormSuccessToast: store.notification.submitFormSuccessToast,
+    submitFormErrorToast: store.notification.submitFormErrorToast
   }
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps>(
+  connect<NotificationProps, DispatchProps, NotificationProps, IStoreState>(
     mapStateToProps,
     {
       hideNewContentAvailableNotification,
       hideBackgroundSyncedNotification,
       hideConfigurationErrorNotification,
+      hideSubmitFormSuccessToast,
+      hideSubmitFormErrorToast,
       toggleDraftSavedNotification
     }
   )(injectIntl(Component))
-)
+) as any

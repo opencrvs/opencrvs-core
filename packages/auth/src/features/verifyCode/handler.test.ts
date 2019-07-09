@@ -1,4 +1,4 @@
-import { createServerWithEnvironment } from 'src/tests/util'
+import { createServerWithEnvironment } from '@auth/tests/util'
 
 describe('authenticate handler receives a request', () => {
   let server: any
@@ -15,6 +15,7 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         scope: ['admin'],
+        status: 'active',
         mobile: '+345345343'
       })
 
@@ -22,7 +23,7 @@ describe('authenticate handler receives a request', () => {
         method: 'POST',
         url: '/authenticate',
         payload: {
-          mobile: '+345345343',
+          username: '+345345343',
           password: '2r23432'
         }
       })
@@ -35,7 +36,6 @@ describe('authenticate handler receives a request', () => {
           code: smsCode
         }
       })
-
       expect(res.result.token.split('.')).toHaveLength(3)
       const [, payload] = res.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
@@ -49,6 +49,7 @@ describe('authenticate handler receives a request', () => {
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
         scope: ['admin'],
+        status: 'active',
         mobile: '+345345343'
       })
       const authRes = await server.server.inject({

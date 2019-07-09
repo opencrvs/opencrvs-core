@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { client } from 'src/utils/apolloClient'
+import { client } from '@register/utils/apolloClient'
 
 export const FETCH_USER = gql`
   query($userId: String!) {
@@ -7,6 +7,8 @@ export const FETCH_USER = gql`
       userMgntUserID
       practitionerId
       role
+      type
+      status
       name {
         use
         firstNames

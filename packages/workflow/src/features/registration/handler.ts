@@ -1,17 +1,20 @@
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { HEARTH_URL } from 'src/constants'
+import { HEARTH_URL } from '@workflow/constants'
 import {
   modifyRegistrationBundle,
   markBundleAsRegistered,
   markBundleAsCertified,
   setTrackingId
-} from './fhir/fhir-bundle-modifier'
-import { getToken } from 'src/utils/authUtils'
-import { sendEventNotification } from './utils'
-import { postToHearth, getSharedContactMsisdn } from './fhir/fhir-utils'
-import { logger } from 'src/logger'
-import { Events } from 'src/features/events/handler'
+} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { getToken } from '@workflow/utils/authUtils'
+import { sendEventNotification } from '@workflow/features/registration/utils'
+import {
+  postToHearth,
+  getSharedContactMsisdn
+} from '@workflow/features/registration/fhir/fhir-utils'
+import { logger } from '@workflow/logger'
+import { Events } from '@workflow/features/events/handler'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -80,7 +83,11 @@ export async function createRegistrationHandler(
 
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
-    if (msisdn) {
+    if (
+      msisdn &&
+      (event !== Events.BIRTH_IN_PROGRESS_DEC &&
+        event !== Events.DEATH_IN_PROGRESS_DEC)
+    ) {
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })

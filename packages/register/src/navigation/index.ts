@@ -4,6 +4,7 @@ import {
   HOME,
   SEARCH_RESULT,
   DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_BIRTH_APPLICANT_FORM,
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
@@ -13,10 +14,14 @@ import {
   SEARCH,
   APPLICATION_DETAIL,
   SETTINGS,
-  SYS_ADMIN_HOME_TAB
-} from 'src/navigation/routes'
+  SYS_ADMIN_HOME_TAB,
+  CREATE_USER,
+  CREATE_USER_SECTION,
+  SELECT_PRIMARY_APPLICANT,
+  SELECT_MAIN_CONTACT_POINT
+} from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken } from 'src/utils/authUtils'
+import { getToken } from '@register/utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -29,20 +34,20 @@ function formatUrl(url: string, props: { [key: string]: string }) {
   )
 }
 
-export const GO_TO_TAB = 'navigation/GO_TO_TAB'
-type GoToTabAction = {
-  type: typeof GO_TO_TAB
+export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
+type GoToPageAction = {
+  type: typeof GO_TO_PAGE
   payload: {
-    tabRoute: string
+    pageRoute: string
     applicationId: string
-    tabId: string
+    pageId: string
     event: string
     fieldNameHash?: string
     historyState?: IDynamicValues
   }
 }
 export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
-type GoToREGISTRAR_HOME = {
+type GoToRegistrarHome = {
   type: typeof GO_TO_REGISTRAR_HOME
   payload: {
     tabId: string
@@ -50,30 +55,46 @@ type GoToREGISTRAR_HOME = {
 }
 
 export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
-type GoTo_FIELD_AGENT_HOME = {
+type GoToFieldAgentHome = {
   type: typeof GO_TO_FIELD_AGENT_HOME
   payload: {
     tabId: string
   }
 }
 
+export type Action =
+  | GoToPageAction
+  | GoToRegistrarHome
+  | GoToFieldAgentHome
+  | GoToSysAdminHome
 export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
-type GoTo_SYS_ADMIN_HOME = {
+type GoToSysAdminHome = {
   type: typeof GO_TO_SYS_ADMIN_HOME
   payload: {
     tabId: string
   }
 }
 
-export type Action =
-  | GoToTabAction
-  | GoToREGISTRAR_HOME
-  | GoTo_FIELD_AGENT_HOME
-  | GoTo_SYS_ADMIN_HOME
-
 export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
 }
+
+export function goToBirthInformant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_INFORMANT, {
+      applicationId
+    })
+  )
+}
+
+export function goToMainContactPoint(applicationId: string) {
+  return push(
+    formatUrl(SELECT_MAIN_CONTACT_POINT, {
+      applicationId
+    })
+  )
+}
+
 export function goToEvents() {
   return push(SELECT_VITAL_EVENT)
 }
@@ -125,7 +146,20 @@ export function goToBirthRegistrationAsParent(applicationId: string) {
     })
   )
 }
-
+export function goToApplicationContact(informant: string) {
+  return push(
+    formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
+      informant: informant.toString()
+    })
+  )
+}
+export function goToPrimaryApplicant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_PRIMARY_APPLICANT, {
+      applicationId
+    })
+  )
+}
 export function goToReviewDuplicate(applicationId: string) {
   return push(
     formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })
@@ -172,22 +206,51 @@ export function goToSettings() {
   return push(SETTINGS)
 }
 
-export function goToTab(
-  tabRoute: string,
+export function goToCreateNewUser() {
+  return push(CREATE_USER)
+}
+
+export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
+type GoToCreateUserSection = {
+  type: typeof GO_TO_CREATE_USER_SECTION
+  payload: {
+    sectionId: string
+    userFormFieldNameHash?: string
+    formHistoryState?: IDynamicValues
+  }
+}
+
+export function goToCreateUserSection(
+  sectionId: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+): GoToCreateUserSection {
+  return {
+    type: GO_TO_CREATE_USER_SECTION,
+    payload: {
+      sectionId,
+      userFormFieldNameHash: fieldNameHash,
+      formHistoryState: historyState
+    }
+  }
+}
+
+export function goToPage(
+  pageRoute: string,
   applicationId: string,
-  tabId: string,
+  pageId: string,
   event: string,
   fieldNameHash?: string,
   historyState?: IDynamicValues
 ) {
   return {
-    type: GO_TO_TAB,
+    type: GO_TO_PAGE,
     payload: {
       applicationId,
-      tabId,
+      pageId,
       event,
       fieldNameHash,
-      tabRoute,
+      pageRoute,
       historyState
     }
   }
@@ -195,24 +258,24 @@ export function goToTab(
 
 export type INavigationState = undefined
 
-export function navigationReducer(state: INavigationState, action: Action) {
+export function navigationReducer(state: INavigationState, action: any) {
   switch (action.type) {
-    case GO_TO_TAB:
+    case GO_TO_PAGE:
       const {
         fieldNameHash,
         applicationId,
-        tabId,
+        pageId,
         event,
-        tabRoute,
+        pageRoute,
         historyState
       } = action.payload
       return loop(
         state,
         Cmd.action(
           push(
-            formatUrl(tabRoute, {
+            formatUrl(pageRoute, {
               applicationId: applicationId.toString(),
-              tabId,
+              pageId,
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
@@ -241,6 +304,22 @@ export function navigationReducer(state: INavigationState, action: Action) {
         state,
         Cmd.action(
           push(formatUrl(SYS_ADMIN_HOME_TAB, { tabId: SysAdminHomeTabId }))
+        )
+      )
+    case GO_TO_CREATE_USER_SECTION:
+      const {
+        sectionId,
+        userFormFieldNameHash,
+        formHistoryState
+      } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(CREATE_USER_SECTION, { sectionId }) +
+              (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
+            formHistoryState
+          )
         )
       )
   }
