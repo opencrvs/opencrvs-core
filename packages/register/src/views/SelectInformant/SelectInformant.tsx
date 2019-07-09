@@ -14,8 +14,8 @@ import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import { IApplication, modifyApplication } from '@register/applications'
 import {
-  goBack,
   goToBirthRegistrationAsParent,
+  goBack,
   goToHome,
   goToMainContactPoint,
   goToPrimaryApplicant
