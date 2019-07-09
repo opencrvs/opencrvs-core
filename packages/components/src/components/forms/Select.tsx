@@ -18,6 +18,8 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   hideBorder?: boolean
   options: ISelectOption[]
   ignoreMediaQuery?: boolean
+  color?: string
+  isSmallSized?: boolean
 }
 
 const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
@@ -35,7 +37,8 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
 
   ${({ theme }) => theme.fonts.bodyStyle};
   .react-select__control {
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme, color }) =>
+      color ? color : theme.colors.background};
     border-radius: 0;
     height: 40px;
     box-shadow: none;
@@ -65,9 +68,13 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
       ${({ theme }) => theme.colors.copy};
   }
 
-  ${({ ignoreMediaQuery, theme }) => {
+  ${({ ignoreMediaQuery, isSmallSized, theme }) => {
     return !ignoreMediaQuery
-      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+      ? isSmallSized
+        ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
+        width: 200px;
+      }`
+        : `@media (min-width: ${theme.grid.breakpoints.md}px) {
         width: 275px;
       }`
       : ''
@@ -90,6 +97,8 @@ export interface ISelectProps
   extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
+  color?: string
+  isSmallSized?: boolean
 }
 
 export class Select extends React.Component<ISelectProps> {
