@@ -169,8 +169,9 @@ function formatRoleCode(str: string) {
   const sections = str.split('_')
   const formattedString: string[] = []
   sections.map(section => {
-    section = section.charAt(0) + section.slice(1).toLowerCase()
-    formattedString.push(section)
+    return formattedString.push(
+      section.charAt(0) + section.slice(1).toLowerCase()
+    )
   })
 
   return formattedString.join(' ')

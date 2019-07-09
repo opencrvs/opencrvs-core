@@ -160,7 +160,7 @@ export class GridTable extends React.Component<
     } else {
       return (
         <ActionWrapper key={key} width={width} alignment={alignment}>
-          <ListItemAction actions={actions} />
+          <ListItemAction id={`ListItemAction-${itemId}`} actions={actions} />
         </ActionWrapper>
       )
     }

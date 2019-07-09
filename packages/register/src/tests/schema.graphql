@@ -731,6 +731,7 @@ enum RegistrationType {
 }
 
 enum RegStatus {
+  IN_PROGRESS
   DECLARED
   REGISTERED
   CERTIFIED
