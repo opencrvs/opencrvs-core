@@ -26,12 +26,13 @@ const fieldAgent = new User({
   scope: ['declare', 'demo'],
   status: 'active',
   practitionerId: '74e076cd-5663-409d-91a9-335c19660c3f',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId:
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763' /* TODO: when office details arrive change to office id - currently set to union id */,
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b', // should be a division
+    '7826c863-5463-4ab2-952f-f984685f364b', // should be a district child of the above division
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd', // should be an upazila child of the above district
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763' // should be a union child of the above upazila
   ],
   securityQuestionAnswers: []
 })
@@ -54,12 +55,12 @@ const registrationClerk = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'fca00fb7-ce04-4820-a938-a4e11b2d8afb',
-  primaryOfficeId: '61f745b4-5e97-4b06-9560-429df5ca511b',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de',
-    'd3b6592e-c674-4b01-bd89-bee0c8103d45',
-    '036de332-68be-4acd-bd51-d93c50cfeff3',
-    '33bb66cc-6da6-4f40-8edd-b1985199af3d'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -82,12 +83,12 @@ const localRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: '18f0b714-b8dc-442f-a565-96aa4f954f32',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -110,8 +111,8 @@ const districtRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'f9af90e7-d15e-444c-8ab1-cc39cdd64f89',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
-  catchmentAreaIds: ['759a0452-ef5b-4853-95d0-2f231c22e230'],
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
+  catchmentAreaIds: ['2b981ef4-1466-4f17-b325-48c50f6cd23b'],
   securityQuestionAnswers: []
 })
 
@@ -133,7 +134,7 @@ const stateRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: '218dbf20-274a-47a3-8c8d-50007e52d5ec',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [],
   securityQuestionAnswers: []
 })
@@ -156,7 +157,7 @@ const nationalRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'],
   status: 'active',
   practitionerId: '5cbe14da-66fc-4ac5-9d72-bc5d6b69e7c0',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [],
   securityQuestionAnswers: []
 })
@@ -179,12 +180,12 @@ const fieldAgent2 = new User({
   scope: ['declare', 'demo'],
   status: 'active',
   practitionerId: '17206db6-0939-4890-a4c8-d65f736dd18b',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -207,12 +208,12 @@ const fieldAgent3 = new User({
   scope: ['declare', 'demo'],
   status: 'active',
   practitionerId: 'f4295ded-2d2d-485a-a20c-2eff3ae1e253',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -235,12 +236,12 @@ const registrationClerk2 = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'e701100b-4f52-409e-8893-bd6cbc19466c',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -263,12 +264,12 @@ const registrationClerk3 = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: '7c365db1-27c8-4652-b877-beaaa26b73c4',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -291,12 +292,12 @@ const localRegistrar2 = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'a87babd7-b47f-405e-ad7a-a638be2af1dd',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -319,12 +320,12 @@ const localRegistrar3 = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'e579487f-b96e-41fb-8698-e38bd2778255',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -347,12 +348,12 @@ const fieldAgent4 = new User({
   scope: ['declare', 'demo'],
   status: 'active',
   practitionerId: '7d7fc007-37ce-4ad7-bed0-9f67d420e159',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -375,12 +376,12 @@ const registrationClerk4 = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'fec985dd-8f68-437e-8d7c-405c797460f7',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
@@ -403,12 +404,12 @@ const sysAdmin = new User({
   scope: ['sysadmin', 'demo'],
   status: 'active',
   practitionerId: '15f3bfb8-59c4-4652-8ef7-382bed46a970',
-  primaryOfficeId: '454b4008-7ffd-4808-9ed4-4613d4047021',
+  primaryOfficeId: '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763',
   catchmentAreaIds: [
-    '759a0452-ef5b-4853-95d0-2f231c22e230',
-    '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
-    '61f745b4-5e97-4b06-9560-429df5ca511b',
-    'e5320d3c-78b3-4122-9dfd-9324906ab7de'
+    '2b981ef4-1466-4f17-b325-48c50f6cd23b',
+    '7826c863-5463-4ab2-952f-f984685f364b',
+    'adbcdd2e-3a93-4147-a605-eb98e0cb10cd',
+    '4a0c57d0-cd7a-4673-b87e-e58b6fb6c763'
   ],
   securityQuestionAnswers: []
 })
