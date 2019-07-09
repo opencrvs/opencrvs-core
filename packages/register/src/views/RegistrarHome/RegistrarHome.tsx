@@ -1,18 +1,18 @@
 import {
   Button,
+  FloatingActionButton,
   IButtonProps,
   ICON_ALIGNMENT,
-  FloatingActionButton,
   PrimaryButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import {
+  Duplicate,
+  PlusTransparentWhite,
+  StatusGreen,
   StatusOrange,
   StatusProgress,
-  StatusGreen,
-  StatusRejected,
-  Duplicate,
-  PlusTransparentWhite
+  StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
@@ -25,27 +25,16 @@ import {
 } from '@opencrvs/components/lib/interface/GridTable'
 import { IAction } from '@opencrvs/components/lib/interface/ListItem'
 import { BodyContent } from '@opencrvs/components/lib/layout'
-import styled, { ITheme, withTheme } from '@register/styledComponents'
-import {
-  GQLQuery,
-  GQLEventRegCount
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import moment from 'moment'
-import * as React from 'react'
-import * as Sentry from '@sentry/browser'
-import { Query } from 'react-apollo'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import { Header } from '@register/components/interface/Header/Header'
 import { IViewHeadingProps } from '@register/components/ViewHeading'
-import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
+  goToEvents as goToEventsAction,
   goToPage as goToPageAction,
+  goToPrintCertificate as goToPrintCertificateAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goToEvents as goToEventsAction
+  goToReviewDuplicate as goToReviewDuplicateAction
 } from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -53,21 +42,26 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
-import { IStoreState, AppStore } from '@register/store'
+import { transformData } from '@register/search/transformer'
+import { IStoreState } from '@register/store'
+import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-import {
-  COUNT_REGISTRATION_QUERY,
-  SEARCH_EVENTS,
-  COUNT_EVENT_REGISTRATION_BY_STATUS
-} from '@register/views/RegistrarHome/queries'
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
-import { transformData } from '@register/search/transformer'
+import {
+  COUNT_EVENT_REGISTRATION_BY_STATUS,
+  COUNT_REGISTRATION_QUERY,
+  SEARCH_EVENTS
+} from '@register/views/RegistrarHome/queries'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
-import ApolloClient from 'apollo-client'
-import { createClient } from '@register/utils/apolloClient'
-import { async } from 'q'
+import * as Sentry from '@sentry/browser'
+import moment from 'moment'
+import * as React from 'react'
+import { Query } from 'react-apollo'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -315,13 +309,9 @@ export class RegistrarHomeView extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
-  private client: ApolloClient<{}>
-  private fieldAgentDraftsCount = 0
-
   pageSize = 10
-  constructor(props: IRegistrarHomeProps, store: AppStore) {
+  constructor(props: IRegistrarHomeProps) {
     super(props)
-    this.client = createClient(store)
     this.state = {
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
