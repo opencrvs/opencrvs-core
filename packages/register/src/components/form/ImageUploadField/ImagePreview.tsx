@@ -59,7 +59,7 @@ export class ImagePreview extends React.Component<IProps> {
   render = () => {
     const { previewImage, title, goBack, onDelete } = this.props
     return (
-      <PreviewContainer>
+      <PreviewContainer id="preview_image_field">
         <PreviewContainerHeader>
           <BackButton onClick={goBack}>
             <ArrowBack />
