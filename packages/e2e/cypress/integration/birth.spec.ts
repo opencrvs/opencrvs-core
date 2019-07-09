@@ -63,6 +63,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
+    cy.wait(6000)
   })
 
   it('Application review as registrar', () => {
@@ -77,10 +78,10 @@ context('Birth Registration Integration Test', () => {
     // LANDING PAGE
     cy.wait(3000)
     cy.get('#row_0').then($listItem => {
-      if ($listItem.find('#Review').length) {
+      if ($listItem.find('button[id*=ListItemAction-]').length) {
         cy.log('Birth review found')
 
-        cy.get('#Review')
+        cy.get('button[id*=ListItemAction-]')
           .first()
           .click()
         cy.wait(500)
