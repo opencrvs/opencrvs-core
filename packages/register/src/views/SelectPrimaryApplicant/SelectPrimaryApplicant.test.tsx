@@ -1,20 +1,26 @@
 import {
-  createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from '@register/tests/util'
+  createApplication,
+  IApplication,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import { SELECT_PRIMARY_APPLICANT } from '@register/navigation/routes'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import { Store } from 'redux'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
+import {
+  assign,
+  createTestApp,
+  flushPromises,
+  getItem,
+  mockOfflineData,
+  setItem,
+  validToken
+} from '@register/tests/util'
 import * as CommonUtils from '@register/utils/commonUtils'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
 import * as fetchAny from 'jest-fetch-mock'
+import { Store } from 'redux'
 
 const fetch = fetchAny as any
 storage.getItem = jest.fn()
@@ -30,6 +36,7 @@ describe('when user is selecting the vital event', () => {
   let app: ReactWrapper
   let history: History
   let store: Store
+  let draft: IApplication
 
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
@@ -50,7 +57,11 @@ describe('when user is selecting the vital event', () => {
 
   describe('when user is in primary applicant selection view', () => {
     beforeEach(async () => {
-      history.replace(SELECT_PRIMARY_APPLICANT)
+      draft = createApplication(Event.BIRTH)
+      store.dispatch(storeApplication(draft))
+      history.replace(
+        SELECT_PRIMARY_APPLICANT.replace(':applicationId', draft.id)
+      )
       app.update()
       app
         .find('#createPinBtn')
@@ -83,8 +94,8 @@ describe('when user is selecting the vital event', () => {
           .simulate('click')
       })
       it('takes user to the contact selection view', () => {
-        expect(history.location.pathname).toContain(
-          'events/birth/parents/mother/contact'
+        expect(window.location.pathname).toContain(
+          '/events/birth/registration/contact'
         )
       })
     })
@@ -101,8 +112,8 @@ describe('when user is selecting the vital event', () => {
           .simulate('click')
       })
       it('takses user to the contact selection form', () => {
-        expect(history.location.pathname).toContain(
-          'events/birth/parents/father/contact'
+        expect(window.location.pathname).toContain(
+          '/events/birth/registration/contact'
         )
       })
     })
