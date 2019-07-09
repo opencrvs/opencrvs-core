@@ -23,6 +23,7 @@ export enum Event {
 }
 
 export enum Action {
+  IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',

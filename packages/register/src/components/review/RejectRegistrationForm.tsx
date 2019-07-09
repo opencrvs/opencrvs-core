@@ -131,6 +131,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
         if (field.name === 'rejectionReason') {
           field.initialValue = ['duplicate']
         }
+        return field
       })
     }
 

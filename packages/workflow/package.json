@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/workflow",
-  "version": "1.0.0-alpha.1.0",
+  "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS workflow service",
   "main": "src/index.js",
   "license": "NONE",
@@ -15,7 +15,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.0",
+    "@opencrvs/commons": "^1.0.0-alpha.1.1",
     "@types/boom": "^7.2.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",

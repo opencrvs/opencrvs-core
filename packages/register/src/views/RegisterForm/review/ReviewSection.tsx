@@ -458,6 +458,7 @@ const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
       value: label,
       label
     })
+    return null
   })
   return {
     selectOptions,
