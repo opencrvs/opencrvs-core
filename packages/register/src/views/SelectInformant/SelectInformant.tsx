@@ -1,6 +1,11 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -22,6 +27,8 @@ import {
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { IRadioOption as RadioComponentOption } from '@opencrvs/components/lib/forms'
+import { Event } from '@register/forms'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -69,6 +76,27 @@ export const messages: {
     defaultMessage: 'Self',
     description: 'The title that appears when selecting self as informant'
   },
+  spouse: {
+    id: 'register.selectInformant.spouse',
+    defaultMessage: 'Spouse',
+    description: 'The title that appears when selecting spouse as informant'
+  },
+  son: {
+    id: 'register.selectInformant.son',
+    defaultMessage: 'Son',
+    description: 'The title that appears when selecting son as informant'
+  },
+  daughter: {
+    id: 'register.selectInformant.daughter',
+    defaultMessage: 'Daughter',
+    description: 'The title that appears when selecting daughter as informant'
+  },
+  extendedFamily: {
+    id: 'register.selectInformant.extendedFamily',
+    defaultMessage: 'Extended family',
+    description:
+      'The title that appears when selecting extended family as informant'
+  },
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',
@@ -107,6 +135,121 @@ enum INFORMANT {
   SON = 'SON',
   DAUGHTER = 'DAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY'
+}
+
+interface IInformantField {
+  id: string
+  option: RadioComponentOption
+  disabled: boolean
+}
+
+const setInformantFields = (
+  intl: InjectedIntl,
+  event: string
+): IInformantField[] => {
+  if (event === Event.BIRTH) {
+    return [
+      {
+        id: `select_informant_${INFORMANT.MOTHER}`,
+        option: {
+          label: intl.formatMessage(messages.mother),
+          value: INFORMANT.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.FATHER}`,
+        option: {
+          label: intl.formatMessage(messages.father),
+          value: INFORMANT.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.BOTH_PARENTS}`,
+        option: {
+          label: intl.formatMessage(messages.parents),
+          value: INFORMANT.BOTH_PARENTS
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SELF}`,
+        option: {
+          label: intl.formatMessage(messages.self),
+          value: INFORMANT.SELF
+        },
+        disabled: true
+      },
+      {
+        id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
+        option: {
+          label: intl.formatMessage(messages.someoneElse),
+          value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: true
+      }
+    ]
+  } else {
+    return [
+      {
+        id: `select_informant_${INFORMANT.MOTHER}`,
+        option: {
+          label: intl.formatMessage(messages.mother),
+          value: INFORMANT.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.FATHER}`,
+        option: {
+          label: intl.formatMessage(messages.father),
+          value: INFORMANT.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SPOUSE}`,
+        option: {
+          label: intl.formatMessage(messages.spouse),
+          value: INFORMANT.SPOUSE
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SON}`,
+        option: {
+          label: intl.formatMessage(messages.son),
+          value: INFORMANT.SON
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.DAUGHTER}`,
+        option: {
+          label: intl.formatMessage(messages.daughter),
+          value: INFORMANT.DAUGHTER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.EXTENDED_FAMILY}`,
+        option: {
+          label: intl.formatMessage(messages.extendedFamily),
+          value: INFORMANT.EXTENDED_FAMILY
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
+        option: {
+          label: intl.formatMessage(messages.someoneElse),
+          value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: false
+      }
+    ]
+  }
 }
 
 interface IMatchProps {
@@ -185,6 +328,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
   }
   render() {
     const { intl } = this.props
+    const event = this.props.location.pathname.includes(Event.BIRTH)
+      ? Event.BIRTH
+      : Event.DEATH
+    const infornantFields = setInformantFields(intl, event)
     console.log(this.props.location.pathname.includes('birth'))
     return (
       <Container>
@@ -203,7 +350,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           </TertiaryButton>
 
           <Title>
-            {this.props.location.pathname.includes('birth')
+            {this.props.location.pathname.includes(Event.BIRTH)
               ? intl.formatMessage(messages.birthInformantTitle)
               : intl.formatMessage(messages.deathInformantTitle)}
           </Title>
@@ -213,68 +360,29 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             </ErrorText>
           )}
           <Actions id="select_parent_informant">
-            <RadioButton
-              size="large"
-              key="select_informant_mother"
-              name="birthevent"
-              label={intl.formatMessage(messages.mother)}
-              value={INFORMANT.MOTHER}
-              id="select_informant_mother"
-              selected={
-                this.state.informant === INFORMANT.MOTHER
-                  ? INFORMANT.MOTHER
-                  : ''
-              }
-              onChange={() => this.setState({ informant: INFORMANT.MOTHER })}
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_father"
-              name="birthevent"
-              label={intl.formatMessage(messages.father)}
-              value={INFORMANT.FATHER}
-              id="select_informant_father"
-              selected={
-                this.state.informant === INFORMANT.FATHER
-                  ? INFORMANT.FATHER
-                  : ''
-              }
-              onChange={() => this.setState({ informant: INFORMANT.FATHER })}
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_parents"
-              name="birthevent"
-              label={intl.formatMessage(messages.parents)}
-              value={INFORMANT.BOTH_PARENTS}
-              id="select_informant_parents"
-              selected={
-                this.state.informant === INFORMANT.BOTH_PARENTS
-                  ? INFORMANT.BOTH_PARENTS
-                  : ''
-              }
-              onChange={() =>
-                this.setState({ informant: INFORMANT.BOTH_PARENTS })
-              }
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_self"
-              name="birthevent"
-              label={intl.formatMessage(messages.self)}
-              value={INFORMANT.SELF}
-              id="select_informant_self"
-              disabled={true}
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_someone"
-              name="birthevent"
-              label={intl.formatMessage(messages.someoneElse)}
-              value={INFORMANT.SOMEONE_ELSE}
-              disabled={true}
-              id="select_informant_someone"
-            />
+            {infornantFields.map((infornantField: IInformantField) => {
+              return (
+                <RadioButton
+                  size="large"
+                  key={infornantField.id}
+                  name={`${event}Option`}
+                  label={infornantField.option.label}
+                  value={infornantField.option.value}
+                  id={infornantField.id}
+                  selected={
+                    this.state.informant === infornantField.option.value
+                      ? infornantField.option.value
+                      : ''
+                  }
+                  onChange={() =>
+                    this.setState({
+                      informant: infornantField.option.value as string
+                    })
+                  }
+                  disabled={infornantField.disabled}
+                />
+              )
+            })}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(messages.continueButton)}

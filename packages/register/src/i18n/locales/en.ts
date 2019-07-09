@@ -510,6 +510,10 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.parents': 'Mother & Father',
     'register.selectInformant.someoneElse': 'Someone Else',
     'register.selectInformant.self': 'Self',
+    'register.selectInformant.spouse': 'Spouse',
+    'register.selectInformant.son': 'Son',
+    'register.selectInformant.daughter': 'Daughter',
+    'register.selectInformant.extendedFamily': 'Extended family',
     'register.selectInformant.errorMessage':
       'Please select who is present and applying',
     'register.primaryApplicant.registerNewEventHeading':
