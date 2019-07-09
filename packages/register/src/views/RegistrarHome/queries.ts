@@ -21,6 +21,54 @@ export const COUNT_EVENT_REGISTRATION_BY_STATUS = gql`
   }
 `
 
+export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
+  query data($locationIds: [String], $status: String, $count: Int, $skip: Int) {
+    listEventRegistrations(
+      locationId: $locationIds
+      status: $status
+      count: $count
+      skip: $skip
+    ) {
+      totalItems
+      results {
+        registration {
+          type
+          status {
+            user {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              role
+            }
+          }
+        }
+        ... on BirthRegistration {
+          child {
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+          updatedAt
+        }
+        ... on DeathRegistration {
+          deceased {
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+          updatedAt
+        }
+      }
+    }
+  }
+`
+
 export const SEARCH_EVENTS = gql`
   query(
     $sort: String
