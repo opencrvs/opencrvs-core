@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from '@register/styledComponents'
 
 interface IReviewHeaderProps {
+  id?: string
   logoSource: string
   title: string
   subject: string
@@ -37,16 +38,16 @@ const Image = styled.img`
 `
 
 export const ReviewHeader = (props: IReviewHeaderProps) => {
-  const { logoSource, title, subject } = props
+  const { id, logoSource, title, subject } = props
 
   return (
-    <HeaderContainer>
+    <HeaderContainer id={id}>
       <ContentContainer>
         <IconContainer>
           <Image src={logoSource} />
         </IconContainer>
-        <TitleContainer>{title}</TitleContainer>
-        <SubjectContainer>{subject}</SubjectContainer>
+        <TitleContainer id={`${id}_title`}>{title}</TitleContainer>
+        <SubjectContainer id={`${id}_subject`}>{subject}</SubjectContainer>
       </ContentContainer>
     </HeaderContainer>
   )
