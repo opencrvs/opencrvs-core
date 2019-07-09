@@ -1,3 +1,8 @@
+import * as React from 'react'
+import styled from '@register/styledComponents'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -7,6 +12,7 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { IApplication, modifyApplication } from '@register/applications'
 import {
   goToBirthRegistrationAsParent,
   goBack,
@@ -14,12 +20,8 @@ import {
   goToMainContactPoint,
   goToPrimaryApplicant
 } from '@register/navigation'
-import styled from '@register/styledComponents'
-import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router'
-import { IStoreState } from '@opencrvs/register/src/store'
+import { IStoreState } from '@register/store'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -94,33 +96,89 @@ const Actions = styled.div`
     margin-bottom: 16px;
   }
 `
+
 enum INFORMANT {
-  FATHER = 'father',
-  MOTHER = 'mother',
-  BOTH_PARENTS = 'parents',
-  SELF = 'self',
-  SPOUSE = 'spouse',
-  SON = 'son',
-  DAUGHTER = 'daughter',
-  EXTENDED_FAMILY = 'extendedFamily',
-  OTHER = 'other',
-  SOMEONE_ELSE = 'other'
+  FATHER = 'FATHER_ONLY',
+  MOTHER = 'MOTHER_ONLY',
+  BOTH_PARENTS = 'BOTH_PARENTS',
+  SELF = 'INFORMANT_ONLY',
+  SOMEONE_ELSE = 'OTHER',
+  SPOUSE = 'SPOUSE',
+  SON = 'SON',
+  DAUGHTER = 'DAUGHTER',
+  EXTENDED_FAMILY = 'EXTENDED_FAMILY'
 }
 
-type IPageProps = IDispatchProps & InjectedIntlProps & RouteComponentProps<{}>
-export class SelectInformantView extends React.Component<IPageProps> {
-  state = {
-    informant: ''
+interface IMatchProps {
+  applicationId: string
+}
+
+type IFullProps = {
+  application: IApplication
+  modifyApplication: typeof modifyApplication
+  goBack: typeof goBack
+  goToHome: typeof goToHome
+  goToMainContactPoint: typeof goToMainContactPoint
+  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  goToPrimaryApplicant: typeof goToPrimaryApplicant
+} & InjectedIntlProps &
+  RouteComponentProps<IMatchProps>
+
+interface IState {
+  informant: string
+}
+
+export class SelectInformantView extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      informant:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
+            .presentAtBirthRegistration as string)) ||
+        ''
+    }
   }
+
   handleContinue = () => {
     if (
       this.state.informant &&
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
-      this.props.goToPrimaryApplicant()
+      const { application, goToPrimaryApplicant } = this.props
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant
+            }
+          }
+        }
+      })
+      goToPrimaryApplicant(this.props.match.params.applicationId)
     } else if (this.state.informant && this.state.informant !== 'error') {
-      this.props.goToMainContactPoint(this.state.informant)
+      const { application, goToMainContactPoint } = this.props
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: this.state.informant
+            }
+          }
+        }
+      })
+
+      goToMainContactPoint(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
@@ -227,23 +285,28 @@ export class SelectInformantView extends React.Component<IPageProps> {
   }
 }
 
-interface IDispatchProps {
-  goBack: typeof goBack
-  goToHome: typeof goToHome
-  goToMainContactPoint: typeof goToMainContactPoint
-  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-  goToPrimaryApplicant: typeof goToPrimaryApplicant
+const mapStateToProps = (
+  store: IStoreState,
+  props: RouteComponentProps<{ applicationId: string }>
+) => {
+  const { match } = props
+  return {
+    application: store.applicationsState.applications.find(
+      ({ id }) => id === match.params.applicationId
+    ) as IApplication
+  }
 }
 
 export const SelectInformant = withRouter(
-  connect<{}, IDispatchProps, IPageProps, IStoreState>(
-    null,
+  connect(
+    mapStateToProps,
     {
       goBack,
       goToHome,
       goToMainContactPoint,
       goToBirthRegistrationAsParent,
-      goToPrimaryApplicant
+      goToPrimaryApplicant,
+      modifyApplication
     }
   )(injectIntl(SelectInformantView))
 ) as any

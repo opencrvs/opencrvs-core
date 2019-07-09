@@ -86,7 +86,7 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.SELECT_PRIMARY_APPLICANT}
+                                  path={routes.SELECT_BIRTH_PRIMARY_APPLICANT}
                                   component={SelectPrimaryApplicant}
                                 />
                                 <ProtectedRoute
@@ -184,7 +184,7 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.SELECT_MAIN_CONTACT_POINT}
+                                  path={routes.SELECT_BIRTH_MAIN_CONTACT_POINT}
                                   component={SelectContactPoint}
                                 />
                               </Switch>

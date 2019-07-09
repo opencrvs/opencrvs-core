@@ -18,8 +18,8 @@ import {
   SYS_ADMIN_HOME_TAB,
   CREATE_USER,
   CREATE_USER_SECTION,
-  SELECT_PRIMARY_APPLICANT,
-  SELECT_MAIN_CONTACT_POINT
+  SELECT_BIRTH_PRIMARY_APPLICANT,
+  SELECT_BIRTH_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -76,22 +76,26 @@ type GoToSysAdminHome = {
   }
 }
 
-export function goToBirthRegistration() {
-  return push(SELECT_BIRTH_INFORMANT)
-}
-
-export function goToDeathRegistration() {
-  return push(SELECT_DEATH_INFORMANT)
-}
-
-export function goToMainContactPoint(
-  presentAtReg: string,
-  applicant: string = presentAtReg
-) {
+export function goToBirthInformant(applicationId: string) {
   return push(
-    formatUrl(SELECT_MAIN_CONTACT_POINT, {
-      presentAtReg,
-      applicant
+    formatUrl(SELECT_BIRTH_INFORMANT, {
+      applicationId
+    })
+  )
+}
+
+export function goToDeathInformant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_DEATH_INFORMANT, {
+      applicationId
+    })
+  )
+}
+
+export function goToMainContactPoint(applicationId: string) {
+  return push(
+    formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
+      applicationId
     })
   )
 }
@@ -154,8 +158,12 @@ export function goToApplicationContact(informant: string) {
     })
   )
 }
-export function goToPrimaryApplicant() {
-  return push(formatUrl(SELECT_PRIMARY_APPLICANT, {}))
+export function goToPrimaryApplicant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
+      applicationId
+    })
+  )
 }
 export function goToReviewDuplicate(applicationId: string) {
   return push(
@@ -172,11 +180,11 @@ export function goToPrintCertificate(registrationId: string, event: string) {
   )
 }
 
-/* export function goToDeathRegistration(applicationId: string) {
+export function goToDeathRegistration(applicationId: string) {
   return push(
     formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
   )
-}*/
+}
 
 export function goToRegistrarHomeTab(tabId: string) {
   return {

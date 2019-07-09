@@ -1,21 +1,20 @@
+import { Event } from '@register/forms'
+
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
-export const SELECT_BIRTH_INFORMANT = '/events/birth'
-export const SELECT_DEATH_INFORMANT = '/events/death'
-export const SELECT_PRIMARY_APPLICANT = '/events/birth/parents/primary'
-export const SELECT_MAIN_CONTACT_POINT =
-  '/events/birth/:presentAtReg/:applicant/contact'
 
-export const DRAFT_BIRTH_PARENT_FORM = '/drafts/:applicationId/events/birth'
-export const DRAFT_BIRTH_PARENT_FORM_PAGE =
-  '/drafts/:applicationId/events/birth/:pageId'
-export const DRAFT_BIRTH_APPLICANT_FORM = '/events/birth/contact'
-export const DRAFT_BIRTH_PARENT_FORM_TAB =
-  '/drafts/:applicationId/events/birth/parent/:tabId'
+export const SELECT_BIRTH_INFORMANT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/informant`
+export const SELECT_BIRTH_PRIMARY_APPLICANT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/applicant`
+export const SELECT_BIRTH_MAIN_CONTACT_POINT = `/drafts/:applicationId/events/${Event.BIRTH}/registration/contact`
 
-export const DRAFT_DEATH_FORM = '/drafts/:applicationId/events/death'
-export const DRAFT_DEATH_FORM_PAGE =
-  '/drafts/:applicationId/events/death/:pageId'
+export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:applicationId/events/${Event.BIRTH}`
+export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:applicationId/events/${Event.BIRTH}/:pageId`
+export const DRAFT_BIRTH_APPLICANT_FORM = `/events/${Event.BIRTH}/contact`
+export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:applicationId/events/${Event.BIRTH}/parent/:tabId`
+
+export const SELECT_DEATH_INFORMANT = `/drafts/:applicationId/events/${Event.DEATH}/registration/informant`
+export const DRAFT_DEATH_FORM = `/drafts/:applicationId/events/${Event.DEATH}`
+export const DRAFT_DEATH_FORM_PAGE = `/drafts/:applicationId/events/${Event.DEATH}/:pageId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:applicationId/events/:event/parent/:pageId'
