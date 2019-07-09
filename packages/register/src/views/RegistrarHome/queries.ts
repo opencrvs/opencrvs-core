@@ -10,7 +10,7 @@ export const COUNT_REGISTRATION_QUERY = gql`
   }
 `
 
-export const COUNT_REGISTRATION_QUERY_BY_STATUS = gql`
+export const COUNT_EVENT_REGISTRATION_BY_STATUS = gql`
   query data($locationIds: [String], $status: String) {
     countEventRegistrationsByStatus(
       locationIds: $locationIds

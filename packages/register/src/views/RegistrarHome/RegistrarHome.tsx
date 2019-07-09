@@ -60,7 +60,7 @@ import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import {
   COUNT_REGISTRATION_QUERY,
   SEARCH_EVENTS,
-  COUNT_REGISTRATION_QUERY_BY_STATUS
+  COUNT_EVENT_REGISTRATION_BY_STATUS
 } from '@register/views/RegistrarHome/queries'
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
 import { transformData } from '@register/search/transformer'
@@ -541,7 +541,7 @@ export class RegistrarHomeView extends React.Component<
 
     return (
       <Query
-        query={COUNT_REGISTRATION_QUERY_BY_STATUS}
+        query={COUNT_EVENT_REGISTRATION_BY_STATUS}
         variables={{
           locationIds: [registrarUnion],
           status: EVENT_STATUS.IN_PROGRESS
@@ -603,7 +603,7 @@ export class RegistrarHomeView extends React.Component<
 
     return (
       <Query
-        query={COUNT_REGISTRATION_QUERY_BY_STATUS}
+        query={COUNT_EVENT_REGISTRATION_BY_STATUS}
         variables={{
           locationIds: [registrarUnion],
           status: EVENT_STATUS.IN_PROGRESS
