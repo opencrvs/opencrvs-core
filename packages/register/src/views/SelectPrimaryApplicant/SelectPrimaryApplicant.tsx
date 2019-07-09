@@ -1,23 +1,26 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import styled from '@register/styledComponents'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 import {
-  goToBirthRegistrationAsParent,
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { Container } from '@opencrvs/components/lib/layout'
+import { IApplication, modifyApplication } from '@register/applications'
+import {
   goBack,
+  goToBirthRegistrationAsParent,
   goToHome,
   goToMainContactPoint
 } from '@register/navigation'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
-import styled from '@register/styledComponents'
-import { BackArrow } from '@opencrvs/components/lib/icons'
-import { Container } from '@opencrvs/components/lib/layout'
+import { IStoreState } from '@register/store'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -85,22 +88,62 @@ const Actions = styled.div`
 const Description = styled.p`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-class SelectPrimaryApplicantView extends React.Component<
-  InjectedIntlProps & {
+interface IMatchProps {
+  applicationId: string
+}
+
+type IFullProps = InjectedIntlProps &
+  RouteComponentProps<IMatchProps> & {
+    application: IApplication
+    modifyApplication: typeof modifyApplication
     goBack: typeof goBack
     goToHome: typeof goToHome
     goToMainContactPoint: typeof goToMainContactPoint
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   }
-> {
-  state = {
-    goTo: ''
+
+interface IState {
+  applicant: string
+}
+
+enum APPLICANT {
+  FATHER = 'FATHER_ONLY',
+  MOTHER = 'MOTHER_ONLY'
+}
+class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
+    super(props)
+    this.state = {
+      applicant:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
+            .applicant as string)) ||
+        ''
+    }
   }
   handleContinue = () => {
-    if (this.state.goTo === 'mother' || this.state.goTo === 'father') {
-      this.props.goToMainContactPoint('parents', this.state.goTo)
+    if (
+      this.state.applicant === APPLICANT.MOTHER ||
+      this.state.applicant === APPLICANT.FATHER
+    ) {
+      const { application, goToMainContactPoint } = this.props
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              applicant: this.state.applicant
+            }
+          }
+        }
+      })
+      goToMainContactPoint(this.props.match.params.applicationId)
     } else {
-      this.setState({ goTo: 'error' })
+      this.setState({ applicant: 'error' })
     }
   }
   render() {
@@ -124,7 +167,7 @@ class SelectPrimaryApplicantView extends React.Component<
           <Description>
             {intl.formatMessage(messages.primaryApplicantDescription)}
           </Description>
-          {this.state.goTo === 'error' && (
+          {this.state.applicant === 'error' && (
             <ErrorText id="error_text">
               {intl.formatMessage(messages.errorMessage)}
             </ErrorText>
@@ -135,20 +178,20 @@ class SelectPrimaryApplicantView extends React.Component<
               key="motherevent"
               name="motherevent"
               label={intl.formatMessage(messages.mother)}
-              value="mother"
+              value={APPLICANT.MOTHER}
               id="select_mother_event"
-              selected={this.state.goTo === 'mother' ? 'mother' : ''}
-              onChange={() => this.setState({ goTo: 'mother' })}
+              selected={this.state.applicant}
+              onChange={() => this.setState({ applicant: APPLICANT.MOTHER })}
             />
             <RadioButton
               size="large"
               key="fatherevent"
               name="fatherevent"
               label={intl.formatMessage(messages.father)}
-              value="father"
+              value={APPLICANT.FATHER}
               id="select_father_event"
-              selected={this.state.goTo === 'father' ? 'father' : ''}
-              onChange={() => this.setState({ goTo: 'father' })}
+              selected={this.state.applicant}
+              onChange={() => this.setState({ applicant: APPLICANT.FATHER })}
             />
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
@@ -160,12 +203,25 @@ class SelectPrimaryApplicantView extends React.Component<
   }
 }
 
+const mapStateToProps = (
+  store: IStoreState,
+  props: RouteComponentProps<{ applicationId: string }>
+) => {
+  const { match } = props
+  return {
+    application: store.applicationsState.applications.find(
+      ({ id }) => id === match.params.applicationId
+    ) as IApplication
+  }
+}
+
 export const SelectPrimaryApplicant = connect(
-  null,
+  mapStateToProps,
   {
     goBack,
     goToHome,
     goToMainContactPoint,
-    goToBirthRegistrationAsParent
+    goToBirthRegistrationAsParent,
+    modifyApplication
   }
 )(injectIntl(SelectPrimaryApplicantView))
