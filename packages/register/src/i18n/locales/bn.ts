@@ -803,6 +803,12 @@ export const BENGALI_STATE: ILanguage = {
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.form.deleteApplication': 'আবেদন বাতিল',
+    'review.header.title.govtName.bgd': 'গণপ্রজাতন্ত্রী বাংলাদেশ সরকার',
+    'review.header.subject.subjectWithoutName':
+      '{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
+    'review.header.subject.subjectWitName':
+      '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
+    'review.inputs.additionalComments': 'কোন মন্তব্য?',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
     'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',

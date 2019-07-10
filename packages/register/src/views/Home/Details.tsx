@@ -36,8 +36,8 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Event } from '@opencrvs/register/src/forms'
 import {
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_DEATH_FORM
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE
 } from '@register/navigation/routes'
 import { Query } from 'react-apollo'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
@@ -389,7 +389,9 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
         )
       }
       const tabRoute =
-        draft.event === Event.BIRTH ? DRAFT_BIRTH_PARENT_FORM : DRAFT_DEATH_FORM
+        draft.event === Event.BIRTH
+          ? DRAFT_BIRTH_PARENT_FORM_PAGE
+          : DRAFT_DEATH_FORM_PAGE
       action = (
         <ActionButton
           id="draft_update"
@@ -397,7 +399,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             this.props.goToPage(
               tabRoute,
               draft.id,
-              '',
+              'preview',
               (draft.event && draft.event.toString()) || ''
             )
           }

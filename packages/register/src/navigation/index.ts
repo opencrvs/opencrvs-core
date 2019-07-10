@@ -79,14 +79,18 @@ export function goToBirthRegistration() {
   return push(SELECT_INFORMANT)
 }
 
-export function goToMainContactPoint(
-  presentAtReg: string,
-  applicant: string = presentAtReg
-) {
+export function goToBirthInformant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_INFORMANT, {
+      applicationId
+    })
+  )
+}
+
+export function goToMainContactPoint(applicationId: string) {
   return push(
     formatUrl(SELECT_MAIN_CONTACT_POINT, {
-      presentAtReg,
-      applicant
+      applicationId
     })
   )
 }
@@ -149,8 +153,12 @@ export function goToApplicationContact(informant: string) {
     })
   )
 }
-export function goToPrimaryApplicant() {
-  return push(formatUrl(SELECT_PRIMARY_APPLICANT, {}))
+export function goToPrimaryApplicant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_PRIMARY_APPLICANT, {
+      applicationId
+    })
+  )
 }
 export function goToReviewDuplicate(applicationId: string) {
   return push(

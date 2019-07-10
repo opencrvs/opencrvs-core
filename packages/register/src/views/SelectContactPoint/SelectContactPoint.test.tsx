@@ -1,20 +1,26 @@
 import {
-  createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from '@register/tests/util'
+  createApplication,
+  IApplication,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import { SELECT_MAIN_CONTACT_POINT } from '@register/navigation/routes'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import { Store } from 'redux'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
+import {
+  assign,
+  createTestApp,
+  flushPromises,
+  getItem,
+  mockOfflineData,
+  setItem,
+  validToken
+} from '@register/tests/util'
 import * as CommonUtils from '@register/utils/commonUtils'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
 import * as fetchAny from 'jest-fetch-mock'
+import { Store } from 'redux'
 
 const fetch = fetchAny as any
 
@@ -27,11 +33,11 @@ beforeEach(() => {
   assign.mockClear()
 })
 
-describe('when user is selecting the informant', () => {
+describe('when user is selecting the Main point of contact', () => {
   let app: ReactWrapper
   let history: History
   let store: Store
-
+  let draft: IApplication
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
     setItem.mockClear()
@@ -47,11 +53,10 @@ describe('when user is selecting the informant', () => {
     history = testApp.history
     store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-  })
-
-  beforeEach(async () => {
+    draft = createApplication(Event.BIRTH)
+    store.dispatch(storeApplication(draft))
     history.replace(
-      SELECT_MAIN_CONTACT_POINT.replace(':presentAtReg', 'mother')
+      SELECT_MAIN_CONTACT_POINT.replace(':applicationId', draft.id)
     )
     await flushPromises()
     app.update()

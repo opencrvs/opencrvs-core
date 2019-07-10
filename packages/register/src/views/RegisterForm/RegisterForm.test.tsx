@@ -930,20 +930,6 @@ describe('when user is in the register form preview section', () => {
     })
 
     it('should be able to submit the form', () => {
-      const nextForChildSectionBtn = component
-        .find('#next_button_child')
-        .hostNodes()
-      const nextForMotherSectionBtn = component
-        .find('#next_button_mother')
-        .hostNodes()
-      const nextForFatherSectionBtn = component
-        .find('#next_button_father')
-        .hostNodes()
-
-      nextForChildSectionBtn.simulate('click')
-      nextForMotherSectionBtn.simulate('click')
-      nextForFatherSectionBtn.simulate('click')
-
       component
         .find('#submit_form')
         .hostNodes()
@@ -1016,21 +1002,6 @@ describe('when user is in the register form review section', () => {
   })
 
   it('clicking the reject button launches the reject form action page', () => {
-    component
-      .find('#next_button_child')
-      .hostNodes()
-      .simulate('click')
-
-    component
-      .find('#next_button_mother')
-      .hostNodes()
-      .simulate('click')
-
-    component
-      .find('#next_button_father')
-      .hostNodes()
-      .simulate('click')
-
     component
       .find('#rejectApplicationBtn')
       .hostNodes()
@@ -1150,19 +1121,6 @@ describe('When user is in Preview section death event', async () => {
 
   it('Should be able to submit the form', () => {
     component
-      .find('#next_button_deceased')
-      .hostNodes()
-      .simulate('click')
-    component
-      .find('#next_button_informant')
-      .hostNodes()
-      .simulate('click')
-    component
-      .find('#next_button_deathEvent')
-      .hostNodes()
-      .simulate('click')
-
-    component
       .find('#submit_form')
       .hostNodes()
       .simulate('click')
@@ -1257,19 +1215,6 @@ describe('When user is in Preview section death event in offline mode', async ()
   })
 
   it('Should be able to submit the form', async () => {
-    component
-      .find('#next_button_deceased')
-      .hostNodes()
-      .simulate('click')
-    component
-      .find('#next_button_informant')
-      .hostNodes()
-      .simulate('click')
-    component
-      .find('#next_button_deathEvent')
-      .hostNodes()
-      .simulate('click')
-
     component
       .find('#submit_form')
       .hostNodes()

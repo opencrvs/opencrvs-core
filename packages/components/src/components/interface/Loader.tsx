@@ -12,30 +12,21 @@ export interface IDiaMeter {
 }
 
 const styledLoader = styled.div.attrs<ILoader>({})
-const styledSpinnerContainer = styled.div.attrs<IDiaMeter>({})
 
 const StyledSpinner = styled(Spinner)`
   width: 100%;
   height: 100%;
-`
-const StyledSpinnerContainer = styledSpinnerContainer`
-  width: ${({ diameter }) => diameter}px;
-  height: ${({ diameter }) => diameter}px;
-`
-const LoadingSpinnerContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin: 24px 0;
 `
 const LoadingContainer = styledLoader`
+  width: 100%;
   margin: ${({ marginPercent }) => marginPercent}% auto;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap-reverse;
+  align-items: center;
+  flex-direction:column;
 `
 const LoadingTextContainer = styled.div`
-  margin-top: 20px;
   ${({ theme }) => theme.fonts.bigBodyStyle};
   text-align: center;
 `
@@ -45,12 +36,10 @@ export class Loader extends React.Component<ILoader> {
     const { id, loadingText, marginPercent, spinnerDiameter } = this.props
     return (
       <LoadingContainer id={id} marginPercent={marginPercent}>
-        <LoadingTextContainer>{loadingText}</LoadingTextContainer>
-        <LoadingSpinnerContainer>
-          <StyledSpinnerContainer diameter={spinnerDiameter}>
-            <StyledSpinner id={id + '_spinner'} />
-          </StyledSpinnerContainer>
-        </LoadingSpinnerContainer>
+        <StyledSpinner id={id + '_spinner'} size={spinnerDiameter} />
+        {loadingText && (
+          <LoadingTextContainer>{loadingText}</LoadingTextContainer>
+        )}
       </LoadingContainer>
     )
   }

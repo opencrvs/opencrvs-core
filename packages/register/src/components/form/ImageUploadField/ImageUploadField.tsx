@@ -106,13 +106,15 @@ class ImageUploadComponent extends React.Component<
   {
     showNestedOptionSection: boolean
     previewImage: IFileValue | null
+    previewIndex: number
   }
 > {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
       showNestedOptionSection: false,
-      previewImage: null
+      previewImage: null,
+      previewIndex: 0
     }
   }
 
@@ -127,13 +129,14 @@ class ImageUploadComponent extends React.Component<
   }
 
   onDelete = (index: number): void => {
+    this.closePreviewSection()
     const files = this.props.files ? this.props.files : []
     files.splice(index, 1)
     this.props.onComplete(files)
   }
 
-  onPreview = (file: IFileValue): void => {
-    this.setState({ previewImage: file })
+  onPreview = (file: IFileValue, index: number): void => {
+    this.setState({ previewImage: file, previewIndex: index })
   }
 
   onComplete = (file: IFileValue) => {
@@ -156,7 +159,7 @@ class ImageUploadComponent extends React.Component<
               deleteLabel={intl.formatMessage(messages.delete)}
               onDelete={() => this.onDelete(index)}
               previewLabel={intl.formatMessage(messages.preview)}
-              onPreview={() => this.onPreview(file)}
+              onPreview={() => this.onPreview(file, index)}
             />
           </FileItemContainer>
         )
@@ -193,9 +196,9 @@ class ImageUploadComponent extends React.Component<
         {this.state.previewImage && (
           <ImagePreview
             previewImage={this.state.previewImage}
-            title={intl.formatMessage(messages.preview)}
-            backLabel={intl.formatMessage(messages.back)}
+            title={augmentFile(this.state.previewImage).title}
             goBack={this.closePreviewSection}
+            onDelete={() => this.onDelete(0)}
           />
         )}
       </Container>
