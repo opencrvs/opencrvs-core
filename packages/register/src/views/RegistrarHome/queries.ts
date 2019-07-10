@@ -24,7 +24,7 @@ export const COUNT_EVENT_REGISTRATION_BY_STATUS = gql`
 export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
   query data($locationIds: [String], $status: String, $count: Int, $skip: Int) {
     listEventRegistrations(
-      locationId: $locationIds
+      locationIds: $locationIds
       status: $status
       count: $count
       skip: $skip
