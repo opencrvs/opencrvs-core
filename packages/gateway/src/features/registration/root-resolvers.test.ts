@@ -1,7 +1,6 @@
 import { resolvers } from '@gateway/features/registration/root-resolvers'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { mockDeathComposition } from '@gateway/utils/testUtils'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -345,6 +344,12 @@ describe('Registration root resolvers', () => {
       mother: {
         name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
         telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      father: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }]
+      },
+      informant: {
+        relationship: 'FATHER'
       },
       registration: { contact: 'MOTHER' }
     }
@@ -1382,18 +1387,15 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockDeathComposition)],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                response: { location: 'Task/12423/_history/1' }
-              }
-            ]
-          })
-        ]
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Task/12423/_history/1' }
+            }
+          ]
+        })
       )
       const result = await resolvers.Mutation.markDeathAsCertified(
         {},

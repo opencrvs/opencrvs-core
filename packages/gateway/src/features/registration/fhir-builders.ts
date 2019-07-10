@@ -1545,20 +1545,22 @@ const builders: IFieldBuilders = {
           }
         ]
       }
-      if (fieldValue === 'MOTHER') {
-        await setInformantReference(
-          MOTHER_CODE,
-          relatedPersonResource,
-          fhirBundle,
-          context
-        )
-      } else if (fieldValue === 'FATHER') {
-        await setInformantReference(
-          FATHER_CODE,
-          relatedPersonResource,
-          fhirBundle,
-          context
-        )
+      if (context.event === EVENT_TYPE.BIRTH) {
+        if (fieldValue === 'MOTHER') {
+          await setInformantReference(
+            MOTHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'FATHER') {
+          await setInformantReference(
+            FATHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        }
       }
     },
     otherRelationship: (
