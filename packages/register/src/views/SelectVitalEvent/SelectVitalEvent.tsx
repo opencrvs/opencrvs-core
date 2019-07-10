@@ -1,23 +1,24 @@
+import * as React from 'react'
+import styled from '@register/styledComponents'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   createApplication,
+  IApplication,
   setInitialApplications,
   storeApplication
 } from '@register/applications'
 import { Event } from '@register/forms'
 import {
-  goToBirthRegistration,
+  goBack,
+  goToBirthInformant,
   goToDeathRegistration,
   goToHome
 } from '@register/navigation'
-import styled from '@register/styledComponents'
-import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { Dispatch } from 'redux'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -67,21 +68,30 @@ const Actions = styled.div`
 
 class SelectVitalEventView extends React.Component<
   InjectedIntlProps & {
-    goToBirthRegistration: typeof goToBirthRegistration
-    goToDeathRegistration: () => void
-    goHome: () => void
+    goBack: typeof goBack
+    goToHome: typeof goToHome
+    storeApplication: typeof storeApplication
+    goToBirthInformant: typeof goToBirthInformant
+    goToDeathRegistration: typeof goToDeathRegistration
+    setInitialApplications: typeof setInitialApplications
   }
 > {
   state = {
     goTo: ''
   }
   handleContinue = () => {
+    let application: IApplication
     switch (this.state.goTo) {
       case 'birth':
-        this.props.goToBirthRegistration()
+        application = createApplication(Event.BIRTH)
+        this.props.storeApplication(application)
+        this.props.goToBirthInformant(application.id)
+
         break
       case 'death':
-        this.props.goToDeathRegistration()
+        application = createApplication(Event.DEATH)
+        this.props.storeApplication(application)
+        this.props.goToDeathRegistration(application.id)
         break
       default:
         this.setState({ goTo: 'error' })
@@ -93,7 +103,7 @@ class SelectVitalEventView extends React.Component<
       <Container>
         <EventTopBar
           title={intl.formatMessage(messages.registerNewEventTitle)}
-          goHome={this.props.goHome}
+          goHome={this.props.goToHome}
         />
 
         <BodyContent>
@@ -134,18 +144,12 @@ class SelectVitalEventView extends React.Component<
 
 export const SelectVitalEvent = connect(
   null,
-  function mapDispatchToProps(dispatch: Dispatch) {
-    return {
-      goToBirthRegistration: () => dispatch(goToBirthRegistration()),
-      goToDeathRegistration: () => {
-        const application = createApplication(Event.DEATH)
-        dispatch(storeApplication(application))
-        dispatch(goToDeathRegistration(application.id))
-      },
-      goHome: () => {
-        dispatch(setInitialApplications())
-        dispatch(goToHome())
-      }
-    }
+  {
+    goBack,
+    goToHome,
+    storeApplication,
+    goToBirthInformant,
+    goToDeathRegistration,
+    setInitialApplications
   }
 )(injectIntl(SelectVitalEventView))

@@ -1,39 +1,39 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 import {
-  goBack as goBackAction,
-  goToHome as goToHomeAction,
-  goToBirthRegistrationAsParent
-} from '@register/navigation'
-import {
-  PrimaryButton,
   ICON_ALIGNMENT,
+  PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { RadioButton, EventTopBar } from '@opencrvs/components/lib/interface'
-import styled from '@register/styledComponents'
-import { getLanguage } from '@register/i18n/selectors'
-import { IStoreState } from '@register/store'
-import { TextInput, InputField } from '@opencrvs/components/lib/forms'
-import { BackArrow } from '@opencrvs/components/lib/icons'
-import { phoneNumberFormat } from '@register/utils/validate'
-import {
-  RADIO_BUTTON_LARGE_STRING,
-  CONTACT_POINT_FIELD_STRING,
-  PHONE_NO_FIELD_STRING
-} from '@register/utils/constants'
+import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   IApplication,
-  createApplication,
+  modifyApplication,
+  setInitialApplications,
   storeApplication,
-  setInitialApplications
+  writeApplication
 } from '@register/applications'
-import { Event } from '@register/forms'
-import { RouteComponentProps } from 'react-router'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { getLanguage } from '@register/i18n/selectors'
+import {
+  goBack as goBackAction,
+  goToBirthRegistrationAsParent,
+  goToHome as goToHomeAction
+} from '@register/navigation'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import {
+  CONTACT_POINT_FIELD_STRING,
+  PHONE_NO_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING
+} from '@register/utils/constants'
+import { phoneNumberFormat } from '@register/utils/validate'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 
 const messages = defineMessages({
   title: {
@@ -122,14 +122,6 @@ const ChildContainer = styled.div`
   }
 `
 
-const PresentAtBirthRegistration = {
-  mother: 'MOTHER_ONLY',
-  father: 'FATHER_ONLY',
-  parents: 'BOTH_PARENTS',
-  other: 'OTHER',
-  self: 'INFORMANT_ONLY'
-}
-
 enum ContactPoint {
   MOTHER = 'MOTHER',
   FATHER = 'FATHER',
@@ -143,14 +135,17 @@ interface IState {
   touched: boolean
   isError: boolean
 }
-interface IMatch {
-  presentAtReg: string
-  applicant: string
+
+interface IMatchProps {
+  applicationId: string
 }
 
 type IProps = InjectedIntlProps &
-  RouteComponentProps<IMatch> & {
+  RouteComponentProps<IMatchProps> & {
     language: string
+    application: IApplication
+    modifyApplication: typeof modifyApplication
+    writeApplication: typeof writeApplication
     goBack: typeof goBackAction
     goToHome: typeof goToHomeAction
     storeApplication: typeof storeApplication
@@ -161,8 +156,20 @@ class SelectContactPointView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      selected: '',
-      phoneNumber: '',
+      selected:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data['registration'] &&
+          (this.props.application.data['registration']
+            .whoseContactDetails as string)) ||
+        '',
+      phoneNumber:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data['registration'] &&
+          (this.props.application.data['registration']
+            .registrationPhone as string)) ||
+        '',
       relationShip: '',
       isPhoneNoError: false,
       touched: false,
@@ -183,27 +190,31 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     })
   }
 
-  handleSubmit = (e: any) => {
+  handleSubmit = async (e: any) => {
+    const {
+      application,
+      writeApplication,
+      modifyApplication,
+      goToBirthRegistrationAsParent
+    } = this.props
     e.preventDefault()
     if (this.state.phoneNumber && !this.state.isPhoneNoError) {
-      const application: IApplication = createApplication(Event.BIRTH)
-      application.data['registration'] = {
-        presentAtBirthRegistration:
-          PresentAtBirthRegistration[
-            this.props.match.params.presentAtReg as
-              | 'mother'
-              | 'father'
-              | 'parents'
-              | 'other'
-              | 'self'
-          ],
-        registrationPhone: this.state.phoneNumber,
-        whoseContactDetails: this.state.selected,
-        applicant: this.props.match.params.applicant
-      }
+      await modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              registrationPhone: this.state.phoneNumber,
+              whoseContactDetails: this.state.selected
+            }
+          }
+        }
+      })
 
-      this.props.storeApplication(application)
-      this.props.goToBirthRegistrationAsParent(application.id)
+      writeApplication(this.props.application)
+      goToBirthRegistrationAsParent(application.id)
     } else {
       this.setState({
         isError: true
@@ -229,6 +240,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           type="tel"
           name={PHONE_NO_FIELD_STRING}
           isSmallSized={true}
+          value={this.state.phoneNumber}
           onChange={e => this.handlePhoneNoChange(e.target.value)}
           touched={this.state.touched}
           error={this.state.isPhoneNoError}
@@ -247,7 +259,6 @@ class SelectContactPointView extends React.Component<IProps, IState> {
 
   render() {
     const { intl } = this.props
-
     return (
       <Container>
         <EventTopBar
@@ -356,8 +367,15 @@ class SelectContactPointView extends React.Component<IProps, IState> {
   }
 }
 
-const mapStateToProps = (store: IStoreState) => {
+const mapStateToProps = (
+  store: IStoreState,
+  props: RouteComponentProps<{ applicationId: string }>
+) => {
+  const { match } = props
   return {
+    application: store.applicationsState.applications.find(
+      ({ id }) => id === match.params.applicationId
+    ) as IApplication,
     language: getLanguage(store)
   }
 }
@@ -369,6 +387,8 @@ export const SelectContactPoint = connect(
     goToHome: goToHomeAction,
     storeApplication,
     goToBirthRegistrationAsParent,
-    setInitialApplications
+    setInitialApplications,
+    modifyApplication,
+    writeApplication
   }
 )(injectIntl(SelectContactPointView))

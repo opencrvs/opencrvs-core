@@ -89,6 +89,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
             })
           }
         }
+        return {}
       }
     ) as IGQLLocation[]
     if (potentialCatchmentAreas !== undefined) {

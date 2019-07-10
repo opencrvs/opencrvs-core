@@ -2,7 +2,7 @@ import * as React from 'react'
 
 export const RotateLeft = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={24} height={24} fill="none" {...props}>
-    <g clip-path="url(#clip0)">
+    <g clipPath="url(#clip0)">
       <rect width="24" height="24" fill="white" />
       <path
         d="M4.97538 3.70034L5.45613 9.36961L11.1254 8.88886"

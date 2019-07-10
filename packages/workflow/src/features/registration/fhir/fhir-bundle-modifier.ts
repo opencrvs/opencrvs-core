@@ -1,7 +1,8 @@
 import {
   generateBirthTrackingId,
   generateDeathTrackingId,
-  getEventType
+  getEventType,
+  isInProgressApplication
 } from '@workflow/features/registration/utils'
 import { getRegStatusCode } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -17,6 +18,7 @@ import {
 import {
   OPENCRVS_SPECIFICATION_URL,
   EVENT_TYPE,
+  REG_STATUS_IN_PROGRESS,
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   REG_STATUS_CERTIFIED
@@ -50,7 +52,9 @@ export async function modifyRegistrationBundle(
   setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_DECLARED
+    isInProgressApplication(fhirBundle)
+      ? REG_STATUS_IN_PROGRESS
+      : REG_STATUS_DECLARED
   )
 
   const practitioner = await getLoggedInPractitionerResource(token)
