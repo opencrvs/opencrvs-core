@@ -8,18 +8,21 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   mockOfflineData,
-  intl
+  intl,
+  flushPromises
 } from '@register/tests/util'
 import {
   createApplication,
-  createReviewApplication
+  createReviewApplication,
+  storeApplication,
+  modifyApplication
 } from '@register/applications'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import { REJECTED } from '@register/utils/constants'
 
-const { store } = createStore()
+const { store, history } = createStore()
 const mockHandler = jest.fn()
 const draft = createApplication(Event.BIRTH)
 const rejectedDraftBirth = createReviewApplication(
@@ -40,6 +43,9 @@ draft.data = {
   father: { fathersDetailsExist: true, addressSameAsMother: false },
   documents: {
     imageUploader: { title: 'dummy', description: 'dummy', data: '' }
+  },
+  registration: {
+    commentsOrNotes: ''
   }
 }
 
@@ -53,37 +59,80 @@ describe('when user is in the review page', () => {
         registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
+        onChangeReviewForm={mockHandler}
       />,
       store
     )
     reviewSectionComponent = testComponent.component
-    reviewSectionComponent
-      .find(`button#next_button_child`)
-      .hostNodes()
-      .simulate('click')
-    reviewSectionComponent
-      .find(`button#next_button_mother`)
-      .hostNodes()
-      .simulate('click')
-    reviewSectionComponent
-      .find(`button#next_button_father`)
-      .hostNodes()
-      .simulate('click')
   })
 
-  it('Should collapse the section', () => {
-    reviewSectionComponent
-      .find(`#SectionDrawer_child ._expansionBtn`)
-      .hostNodes()
-      .simulate('click')
+  describe('when user clicks on change link', () => {
+    beforeEach(() => {
+      reviewSectionComponent
+        .find('#btn_change_child_familyNameEng')
+        .hostNodes()
+        .simulate('click')
+      reviewSectionComponent.update()
+    })
 
-    const elemHeight = reviewSectionComponent
-      .find(`#SectionDrawer_child ._sectionContainer`)
-      .at(0)
-      .getDOMNode().clientHeight
-    expect(elemHeight).toBe(0)
+    it('edit dialog should show up', () => {
+      expect(
+        reviewSectionComponent.find('#edit_confirm').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('clicking on edit takes user back to form', async () => {
+      reviewSectionComponent
+        .find('#edit_confirm')
+        .hostNodes()
+        .simulate('click')
+      reviewSectionComponent.update()
+      await flushPromises()
+      expect(history.location.pathname).toContain('reviews')
+    })
   })
 
+  it('renders header component', () => {
+    expect(
+      reviewSectionComponent.find('#review_header').hostNodes()
+    ).toHaveLength(1)
+    expect(
+      reviewSectionComponent
+        .find('#review_header_title')
+        .hostNodes()
+        .text()
+    ).toBe('Government of the peoples republic of Bangladesh')
+    expect(
+      reviewSectionComponent
+        .find('#review_header_subject')
+        .hostNodes()
+        .text()
+    ).toBe('Birth Application for John Doe')
+  })
+  it('clicking required field link takes user to the to field on form', async () => {
+    reviewSectionComponent
+      .find('#required_link_child_familyName')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    reviewSectionComponent.update()
+    expect(history.location.pathname).toContain('child')
+    expect(history.location.hash).toBe('#familyName')
+  })
+
+  it('typing additional comments input triggers onchange review form', async () => {
+    store.dispatch(storeApplication(draft))
+    reviewSectionComponent
+      .find('#additional_comments')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          id: 'additional_comments',
+          value: 'some comments'
+        }
+      })
+    expect(mockHandler).toBeCalled()
+  })
   it('Should click the Register button', async () => {
     reviewSectionComponent
       .find('#registerApplicationBtn')
@@ -147,18 +196,6 @@ describe('when user is in the review page for rejected birth application', () =>
       store
     )
     reviewSectionComponent = testComponent.component
-    reviewSectionComponent
-      .find(`button#next_button_child`)
-      .hostNodes()
-      .simulate('click')
-    reviewSectionComponent
-      .find(`button#next_button_mother`)
-      .hostNodes()
-      .simulate('click')
-    reviewSectionComponent
-      .find(`button#next_button_father`)
-      .hostNodes()
-      .simulate('click')
   })
 
   it('Should not click the Reject Application', async () => {
@@ -182,18 +219,6 @@ describe('when user is in the review page for rejected death application', () =>
       store
     )
     reviewSectionComponent = testComponent.component
-    reviewSectionComponent
-      .find(`button#next_button_deceased`)
-      .hostNodes()
-      .simulate('click')
-    reviewSectionComponent
-      .find(`button#next_button_informant`)
-      .hostNodes()
-      .simulate('click')
-    reviewSectionComponent
-      .find(`button#next_button_deathEvent`)
-      .hostNodes()
-      .simulate('click')
   })
 
   it('Should not click the Reject Application', async () => {
