@@ -49,12 +49,15 @@ export function findCompositionSection(
   code: string,
   composition: ITemplatedComposition
 ) {
-  return composition.section.find((section: fhir.CompositionSection) => {
-    if (!section.code || !section.code.coding || !section.code.coding.some) {
-      return false
-    }
-    return section.code.coding.some(coding => coding.code === code)
-  })
+  return (
+    composition.section &&
+    composition.section.find((section: fhir.CompositionSection) => {
+      if (!section.code || !section.code.coding || !section.code.coding.some) {
+        return false
+      }
+      return section.code.coding.some(coding => coding.code === code)
+    })
+  )
 }
 
 export function selectOrCreatePersonResource(
