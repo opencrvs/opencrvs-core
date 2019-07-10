@@ -10,6 +10,7 @@ import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { string } from 'joi'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -381,11 +382,19 @@ export interface IFormSection {
   viewType: ViewType
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
-  fields: IFormField[]
+  groups: IFormSectionGroup[]
   disabled?: boolean
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapping
+}
+
+export interface IFormSectionGroup {
+  id: string
+  name?: FormattedMessage.MessageDescriptor
+  title?: FormattedMessage.MessageDescriptor
+  fields: IFormField[]
+  disabled?: boolean
 }
 
 export interface IForm {
