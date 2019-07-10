@@ -52,5 +52,6 @@ export const UNION_LOCATION_CODE = 'UNION'
 
 export const PHONE_NO_FIELD_STRING = 'phoneNo'
 export const CONTACT_POINT_FIELD_STRING = 'contactPoint'
+export const INFORMANT_FIELD_STRING = 'informantOption'
 
 export const RADIO_BUTTON_LARGE_STRING = 'large'

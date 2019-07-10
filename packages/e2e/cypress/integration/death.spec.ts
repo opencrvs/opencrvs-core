@@ -18,6 +18,13 @@ context('Death Registration Integration Test', () => {
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
+    cy.get('#select_informant_SON').click()
+    cy.get('#continue').click()
+
+    // SELECT MAIN CONTACT POINT
+    cy.get('#contact_SON').click()
+    cy.get('#phone_number_input').type('01526972106')
+    cy.get('#continue').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -176,7 +183,11 @@ context('Death Registration Integration Test', () => {
     // cy.get('#applicantBirthDate-dd').type('17')
     // cy.get('#applicantBirthDate-mm').type('10')
     // cy.get('#applicantBirthDate-yyyy').type('1956')
-    cy.selectOption('#applicantsRelationToDeceased', 'Extended Family', 'Extended Family')
+    cy.selectOption(
+      '#applicantsRelationToDeceased',
+      'Extended Family',
+      'Extended Family'
+    )
     cy.get('#applicantPhone').type('01712345678')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')

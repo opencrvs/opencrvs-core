@@ -22,7 +22,8 @@ import {
   goToBirthRegistrationAsParent,
   goBack,
   goToHome,
-  goToMainContactPoint,
+  goToBirthContactPoint,
+  goToDeathContactPoint,
   goToPrimaryApplicant,
   goToDeathRegistration
 } from '@register/navigation'
@@ -35,7 +36,11 @@ import {
 } from '@opencrvs/components/lib/forms'
 import { Event } from '@register/forms'
 import { phoneNumberFormat } from '@register/utils/validate'
-import { PHONE_NO_FIELD_STRING } from '@register/utils/constants'
+import {
+  PHONE_NO_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING,
+  INFORMANT_FIELD_STRING
+} from '@register/utils/constants'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -170,10 +175,10 @@ const ChildContainer = styled.div`
 `
 
 enum INFORMANT {
-  FATHER = 'FATHER_ONLY',
-  MOTHER = 'MOTHER_ONLY',
+  FATHER = 'FATHER',
+  MOTHER = 'MOTHER',
   BOTH_PARENTS = 'BOTH_PARENTS',
-  SELF = 'INFORMANT_ONLY',
+  SELF = 'SELF',
   SOMEONE_ELSE = 'OTHER',
   SPOUSE = 'SPOUSE',
   SON = 'SON',
@@ -181,7 +186,7 @@ enum INFORMANT {
   EXTENDED_FAMILY = 'EXTENDED_FAMILY'
 }
 
-interface IInformantField {
+export interface IInformantField {
   id: string
   option: RadioComponentOption
   disabled: boolean
@@ -305,7 +310,8 @@ type IFullProps = {
   modifyApplication: typeof modifyApplication
   goBack: typeof goBack
   goToHome: typeof goToHome
-  goToMainContactPoint: typeof goToMainContactPoint
+  goToBirthContactPoint: typeof goToBirthContactPoint
+  goToDeathContactPoint: typeof goToDeathContactPoint
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
   goToPrimaryApplicant: typeof goToPrimaryApplicant
@@ -371,7 +377,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant !== INFORMANT.SOMEONE_ELSE
     ) {
-      const { application, goToMainContactPoint } = this.props
+      const {
+        application,
+        goToBirthContactPoint,
+        goToDeathContactPoint
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -386,7 +396,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       })
 
-      goToMainContactPoint(this.props.match.params.applicationId)
+      this.props.location.pathname.includes(Event.BIRTH)
+        ? goToBirthContactPoint(this.props.match.params.applicationId)
+        : goToDeathContactPoint(this.props.match.params.applicationId)
     } else if (
       this.state.informant &&
       this.state.informant !== 'error' &&
@@ -501,9 +513,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             {infornantFields.map((infornantField: IInformantField) => {
               return (
                 <RadioButton
-                  size="large"
+                  size={RADIO_BUTTON_LARGE_STRING}
                   key={infornantField.id}
-                  name={`${event}Option`}
+                  name={INFORMANT_FIELD_STRING}
                   label={infornantField.option.label}
                   value={infornantField.option.value}
                   id={infornantField.id}
@@ -571,7 +583,8 @@ export const SelectInformant = withRouter(
     {
       goBack,
       goToHome,
-      goToMainContactPoint,
+      goToBirthContactPoint,
+      goToDeathContactPoint,
       goToBirthRegistrationAsParent,
       goToPrimaryApplicant,
       goToDeathRegistration,

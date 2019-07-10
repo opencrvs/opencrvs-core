@@ -1,7 +1,12 @@
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -23,7 +28,8 @@ import { getLanguage } from '@register/i18n/selectors'
 import {
   goBack as goBackAction,
   goToBirthRegistrationAsParent,
-  goToHome as goToHomeAction
+  goToHome as goToHomeAction,
+  goToDeathRegistration
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
@@ -34,6 +40,8 @@ import {
 } from '@register/utils/constants'
 import { phoneNumberFormat } from '@register/utils/validate'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { IInformantField } from '@register/views/SelectInformant/SelectInformant'
+import { Event } from '@register/forms'
 
 const messages = defineMessages({
   title: {
@@ -71,10 +79,15 @@ const messages = defineMessages({
     defaultMessage: 'Phone number',
     description: 'Phone No Label'
   },
-  relationshipLabel: {
-    id: 'register.SelectContactPoint.relationshipLabel',
-    defaultMessage: 'RelationShip to child',
-    description: 'RelationShip Label'
+  birthRelationshipLabel: {
+    id: 'register.SelectContactPoint.birthRelationshipLabel',
+    defaultMessage: 'Relationship to child',
+    description: 'Relationship Label for birth'
+  },
+  deathRelationshipLabel: {
+    id: 'register.SelectContactPoint.deathRelationshipLabel',
+    defaultMessage: 'Relationship',
+    description: 'Relationship Label for death'
   },
   goBack: {
     id: 'register.SelectContactPoint.goBack',
@@ -95,6 +108,30 @@ const messages = defineMessages({
     id: 'register.SelectContactPoint.relationshipPlaceHolder',
     defaultMessage: 'eg. Grandmother',
     description: 'Relationship place holder'
+  },
+  spouse: {
+    id: 'register.SelectContactPoint.spouse',
+    defaultMessage: 'Spouse',
+    description:
+      'The title that appears when selecting spouse as a main point of contact'
+  },
+  son: {
+    id: 'register.SelectContactPoint.son',
+    defaultMessage: 'Son',
+    description:
+      'The title that appears when selecting son as a main point of contact'
+  },
+  daughter: {
+    id: 'register.SelectContactPoint.daughter',
+    defaultMessage: 'Daughter',
+    description:
+      'The title that appears when selecting daughter as a main point of contact'
+  },
+  extendedFamily: {
+    id: 'register.SelectContactPoint.extendedFamily',
+    defaultMessage: 'Extended family',
+    description:
+      'The title that appears when selecting extended family as a main point of contact'
   }
 })
 
@@ -125,7 +162,104 @@ const ChildContainer = styled.div`
 enum ContactPoint {
   MOTHER = 'MOTHER',
   FATHER = 'FATHER',
+  SPOUSE = 'SPOUSE',
+  SON = 'SON',
+  DAUGHTER = 'DAUGHTER',
+  EXTENDED_FAMILY = 'EXTENDED_FAMILY',
   OTHER = 'OTHER'
+}
+
+const setContactPointFields = (
+  intl: InjectedIntl,
+  event: string
+): IInformantField[] => {
+  if (event === Event.BIRTH) {
+    return [
+      {
+        id: `contact_${ContactPoint.MOTHER}`,
+        option: {
+          label: intl.formatMessage(messages.motherLabel),
+          value: ContactPoint.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.FATHER}`,
+        option: {
+          label: intl.formatMessage(messages.fatherLabel),
+          value: ContactPoint.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.OTHER}`,
+        option: {
+          label: intl.formatMessage(messages.otherLabel),
+          value: ContactPoint.OTHER
+        },
+        disabled: false
+      }
+    ]
+  } else {
+    return [
+      {
+        id: `contact_${ContactPoint.MOTHER}`,
+        option: {
+          label: intl.formatMessage(messages.motherLabel),
+          value: ContactPoint.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.FATHER}`,
+        option: {
+          label: intl.formatMessage(messages.fatherLabel),
+          value: ContactPoint.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.SPOUSE}`,
+        option: {
+          label: intl.formatMessage(messages.spouse),
+          value: ContactPoint.SPOUSE
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.SON}`,
+        option: {
+          label: intl.formatMessage(messages.son),
+          value: ContactPoint.SON
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.DAUGHTER}`,
+        option: {
+          label: intl.formatMessage(messages.daughter),
+          value: ContactPoint.DAUGHTER
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.EXTENDED_FAMILY}`,
+        option: {
+          label: intl.formatMessage(messages.extendedFamily),
+          value: ContactPoint.EXTENDED_FAMILY
+        },
+        disabled: false
+      },
+      {
+        id: `contact_${ContactPoint.OTHER}`,
+        option: {
+          label: intl.formatMessage(messages.otherLabel),
+          value: ContactPoint.OTHER
+        },
+        disabled: false
+      }
+    ]
+  }
 }
 interface IState {
   selected: string
@@ -151,6 +285,7 @@ type IProps = InjectedIntlProps &
     storeApplication: typeof storeApplication
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
     setInitialApplications: typeof setInitialApplications
+    goToDeathRegistration: typeof goToDeathRegistration
   }
 class SelectContactPointView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -195,10 +330,15 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       application,
       writeApplication,
       modifyApplication,
-      goToBirthRegistrationAsParent
+      goToBirthRegistrationAsParent,
+      goToDeathRegistration
     } = this.props
     e.preventDefault()
-    if (this.state.phoneNumber && !this.state.isPhoneNoError) {
+    if (
+      this.state.phoneNumber &&
+      !this.state.isPhoneNoError &&
+      this.state.selected !== ContactPoint.OTHER
+    ) {
       await modifyApplication({
         ...application,
         data: {
@@ -214,7 +354,33 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       })
 
       writeApplication(this.props.application)
-      goToBirthRegistrationAsParent(application.id)
+      this.props.location.pathname.includes(Event.BIRTH)
+        ? goToBirthRegistrationAsParent(application.id)
+        : goToDeathRegistration(application.id)
+    } else if (
+      this.state.phoneNumber &&
+      !this.state.isPhoneNoError &&
+      this.state.selected === ContactPoint.OTHER &&
+      this.state.relationship !== ''
+    ) {
+      await modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              registrationPhone: this.state.phoneNumber,
+              whoseContactDetails: this.state.relationship
+            }
+          }
+        }
+      })
+
+      writeApplication(this.props.application)
+      this.props.location.pathname.includes(Event.BIRTH)
+        ? goToBirthRegistrationAsParent(application.id)
+        : goToDeathRegistration(application.id)
     } else {
       this.setState({
         isError: true
@@ -222,10 +388,11 @@ class SelectContactPointView extends React.Component<IProps, IState> {
     }
   }
 
-  renderPhoneNumberField = (): JSX.Element => {
+  renderPhoneNumberField = (id: string): JSX.Element => {
     return (
       <InputField
         id="phone_number"
+        key={`${id}_phoneNumberFieldContainer`}
         label={this.props.intl.formatMessage(messages.phoneNoLabel)}
         touched={this.state.touched}
         error={
@@ -238,6 +405,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         <TextInput
           id="phone_number_input"
           type="tel"
+          key={`${id}_phoneNumberInputField`}
           name={PHONE_NO_FIELD_STRING}
           isSmallSized={true}
           value={this.state.phoneNumber}
@@ -256,9 +424,20 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       touched: false,
       isError: false
     })
+  handleRelationshipChange = (value: string) => {
+    this.setState({
+      relationship: value,
+      touched: true,
+      isError: false
+    })
+  }
 
   render() {
     const { intl } = this.props
+    const event = this.props.location.pathname.includes(Event.BIRTH)
+      ? Event.BIRTH
+      : Event.DEATH
+    const contactPointFields = setContactPointFields(intl, event)
     return (
       <Container>
         <EventTopBar
@@ -285,56 +464,44 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           )}
           <form>
             <Actions id="select_main_contact_point">
-              <RadioButton
-                id="contact_mother"
-                size={RADIO_BUTTON_LARGE_STRING}
-                name={CONTACT_POINT_FIELD_STRING}
-                label={intl.formatMessage(messages.motherLabel)}
-                value={ContactPoint.MOTHER}
-                selected={this.state.selected}
-                onChange={() =>
-                  this.handleContactPointChange(ContactPoint.MOTHER)
-                }
-              />
-
-              {this.state.selected === ContactPoint.MOTHER && (
-                <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
-              )}
-
-              <RadioButton
-                id="contact_father"
-                size={RADIO_BUTTON_LARGE_STRING}
-                name={CONTACT_POINT_FIELD_STRING}
-                label={intl.formatMessage(messages.fatherLabel)}
-                value={ContactPoint.FATHER}
-                selected={this.state.selected}
-                onChange={() =>
-                  this.handleContactPointChange(ContactPoint.FATHER)
-                }
-              />
-
-              {this.state.selected === ContactPoint.FATHER && (
-                <ChildContainer>{this.renderPhoneNumberField()}</ChildContainer>
-              )}
-
-              <RadioButton
-                id="contact_other"
-                disabled={true}
-                size={RADIO_BUTTON_LARGE_STRING}
-                name={CONTACT_POINT_FIELD_STRING}
-                label={intl.formatMessage(messages.otherLabel)}
-                value={ContactPoint.OTHER}
-                selected={this.state.selected}
-                onChange={() =>
-                  this.handleContactPointChange(ContactPoint.OTHER)
-                }
-              />
+              {contactPointFields.map((contactPointField: IInformantField) => {
+                return (
+                  <div key={`${contactPointField.id}_wrapper`}>
+                    <RadioButton
+                      size={RADIO_BUTTON_LARGE_STRING}
+                      key={contactPointField.id}
+                      name={CONTACT_POINT_FIELD_STRING}
+                      label={contactPointField.option.label}
+                      value={contactPointField.option.value}
+                      id={contactPointField.id}
+                      selected={this.state.selected}
+                      onChange={() =>
+                        this.handleContactPointChange(contactPointField.option
+                          .value as string)
+                      }
+                      disabled={contactPointField.disabled}
+                    />
+                    {this.state.selected === contactPointField.option.value &&
+                      this.state.selected !== ContactPoint.OTHER && (
+                        <ChildContainer
+                          key={`${contactPointField.id}_phoneContainer`}
+                        >
+                          {this.renderPhoneNumberField(contactPointField.id)}
+                        </ChildContainer>
+                      )}
+                  </div>
+                )
+              })}
 
               {this.state.selected === ContactPoint.OTHER && (
                 <ChildContainer>
                   <InputField
                     id="relationship"
-                    label={intl.formatMessage(messages.relationshipLabel)}
+                    label={
+                      event === Event.BIRTH
+                        ? intl.formatMessage(messages.birthRelationshipLabel)
+                        : intl.formatMessage(messages.deathRelationshipLabel)
+                    }
                     touched={this.state.touched}
                     hideAsterisk={true}
                   >
@@ -345,11 +512,13 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                         messages.relationshipPlaceHolder
                       )}
                       isSmallSized={true}
-                      onChange={e => this.handlePhoneNoChange(e.target.value)}
+                      onChange={e =>
+                        this.handleRelationshipChange(e.target.value)
+                      }
                       touched={this.state.touched}
                     />
                   </InputField>
-                  {this.renderPhoneNumberField()}
+                  {this.renderPhoneNumberField('otherRelationship')}
                 </ChildContainer>
               )}
             </Actions>
@@ -380,15 +549,18 @@ const mapStateToProps = (
   }
 }
 
-export const SelectContactPoint = connect(
-  mapStateToProps,
-  {
-    goBack: goBackAction,
-    goToHome: goToHomeAction,
-    storeApplication,
-    goToBirthRegistrationAsParent,
-    setInitialApplications,
-    modifyApplication,
-    writeApplication
-  }
-)(injectIntl(SelectContactPointView))
+export const SelectContactPoint = withRouter(
+  connect(
+    mapStateToProps,
+    {
+      goBack: goBackAction,
+      goToHome: goToHomeAction,
+      storeApplication,
+      goToBirthRegistrationAsParent,
+      setInitialApplications,
+      modifyApplication,
+      writeApplication,
+      goToDeathRegistration
+    }
+  )(injectIntl(SelectContactPointView))
+) as any

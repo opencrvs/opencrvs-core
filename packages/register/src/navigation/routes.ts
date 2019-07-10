@@ -13,6 +13,7 @@ export const DRAFT_BIRTH_APPLICANT_FORM = `/events/${Event.BIRTH}/contact`
 export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:applicationId/events/${Event.BIRTH}/parent/:tabId`
 
 export const SELECT_DEATH_INFORMANT = `/drafts/:applicationId/events/${Event.DEATH}/registration/informant`
+export const SELECT_DEATH_MAIN_CONTACT_POINT = `/drafts/:applicationId/events/${Event.DEATH}/registration/contact`
 export const DRAFT_DEATH_FORM = `/drafts/:applicationId/events/${Event.DEATH}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:applicationId/events/${Event.DEATH}/:pageId`
 

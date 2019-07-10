@@ -1187,10 +1187,17 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'Father',
     'register.SelectContactPoint.otherLabel': 'Someone else',
     'register.SelectContactPoint.phoneNoLabel': 'Phone number',
-    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.birthRelationshipLabel':
+      'RelationShip to child',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'Back',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
-    'register.SelectContactPoint.error': 'Please select a main point of contact'
+    'register.SelectContactPoint.error':
+      'Please select a main point of contact',
+    'register.SelectContactPoint.spouse': 'Spouse',
+    'register.SelectContactPoint.son': 'Son',
+    'register.SelectContactPoint.daughter': 'Daughter',
+    'register.SelectContactPoint.extendedFamily': 'Extended family'
   }
 }

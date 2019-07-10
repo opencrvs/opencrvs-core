@@ -19,7 +19,8 @@ import {
   CREATE_USER,
   CREATE_USER_SECTION,
   SELECT_BIRTH_PRIMARY_APPLICANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT
+  SELECT_BIRTH_MAIN_CONTACT_POINT,
+  SELECT_DEATH_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -92,9 +93,17 @@ export function goToDeathInformant(applicationId: string) {
   )
 }
 
-export function goToMainContactPoint(applicationId: string) {
+export function goToBirthContactPoint(applicationId: string) {
   return push(
     formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
+      applicationId
+    })
+  )
+}
+
+export function goToDeathContactPoint(applicationId: string) {
+  return push(
+    formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
       applicationId
     })
   )

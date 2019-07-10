@@ -1186,11 +1186,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'বাবা',
     'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
     'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
-    'register.SelectContactPoint.relationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.birthRelationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'ফিরে যান',
     'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
-      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'register.SelectContactPoint.spouse': 'Spouse',
+    'register.SelectContactPoint.son': 'Son',
+    'register.SelectContactPoint.daughter': 'Daughter',
+    'register.SelectContactPoint.extendedFamily': 'Extended family'
   }
 }
