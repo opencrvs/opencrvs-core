@@ -20,7 +20,7 @@
     "test": "CI=true lerna run test --silent --noStackTrace --stream --watchAll=false",
     "compose": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev.yml up",
     "compose:down": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev.yml down",
-    "compose:build": "docker-compose build",
+    "compose:build": "docker build -t opencrvs-build . && docker-compose build",
     "compose:push": "docker-compose build && docker-compose push && yarn compose:push:version",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && docker-compose build && docker-compose push && unset VERSION",
     "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && docker-compose build && docker-compose push && unset VERSION",
@@ -34,7 +34,8 @@
     "cov:register": "cd packages/register && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
     "cov:performance": "cd packages/performance && yarn open:cov",
-    "cy": "cd packages/e2e && yarn open"
+    "cy": "cd packages/e2e && yarn open",
+    "build": "lerna run build"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

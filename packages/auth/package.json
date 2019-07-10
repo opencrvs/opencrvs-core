@@ -7,14 +7,16 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "ts-node -r tsconfig-paths/register src/index.ts",
+    "start:prod": "node build/dist/src/index.js",
+    "build": "tsc",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
     "request-token": "NODE_PATH=. ts-node resources/request-token",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "postbuild": "ef-tspm"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",
@@ -34,17 +36,18 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@ef-carbon/tspm": "^2.2.5",
+    "@types/command-line-args": "^5.0.0",
+    "@types/command-line-usage": "^5.0.1",
     "@types/dotenv": "^6.1.0",
+    "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
+    "@types/jest": "^24.0.13",
     "@types/joi": "^14.0.0",
     "@types/jsonwebtoken": "^7.2.7",
     "@types/node-fetch": "^2.1.2",
     "@types/redis": "^2.8.6",
     "@types/winston": "^2.3.9",
-    "@types/command-line-args": "^5.0.0",
-    "@types/command-line-usage": "^5.0.1",
-    "@types/fhir": "^0.0.30",
-    "@types/jest": "^24.0.13",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "cross-env": "^5.2.0",
@@ -53,12 +56,12 @@
     "nodemon": "^1.17.5",
     "prettier": "^1.15.2",
     "redis-mock": "^0.27.0",
-    "typescript": "^3.0.1",
     "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
-    "tslint-microsoft-contrib": "^6.2.0"
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "^3.0.1"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
