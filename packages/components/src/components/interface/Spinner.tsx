@@ -1,91 +1,67 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled from 'styled-components'
 
 export interface ISpinner {
   id: string
   baseColor?: string
   className?: string
+  size?: number
 }
 
 const styledSpinner = styled.div.attrs<ISpinner>({})
 
 const StyledSpinner = styledSpinner`
-  font-size: 10px;
-  text-indent: -9999em;
-  width: 6em;
-  height: 6em;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gradientDark};
-  background: -moz-linear-gradient(left, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) =>
-  theme.colors.gradientDark} 42%);
-  background: -webkit-linear-gradient(left, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) =>
-  theme.colors.gradientDark} 42%);
-  background: -o-linear-gradient(left, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) =>
-  theme.colors.gradientDark} 42%);
-  background: linear-gradient(to right, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) =>
-  theme.colors.gradientDark} 42%);
-  position: relative;
-  -webkit-animation: load3 0.4s infinite linear;
-  animation: load3 0.4s infinite linear;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  &:before {
-    width: 50%;
-    height: 50%;
-    background: ${({ baseColor }) => (baseColor ? baseColor : '#FFFFFF')};
-    border-radius: 100% 0 0 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: '';
-  }
-  &:after {
-    background: ${({ baseColor }) => (baseColor ? baseColor : '#FFFFFF')};
-    width: 80%;
-    height: 80%;
-    border-radius: 50%;
-    content: '';
-    margin: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-  }
-}
+  width: auto;
+  display:flex;
+  justify-content: center;
+  & svg {
+    animation: rotate 2s linear infinite;
+    width: ${({ size }) => size}px;
+    height: ${({ size }) => size}px;
 
-@-webkit-keyframes load3 {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
+    & circle {
+      stroke: ${({ baseColor }) =>
+        baseColor ? baseColor : ({ theme }) => theme.colors.primary};
+      stroke-linecap: round;
+      animation: dash 1.5s ease-in-out infinite;
+    }
   }
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
   }
-}
-@keyframes load3 {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+
+  @keyframes dash {
+    0% {
+      stroke-dasharray: 1, 150;
+      stroke-dashoffset: 0;
+    }
+    50% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -35;
+    }
+    100% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -124;
+    }
   }
 }`
 
 export class Spinner extends React.Component<ISpinner> {
   render() {
-    const { children, id, className, baseColor } = this.props
+    const { id, className, baseColor, size } = this.props
     return (
-      <StyledSpinner id={id} className={className} baseColor={baseColor}>
-        {children}
+      <StyledSpinner
+        id={id}
+        className={className}
+        baseColor={baseColor}
+        size={size ? size : 48}
+      >
+        <svg viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
+        </svg>
       </StyledSpinner>
     )
   }

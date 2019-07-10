@@ -5,7 +5,11 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
 import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import {
+  BodyContent,
+  Container,
+  FullBodyContent
+} from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -425,15 +429,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 }
               ]}
             />
-            <BodyContent>
-              <TertiaryButton
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <BackArrow />}
-                onClick={this.props.goBack}
-              >
-                {intl.formatMessage(messages.back)}
-              </TertiaryButton>
-              {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+
+            {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+              <FullBodyContent>
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={application}
@@ -444,8 +442,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     history.push('/')
                   }}
                 />
-              )}
-              {activeSection.viewType === VIEW_TYPE.REVIEW && (
+              </FullBodyContent>
+            )}
+            {activeSection.viewType === VIEW_TYPE.REVIEW && (
+              <FullBodyContent>
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={application}
@@ -454,9 +454,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   }}
                   registerClickEvent={this.registerApplication}
                 />
-              )}
-              {activeSection.viewType === 'form' && (
-                <>
+              </FullBodyContent>
+            )}
+
+            {activeSection.viewType === 'form' && (
+              <>
+                <BodyContent>
+                  <TertiaryButton
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <BackArrow />}
+                    onClick={this.props.goBack}
+                  >
+                    {intl.formatMessage(messages.back)}
+                  </TertiaryButton>
                   <FormSectionTitle
                     id={`form_section_title_${activeSection.id}`}
                   >
@@ -512,9 +522,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       </PrimaryButton>
                     </FooterArea>
                   )}
-                </>
-              )}
-            </BodyContent>
+                </BodyContent>
+              </>
+            )}
           </>
         )}
 

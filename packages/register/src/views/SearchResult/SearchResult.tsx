@@ -756,7 +756,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       <Loader
                         id="search_loader"
                         marginPercent={35}
-                        spinnerDiameter={60}
                         loadingText={intl.formatMessage(messages.searchingFor, {
                           param: searchText
                         })}

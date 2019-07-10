@@ -112,9 +112,9 @@ context('Death Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    cy.get('#next_button_deceased').click()
-    cy.get('#next_button_informant').click()
-    cy.get('#next_button_deathEvent').click()
+    // cy.get('#next_button_deceased').click()
+    // cy.get('#next_button_informant').click()
+    // cy.get('#next_button_deathEvent').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
@@ -176,7 +176,11 @@ context('Death Registration Integration Test', () => {
     // cy.get('#applicantBirthDate-dd').type('17')
     // cy.get('#applicantBirthDate-mm').type('10')
     // cy.get('#applicantBirthDate-yyyy').type('1956')
-    cy.selectOption('#applicantsRelationToDeceased', 'Extended Family', 'Extended Family')
+    cy.selectOption(
+      '#applicantsRelationToDeceased',
+      'Extended Family',
+      'Extended Family'
+    )
     cy.get('#applicantPhone').type('01712345678')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
@@ -228,9 +232,9 @@ context('Death Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    cy.get('#next_button_deceased').click()
-    cy.get('#next_button_informant').click()
-    cy.get('#next_button_deathEvent').click()
+    // cy.get('#next_button_deceased').click()
+    // cy.get('#next_button_informant').click()
+    // cy.get('#next_button_deathEvent').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
