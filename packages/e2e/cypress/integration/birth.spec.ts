@@ -90,13 +90,13 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#continue').click()
-    cy.get('#select_informant_parents').click()
+    cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     cy.get('#select_mother_event').click()
     cy.get('#continue').click()
 
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_mother').click()
+    cy.get('#contact_MOTHER').click()
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
 
