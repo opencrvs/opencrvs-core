@@ -19,7 +19,7 @@ DotEnv.config({
   path: `${process.cwd()}/.env`
 })
 
-const graphQLSchemaPath = `${process.cwd()}/src/graphql/index.graphql`
+const graphQLSchemaPath = `${__dirname}/graphql/index.graphql`
 
 const logger = getLogger(Number(process.env.LOG_LEVEL), process.env.APP_NAME)
 

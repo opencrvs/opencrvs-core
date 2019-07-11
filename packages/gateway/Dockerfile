@@ -1,6 +1,9 @@
 FROM node:dubnium-alpine
 WORKDIR /usr/src/app
 
+# Override the base log level (info).
+ENV NPM_CONFIG_LOGLEVEL warn
+
 # Install npm dependencies first (so they may be cached if dependencies don't change)
 COPY package.json package.json
 COPY packages/gateway/package.json packages/gateway/package.json
@@ -9,7 +12,7 @@ COPY yarn.lock yarn.lock
 RUN yarn install --production
 
 # Copy package build
-COPY --from=opencrvs-build /packages/gateway packages/gateway
+COPY --from=opencrvs-build /packages/gateway/build packages/gateway/build
 
 # Copy dependant package(s) source
 COPY packages/commons packages/commons
