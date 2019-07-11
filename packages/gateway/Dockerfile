@@ -17,8 +17,6 @@ COPY --from=opencrvs-build /packages/gateway/build packages/gateway/build
 # Copy dependant package(s) source
 COPY packages/commons packages/commons
 
-ENV LOG_LEVEL=30
-
 EXPOSE 7070
 WORKDIR /usr/src/app/packages/gateway
 

@@ -9,19 +9,13 @@ COPY package.json package.json
 COPY packages/resources/package.json packages/resources/package.json
 COPY packages/commons/package.json packages/commons/package.json
 COPY yarn.lock yarn.lock
-RUN yarn install
+RUN yarn install --prodction
 
 # Copy package source
-COPY packages/resources packages/resources
+COPY --from=opencrvs-build packages/resources/build packages/resources/build
 
 # Copy dependant package(s) source
 COPY packages/commons packages/commons
-
-# set environment
-ENV PORT=3040
-ENV HOST=0.0.0.0
-# TODO change this for production
-ENV NODE_ENV=DEVELOPMENT
 
 EXPOSE 3040
 WORKDIR /usr/src/app/packages/resources
