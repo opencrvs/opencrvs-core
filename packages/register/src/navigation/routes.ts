@@ -7,6 +7,9 @@ export const SELECT_PRIMARY_APPLICANT =
 export const SELECT_MAIN_CONTACT_POINT =
   '/drafts/:applicationId/events/birth/registration/contact'
 
+export const FORM_DOCUMENT_SECTION =
+  '/drafts/:applicationId/events/:event/documents'
+
 export const DRAFT_BIRTH_PARENT_FORM = '/drafts/:applicationId/events/birth'
 export const DRAFT_BIRTH_PARENT_FORM_PAGE =
   '/drafts/:applicationId/events/birth/:pageId'

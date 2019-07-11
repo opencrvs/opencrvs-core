@@ -18,7 +18,8 @@ import {
   CREATE_USER,
   CREATE_USER_SECTION,
   SELECT_PRIMARY_APPLICANT,
-  SELECT_MAIN_CONTACT_POINT
+  SELECT_MAIN_CONTACT_POINT,
+  FORM_DOCUMENT_SECTION
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -91,6 +92,15 @@ export function goToMainContactPoint(applicationId: string) {
   return push(
     formatUrl(SELECT_MAIN_CONTACT_POINT, {
       applicationId
+    })
+  )
+}
+
+export function goToDocumentSection(applicationId: string, event: string) {
+  return push(
+    formatUrl(FORM_DOCUMENT_SECTION, {
+      applicationId,
+      event
     })
   )
 }
