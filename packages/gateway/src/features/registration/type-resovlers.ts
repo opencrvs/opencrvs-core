@@ -776,6 +776,16 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
+    async informant(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
+    },
     async registration(composition: ITemplatedComposition, _, authHeader) {
       const taskBundle = await fetchFHIR(
         `/Task?focus=Composition/${composition.id}`,

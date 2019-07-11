@@ -170,7 +170,7 @@ input BirthRegistrationInput {
   child: PersonInput
   mother: PersonInput
   father: PersonInput
-  informant: PersonInput
+  informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
@@ -193,7 +193,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   child: Person # -> .section(code='child-details').entry.reference
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
-  informant: Person # -> .section(code='informant-details').entry.reference
+  informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)

@@ -1193,6 +1193,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Please select a main point of contact',
     'review.documents.zeroDocumentsText':
       'No supporting documents for {section, select, child {child} mother {mother} father {father}}',
-    'review.documents.editDocuments': 'Add attachement'
+    'review.documents.editDocuments': 'Add attachement',
+    'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }
 }
