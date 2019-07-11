@@ -199,9 +199,6 @@ context('Birth Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    // cy.get('#next_button_child').click()
-    // cy.get('#next_button_mother').click()
-    // cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
@@ -218,16 +215,12 @@ context('Birth Registration Integration Test', () => {
     // LANDING PAGE
     cy.wait(3000)
     cy.get('#row_0').then($listItem => {
-      if ($listItem.find('#Review').length) {
+      if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Birth review found')
-
-        cy.get('#Review')
+        cy.get('#ListItemAction-0-Review')
           .first()
           .click()
         cy.wait(500)
-        cy.get('#next_button_child').click()
-        cy.get('#next_button_mother').click()
-        cy.get('#next_button_father').click()
         cy.get('#registerApplicationBtn').click()
         // MODAL
         cy.get('#register_confirm').click()
