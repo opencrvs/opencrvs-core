@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const CenterWrapper = styled.div`
-  padding: 0 20px;
+  padding: 0 8px;
   align-items: center;
   justify-content: center;
   display: inline-flex;
