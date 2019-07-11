@@ -57,9 +57,9 @@ context('Birth Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    cy.get('#next_button_child').click()
-    cy.get('#next_button_mother').click()
-    cy.get('#next_button_father').click()
+    // cy.get('#next_button_child').click()
+    // cy.get('#next_button_mother').click()
+    // cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
@@ -230,9 +230,9 @@ context('Birth Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    cy.get('#next_button_child').click()
-    cy.get('#next_button_mother').click()
-    cy.get('#next_button_father').click()
+    // cy.get('#next_button_child').click()
+    // cy.get('#next_button_mother').click()
+    // cy.get('#next_button_father').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()

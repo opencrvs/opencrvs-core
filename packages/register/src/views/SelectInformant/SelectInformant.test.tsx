@@ -1,3 +1,9 @@
+import {
+  createApplication,
+  IApplication,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import { SELECT_INFORMANT } from '@register/navigation/routes'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
@@ -31,6 +37,7 @@ describe('when user is selecting the informant', () => {
   let app: ReactWrapper
   let history: History
   let store: Store
+  let draft: IApplication
 
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
@@ -47,10 +54,9 @@ describe('when user is selecting the informant', () => {
     history = testApp.history
     store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-  })
-
-  beforeEach(async () => {
-    history.replace(SELECT_INFORMANT)
+    draft = createApplication(Event.BIRTH)
+    store.dispatch(storeApplication(draft))
+    history.replace(SELECT_INFORMANT.replace(':applicationId', draft.id))
     await flushPromises()
     app.update()
     app
@@ -80,8 +86,8 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(window.location.pathname).toBe(
-        '/events/birth/mother/mother/contact'
+      expect(window.location.pathname).toContain(
+        '/events/birth/registration/contact'
       )
     })
   })
@@ -129,8 +135,8 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(window.location.pathname).toBe(
-        '/events/birth/mother/mother/contact'
+      expect(window.location.pathname).toContain(
+        '/events/birth/registration/contact'
       )
     })
   })

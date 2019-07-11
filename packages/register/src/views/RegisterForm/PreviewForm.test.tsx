@@ -221,26 +221,9 @@ describe('when user is previewing the form data', () => {
             .find('#submit_form')
             .hostNodes()
             .prop('disabled')
-        ).toBe(true)
+        ).toBe(false)
       })
       describe('All sections visited', () => {
-        beforeEach(async () => {
-          app
-            .find('#next_button_child')
-            .hostNodes()
-            .simulate('click')
-          app
-            .find('#next_button_mother')
-            .hostNodes()
-            .simulate('click')
-          app
-            .find('#next_button_father')
-            .hostNodes()
-            .simulate('click')
-          await flushPromises()
-          app.update()
-        })
-
         it('Should be able to click SEND FOR REVIEW Button', () => {
           expect(
             app
@@ -440,30 +423,6 @@ describe('when user is previewing the form data', () => {
 
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-      app
-        .find('#next_button_child')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_mother')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_father')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#registerApplicationBtn')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#register_confirm')
-        .hostNodes()
-        .simulate('click')
 
       await flushPromises()
       app.update()
@@ -471,20 +430,6 @@ describe('when user is previewing the form data', () => {
 
     it('preview link will close the modal', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-      app
-        .find('#next_button_child')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_mother')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_father')
-        .hostNodes()
-        .simulate('click')
 
       app
         .find('#registerApplicationBtn')
@@ -503,20 +448,6 @@ describe('when user is previewing the form data', () => {
     })
     it('rejecting application redirects to home screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-      app
-        .find('#next_button_child')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_mother')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_father')
-        .hostNodes()
-        .simulate('click')
 
       app
         .find('#rejectApplicationBtn')
@@ -548,12 +479,7 @@ describe('when user is previewing the form data', () => {
       app.update()
 
       expect(store.dispatch).toBeCalled()
-      // expect(
-      //   app
-      //     .find('#submission_text')
-      //     .hostNodes()
-      //     .text()
-      // ).toEqual('birth application has been rejected.')
+      expect(history.location.pathname).toEqual('/')
     })
   })
   describe('when user is in the death review section', () => {
@@ -717,20 +643,6 @@ describe('when user is previewing the form data', () => {
 
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-      app
-        .find('#next_button_deceased')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_informant')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_deathEvent')
-        .hostNodes()
-        .simulate('click')
 
       app
         .find('#registerApplicationBtn')
@@ -747,20 +659,6 @@ describe('when user is previewing the form data', () => {
     })
     it('rejecting application redirects to reject confirmation screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
-      app
-        .find('#next_button_deceased')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_informant')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#next_button_deathEvent')
-        .hostNodes()
-        .simulate('click')
 
       app
         .find('#rejectApplicationBtn')

@@ -1,11 +1,6 @@
 import * as React from 'react'
-import styled from '@register/styledComponents'
-import {
-  ActionPage,
-  Box,
-  Spinner,
-  InvertSpinner
-} from '@opencrvs/components/lib/interface'
+import styled, { withTheme, ITheme } from '@register/styledComponents'
+import { ActionPage, Box, Spinner } from '@opencrvs/components/lib/interface'
 
 import {
   InjectedIntlProps,
@@ -221,12 +216,6 @@ const B = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
-const ButtonSpinner = styled(InvertSpinner)`
-  width: 15px;
-  height: 15px;
-  top: 0px !important;
-`
-
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
@@ -378,6 +367,7 @@ type IProps = {
   userDetails: IUserDetails | null
   offlineResources: IOfflineDataState
   draft: IApplication
+  theme: ITheme
 }
 
 type IFullProps = InjectedIntlProps &
@@ -614,7 +604,11 @@ class PrintCertificateActionComponent extends React.Component<
                       )}
                       {loading && (
                         <span>
-                          <ButtonSpinner id="Spinner" />
+                          <Spinner
+                            id="Spinner"
+                            size={15}
+                            baseColor={this.props.theme.colors.white}
+                          />
                         </span>
                       )}
                     </ConfirmBtn>
@@ -1173,4 +1167,4 @@ function mapStatetoProps(
 }
 export const PrintCertificateAction = connect(
   (state: IStoreState) => mapStatetoProps
-)(injectIntl<IFullProps>(PrintCertificateActionComponent))
+)(injectIntl(withTheme(PrintCertificateActionComponent)))

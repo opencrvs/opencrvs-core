@@ -60,6 +60,7 @@ export const colors = {
   gradientDark: colorDictionary.nightshadeDark,
   gradientLight: colorDictionary.nightshadeLight,
   secondaryLabel: colorDictionary.darkSteel,
+  previewBackground: colorDictionary.greyBlackMetal,
 
   // Grey Scrollbar
   scrollBarGrey: colorDictionary.greySteel,

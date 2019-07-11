@@ -12,6 +12,7 @@ describe('image upload component', () => {
         data: 'dummy base64 data'
       }}
       goBack={mock}
+      onDelete={mock}
     />
   )
 

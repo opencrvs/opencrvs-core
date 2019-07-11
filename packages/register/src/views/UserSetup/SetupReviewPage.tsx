@@ -281,8 +281,6 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
                 <LoaderOverlay>
                   <Loader
                     id="setup_submit_waiting"
-                    marginPercent={20}
-                    spinnerDiameter={60}
                     loadingText={intl.formatMessage(messages.wiating)}
                   />
                 </LoaderOverlay>
