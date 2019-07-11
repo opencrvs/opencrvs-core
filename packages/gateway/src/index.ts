@@ -49,7 +49,7 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    server.log('info', `server started on port ${process.env.PORT}`)
+    server.log('info', `server started on port ${process.env.PORT || '7070'}`)
   }
 
   async function stop() {
