@@ -1,7 +1,6 @@
 import { resolvers } from '@gateway/features/registration/root-resolvers'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -345,6 +344,12 @@ describe('Registration root resolvers', () => {
       mother: {
         name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
         telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      father: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }]
+      },
+      informant: {
+        relationship: 'FATHER'
       },
       registration: { contact: 'MOTHER' }
     }
@@ -1363,7 +1368,7 @@ describe('Registration root resolvers', () => {
         name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
       },
       informant: {
-        relationship: 'MOTHER',
+        relationship: 'FATHER',
         individual: {
           name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
           telecom: [{ system: 'phone', value: '+8801622688231' }]
@@ -1373,7 +1378,7 @@ describe('Registration root resolvers', () => {
         certificates: [
           {
             collector: {
-              relationship: 'informant'
+              relationship: 'INFORMANT'
             },
             hasShowedVerifiedDocument: true,
             data: 'DUMMY'
@@ -1387,7 +1392,7 @@ describe('Registration root resolvers', () => {
           resourceType: 'Bundle',
           entry: [
             {
-              response: { location: 'Patient/12423/_history/1' }
+              response: { location: 'Task/12423/_history/1' }
             }
           ]
         })

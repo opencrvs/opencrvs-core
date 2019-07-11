@@ -1189,6 +1189,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.goBack': 'Back',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
-    'register.SelectContactPoint.error': 'Please select a main point of contact'
+    'register.SelectContactPoint.error':
+      'Please select a main point of contact',
+    'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }
 }

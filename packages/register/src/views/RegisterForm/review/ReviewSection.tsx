@@ -5,7 +5,7 @@ import {
   DataSection
 } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
-import { IApplication } from '@register/applications'
+import { IApplication, writeApplication } from '@register/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
@@ -293,6 +293,7 @@ interface IProps {
   offlineResources: IOfflineDataState
   language: string
   onChangeReviewForm?: onChangeReviewForm
+  writeApplication: typeof writeApplication
 }
 type State = {
   displayEditDialog: boolean
@@ -725,6 +726,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
           handleEdit={() => {
+            const application = this.props.draft
+            application.review = true
+            this.props.writeApplication(application)
             this.props.goToPage(
               pageRoute,
               draft.id,
@@ -757,5 +761,5 @@ export const ReviewSection = connect(
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
   }),
-  { goToPage }
+  { goToPage, writeApplication }
 )(injectIntl(ReviewSectionComp))
