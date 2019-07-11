@@ -50,7 +50,8 @@ import {
   selectOrCreateLocationRefResource,
   selectOrCreateEncounterLocationRef,
   selectOrCreateInformantSection,
-  selectOrCreateInformantResource
+  selectOrCreateInformantResource,
+  setInformantReference
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -1524,7 +1525,7 @@ const builders: IFieldBuilders = {
         return createEducationalAttainmentBuilder(person, fieldValue)
       }
     },
-    relationship: (
+    relationship: async (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
       context: any
@@ -1534,15 +1535,31 @@ const builders: IFieldBuilders = {
         INFORMANT_TITLE,
         fhirBundle
       )
-      if (!relatedPersonResource.relationship) {
-        relatedPersonResource.relationship = {
-          coding: [
-            {
-              system:
-                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-              code: fieldValue
-            }
-          ]
+
+      relatedPersonResource.relationship = {
+        coding: [
+          {
+            system:
+              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+            code: fieldValue
+          }
+        ]
+      }
+      if (context.event === EVENT_TYPE.BIRTH) {
+        if (fieldValue === 'MOTHER') {
+          await setInformantReference(
+            MOTHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'FATHER') {
+          await setInformantReference(
+            FATHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
         }
       }
     },

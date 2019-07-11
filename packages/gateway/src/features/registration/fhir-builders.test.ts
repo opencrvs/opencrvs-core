@@ -91,6 +91,9 @@ test('should build a minimal FHIR registration document without error', async ()
         nationality: ['BGD'],
         educationalAttainment: 'NO_SCHOOLING'
       },
+      informant: {
+        relationship: 'MOTHER'
+      },
       registration: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
         contact: 'MOTHER',
@@ -206,7 +209,7 @@ test('should build a minimal FHIR registration document without error', async ()
     'BIRTH' as EVENT_TYPE
   )
   expect(fhir).toBeDefined()
-  expect(fhir.entry[0].resource.section.length).toBe(6)
+  expect(fhir.entry[0].resource.section.length).toBe(7)
   expect(fhir.entry[0].resource.date).toBeDefined()
   expect(fhir.entry[0].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd'
@@ -322,10 +325,12 @@ test('should build a minimal FHIR registration document without error', async ()
     `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`
   )
 
+  /* RelatedPerson Test cases */
+
   /* Task Test cases */
-  expect(fhir.entry[4].resource.resourceType).toBe('Task')
-  expect(fhir.entry[4].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eebce')
-  expect(fhir.entry[4].resource.code).toEqual({
+  expect(fhir.entry[5].resource.resourceType).toBe('Task')
+  expect(fhir.entry[5].resource.id).toBe('8f18a6ea-89d1-4b03-80b3-57509a7eebce')
+  expect(fhir.entry[5].resource.code).toEqual({
     coding: [
       {
         system: `${OPENCRVS_SPECIFICATION_URL}types`,
@@ -333,23 +338,23 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[4].resource.extension[0]).toEqual({
+  expect(fhir.entry[5].resource.extension[0]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
     valueString: 'MOTHER'
   })
-  expect(fhir.entry[4].resource.extension[1]).toEqual({
+  expect(fhir.entry[5].resource.extension[1]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
     valueString: '01733333333'
   })
-  expect(fhir.entry[4].resource.status).toEqual('draft')
-  expect(fhir.entry[4].resource.lastModified).toEqual(
+  expect(fhir.entry[5].resource.status).toEqual('draft')
+  expect(fhir.entry[5].resource.lastModified).toEqual(
     '2018-10-31T09:45:05+10:00'
   )
-  expect(fhir.entry[4].resource.note[0]).toEqual({
+  expect(fhir.entry[5].resource.note[0]).toEqual({
     text: 'This is just a test data',
     time: '2018-10-31T09:45:05+10:00'
   })
-  expect(fhir.entry[4].resource.identifier).toEqual([
+  expect(fhir.entry[5].resource.identifier).toEqual([
     { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '12345678' },
     {
       system: 'http://opencrvs.org/specs/id/birth-tracking-id',
@@ -361,12 +366,12 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   // Attachment Test cases
-  expect(fhir.entry[5].resource.id).toBe(
+  expect(fhir.entry[6].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce11'
   )
-  expect(fhir.entry[5].resource.docStatus).toBe('final')
-  expect(fhir.entry[5].resource.created).toBe('2018-10-21')
-  expect(fhir.entry[5].resource.type).toEqual({
+  expect(fhir.entry[6].resource.docStatus).toBe('final')
+  expect(fhir.entry[6].resource.created).toBe('2018-10-21')
+  expect(fhir.entry[6].resource.type).toEqual({
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
@@ -374,7 +379,7 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[5].resource.content).toEqual([
+  expect(fhir.entry[6].resource.content).toEqual([
     {
       attachment: {
         contentType: 'image/jpeg',
@@ -382,7 +387,7 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     }
   ])
-  expect(fhir.entry[5].resource.identifier).toEqual([
+  expect(fhir.entry[6].resource.identifier).toEqual([
     {
       system: 'http://opencrvs.org/specs/id/original-file-name',
       value: 'original.jpg'
@@ -392,12 +397,12 @@ test('should build a minimal FHIR registration document without error', async ()
       value: 'system.jpg'
     }
   ])
-  expect(fhir.entry[6].resource.id).toBe(
+  expect(fhir.entry[7].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce22'
   )
-  expect(fhir.entry[6].resource.docStatus).toBe('deleted')
-  expect(fhir.entry[6].resource.created).toBe('2018-10-22')
-  expect(fhir.entry[6].resource.type).toEqual({
+  expect(fhir.entry[7].resource.docStatus).toBe('deleted')
+  expect(fhir.entry[7].resource.created).toBe('2018-10-22')
+  expect(fhir.entry[7].resource.type).toEqual({
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
@@ -405,7 +410,7 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[6].resource.identifier).toEqual([
+  expect(fhir.entry[7].resource.identifier).toEqual([
     {
       system: 'http://opencrvs.org/specs/id/original-file-name',
       value: 'original.png'
@@ -415,7 +420,7 @@ test('should build a minimal FHIR registration document without error', async ()
       value: 'system.png'
     }
   ])
-  expect(fhir.entry[6].resource.content).toEqual([
+  expect(fhir.entry[7].resource.content).toEqual([
     {
       attachment: {
         contentType: 'image/png',
@@ -423,12 +428,12 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     }
   ])
-  expect(fhir.entry[6].resource.subject).toEqual({
+  expect(fhir.entry[7].resource.subject).toEqual({
     display: 'MOTHER'
   })
   // Certificate Collection
-  expect(fhir.entry[7].resource.resourceType).toBe('DocumentReference')
-  expect(fhir.entry[7].resource.type).toEqual({
+  expect(fhir.entry[8].resource.resourceType).toBe('DocumentReference')
+  expect(fhir.entry[8].resource.type).toEqual({
     coding: [
       {
         system: 'http://opencrvs.org/specs/certificate-type',
@@ -436,11 +441,11 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[7].resource.extension).toEqual([
+  expect(fhir.entry[8].resource.extension).toEqual([
     {
       url: 'http://opencrvs.org/specs/extension/collector',
       valueReference: {
-        reference: fhir.entry[8].fullUrl
+        reference: fhir.entry[9].fullUrl
       }
     },
     {
@@ -450,11 +455,11 @@ test('should build a minimal FHIR registration document without error', async ()
     {
       url: 'http://opencrvs.org/specs/extension/payment',
       valueReference: {
-        reference: fhir.entry[10].fullUrl
+        reference: fhir.entry[11].fullUrl
       }
     }
   ])
-  expect(fhir.entry[7].resource.content).toEqual([
+  expect(fhir.entry[8].resource.content).toEqual([
     {
       attachment: {
         contentType: 'application/pdf',
@@ -463,8 +468,8 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
 
-  expect(fhir.entry[8].resource.resourceType).toBe('RelatedPerson')
-  expect(fhir.entry[8].resource.relationship).toEqual({
+  expect(fhir.entry[9].resource.resourceType).toBe('RelatedPerson')
+  expect(fhir.entry[9].resource.relationship).toEqual({
     coding: [
       {
         system: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
@@ -472,36 +477,36 @@ test('should build a minimal FHIR registration document without error', async ()
       }
     ]
   })
-  expect(fhir.entry[8].resource.patient.reference).toBe(fhir.entry[9].fullUrl)
+  expect(fhir.entry[9].resource.patient.reference).toBe(fhir.entry[10].fullUrl)
 
-  expect(fhir.entry[9].resource.resourceType).toBe('Patient')
-  expect(fhir.entry[9].resource.name).toEqual([
+  expect(fhir.entry[10].resource.resourceType).toBe('Patient')
+  expect(fhir.entry[10].resource.name).toEqual([
     {
       use: 'en',
       family: ['Jane'],
       given: ['Doe']
     }
   ])
-  expect(fhir.entry[9].resource.identifier).toEqual([
+  expect(fhir.entry[10].resource.identifier).toEqual([
     {
       id: '123456',
       type: 'PASSPORT'
     }
   ])
 
-  expect(fhir.entry[10].resource.resourceType).toBe('PaymentReconciliation')
-  expect(fhir.entry[10].resource.status).toBe('active')
-  expect(fhir.entry[10].resource.identifier).toEqual([
+  expect(fhir.entry[11].resource.resourceType).toBe('PaymentReconciliation')
+  expect(fhir.entry[11].resource.status).toBe('active')
+  expect(fhir.entry[11].resource.identifier).toEqual([
     {
       system: 'http://opencrvs.org/specs/id/payment-id',
       value: '1234'
     }
   ])
-  expect(fhir.entry[10].resource.total).toBe(50.0)
-  expect(fhir.entry[10].resource.outcome).toEqual({
+  expect(fhir.entry[11].resource.total).toBe(50.0)
+  expect(fhir.entry[11].resource.outcome).toEqual({
     coding: [{ code: 'COMPLETED' }]
   })
-  expect(fhir.entry[10].resource.detail).toEqual([
+  expect(fhir.entry[11].resource.detail).toEqual([
     {
       type: { coding: [{ code: 'MANUAL' }] },
       amount: 50.0,
@@ -510,27 +515,27 @@ test('should build a minimal FHIR registration document without error', async ()
   ])
 
   // Encounter
-  expect(fhir.entry[11].resource.id).toBe(
+  expect(fhir.entry[12].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsakelske'
   )
-  expect(fhir.entry[11].resource.resourceType).toBe('Encounter')
+  expect(fhir.entry[12].resource.resourceType).toBe('Encounter')
 
-  expect(fhir.entry[12].resource.resourceType).toBe('Location')
-  expect(fhir.entry[12].resource.partOf.reference).toBe('Location/456')
-  expect(fhir.entry[12].resource.address.country).toBe('789')
-  expect(fhir.entry[12].resource.address.state).toBe('101112')
-  expect(fhir.entry[12].resource.address.district).toBe('131415')
-  expect(fhir.entry[12].resource.address.postalCode).toBe('sw11')
+  expect(fhir.entry[13].resource.resourceType).toBe('Location')
+  expect(fhir.entry[13].resource.partOf.reference).toBe('Location/456')
+  expect(fhir.entry[13].resource.address.country).toBe('789')
+  expect(fhir.entry[13].resource.address.state).toBe('101112')
+  expect(fhir.entry[13].resource.address.district).toBe('131415')
+  expect(fhir.entry[13].resource.address.postalCode).toBe('sw11')
 
   // Observation
-  expect(fhir.entry[13].resource.id).toBe(
+  expect(fhir.entry[14].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283'
   )
-  expect(fhir.entry[13].resource.valueQuantity.value).toBe(2)
-  expect(fhir.entry[13].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[14].resource.valueQuantity.value).toBe(2)
+  expect(fhir.entry[14].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[13].resource.category).toEqual([
+  expect(fhir.entry[14].resource.category).toEqual([
     {
       coding: [
         {
@@ -541,21 +546,21 @@ test('should build a minimal FHIR registration document without error', async ()
       ]
     }
   ])
-  expect(fhir.entry[13].resource.code.coding).toEqual([
+  expect(fhir.entry[14].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: BIRTH_TYPE_CODE,
       display: 'Birth plurality of Pregnancy'
     }
   ])
-  expect(fhir.entry[14].resource.id).toBe(
+  expect(fhir.entry[15].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3293'
   )
-  expect(fhir.entry[14].resource.valueQuantity.value).toBe(3)
-  expect(fhir.entry[14].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[15].resource.valueQuantity.value).toBe(3)
+  expect(fhir.entry[15].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[14].resource.category).toEqual([
+  expect(fhir.entry[15].resource.category).toEqual([
     {
       coding: [
         {
@@ -566,21 +571,21 @@ test('should build a minimal FHIR registration document without error', async ()
       ]
     }
   ])
-  expect(fhir.entry[14].resource.code.coding).toEqual([
+  expect(fhir.entry[15].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: BODY_WEIGHT_CODE,
       display: 'Body weight Measured'
     }
   ])
-  expect(fhir.entry[15].resource.id).toBe(
+  expect(fhir.entry[16].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203'
   )
-  expect(fhir.entry[15].resource.valueString).toBe('NURSE')
-  expect(fhir.entry[15].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[16].resource.valueString).toBe('NURSE')
+  expect(fhir.entry[16].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[15].resource.category).toEqual([
+  expect(fhir.entry[16].resource.category).toEqual([
     {
       coding: [
         {
@@ -591,77 +596,77 @@ test('should build a minimal FHIR registration document without error', async ()
       ]
     }
   ])
-  expect(fhir.entry[15].resource.code.coding).toEqual([
+  expect(fhir.entry[16].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: BIRTH_ATTENDANT_CODE,
       display: 'Birth attendant title'
     }
   ])
-  expect(fhir.entry[16].resource.id).toBe(
+  expect(fhir.entry[17].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes'
   )
-  expect(fhir.entry[16].resource.valueString).toBe('INFORMANT_ONLY')
-  expect(fhir.entry[16].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[17].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[17].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[16].resource.code.coding).toEqual([
+  expect(fhir.entry[17].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: BIRTH_REG_TYPE_CODE,
       display: 'Birth registration type'
     }
   ])
-  expect(fhir.entry[17].resource.id).toBe(
+  expect(fhir.entry[18].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586'
   )
-  expect(fhir.entry[17].resource.valueString).toBe('INFORMANT_ONLY')
-  expect(fhir.entry[17].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[18].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[18].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[17].resource.code.coding).toEqual([
+  expect(fhir.entry[18].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: BIRTH_REG_PRESENT_CODE,
       display: 'Present at birth registration'
     }
   ])
-  expect(fhir.entry[18].resource.id).toBe(
+  expect(fhir.entry[19].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
   )
-  expect(fhir.entry[18].resource.valueQuantity.value).toBe(2)
-  expect(fhir.entry[18].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[19].resource.valueQuantity.value).toBe(2)
+  expect(fhir.entry[19].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[18].resource.code.coding).toEqual([
+  expect(fhir.entry[19].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: NUMBER_BORN_ALIVE_CODE,
       display: 'Number born alive to mother'
     }
   ])
-  expect(fhir.entry[19].resource.id).toBe(
+  expect(fhir.entry[20].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
   )
-  expect(fhir.entry[19].resource.valueQuantity.value).toBe(0)
-  expect(fhir.entry[19].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[20].resource.valueQuantity.value).toBe(0)
+  expect(fhir.entry[20].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[19].resource.code.coding).toEqual([
+  expect(fhir.entry[20].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ])
-  expect(fhir.entry[20].resource.id).toBe(
+  expect(fhir.entry[21].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
   )
-  expect(fhir.entry[20].resource.valueDateTime).toBe('2014-01-28')
-  expect(fhir.entry[20].resource.context.reference).toEqual(
-    fhir.entry[11].fullUrl
+  expect(fhir.entry[21].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[21].resource.context.reference).toEqual(
+    fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[20].resource.code.coding).toEqual([
+  expect(fhir.entry[21].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: LAST_LIVE_BIRTH_CODE,

@@ -184,9 +184,9 @@ context('Death Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    cy.get('#next_button_deceased').click()
-    cy.get('#next_button_informant').click()
-    cy.get('#next_button_deathEvent').click()
+    // cy.get('#next_button_deceased').click()
+    // cy.get('#next_button_informant').click()
+    // cy.get('#next_button_deathEvent').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
@@ -205,7 +205,6 @@ context('Death Registration Integration Test', () => {
     cy.get('#row_0').then($listItem => {
       if ($listItem.find('#Review').length) {
         cy.log('Death review found')
-
         cy.get('#Review')
           .first()
           .click()

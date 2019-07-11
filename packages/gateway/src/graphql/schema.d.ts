@@ -237,7 +237,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   child?: GQLPerson
   mother?: GQLPerson
   father?: GQLPerson
-  informant?: GQLPerson
+  informant?: GQLRelatedPerson
   eventLocation?: GQLLocation
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -673,7 +673,7 @@ export interface GQLBirthRegistrationInput {
   child?: GQLPersonInput
   mother?: GQLPersonInput
   father?: GQLPersonInput
-  informant?: GQLPersonInput
+  informant?: GQLRelatedPersonInput
   eventLocation?: GQLLocationInput
   birthType?: GQLBirthType
   weightAtBirth?: number
