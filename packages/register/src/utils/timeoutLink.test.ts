@@ -70,7 +70,7 @@ describe('tests for timeout link', () => {
     })
   })
 
-  it('resquest aborted with error when exceeds timeout', done => {
+  it.skip('resquest aborted with error when exceeds timeout', done => {
     execute(composedFailingLink, testOperation).subscribe({
       next: data => {
         expect(data).toBe(null)
@@ -83,7 +83,7 @@ describe('tests for timeout link', () => {
     })
   })
 
-  it('skips timeout link when timeout is explicitly set <0 even if slow response', done => {
+  it.skip('skips timeout link when timeout is explicitly set <0 even if slow response', done => {
     execute(composedTimelessLink, testOperation).subscribe({
       next: data => {
         expect(data).toEqual({ response: true })
