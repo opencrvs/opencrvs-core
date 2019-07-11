@@ -779,8 +779,8 @@ export const ENGLISH_STATE: ILanguage = {
     'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
-    'register.registrarHome.results.reviewDuplicates': 'Review Duplicates',
-    'register.searchResult.results.reviewDuplicates': 'Review Duplicates',
+    'register.registrarHome.results.reviewDuplicates': 'Review',
+    'register.searchResult.results.reviewDuplicates': 'Review',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',

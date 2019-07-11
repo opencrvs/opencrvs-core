@@ -68,6 +68,10 @@ const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
 `
 
+const IconWrapper = styled(ContentWrapper)`
+  padding-top: 5px;
+`
+
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   margin-top: 5px;
   overflow: hidden;
@@ -235,7 +239,7 @@ export class GridTable extends React.Component<
                 width={preference.width}
                 alignment={preference.alignment}
               >
-                {preference.label}
+                {preference.label && preference.label}
               </ContentWrapper>
             ))}
           </TableHeader>
@@ -266,6 +270,19 @@ export class GridTable extends React.Component<
                         preference.width,
                         indx,
                         preference.alignment
+                      )
+                    } else if (preference.isIconColumn) {
+                      return (
+                        <IconWrapper
+                          key={indx}
+                          width={preference.width}
+                          alignment={preference.alignment}
+                          color={preference.color}
+                        >
+                          {(item.icon as JSX.Element) || (
+                            <Error>{preference.errorValue}</Error>
+                          )}
+                        </IconWrapper>
                       )
                     } else {
                       return (
