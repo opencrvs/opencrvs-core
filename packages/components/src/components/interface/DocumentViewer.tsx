@@ -31,9 +31,6 @@ export interface IDocumentViewerOptions {
 }
 
 interface IProps {
-  title: string
-  tagline?: string
-  icon?: React.ReactNode
   options: IDocumentViewerOptions
 }
 
@@ -59,30 +56,36 @@ export class DocumentViewer extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { options } = this.props
+    const { options, children } = this.props
+
     return (
       <Sticky enabled={true} top="#form_tabs_container">
         <Container id="test_id">
-          <Select
-            id="selectDocument"
-            options={options.selectOptions}
-            color="inherit"
-            value={this.state.selectedOption as string}
-            onChange={(val: string) => {
-              const imgArray = options.documentOptions.filter(doc => {
-                return doc.label === val
-              })
-              if (imgArray[0]) {
-                this.setState({
-                  selectedOption: val,
-                  selectedDocument: imgArray[0].value
-                })
-              }
-            }}
-          />
-          {this.state.selectedDocument && (
-            <DocumentImage image={this.state.selectedDocument} />
+          {options.documentOptions.length > 0 && (
+            <>
+              <Select
+                id="selectDocument"
+                options={options.selectOptions}
+                color="inherit"
+                value={this.state.selectedOption as string}
+                onChange={(val: string) => {
+                  const imgArray = options.documentOptions.filter(doc => {
+                    return doc.label === val
+                  })
+                  if (imgArray[0]) {
+                    this.setState({
+                      selectedOption: val,
+                      selectedDocument: imgArray[0].value
+                    })
+                  }
+                }}
+              />
+              {this.state.selectedDocument && (
+                <DocumentImage image={this.state.selectedDocument} />
+              )}
+            </>
           )}
+          {options.documentOptions.length === 0 && children}
         </Container>
       </Sticky>
     )

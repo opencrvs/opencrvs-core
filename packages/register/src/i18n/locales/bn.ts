@@ -1188,6 +1188,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
-      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'review.documents.zeroDocumentsText':
+      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} জন্য কোন সমর্থিত নথি নেই  }',
+    'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।'
   }
 }

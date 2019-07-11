@@ -20,7 +20,7 @@ import {
 import { Link } from '@opencrvs/components/lib/typography'
 import { flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToPage } from '@register/navigation'
+import { goToPage, goToDocumentSection } from '@register/navigation'
 
 import {
   ISelectOption as SelectComponentOptions,
@@ -47,7 +47,8 @@ import {
 import {
   PrimaryButton,
   IconAction,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  LinkButton
 } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
@@ -112,16 +113,6 @@ const messages: {
     defaultMessage: 'This field is required',
     description: 'Message when a field doesnt have a value'
   },
-  documentViewerTitle: {
-    id: 'review.documentViewer.title',
-    defaultMessage: 'Supporting Documents',
-    description: 'Document Viewer Title'
-  },
-  documentViewerTagline: {
-    id: 'review.documentViewer.tagline',
-    defaultMessage: 'Select to Preview',
-    description: 'Document Viewer Tagline'
-  },
   valueSendForReview: {
     id: 'register.form.submit',
     defaultMessage: 'SEND FOR REVIEW',
@@ -164,6 +155,17 @@ const messages: {
     id: 'review.inputs.additionalComments',
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments'
+  },
+  zeroDocumentsText: {
+    id: 'review.documents.zeroDocumentsText',
+    defaultMessage:
+      'No supporting documents for {section, select, child {child} mother {mother} father {father}}',
+    description: 'Zero documents text'
+  },
+  editDocuments: {
+    id: 'review.documents.editDocuments',
+    defaultMessage: 'Add attachement',
+    description: 'Edit documents text'
   }
 })
 
@@ -274,6 +276,15 @@ const FormData = styled.div`
 const InputWrapper = styled.div`
   margin-top: 16px;
 `
+const ZeroDocument = styled.div`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: 16px;
+  margin-left: 16px;
+`
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
   activeSection: any,
@@ -293,6 +304,7 @@ interface IProps {
   offlineResources: IOfflineDataState
   language: string
   onChangeReviewForm?: onChangeReviewForm
+  goToDocumentSection: typeof goToDocumentSection
 }
 type State = {
   displayEditDialog: boolean
@@ -658,6 +670,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
+    const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
 
     return (
@@ -760,13 +773,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             >
               <DocumentViewer
                 key={'Document_section_' + this.state.activeSection}
-                title={intl.formatMessage(messages.documentViewerTitle)}
-                tagline={intl.formatMessage(messages.documentViewerTagline)}
                 options={this.prepSectionDocuments(
                   draft,
                   this.state.activeSection || formSections[0].id
                 )}
-              />
+              >
+                <ZeroDocument>
+                  {intl.formatMessage(messages.zeroDocumentsText, {
+                    section: sectionName
+                  })}
+                  <LinkButton
+                    id="edit-document"
+                    onClick={() =>
+                      this.props.goToDocumentSection(draft.id, draft.event)
+                    }
+                  >
+                    {intl.formatMessage(messages.editDocuments)}
+                  </LinkButton>
+                </ZeroDocument>
+              </DocumentViewer>
             </ResponsiveDocumentViewer>
           </Column>
         </Row>
@@ -806,5 +831,5 @@ export const ReviewSection = connect(
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
   }),
-  { goToPage }
+  { goToPage, goToDocumentSection }
 )(injectIntl(ReviewSectionComp))
