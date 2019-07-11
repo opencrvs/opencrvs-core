@@ -298,6 +298,7 @@ type State = {
   displayEditDialog: boolean
   editClickedSectionId: string
   editClickFieldName: string
+  activeSection: string
 }
 type FullProps = IProps & InjectedIntlProps
 
@@ -305,6 +306,12 @@ const getViewableSection = (registerForm: IForm): IFormSection[] => {
   return registerForm.sections.filter(
     ({ id, viewType }) =>
       id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+  )
+}
+
+const getDocumentSections = (registerForm: IForm): IFormSection[] => {
+  return registerForm.sections.filter(
+    ({ id, viewType }) => id !== 'documents' && viewType === 'form'
   )
 }
 
@@ -437,43 +444,82 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
-  const draftItemName = documentsSection.id
-  const documentOptions: SelectComponentOptions[] = []
-  const selectOptions: SelectComponentOptions[] = []
-
-  const uploadedDocuments =
-    draft.data[draftItemName] &&
-    isArray(draft.data[draftItemName].imageUploader)
-      ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
-      : []
-
-  uploadedDocuments.map(document => {
-    const label = document.title + ' ' + document.description
-    documentOptions.push({
-      value: document.data,
-      label
-    })
-    selectOptions.push({
-      value: label,
-      label
-    })
-    return null
-  })
-  return {
-    selectOptions,
-    documentOptions
-  }
-}
-
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
-
     this.state = {
       displayEditDialog: false,
       editClickedSectionId: '',
-      editClickFieldName: ''
+      editClickFieldName: '',
+      activeSection: ''
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.onScroll)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll)
+  }
+
+  docSections = getDocumentSections(
+    this.props.registerForm[this.props.draft.event]
+  )
+
+  onScroll = () => {
+    const scrollY = window.scrollY
+    let minDistance = 100000
+    let sectionY = 0
+    let distance = 0
+    let activeSection = ''
+    this.docSections.map((section: IFormSection) => {
+      // @ts-ignore
+      sectionY = document.getElementById('Section_' + section.id).offsetTop
+      distance = Math.abs(sectionY - scrollY)
+      if (distance < minDistance) {
+        minDistance = distance
+        activeSection = section.id
+      }
+    })
+    this.setState({
+      activeSection
+    })
+  }
+
+  prepSectionDocuments = (
+    draft: IApplication,
+    activeSection: string
+  ): IDocumentViewerOptions => {
+    const draftItemName = documentsSection.id
+    const documentOptions: SelectComponentOptions[] = []
+    const selectOptions: SelectComponentOptions[] = []
+    let uploadedDocuments =
+      draft.data[draftItemName] &&
+      isArray(draft.data[draftItemName].imageUploader)
+        ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
+        : []
+
+    uploadedDocuments = uploadedDocuments.filter(
+      document => document.title.toUpperCase() === activeSection.toUpperCase()
+    )
+
+    uploadedDocuments.map(document => {
+      const label = document.title + ' ' + document.description
+      documentOptions.push({
+        value: document.data,
+        label
+      })
+      selectOptions.push({
+        value: label,
+        label
+      })
+      return null
+    })
+
+    return {
+      selectOptions,
+      documentOptions
     }
   }
 
@@ -519,6 +565,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       )
     }
     return formSections.map(section => ({
+      id: section.id,
       title: intl.formatMessage(section.title),
       items: section.fields
         .filter(field => isVisibleField(field, section) && !isViewOnly(field))
@@ -585,9 +632,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
 
     const formSections = getViewableSection(registerForm[event])
-
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
-
     const numberOfErrors = flatten(
       // @ts-ignore
       Object.values(errorsOnFields).map(Object.values)
@@ -639,7 +684,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <FormData>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
-                  <DataSection key={index} {...sec} />
+                  <DataSection key={index} {...sec} id={'Section_' + sec.id} />
                 )
               )}
               {event === BIRTH && (
@@ -714,9 +759,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               isRegisterScope={this.userHasRegisterScope()}
             >
               <DocumentViewer
+                key={'Document_section_' + this.state.activeSection}
                 title={intl.formatMessage(messages.documentViewerTitle)}
                 tagline={intl.formatMessage(messages.documentViewerTagline)}
-                options={prepDocumentOption(draft)}
+                options={this.prepSectionDocuments(
+                  draft,
+                  this.state.activeSection || formSections[0].id
+                )}
               />
             </ResponsiveDocumentViewer>
           </Column>
