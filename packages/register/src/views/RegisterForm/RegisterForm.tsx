@@ -1,7 +1,8 @@
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
-  TertiaryButton
+  TertiaryButton,
+  LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
 import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
@@ -71,6 +72,9 @@ const CancelButton = styled.a`
   text-decoration: underline;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.primary};
+`
+const StyledLinkButton = styled(LinkButton)`
+  margin-left: 32px;
 `
 
 export const messages: {
@@ -160,6 +164,10 @@ export const messages: {
     id: 'register.selectVitalEvent.saveExitButton',
     defaultMessage: 'SAVE & EXIT',
     description: 'SAVE & EXIT Button Text'
+  },
+  backToReviewButton: {
+    id: 'register.selectVitalEvent.backToReviewButton',
+    defaultMessage: 'Back to review'
   }
 })
 
@@ -384,7 +392,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicate
     } = this.props
 
-    const isReviewForm = application.review
     let activeSection: IFormSection = this.props.activeSection
 
     if (activeSection.viewType === 'hidden') {
@@ -395,11 +402,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     const nextSection = getNextSection(registerForm.sections, activeSection)
-    const title = isReviewForm
-      ? messages.reviewEventRegistration
-      : activeSection.viewType === VIEW_TYPE.PREVIEW
-      ? messages.previewEventRegistration
-      : messages.newVitalEventRegistration
+    const title =
+      activeSection.viewType === VIEW_TYPE.REVIEW
+        ? messages.reviewEventRegistration
+        : activeSection.viewType === VIEW_TYPE.PREVIEW
+        ? messages.previewEventRegistration
+        : messages.newVitalEventRegistration
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -520,6 +528,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       >
                         {intl.formatMessage(messages.continueButton)}
                       </PrimaryButton>
+                      {application.review && (
+                        <StyledLinkButton
+                          id="back-to-review-button"
+                          className="item"
+                          onClick={() => {
+                            this.continueButtonHandler(
+                              this.props.pageRoute,
+                              application.id,
+                              application.submissionStatus &&
+                                application.submissionStatus ===
+                                  SUBMISSION_STATUS.DRAFT
+                                ? 'preview'
+                                : 'review',
+                              application.event.toLowerCase()
+                            )
+                          }}
+                        >
+                          {intl.formatMessage(messages.backToReviewButton)}
+                        </StyledLinkButton>
+                      )}
                     </FooterArea>
                   )}
                 </BodyContent>
