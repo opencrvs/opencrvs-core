@@ -19,7 +19,6 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   options: ISelectOption[]
   ignoreMediaQuery?: boolean
   color?: string
-  isSmallSized?: boolean
 }
 
 const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
@@ -68,13 +67,9 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
       ${({ theme }) => theme.colors.copy};
   }
 
-  ${({ ignoreMediaQuery, isSmallSized, theme }) => {
+  ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
-      ? isSmallSized
-        ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 200px;
-      }`
-        : `@media (min-width: ${theme.grid.breakpoints.md}px) {
+      ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
         width: 275px;
       }`
       : ''
@@ -98,7 +93,6 @@ export interface ISelectProps
   onChange: (value: string) => void
   value: string
   color?: string
-  isSmallSized?: boolean
 }
 
 export class Select extends React.Component<ISelectProps> {

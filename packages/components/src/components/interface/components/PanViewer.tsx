@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 import { ZoomIn, ZoomOut, RotateLeft } from '../../icons'
 const Container = css`
   width: 100%;
-  height: 470px;
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
   align-items: center;

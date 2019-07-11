@@ -3,7 +3,10 @@ import styled from 'styled-components'
 import { isEqual } from 'lodash'
 import PanViewer from './PanViewer'
 const ImageContainer = styled.div`
+  top: 0px;
   text-align: center;
+  height: 100%;
+  position: absolute;
   overflow: hidden;
 `
 interface IProps {
