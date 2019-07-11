@@ -155,7 +155,8 @@ function GeneratedInputField({
     value,
     disabled: fieldDefinition.disabled,
     error: Boolean(error),
-    touched: Boolean(touched)
+    touched: Boolean(touched),
+    placeholder: fieldDefinition.placeholder
   }
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
