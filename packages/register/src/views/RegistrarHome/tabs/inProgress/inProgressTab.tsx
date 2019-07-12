@@ -620,50 +620,46 @@ export class InProgressTabComponent extends React.Component<
                 )
               }
               return (
-                <BodyContent>
-                  <GridTable
-                    content={this.transformRemoteDraftsContent(data)}
-                    columns={[
-                      {
-                        width: 10,
-                        key: 'event'
-                      },
-                      {
-                        width: 20,
-                        key: 'name'
-                      },
-                      {
-                        width: 35,
-                        key: 'startedBy'
-                      },
-                      {
-                        width: 15,
-                        key: 'dateOfModification'
-                      },
-                      {
-                        width: 20,
-                        key: 'actions',
-                        isActionColumn: true,
-                        alignment: ColumnContentAlignment.CENTER
-                      }
-                    ]}
-                    hideTableHeader={true}
-                    renderExpandedComponent={this.renderExpandedComponent}
-                    noResultText={intl.formatMessage(
-                      messages.dataTableNoResults
-                    )}
-                    onPageChange={(currentPage: number) => {
-                      this.onPageChange(currentPage)
-                    }}
-                    pageSize={this.pageSize}
-                    totalItems={
-                      data.listEventRegistrations &&
-                      data.listEventRegistrations.totalItems
+                <GridTable
+                  content={this.transformRemoteDraftsContent(data)}
+                  columns={[
+                    {
+                      width: 10,
+                      key: 'event'
+                    },
+                    {
+                      width: 20,
+                      key: 'name'
+                    },
+                    {
+                      width: 35,
+                      key: 'startedBy'
+                    },
+                    {
+                      width: 15,
+                      key: 'dateOfModification'
+                    },
+                    {
+                      width: 20,
+                      key: 'actions',
+                      isActionColumn: true,
+                      alignment: ColumnContentAlignment.CENTER
                     }
-                    currentPage={this.state.progressCurrentPage}
-                    expandable={true}
-                  />
-                </BodyContent>
+                  ]}
+                  hideTableHeader={true}
+                  renderExpandedComponent={this.renderExpandedComponent}
+                  noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                  onPageChange={(currentPage: number) => {
+                    this.onPageChange(currentPage)
+                  }}
+                  pageSize={this.pageSize}
+                  totalItems={
+                    data.listEventRegistrations &&
+                    data.listEventRegistrations.totalItems
+                  }
+                  currentPage={this.state.progressCurrentPage}
+                  expandable={true}
+                />
               )
             }}
           </Query>
