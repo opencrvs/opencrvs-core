@@ -125,6 +125,10 @@ const messages: {
     id: 'formFields.docTypeFuneralReceipt',
     defaultMessage: 'Certified Copy of Funeral Receipt',
     description: 'Label for select option Certified Copy of Funeral Receipt'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -186,6 +190,7 @@ export const documentsSection: IFormSection = {
             required: true,
             hideAsterisk: true,
             validate: [],
+            placeholder: messages.select,
             initialValue: '',
             dynamicOptions: {
               dependency: 'whatDocToUpload',

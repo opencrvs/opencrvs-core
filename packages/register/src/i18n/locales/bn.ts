@@ -1114,7 +1114,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.securityquestion.heading': 'আপনার নিরাপত্তা প্রশ্ন সেট করুন',
     'register.securityquestion.description':
       'নীচের ড্রপডাউন তালিকা থেকে আপনার পছন্দের প্রশ্ন নির্বাচন করুন।',
-    'register.securityquestion.select': 'নির্বাচন করুন',
+    'register.select.placeholder': 'নির্বাচন করুন...',
     'register.securityquestion.selectSecurityQuestion':
       'একটি নিরাপত্তা প্রশ্ন নির্বাচন করুন',
     'register.securityquestion.enterResponse':

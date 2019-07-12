@@ -1114,7 +1114,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.securityquestion.heading': 'Set your security questions',
     'register.securityquestion.description':
       'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
-    'register.securityquestion.select': 'Select',
+    'register.select.placeholder': 'Select...',
     'register.securityquestion.selectSecurityQuestion':
       'Select a security question',
     'register.securityquestion.enterResponse':
