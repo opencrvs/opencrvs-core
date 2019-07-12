@@ -75,6 +75,7 @@ import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { findDOMNode } from 'react-dom'
+import { FullBodyContent } from '@opencrvs/components/lib/layout'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -218,7 +219,6 @@ const Row = styled.div`
 const Column = styled.div`
   width: 50%;
   margin: 0px 15px;
-  ${({ theme }) => theme.shadows.mistyShadow};
 
   &:first-child {
     margin-left: 0px;
@@ -231,6 +231,9 @@ const Column = styled.div`
     margin: 0px;
     width: 100%;
   }
+`
+const StyledColumn = styled(Column)`
+  ${({ theme }) => theme.shadows.mistyShadow};
 `
 const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
   {}
@@ -283,8 +286,6 @@ const ZeroDocument = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-top: 16px;
-  margin-left: 16px;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
@@ -690,9 +691,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
 
     return (
-      <>
+      <FullBodyContent>
         <Row>
-          <Column>
+          <StyledColumn>
             <ReviewHeader
               id="review_header"
               logoSource={SEAL_BD_GOVT}
@@ -782,7 +783,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </SaveDraftText>
               </DraftButtonContainer>
             )}
-          </Column>
+          </StyledColumn>
           <Column>
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
@@ -839,7 +840,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             </DeleteApplication>
           </DButtonContainer>
         )}
-      </>
+      </FullBodyContent>
     )
   }
 }

@@ -6,11 +6,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
 import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
-import {
-  BodyContent,
-  Container,
-  FullBodyContent
-} from '@opencrvs/components/lib/layout'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -439,30 +435,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
             />
 
             {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-              <FullBodyContent>
-                <ReviewSection
-                  pageRoute={this.props.pageRoute}
-                  draft={application}
-                  submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                  deleteApplicationClickEvent={() => {
-                    this.props.deleteApplication(application)
-                    history.push('/')
-                  }}
-                />
-              </FullBodyContent>
+              <ReviewSection
+                pageRoute={this.props.pageRoute}
+                draft={application}
+                submitClickEvent={this.submitForm}
+                saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
+                deleteApplicationClickEvent={() => {
+                  this.props.deleteApplication(application)
+                  history.push('/')
+                }}
+              />
             )}
             {activeSection.viewType === VIEW_TYPE.REVIEW && (
-              <FullBodyContent>
-                <ReviewSection
-                  pageRoute={this.props.pageRoute}
-                  draft={application}
-                  rejectApplicationClickEvent={() => {
-                    this.toggleRejectForm()
-                  }}
-                  registerClickEvent={this.registerApplication}
-                />
-              </FullBodyContent>
+              <ReviewSection
+                pageRoute={this.props.pageRoute}
+                draft={application}
+                rejectApplicationClickEvent={() => {
+                  this.toggleRejectForm()
+                }}
+                registerClickEvent={this.registerApplication}
+              />
             )}
 
             {activeSection.viewType === 'form' && (

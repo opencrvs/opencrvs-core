@@ -21,8 +21,10 @@ export const Container = styled.div`
   width: 100%;
 `
 export const FullBodyContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.background};
   flex: 1;
   width: 100%;
   height: 100%;
   padding: 24px;
+  margin-top: 4px;
 `

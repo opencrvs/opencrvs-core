@@ -10,6 +10,7 @@ const ImageContainer = styled.div`
   overflow: hidden;
 `
 interface IProps {
+  id?: string
   image: string
 }
 
@@ -19,9 +20,9 @@ export class DocumentImage extends React.Component<IProps> {
   }
 
   render() {
-    const { image } = this.props
+    const { image, id } = this.props
     return (
-      <ImageContainer>
+      <ImageContainer id={id}>
         {image && <PanViewer key={Math.random()} image={image} />}
       </ImageContainer>
     )

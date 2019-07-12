@@ -6,7 +6,7 @@ import { DocumentImage } from './components/DocumentImage'
 
 const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
-  border: 2px solid ${({ theme }) => theme.colors.white};
+  outline: 2px solid ${({ theme }) => theme.colors.chartAreaGradientStart};
   box-sizing: border-box;
   height: 720px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -15,14 +15,23 @@ const Container = styled.div`
 
   > div {
     width: 100%;
+    padding-top: 16px;
+    padding-left: 16px;
   }
 
-  > div#selectDocument {
+  > div#select_document {
     z-index: 2;
     background: ${({ theme }) => theme.colors.lightGreyBackground};
     top: 16px;
     left: 16px;
     width: 200px;
+    padding-top: 0px;
+    padding-left: 0px;
+  }
+
+  > div#document_image {
+    padding-top: 0px;
+    padding-left: 0px;
   }
 `
 export interface IDocumentViewerOptions {
@@ -65,7 +74,7 @@ export class DocumentViewer extends React.Component<IProps, IState> {
           {options.documentOptions.length > 0 && (
             <>
               <Select
-                id="selectDocument"
+                id="select_document"
                 options={options.selectOptions}
                 color="inherit"
                 value={this.state.selectedOption as string}
@@ -82,7 +91,10 @@ export class DocumentViewer extends React.Component<IProps, IState> {
                 }}
               />
               {this.state.selectedDocument && (
-                <DocumentImage image={this.state.selectedDocument} />
+                <DocumentImage
+                  id="document_image"
+                  image={this.state.selectedDocument}
+                />
               )}
             </>
           )}
