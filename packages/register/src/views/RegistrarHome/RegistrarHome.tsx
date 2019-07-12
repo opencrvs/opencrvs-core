@@ -62,6 +62,7 @@ import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { InProgressTab } from './tabs/inProgress/inProgressTab'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -277,7 +278,6 @@ interface IBaseRegistrarHomeProps {
 }
 
 interface IRegistrarHomeState {
-  progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
   printCurrentPage: number
@@ -313,7 +313,6 @@ export class RegistrarHomeView extends React.Component<
   constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
-      progressCurrentPage: 1,
       reviewCurrentPage: 1,
       updatesCurrentPage: 1,
       printCurrentPage: 1
@@ -693,9 +692,6 @@ export class RegistrarHomeView extends React.Component<
   }
 
   onPageChange = (newPageNumber: number) => {
-    if (this.props.tabId === TAB_ID.inProgress) {
-      this.setState({ progressCurrentPage: newPageNumber })
-    }
     if (this.props.tabId === TAB_ID.readyForReview) {
       this.setState({ reviewCurrentPage: newPageNumber })
     }
@@ -806,53 +802,11 @@ export class RegistrarHomeView extends React.Component<
           }}
         </Query>
         {tabId === TAB_ID.inProgress && (
-          <BodyContent>
-            {this.renderInProgressSelectorsWithCounts(
-              selectorId,
-              drafts,
-              registrarUnion as string
-            )}
-            {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-              <GridTable
-                content={this.transformDraftContent()}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemType),
-                    width: 15,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemName),
-                    width: 35,
-                    key: 'name'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemModificationDate
-                    ),
-                    width: 35,
-                    key: 'dateOfModification'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemAction
-                    ),
-                    width: 15,
-                    key: 'actions',
-                    isActionColumn: true,
-                    alignment: ColumnContentAlignment.CENTER
-                  }
-                ]}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
-                onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
-                }}
-                pageSize={this.pageSize}
-                totalItems={drafts && drafts.length}
-                currentPage={this.state.progressCurrentPage}
-              />
-            )}
-          </BodyContent>
+          <InProgressTab
+            drafts={drafts}
+            selectorId={selectorId}
+            registrarUnion={registrarUnion}
+          />
         )}
         {tabId === TAB_ID.readyForReview && (
           <Query
@@ -1180,7 +1134,14 @@ function mapStateToProps(
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
-    drafts: state.applicationsState.applications
+    drafts:
+      (state.applicationsState.applications &&
+        state.applicationsState.applications.filter(
+          (application: IApplication) =>
+            application.submissionStatus ===
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        )) ||
+      []
   }
 }
 
