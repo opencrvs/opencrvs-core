@@ -391,7 +391,6 @@ export interface IFormSection {
 
 export interface IFormSectionGroup {
   id: string
-  name?: FormattedMessage.MessageDescriptor
   title?: FormattedMessage.MessageDescriptor
   fields: IFormField[]
   disabled?: boolean

@@ -21,6 +21,7 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   IFieldInput,
+  IFormSection,
   IQuery
 } from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
@@ -320,6 +321,12 @@ export const getConditionalActionsForField = (
       .filter(conditional => eval(conditional.expression))
       .map((conditional: IConditional) => conditional.action)
   )
+}
+
+export const getSectionFields = (section: IFormSection) => {
+  let fields: IFormField[] = []
+  section.groups.forEach(group => (fields = fields.concat(group.fields)))
+  return fields
 }
 
 export const hasFormError = (

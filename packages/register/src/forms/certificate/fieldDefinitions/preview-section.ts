@@ -42,13 +42,18 @@ export const certificatePreview: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.preview,
   title: messages.preview,
-  fields: [
+  groups: [
     {
-      name: 'certificate',
-      type: PDF_DOCUMENT_VIEWER,
-      label: messages.noLabel,
-      initialValue: '',
-      validate: []
+      id: 'certificate-preview-view-group',
+      fields: [
+        {
+          name: 'certificate',
+          type: PDF_DOCUMENT_VIEWER,
+          label: messages.noLabel,
+          initialValue: '',
+          validate: []
+        }
+      ]
     }
   ]
 }

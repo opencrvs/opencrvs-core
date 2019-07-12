@@ -84,61 +84,68 @@ export const causeOfDeathSection: IFormSection = {
   title: messages.causeOfDeathTitle,
   optional: true,
   notice: messages.causeOfDeathNotice,
-  fields: [
+  groups: [
     {
-      name: 'causeOfDeathEstablished',
-      type: RADIO_GROUP,
-      label: messages.causeOfDeathEstablished,
-      required: false,
-      initialValue: false,
-      validate: [],
-      options: [
+      id: 'causeOfDeath-view-group',
+      fields: [
         {
-          value: false,
-          label: messages.deny
-        },
-        { value: true, label: messages.confirm }
-      ],
-      mapping: {
-        mutation: ignoreFieldTransformer,
-        query: hasCaseOfDeathSectionTransformer
-      }
-    },
-    {
-      name: 'methodOfCauseOfDeath',
-      type: SELECT_WITH_OPTIONS,
-      initialValue: '',
-      label: messages.methodOfCauseOfDeath,
-      validate: [],
-      required: false,
-      options: [
-        {
-          value: 'VERBAL_AUTOPSY',
-          label: messages.verbalAutopsy
+          name: 'causeOfDeathEstablished',
+          type: RADIO_GROUP,
+          label: messages.causeOfDeathEstablished,
+          required: false,
+          initialValue: false,
+          validate: [],
+          options: [
+            {
+              value: false,
+              label: messages.deny
+            },
+            { value: true, label: messages.confirm }
+          ],
+          mapping: {
+            mutation: ignoreFieldTransformer,
+            query: hasCaseOfDeathSectionTransformer
+          }
         },
         {
-          value: 'MEDICALLY_CERTIFIED',
-          label: messages.medicallyCertified
+          name: 'methodOfCauseOfDeath',
+          type: SELECT_WITH_OPTIONS,
+          initialValue: '',
+          label: messages.methodOfCauseOfDeath,
+          validate: [],
+          required: false,
+          options: [
+            {
+              value: 'VERBAL_AUTOPSY',
+              label: messages.verbalAutopsy
+            },
+            {
+              value: 'MEDICALLY_CERTIFIED',
+              label: messages.medicallyCertified
+            }
+          ],
+          conditionals: [conditionals.causeOfDeathEstablished],
+          mapping: {
+            mutation: sectionFieldToBundleFieldTransformer(
+              'causeOfDeathMethod'
+            ),
+            query: bundleFieldToSectionFieldTransformer('causeOfDeathMethod')
+          }
+        },
+        {
+          name: 'causeOfDeathCode',
+          type: TEXT,
+          initialValue: '',
+          label: messages.causeOfDeathCode,
+          required: false,
+          conditionals: [conditionals.causeOfDeathEstablished],
+          validate: [blockAlphaNumericDot, maxLength(17)],
+          mapping: {
+            mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
+            query: bundleFieldToSectionFieldTransformer('causeOfDeath')
+          }
         }
-      ],
-      conditionals: [conditionals.causeOfDeathEstablished],
-      mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('causeOfDeathMethod'),
-        query: bundleFieldToSectionFieldTransformer('causeOfDeathMethod')
-      }
-    },
-    {
-      name: 'causeOfDeathCode',
-      type: TEXT,
-      initialValue: '',
-      label: messages.causeOfDeathCode,
-      required: false,
-      conditionals: [conditionals.causeOfDeathEstablished],
-      validate: [blockAlphaNumericDot, maxLength(17)],
-      mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
-        query: bundleFieldToSectionFieldTransformer('causeOfDeath')
-      }
+      ]
     }
   ]
 }

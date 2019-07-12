@@ -48,7 +48,12 @@ export const initialState: IRegisterFormState = {
           viewType: 'preview',
           name: messages.previewTab,
           title: messages.previewTitle,
-          fields: []
+          groups: [
+            {
+              id: 'preview-view-group',
+              fields: []
+            }
+          ]
         }
       ]
     },
@@ -64,7 +69,12 @@ export const initialState: IRegisterFormState = {
           viewType: 'preview',
           name: messages.previewTab,
           title: messages.previewTitle,
-          fields: []
+          groups: [
+            {
+              id: 'preview-view-group',
+              fields: []
+            }
+          ]
         }
       ]
     }

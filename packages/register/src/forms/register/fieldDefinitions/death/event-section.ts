@@ -148,347 +148,352 @@ export const eventSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.deathEventTab,
   title: messages.deathEventTitle,
-  fields: [
+  groups: [
     {
-      name: 'deathDate',
-      type: DATE,
-      label: messages.deathDate,
-      required: true,
-      initialValue: '',
-      validate: [isValidDeathOccurrenceDate],
-      mapping: {
-        mutation: fieldToDeceasedDateTransformation('deceased'),
-        query: deceasedDateToFieldTransformation('deceased')
-      }
-    },
-    {
-      name: 'manner',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.manner,
-      required: false,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'NATURAL_CAUSES', label: messages.mannerNatural },
-        { value: 'ACCIDENT', label: messages.mannerAccident },
+      id: 'deathEvent-view-group',
+      fields: [
         {
-          value: 'SUICIDE',
-          label: messages.mannerSuicide
+          name: 'deathDate',
+          type: DATE,
+          label: messages.deathDate,
+          required: true,
+          initialValue: '',
+          validate: [isValidDeathOccurrenceDate],
+          mapping: {
+            mutation: fieldToDeceasedDateTransformation('deceased'),
+            query: deceasedDateToFieldTransformation('deceased')
+          }
         },
         {
-          value: 'HOMICIDE',
-          label: messages.mannerHomicide
+          name: 'manner',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.manner,
+          required: false,
+          initialValue: '',
+          validate: [],
+          options: [
+            { value: 'NATURAL_CAUSES', label: messages.mannerNatural },
+            { value: 'ACCIDENT', label: messages.mannerAccident },
+            {
+              value: 'SUICIDE',
+              label: messages.mannerSuicide
+            },
+            {
+              value: 'HOMICIDE',
+              label: messages.mannerHomicide
+            },
+            {
+              value: 'MANNER_UNDETERMINED',
+              label: messages.mannerUndetermined
+            }
+          ],
+          mapping: {
+            mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath'),
+            query: bundleFieldToSectionFieldTransformer('mannerOfDeath')
+          }
         },
         {
-          value: 'MANNER_UNDETERMINED',
-          label: messages.mannerUndetermined
+          name: 'deathPlace',
+          type: SUBSECTION,
+          label: messages.deathPlace,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'deathPlaceAddress',
+          type: RADIO_GROUP,
+          label: messages.deathPlaceAddress,
+          required: true,
+          initialValue: '',
+          validate: [],
+          options: [
+            {
+              value: 'PERMANENT',
+              label: messages.deathPlaceAddressSameAsPermanent
+            },
+            {
+              value: 'CURRENT',
+              label: messages.deathPlaceAddressSameAsCurrent
+            },
+            { value: 'OTHER', label: messages.deathPlaceAddressOther }
+          ],
+          conditionals: [],
+          mapping: {
+            mutation: copyEventAddressTransformer('deceased'),
+            query: deathPlaceToFieldTransformer
+          }
+        },
+        {
+          name: 'placeOfDeath',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.deathPlaceAddressType,
+          required: false,
+          initialValue: '',
+          validate: [],
+          options: [
+            { value: 'HOSPITAL', label: messages.hospital },
+            {
+              value: 'OTHER_HEALTH_INSTITUTION',
+              label: messages.otherHealthInstitution
+            },
+            { value: 'PRIVATE_HOME', label: messages.privateHome },
+            { value: 'OTHER', label: messages.otherInstitution }
+          ],
+          conditionals: [conditionals.deathPlaceOther],
+          mapping: {
+            mutation: eventLocationMutationTransformer(),
+            query: eventLocationIDQueryTransformer()
+          }
+        },
+        {
+          name: 'deathLocation',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          label: messages.deathLocation,
+          required: false,
+          initialValue: '',
+          validate: [],
+          dynamicOptions: {
+            resource: OFFLINE_FACILITIES_KEY,
+            dependency: 'placeOfDeath'
+          },
+          conditionals: [conditionals.placeOfDeathHospital],
+          mapping: {
+            mutation: eventLocationMutationTransformer(),
+            query: eventLocationIDQueryTransformer()
+          }
+        },
+        {
+          name: 'country',
+          type: SELECT_WITH_OPTIONS,
+          label: addressMessages.country,
+          required: true,
+          initialValue: window.config.COUNTRY.toUpperCase(),
+          validate: [],
+          options: countries,
+          conditionals: [
+            conditionals.deathPlaceOther,
+            conditionals.otherDeathEventLocation
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(),
+            query: eventLocationQueryTransformer()
+          }
+        },
+        {
+          name: 'state',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          label: addressMessages.state,
+          required: true,
+          initialValue: '',
+          validate: [],
+          dynamicOptions: {
+            resource: OFFLINE_LOCATIONS_KEY,
+            dependency: 'country'
+          },
+          conditionals: [
+            conditionals.country,
+            conditionals.deathPlaceOther,
+            conditionals.otherDeathEventLocation
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(),
+            query: eventLocationQueryTransformer()
+          }
+        },
+        {
+          name: 'district',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          label: addressMessages.district,
+          required: true,
+          initialValue: '',
+          validate: [],
+          dynamicOptions: {
+            resource: OFFLINE_LOCATIONS_KEY,
+            dependency: 'state'
+          },
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.otherDeathEventLocation,
+            conditionals.deathPlaceOther
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(),
+            query: eventLocationQueryTransformer()
+          }
+        },
+        {
+          name: 'addressLine4',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          label: addressMessages.addressLine4,
+          required: true,
+          initialValue: '',
+          validate: [],
+          dynamicOptions: {
+            resource: OFFLINE_LOCATIONS_KEY,
+            dependency: 'district'
+          },
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.otherDeathEventLocation,
+            conditionals.deathPlaceOther
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(6),
+            query: eventLocationQueryTransformer(6)
+          }
+        },
+        {
+          name: 'addressLine3',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          label: addressMessages.addressLine3,
+          required: false,
+          initialValue: '',
+          validate: [],
+          dynamicOptions: {
+            resource: OFFLINE_LOCATIONS_KEY,
+            dependency: 'addressLine4'
+          },
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.isNotCityLocation,
+            conditionals.otherDeathEventLocation,
+            conditionals.deathPlaceOther
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(4),
+            query: eventLocationQueryTransformer(4)
+          }
+        },
+        {
+          name: 'addressLine3CityOption',
+          type: TEXT,
+          label: addressMessages.addressLine3CityOption,
+          required: false,
+          initialValue: '',
+          validate: [],
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.otherDeathEventLocation,
+            conditionals.isCityLocation
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(5),
+            query: eventLocationQueryTransformer(5)
+          }
+        },
+        {
+          name: 'addressLine2',
+          type: TEXT,
+          label: addressMessages.addressLine2,
+          required: false,
+          initialValue: '',
+          validate: [],
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.addressLine3,
+            conditionals.otherDeathEventLocation,
+            conditionals.deathPlaceOther
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(3),
+            query: eventLocationQueryTransformer(3)
+          }
+        },
+        {
+          name: 'addressLine1CityOption',
+          type: TEXT,
+          label: addressMessages.addressLine1,
+          required: false,
+          initialValue: '',
+          validate: [],
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.otherDeathEventLocation,
+            conditionals.isCityLocation
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(2),
+            query: eventLocationQueryTransformer(2)
+          }
+        },
+        {
+          name: 'postCodeCityOption',
+          type: NUMBER,
+          label: addressMessages.postCode,
+          required: false,
+          initialValue: '',
+          validate: [],
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.otherDeathEventLocation,
+            conditionals.isCityLocation
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(0, 'postalCode'),
+            query: eventLocationQueryTransformer(0, 'postalCode')
+          }
+        },
+        {
+          name: 'addressLine1',
+          type: TEXT,
+          label: addressMessages.addressLine1,
+          required: false,
+          initialValue: '',
+          validate: [],
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.addressLine3,
+            conditionals.otherDeathEventLocation,
+            conditionals.deathPlaceOther
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(1),
+            query: eventLocationQueryTransformer(1)
+          }
+        },
+        {
+          name: 'postCode',
+          type: NUMBER,
+          label: addressMessages.postCode,
+          required: false,
+          initialValue: '',
+          validate: [],
+          conditionals: [
+            conditionals.country,
+            conditionals.state,
+            conditionals.district,
+            conditionals.addressLine4,
+            conditionals.addressLine3,
+            conditionals.otherDeathEventLocation,
+            conditionals.deathPlaceOther
+          ],
+          mapping: {
+            mutation: eventLocationMutationTransformer(0, 'postalCode'),
+            query: eventLocationQueryTransformer(0, 'postalCode')
+          }
         }
-      ],
-      mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath'),
-        query: bundleFieldToSectionFieldTransformer('mannerOfDeath')
-      }
-    },
-    {
-      name: 'deathPlace',
-      type: SUBSECTION,
-      label: messages.deathPlace,
-      initialValue: '',
-      validate: []
-    },
-    {
-      name: 'deathPlaceAddress',
-      type: RADIO_GROUP,
-      label: messages.deathPlaceAddress,
-      required: true,
-      initialValue: '',
-      validate: [],
-      options: [
-        {
-          value: 'PERMANENT',
-          label: messages.deathPlaceAddressSameAsPermanent
-        },
-        {
-          value: 'CURRENT',
-          label: messages.deathPlaceAddressSameAsCurrent
-        },
-        { value: 'OTHER', label: messages.deathPlaceAddressOther }
-      ],
-      conditionals: [],
-      mapping: {
-        mutation: copyEventAddressTransformer('deceased'),
-        query: deathPlaceToFieldTransformer
-      }
-    },
-    {
-      name: 'placeOfDeath',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.deathPlaceAddressType,
-      required: false,
-      initialValue: '',
-      validate: [],
-      options: [
-        { value: 'HOSPITAL', label: messages.hospital },
-        {
-          value: 'OTHER_HEALTH_INSTITUTION',
-          label: messages.otherHealthInstitution
-        },
-        { value: 'PRIVATE_HOME', label: messages.privateHome },
-        { value: 'OTHER', label: messages.otherInstitution }
-      ],
-      conditionals: [conditionals.deathPlaceOther],
-      mapping: {
-        mutation: eventLocationMutationTransformer(),
-        query: eventLocationIDQueryTransformer()
-      }
-    },
-    {
-      name: 'deathLocation',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: messages.deathLocation,
-      required: false,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_FACILITIES_KEY,
-        dependency: 'placeOfDeath'
-      },
-      conditionals: [conditionals.placeOfDeathHospital],
-      mapping: {
-        mutation: eventLocationMutationTransformer(),
-        query: eventLocationIDQueryTransformer()
-      }
-    },
-    {
-      name: 'country',
-      type: SELECT_WITH_OPTIONS,
-      label: addressMessages.country,
-      required: true,
-      initialValue: window.config.COUNTRY.toUpperCase(),
-      validate: [],
-      options: countries,
-      conditionals: [
-        conditionals.deathPlaceOther,
-        conditionals.otherDeathEventLocation
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(),
-        query: eventLocationQueryTransformer()
-      }
-    },
-    {
-      name: 'state',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.state,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'country'
-      },
-      conditionals: [
-        conditionals.country,
-        conditionals.deathPlaceOther,
-        conditionals.otherDeathEventLocation
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(),
-        query: eventLocationQueryTransformer()
-      }
-    },
-    {
-      name: 'district',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.district,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'state'
-      },
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.otherDeathEventLocation,
-        conditionals.deathPlaceOther
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(),
-        query: eventLocationQueryTransformer()
-      }
-    },
-    {
-      name: 'addressLine4',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.addressLine4,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'district'
-      },
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.otherDeathEventLocation,
-        conditionals.deathPlaceOther
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(6),
-        query: eventLocationQueryTransformer(6)
-      }
-    },
-    {
-      name: 'addressLine3',
-      type: SELECT_WITH_DYNAMIC_OPTIONS,
-      label: addressMessages.addressLine3,
-      required: false,
-      initialValue: '',
-      validate: [],
-      dynamicOptions: {
-        resource: OFFLINE_LOCATIONS_KEY,
-        dependency: 'addressLine4'
-      },
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.isNotCityLocation,
-        conditionals.otherDeathEventLocation,
-        conditionals.deathPlaceOther
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(4),
-        query: eventLocationQueryTransformer(4)
-      }
-    },
-    {
-      name: 'addressLine3CityOption',
-      type: TEXT,
-      label: addressMessages.addressLine3CityOption,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.otherDeathEventLocation,
-        conditionals.isCityLocation
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(5),
-        query: eventLocationQueryTransformer(5)
-      }
-    },
-    {
-      name: 'addressLine2',
-      type: TEXT,
-      label: addressMessages.addressLine2,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.addressLine3,
-        conditionals.otherDeathEventLocation,
-        conditionals.deathPlaceOther
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(3),
-        query: eventLocationQueryTransformer(3)
-      }
-    },
-    {
-      name: 'addressLine1CityOption',
-      type: TEXT,
-      label: addressMessages.addressLine1,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.otherDeathEventLocation,
-        conditionals.isCityLocation
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(2),
-        query: eventLocationQueryTransformer(2)
-      }
-    },
-    {
-      name: 'postCodeCityOption',
-      type: NUMBER,
-      label: addressMessages.postCode,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.otherDeathEventLocation,
-        conditionals.isCityLocation
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(0, 'postalCode'),
-        query: eventLocationQueryTransformer(0, 'postalCode')
-      }
-    },
-    {
-      name: 'addressLine1',
-      type: TEXT,
-      label: addressMessages.addressLine1,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.addressLine3,
-        conditionals.otherDeathEventLocation,
-        conditionals.deathPlaceOther
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(1),
-        query: eventLocationQueryTransformer(1)
-      }
-    },
-    {
-      name: 'postCode',
-      type: NUMBER,
-      label: addressMessages.postCode,
-      required: false,
-      initialValue: '',
-      validate: [],
-      conditionals: [
-        conditionals.country,
-        conditionals.state,
-        conditionals.district,
-        conditionals.addressLine4,
-        conditionals.addressLine3,
-        conditionals.otherDeathEventLocation,
-        conditionals.deathPlaceOther
-      ],
-      mapping: {
-        mutation: eventLocationMutationTransformer(0, 'postalCode'),
-        query: eventLocationQueryTransformer(0, 'postalCode')
-      }
+      ]
     }
   ],
   mapping: {

@@ -48,7 +48,12 @@ export const initialState: IReviewFormState = {
           viewType: 'review',
           name: messages.reviewTab,
           title: messages.reviewTitle,
-          fields: []
+          groups: [
+            {
+              id: 'review-group',
+              fields: []
+            }
+          ]
         }
       ]
     },
@@ -64,7 +69,12 @@ export const initialState: IReviewFormState = {
           viewType: 'review',
           name: messages.reviewTab,
           title: messages.reviewTitle,
-          fields: []
+          groups: [
+            {
+              id: 'review-group',
+              fields: []
+            }
+          ]
         }
       ]
     }

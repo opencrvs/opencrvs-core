@@ -10,13 +10,15 @@ export const SELECT_MAIN_CONTACT_POINT =
 export const DRAFT_BIRTH_PARENT_FORM = '/drafts/:applicationId/events/birth'
 export const DRAFT_BIRTH_PARENT_FORM_PAGE =
   '/drafts/:applicationId/events/birth/:pageId'
+export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP =
+  '/drafts/:applicationId/events/birth/:pageId/group/:groupId'
 export const DRAFT_BIRTH_APPLICANT_FORM = '/events/birth/contact'
-export const DRAFT_BIRTH_PARENT_FORM_TAB =
-  '/drafts/:applicationId/events/birth/parent/:tabId'
 
 export const DRAFT_DEATH_FORM = '/drafts/:applicationId/events/death'
 export const DRAFT_DEATH_FORM_PAGE =
   '/drafts/:applicationId/events/death/:pageId'
+export const DRAFT_DEATH_FORM_PAGE_GROUP =
+  '/drafts/:applicationId/events/death/:pageId/group/:groupId'
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:applicationId/events/:event/parent/:pageId'

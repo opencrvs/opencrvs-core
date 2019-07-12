@@ -72,8 +72,6 @@ import {
   IFormData,
   FETCH_BUTTON,
   ILoaderButton,
-  IForm,
-  IFormSection,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD
 } from '@register/forms'
@@ -89,7 +87,6 @@ import { ImageUploadField } from '@register/components/form/ImageUploadField'
 import { FetchButtonField } from '@register/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
-import { gqlToDraftTransformer } from '@register/transformer'
 import { SearchField } from './SearchField'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
@@ -527,6 +524,7 @@ class FormSectionComponent extends React.Component<Props> {
                   queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
+                    /*
                     const section = {
                       id: this.props.id,
                       fields: fieldsWithValuesDefined
@@ -549,6 +547,7 @@ class FormSectionComponent extends React.Component<Props> {
                       transformedData[this.props.id]
                     )
                     setValues(updatedValues)
+                    */
                   }
                 } as ILoaderButton)
               : field

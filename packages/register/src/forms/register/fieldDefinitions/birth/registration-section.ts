@@ -133,94 +133,99 @@ export const registrationSection: IFormSection = {
   viewType: 'hidden',
   name: messages.registrationTab,
   title: messages.registrationTitle,
-  fields: [
+  groups: [
     {
-      name: 'presentAtBirthRegistration',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.whoIsPresentLabel,
-      required: false,
-      initialValue: '',
-      validate: [],
-      options: [
+      id: 'registration-view-group',
+      fields: [
         {
-          value: 'BOTH_PARENTS',
-          label: messages.presentBoth
+          name: 'presentAtBirthRegistration',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.whoIsPresentLabel,
+          required: false,
+          initialValue: '',
+          validate: [],
+          options: [
+            {
+              value: 'BOTH_PARENTS',
+              label: messages.presentBoth
+            },
+            {
+              value: 'MOTHER_ONLY',
+              label: messages.presentMother
+            },
+            {
+              value: 'FATHER_ONLY',
+              label: messages.presentFather
+            },
+            {
+              value: 'OTHER',
+              label: messages.presentOther
+            }
+          ],
+          mapping: {
+            mutation: sectionFieldToBundleFieldTransformer(),
+            query: bundleFieldToSectionFieldTransformer()
+          }
         },
         {
-          value: 'MOTHER_ONLY',
-          label: messages.presentMother
+          name: 'whoseContactDetails',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.whoseContactDetailsLabel,
+          required: false,
+          initialValue: '',
+          validate: [],
+          options: [
+            {
+              value: 'BOTH',
+              label: messages.contactDetailsBoth
+            },
+            {
+              value: 'MOTHER',
+              label: messages.contactDetailsMother
+            },
+            {
+              value: 'FATHER',
+              label: messages.contactDetailsFather
+            }
+          ],
+          mapping: {
+            mutation: fieldNameTransformer('contact'),
+            query: fieldValueTransformer('contact')
+          }
         },
         {
-          value: 'FATHER_ONLY',
-          label: messages.presentFather
+          name: 'registrationPhone',
+          type: TEL,
+          label: messages.registrationPhoneLabel,
+          required: true,
+          initialValue: '',
+          validate: [phoneNumberFormat],
+          mapping: {
+            mutation: fieldNameTransformer('contactPhoneNumber'),
+            query: fieldValueTransformer('contactPhoneNumber')
+          }
         },
         {
-          value: 'OTHER',
-          label: messages.presentOther
+          name: 'phoneVerificationWarning',
+          type: WARNING,
+          label: messages.phoneVerificationWarning,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'commentsOrNotes',
+          type: TEXTAREA,
+          label: messages.commentsOrNotesLabel,
+          required: false,
+          initialValue: '',
+          validate: [],
+          description: messages.commentsOrNotesDescription,
+          mapping: {
+            mutation: fieldToCommentTransformer,
+            query: commentToFieldTransformer
+          }
         }
-      ],
-      mapping: {
-        mutation: sectionFieldToBundleFieldTransformer(),
-        query: bundleFieldToSectionFieldTransformer()
-      }
-    },
-    {
-      name: 'whoseContactDetails',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.whoseContactDetailsLabel,
-      required: false,
-      initialValue: '',
-      validate: [],
-      options: [
-        {
-          value: 'BOTH',
-          label: messages.contactDetailsBoth
-        },
-        {
-          value: 'MOTHER',
-          label: messages.contactDetailsMother
-        },
-        {
-          value: 'FATHER',
-          label: messages.contactDetailsFather
-        }
-      ],
-      mapping: {
-        mutation: fieldNameTransformer('contact'),
-        query: fieldValueTransformer('contact')
-      }
-    },
-    {
-      name: 'registrationPhone',
-      type: TEL,
-      label: messages.registrationPhoneLabel,
-      required: true,
-      initialValue: '',
-      validate: [phoneNumberFormat],
-      mapping: {
-        mutation: fieldNameTransformer('contactPhoneNumber'),
-        query: fieldValueTransformer('contactPhoneNumber')
-      }
-    },
-    {
-      name: 'phoneVerificationWarning',
-      type: WARNING,
-      label: messages.phoneVerificationWarning,
-      initialValue: '',
-      validate: []
-    },
-    {
-      name: 'commentsOrNotes',
-      type: TEXTAREA,
-      label: messages.commentsOrNotesLabel,
-      required: false,
-      initialValue: '',
-      validate: [],
-      description: messages.commentsOrNotesDescription,
-      mapping: {
-        mutation: fieldToCommentTransformer,
-        query: commentToFieldTransformer
-      }
+      ]
     }
   ],
   mapping: {
