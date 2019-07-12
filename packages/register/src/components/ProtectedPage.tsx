@@ -78,7 +78,6 @@ class ProtectedPageComponent extends React.Component<
   onIdle() {
     this.setState({ secured: false })
   }
-
   render() {
     const { pendingUser, secured, pinExists } = this.state
     return (

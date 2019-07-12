@@ -169,6 +169,7 @@ export interface IFormFieldBase {
   initialValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
+  placeholder?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
   mode?: THEME_MODE
@@ -419,6 +420,7 @@ export interface Ii18nFormFieldBase {
   conditionals?: IConditional[]
   hideAsterisk?: boolean
   mode?: THEME_MODE
+  placeholder?: string
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

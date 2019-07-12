@@ -26,6 +26,7 @@ interface IProps {
   goHome?: () => void
   saveAction?: ISaveAction
   menuItems?: IToggleMenuItem[]
+  iconColor?: string
 }
 interface ISaveAction {
   handler: () => void
@@ -38,11 +39,11 @@ interface IToggleMenuItem {
 }
 
 export const EventTopBar = (props: IProps) => {
-  const { goHome, title, saveAction, menuItems } = props
+  const { goHome, title, saveAction, menuItems, iconColor } = props
   return (
     <TopBar>
       <Item>
-        <ApplicationIcon /> <TopBarTitle>{title}</TopBarTitle>
+        <ApplicationIcon color={iconColor} /> <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
         {goHome && (

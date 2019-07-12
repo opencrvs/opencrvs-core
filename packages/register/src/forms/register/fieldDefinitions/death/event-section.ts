@@ -140,6 +140,10 @@ const messages: {
     id: 'formFields.otherInstitution',
     defaultMessage: 'Other',
     description: 'Select item for Other Institution'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -171,6 +175,7 @@ export const eventSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             { value: 'NATURAL_CAUSES', label: messages.mannerNatural },
             { value: 'ACCIDENT', label: messages.mannerAccident },
@@ -230,6 +235,7 @@ export const eventSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             { value: 'HOSPITAL', label: messages.hospital },
             {
@@ -252,6 +258,7 @@ export const eventSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_FACILITIES_KEY,
             dependency: 'placeOfDeath'
@@ -269,6 +276,7 @@ export const eventSection: IFormSection = {
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
+          placeholder: messages.select,
           options: countries,
           conditionals: [
             conditionals.deathPlaceOther,
@@ -286,6 +294,7 @@ export const eventSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'country'
@@ -307,6 +316,7 @@ export const eventSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'state'
@@ -329,6 +339,7 @@ export const eventSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'district'
@@ -352,6 +363,7 @@ export const eventSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'addressLine4'

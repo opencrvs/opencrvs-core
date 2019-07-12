@@ -62,7 +62,8 @@ export const internationaliseFieldObject = (
     ...field,
     label:
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
-    description: field.description && intl.formatMessage(field.description)
+    description: field.description && intl.formatMessage(field.description),
+    placeholder: field.placeholder && intl.formatMessage(field.placeholder)
   }
 
   if (

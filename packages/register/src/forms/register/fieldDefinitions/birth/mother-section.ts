@@ -182,6 +182,10 @@ const messages: {
     id: 'formFields.fetchPersonByNIDModalInfo',
     defaultMessage: 'National ID',
     description: 'Label for loader button'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -201,6 +205,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: birthIdentityOptions,
           mapping: {
             mutation: fieldToIdentifierTransformer('type'),
@@ -298,6 +303,7 @@ export const motherSection: IFormSection = {
           required: false,
           initialValue: 'BGD',
           validate: [],
+          placeholder: messages.select,
           options: countries,
           mapping: {
             mutation: fieldToArrayTransformer,
@@ -395,6 +401,7 @@ export const motherSection: IFormSection = {
           required: false,
           initialValue: 'MARRIED',
           validate: [],
+          placeholder: messages.select,
           options: [
             {
               value: 'SINGLE',
@@ -458,6 +465,7 @@ export const motherSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             {
               value: 'NO_SCHOOLING',
@@ -508,6 +516,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
+          placeholder: messages.select,
           options: countries,
           mapping: {
             mutation: fieldToAddressTransformer('PERMANENT', 0, 'country'),
@@ -521,6 +530,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'countryPermanent'
@@ -538,6 +548,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'statePermanent'
@@ -558,6 +569,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'districtPermanent'
@@ -579,6 +591,7 @@ export const motherSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'addressLine4Permanent'
@@ -764,6 +777,7 @@ export const motherSection: IFormSection = {
           label: addressMessages.state,
           required: true,
           initialValue: '',
+          placeholder: messages.select,
           validate: [],
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
@@ -785,6 +799,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'state'
@@ -806,6 +821,7 @@ export const motherSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'district'
@@ -828,6 +844,7 @@ export const motherSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'addressLine4'

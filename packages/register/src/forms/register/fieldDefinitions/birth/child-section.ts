@@ -234,6 +234,10 @@ const messages: {
     id: 'formFields.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -301,6 +305,7 @@ export const childSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             { value: 'male', label: messages.childSexMale },
             { value: 'female', label: messages.childSexFemale },
@@ -327,6 +332,7 @@ export const childSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             { value: 'PHYSICIAN', label: messages.attendantAtBirthPhysician },
             { value: 'NURSE', label: messages.attendantAtBirthNurse },
@@ -351,6 +357,7 @@ export const childSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             { value: 'SINGLE', label: messages.birthTypeSingle },
             { value: 'TWIN', label: messages.birthTypeTwin },
@@ -399,6 +406,7 @@ export const childSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           options: [
             { value: 'HOSPITAL', label: messages.hospital },
             {
@@ -420,6 +428,7 @@ export const childSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_FACILITIES_KEY,
             dependency: 'placeOfBirth'
@@ -437,6 +446,7 @@ export const childSection: IFormSection = {
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
+          placeholder: messages.select,
           options: countries,
           conditionals: [conditionals.otherBirthEventLocation],
           mapping: {
@@ -451,6 +461,7 @@ export const childSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'country'
@@ -471,6 +482,7 @@ export const childSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'state'
@@ -492,6 +504,7 @@ export const childSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'district'
@@ -514,6 +527,7 @@ export const childSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'addressLine4'

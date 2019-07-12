@@ -178,6 +178,10 @@ const messages: {
     defaultMessage:
       "Certificate from doctor to prove child's age OR School certificate",
     description: 'Label for list item Doctor Certificate'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -228,6 +232,7 @@ export const documentsSection: IFormSection = {
                     hideAsterisk: true,
                     initialValue: '',
                     validate: [],
+                    placeholder: messages.select,
                     dynamicOptions: {
                       dependency: 'uploadDocForWhom',
                       options: {
