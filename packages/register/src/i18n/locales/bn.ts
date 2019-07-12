@@ -777,10 +777,8 @@ export const BENGALI_STATE: ILanguage = {
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া গেছে',
-    'register.registrarHome.results.reviewDuplicates':
-      'সদৃশগুলো পর্যালোচনা করুন',
-    'register.searchResult.results.reviewDuplicates':
-      'সদৃশগুলো পর্যালোচনা করুন',
+    'register.registrarHome.results.reviewDuplicates': 'পর্যালোচনা',
+    'register.searchResult.results.reviewDuplicates': 'পর্যালোচনা',
     'register.workQueue.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'review.edit.modal.preview': 'প্রিভিউতে ফেরত যান',
     'review.edit.modal.editButton': 'সম্পাদন',
