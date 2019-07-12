@@ -5,7 +5,11 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
-import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
+import {
+  EventTopBar,
+  Modal,
+  ResponsiveModal
+} from '@opencrvs/components/lib/interface'
 import {
   BodyContent,
   Container,
@@ -43,8 +47,11 @@ import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge } from 'lodash'
+import {
+  ReviewSection,
+  getErrorsOnFieldsBySection
+} from '@register/views/RegisterForm/review/ReviewSection'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
@@ -168,6 +175,12 @@ export const messages: {
   backToReviewButton: {
     id: 'register.selectVitalEvent.backToReviewButton',
     defaultMessage: 'Back to review'
+  },
+  submitDescriptionUponCompletion: {
+    id: 'register.form.modal.submitDescUponCompletion',
+    defaultMessage:
+      '{isComplete, select, true {Have you checked the details you are providing are correct?} false {Have you checked with the applicant all the information are correct?}}',
+    description: 'Submit description text on submit modal when form is complete'
   }
 })
 
@@ -394,6 +407,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     let activeSection: IFormSection = this.props.activeSection
 
+    const errorsOnFields = getErrorsOnFieldsBySection(
+      registerForm.sections,
+      application
+    )
+    const isComplete =
+      flatten(
+        // @ts-ignore
+        Object.values(errorsOnFields).map(Object.values)
+        // @ts-ignore
+      ).filter(errors => errors.length > 0).length === 0
+
     if (activeSection.viewType === 'hidden') {
       const nextSec = getNextSection(registerForm.sections, activeSection)
       if (nextSec) {
@@ -556,45 +580,43 @@ class RegisterFormView extends React.Component<FullProps, State> {
           </>
         )}
 
-        {this.state.showSubmitModal && (
-          <Modal
-            title={intl.formatMessage(messages.submitConfirmation)}
-            actions={[
-              <ConfirmBtn
-                key="submit"
-                id="submit_confirm"
-                onClick={() =>
-                  this.confirmSubmission(
-                    application,
-                    SUBMISSION_STATUS.READY_TO_SUBMIT,
-                    Action.SUBMIT_FOR_REVIEW
-                  )
+        <ResponsiveModal
+          title={intl.formatMessage(messages.submitConfirmation)}
+          contentHeight={96}
+          actions={[
+            <TertiaryButton
+              id="cancel-btn"
+              key="cancel"
+              onClick={() => {
+                this.toggleSubmitModalOpen()
+                if (document.documentElement) {
+                  document.documentElement.scrollTop = 0
                 }
-              >
-                <>
-                  <TickLarge />
-                  {intl.formatMessage(messages.submitButton)}
-                </>
-              </ConfirmBtn>,
-              <CancelButton
-                id="cancel-btn"
-                key="cancel"
-                onClick={() => {
-                  this.toggleSubmitModalOpen()
-                  if (document.documentElement) {
-                    document.documentElement.scrollTop = 0
-                  }
-                }}
-              >
-                {intl.formatMessage(messages.cancel)}
-              </CancelButton>
-            ]}
-            show={this.state.showSubmitModal}
-            handleClose={this.toggleSubmitModalOpen}
-          >
-            {intl.formatMessage(messages.submitDescription)}
-          </Modal>
-        )}
+              }}
+            >
+              {intl.formatMessage(messages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              key="submit"
+              id="submit_confirm"
+              onClick={() =>
+                this.confirmSubmission(
+                  application,
+                  SUBMISSION_STATUS.READY_TO_SUBMIT,
+                  Action.SUBMIT_FOR_REVIEW
+                )
+              }
+            >
+              {intl.formatMessage(messages.submitButton)}
+            </PrimaryButton>
+          ]}
+          show={this.state.showSubmitModal}
+          handleClose={this.toggleSubmitModalOpen}
+        >
+          {intl.formatMessage(messages.submitDescriptionUponCompletion, {
+            isComplete
+          })}
+        </ResponsiveModal>
         {this.state.showRegisterModal && (
           <Modal
             title={intl.formatMessage(messages.submitConfirmation)}
