@@ -250,24 +250,9 @@ describe('when user has starts a new application', () => {
         app.update()
       })
       it('changes to the mother details section', () => {
-        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
-          1
-        )
-      })
-    })
-    describe('when user clicks "next" button', () => {
-      beforeEach(async () => {
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-      })
-      it('changes to the mother details section', () => {
-        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
-          1
-        )
+        expect(
+          app.find('#form_section_title_mother-view-group').hostNodes()
+        ).toHaveLength(1)
       })
     })
     describe('when user clicks the "father" page', () => {
@@ -286,9 +271,9 @@ describe('when user has starts a new application', () => {
         app.update()
       })
       it('changes to the father details section', () => {
-        expect(app.find('#form_section_title_father').hostNodes()).toHaveLength(
-          1
-        )
+        expect(
+          app.find('#form_section_title_father-view-group').hostNodes()
+        ).toHaveLength(1)
       })
     })
     describe('when user is in document page', () => {

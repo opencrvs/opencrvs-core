@@ -26,7 +26,8 @@ import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
-  HOME
+  HOME,
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
@@ -175,7 +176,7 @@ describe('when user is in the register form before initial draft load', () => {
           application={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: '', pageId: '' },
+            params: { applicationId: '', pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -211,9 +212,13 @@ describe('when user is in the register form for birth event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
+          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
           match={{
-            params: { applicationId: draft.id, pageId: 'mother' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'mother',
+              groupId: 'mother-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -225,7 +230,7 @@ describe('when user is in the register form for birth event', async () => {
     })
     it('renders the page', () => {
       expect(
-        component.find('#form_section_title_mother').hostNodes()
+        component.find('#form_section_title_mother-view-group').hostNodes()
       ).toHaveLength(1)
     })
     it('changes the country select', async () => {
@@ -281,13 +286,17 @@ describe('when user is in the register form for death event', async () => {
     })
     it('renders the optional label', () => {
       expect(
-        component.find('#form_section_opt_label_causeOfDeath').hostNodes()
+        component
+          .find('#form_section_opt_label_causeOfDeath-view-group')
+          .hostNodes()
       ).toHaveLength(1)
     })
 
     it('renders the notice component', () => {
       expect(
-        component.find('#form_section_notice_causeOfDeath').hostNodes()
+        component
+          .find('#form_section_notice_causeOfDeath-view-group')
+          .hostNodes()
       ).toHaveLength(1)
     })
   })
@@ -1009,53 +1018,6 @@ describe('when user is in the register form review section', () => {
     expect(
       component.find('#reject-registration-form-container').hostNodes()
     ).toHaveLength(1)
-  })
-})
-
-describe('when user is in the register form for death event', async () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
-  let component: ReactWrapper<{}, {}>
-
-  const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())[Event.DEATH]
-
-  describe('when user is in optional cause of death section', () => {
-    beforeEach(async () => {
-      const testComponent = createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          scope={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          application={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: { applicationId: draft.id, pageId: 'causeOfDeath' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      component = testComponent.component
-    })
-    it('renders the optional label', () => {
-      expect(
-        component.find('#form_section_opt_label_causeOfDeath').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('renders the notice component', () => {
-      expect(
-        component.find('#form_section_notice_causeOfDeath').hostNodes()
-      ).toHaveLength(1)
-    })
   })
 })
 

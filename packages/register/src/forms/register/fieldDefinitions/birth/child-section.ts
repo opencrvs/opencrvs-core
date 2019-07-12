@@ -244,7 +244,7 @@ export const childSection: IFormSection = {
   title: messages.childTitle,
   groups: [
     {
-      id: 'child-group',
+      id: 'child-view-group',
       fields: [
         {
           name: 'firstNames',

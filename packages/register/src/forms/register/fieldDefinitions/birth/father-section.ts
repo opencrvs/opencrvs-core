@@ -213,7 +213,7 @@ export const fatherSection: IFormSection = {
   title: messages.fatherTitle,
   groups: [
     {
-      id: 'father-group',
+      id: 'father-view-group',
       fields: [
         {
           name: 'fathersDetailsExist',

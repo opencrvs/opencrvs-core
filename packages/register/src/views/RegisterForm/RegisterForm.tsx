@@ -260,7 +260,7 @@ export type FullProps = IFormProps &
   DispatchProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
     pageId: string
-    groupId: string
+    groupId?: string
     applicationId: string
   }>
 
@@ -678,7 +678,7 @@ function mapStateToProps(
     Props &
     RouteComponentProps<{
       pageId: string
-      groupId: string
+      groupId?: string
       applicationId: string
     }>
 ) {
