@@ -496,6 +496,7 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.isValidBirthDate': 'Must be a valid birth date',
     'validations.requiredSymbol': '',
     'register.form.submit': 'SEND FOR REVIEW',
+    'register.form.submitIncomplete': 'Send incomplete application',
     'register.form.informationMissing': 'Information missing',
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
@@ -538,6 +539,8 @@ export const ENGLISH_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'Are you ready to submit?',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
+    'register.form.modal.submitDescUponCompletion':
+      '{isComplete, select, true {Have you checked the details you are providing are correct?} false {Have you checked with the applicant all the information are correct?}}',
     'register.form.modal.submitButton': 'Submit',
     'register.home.header.fieldAgent': 'Field Agent',
     'register.home.header.registrationClerk': 'Registration Clerk',
@@ -821,6 +824,12 @@ export const ENGLISH_STATE: ILanguage = {
     'review.header.subject.subjectWitName':
       '{eventType, select, birth {Birth} death {Death}} Application for {name}',
     'review.inputs.additionalComments': 'Any additional comments?',
+    'review.actions.title.applicationStatus':
+      'Application is {isComplete, select, true {complete} false {incomplete}}',
+    'review.actions.description.confirmInComplete':
+      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered',
+    'review.actions.description.confirmComplete':
+      'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
     'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
