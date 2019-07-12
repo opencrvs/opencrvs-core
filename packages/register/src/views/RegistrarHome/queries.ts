@@ -31,6 +31,7 @@ export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
     ) {
       totalItems
       results {
+        id
         registration {
           type
           status {
@@ -52,7 +53,7 @@ export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
               familyName
             }
           }
-          updatedAt
+          createdAt
         }
         ... on DeathRegistration {
           deceased {
@@ -62,7 +63,7 @@ export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
               familyName
             }
           }
-          updatedAt
+          createdAt
         }
       }
     }
