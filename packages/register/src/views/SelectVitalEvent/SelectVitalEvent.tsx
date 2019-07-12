@@ -16,7 +16,7 @@ import { Event } from '@register/forms'
 import {
   goBack,
   goToBirthInformant,
-  goToDeathRegistration,
+  goToDeathInformant,
   goToHome
 } from '@register/navigation'
 
@@ -72,7 +72,7 @@ class SelectVitalEventView extends React.Component<
     goToHome: typeof goToHome
     storeApplication: typeof storeApplication
     goToBirthInformant: typeof goToBirthInformant
-    goToDeathRegistration: typeof goToDeathRegistration
+    goToDeathInformant: typeof goToDeathInformant
     setInitialApplications: typeof setInitialApplications
   }
 > {
@@ -91,7 +91,7 @@ class SelectVitalEventView extends React.Component<
       case 'death':
         application = createApplication(Event.DEATH)
         this.props.storeApplication(application)
-        this.props.goToDeathRegistration(application.id)
+        this.props.goToDeathInformant(application.id)
         break
       default:
         this.setState({ goTo: 'error' })
@@ -149,7 +149,7 @@ export const SelectVitalEvent = connect(
     goToHome,
     storeApplication,
     goToBirthInformant,
-    goToDeathRegistration,
+    goToDeathInformant,
     setInitialApplications
   }
 )(injectIntl(SelectVitalEventView))

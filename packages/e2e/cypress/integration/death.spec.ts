@@ -19,6 +19,13 @@ context('Death Registration Integration Test', () => {
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
+    cy.get('#select_informant_SON').click()
+    cy.get('#continue').click()
+
+    // SELECT MAIN CONTACT POINT
+    cy.get('#contact_SON').click()
+    cy.get('#phone_number_input').type('01526972106')
+    cy.get('#continue').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No ID available', 'No ID available')
     cy.get('#familyName').type('খান')
@@ -89,6 +96,13 @@ context('Death Registration Integration Test', () => {
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
+    cy.get('#continue').click()
+    cy.get('#select_informant_SON').click()
+    cy.get('#continue').click()
+
+    // SELECT MAIN CONTACT POINT
+    cy.get('#contact_SON').click()
+    cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National ID', 'National ID')

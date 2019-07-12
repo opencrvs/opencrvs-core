@@ -501,15 +501,24 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.selectInformant.newBirthRegistration': 'New birth application',
-    'register.selectInformant.informantTitle':
+    'register.selectInformant.birthInformantTitle':
       'Who is applying for birth registration?',
+    'register.selectInformant.deathInformantTitle':
+      'What relationship does the applicant have to the deceased?',
     'register.selectInformant.mother': 'Mother',
     'register.selectInformant.father': 'Father',
     'register.selectInformant.parents': 'Mother & Father',
     'register.selectInformant.someoneElse': 'Someone Else',
     'register.selectInformant.self': 'Self',
-    'register.selectInformant.errorMessage':
+    'register.selectInformant.spouse': 'Spouse',
+    'register.selectInformant.son': 'Son',
+    'register.selectInformant.daughter': 'Daughter',
+    'register.selectInformant.extendedFamily': 'Extended family',
+    'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying',
+    'register.selectInformant.deathErrorMessage':
+      'Please select the relationship to the deceased and any relevant contact details.',
+    'register.selectInformant.relationshipLabel': 'Relationship to deceased',
     'register.primaryApplicant.registerNewEventHeading':
       'Who is the primary applicant for this application?',
     'register.primaryApplicant.description':
@@ -1185,12 +1194,18 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'Father',
     'register.SelectContactPoint.otherLabel': 'Someone else',
     'register.SelectContactPoint.phoneNoLabel': 'Phone number',
-    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.birthRelationshipLabel':
+      'RelationShip to child',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'Back',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
     'register.SelectContactPoint.error':
       'Please select a main point of contact',
+    'register.SelectContactPoint.spouse': 'Spouse',
+    'register.SelectContactPoint.son': 'Son',
+    'register.SelectContactPoint.daughter': 'Daughter',
+    'register.SelectContactPoint.extendedFamily': 'Extended family',
     'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }
 }
