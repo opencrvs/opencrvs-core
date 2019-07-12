@@ -805,6 +805,13 @@ export const ENGLISH_STATE: ILanguage = {
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
     'review.form.deleteApplication': 'Delete Application',
+    'review.header.title.govtName.bgd':
+      'Government of the peoples republic of Bangladesh',
+    'review.header.subject.subjectWithoutName':
+      '{eventType, select, birth {Birth} death {Death}} Application',
+    'review.header.subject.subjectWitName':
+      '{eventType, select, birth {Birth} death {Death}} Application for {name}',
+    'review.inputs.additionalComments': 'Any additional comments?',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
     'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
@@ -1182,6 +1189,8 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.goBack': 'Back',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
-    'register.SelectContactPoint.error': 'Please select a main point of contact'
+    'register.SelectContactPoint.error':
+      'Please select a main point of contact',
+    'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }
 }

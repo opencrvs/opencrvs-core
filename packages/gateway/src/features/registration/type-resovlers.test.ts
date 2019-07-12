@@ -107,6 +107,18 @@ describe('Registration type resolvers', () => {
 
     expect(patient).toBeNull()
   })
+  it('returns informant', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
+
+    // @ts-ignore
+    const informant = await typeResolvers.BirthRegistration.informant(
+      mockComposition
+    )
+    expect(informant).toBeDefined()
+    expect(informant.resource.resourceType).toEqual('RelatedPerson')
+    expect(informant.resource.relationship.coding[0].code).toEqual('OTHER')
+    expect(informant.resource.relationship.text).toEqual('Nephew')
+  })
   it('returns id from identifier', () => {
     const id = typeResolvers.IdentityType.id({
       value: '123456789',
@@ -551,6 +563,13 @@ describe('Registration type resolvers', () => {
         section: []
       })
       expect(child).toEqual(null)
+    })
+    it('returns informant null', async () => {
+      // @ts-ignore
+      const informant = await typeResolvers.BirthRegistration.informant({
+        section: []
+      })
+      expect(informant).toEqual(null)
     })
     it('returns weight At birth null', async () => {
       // @ts-ignore
