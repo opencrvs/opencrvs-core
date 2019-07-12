@@ -31,6 +31,7 @@ export interface IDocumentViewerOptions {
 }
 
 interface IProps {
+  id?: string
   options: IDocumentViewerOptions
 }
 
@@ -56,11 +57,11 @@ export class DocumentViewer extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { options, children } = this.props
+    const { options, children, id } = this.props
 
     return (
       <Sticky enabled={true} top="#form_tabs_container">
-        <Container id="test_id">
+        <Container id={id}>
           {options.documentOptions.length > 0 && (
             <>
               <Select

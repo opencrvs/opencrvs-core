@@ -18,23 +18,24 @@ import {
   modifyApplication
 } from '@register/applications'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
-import { Event } from '@register/forms'
+import { Event as ApplicationEvent } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import { REJECTED } from '@register/utils/constants'
+import { async } from 'q'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
-const draft = createApplication(Event.BIRTH)
+const draft = createApplication(ApplicationEvent.BIRTH)
 const rejectedDraftBirth = createReviewApplication(
   uuid(),
   {},
-  Event.BIRTH,
+  ApplicationEvent.BIRTH,
   REJECTED
 )
 const rejectedDraftDeath = createReviewApplication(
   uuid(),
   {},
-  Event.DEATH,
+  ApplicationEvent.DEATH,
   REJECTED
 )
 
@@ -73,6 +74,16 @@ describe('when user is in the review page', () => {
         .hostNodes()
         .simulate('click')
       reviewSectionComponent.update()
+    })
+
+    it('Goes to child document while scroll to child section', async () => {
+      window.dispatchEvent(new Event('scroll'))
+      await flushPromises()
+      reviewSectionComponent.update()
+
+      expect(
+        reviewSectionComponent.find('#document_section_child').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('edit dialog should show up', () => {
