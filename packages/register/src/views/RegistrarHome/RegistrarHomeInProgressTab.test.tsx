@@ -358,12 +358,10 @@ describe('RegistrarHome In Progress tab related tests', () => {
     })
     testComponent.component.update()
     expect(
-      testComponent.component
-        .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Update')
-        .hostNodes()
+      testComponent.component.find('#ListItemAction-0-Update').hostNodes()
     ).toHaveLength(1)
     testComponent.component
-      .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Update')
+      .find('#ListItemAction-0-Update')
       .hostNodes()
       .simulate('click')
 
