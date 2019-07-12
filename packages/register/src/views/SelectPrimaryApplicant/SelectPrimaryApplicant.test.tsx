@@ -62,6 +62,7 @@ describe('when user is selecting the vital event', () => {
       history.replace(
         SELECT_PRIMARY_APPLICANT.replace(':applicationId', draft.id)
       )
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')
