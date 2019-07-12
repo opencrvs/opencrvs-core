@@ -152,7 +152,7 @@ export class GridTable extends React.Component<
               this.state.expanded.findIndex(id => id === itemId) >= 0 || false
             }
             arrowExpansion={true}
-            id={`ListItemAction-${itemId}`}
+            id={`ListItemAction-${key}`}
             onExpand={() => this.toggleExpanded(itemId)}
           />
         </ActionWrapper>
@@ -160,7 +160,7 @@ export class GridTable extends React.Component<
     } else {
       return (
         <ActionWrapper key={key} width={width} alignment={alignment}>
-          <ListItemAction id={`ListItemAction-${itemId}`} actions={actions} />
+          <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
         </ActionWrapper>
       )
     }
@@ -264,7 +264,7 @@ export class GridTable extends React.Component<
                         item.id as string,
                         item[preference.key] as IAction[],
                         preference.width,
-                        indx,
+                        index,
                         preference.alignment
                       )
                     } else {
