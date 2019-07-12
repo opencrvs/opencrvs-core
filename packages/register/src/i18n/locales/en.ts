@@ -1246,6 +1246,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.extendedFamily': 'Extended family',
     'register.selectVitalEvent.backToReviewButton': 'Back to review',
     'tab.inProgress.selector.own.drafts': 'Yours',
-    'tab.inProgress.selector.field.agents': 'Field agents'
+    'tab.inProgress.selector.field.agents': 'Field agents',
+    'column.name.error.value': 'No name provided'
   }
 }

@@ -202,6 +202,11 @@ const messages: {
     id: 'register.registrarHome.printButton',
     defaultMessage: 'Print',
     description: 'The title of print button in list item actions'
+  },
+  nameColumnErrorValue: {
+    id: 'column.name.error.value',
+    defaultMessage: 'No name provided',
+    description: 'Text to display if the name column has no value provided'
   }
 })
 
@@ -519,24 +524,22 @@ export class InProgressTabComponent extends React.Component<
             content={this.transformDraftContent()}
             columns={[
               {
-                label: this.props.intl.formatMessage(messages.listItemType),
+                label: intl.formatMessage(messages.listItemType),
                 width: 15,
                 key: 'event'
               },
               {
-                label: this.props.intl.formatMessage(messages.listItemName),
+                label: intl.formatMessage(messages.listItemName),
                 width: 35,
                 key: 'name'
               },
               {
-                label: this.props.intl.formatMessage(
-                  messages.listItemModificationDate
-                ),
+                label: intl.formatMessage(messages.listItemModificationDate),
                 width: 35,
                 key: 'dateOfModification'
               },
               {
-                label: this.props.intl.formatMessage(messages.listItemAction),
+                label: intl.formatMessage(messages.listItemAction),
                 width: 15,
                 key: 'actions',
                 isActionColumn: true,
@@ -595,28 +598,27 @@ export class InProgressTabComponent extends React.Component<
                   content={this.transformRemoteDraftsContent(data)}
                   columns={[
                     {
-                      label: this.props.intl.formatMessage(
-                        messages.listItemType
-                      ),
+                      label: intl.formatMessage(messages.listItemType),
                       width: 15,
                       key: 'event'
                     },
                     {
-                      label: this.props.intl.formatMessage(
-                        messages.listItemName
-                      ),
+                      label: intl.formatMessage(messages.listItemName),
                       width: 30,
-                      key: 'name'
+                      key: 'name',
+                      errorValue: intl.formatMessage(
+                        messages.nameColumnErrorValue
+                      )
                     },
                     {
-                      label: this.props.intl.formatMessage(
+                      label: intl.formatMessage(
                         messages.listItemModificationDate
                       ),
                       width: 20,
                       key: 'dateOfModification'
                     },
                     {
-                      label: this.props.intl.formatMessage(
+                      label: intl.formatMessage(
                         messages.listItemTrackingNumber
                       ),
                       width: 15,
