@@ -4,26 +4,18 @@ services:
   mongo1:
     image: mongo:3.6
     restart: unless-stopped
-    networks:
-      - overlay_net
 
   redis:
     image: redis:5
     restart: unless-stopped
-    networks:
-      - overlay_net
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
     restart: unless-stopped
-    networks:
-      - overlay_net
 
   influxdb:
     image: influxdb:1.7
     restart: unless-stopped
-    networks:
-      - overlay_net
 
   hearth:
     image: jembi/hearth:v1.0.0-beta.1
@@ -36,8 +28,6 @@ services:
     depends_on:
       - mongo1
     restart: unless-stopped
-    networks:
-      - overlay_net
 
   openhim-core:
     image: jembi/openhim-core:5
@@ -48,16 +38,7 @@ services:
     depends_on:
       - mongo1
     restart: unless-stopped
-    networks:
-      - overlay_net
 
   openhim-console:
     image: jembi/openhim-console:1.13
     restart: unless-stopped
-    networks:
-      - overlay_net
-
-networks:
-  overlay_net:
-    driver: overlay
-    attachable: true

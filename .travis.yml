@@ -11,12 +11,12 @@ jobs:
       addons:
         apt:
           packages:
-          - libgconf-2-4
+            - libgconf-2-4
       script:
         - yarn global add wait-on
         - yarn dev:secrets:gen
         - docker swarm init
-        - yarn compose -d
+        - yarn compose:deps -d
         - sleep 10
         - yarn start:prod &
         - wait-on http://localhost:3000 http://localhost:3020
@@ -55,7 +55,7 @@ jobs:
       addons:
         apt:
           packages:
-          - libgconf-2-4
+            - libgconf-2-4
       script: cd packages/e2e && yarn && yarn start --record false
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
