@@ -242,6 +242,7 @@ export const childSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.childTab,
   title: messages.childTitle,
+  hasDocumentSection: true,
   fields: [
     {
       name: 'firstNames',

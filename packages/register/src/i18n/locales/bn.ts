@@ -1190,7 +1190,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
     'review.documents.zeroDocumentsText':
-      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} জন্য কোন সমর্থিত নথি নেই  }',
+      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
     'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
     'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
   }

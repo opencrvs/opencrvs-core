@@ -1192,7 +1192,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.error':
       'Please select a main point of contact',
     'review.documents.zeroDocumentsText':
-      'No supporting documents for {section, select, child {child} mother {mother} father {father}}',
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
     'review.documents.editDocuments': 'Add attachement',
     'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }

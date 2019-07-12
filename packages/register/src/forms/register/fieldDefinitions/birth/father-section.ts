@@ -211,6 +211,7 @@ export const fatherSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.fatherTab,
   title: messages.fatherTitle,
+  hasDocumentSection: true,
   fields: [
     {
       name: 'fathersDetailsExist',

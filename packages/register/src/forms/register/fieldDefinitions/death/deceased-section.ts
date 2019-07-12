@@ -193,6 +193,7 @@ export const deceasedSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.deceasedTab,
   title: messages.deceasedTitle,
+  hasDocumentSection: true,
   fields: [
     {
       name: 'iDType',

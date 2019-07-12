@@ -160,7 +160,7 @@ const messages: {
   zeroDocumentsText: {
     id: 'review.documents.zeroDocumentsText',
     defaultMessage:
-      'No supporting documents for {section, select, child {child} mother {mother} father {father}}',
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
     description: 'Zero documents text'
   },
   editDocuments: {
@@ -325,7 +325,7 @@ const getViewableSection = (registerForm: IForm): IFormSection[] => {
 
 const getDocumentSections = (registerForm: IForm): IFormSection[] => {
   return registerForm.sections.filter(
-    ({ id, viewType }) => id !== 'documents' && viewType === 'form'
+    ({ hasDocumentSection }) => hasDocumentSection
   )
 }
 
@@ -529,9 +529,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
         : []
 
-    uploadedDocuments = uploadedDocuments.filter(
-      document => document.title.toUpperCase() === activeSection.toUpperCase()
-    )
+    uploadedDocuments = uploadedDocuments.filter(document => {
+      return document.title.toUpperCase() === activeSection.toUpperCase()
+    })
 
     uploadedDocuments.forEach(document => {
       const label = document.title + ' ' + document.description

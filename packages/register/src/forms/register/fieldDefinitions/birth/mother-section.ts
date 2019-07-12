@@ -190,6 +190,7 @@ export const motherSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.motherTab,
   title: messages.motherTitle,
+  hasDocumentSection: true,
   fields: [
     {
       name: 'iDType',
