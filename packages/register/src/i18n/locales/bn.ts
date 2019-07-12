@@ -588,15 +588,15 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectInformant.parents': 'পিতা ও মাতা ',
     'register.selectInformant.someoneElse': 'অন্য কেউ',
     'register.selectInformant.self': 'নিজের',
-    'register.selectInformant.spouse': 'Spouse',
-    'register.selectInformant.son': 'Son',
-    'register.selectInformant.daughter': 'Daughter',
-    'register.selectInformant.extendedFamily': 'Extended family',
+    'register.selectInformant.spouse': 'স্বামী বা স্ত্রী',
+    'register.selectInformant.son': 'পুত্র',
+    'register.selectInformant.daughter': 'কন্যা',
+    'register.selectInformant.extendedFamily': 'যৌথ পরিবার',
     'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying.',
     'register.selectInformant.deathErrorMessage':
       'Please select the relationship to the deceased and any relevant contact details.',
-    'register.selectInformant.relationshipLabel': 'Relationship to deceased',
+    'register.selectInformant.relationshipLabel': 'মৃত ব্যক্তি সঙ্গে সম্পর্ক',
     'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
     'register.selectVitalEvent.registerNewEventHeading':
       'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
@@ -812,6 +812,12 @@ export const BENGALI_STATE: ILanguage = {
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.form.deleteApplication': 'আবেদন বাতিল',
+    'review.header.title.govtName.bgd': 'গণপ্রজাতন্ত্রী বাংলাদেশ সরকার',
+    'review.header.subject.subjectWithoutName':
+      '{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
+    'review.header.subject.subjectWitName':
+      '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
+    'review.inputs.additionalComments': 'কোন মন্তব্য?',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
     'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
@@ -1193,9 +1199,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
-    'register.SelectContactPoint.spouse': 'Spouse',
-    'register.SelectContactPoint.son': 'Son',
-    'register.SelectContactPoint.daughter': 'Daughter',
-    'register.SelectContactPoint.extendedFamily': 'Extended family'
+    'register.SelectContactPoint.spouse': 'স্বামী বা স্ত্রী',
+    'register.SelectContactPoint.son': 'পুত্র',
+    'register.SelectContactPoint.daughter': 'কন্যা',
+    'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
+    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
   }
 }

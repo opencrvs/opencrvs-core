@@ -70,11 +70,6 @@ const messages = {
   }
 }
 
-// Might add a size prop to our Spinner lib component
-const SmallSpinner = styled(Spinner)`
-  width: 24px;
-  height: 24px;
-`
 interface ISentForReviewProps {
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
@@ -118,7 +113,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     switch (status) {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
         iconId = `submitting${index}`
-        icon = () => <SmallSpinner id={iconId} key={iconId} />
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusSubmitting)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:

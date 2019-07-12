@@ -1,11 +1,16 @@
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
-  TertiaryButton
+  TertiaryButton,
+  LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
 import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import {
+  BodyContent,
+  Container,
+  FullBodyContent
+} from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -67,6 +72,9 @@ const CancelButton = styled.a`
   text-decoration: underline;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.primary};
+`
+const StyledLinkButton = styled(LinkButton)`
+  margin-left: 32px;
 `
 
 export const messages: {
@@ -156,6 +164,10 @@ export const messages: {
     id: 'register.selectVitalEvent.saveExitButton',
     defaultMessage: 'SAVE & EXIT',
     description: 'SAVE & EXIT Button Text'
+  },
+  backToReviewButton: {
+    id: 'register.selectVitalEvent.backToReviewButton',
+    defaultMessage: 'Back to review'
   }
 })
 
@@ -380,7 +392,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicate
     } = this.props
 
-    const isReviewForm = application.review
     let activeSection: IFormSection = this.props.activeSection
 
     if (activeSection.viewType === 'hidden') {
@@ -391,11 +402,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     const nextSection = getNextSection(registerForm.sections, activeSection)
-    const title = isReviewForm
-      ? messages.reviewEventRegistration
-      : activeSection.viewType === VIEW_TYPE.PREVIEW
-      ? messages.previewEventRegistration
-      : messages.newVitalEventRegistration
+    const title =
+      activeSection.viewType === VIEW_TYPE.REVIEW
+        ? messages.reviewEventRegistration
+        : activeSection.viewType === VIEW_TYPE.PREVIEW
+        ? messages.previewEventRegistration
+        : messages.newVitalEventRegistration
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -425,15 +437,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 }
               ]}
             />
-            <BodyContent>
-              <TertiaryButton
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <BackArrow />}
-                onClick={this.props.goBack}
-              >
-                {intl.formatMessage(messages.back)}
-              </TertiaryButton>
-              {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+
+            {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+              <FullBodyContent>
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={application}
@@ -444,8 +450,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     history.push('/')
                   }}
                 />
-              )}
-              {activeSection.viewType === VIEW_TYPE.REVIEW && (
+              </FullBodyContent>
+            )}
+            {activeSection.viewType === VIEW_TYPE.REVIEW && (
+              <FullBodyContent>
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={application}
@@ -454,9 +462,19 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   }}
                   registerClickEvent={this.registerApplication}
                 />
-              )}
-              {activeSection.viewType === 'form' && (
-                <>
+              </FullBodyContent>
+            )}
+
+            {activeSection.viewType === 'form' && (
+              <>
+                <BodyContent>
+                  <TertiaryButton
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <BackArrow />}
+                    onClick={this.props.goBack}
+                  >
+                    {intl.formatMessage(messages.back)}
+                  </TertiaryButton>
                   <FormSectionTitle
                     id={`form_section_title_${activeSection.id}`}
                   >
@@ -510,11 +528,31 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       >
                         {intl.formatMessage(messages.continueButton)}
                       </PrimaryButton>
+                      {application.review && (
+                        <StyledLinkButton
+                          id="back-to-review-button"
+                          className="item"
+                          onClick={() => {
+                            this.continueButtonHandler(
+                              this.props.pageRoute,
+                              application.id,
+                              application.submissionStatus &&
+                                application.submissionStatus ===
+                                  SUBMISSION_STATUS.DRAFT
+                                ? 'preview'
+                                : 'review',
+                              application.event.toLowerCase()
+                            )
+                          }}
+                        >
+                          {intl.formatMessage(messages.backToReviewButton)}
+                        </StyledLinkButton>
+                      )}
                     </FooterArea>
                   )}
-                </>
-              )}
-            </BodyContent>
+                </BodyContent>
+              </>
+            )}
           </>
         )}
 
