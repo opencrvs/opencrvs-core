@@ -1188,6 +1188,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
-      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
   }
 }

@@ -240,6 +240,59 @@ describe('when user has starts a new application', () => {
       })
     })
 
+    describe('when user goes to preview page', () => {
+      beforeEach(async () => {
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#btn_change_child_firstNames')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#edit_confirm')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+      })
+
+      it('renders preview page', async () => {
+        app
+          .find('#back-to-review-button')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(
+          app.find('#btn_change_child_firstNames').hostNodes()
+        ).toHaveLength(1)
+      })
+    })
+
     describe('when user clicks the "mother" page', () => {
       beforeEach(async () => {
         app
