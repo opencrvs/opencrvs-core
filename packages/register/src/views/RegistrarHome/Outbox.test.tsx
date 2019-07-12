@@ -8,7 +8,7 @@ import {
 } from '@register/tests/util'
 import { createStore } from '@register/store'
 
-describe('OutBox test', () => {
+describe('OutBox tests', () => {
   const birthApp = {
     id: '10b7ccca-e1b9-4d14-a735-4bb7964a3ed9',
     data: {
@@ -105,7 +105,7 @@ describe('OutBox test', () => {
     modifiedOn: 1562846292423,
     action: 'submit for review'
   }
-  const applications: IApplication[] = []
+
   const statuses = [
     'READY_TO_SUBMIT',
     'SUBMITTING',
@@ -122,44 +122,179 @@ describe('OutBox test', () => {
     'Rejecting...',
     'Waiting to retry'
   ]
-
-  statuses.map(status =>
-    applications.push({
-      ...birthApp,
-      submissionStatus: status
-    })
-  )
-
-  statuses.map(status =>
-    applications.push({
-      ...deathApp,
-      submissionStatus: status
-    })
-  )
-
   const { store } = createStore()
-  const comp = createTestComponent(<OutBox application={applications} />, store)
-  const testComp = comp.component
-  it('renders texts in data rows for birth applications', () => {
-    const birthValues = ['Birth', 'Eoin Morgan']
-    for (let i = 0; i < 6; i++) {
+
+  describe('When all the fields are fully provided', () => {
+    it('renders texts in data rows for birth applications', () => {
+      const applications: IApplication[] = []
+      statuses.map(status =>
+        applications.push({
+          ...birthApp,
+          submissionStatus: status
+        })
+      )
+      const comp = createTestComponent(
+        <OutBox application={applications} />,
+        store
+      )
+      const testComp = comp.component
+      for (let i = 0; i < 6; i++) {
+        testComp
+          .find(`#row_${i}`)
+          .find('span')
+          .map((span, index) =>
+            expect(span.text()).toBe(
+              ['Birth', 'Eoin Morgan', messages[i], ''][index]
+            )
+          )
+      }
+      testComp.unmount()
+    })
+
+    it('renders texts in data rows for death applications', () => {
+      const applications: IApplication[] = []
+      statuses.map(status =>
+        applications.push({
+          ...deathApp,
+          submissionStatus: status
+        })
+      )
+      const comp = createTestComponent(
+        <OutBox application={applications} />,
+        store
+      )
+      const testComp = comp.component
+      for (let i = 0; i < 6; i++) {
+        testComp
+          .find(`#row_${i}`)
+          .find('span')
+          .map((span, index) =>
+            expect(span.text()).toBe(
+              ['Death', 'Aaron Finch', messages[i], ''][index]
+            )
+          )
+      }
+      testComp.unmount()
+    })
+    it('shows "Waiting to register" if no status is provided', () => {
+      const applications: IApplication[] = []
+      applications.push({
+        ...deathApp,
+        submissionStatus: ''
+      })
+
+      const comp = createTestComponent(
+        <OutBox application={applications} />,
+        store
+      )
+      const testComp = comp.component
       testComp
-        .find(`#row_${i}`)
+        .find(`#row_0`)
         .find('span')
         .map((span, index) =>
-          expect(span.text()).toBe([...birthValues, messages[i], ''][index])
+          expect(span.text()).toBe(
+            ['Death', 'Aaron Finch', 'Waiting to register', ''][index]
+          )
         )
-    }
+
+      testComp.unmount()
+    })
   })
-  it('renders texts in data rows for death applications', () => {
-    const deathValues = ['Death', 'Aaron Finch']
-    for (let i = 0; i < 6; i++) {
+
+  describe('When a part of the name or the whole name is missing', () => {
+    it('displays only the last name if there is no first name', () => {
+      const noFirstNameBirthApp = birthApp
+      noFirstNameBirthApp.data.child.firstNamesEng = ''
+      const comp = createTestComponent(
+        <OutBox application={[noFirstNameBirthApp]} />,
+        store
+      )
+      const testComp = comp.component
       testComp
-        .find(`#row_${i + 6}`)
+        .find('#row_0')
         .find('span')
         .map((span, index) =>
-          expect(span.text()).toBe([...deathValues, messages[i], ''][index])
+          expect(span.text()).toBe(
+            ['Birth', 'Morgan', 'Waiting to submit', ''][index]
+          )
         )
-    }
+      testComp.unmount()
+    })
+
+    it('displays only the first name if there is no last name', () => {
+      const noLastNameDeathApp = deathApp
+      noLastNameDeathApp.data.deceased.familyNameEng = ''
+      const comp = createTestComponent(
+        <OutBox application={[noLastNameDeathApp]} />,
+        store
+      )
+      const testComp = comp.component
+      testComp
+        .find('#row_1')
+        .find('span')
+        .map((span, index) =>
+          expect(span.text()).toBe(
+            ['Death', 'Finch', 'Waiting to submit', ''][index]
+          )
+        )
+      testComp.unmount()
+    })
+    it('displays empty string if there is no name', () => {
+      const noNameBirthApp = birthApp
+      noNameBirthApp.data.child.firstNamesEng = ''
+      noNameBirthApp.data.child.familyNameEng = ''
+
+      const comp = createTestComponent(
+        <OutBox application={[noNameBirthApp]} />,
+        store
+      )
+      const testComp = comp.component
+      testComp
+        .find('#row_1')
+        .find('span')
+        .map((span, index) =>
+          expect(span.text()).toBe(
+            ['Birth', '', 'Waiting to submit', ''][index]
+          )
+        )
+      testComp.unmount()
+    })
+    it('displays empty div if there is no application', () => {
+      // const incompleteBirthApp = {
+      //   ...birthApp,
+      //   event: Event.BIRTH,
+      //   name: '',
+      //   submissionStatus: '',
+      //   statusIndicator: null
+      // }
+      const comp = createTestComponent(<OutBox application={[]} />, store)
+      const testComp = comp.component
+      // console.log(testComp.debug())
+      expect(testComp.find('#row_0').exists()).toBeFalsy()
+      // testComp
+      //   .find('#row_0')
+      //   .find('span')
+      //   .map((span, index) => expect(span.text()).toBe(['Birth', '', 'Waiting to submit', ''][index]))
+      testComp.unmount()
+    })
+  })
+
+  describe('Pagination test', () => {
+    it('shows pagination bar for more than 10 applications', () => {
+      const applications: IApplication[] = []
+      for (let i = 0; i < 16; i++) {
+        applications.push(birthApp)
+      }
+      const testComp = createTestComponent(
+        <OutBox application={applications} />,
+        store
+      ).component
+      expect(testComp.exists('#pagination')).toBeTruthy()
+      testComp
+        .find('#pagination')
+        .children()
+        .map(child => child.simulate('click'))
+      testComp.unmount()
+    })
   })
 })

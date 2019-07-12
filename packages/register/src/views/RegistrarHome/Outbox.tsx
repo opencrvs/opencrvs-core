@@ -193,7 +193,7 @@ class Outbox extends React.Component<IFullProps, IState> {
       return {
         id: application.id,
         event: (application.event && sentenceCase(application.event)) || '',
-        name: name || '',
+        name,
         submissionStatus: statusText || '',
         statusIndicator: icon ? [icon()] : null
       }
@@ -205,7 +205,7 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, application } = this.props
 
     return (
       <Container>
@@ -240,7 +240,7 @@ class Outbox extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}
-          totalItems={10}
+          totalItems={application.length}
           onPageChange={this.onPageChange}
           pageSize={10}
         />
