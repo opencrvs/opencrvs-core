@@ -74,6 +74,7 @@ import { ReviewHeader } from './ReviewHeader'
 import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
+import { findDOMNode } from 'react-dom'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -481,15 +482,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   )
 
   onScroll = () => {
-    const scrollY = window.scrollY
+    const scrollY = window.scrollY + window.innerHeight / 2
     let minDistance = 100000
-    let sectionY = 0
+    let sectionYTop = 0
+    let sectionYBottom = 0
     let distance = 0
-    let activeSection = ''
-    this.docSections.map((section: IFormSection) => {
-      // @ts-ignore
-      sectionY = document.getElementById('Section_' + section.id).offsetTop
-      distance = Math.abs(sectionY - scrollY)
+    let sectionElement: HTMLElement
+    let activeSection = this.state.activeSection
+
+    const node = findDOMNode(this) as HTMLElement
+
+    this.docSections.forEach((section: IFormSection) => {
+      sectionElement = node.querySelector(
+        '#Section_' + section.id
+      ) as HTMLElement
+      sectionYTop = sectionElement.offsetTop
+      sectionYBottom = sectionElement.offsetTop + sectionElement.offsetHeight
+
+      distance = Math.abs(sectionYTop - scrollY)
+      if (distance < minDistance) {
+        minDistance = distance
+        activeSection = section.id
+      }
+
+      distance = Math.abs(sectionYBottom - scrollY)
       if (distance < minDistance) {
         minDistance = distance
         activeSection = section.id
@@ -517,7 +533,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       document => document.title.toUpperCase() === activeSection.toUpperCase()
     )
 
-    uploadedDocuments.map(document => {
+    uploadedDocuments.forEach(document => {
       const label = document.title + ' ' + document.description
       documentOptions.push({
         value: document.data,
@@ -527,7 +543,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         value: label,
         label
       })
-      return null
     })
 
     return {
@@ -773,6 +788,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               isRegisterScope={this.userHasRegisterScope()}
             >
               <DocumentViewer
+                id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
                 options={this.prepSectionDocuments(
                   draft,
