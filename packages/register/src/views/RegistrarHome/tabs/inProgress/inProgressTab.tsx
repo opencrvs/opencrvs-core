@@ -267,38 +267,9 @@ export class InProgressTabComponent extends React.Component<
         const event =
           reg && reg.registration && (reg.registration.type as string)
         const lastModificationDate = reg && reg.createdAt
+        const trackingId =
+          reg && reg.registration && reg.registration.trackingId
         const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
-
-        const userName: GQLHumanName[] =
-          (reg &&
-            reg.registration &&
-            reg.registration &&
-            reg.registration.status &&
-            ((reg.registration.status as GQLRegWorkflow[])[0]
-              .user as GQLUser) &&
-            (((reg.registration.status as GQLRegWorkflow[])[0].user as GQLUser)
-              .name as GQLHumanName[])) ||
-          []
-        const userRole: string =
-          (reg &&
-            reg.registration &&
-            reg.registration &&
-            reg.registration.status &&
-            ((reg.registration.status as GQLRegWorkflow[])[0]
-              .user as GQLUser) &&
-            (((reg.registration.status as GQLRegWorkflow[])[0].user as GQLUser)
-              .role as string) &&
-            intl.formatMessage(
-              roleMessages[
-                ((reg.registration.status as GQLRegWorkflow[])[0]
-                  .user as GQLUser).role as string
-              ]
-            )) ||
-          ''
-
-        const startedBy = `${(createNamesMap(userName)[locale] as string) ||
-          (createNamesMap(userName)[LANG_EN] as string) ||
-          ''} | ${userRole}`
 
         if (event && event.toLowerCase() === 'birth') {
           birthReg = reg as GQLBirthRegistration
@@ -337,7 +308,7 @@ export class InProgressTabComponent extends React.Component<
             (event && intl.formatMessage(eventMessages[event.toLowerCase()])) ||
             '',
           name,
-          startedBy,
+          trackingId,
           dateOfModification:
             (lastModificationDate && moment(lastModificationDate).fromNow()) ||
             '',
@@ -624,20 +595,32 @@ export class InProgressTabComponent extends React.Component<
                   content={this.transformRemoteDraftsContent(data)}
                   columns={[
                     {
-                      width: 10,
+                      label: this.props.intl.formatMessage(
+                        messages.listItemType
+                      ),
+                      width: 15,
                       key: 'event'
                     },
                     {
-                      width: 20,
+                      label: this.props.intl.formatMessage(
+                        messages.listItemName
+                      ),
+                      width: 30,
                       key: 'name'
                     },
                     {
-                      width: 35,
-                      key: 'startedBy'
+                      label: this.props.intl.formatMessage(
+                        messages.listItemModificationDate
+                      ),
+                      width: 20,
+                      key: 'dateOfModification'
                     },
                     {
+                      label: this.props.intl.formatMessage(
+                        messages.listItemTrackingNumber
+                      ),
                       width: 15,
-                      key: 'dateOfModification'
+                      key: 'trackingId'
                     },
                     {
                       width: 20,
@@ -646,7 +629,6 @@ export class InProgressTabComponent extends React.Component<
                       alignment: ColumnContentAlignment.CENTER
                     }
                   ]}
-                  hideTableHeader={true}
                   renderExpandedComponent={this.renderExpandedComponent}
                   noResultText={intl.formatMessage(messages.dataTableNoResults)}
                   onPageChange={(currentPage: number) => {

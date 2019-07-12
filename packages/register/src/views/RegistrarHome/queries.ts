@@ -34,16 +34,7 @@ export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
         id
         registration {
           type
-          status {
-            user {
-              name {
-                use
-                firstNames
-                familyName
-              }
-              role
-            }
-          }
+          trackingId
         }
         ... on BirthRegistration {
           child {
