@@ -74,6 +74,10 @@ const messages: {
     defaultMessage:
       'Can contain only block character, number and dot (e.g. C91.5)',
     description: 'The error message that appears when an invalid value is used'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -110,6 +114,7 @@ export const causeOfDeathSection: IFormSection = {
       initialValue: '',
       label: messages.methodOfCauseOfDeath,
       validate: [],
+      placeholder: messages.select,
       required: false,
       options: [
         {

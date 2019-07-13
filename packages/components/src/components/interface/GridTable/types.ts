@@ -18,12 +18,13 @@ export interface IStatus {
 }
 
 export interface IColumn {
-  label: string
+  label?: string
   width: number
   key: string
   errorValue?: string
   alignment?: ColumnContentAlignment
   isActionColumn?: boolean
+  isIconColumn?: boolean
   color?: string
 }
 
