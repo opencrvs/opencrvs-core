@@ -38,8 +38,10 @@ import {
 } from '@register/forms/utils'
 
 import styled, { keyframes } from '@register/styledComponents'
-
+import { gqlToDraftTransformer } from '@register/transformer'
 import {
+  IForm,
+  IFormSection,
   IFormField,
   Ii18nFormField,
   IFormSectionData,
@@ -525,10 +527,14 @@ class FormSectionComponent extends React.Component<Props> {
                   queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
-                    /*
                     const section = {
                       id: this.props.id,
-                      fields: fieldsWithValuesDefined
+                      groups: [
+                        {
+                          id: `${this.props.id}-view-group`,
+                          fields: fieldsWithValuesDefined
+                        }
+                      ]
                     } as IFormSection
 
                     const form = {
@@ -548,7 +554,6 @@ class FormSectionComponent extends React.Component<Props> {
                       transformedData[this.props.id]
                     )
                     setValues(updatedValues)
-                    */
                   }
                 } as ILoaderButton)
               : field
