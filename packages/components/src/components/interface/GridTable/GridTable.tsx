@@ -268,7 +268,7 @@ export class GridTable extends React.Component<
                         item.id as string,
                         item[preference.key] as IAction[],
                         preference.width,
-                        index,
+                        indx,
                         preference.alignment
                       )
                     } else if (preference.isIconColumn) {
