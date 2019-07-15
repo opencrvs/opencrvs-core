@@ -53,8 +53,8 @@ import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 
-const FormSectionTitle = styled.h3`
-  ${({ theme }) => theme.fonts.h3Style};
+const FormSectionTitle = styled.h4`
+  ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FooterArea = styled.div`

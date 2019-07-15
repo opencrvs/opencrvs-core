@@ -154,7 +154,7 @@ export const eventSection: IFormSection = {
   title: messages.deathEventTitle,
   groups: [
     {
-      id: 'deathEvent-view-group',
+      id: 'deathEvent-deathDate-view-group',
       fields: [
         {
           name: 'deathDate',
@@ -167,7 +167,12 @@ export const eventSection: IFormSection = {
             mutation: fieldToDeceasedDateTransformation('deceased'),
             query: deceasedDateToFieldTransformation('deceased')
           }
-        },
+        }
+      ]
+    },
+    {
+      id: 'deathEvent-deathManner-view-group',
+      fields: [
         {
           name: 'manner',
           type: SELECT_WITH_OPTIONS,
@@ -196,14 +201,12 @@ export const eventSection: IFormSection = {
             mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath'),
             query: bundleFieldToSectionFieldTransformer('mannerOfDeath')
           }
-        },
-        {
-          name: 'deathPlace',
-          type: SUBSECTION,
-          label: messages.deathPlace,
-          initialValue: '',
-          validate: []
-        },
+        }
+      ]
+    },
+    {
+      id: 'deathEvent-view-group',
+      fields: [
         {
           name: 'deathPlaceAddress',
           type: RADIO_GROUP,

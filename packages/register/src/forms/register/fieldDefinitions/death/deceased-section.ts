@@ -66,12 +66,12 @@ const messages: {
   },
   deceasedTitle: {
     id: 'register.form.section.deceasedTitle',
-    defaultMessage: "Deceased's details",
+    defaultMessage: 'What are the deceased details?',
     description: 'Form section title for Deceased'
   },
   deceasedIdType: {
     id: 'formFields.deceasedIdType',
-    defaultMessage: 'Existing ID',
+    defaultMessage: 'Type of ID',
     description: 'Label for form field: Existing ID'
   },
   fetchDeceasedDetails: {
@@ -116,22 +116,22 @@ const messages: {
   },
   deceasedGivenNames: {
     id: 'formFields.deceasedGivenNames',
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'Bengali Given Name',
     description: 'Label for form field: Given names'
   },
   deceasedFamilyName: {
     id: 'formFields.deceasedFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'Bengali Family Name',
     description: 'Label for form field: Family name'
   },
   deceasedGivenNamesEng: {
     id: 'formFields.deceasedGivenNamesEng',
-    defaultMessage: 'First Name(s) in English',
+    defaultMessage: 'English Given Name',
     description: 'Label for form field: Given names in english'
   },
   deceasedFamilyNameEng: {
     id: 'formFields.deceasedFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
+    defaultMessage: 'English Family Name',
     description: 'Label for form field: Family name in english'
   },
   nationality: {
@@ -183,7 +183,7 @@ const messages: {
   },
   permanentAddress: {
     id: 'formFields.permanentAddress',
-    defaultMessage: 'Permanent Address',
+    defaultMessage: 'What was their permanent address?',
     description: 'Title for the permanent address fields'
   },
   select: {
@@ -301,6 +301,19 @@ export const deceasedSection: IFormSection = {
           errorTitle: messages.fetchIdentifierModalErrorTitle
         },
         {
+          name: 'nationality',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.nationality,
+          required: true,
+          initialValue: 'BGD',
+          validate: [],
+          options: countries,
+          mapping: {
+            mutation: fieldToArrayTransformer,
+            query: arrayToFieldTransformer
+          }
+        },
+        {
           name: 'firstNames',
           type: TEXT,
           label: messages.deceasedGivenNames,
@@ -349,19 +362,6 @@ export const deceasedSection: IFormSection = {
           }
         },
         {
-          name: 'nationality',
-          type: SELECT_WITH_OPTIONS,
-          label: messages.nationality,
-          required: true,
-          initialValue: 'BGD',
-          validate: [],
-          options: countries,
-          mapping: {
-            mutation: fieldToArrayTransformer,
-            query: arrayToFieldTransformer
-          }
-        },
-        {
           name: 'gender',
           type: SELECT_WITH_OPTIONS,
           label: messages.deceasedSex,
@@ -375,6 +375,14 @@ export const deceasedSection: IFormSection = {
             { value: 'other', label: messages.deceasedSexOther },
             { value: 'unknown', label: messages.deceasedSexUnknown }
           ]
+        },
+        {
+          name: 'birthDate',
+          type: DATE,
+          label: messages.deceasedDateOfBirth,
+          required: true,
+          initialValue: '',
+          validate: [isValidBirthDate]
         },
         {
           name: 'maritalStatus',
@@ -406,14 +414,6 @@ export const deceasedSection: IFormSection = {
               label: maritalStatusMessages.maritalStatusNotStated
             }
           ]
-        },
-        {
-          name: 'birthDate',
-          type: DATE,
-          label: messages.deceasedDateOfBirth,
-          required: true,
-          initialValue: '',
-          validate: [isValidBirthDate]
         },
         {
           name: 'permanentAddress',
@@ -633,14 +633,6 @@ export const deceasedSection: IFormSection = {
             mutation: fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
             query: addressToFieldTransformer('PERMANENT', 0, 'postalCode')
           }
-        },
-        {
-          name: 'currentAddress',
-          type: SUBSECTION,
-          label: messages.currentAddress,
-          initialValue: '',
-          validate: [],
-          conditionals: []
         },
         {
           name: 'currentAddressSameAsPermanent',

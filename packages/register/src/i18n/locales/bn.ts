@@ -25,7 +25,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.addressLine3CityOption': 'ওয়ার্ড',
     'formFields.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'formFields.postCode': 'পোস্ট কোড',
-    'formFields.permanentAddress': 'স্থায়ী ঠিকানা',
+    'formFields.permanentAddress': 'তাদের স্থায়ী ঠিকানা কি ছিল?',
     'formFields.confirm': 'হ্যাঁ',
     'formFields.deny': 'না',
     'formFields.addressSameAsMother':
@@ -414,8 +414,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes.description':
       'প্রাসঙ্গিক মন্তব্য এই স্থানে যোগ করুন। এই মন্তব্য তথ্যপ্রদানকারীর সঙ্গে আলোচনা করা হবে না।',
     'register.form.tabs.deceasedTab': 'মৃত',
-    'register.form.section.deceasedTitle': 'মৃতের বিবরণ',
-    'formFields.deceasedIdType': 'বিদ্যমান আইডি',
+    'register.form.section.deceasedTitle': 'মৃত ব্যক্তির বিস্তারিত কি?',
+    'formFields.deceasedIdType': 'আইডি টাইপ',
     'formFields.iDTypeNoID': 'আইডি পাওয়া যায় নি',
     'formFields.deceasedGivenNames': 'নামের প্রথমাংশ বাংলায়',
     'formFields.deceasedFamilyName': 'নামের শেষাংশ বাংলায়',

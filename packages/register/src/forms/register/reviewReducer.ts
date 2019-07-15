@@ -60,9 +60,9 @@ export const initialState: IReviewFormState = {
     death: {
       sections: [
         deceasedSection,
-        applicantsSection,
         eventSection,
         causeOfDeathSection,
+        applicantsSection,
         deathDocumentsSection,
         {
           id: 'review',

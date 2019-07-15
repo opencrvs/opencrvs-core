@@ -60,9 +60,9 @@ export const initialState: IRegisterFormState = {
     death: {
       sections: [
         deceasedSection,
-        applicantsSection,
         eventSection,
         causeOfDeathSection,
+        applicantsSection,
         deathDocumentsSection,
         {
           id: 'preview',
