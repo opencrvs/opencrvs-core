@@ -501,15 +501,24 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.selectInformant.newBirthRegistration': 'New birth application',
-    'register.selectInformant.informantTitle':
+    'register.selectInformant.birthInformantTitle':
       'Who is applying for birth registration?',
+    'register.selectInformant.deathInformantTitle':
+      'What relationship does the applicant have to the deceased?',
     'register.selectInformant.mother': 'Mother',
     'register.selectInformant.father': 'Father',
     'register.selectInformant.parents': 'Mother & Father',
     'register.selectInformant.someoneElse': 'Someone Else',
     'register.selectInformant.self': 'Self',
-    'register.selectInformant.errorMessage':
+    'register.selectInformant.spouse': 'Spouse',
+    'register.selectInformant.son': 'Son',
+    'register.selectInformant.daughter': 'Daughter',
+    'register.selectInformant.extendedFamily': 'Extended family',
+    'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying',
+    'register.selectInformant.deathErrorMessage':
+      'Please select the relationship to the deceased and any relevant contact details.',
+    'register.selectInformant.relationshipLabel': 'Relationship to deceased',
     'register.primaryApplicant.registerNewEventHeading':
       'Who is the primary applicant for this application?',
     'register.primaryApplicant.description':
@@ -779,8 +788,8 @@ export const ENGLISH_STATE: ILanguage = {
     'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
-    'register.registrarHome.results.reviewDuplicates': 'Review Duplicates',
-    'register.searchResult.results.reviewDuplicates': 'Review Duplicates',
+    'register.registrarHome.results.reviewDuplicates': 'Review',
+    'register.searchResult.results.reviewDuplicates': 'Review',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
@@ -1114,7 +1123,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.securityquestion.heading': 'Set your security questions',
     'register.securityquestion.description':
       'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
-    'register.securityquestion.select': 'Select',
+    'register.select.placeholder': 'Select...',
     'register.securityquestion.selectSecurityQuestion':
       'Select a security question',
     'register.securityquestion.enterResponse':
@@ -1185,7 +1194,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'Father',
     'register.SelectContactPoint.otherLabel': 'Someone else',
     'register.SelectContactPoint.phoneNoLabel': 'Phone number',
-    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.birthRelationshipLabel':
+      'RelationShip to child',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'Back',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
@@ -1194,6 +1205,10 @@ export const ENGLISH_STATE: ILanguage = {
     'review.documents.zeroDocumentsText':
       'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
     'review.documents.editDocuments': 'Add attachement',
+    'register.SelectContactPoint.spouse': 'Spouse',
+    'register.SelectContactPoint.son': 'Son',
+    'register.SelectContactPoint.daughter': 'Daughter',
+    'register.SelectContactPoint.extendedFamily': 'Extended family',
     'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }
 }

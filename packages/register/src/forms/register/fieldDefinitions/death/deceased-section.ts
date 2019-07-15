@@ -185,6 +185,10 @@ const messages: {
     id: 'formFields.permanentAddress',
     defaultMessage: 'Permanent Address',
     description: 'Title for the permanent address fields'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -202,6 +206,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       options: deathIdentityOptions,
       mapping: {
         mutation: fieldToIdentifierTransformer('type'),
@@ -361,6 +366,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       options: [
         { value: 'male', label: messages.deceasedSexMale },
         { value: 'female', label: messages.deceasedSexFemale },
@@ -375,6 +381,7 @@ export const deceasedSection: IFormSection = {
       required: false,
       initialValue: 'MARRIED',
       validate: [],
+      placeholder: messages.select,
       options: [
         { value: 'SINGLE', label: maritalStatusMessages.maritalStatusSingle },
         { value: 'MARRIED', label: maritalStatusMessages.maritalStatusMarried },
@@ -424,6 +431,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'countryPermanent'
@@ -441,6 +449,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'statePermanent'
@@ -461,6 +470,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'districtPermanent'
@@ -482,6 +492,7 @@ export const deceasedSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'addressLine4Permanent'
@@ -654,6 +665,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
+      placeholder: messages.select,
       options: countries,
       conditionals: [conditionals.currentAddressSameAsPermanent],
       mapping: {
@@ -668,6 +680,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
@@ -688,6 +701,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'state'
@@ -709,6 +723,7 @@ export const deceasedSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'district'
@@ -731,6 +746,7 @@ export const deceasedSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'addressLine4'

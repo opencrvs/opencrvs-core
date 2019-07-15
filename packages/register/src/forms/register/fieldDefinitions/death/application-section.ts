@@ -225,6 +225,10 @@ const messages: {
     id: 'formFields.fetchPersonByNIDModalInfo',
     defaultMessage: 'National ID',
     description: 'Label for loader button'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -244,6 +248,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       options: deathIdentityOptions,
       mapping: {
         mutation: fieldValueNestingTransformer(
@@ -436,6 +441,7 @@ export const applicantsSection: IFormSection = {
       required: false,
       initialValue: 'BGD',
       validate: [],
+      placeholder: messages.select,
       options: countries,
       mapping: {
         mutation: fieldValueNestingTransformer(
@@ -473,6 +479,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       options: [
         { value: 'FATHER', label: messages.relationFather },
         { value: 'MOTHER', label: messages.relationMother },
@@ -551,6 +558,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
+      placeholder: messages.select,
       options: countries,
       mapping: {
         mutation: fieldValueNestingTransformer(
@@ -571,6 +579,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'country'
@@ -595,6 +604,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'state'
@@ -647,6 +657,7 @@ export const applicantsSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'addressLine4'
@@ -882,6 +893,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
+      placeholder: messages.select,
       options: countries,
       conditionals: [conditionals.applicantPermanentAddressSameAsCurrent],
       mapping: {
@@ -903,6 +915,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'countryPermanent'
@@ -930,6 +943,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'statePermanent'
@@ -958,6 +972,7 @@ export const applicantsSection: IFormSection = {
       required: true,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'districtPermanent'
@@ -987,6 +1002,7 @@ export const applicantsSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       dynamicOptions: {
         resource: OFFLINE_LOCATIONS_KEY,
         dependency: 'addressLine4Permanent'

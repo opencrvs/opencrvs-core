@@ -579,15 +579,24 @@ export const BENGALI_STATE: ILanguage = {
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশে ফেরত যান',
 
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
-    'register.selectInformant.informantTitle':
+    'register.selectInformant.birthInformantTitle':
       'কে জন্ম নিবন্ধনের জন্য আবেদন করছে?',
+    'register.selectInformant.deathInformantTitle':
+      'What relationship does the applicant have to the deceased?',
     'register.selectInformant.mother': 'মাতা',
     'register.selectInformant.father': 'পিতা',
     'register.selectInformant.parents': 'পিতা ও মাতা ',
     'register.selectInformant.someoneElse': 'অন্য কেউ',
     'register.selectInformant.self': 'নিজের',
-    'register.selectInformant.errorMessage':
-      'Please select who is present and applying',
+    'register.selectInformant.spouse': 'স্বামী বা স্ত্রী',
+    'register.selectInformant.son': 'পুত্র',
+    'register.selectInformant.daughter': 'কন্যা',
+    'register.selectInformant.extendedFamily': 'যৌথ পরিবার',
+    'register.selectInformant.birthErrorMessage':
+      'Please select who is present and applying.',
+    'register.selectInformant.deathErrorMessage':
+      'Please select the relationship to the deceased and any relevant contact details.',
+    'register.selectInformant.relationshipLabel': 'মৃত ব্যক্তি সঙ্গে সম্পর্ক',
     'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
     'register.selectVitalEvent.registerNewEventHeading':
       'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
@@ -777,10 +786,8 @@ export const BENGALI_STATE: ILanguage = {
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া গেছে',
-    'register.registrarHome.results.reviewDuplicates':
-      'সদৃশগুলো পর্যালোচনা করুন',
-    'register.searchResult.results.reviewDuplicates':
-      'সদৃশগুলো পর্যালোচনা করুন',
+    'register.registrarHome.results.reviewDuplicates': 'পর্যালোচনা',
+    'register.searchResult.results.reviewDuplicates': 'পর্যালোচনা',
     'register.workQueue.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'review.edit.modal.preview': 'প্রিভিউতে ফেরত যান',
     'review.edit.modal.editButton': 'সম্পাদন',
@@ -1114,7 +1121,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.securityquestion.heading': 'আপনার নিরাপত্তা প্রশ্ন সেট করুন',
     'register.securityquestion.description':
       'নীচের ড্রপডাউন তালিকা থেকে আপনার পছন্দের প্রশ্ন নির্বাচন করুন।',
-    'register.securityquestion.select': 'নির্বাচন করুন',
+    'register.select.placeholder': 'নির্বাচন করুন...',
     'register.securityquestion.selectSecurityQuestion':
       'একটি নিরাপত্তা প্রশ্ন নির্বাচন করুন',
     'register.securityquestion.enterResponse':
@@ -1183,7 +1190,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'বাবা',
     'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
     'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
-    'register.SelectContactPoint.relationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.birthRelationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'ফিরে যান',
     'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
@@ -1192,6 +1200,10 @@ export const BENGALI_STATE: ILanguage = {
     'review.documents.zeroDocumentsText':
       '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
     'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
+    'register.SelectContactPoint.spouse': 'স্বামী বা স্ত্রী',
+    'register.SelectContactPoint.son': 'পুত্র',
+    'register.SelectContactPoint.daughter': 'কন্যা',
+    'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
     'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
   }
 }
