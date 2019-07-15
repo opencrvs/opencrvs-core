@@ -19,9 +19,9 @@ context('Death Registration Integration Test', () => {
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
+    // SELECT INFORMANT
     cy.get('#select_informant_SON').click()
     cy.get('#continue').click()
-
     // SELECT MAIN CONTACT POINT
     cy.get('#contact_SON').click()
     cy.get('#phone_number_input').type('01526972106')
@@ -44,8 +44,8 @@ context('Death Registration Integration Test', () => {
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'No ID available', 'No ID available')
-    cy.get('#applicantFamilyName').type('খান')
-    cy.get('#applicantFamilyNameEng').type('Khan')
+    cy.get('#applicantFamilyName').type('উদ্দিন')
+    cy.get('#applicantFamilyNameEng').type('Uddin')
     cy.selectOption(
       '#applicantsRelationToDeceased',
       'Extended Family',
@@ -74,13 +74,36 @@ context('Death Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    // cy.get('#next_button_deceased').click()
-    // cy.get('#next_button_informant').click()
-    // cy.get('#next_button_deathEvent').click()
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
     cy.wait(6000)
+    // LOG OUT
+    cy.get('#mobile_header_left').click()
+    cy.get('#mobile_menu_item_4').click()
+    // LOGIN AS LOCAL REGISTRAR
+    cy.get('#username').type('mohammad.ashraful')
+    cy.get('#password').type('test')
+    cy.get('#login-mobile-submit').click()
+    cy.get('#code').type('000000')
+    cy.get('#login-mobile-submit').click()
+    // LANDING PAGE
+    cy.wait(3000)
+    cy.get('#row_0').then($listItem => {
+      if ($listItem.find('#ListItemAction-0-Review').length) {
+        cy.log('Death review found')
+        cy.get('#ListItemAction-0-Review')
+          .first()
+          .click()
+        cy.wait(500)
+        cy.get('#registerApplicationBtn').click()
+        // MODAL
+        cy.get('#register_confirm').click()
+        cy.wait(1000)
+      } else {
+        cy.log('Death review not found')
+      }
+    })
   })
 
   it('Tests from application to registration using maximum input', () => {
