@@ -64,7 +64,6 @@ context('Birth Registration Integration Test', () => {
     // MODAL
     cy.get('#submit_confirm').click()
     cy.wait(6000)
-<<<<<<< HEAD
   })
 
   it('Application review as registrar', () => {
@@ -97,8 +96,6 @@ context('Birth Registration Integration Test', () => {
         cy.log('Birth review not found')
       }
     })
-=======
->>>>>>> c4a40bd599a91690dd6a419c5600b64b77805481
   })
 
   it('Tests from application to registration using maximum input', () => {
