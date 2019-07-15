@@ -75,7 +75,9 @@ import {
   IForm,
   IFormSection,
   FIELD_GROUP_TITLE,
-  SEARCH_FIELD
+  SEARCH_FIELD,
+  DOCUMENT_UPLOADER_WRAPER,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 
 import { IValidationResult } from '@register/utils/validate'
@@ -92,6 +94,8 @@ import { InformativeRadioGroup } from '@register/views/PrintCertificate/Informat
 import { gqlToDraftTransformer } from '@register/transformer'
 import { SearchField } from './SearchField'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
+import { DocumentUploadWraper } from './DocumentUploadfield/DocumentUploadField'
+import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -172,6 +176,18 @@ function GeneratedInputField({
           options={fieldDefinition.options}
         />
       </InputField>
+    )
+  }
+  if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+    return (
+      <DocumentUploaderWithOption
+        name={fieldDefinition.name}
+        label={fieldDefinition.label}
+        options={fieldDefinition.options}
+        onComplete={(files: IFileValue[]) =>
+          onSetFieldValue(fieldDefinition.name, files)
+        }
+      />
     )
   }
   if (fieldDefinition.type === RADIO_GROUP) {
@@ -326,6 +342,19 @@ function GeneratedInputField({
       />
     )
   }
+
+  if (fieldDefinition.type === DOCUMENT_UPLOADER_WRAPER) {
+    return (
+      <DocumentUploadWraper
+        id={inputProps.id}
+        fields={fieldDefinition.fields}
+      />
+    )
+  }
+
+  // if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+  //   return <DocumentUploaderWithOption definition={fieldDefinition} />
+  // }
 
   if (fieldDefinition.type === SEARCH_FIELD) {
     return (
@@ -558,7 +587,8 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+            field.type === DOCUMENT_UPLOADER_WITH_OPTION
           ) {
             return (
               <FormItem key={`${field.name}`}>

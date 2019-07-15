@@ -5,7 +5,10 @@ import {
   IMAGE_UPLOADER_WITH_OPTIONS,
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  DYNAMIC_LIST
+  DYNAMIC_LIST,
+  DOCUMENT_UPLOADER_WRAPER,
+  SELECT_WITH_OPTIONS,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { birthFieldToAttachmentTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
@@ -21,7 +24,7 @@ const messages: {
   },
   documentsTitle: {
     id: 'register.form.section.documentsTitle',
-    defaultMessage: 'Supporting documents',
+    defaultMessage: 'Attach Supporting documents',
     description: 'Form section title for Documents'
   },
   uploadImage: {
@@ -187,6 +190,56 @@ export const documentsSection: IFormSection = {
   name: messages.documentsTab,
   title: messages.documentsTitle,
   fields: [
+    {
+      name: 'uploadDocForMother',
+      type: DOCUMENT_UPLOADER_WITH_OPTION,
+      label: messages.proofOfMothersID,
+      required: true,
+      initialValue: '',
+      hideAsterisk: true,
+      validate: [],
+      options: [
+        { value: 'Birth Registration', label: messages.docTypeBR },
+        { value: 'National ID (front)', label: messages.docTypeNIDFront },
+        { value: 'National ID (back)', label: messages.docTypeNIDBack },
+        { value: 'Passport', label: messages.docTypePassport },
+        { value: 'School Certificate', label: messages.docTypeSC },
+        { value: 'Other', label: messages.docTypeOther }
+      ]
+    },
+    {
+      name: 'uploadDocForFather',
+      type: DOCUMENT_UPLOADER_WITH_OPTION,
+      label: messages.proofOfFathersID,
+      required: true,
+      initialValue: '',
+      hideAsterisk: true,
+      validate: [],
+      options: [
+        { value: 'Birth Registration', label: messages.docTypeBR },
+        { value: 'National ID (front)', label: messages.docTypeNIDFront },
+        { value: 'National ID (back)', label: messages.docTypeNIDBack },
+        { value: 'Passport', label: messages.docTypePassport },
+        { value: 'School Certificate', label: messages.docTypeSC },
+        { value: 'Other', label: messages.docTypeOther }
+      ]
+    },
+    // {
+    //   name: 'documentUploader',
+    //   type: DOCUMENT_UPLOADER_WRAPER,
+    //   label: messages.uploadImage,
+    //   initialValue: '',
+    //   validate: [],
+    //   fields: [
+    //     {
+    //       name: 'info-paragraph',
+    //       type: PARAGRAPH,
+    //       label: messages.paragraph,
+    //       initialValue: '',
+    //       validate: []
+    //     }
+    //   ]
+    // },
     {
       name: 'imageUploader',
       type: IMAGE_UPLOADER_WITH_OPTIONS,

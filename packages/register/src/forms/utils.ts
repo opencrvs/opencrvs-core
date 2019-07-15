@@ -21,7 +21,8 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   IFieldInput,
-  IQuery
+  IQuery,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -68,7 +69,8 @@ export const internationaliseFieldObject = (
     base.type === SELECT_WITH_OPTIONS ||
     base.type === RADIO_GROUP ||
     base.type === INFORMATIVE_RADIO_GROUP ||
-    base.type === CHECKBOX_GROUP
+    base.type === CHECKBOX_GROUP ||
+    base.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
