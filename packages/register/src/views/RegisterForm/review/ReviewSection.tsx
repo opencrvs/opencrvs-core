@@ -89,16 +89,7 @@ const messages: {
     defaultMessage: 'Next',
     description: 'Next button text'
   },
-  valueRegister: {
-    id: 'review.button.register',
-    defaultMessage: 'REGISTER',
-    description: 'Register button text'
-  },
-  valueReject: {
-    id: 'review.button.reject',
-    defaultMessage: 'Reject Application',
-    description: 'Reject application button text'
-  },
+
   requiredField: {
     id: 'register.form.required',
     defaultMessage: 'This field is required',
@@ -114,16 +105,7 @@ const messages: {
     defaultMessage: 'Select to Preview',
     description: 'Document Viewer Tagline'
   },
-  valueSendForReview: {
-    id: 'register.form.submit',
-    defaultMessage: 'SEND FOR REVIEW',
-    description: 'Submit Button Text'
-  },
-  valueSendForReviewIncomplete: {
-    id: 'register.form.submitIncomplete',
-    defaultMessage: 'Send incomplete application',
-    description: 'Title for Incomplete submit button'
-  },
+
   valueSaveAsDraft: {
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
@@ -161,26 +143,6 @@ const messages: {
     id: 'review.inputs.additionalComments',
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments'
-  },
-  reviewActionTitle: {
-    id: 'review.actions.title.applicationStatus',
-    defaultMessage:
-      'Application is {isComplete, select, true {complete} false {incomplete}}',
-    description: 'Title for review action component'
-  },
-  reviewActionDescriptionIncomplete: {
-    id: 'review.actions.description.confirmInComplete',
-    defaultMessage:
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered',
-    description:
-      'Description for review action component when incomplete application'
-  },
-  reviewActionDescriptionComplete: {
-    id: 'review.actions.description.confirmComplete',
-    defaultMessage:
-      'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
-    description:
-      'Description for review action component when complete application'
   }
 })
 
@@ -568,48 +530,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
-    const reviewActionProps = {
-      isComplete,
-      title: intl.formatMessage(messages.reviewActionTitle, { isComplete }),
-      description: intl.formatMessage(
-        isComplete
-          ? messages.reviewActionDescriptionComplete
-          : messages.reviewActionDescriptionIncomplete
-      ),
-      confirmAction:
-        ((!!registerClickEvent && {
-          id: 'registerApplicationBtn',
-          icon: () => <TickLarge />,
-          disabled: !isComplete,
-          align: ICON_ALIGNMENT.LEFT,
-          onClick: registerClickEvent,
-          children: intl.formatMessage(messages.valueRegister)
-        }) as IButtonProps) ||
-        (!!submitClickEvent && {
-          id: 'submit_form',
-          icon: () => <Upload />,
-          children: intl.formatMessage(
-            this.userHasRegisterScope()
-              ? messages.valueRegister
-              : isComplete
-              ? messages.valueSendForReview
-              : messages.valueSendForReviewIncomplete
-          ),
-          disabled: false,
-          align: ICON_ALIGNMENT.LEFT,
-          onClick: submitClickEvent
-        }),
-      rejectAction:
-        (!!rejectApplicationClickEvent &&
-          !isRejected && {
-            id: 'rejectApplicationBtn',
-            align: ICON_ALIGNMENT.LEFT,
-            children: intl.formatMessage(messages.valueReject),
-            icon: () => <CrossLarge />,
-            onClick: rejectApplicationClickEvent
-          }) ||
-        undefined
-    }
+
     return (
       <>
         <Row>
@@ -650,7 +571,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
             </FormData>
-            <ReviewAction {...reviewActionProps} />
+            <ReviewAction
+              isComplete={isComplete}
+              hasRegisterScope={this.userHasRegisterScope()}
+              isRejected={Boolean(isRejected)}
+              registerAction={registerClickEvent}
+              submitAction={submitClickEvent}
+              rejectAction={rejectApplicationClickEvent}
+            />
           </Column>
           <Column>
             <ResponsiveDocumentViewer
