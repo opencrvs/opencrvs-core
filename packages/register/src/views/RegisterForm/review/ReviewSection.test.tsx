@@ -14,17 +14,16 @@ import {
 import {
   createApplication,
   createReviewApplication,
-  storeApplication,
-  modifyApplication
+  storeApplication
 } from '@register/applications'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { Event as ApplicationEvent } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import { REJECTED } from '@register/utils/constants'
-import { async } from 'q'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
+
 const draft = createApplication(ApplicationEvent.BIRTH)
 const rejectedDraftBirth = createReviewApplication(
   uuid(),
@@ -50,6 +49,13 @@ draft.data = {
   }
 }
 
+Object.defineProperty(window.navigator, 'userAgent', {
+  value: 'Desktop'
+})
+Object.defineProperty(window, 'outerWidth', {
+  value: 1034
+})
+
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
@@ -67,6 +73,16 @@ describe('when user is in the review page', () => {
     reviewSectionComponent = testComponent.component
   })
 
+  it('Goes to child document while scroll to child section', async () => {
+    window.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    reviewSectionComponent.update()
+
+    expect(
+      reviewSectionComponent.find('#document_section_child').hostNodes()
+    ).toHaveLength(1)
+  })
+
   describe('when user clicks on change link', () => {
     beforeEach(() => {
       reviewSectionComponent
@@ -74,16 +90,6 @@ describe('when user is in the review page', () => {
         .hostNodes()
         .simulate('click')
       reviewSectionComponent.update()
-    })
-
-    it('Goes to child document while scroll to child section', async () => {
-      window.dispatchEvent(new Event('scroll'))
-      await flushPromises()
-      reviewSectionComponent.update()
-
-      expect(
-        reviewSectionComponent.find('#document_section_child').hostNodes()
-      ).toHaveLength(1)
     })
 
     it('edit dialog should show up', () => {

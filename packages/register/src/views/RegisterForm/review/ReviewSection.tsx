@@ -76,6 +76,7 @@ import { registrationSection } from '@register/forms/register/fieldDefinitions/b
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { findDOMNode } from 'react-dom'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import { isMobileDevice } from '@register/utils/commonUtils'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -471,7 +472,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', this.onScroll)
+    !isMobileDevice() && window.addEventListener('scroll', this.onScroll)
   }
 
   componentWillUnmount() {
