@@ -13,9 +13,7 @@ import {
   GQLDeathRegistration,
   GQLEventRegistration,
   GQLHumanName,
-  GQLQuery,
-  GQLRegWorkflow,
-  GQLUser
+  GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IApplication } from '@register/applications'
 import {
@@ -30,12 +28,10 @@ import {
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
-import { roleMessages } from '@register/utils/roleTypeMessages'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   LIST_EVENT_REGISTRATIONS_BY_STATUS
 } from '@register/views/RegistrarHome/queries'
-import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
 import { messages as eventMessages } from '@register/views/SelectVitalEvent/SelectVitalEvent'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
@@ -43,6 +39,8 @@ import * as React from 'react'
 import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
+import { DraftDataDetails } from './draftDataDetails'
+import { InProgressDataDetails } from './inProgressDataDetails'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -504,8 +502,12 @@ export class InProgressTabComponent extends React.Component<
     this.setState({ progressCurrentPage: newPageNumber })
   }
 
-  renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
+  renderDraftDataExpandedComponent = (itemId: string) => {
+    return <DraftDataDetails eventId={itemId} />
+  }
+
+  renderInProgressDataExpandedComponent = (itemId: string) => {
+    return <InProgressDataDetails eventId={itemId} />
   }
 
   render() {
@@ -546,6 +548,7 @@ export class InProgressTabComponent extends React.Component<
                 alignment: ColumnContentAlignment.CENTER
               }
             ]}
+            renderExpandedComponent={this.renderDraftDataExpandedComponent}
             noResultText={intl.formatMessage(messages.dataTableNoResults)}
             onPageChange={(currentPage: number) => {
               this.onPageChange(currentPage)
@@ -553,6 +556,7 @@ export class InProgressTabComponent extends React.Component<
             pageSize={this.pageSize}
             totalItems={drafts && drafts.length}
             currentPage={this.state.progressCurrentPage}
+            expandable={true}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts && (
@@ -631,7 +635,9 @@ export class InProgressTabComponent extends React.Component<
                       alignment: ColumnContentAlignment.CENTER
                     }
                   ]}
-                  renderExpandedComponent={this.renderExpandedComponent}
+                  renderExpandedComponent={
+                    this.renderInProgressDataExpandedComponent
+                  }
                   noResultText={intl.formatMessage(messages.dataTableNoResults)}
                   onPageChange={(currentPage: number) => {
                     this.onPageChange(currentPage)
