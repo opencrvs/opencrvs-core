@@ -372,7 +372,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.privateHome': 'Private Home',
     'formFields.otherInstitution': 'Other',
     'register.form.tabs.documentsTab': 'Documents',
-    'register.form.section.documentsTitle': 'Supporting documents',
+    'register.form.section.documentsTitle': 'Attach Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
     'review.form.tabs.reviewTab': 'Review',
     'register.form.section.previewTitle': 'Preview',
@@ -979,6 +979,8 @@ export const ENGLISH_STATE: ILanguage = {
     'error.description2': "It's not you, it us. This is our fault.",
     'goto.homepage': 'Go to Homepage',
     'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
+    'imageUploadOption.upload.documentType':
+      'Please select the type of document first',
     'register.SearchResult.searchingFor': 'Searching for “{param}”',
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',

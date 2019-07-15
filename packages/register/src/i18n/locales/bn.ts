@@ -982,6 +982,7 @@ export const BENGALI_STATE: ILanguage = {
     'error.description2': "It's not you, it us. This is our fault.",
     'goto.homepage': 'Go to Homepage',
     'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
+    'imageUploadOption.upload.documentType': 'প্রথমে নথি ধরন নির্বাচন করুন',
     'register.SearchResult.searchingFor': '“{param}” এর অনুসন্ধান চলসে ',
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {“{param}” এর জন্য কোন ফলাফল পাওয়া যায়নি} other {“{param}” এর অনুসন্ধান ফলাফল}}',
