@@ -517,8 +517,14 @@ export const BENGALI_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'আপনি জমা দিতে প্রস্তুত?',
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
-    'register.form.modal.submitDescUponCompletion':
-      '{isComplete, select, true {আপনি যে বিবরণটি সরবরাহ করছেন তা সঠিক কিনা তা যাচাই করেছেন?} false {সব তথ্য সঠিক তা আবেদনকারীর সাথে যাচাই করেছেন?}}',
+    'register.form.modal.title.submitConfirmation':
+      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+    'register.form.modal.desc.submitConfirmation':
+      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+    'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
+    'register.form.modal.desc.registerConfirmation':
+      'আপনি কি এ ব্যাপারে নিশ্চিত?',
+    'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
     'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',

@@ -539,8 +539,14 @@ export const ENGLISH_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'Are you ready to submit?',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
-    'register.form.modal.submitDescUponCompletion':
-      '{isComplete, select, true {Have you checked the details you are providing are correct?} false {Have you checked with the applicant all the information are correct?}}',
+    'register.form.modal.title.submitConfirmation':
+      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+    'register.form.modal.desc.submitConfirmation':
+      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+    'register.form.modal.title.registerConfirmation':
+      'Register this application?',
+    'register.form.modal.desc.registerConfirmation': 'Are you sure?',
+    'register.form.modal.button.title.registerConfirmation': 'Register',
     'register.form.modal.submitButton': 'Submit',
     'register.home.header.fieldAgent': 'Field Agent',
     'register.home.header.registrationClerk': 'Registration Clerk',
