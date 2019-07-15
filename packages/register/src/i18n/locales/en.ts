@@ -1247,6 +1247,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectVitalEvent.backToReviewButton': 'Back to review',
     'tab.inProgress.selector.own.drafts': 'Yours',
     'tab.inProgress.selector.field.agents': 'Field agents',
-    'column.name.error.value': 'No name provided'
+    'column.name.error.value': 'No name provided',
+    'application.creation.label': 'Started on',
+    'application.informant.label': 'Informant',
+    'application.informant.value.mother': 'Mother',
+    'application.informant.value.mother.only': 'Mother',
+    'application.informant.value.father': 'Father',
+    'application.initiator.label': 'By',
+    'expansion.info.queryError': 'An error occurred while fetching details'
   }
 }
