@@ -33,9 +33,9 @@ import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
-import { CreateNewUser } from './views/SysAdmin/views/CreateNewUser'
-import { SelectPrimaryApplicant } from './views/SelectPrimaryApplicant/SelectPrimaryApplicant'
-import { SelectContactPoint } from './views/SelectContactPoint/SelectContactPoint'
+import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
+import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
+import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -86,12 +86,17 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.SELECT_PRIMARY_APPLICANT}
+                                  path={routes.SELECT_BIRTH_PRIMARY_APPLICANT}
                                   component={SelectPrimaryApplicant}
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.SELECT_INFORMANT}
+                                  path={routes.SELECT_BIRTH_INFORMANT}
+                                  component={SelectInformant}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_DEATH_INFORMANT}
                                   component={SelectInformant}
                                 />
                                 <ProtectedRoute
@@ -179,7 +184,12 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
-                                  path={routes.SELECT_MAIN_CONTACT_POINT}
+                                  path={routes.SELECT_DEATH_MAIN_CONTACT_POINT}
+                                  component={SelectContactPoint}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.SELECT_BIRTH_MAIN_CONTACT_POINT}
                                   component={SelectContactPoint}
                                 />
                               </Switch>
