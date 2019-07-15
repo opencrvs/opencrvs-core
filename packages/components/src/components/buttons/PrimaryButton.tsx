@@ -18,9 +18,8 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:active:enabled {
-    outline: none;
     background: ${({ theme }) => theme.colors.primary};
-    border: 3px solid ${({ theme }) => theme.colors.focus};
+    outline: 3px solid ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {

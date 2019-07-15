@@ -902,7 +902,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     })
     testComponent.component.update()
     testComponent.component
-      .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Print')
+      .find('#ListItemAction-0-Print')
       .hostNodes()
       .simulate('click')
 

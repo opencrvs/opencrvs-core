@@ -4,7 +4,7 @@ import {
   storeApplication
 } from '@register/applications'
 import { Event } from '@register/forms'
-import { SELECT_MAIN_CONTACT_POINT } from '@register/navigation/routes'
+import { SELECT_DEATH_MAIN_CONTACT_POINT } from '@register/navigation/routes'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
 import {
@@ -56,7 +56,7 @@ describe('when user is selecting the Main point of contact', () => {
     draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     history.replace(
-      SELECT_MAIN_CONTACT_POINT.replace(':applicationId', draft.id)
+      SELECT_DEATH_MAIN_CONTACT_POINT.replace(':applicationId', draft.id)
     )
     await flushPromises()
     app.update()
@@ -76,9 +76,9 @@ describe('when user is selecting the Main point of contact', () => {
     app.update()
   })
   describe('In select main contact point', () => {
-    it('when selects Mother it opens phone number input', async () => {
+    it('when selects Spouse it opens phone number input', async () => {
       app
-        .find('#contact_mother')
+        .find('#contact_SPOUSE')
         .hostNodes()
         .simulate('change')
 
@@ -88,9 +88,9 @@ describe('when user is selecting the Main point of contact', () => {
       expect(app.find('#phone_number_input').hostNodes().length).toBe(1)
     })
 
-    it('when selects Father it opens phone number input', async () => {
+    it('when selects Son it opens phone number input', async () => {
       app
-        .find('#contact_father')
+        .find('#contact_SON')
         .hostNodes()
         .simulate('change')
 
@@ -100,9 +100,9 @@ describe('when user is selecting the Main point of contact', () => {
       expect(app.find('#phone_number_input').hostNodes().length).toBe(1)
     })
 
-    it('goes to form page while after giving mother mobile no', async () => {
+    it('goes to form page while after giving spouse mobile no', async () => {
       app
-        .find('#contact_mother')
+        .find('#contact_SPOUSE')
         .hostNodes()
         .simulate('change')
 
@@ -127,12 +127,12 @@ describe('when user is selecting the Main point of contact', () => {
       await flushPromises()
       app.update()
 
-      expect(window.location.pathname).toContain('events/birth')
+      expect(window.location.pathname).toContain('events/death')
     })
 
-    it('goes to form page while after giving father mobile no', async () => {
+    it('goes to form page while after giving son mobile no', async () => {
       app
-        .find('#contact_father')
+        .find('#contact_SON')
         .hostNodes()
         .simulate('change')
 
@@ -157,12 +157,12 @@ describe('when user is selecting the Main point of contact', () => {
       await flushPromises()
       app.update()
 
-      expect(window.location.pathname).toContain('events/birth')
+      expect(window.location.pathname).toContain('events/death')
     })
 
-    it('show error while giving invalid mother mobile no', async () => {
+    it('show error while giving invalid daughter mobile no', async () => {
       app
-        .find('#contact_mother')
+        .find('#contact_DAUGHTER')
         .hostNodes()
         .simulate('change')
 
@@ -189,7 +189,7 @@ describe('when user is selecting the Main point of contact', () => {
 
     it('show error while giving invalid father mobile no', async () => {
       app
-        .find('#contact_father')
+        .find('#contact_FATHER')
         .hostNodes()
         .simulate('change')
 
@@ -216,7 +216,7 @@ describe('when user is selecting the Main point of contact', () => {
 
     it('show error without selecting any input', async () => {
       app
-        .find('#contact_mother')
+        .find('#contact_MOTHER')
         .hostNodes()
         .simulate('change')
 
@@ -229,6 +229,109 @@ describe('when user is selecting the Main point of contact', () => {
       app.update()
 
       expect(app.find('#error_text').hostNodes()).toHaveLength(1)
+    })
+  })
+  describe('when select other contact point', () => {
+    it('show error if neither relationship nor phone number entered', () => {
+      app
+        .find('#contact_OTHER')
+        .hostNodes()
+        .simulate('change')
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      expect(
+        app
+          .find('#error_text')
+          .hostNodes()
+          .text()
+      ).toBe('Please select a main point of contact')
+    })
+    it('show error while giving invalid mobile no', async () => {
+      app
+        .find('#contact_OTHER')
+        .hostNodes()
+        .simulate('change')
+
+      await flushPromises()
+      app.update()
+
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '016562106' }
+        })
+
+      await flushPromises()
+      app.update()
+
+      expect(
+        app
+          .find('#phone_number_error')
+          .hostNodes()
+          .text()
+      ).toBe('Not a valid mobile number')
+    })
+    it('show error if valid phone number but relationship not entered', async () => {
+      app
+        .find('#contact_OTHER')
+        .hostNodes()
+        .simulate('change')
+
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '01711111111' }
+        })
+
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      expect(
+        app
+          .find('#error_text')
+          .hostNodes()
+          .text()
+      ).toBe('Please select a main point of contact')
+    })
+    it('advances to death application if informant is other', async () => {
+      app
+        .find('#contact_OTHER')
+        .hostNodes()
+        .simulate('change')
+
+      app
+        .find('#phone_number_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'phone_number_input', value: '01711111111' }
+        })
+
+      app
+        .find('#relationship_input')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'relationship_input', value: 'Neighbour' }
+        })
+
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+      app.update()
+
+      expect(app.find('#firstNamesEng').hostNodes()).toHaveLength(1)
     })
   })
 })

@@ -68,6 +68,10 @@ const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
 `
 
+const IconWrapper = styled(ContentWrapper)`
+  padding-top: 5px;
+`
+
 const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
   margin-top: 5px;
   overflow: hidden;
@@ -152,7 +156,7 @@ export class GridTable extends React.Component<
               this.state.expanded.findIndex(id => id === itemId) >= 0 || false
             }
             arrowExpansion={true}
-            id={`ListItemAction-${itemId}`}
+            id={`ListItemAction-${key}`}
             onExpand={() => this.toggleExpanded(itemId)}
           />
         </ActionWrapper>
@@ -160,7 +164,7 @@ export class GridTable extends React.Component<
     } else {
       return (
         <ActionWrapper key={key} width={width} alignment={alignment}>
-          <ListItemAction id={`ListItemAction-${itemId}`} actions={actions} />
+          <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
         </ActionWrapper>
       )
     }
@@ -235,7 +239,7 @@ export class GridTable extends React.Component<
                 width={preference.width}
                 alignment={preference.alignment}
               >
-                {preference.label}
+                {preference.label && preference.label}
               </ContentWrapper>
             ))}
           </TableHeader>
@@ -264,8 +268,21 @@ export class GridTable extends React.Component<
                         item.id as string,
                         item[preference.key] as IAction[],
                         preference.width,
-                        indx,
+                        index,
                         preference.alignment
+                      )
+                    } else if (preference.isIconColumn) {
+                      return (
+                        <IconWrapper
+                          key={indx}
+                          width={preference.width}
+                          alignment={preference.alignment}
+                          color={preference.color}
+                        >
+                          {(item.icon as JSX.Element) || (
+                            <Error>{preference.errorValue}</Error>
+                          )}
+                        </IconWrapper>
                       )
                     } else {
                       return (

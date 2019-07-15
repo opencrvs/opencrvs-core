@@ -1,8 +1,13 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  InjectedIntlProps,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -17,11 +22,25 @@ import {
   goToBirthRegistrationAsParent,
   goBack,
   goToHome,
-  goToMainContactPoint,
-  goToPrimaryApplicant
+  goToBirthContactPoint,
+  goToDeathContactPoint,
+  goToPrimaryApplicant,
+  goToDeathRegistration
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import {
+  InputField,
+  TextInput,
+  IRadioOption as RadioComponentOption
+} from '@opencrvs/components/lib/forms'
+import { Event } from '@register/forms'
+import { phoneNumberFormat } from '@register/utils/validate'
+import {
+  PHONE_NO_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING,
+  INFORMANT_FIELD_STRING
+} from '@register/utils/constants'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -31,10 +50,16 @@ export const messages: {
     defaultMessage: 'New birth application',
     description: 'The message that appears for new birth registrations'
   },
-  informantTitle: {
-    id: 'register.selectInformant.informantTitle',
+  birthInformantTitle: {
+    id: 'register.selectInformant.birthInformantTitle',
     defaultMessage: 'Who is applying for birth registration?',
-    description: 'The title that appears when asking for the informant'
+    description: 'The title that appears when asking for the birth informant'
+  },
+  deathInformantTitle: {
+    id: 'register.selectInformant.deathInformantTitle',
+    defaultMessage:
+      'What relationship does the applicant have to the deceased?',
+    description: 'The title that appears when asking for the death informant'
   },
   mother: {
     id: 'register.selectInformant.mother',
@@ -63,20 +88,67 @@ export const messages: {
     defaultMessage: 'Self',
     description: 'The title that appears when selecting self as informant'
   },
+  spouse: {
+    id: 'register.selectInformant.spouse',
+    defaultMessage: 'Spouse',
+    description: 'The title that appears when selecting spouse as informant'
+  },
+  son: {
+    id: 'register.selectInformant.son',
+    defaultMessage: 'Son',
+    description: 'The title that appears when selecting son as informant'
+  },
+  daughter: {
+    id: 'register.selectInformant.daughter',
+    defaultMessage: 'Daughter',
+    description: 'The title that appears when selecting daughter as informant'
+  },
+  extendedFamily: {
+    id: 'register.selectInformant.extendedFamily',
+    defaultMessage: 'Extended family',
+    description:
+      'The title that appears when selecting extended family as informant'
+  },
   back: {
     id: 'menu.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   },
-  errorMessage: {
-    id: 'register.selectInformant.errorMessage',
+  birthErrorMessage: {
+    id: 'register.selectInformant.birthErrorMessage',
     defaultMessage: 'Please select who is present and applying',
-    description: 'Error Message to show when no event is being selected'
+    description: 'Error Message to show when no informant is selected for birth'
+  },
+  deathErrorMessage: {
+    id: 'register.selectInformant.deathErrorMessage',
+    defaultMessage:
+      'Please select the relationship to the deceased and any relevant contact details.',
+    description: 'Error Message to show when no informant is selected for death'
   },
   continueButton: {
     id: 'register.selectVitalEvent.continueButton',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
+  },
+  phoneNoLabel: {
+    id: 'register.SelectContactPoint.phoneNoLabel',
+    defaultMessage: 'Phone number',
+    description: 'Phone No Label'
+  },
+  relationshipLabel: {
+    id: 'register.selectInformant.relationshipLabel',
+    defaultMessage: 'Relationship to deceased',
+    description: 'Relationship Label used for death informant'
+  },
+  phoneNoError: {
+    id: 'register.SelectContactPoint.phoneNoError',
+    defaultMessage: 'Not a valid mobile number',
+    description: 'Phone no error text'
+  },
+  error: {
+    id: 'register.SelectContactPoint.error',
+    defaultMessage: 'Please select a main point of contact',
+    description: 'Error text'
   }
 })
 
@@ -90,12 +162,143 @@ const Actions = styled.div`
     margin-bottom: 16px;
   }
 `
+
+const ChildContainer = styled.div`
+  margin-left: 18px;
+  padding-left: 33px;
+  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  padding-top: 0px !important;
+
+  > div {
+    padding: 16px 0;
+  }
+`
+
 enum INFORMANT {
-  FATHER = 'FATHER_ONLY',
-  MOTHER = 'MOTHER_ONLY',
+  FATHER = 'FATHER',
+  MOTHER = 'MOTHER',
   BOTH_PARENTS = 'BOTH_PARENTS',
-  SELF = 'INFORMANT_ONLY',
-  SOMEONE_ELSE = 'OTHER'
+  SELF = 'SELF',
+  SOMEONE_ELSE = 'OTHER',
+  SPOUSE = 'SPOUSE',
+  SON = 'SON',
+  DAUGHTER = 'DAUGHTER',
+  EXTENDED_FAMILY = 'EXTENDED_FAMILY'
+}
+
+export interface IInformantField {
+  id: string
+  option: RadioComponentOption
+  disabled: boolean
+}
+
+const setInformantFields = (
+  intl: InjectedIntl,
+  event: string
+): IInformantField[] => {
+  if (event === Event.BIRTH) {
+    return [
+      {
+        id: `select_informant_${INFORMANT.MOTHER}`,
+        option: {
+          label: intl.formatMessage(messages.mother),
+          value: INFORMANT.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.FATHER}`,
+        option: {
+          label: intl.formatMessage(messages.father),
+          value: INFORMANT.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.BOTH_PARENTS}`,
+        option: {
+          label: intl.formatMessage(messages.parents),
+          value: INFORMANT.BOTH_PARENTS
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SELF}`,
+        option: {
+          label: intl.formatMessage(messages.self),
+          value: INFORMANT.SELF
+        },
+        disabled: true
+      },
+      {
+        id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
+        option: {
+          label: intl.formatMessage(messages.someoneElse),
+          value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: true
+      }
+    ]
+  } else {
+    return [
+      {
+        id: `select_informant_${INFORMANT.MOTHER}`,
+        option: {
+          label: intl.formatMessage(messages.mother),
+          value: INFORMANT.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.FATHER}`,
+        option: {
+          label: intl.formatMessage(messages.father),
+          value: INFORMANT.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SPOUSE}`,
+        option: {
+          label: intl.formatMessage(messages.spouse),
+          value: INFORMANT.SPOUSE
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SON}`,
+        option: {
+          label: intl.formatMessage(messages.son),
+          value: INFORMANT.SON
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.DAUGHTER}`,
+        option: {
+          label: intl.formatMessage(messages.daughter),
+          value: INFORMANT.DAUGHTER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.EXTENDED_FAMILY}`,
+        option: {
+          label: intl.formatMessage(messages.extendedFamily),
+          value: INFORMANT.EXTENDED_FAMILY
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
+        option: {
+          label: intl.formatMessage(messages.someoneElse),
+          value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: false
+      }
+    ]
+  }
 }
 
 interface IMatchProps {
@@ -107,15 +310,23 @@ type IFullProps = {
   modifyApplication: typeof modifyApplication
   goBack: typeof goBack
   goToHome: typeof goToHome
-  goToMainContactPoint: typeof goToMainContactPoint
+  goToBirthContactPoint: typeof goToBirthContactPoint
+  goToDeathContactPoint: typeof goToDeathContactPoint
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  goToDeathRegistration: typeof goToDeathRegistration
   goToPrimaryApplicant: typeof goToPrimaryApplicant
 } & InjectedIntlProps &
   RouteComponentProps<IMatchProps>
 
 interface IState {
   informant: string
+  phoneNumber: string
+  relationship: string
+  isPhoneNoError: boolean
+  touched: boolean
+  isError: boolean
 }
+
 export class SelectInformantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
@@ -126,7 +337,18 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           this.props.application.data[registrationSection.id] &&
           (this.props.application.data[registrationSection.id]
             .presentAtBirthRegistration as string)) ||
-        ''
+        '',
+      phoneNumber:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
+            .registrationPhone as string)) ||
+        '',
+      relationship: '',
+      isPhoneNoError: false,
+      touched: false,
+      isError: false
     }
   }
 
@@ -150,8 +372,16 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       })
       goToPrimaryApplicant(this.props.match.params.applicationId)
-    } else if (this.state.informant && this.state.informant !== 'error') {
-      const { application, goToMainContactPoint } = this.props
+    } else if (
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant !== INFORMANT.SOMEONE_ELSE
+    ) {
+      const {
+        application,
+        goToBirthContactPoint,
+        goToDeathContactPoint
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -166,13 +396,91 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       })
 
-      goToMainContactPoint(this.props.match.params.applicationId)
+      this.props.location.pathname.includes(Event.BIRTH)
+        ? goToBirthContactPoint(this.props.match.params.applicationId)
+        : goToDeathContactPoint(this.props.match.params.applicationId)
+    } else if (
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant === INFORMANT.SOMEONE_ELSE &&
+      this.state.phoneNumber &&
+      !this.state.isPhoneNoError &&
+      this.state.relationship !== ''
+    ) {
+      const { application, goToDeathRegistration } = this.props
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          registration: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: this.state.informant,
+              registrationPhone: this.state.phoneNumber,
+              whoseContactDetails: this.state.relationship,
+              applicantOtherRelationship: this.state.relationship
+            }
+          }
+        }
+      })
+
+      goToDeathRegistration(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
   }
+  handleRelationshipChange = (value: string) => {
+    this.setState({
+      relationship: value,
+      touched: true,
+      isError: false
+    })
+  }
+  handlePhoneNoChange = (value: string) => {
+    let invalidPhoneNo = false
+    if (phoneNumberFormat(value)) {
+      invalidPhoneNo = true
+    }
+    this.setState({
+      isPhoneNoError: invalidPhoneNo ? true : false,
+      phoneNumber: value,
+      touched: true,
+      isError: false
+    })
+  }
+  renderPhoneNumberField = (): JSX.Element => {
+    return (
+      <InputField
+        id="phone_number"
+        label={this.props.intl.formatMessage(messages.phoneNoLabel)}
+        touched={this.state.touched}
+        error={
+          this.state.isPhoneNoError
+            ? this.props.intl.formatMessage(messages.phoneNoError)
+            : ''
+        }
+        hideAsterisk={true}
+      >
+        <TextInput
+          id="phone_number_input"
+          type="tel"
+          name={PHONE_NO_FIELD_STRING}
+          isSmallSized={true}
+          value={this.state.phoneNumber}
+          onChange={e => this.handlePhoneNoChange(e.target.value)}
+          touched={this.state.touched}
+          error={this.state.isPhoneNoError}
+        />
+      </InputField>
+    )
+  }
   render() {
     const { intl } = this.props
+    const event = this.props.location.pathname.includes(Event.BIRTH)
+      ? Event.BIRTH
+      : Event.DEATH
+    const infornantFields = setInformantFields(intl, event)
     return (
       <Container>
         <EventTopBar
@@ -188,75 +496,65 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           >
             {intl.formatMessage(messages.back)}
           </TertiaryButton>
-          <Title>{intl.formatMessage(messages.informantTitle)}</Title>
+
+          <Title>
+            {event === Event.BIRTH
+              ? intl.formatMessage(messages.birthInformantTitle)
+              : intl.formatMessage(messages.deathInformantTitle)}
+          </Title>
           {this.state.informant === 'error' && (
             <ErrorText id="error_text">
-              {intl.formatMessage(messages.errorMessage)}
+              {event === Event.BIRTH
+                ? intl.formatMessage(messages.birthErrorMessage)
+                : intl.formatMessage(messages.deathErrorMessage)}
             </ErrorText>
           )}
           <Actions id="select_parent_informant">
-            <RadioButton
-              size="large"
-              key="select_informant_mother"
-              name="birthevent"
-              label={intl.formatMessage(messages.mother)}
-              value={INFORMANT.MOTHER}
-              id="select_informant_mother"
-              selected={
-                this.state.informant === INFORMANT.MOTHER
-                  ? INFORMANT.MOTHER
-                  : ''
-              }
-              onChange={() => this.setState({ informant: INFORMANT.MOTHER })}
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_father"
-              name="birthevent"
-              label={intl.formatMessage(messages.father)}
-              value={INFORMANT.FATHER}
-              id="select_informant_father"
-              selected={
-                this.state.informant === INFORMANT.FATHER
-                  ? INFORMANT.FATHER
-                  : ''
-              }
-              onChange={() => this.setState({ informant: INFORMANT.FATHER })}
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_parents"
-              name="birthevent"
-              label={intl.formatMessage(messages.parents)}
-              value={INFORMANT.BOTH_PARENTS}
-              id="select_informant_parents"
-              selected={
-                this.state.informant === INFORMANT.BOTH_PARENTS
-                  ? INFORMANT.BOTH_PARENTS
-                  : ''
-              }
-              onChange={() =>
-                this.setState({ informant: INFORMANT.BOTH_PARENTS })
-              }
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_self"
-              name="birthevent"
-              label={intl.formatMessage(messages.self)}
-              value={INFORMANT.SELF}
-              id="select_informant_self"
-              disabled={true}
-            />
-            <RadioButton
-              size="large"
-              key="select_informant_someone"
-              name="birthevent"
-              label={intl.formatMessage(messages.someoneElse)}
-              value={INFORMANT.SOMEONE_ELSE}
-              disabled={true}
-              id="select_informant_someone"
-            />
+            {infornantFields.map((infornantField: IInformantField) => {
+              return (
+                <RadioButton
+                  size={RADIO_BUTTON_LARGE_STRING}
+                  key={infornantField.id}
+                  name={INFORMANT_FIELD_STRING}
+                  label={infornantField.option.label}
+                  value={infornantField.option.value}
+                  id={infornantField.id}
+                  selected={
+                    this.state.informant === infornantField.option.value
+                      ? infornantField.option.value
+                      : ''
+                  }
+                  onChange={() =>
+                    this.setState({
+                      informant: infornantField.option.value as string
+                    })
+                  }
+                  disabled={infornantField.disabled}
+                />
+              )
+            })}
+            {this.state.informant === INFORMANT.SOMEONE_ELSE &&
+              event === Event.DEATH && (
+                <ChildContainer>
+                  <InputField
+                    id="relationship"
+                    label={intl.formatMessage(messages.relationshipLabel)}
+                    touched={this.state.touched}
+                    hideAsterisk={true}
+                  >
+                    <TextInput
+                      id="relationship_input"
+                      name="relationship"
+                      isSmallSized={true}
+                      onChange={e =>
+                        this.handleRelationshipChange(e.target.value)
+                      }
+                      touched={this.state.touched}
+                    />
+                  </InputField>
+                  {this.renderPhoneNumberField()}
+                </ChildContainer>
+              )}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(messages.continueButton)}
@@ -279,14 +577,18 @@ const mapStateToProps = (
   }
 }
 
-export const SelectInformant = connect(
-  mapStateToProps,
-  {
-    goBack,
-    goToHome,
-    goToMainContactPoint,
-    goToBirthRegistrationAsParent,
-    goToPrimaryApplicant,
-    modifyApplication
-  }
-)(injectIntl(SelectInformantView))
+export const SelectInformant = withRouter(
+  connect(
+    mapStateToProps,
+    {
+      goBack,
+      goToHome,
+      goToBirthContactPoint,
+      goToDeathContactPoint,
+      goToBirthRegistrationAsParent,
+      goToPrimaryApplicant,
+      goToDeathRegistration,
+      modifyApplication
+    }
+  )(injectIntl(SelectInformantView))
+) as any
