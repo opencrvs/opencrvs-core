@@ -264,7 +264,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           <span>Logout</span>
           <Logout />
         </LogoutHeader>
-        <Container>
+        <Container onClick={this.focusKeypad}>
           <Logo />
           {this.showName()}
 

@@ -447,6 +447,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <>
             <EventTopBar
               title={intl.formatMessage(title, { event: application.event })}
+              iconColor={
+                application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                  ? 'orange'
+                  : 'violet'
+              }
               saveAction={{
                 handler: this.onSaveAsDraftClicked,
                 label: intl.formatMessage(messages.saveExitButton)
