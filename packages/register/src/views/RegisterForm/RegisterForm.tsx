@@ -434,7 +434,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   render() {
     const {
-      goToPage,
       intl,
       setAllFieldsDirty,
       application,
@@ -442,20 +441,23 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       offlineResources,
       handleSubmit,
-      duplicate
+      duplicate,
+      activeSection
     } = this.props
 
     const isReviewForm = application.review
-    let activeSection: IFormSection = this.props.activeSection
 
-    if (activeSection.viewType === 'hidden') {
-      const nextSec = getNextSection(registerForm.sections, activeSection)
-      if (nextSec) {
-        activeSection = nextSec
-      }
+    let nextSection = getNextSection(
+      registerForm.sections,
+      activeSection
+    ) as IFormSection
+
+    if (nextSection && nextSection.viewType === 'hidden') {
+      nextSection = getNextSection(
+        registerForm.sections,
+        nextSection
+      ) as IFormSection
     }
-
-    const nextSection = getNextSection(registerForm.sections, activeSection)
     const title = isReviewForm
       ? messages.reviewEventRegistration
       : activeSection.viewType === VIEW_TYPE.PREVIEW
