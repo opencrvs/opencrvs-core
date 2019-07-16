@@ -7,7 +7,8 @@ import {
   StatusOrange,
   StatusProgress,
   StatusGreen,
-  StatusRejected
+  StatusRejected,
+  Duplicate
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
@@ -190,7 +191,7 @@ const messages: {
   },
   reviewDuplicates: {
     id: 'register.registrarHome.results.reviewDuplicates',
-    defaultMessage: 'Review Duplicates',
+    defaultMessage: 'Review',
     description:
       'The title of review duplicates button in expanded area of list item'
   },
@@ -299,12 +300,14 @@ export class RegistrarHomeView extends React.Component<
 
     return transformedData.map(reg => {
       const actions = [] as IAction[]
+      let icon: JSX.Element = <div />
       if (this.userHasRegisterScope()) {
         if (reg.duplicates && reg.duplicates.length > 0) {
           actions.push({
             label: this.props.intl.formatMessage(messages.reviewDuplicates),
             handler: () => this.props.goToReviewDuplicate(reg.id)
           })
+          icon = <Duplicate />
         } else {
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
@@ -332,7 +335,8 @@ export class RegistrarHomeView extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        actions
+        actions,
+        icon
       }
     })
   }
@@ -716,20 +720,22 @@ export class RegistrarHomeView extends React.Component<
                         label: this.props.intl.formatMessage(
                           messages.listItemApplicationDate
                         ),
-                        width: 23,
+                        width: 20,
                         key: 'applicationTimeElapsed'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemEventDate
                         ),
-                        width: 23,
+                        width: 20,
                         key: 'eventTimeElapsed'
                       },
                       {
-                        label: this.props.intl.formatMessage(
-                          messages.listItemAction
-                        ),
+                        width: 6,
+                        key: 'icons',
+                        isIconColumn: true
+                      },
+                      {
                         width: 20,
                         key: 'actions',
                         isActionColumn: true,

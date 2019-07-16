@@ -17,6 +17,7 @@ jobs:
         - yarn dev:secrets:gen
         - docker swarm init
         - yarn compose:all -d
+        - sudo chmod 775 data/elasticsearch
         - sleep 10
         - wait-on http://localhost:3000 http://localhost:3020
         - yarn db:backup:restore
