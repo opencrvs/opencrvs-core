@@ -51,15 +51,26 @@ const messages: {
     defaultMessage: 'Event details',
     description: 'Form section title for Death Event'
   },
+  deathEventDateTitle: {
+    id: 'register.form.section.deathEventDateTitle',
+    defaultMessage: 'When did the death occur?',
+    description: 'Form section title for Death Event Date'
+  },
   deathDate: {
     id: 'formFields.deathDate',
-    defaultMessage: 'Date of Occurrence',
+    defaultMessage:
+      'Enter the date in the format day, month and year. For example 24 10 2020.',
     description: 'Label for form field: Date of occurrence'
   },
-  manner: {
-    id: 'formFields.manner',
-    defaultMessage: 'Manner of Death',
-    description: 'Label for form field: Manner of death'
+  deathEventMannerTitle: {
+    id: 'register.form.section.deathEventMannerTitle',
+    defaultMessage: 'What was the manner of death?',
+    description: 'Form section title for Death Event Date'
+  },
+  selectOne: {
+    id: 'formFields.selectOne',
+    defaultMessage: 'Please select an option',
+    description: 'Generic label for select on option'
   },
   mannerNatural: {
     id: 'formFields.mannerNatural',
@@ -91,10 +102,20 @@ const messages: {
     defaultMessage: 'Place of Occurrence of Death',
     description: 'Title for place of occurrence of death'
   },
-  deathLocation: {
-    id: 'formFields.birthLocation',
-    defaultMessage: 'Hospital / Clinic',
+  deathAtFacility: {
+    id: 'formFields.deathAtFacility',
+    defaultMessage: 'What hospital did the death occur at?',
     description: 'Label for form field: Hospital or Health Institution'
+  },
+  deathAtPrivateHome: {
+    id: 'formFields.deathAtPrivateHome',
+    defaultMessage: 'What is the address of the private home?',
+    description: 'Label for form field: Private Home Address'
+  },
+  deathAtOtherLocation: {
+    id: 'formFields.deathAtOtherLocation',
+    defaultMessage: 'What is the other address did the death occur at?',
+    description: 'Label for form field: Other Location Address'
   },
   deathPlaceAddress: {
     id: 'formFields.deathPlaceAddress',
@@ -126,10 +147,10 @@ const messages: {
     defaultMessage: 'Hospital',
     description: 'Select item for hospital'
   },
-  otherHealthInstitution: {
-    id: 'formFields.otherHealthInstitution',
-    defaultMessage: 'Other Health Institution',
-    description: 'Select item for Other Health Institution'
+  healthInstitution: {
+    id: 'formFields.healthInstitution',
+    defaultMessage: 'Health Institution',
+    description: 'Select item for Health Institution'
   },
   privateHome: {
     id: 'formFields.privateHome',
@@ -155,11 +176,13 @@ export const eventSection: IFormSection = {
   groups: [
     {
       id: 'deathEvent-deathDate-view-group',
+      showFirstFieldTitle: true,
       fields: [
         {
           name: 'deathDate',
           type: DATE,
-          label: messages.deathDate,
+          label: messages.deathEventDateTitle,
+          instruction: messages.deathDate,
           required: true,
           initialValue: '',
           validate: [isValidDeathOccurrenceDate],
@@ -172,11 +195,12 @@ export const eventSection: IFormSection = {
     },
     {
       id: 'deathEvent-deathManner-view-group',
+      showFirstFieldTitle: true,
       fields: [
         {
           name: 'manner',
-          type: SELECT_WITH_OPTIONS,
-          label: messages.manner,
+          type: RADIO_GROUP,
+          label: messages.deathEventMannerTitle,
           required: false,
           initialValue: '',
           validate: [],
@@ -205,7 +229,8 @@ export const eventSection: IFormSection = {
       ]
     },
     {
-      id: 'deathEvent-view-group',
+      id: 'deathEvent-deathPlaceAddress-view-group',
+      showFirstFieldTitle: true,
       fields: [
         {
           name: 'deathPlaceAddress',
@@ -223,7 +248,9 @@ export const eventSection: IFormSection = {
               value: 'CURRENT',
               label: messages.deathPlaceAddressSameAsCurrent
             },
-            { value: 'OTHER', label: messages.deathPlaceAddressOther }
+            { value: 'PRIVATE_HOME', label: messages.privateHome },
+            { value: 'HEALTH_INSTITUTION', label: messages.healthInstitution },
+            { value: 'OTHER', label: messages.otherInstitution }
           ],
           conditionals: [],
           mapping: {
@@ -232,32 +259,17 @@ export const eventSection: IFormSection = {
           }
         },
         {
-          name: 'placeOfDeath',
-          type: SELECT_WITH_OPTIONS,
-          label: messages.deathPlaceAddressType,
-          required: false,
+          name: 'deathLocationSection',
+          type: SUBSECTION,
+          label: messages.deathAtFacility,
           initialValue: '',
           validate: [],
-          placeholder: messages.select,
-          options: [
-            { value: 'HOSPITAL', label: messages.hospital },
-            {
-              value: 'OTHER_HEALTH_INSTITUTION',
-              label: messages.otherHealthInstitution
-            },
-            { value: 'PRIVATE_HOME', label: messages.privateHome },
-            { value: 'OTHER', label: messages.otherInstitution }
-          ],
-          conditionals: [conditionals.deathPlaceOther],
-          mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationIDQueryTransformer()
-          }
+          conditionals: [conditionals.deathPlaceAddressTypeHeathInstitue]
         },
         {
           name: 'deathLocation',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: messages.deathLocation,
+          label: messages.selectOne,
           required: false,
           initialValue: '',
           validate: [],
@@ -266,11 +278,27 @@ export const eventSection: IFormSection = {
             resource: OFFLINE_FACILITIES_KEY,
             dependency: 'placeOfDeath'
           },
-          conditionals: [conditionals.placeOfDeathHospital],
+          conditionals: [conditionals.deathPlaceAddressTypeHeathInstitue],
           mapping: {
             mutation: eventLocationMutationTransformer(),
             query: eventLocationIDQueryTransformer()
           }
+        },
+        {
+          name: 'deathAtPrivateHomeSection',
+          type: SUBSECTION,
+          label: messages.deathAtPrivateHome,
+          initialValue: '',
+          validate: [],
+          conditionals: [conditionals.deathPlaceAtPrivateHome]
+        },
+        {
+          name: 'deathAtOtherLocationSection',
+          type: SUBSECTION,
+          label: messages.deathAtOtherLocation,
+          initialValue: '',
+          validate: [],
+          conditionals: [conditionals.deathPlaceAtOtherLocation]
         },
         {
           name: 'country',
@@ -281,10 +309,7 @@ export const eventSection: IFormSection = {
           validate: [],
           placeholder: messages.select,
           options: countries,
-          conditionals: [
-            conditionals.deathPlaceOther,
-            conditionals.otherDeathEventLocation
-          ],
+          conditionals: [conditionals.deathPlaceOther],
           mapping: {
             mutation: eventLocationMutationTransformer(),
             query: eventLocationQueryTransformer()
@@ -302,11 +327,7 @@ export const eventSection: IFormSection = {
             resource: OFFLINE_LOCATIONS_KEY,
             dependency: 'country'
           },
-          conditionals: [
-            conditionals.country,
-            conditionals.deathPlaceOther,
-            conditionals.otherDeathEventLocation
-          ],
+          conditionals: [conditionals.country, conditionals.deathPlaceOther],
           mapping: {
             mutation: eventLocationMutationTransformer(),
             query: eventLocationQueryTransformer()
@@ -327,7 +348,6 @@ export const eventSection: IFormSection = {
           conditionals: [
             conditionals.country,
             conditionals.state,
-            conditionals.otherDeathEventLocation,
             conditionals.deathPlaceOther
           ],
           mapping: {
@@ -351,7 +371,6 @@ export const eventSection: IFormSection = {
             conditionals.country,
             conditionals.state,
             conditionals.district,
-            conditionals.otherDeathEventLocation,
             conditionals.deathPlaceOther
           ],
           mapping: {
@@ -377,7 +396,6 @@ export const eventSection: IFormSection = {
             conditionals.district,
             conditionals.addressLine4,
             conditionals.isNotCityLocation,
-            conditionals.otherDeathEventLocation,
             conditionals.deathPlaceOther
           ],
           mapping: {
@@ -397,7 +415,6 @@ export const eventSection: IFormSection = {
             conditionals.state,
             conditionals.district,
             conditionals.addressLine4,
-            conditionals.otherDeathEventLocation,
             conditionals.isCityLocation
           ],
           mapping: {
@@ -418,7 +435,6 @@ export const eventSection: IFormSection = {
             conditionals.district,
             conditionals.addressLine4,
             conditionals.addressLine3,
-            conditionals.otherDeathEventLocation,
             conditionals.deathPlaceOther
           ],
           mapping: {
@@ -438,7 +454,6 @@ export const eventSection: IFormSection = {
             conditionals.state,
             conditionals.district,
             conditionals.addressLine4,
-            conditionals.otherDeathEventLocation,
             conditionals.isCityLocation
           ],
           mapping: {
@@ -458,7 +473,6 @@ export const eventSection: IFormSection = {
             conditionals.state,
             conditionals.district,
             conditionals.addressLine4,
-            conditionals.otherDeathEventLocation,
             conditionals.isCityLocation
           ],
           mapping: {
@@ -479,7 +493,6 @@ export const eventSection: IFormSection = {
             conditionals.district,
             conditionals.addressLine4,
             conditionals.addressLine3,
-            conditionals.otherDeathEventLocation,
             conditionals.deathPlaceOther
           ],
           mapping: {
@@ -500,7 +513,6 @@ export const eventSection: IFormSection = {
             conditionals.district,
             conditionals.addressLine4,
             conditionals.addressLine3,
-            conditionals.otherDeathEventLocation,
             conditionals.deathPlaceOther
           ],
           mapping: {

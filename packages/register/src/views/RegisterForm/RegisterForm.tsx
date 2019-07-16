@@ -77,6 +77,14 @@ const CancelButton = styled.a`
 const StyledLinkButton = styled(LinkButton)`
   margin-left: 32px;
 `
+const Required = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.error};
+  flex-grow: 0;
+`
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -517,19 +525,40 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <FormSectionTitle
                     id={`form_section_title_${activeSectionGroup.id}`}
                   >
-                    {intl.formatMessage(
-                      activeSectionGroup.title || activeSection.title
-                    )}
-                    {activeSection.optional && (
-                      <Optional
-                        id={`form_section_opt_label_${activeSectionGroup.id}`}
-                        disabled={
-                          activeSectionGroup.disabled || activeSection.disabled
-                        }
-                      >
-                        &nbsp;&nbsp;•&nbsp;
-                        {intl.formatMessage(messages.optionalLabel)}
-                      </Optional>
+                    {(activeSectionGroup.showFirstFieldTitle && (
+                      <>
+                        {(activeSectionGroup.fields[0].hideHeader = true)}
+                        {intl.formatMessage(activeSectionGroup.fields[0].label)}
+                        {activeSectionGroup.fields[0].required && (
+                          <Required
+                            disabled={
+                              activeSectionGroup.disabled ||
+                              activeSection.disabled ||
+                              false
+                            }
+                          >
+                            &nbsp;*
+                          </Required>
+                        )}
+                      </>
+                    )) || (
+                      <>
+                        {intl.formatMessage(
+                          activeSectionGroup.title || activeSection.title
+                        )}
+                        {activeSection.optional && (
+                          <Optional
+                            id={`form_section_opt_label_${activeSectionGroup.id}`}
+                            disabled={
+                              activeSectionGroup.disabled ||
+                              activeSection.disabled
+                            }
+                          >
+                            &nbsp;&nbsp;•&nbsp;
+                            {intl.formatMessage(messages.optionalLabel)}
+                          </Optional>
+                        )}
+                      </>
                     )}
                   </FormSectionTitle>
                   {activeSection.notice && (

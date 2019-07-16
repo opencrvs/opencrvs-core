@@ -22,7 +22,9 @@ import {
   ILoaderButton,
   IFieldInput,
   IFormSection,
-  IQuery
+  IQuery,
+  DATE,
+  IDateFormField
 } from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -73,6 +75,13 @@ export const internationaliseFieldObject = (
     base.type === CHECKBOX_GROUP
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
+  }
+
+  if (base.type === DATE && (field as IDateFormField).instruction) {
+    ;(base as any).instruction = intl.formatMessage(
+      // @ts-ignore
+      (field as IDateFormField).instruction
+    )
   }
 
   if (base.type === FETCH_BUTTON) {
@@ -438,20 +447,14 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  placeOfDeathHospital: {
+  deathPlaceAddressTypeHeathInstitue: {
     action: 'hide',
-    expression:
-      '(values.placeOfDeath!="HOSPITAL" && values.placeOfDeath!="OTHER_HEALTH_INSTITUTION")'
+    expression: 'values.deathPlaceAddress!="HEALTH_INSTITUTION"'
   },
   otherBirthEventLocation: {
     action: 'hide',
     expression:
       '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
-  },
-  otherDeathEventLocation: {
-    action: 'hide',
-    expression:
-      '(values.placeOfDeath!="OTHER" && values.placeOfDeath!="PRIVATE_HOME")'
   },
   isNotCityLocation: {
     action: 'hide',
@@ -482,6 +485,15 @@ export const conditionals: IConditionals = {
     expression: 'values.applicantPermanentAddressSameAsCurrent'
   },
   deathPlaceOther: {
+    action: 'hide',
+    expression:
+      '(values.deathPlaceAddress !== "PRIVATE_HOME" && values.deathPlaceAddress !== "OTHER")'
+  },
+  deathPlaceAtPrivateHome: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "PRIVATE_HOME"'
+  },
+  deathPlaceAtOtherLocation: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "OTHER"'
   },

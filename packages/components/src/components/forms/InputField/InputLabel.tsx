@@ -22,7 +22,7 @@ const StyledInputLabel = styledInputLabel`
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
       ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 515px;
+        width: 615px;
       }`
       : ''
   }}

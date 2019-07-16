@@ -172,6 +172,7 @@ export interface IFormFieldBase {
   placeholder?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
+  hideHeader?: boolean
   mode?: THEME_MODE
 }
 
@@ -218,6 +219,7 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
 }
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
+  instruction?: FormattedMessage.MessageDescriptor
 }
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
@@ -344,9 +346,8 @@ export interface IConditionals {
   deathCertificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  placeOfDeathHospital: IConditional
+  deathPlaceAddressTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
-  otherDeathEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isNotCityLocationPermanent: IConditional
@@ -354,6 +355,8 @@ export interface IConditionals {
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
+  deathPlaceAtPrivateHome: IConditional
+  deathPlaceAtOtherLocation: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
@@ -395,6 +398,7 @@ export interface IFormSectionGroup {
   title?: FormattedMessage.MessageDescriptor
   fields: IFormField[]
   disabled?: boolean
+  showFirstFieldTitle?: boolean
 }
 
 export interface IForm {
@@ -419,6 +423,7 @@ export interface Ii18nFormFieldBase {
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
+  hideHeader?: boolean
   mode?: THEME_MODE
   placeholder?: string
 }
@@ -471,6 +476,7 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
+  instruction?: string
 }
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA

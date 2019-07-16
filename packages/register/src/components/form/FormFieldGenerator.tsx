@@ -142,6 +142,7 @@ function GeneratedInputField({
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,
+    hideInputHeader: fieldDefinition.hideHeader,
     error,
     touched,
     mode: fieldDefinition.mode
@@ -224,6 +225,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <DateField
           {...inputProps}
+          instruction={fieldDefinition.instruction}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
         />
