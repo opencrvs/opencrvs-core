@@ -533,7 +533,8 @@ export class InProgressTabComponent extends React.Component<
               {
                 label: intl.formatMessage(messages.listItemName),
                 width: 35,
-                key: 'name'
+                key: 'name',
+                errorValue: intl.formatMessage(messages.nameColumnErrorValue)
               },
               {
                 label: intl.formatMessage(messages.listItemModificationDate),
