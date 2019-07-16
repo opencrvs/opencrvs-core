@@ -16,6 +16,7 @@ export interface IProps {
   meta?: { touched: boolean; error: string }
   focusInput?: boolean
   notice?: string
+  ignorePlaceHolder?: boolean
   onChange: (dateString: string) => void
 }
 
@@ -133,7 +134,14 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const { id, meta, focusInput, notice, ...props } = this.props
+    const {
+      id,
+      meta,
+      focusInput,
+      notice,
+      ignorePlaceHolder,
+      ...props
+    } = this.props
 
     return (
       <>
@@ -151,6 +159,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             touched={meta && meta.touched}
             focusInput={focusInput}
             type="number"
+            placeholder={ignorePlaceHolder ? '' : 'dd'}
             min={1}
             max={31}
             value={this.state.dd}
@@ -164,6 +173,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             touched={meta && meta.touched}
             focusInput={false}
             type="number"
+            placeholder={ignorePlaceHolder ? '' : 'mm'}
             maxLength={2}
             min={1}
             max={12}
@@ -178,6 +188,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             touched={meta && meta.touched}
             focusInput={false}
             type="number"
+            placeholder={ignorePlaceHolder ? '' : 'yyyy'}
             maxLength={4}
             min={1900}
             value={this.state.yyyy}

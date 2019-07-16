@@ -81,32 +81,32 @@ const messages: {
   },
   applicantTitle: {
     id: 'register.form.section.applicantTitle',
-    defaultMessage: "Applicant's details",
+    defaultMessage: "What are the applicant's details?",
     description: 'Form section title for applicants'
   },
   applicantsIdType: {
     id: 'formFields.applicantsIdType',
-    defaultMessage: 'Existing ID',
+    defaultMessage: 'Type of ID',
     description: 'Label for form field: Existing ID'
   },
   applicantsGivenNames: {
     id: 'formFields.applicantsGivenNames',
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'Bengali Given Name',
     description: 'Label for form field: Given names'
   },
   applicantsFamilyName: {
     id: 'formFields.applicantsFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'Bengali Family Name',
     description: 'Label for form field: Family name'
   },
   applicantsGivenNamesEng: {
     id: 'formFields.applicantsGivenNamesEng',
-    defaultMessage: 'First Name(s) in English',
+    defaultMessage: 'English Given Name',
     description: 'Label for form field: Given names in english'
   },
   applicantsFamilyNameEng: {
     id: 'formFields.applicantsFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
+    defaultMessage: 'English Family Name',
     description: 'Label for form field: Family name in english'
   },
   applicantsNationality: {
@@ -119,51 +119,6 @@ const messages: {
     defaultMessage: 'Date of Birth',
     description: 'Label for form field: Date of birth'
   },
-  applicantsRelationWithDeceased: {
-    id: 'formFields.applicantsRelationWithDeceased',
-    defaultMessage: 'Relationship to Deceased',
-    description: 'Label for Relationship to Deceased select'
-  },
-  relationFather: {
-    id: 'formFields.applicantRelation.father',
-    defaultMessage: 'Father',
-    description: 'Label for option Father'
-  },
-  relationMother: {
-    id: 'formFields.applicantRelation.mother',
-    defaultMessage: 'Mother',
-    description: 'Label for option Mother'
-  },
-  relationSpouse: {
-    id: 'formFields.applicantRelation.spouse',
-    defaultMessage: 'Spouse',
-    description: 'Label for option Spouse'
-  },
-  relationSon: {
-    id: 'formFields.applicantRelation.son',
-    defaultMessage: 'Son',
-    description: 'Label for option Son'
-  },
-  relationDaughter: {
-    id: 'formFields.applicantRelation.daughter',
-    defaultMessage: 'Daughter',
-    description: 'Label for option Daughter'
-  },
-  relationExtendedFamily: {
-    id: 'formFields.applicantRelation.extendedFamily',
-    defaultMessage: 'Extended Family',
-    description: 'Label for option Extended Family'
-  },
-  relationOther: {
-    id: 'formFields.applicantRelation.other',
-    defaultMessage: 'Other(Specify)',
-    description: 'Label for option Other'
-  },
-  applicantOtherRelationship: {
-    id: 'formFields.applicantOtherRelationship',
-    defaultMessage: 'Other relation',
-    description: 'Label for form field: Other relation'
-  },
   permanentAddressSameAsCurrent: {
     id: 'formFields.applicantsCurrentAddressSameAsPermanent',
     defaultMessage:
@@ -171,20 +126,10 @@ const messages: {
     description:
       'Title for the radio button to select that the applicants current address is the same as their permanent address'
   },
-  applicantsPhone: {
-    defaultMessage: 'Phone number',
-    id: 'formFields.applicant.phone',
-    description: 'Input label for phone input'
-  },
   currentAddress: {
     id: 'formFields.currentAddress',
-    defaultMessage: 'Current Address',
+    defaultMessage: 'What is their current address?',
     description: 'Title for the current address fields'
-  },
-  permanentAddress: {
-    id: 'formFields.permanentAddress',
-    defaultMessage: 'Permanent Address',
-    description: 'Title for the permanent address fields'
   },
   fetchInformantDetails: {
     id: 'formFields.fetchInformantDetails',
@@ -361,6 +306,26 @@ export const applicantsSection: IFormSection = {
           errorTitle: messages.fetchIdentifierModalErrorTitle
         },
         {
+          name: 'nationality',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.applicantsNationality,
+          required: false,
+          initialValue: 'BGD',
+          validate: [],
+          placeholder: messages.select,
+          options: countries,
+          mapping: {
+            mutation: fieldValueNestingTransformer(
+              NESTED_SECTION,
+              fieldToArrayTransformer
+            ),
+            query: nestedValueToFieldTransformer(
+              NESTED_SECTION,
+              arrayToFieldTransformer
+            )
+          }
+        },
+        {
           name: 'applicantFirstNames',
           type: TEXT,
           label: messages.applicantsGivenNames,
@@ -437,26 +402,6 @@ export const applicantsSection: IFormSection = {
           }
         },
         {
-          name: 'nationality',
-          type: SELECT_WITH_OPTIONS,
-          label: messages.applicantsNationality,
-          required: false,
-          initialValue: 'BGD',
-          validate: [],
-          placeholder: messages.select,
-          options: countries,
-          mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToArrayTransformer
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              arrayToFieldTransformer
-            )
-          }
-        },
-        {
           name: 'applicantBirthDate',
           type: DATE,
           label: messages.applicantsDateOfBirth,
@@ -471,80 +416,6 @@ export const applicantsSection: IFormSection = {
             query: nestedValueToFieldTransformer(
               NESTED_SECTION,
               fieldValueTransformer('birthDate')
-            )
-          }
-        },
-        {
-          name: 'applicantsRelationToDeceased',
-          type: SELECT_WITH_OPTIONS,
-          label: messages.applicantsRelationWithDeceased,
-          required: true,
-          initialValue: '',
-          validate: [],
-          placeholder: messages.select,
-          options: [
-            { value: 'FATHER', label: messages.relationFather },
-            { value: 'MOTHER', label: messages.relationMother },
-            { value: 'SPOUSE', label: messages.relationSpouse },
-            {
-              value: 'SON',
-              label: messages.relationSon
-            },
-            {
-              value: 'DAUGHTER',
-              label: messages.relationDaughter
-            },
-            {
-              value: 'EXTENDED_FAMILY',
-              label: messages.relationExtendedFamily
-            },
-            {
-              value: 'OTHER',
-              label: messages.relationOther
-            }
-          ],
-          mapping: {
-            mutation: fieldValueSectionExchangeTransformer(
-              'informant',
-              'relationship'
-            ),
-            query: sectionFieldExchangeTransformer('informant', 'relationship')
-          }
-        },
-        {
-          name: 'applicantOtherRelationship',
-          type: TEXT,
-          label: messages.applicantOtherRelationship,
-          required: true,
-          initialValue: '',
-          validate: [],
-          mapping: {
-            mutation: fieldValueSectionExchangeTransformer(
-              'informant',
-              'otherRelationship'
-            ),
-            query: sectionFieldExchangeTransformer(
-              'informant',
-              'otherRelationship'
-            )
-          },
-          conditionals: [conditionals.otherRelationship]
-        },
-        {
-          name: 'applicantPhone',
-          type: TEL,
-          label: messages.applicantsPhone,
-          required: true,
-          initialValue: '',
-          validate: [phoneNumberFormat],
-          mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToPhoneNumberTransformer()
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              phoneNumberToFieldTransformer
             )
           }
         },
@@ -843,16 +714,6 @@ export const applicantsSection: IFormSection = {
               NESTED_SECTION,
               addressToFieldTransformer('CURRENT', 0, 'postalCode')
             )
-          }
-        },
-        {
-          name: 'permanentAddress',
-          type: SUBSECTION,
-          label: messages.permanentAddress,
-          initialValue: '',
-          validate: [],
-          mapping: {
-            mutation: fieldValueNestingTransformer(NESTED_SECTION)
           }
         },
         {

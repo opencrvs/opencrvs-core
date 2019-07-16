@@ -228,6 +228,7 @@ function GeneratedInputField({
         <DateField
           {...inputProps}
           notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
         />

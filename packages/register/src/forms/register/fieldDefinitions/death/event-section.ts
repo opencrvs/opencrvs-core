@@ -184,6 +184,7 @@ export const eventSection: IFormSection = {
           type: DATE,
           label: messages.deathEventDateTitle,
           notice: messages.deathDate,
+          ignorePlaceHolder: true,
           required: true,
           initialValue: '',
           validate: [isValidDeathOccurrenceDate],
