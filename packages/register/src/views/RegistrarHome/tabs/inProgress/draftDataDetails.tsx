@@ -88,7 +88,7 @@ export class DraftDataDetailsComponent extends React.Component<IProps> {
         draft &&
         draft.data &&
         draft.data.registration &&
-        (draft.data.registration.applicant as string),
+        (draft.data.registration.whoseContactDetails as string),
       informantContactNumber:
         draft &&
         draft.data &&
