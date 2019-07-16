@@ -23,7 +23,7 @@ import {
   SELECT_DEATH_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken } from '@register/utils/authUtils'
+import { getToken, getTokenPayload } from '@register/utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -118,7 +118,19 @@ export function goBack() {
 }
 
 export function goToHome() {
-  return push(HOME)
+  const token = getToken()
+  if (!token) {
+    return push(HOME)
+  }
+  const scopes = (getTokenPayload(token) || { scope: '' }).scope
+  if (!scopes) {
+    return push(HOME)
+  }
+  if (scopes.includes('register')) {
+    return push('/registrar-home/progress')
+  } else {
+    return push('/field-agent-home/progress')
+  }
 }
 
 export function goToPerformance() {
