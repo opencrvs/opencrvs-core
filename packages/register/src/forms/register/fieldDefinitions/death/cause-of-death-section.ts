@@ -96,7 +96,7 @@ export const causeOfDeathSection: IFormSection = {
   groups: [
     {
       id: 'causeOfDeath-view-group',
-      showFirstFieldTitle: true,
+      showFieldTitle: true,
       fields: [
         {
           name: 'causeOfDeathEstablished',

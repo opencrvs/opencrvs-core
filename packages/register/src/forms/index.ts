@@ -401,7 +401,7 @@ export interface IFormSectionGroup {
   title?: FormattedMessage.MessageDescriptor
   fields: IFormField[]
   disabled?: boolean
-  showFirstFieldTitle?: boolean
+  showFieldTitle?: boolean
 }
 
 export interface IForm {

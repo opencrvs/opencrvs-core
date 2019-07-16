@@ -177,7 +177,7 @@ export const eventSection: IFormSection = {
   groups: [
     {
       id: 'deathEvent-deathDate-view-group',
-      showFirstFieldTitle: true,
+      showFieldTitle: true,
       fields: [
         {
           name: 'deathDate',
@@ -197,7 +197,7 @@ export const eventSection: IFormSection = {
     },
     {
       id: 'deathEvent-deathManner-view-group',
-      showFirstFieldTitle: true,
+      showFieldTitle: true,
       fields: [
         {
           name: 'manner',
@@ -233,7 +233,7 @@ export const eventSection: IFormSection = {
     },
     {
       id: 'deathEvent-deathPlaceAddress-view-group',
-      showFirstFieldTitle: true,
+      showFieldTitle: true,
       fields: [
         {
           name: 'deathPlaceAddress',

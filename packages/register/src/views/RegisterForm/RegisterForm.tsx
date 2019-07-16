@@ -525,7 +525,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <FormSectionTitle
                     id={`form_section_title_${activeSectionGroup.id}`}
                   >
-                    {(activeSectionGroup.showFirstFieldTitle && (
+                    {(activeSectionGroup.showFieldTitle && (
                       <>
                         {(activeSectionGroup.fields[0].hideHeader = true)}
                         {intl.formatMessage(activeSectionGroup.fields[0].label)}
