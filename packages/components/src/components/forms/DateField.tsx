@@ -7,7 +7,7 @@ import { Omit } from '../omit'
 const DateWrapper = styled.div`
   width: 100%;
 `
-const InstructionWrapper = styled.div`
+export const NoticeWrapper = styled.div`
   padding-bottom: 15px;
 `
 export interface IProps {
@@ -15,7 +15,7 @@ export interface IProps {
   disabled?: boolean
   meta?: { touched: boolean; error: string }
   focusInput?: boolean
-  instruction?: string
+  notice?: string
   onChange: (dateString: string) => void
 }
 
@@ -133,16 +133,16 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const { id, meta, focusInput, instruction, ...props } = this.props
+    const { id, meta, focusInput, notice, ...props } = this.props
 
     return (
       <>
         <DateWrapper id={id}>
-          <InstructionWrapper>
-            {instruction && (
-              <InputLabel id={`${id}_instruction`}>{instruction}</InputLabel>
-            )}
-          </InstructionWrapper>
+          {notice && (
+            <NoticeWrapper>
+              <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
+            </NoticeWrapper>
+          )}
           <DateSegment
             {...props}
             id={`${id}-dd`}

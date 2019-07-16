@@ -220,7 +220,7 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
 }
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
-  instruction?: FormattedMessage.MessageDescriptor
+  notice?: FormattedMessage.MessageDescriptor
 }
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
@@ -478,7 +478,7 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
-  instruction?: string
+  notice?: string
 }
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA

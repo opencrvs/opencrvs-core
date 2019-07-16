@@ -77,10 +77,10 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === DATE && (field as IDateFormField).instruction) {
-    ;(base as any).instruction = intl.formatMessage(
+  if (base.type === DATE && (field as IDateFormField).notice) {
+    ;(base as any).notice = intl.formatMessage(
       // @ts-ignore
-      (field as IDateFormField).instruction
+      (field as IDateFormField).notice
     )
   }
 

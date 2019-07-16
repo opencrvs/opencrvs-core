@@ -86,8 +86,6 @@ export const causeOfDeathSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.causeOfDeathTab,
   title: messages.causeOfDeathTitle,
-  optional: true,
-  notice: messages.causeOfDeathNotice,
   groups: [
     {
       id: 'causeOfDeath-view-group',

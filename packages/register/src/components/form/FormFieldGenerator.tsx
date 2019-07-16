@@ -226,7 +226,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <DateField
           {...inputProps}
-          instruction={fieldDefinition.instruction}
+          notice={fieldDefinition.notice}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
         />

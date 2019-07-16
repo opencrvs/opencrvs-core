@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { Radio } from './Radio'
 import { RadioButton } from '../../interface/RadioButton'
+import { NoticeWrapper } from '../DateField'
+import { InputLabel } from '../InputField/InputLabel'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -36,6 +38,7 @@ export interface IRadioGroupProps {
   name: string
   value: string
   size?: RadioSize
+  notice?: string
   onChange: (value: string) => void
 }
 
@@ -47,10 +50,15 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
   }
 
   render() {
-    const { options, value, name, size, ...props } = this.props
+    const { options, value, name, size, notice, ...props } = this.props
 
     return (
       <Wrapper>
+        {notice && (
+          <NoticeWrapper>
+            <InputLabel>{notice}</InputLabel>
+          </NoticeWrapper>
+        )}
         {size && size === RadioSize.LARGE ? (
           <LargeList>
             {options.map(option => {
