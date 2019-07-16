@@ -180,6 +180,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
+          size={fieldDefinition.size}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)

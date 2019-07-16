@@ -4,13 +4,13 @@ import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
   ICheckboxOption as CheckboxComponentOption,
-  THEME_MODE
+  THEME_MODE,
+  RadioSize
 } from '@opencrvs/components/lib/forms'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
-import { string } from 'joi'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -193,6 +193,7 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
+  size?: RadioSize
 }
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
@@ -436,6 +437,7 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
+  size?: RadioSize
 }
 
 type Name = {

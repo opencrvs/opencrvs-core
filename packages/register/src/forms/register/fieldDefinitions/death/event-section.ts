@@ -9,6 +9,7 @@ import {
   TEXT,
   NUMBER
 } from '@register/forms'
+import { RadioSize } from '@opencrvs/components/lib/forms'
 import { defineMessages } from 'react-intl'
 import { isValidDeathOccurrenceDate } from '@register/utils/validate'
 import { messages as addressMessages } from '@register/forms/address'
@@ -204,6 +205,7 @@ export const eventSection: IFormSection = {
           required: false,
           initialValue: '',
           validate: [],
+          size: RadioSize.LARGE,
           placeholder: messages.select,
           options: [
             { value: 'NATURAL_CAUSES', label: messages.mannerNatural },
@@ -239,6 +241,7 @@ export const eventSection: IFormSection = {
           required: true,
           initialValue: '',
           validate: [],
+          size: RadioSize.LARGE,
           options: [
             {
               value: 'PERMANENT',
