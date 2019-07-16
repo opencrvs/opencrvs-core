@@ -7,6 +7,7 @@
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
+    "postinstall": "yarn build",
     "build": "tsc -d"
   },
   "license": "NONE",
