@@ -118,15 +118,11 @@ export function goBack() {
 }
 
 export function goToHome() {
-  const token = getToken()
-  if (!token) {
-    return push(HOME)
-  }
-  const scopes = (getTokenPayload(token) || { scope: '' }).scope
+  const scopes = (getTokenPayload(getToken()) || { scope: '' }).scope
   if (!scopes) {
     return push(HOME)
   }
-  if (scopes.includes('register')) {
+  if (scopes && scopes.includes('register')) {
     return push('/registrar-home/progress')
   } else {
     return push('/field-agent-home/progress')
