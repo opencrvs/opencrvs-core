@@ -89,7 +89,7 @@ context('Birth Registration Integration Test', () => {
         cy.get('#registerApplicationBtn').click()
         // MODAL
         cy.get('#register_confirm').click()
-        cy.wait(1000)
+        cy.wait(6000)
       } else {
         cy.log('Birth review not found')
       }
@@ -254,7 +254,7 @@ context('Birth Registration Integration Test', () => {
         cy.get('#registerApplicationBtn').click()
         // MODAL
         cy.get('#register_confirm').click()
-        cy.wait(1000)
+        cy.wait(6000)
       } else {
         cy.log('Birth review not found')
       }
