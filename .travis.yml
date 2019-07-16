@@ -16,7 +16,7 @@ jobs:
         - yarn global add wait-on
         - yarn dev:secrets:gen
         - docker swarm init
-        - yarn compose:all -d
+        - yarn compose:all
         - sudo chmod 775 data/elasticsearch
         - sleep 10
         - wait-on http://localhost:3000 http://localhost:3020
