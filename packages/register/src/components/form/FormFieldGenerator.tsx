@@ -188,6 +188,7 @@ function GeneratedInputField({
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
+          notice={fieldDefinition.notice}
         />
       </InputField>
     )

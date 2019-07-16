@@ -70,11 +70,20 @@ export const internationaliseFieldObject = (
 
   if (
     base.type === SELECT_WITH_OPTIONS ||
-    base.type === RADIO_GROUP ||
     base.type === INFORMATIVE_RADIO_GROUP ||
     base.type === CHECKBOX_GROUP
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
+  }
+
+  if (base.type === RADIO_GROUP) {
+    ;(base as any).options = internationaliseOptions(intl, base.options)
+    if ((field as IDateFormField).notice) {
+      ;(base as any).notice = intl.formatMessage(
+        // @ts-ignore
+        (field as IRadioGroupFormField).notice
+      )
+    }
   }
 
   if (base.type === DATE && (field as IDateFormField).notice) {

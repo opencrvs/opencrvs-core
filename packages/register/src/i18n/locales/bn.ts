@@ -458,6 +458,7 @@ export const BENGALI_STATE: ILanguage = {
       'আবেদন জমা দেয়ার জন্য মৃত্যুর আনুষ্ঠানিক কারণ বাধ্যতামূলক নয়। মৃত্যুর কারণ পরবর্তী তারিখে জমা দেয়া যেতে পারে।',
     'formFields.causeOfDeathEstablished':
       'মৃত্যুর কোন একটি কারণ কি প্রতিষ্ঠিত হয়েছে?',
+    'register.form.section.causeOfDeathSectionTitle': 'মৃত্যুর কারণ কি?',
     'formFields.methodOfCauseOfDeath': 'মৃত্যুর কারণ নির্ণয়ের পদ্ধতি',
     'formFields.causeOfDeathCode': 'মৃত্যুর কারণের কোড',
     'formFields.verbalAutopsy': 'মৌখিক ময়না তদন্ত',

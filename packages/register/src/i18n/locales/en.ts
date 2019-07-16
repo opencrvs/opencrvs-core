@@ -458,7 +458,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.section.causeOfDeathNotice':
       'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
     'formFields.causeOfDeathEstablished':
-      'Has a Cause of Death been established ?',
+      'Has an official cause of death been established?',
+    'register.form.section.causeOfDeathSectionTitle':
+      'What is the official cause of death?',
     'formFields.methodOfCauseOfDeath': 'Method of Cause of Death',
     'formFields.causeOfDeathCode': 'Cause of Death Code',
     'formFields.verbalAutopsy': 'Verbal autopsy',

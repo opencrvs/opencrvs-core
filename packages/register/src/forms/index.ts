@@ -194,6 +194,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
   size?: RadioSize
+  notice?: FormattedMessage.MessageDescriptor
 }
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
@@ -438,6 +439,7 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
   size?: RadioSize
+  notice?: string
 }
 
 type Name = {
