@@ -2,5 +2,6 @@
 	"birthDeclarationNotification": "birthDeclarationNotification",
 	"birthRegistrationNotification": "birthRegistrationNotification",
 	"deathDeclarationNotification": "deathDeclarationNotification",
-	"deathRegistrationNotification": "deathRegistrationNotification"
+	"deathRegistrationNotification": "deathRegistrationNotification",
+	"userCredentialsNotification": "userCredentialsNotification"
 }

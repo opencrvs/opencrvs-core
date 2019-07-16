@@ -15,7 +15,8 @@
     "request-token": "NODE_PATH=. ts-node resources/request-token",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "postbuild": "ef-tspm"
+    "postbuild": "ef-tspm",
+    "build:clean": "rm -rf build"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",

@@ -16,10 +16,10 @@ jobs:
         - yarn global add wait-on
         - yarn dev:secrets:gen
         - docker swarm init
-        - yarn compose:all -d
-        - sudo chmod 775 data/elasticsearch
-        - sleep 10
-        - wait-on http://localhost:3000 http://localhost:3020
+        - sudo mkdir -p data/elasticsearch
+        - sudo chown -R 1000:1000 data/elasticsearch
+        - yarn compose:all &
+        - wait-on tcp:4040 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:3040 tcp:1050 http://localhost:3000 http://localhost:3001 http://localhost:3020 tcp:27017 tcp:6379 tcp:9200 tcp:8086 tcp:3447 tcp:5001
         - yarn db:backup:restore
         - cd packages/resources && yarn save:testData && cd ../..
         - cd packages/e2e && yarn start --record false
