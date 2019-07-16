@@ -5,7 +5,6 @@ import * as Hapi from 'hapi'
 import * as DotEnv from 'dotenv'
 import { getPlugins } from '@gateway/config/plugins'
 import { getServer } from '@gateway/config/server'
-import { getLogger } from '@gateway/utils/logger'
 import { getRoutes } from '@gateway/config/routes'
 import {
   CERT_PUBLIC_KEY_PATH,
@@ -21,12 +20,10 @@ DotEnv.config({
 
 const graphQLSchemaPath = `${__dirname}/graphql/index.graphql`
 
-const logger = getLogger(Number(process.env.LOG_LEVEL), process.env.APP_NAME)
-
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  const server = getServer(process.env.NODE_ENV, process.env.PORT, logger)
+  const server = getServer()
   const plugins = getPlugins(process.env.NODE_ENV, graphQLSchemaPath)
 
   await server.register(plugins)
