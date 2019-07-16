@@ -15,10 +15,6 @@ export const messages: {
     id: 'application.informant.value.mother',
     defaultMessage: 'Mother'
   },
-  MOTHER_ONLY: {
-    id: 'application.informant.value.mother.only',
-    defaultMessage: 'Mother'
-  },
   FATHER: {
     id: 'application.informant.value.father',
     defaultMessage: 'Father'
