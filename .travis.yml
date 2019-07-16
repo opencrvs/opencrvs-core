@@ -22,6 +22,8 @@ jobs:
         - wait-on http://localhost:3000 http://localhost:3020
         - yarn db:backup:restore
         - cd packages/resources && yarn save:testData && cd ../..
+        - docker logs opencrvs_gateway_1
+        - netstat -plant
         - cd packages/e2e && yarn start --record false
       env:
         - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
