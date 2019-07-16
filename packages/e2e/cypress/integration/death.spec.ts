@@ -8,7 +8,7 @@ context('Death Registration Integration Test', () => {
   it('Tests from application to registration using minimum input', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
@@ -109,7 +109,7 @@ context('Death Registration Integration Test', () => {
   it('Tests from application to registration using maximum input', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
