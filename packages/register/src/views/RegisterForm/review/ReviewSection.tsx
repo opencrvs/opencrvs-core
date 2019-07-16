@@ -510,10 +510,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         // @ts-ignore
       ).filter(errors => errors.length > 0).length === 0
 
-    const isRejected =
-      this.props.draft.registrationStatus &&
-      this.props.draft.registrationStatus === REJECTED
-
     const textAreaProps = {
       id: 'additional_comments',
       onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -574,7 +570,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <ReviewAction
               isComplete={isComplete}
               hasRegisterScope={this.userHasRegisterScope()}
-              isRejected={Boolean(isRejected)}
+              registrationStatus={this.props.draft.registrationStatus}
+              submissionStatus={this.props.draft.submissionStatus}
               registerAction={registerClickEvent}
               submitAction={submitClickEvent}
               rejectAction={rejectApplicationClickEvent}

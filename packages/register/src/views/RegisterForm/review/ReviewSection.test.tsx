@@ -140,14 +140,6 @@ describe('when user is in the review page', () => {
       .simulate('click')
     expect(mockHandler).toHaveBeenCalled()
   })
-
-  it('Should click the Reject Application', async () => {
-    reviewSectionComponent
-      .find('#rejectApplicationBtn')
-      .hostNodes()
-      .simulate('click')
-    expect(mockHandler).toHaveBeenCalled()
-  })
 })
 describe('return the correct label on dynamic fields', () => {
   it('Should return the Bengali label', () => {

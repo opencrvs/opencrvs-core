@@ -542,12 +542,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.title.submitConfirmation':
       '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     'register.form.modal.title.registerConfirmation':
       'Register this application?',
     'register.form.modal.desc.registerConfirmation': 'Are you sure?',
     'register.form.modal.button.title.registerConfirmation': 'Register',
-    'register.form.modal.submitButton': 'Submit',
+    'register.form.modal.submitButton': 'Send',
     'register.home.header.fieldAgent': 'Field Agent',
     'register.home.header.registrationClerk': 'Registration Clerk',
     'register.home.header.localRegistrar': 'Registrar',
@@ -818,8 +818,8 @@ export const ENGLISH_STATE: ILanguage = {
     'review.rejection.form.commentInstruction':
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
     'review.rejection.form.submitButton': 'Submit rejection',
-    'review.button.register': 'REGISTER',
-    'review.button.reject': 'Reject Application',
+    'review.button.register': 'Register',
+    'review.button.reject': 'Reject',
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
     'review.form.deleteApplication': 'Delete Application',
@@ -833,9 +833,16 @@ export const ENGLISH_STATE: ILanguage = {
     'review.actions.title.applicationStatus':
       'Application is {isComplete, select, true {complete} false {incomplete}}',
     'review.actions.description.confirmInComplete':
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered',
+      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
     'review.actions.description.confirmComplete':
       'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
+    'register.actions.description.confirmInComplete':
+      'Mandatory information is missing. Please add this information so that you can complete the registration process.',
+    'register.actions.description.confirmComplete':
+      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'register.actions.description':
+      'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'register.actions.title.applicationStatus': 'Register or reject?',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
     'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',

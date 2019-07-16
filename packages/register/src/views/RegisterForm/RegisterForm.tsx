@@ -128,7 +128,7 @@ export const messages: {
   },
   submitButton: {
     id: 'register.form.modal.submitButton',
-    defaultMessage: 'Submit',
+    defaultMessage: 'Send',
     description: 'Submit button on submit modal'
   },
   back: {
@@ -180,7 +180,7 @@ export const messages: {
   submitConfirmationDesc: {
     id: 'register.form.modal.desc.submitConfirmation',
     defaultMessage:
-      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     description: 'Submit description text on modal'
   },
   registerConfirmationTitle: {
