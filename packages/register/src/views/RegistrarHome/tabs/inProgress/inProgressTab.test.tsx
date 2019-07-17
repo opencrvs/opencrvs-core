@@ -1,23 +1,33 @@
-import * as React from 'react'
-import { createTestComponent, mockUserResponse } from '@register/tests/util'
-import { queries } from '@register/profile/queries'
-import { merge } from 'lodash'
-import { storage } from '@register/storage'
-import { createStore } from '@register/store'
-import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
-import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
-import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrarHome/queries'
-import { checkAuth } from '@register/profile/profileActions'
+import { GridTable } from '@opencrvs/components/lib/interface'
 import {
-  SUBMISSION_STATUS,
+  createApplication,
+  IApplication,
   storeApplication,
-  createApplication
+  SUBMISSION_STATUS
 } from '@register/applications'
 import { Event } from '@register/forms'
+import { formatUrl } from '@register/navigation'
+import {
+  REGISTRAR_HOME_TAB,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@register/navigation/routes'
+import { checkAuth } from '@register/profile/profileActions'
+import { queries } from '@register/profile/queries'
+import { storage } from '@register/storage'
+import { createStore } from '@register/store'
+import { createTestComponent, mockUserResponse } from '@register/tests/util'
+import {
+  COUNT_EVENT_REGISTRATION_BY_STATUS,
+  LIST_EVENT_REGISTRATIONS_BY_STATUS
+} from '@register/views/RegistrarHome/queries'
+import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
+import { merge } from 'lodash'
 import moment from 'moment'
+import * as React from 'react'
+import { InProgressTab, SELECTOR_ID, TAB_ID } from './inProgressTab'
 
 const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
+  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
 const getItem = window.localStorage.getItem as jest.Mock
 
 const mockFetchUserDetails = jest.fn()
@@ -45,59 +55,47 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('RegistrarHome In Progress tab related tests', () => {
-  const { store } = createStore()
-  beforeAll(() => {
-    getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
-  })
+const { store, history } = createStore()
+beforeAll(() => {
+  getItem.mockReturnValue(registerScopeToken)
+  store.dispatch(checkAuth({ '?token': registerScopeToken }))
+})
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome
-        match={{
-          params: {
-            tabId: 'progress'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-
-    // @ts-ignore
-    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
-  })
-
-  it('renders page with four tabs', async () => {
+describe('In Progress tab', () => {
+  it('redirects to different route upon selection', async () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_REGISTRATION_QUERY,
+          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['123456789'],
+            status: EVENT_STATUS.IN_PROGRESS
           }
         },
         result: {
           data: {
-            countEvents: {
-              declared: 10,
-              registered: 7,
-              rejected: 5
+            countEventRegistrationsByStatus: {
+              count: 5
             }
           }
         }
       }
     ]
-    store.dispatch(storeApplication(createApplication(Event.BIRTH)))
+    const localDrafts = [
+      {
+        id: '1',
+        event: Event.BIRTH,
+        data: {}
+      },
+      {
+        id: '2',
+        event: Event.BIRTH,
+        data: {}
+      }
+    ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
+      <InProgressTab drafts={localDrafts} registrarUnion={'123456789'} />,
       store,
       graphqlMock
     )
@@ -109,271 +107,659 @@ describe('RegistrarHome In Progress tab related tests', () => {
 
     testComponent.component.update()
     const app = testComponent.component
+
+    app
+      .find(`#selector_${SELECTOR_ID.ownDrafts}`)
+      .hostNodes()
+      .simulate('click')
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    expect(history.location.pathname).toBe(
+      formatUrl(REGISTRAR_HOME_TAB, {
+        tabId: TAB_ID.inProgress,
+        selectorId: SELECTOR_ID.ownDrafts
+      })
+    )
+    app
+      .find(`#selector_${SELECTOR_ID.fieldAgentDrafts}`)
+      .hostNodes()
+      .simulate('click')
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    expect(history.location.pathname).toBe(
+      formatUrl(REGISTRAR_HOME_TAB, {
+        tabId: TAB_ID.inProgress,
+        selectorId: SELECTOR_ID.fieldAgentDrafts
+      })
+    )
+  })
+  it('renders two selectors with count for each', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
+          variables: {
+            locationIds: ['123456789'],
+            status: EVENT_STATUS.IN_PROGRESS
+          }
+        },
+        result: {
+          data: {
+            countEventRegistrationsByStatus: {
+              count: 5
+            }
+          }
+        }
+      }
+    ]
+    const localDrafts = [
+      {
+        id: '1',
+        event: Event.BIRTH,
+        data: {}
+      },
+      {
+        id: '2',
+        event: Event.BIRTH,
+        data: {}
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <InProgressTab
+        drafts={localDrafts}
+        selectorId={'you'}
+        registrarUnion={'123456789'}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    const app = testComponent.component
+
     expect(
       app
-        .find('#tab_progress')
+        .find('#selector_you')
         .hostNodes()
         .text()
-    ).toContain('In progress (1)')
-    app
-      .find('#tab_progress')
-      .hostNodes()
-      .simulate('click')
-    app
-      .find('#tab_review')
-      .hostNodes()
-      .simulate('click')
-    app
-      .find('#tab_updates')
-      .hostNodes()
-      .simulate('click')
-    app
-      .find('#tab_print')
-      .hostNodes()
-      .simulate('click')
-    testComponent.component.unmount()
-  })
-
-  it('renders all items returned from graphql query in inProgress tab', async () => {
-    const { store } = createStore()
-    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
-    const drafts = [
-      {
-        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-        event: 'birth',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          child: {
-            firstNamesEng: 'Anik',
-            firstNames: 'অনিক',
-            familyNameEng: 'Hoque',
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-        event: 'birth',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          child: {
-            firstNames: 'অনিক',
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-        event: 'death',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          deceased: {
-            firstNamesEng: 'Anik',
-            firstNames: 'অনিক',
-            familyNameEng: 'Hoque',
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-        event: 'death',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          deceased: {
-            firstNames: 'অনিক',
-            familyName: 'অনিক'
-          }
-        }
-      }
-    ]
-    // @ts-ignore
-    store.dispatch(storeApplication(drafts))
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
-      store
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
-    Date.now = jest.fn(() => 1563732000000) // 2019-07-21
-    const EXPECTED_DATE_OF_REJECTION = moment(
-      TIME_STAMP,
-      'YYYY-MM-DD'
-    ).fromNow()
-
-    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].name).toBe('Anik Hoque')
-    expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
-    expect(data[0].event).toBe('Birth')
-    expect(data[0].actions).toBeDefined()
-
-    testComponent.component.unmount()
-  })
-
-  it('Should render pagination in progress tab if data is more than 10', async () => {
-    jest.clearAllMocks()
-    for (let i = 0; i < 12; i++) {
-      store.dispatch(storeApplication(createApplication(Event.BIRTH)))
-    }
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome
-        match={{
-          params: {
-            tabId: 'progress'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const pagiBtn = testComponent.component.find('#pagination')
-
-    expect(pagiBtn.hostNodes()).toHaveLength(1)
-    testComponent.component
-      .find('#pagination button')
-      .last()
-      .hostNodes()
-      .simulate('click')
-    testComponent.component.unmount()
-  })
-
-  it('redirects user to draft preview page on update click', async () => {
-    const { store } = createStore()
-    const TIME_STAMP = '2018-12-07T13:11:49.380Z'
-    const drafts = [
-      {
-        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-        event: 'birth',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          child: {
-            firstNamesEng: 'Anik',
-            firstNames: 'অনিক',
-            familyNameEng: 'Hoque',
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
-        event: 'birth',
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          child: {
-            familyNameEng: 'Hoque'
-          }
-        }
-      },
-      {
-        id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be9',
-        event: 'birth',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          child: {
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-        event: 'death',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          deceased: {
-            firstNamesEng: 'Anik',
-            firstNames: 'অনিক',
-            familyNameEng: 'Hoque',
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'cc66d69c-7f0a-4047-9283-f066571830f2',
-        event: 'death',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          deceased: {
-            familyNameEng: 'Hoque'
-          }
-        }
-      },
-      {
-        id: 'cc66d69c-7f0a-4047-9283-f066571830f3',
-        event: 'death',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-        data: {
-          deceased: {
-            familyName: 'অনিক'
-          }
-        }
-      },
-      {
-        id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
-        event: 'death',
-        modifiedOn: TIME_STAMP,
-        submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      }
-    ]
-    // @ts-ignore
-    store.dispatch(storeApplication(drafts))
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
-      store
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
+    ).toContain('Yours (2)')
     expect(
-      testComponent.component.find('#ListItemAction-0-Update').hostNodes()
-    ).toHaveLength(1)
-    testComponent.component
-      .find('#ListItemAction-0-Update')
-      .hostNodes()
-      .simulate('click')
+      app
+        .find('#selector_field-agents')
+        .hostNodes()
+        .text()
+    ).toContain('Field agents (5)')
+  })
 
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
+  describe('When the local drafts selector is selected', () => {
+    it('renders all items returned from local storage in inProgress tab', async () => {
+      const { store } = createStore()
+      const TIME_STAMP = 1562912635549
+      const drafts: IApplication[] = [
+        {
+          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+          data: {
+            registration: {
+              presentAtBirthRegistration: 'MOTHER_ONLY',
+              applicant: 'MOTHER_ONLY',
+              registrationPhone: '01722222222',
+              whoseContactDetails: 'MOTHER'
+            },
+            child: {
+              firstNamesEng: 'Anik',
+              familyNameEng: 'Hoque'
+            }
+          },
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          modifiedOn: TIME_STAMP
+        },
+        {
+          id: 'e6605607-92e0-4625-87d8-c168205bdde7',
+          event: Event.BIRTH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            registration: {
+              presentAtBirthRegistration: 'MOTHER_ONLY',
+              applicant: 'MOTHER_ONLY',
+              registrationPhone: '01722222222',
+              whoseContactDetails: 'MOTHER'
+            },
+            child: {
+              firstNamesEng: 'Anik',
+              familyNameEng: 'Hoque'
+            }
+          }
+        },
+        {
+          id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+          data: {
+            deceased: {
+              firstNamesEng: 'Anik',
+              familyNameEng: 'Hoque'
+            }
+          },
+          event: Event.DEATH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          modifiedOn: TIME_STAMP
+        },
+
+        {
+          id: '607afa75-4fb0-4785-9388-724911d62809',
+          data: {
+            deceased: {
+              firstNamesEng: 'Anik',
+              familyNameEng: 'Hoque'
+            }
+          },
+          event: Event.DEATH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          modifiedOn: TIME_STAMP
+        }
+      ]
+      // @ts-ignore
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.ownDrafts}
+          registrarUnion={'123456789'}
+        />,
+        store
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      const data = testComponent.component.find(GridTable).prop('content')
+      const EXPECTED_DATE_OF_REJECTION = moment(TIME_STAMP).fromNow()
+
+      expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+      expect(data[0].name).toBe('Anik Hoque')
+      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].event).toBe('Birth')
+      expect(data[0].actions).toBeDefined()
+
+      testComponent.component.unmount()
     })
-    testComponent.component.update()
 
-    expect(window.location.href).toContain(
-      '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-    )
-    testComponent.component.unmount()
+    it('Should render pagination in progress tab if data is more than 10', async () => {
+      jest.clearAllMocks()
+      const drafts: IApplication[] = []
+      for (let i = 0; i < 12; i++) {
+        drafts.push(createApplication(Event.BIRTH))
+      }
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.ownDrafts}
+          registrarUnion={'123456789'}
+        />,
+        store
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+      const pagiBtn = testComponent.component.find('#pagination')
+
+      expect(pagiBtn.hostNodes()).toHaveLength(1)
+      testComponent.component
+        .find('#pagination button')
+        .last()
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.unmount()
+    })
+
+    it('redirects user to draft preview page on update click', async () => {
+      const TIME_STAMP = 1562912635549
+      const drafts: IApplication[] = [
+        {
+          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+          event: Event.BIRTH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            child: {
+              firstNamesEng: 'Anik',
+              firstNames: 'অনিক',
+              familyNameEng: 'Hoque',
+              familyName: 'অনিক'
+            }
+          }
+        },
+        {
+          id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
+          event: Event.BIRTH,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            child: {
+              familyNameEng: 'Hoque'
+            }
+          }
+        },
+        {
+          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be9',
+          event: Event.BIRTH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            child: {
+              familyName: 'অনিক'
+            }
+          }
+        },
+        {
+          id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
+          event: Event.DEATH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            deceased: {
+              firstNamesEng: 'Anik',
+              firstNames: 'অনিক',
+              familyNameEng: 'Hoque',
+              familyName: 'অনিক'
+            }
+          }
+        },
+        {
+          id: 'cc66d69c-7f0a-4047-9283-f066571830f2',
+          event: Event.DEATH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            deceased: {
+              familyNameEng: 'Hoque'
+            }
+          }
+        },
+        {
+          id: 'cc66d69c-7f0a-4047-9283-f066571830f3',
+          event: Event.DEATH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            deceased: {
+              familyName: 'অনিক'
+            }
+          }
+        },
+        {
+          id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
+          event: Event.DEATH,
+          modifiedOn: TIME_STAMP,
+          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          data: {
+            '': {}
+          }
+        }
+      ]
+      // @ts-ignore
+      store.dispatch(storeApplication(drafts))
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.ownDrafts}
+          registrarUnion={'123456789'}
+        />,
+        store
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      expect(
+        testComponent.component
+          .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Update')
+          .hostNodes()
+      ).toHaveLength(1)
+      testComponent.component
+        .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Update')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(history.location.pathname).toContain(
+        '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      )
+      testComponent.component.unmount()
+    })
+  })
+
+  describe('When the remote drafts selector is selected', () => {
+    it('renders all items returned from graphql query in inProgress tab', async () => {
+      const TIME_STAMP = 1562912635549
+      const drafts: IApplication[] = []
+      drafts.push(createApplication(Event.BIRTH))
+      const graphqlMock = [
+        {
+          request: {
+            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
+            variables: {
+              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
+              status: EVENT_STATUS.IN_PROGRESS,
+              count: 10,
+              skip: 0
+            }
+          },
+          result: {
+            data: {
+              listEventRegistrations: {
+                totalItems: 2,
+                results: [
+                  {
+                    id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
+                    registration: {
+                      type: 'BIRTH',
+                      trackingId: 'BQ2IDOP'
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Anik',
+                          familyName: 'Hoque'
+                        }
+                      ]
+                    },
+                    deceased: null,
+                    createdAt: TIME_STAMP
+                  },
+                  {
+                    id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
+                    registration: {
+                      type: 'DEATH',
+                      trackingId: 'DZECJZC'
+                    },
+                    child: null,
+                    deceased: null,
+                    createdAt: TIME_STAMP
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+      // @ts-ignore
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      const data = testComponent.component.find(GridTable).prop('content')
+      const EXPECTED_DATE_OF_REJECTION = moment(TIME_STAMP).fromNow()
+
+      expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
+      expect(data[0].name).toBe('Anik Hoque')
+      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].event).toBe('Birth')
+      expect(data[0].actions).toBeDefined()
+
+      testComponent.component.unmount()
+    })
+
+    it('Should render pagination in progress tab if data is more than 10', async () => {
+      jest.clearAllMocks()
+      const drafts: IApplication[] = []
+      drafts.push(createApplication(Event.BIRTH))
+      const graphqlMock = [
+        {
+          request: {
+            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
+            variables: {
+              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
+              status: EVENT_STATUS.IN_PROGRESS,
+              count: 10,
+              skip: 0
+            }
+          },
+          result: {
+            data: {
+              listEventRegistrations: {
+                totalItems: 12,
+                results: [
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  },
+                  {
+                    id: null,
+                    registration: null,
+                    child: null,
+                    deceased: null,
+                    createdAt: null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+      const pagiBtn = testComponent.component.find('#pagination')
+
+      expect(pagiBtn.hostNodes()).toHaveLength(1)
+      testComponent.component
+        .find('#pagination button')
+        .last()
+        .hostNodes()
+        .simulate('click')
+      testComponent.component.unmount()
+    })
+
+    it('redirects user to draft preview page on update click', async () => {
+      jest.clearAllMocks()
+      const TIME_STAMP = 1562912635549
+      const drafts: IApplication[] = []
+      drafts.push(createApplication(Event.BIRTH))
+      const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      const graphqlMock = [
+        {
+          request: {
+            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
+            variables: {
+              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
+              status: EVENT_STATUS.IN_PROGRESS,
+              count: 10,
+              skip: 0
+            }
+          },
+          result: {
+            data: {
+              listEventRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: applicationId,
+                    registration: {
+                      type: 'BIRTH',
+                      trackingId: 'BQ2IDOP'
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Anik',
+                          familyName: 'Hoque'
+                        }
+                      ]
+                    },
+                    deceased: null,
+                    createdAt: TIME_STAMP
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+
+      // @ts-ignore
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      expect(
+        testComponent.component
+          .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Update')
+          .hostNodes()
+      ).toHaveLength(1)
+      testComponent.component
+        .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Update')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      expect(history.location.pathname).toContain(
+        formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+          applicationId,
+          pageId: 'review',
+          event: 'birth'
+        })
+      )
+      testComponent.component.unmount()
+    })
   })
 })
