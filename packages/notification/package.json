@@ -12,7 +12,7 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test:compilation": "tsc --noEmit",
-    "build": "tsc && copyfiles src/**/*.json build/dist",
+    "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "postbuild": "ef-tspm"
   },
   "dependencies": {

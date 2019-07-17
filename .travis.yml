@@ -16,10 +16,10 @@ jobs:
         - yarn global add wait-on
         - yarn dev:secrets:gen
         - docker swarm init
-        - yarn compose:all
-        - sudo chmod 775 data/elasticsearch
-        - sleep 10
-        - wait-on http://localhost:3000 http://localhost:3020
+        - sudo chmod g+rwx data/elasticsearch
+        - sudo chgrp 1000 data/elasticsearch
+        - yarn compose:all -d
+        - sleep 20
         - yarn db:backup:restore
         - cd packages/resources && yarn save:testData && cd ../..
         - docker logs opencrvs_gateway_1
