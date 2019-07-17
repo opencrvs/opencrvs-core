@@ -274,7 +274,7 @@ export class GridTable extends React.Component<
                     } else if (preference.isIconColumn) {
                       return (
                         <IconWrapper
-                          key={indx}
+                          key={'IconColumn' + indx}
                           width={preference.width}
                           alignment={preference.alignment}
                           color={preference.color}
@@ -287,7 +287,7 @@ export class GridTable extends React.Component<
                     } else {
                       return (
                         <ContentWrapper
-                          key={indx}
+                          key={'Content' + indx}
                           width={preference.width}
                           alignment={preference.alignment}
                           color={preference.color}
