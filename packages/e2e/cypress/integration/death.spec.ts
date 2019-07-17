@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-context('Death Registration Integration Test', () => {
+context('Death Integration Test', () => {
   beforeEach(() => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
