@@ -17,6 +17,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  outline: none;
 `
 
 const DotFilled = styled.span`
@@ -26,6 +27,11 @@ const DotFilled = styled.span`
   border-radius: 50%;
   display: inline-block;
   margin: 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: 14px;
+    width: 14px;
+    margin: 14px;
+  }
 `
 
 const DotUnfilled = styled.span`
@@ -35,11 +41,21 @@ const DotUnfilled = styled.span`
   border-radius: 50%;
   display: inline-block;
   margin: 24px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: 14px;
+    width: 14px;
+    margin: 14px;
+  }
 `
 
 const NumberContainer = styled.div`
   display: grid;
   grid-template-columns: auto auto auto;
+
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 const Key = styled.span`
@@ -47,6 +63,10 @@ const Key = styled.span`
   ${({ theme }) => theme.fonts.h2Style};
   padding: 24px 48px;
   text-align: center;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 20px 40px;
+    ${({ theme }) => theme.fonts.h3Style};
+  }
 `
 
 export class PINKeypad extends React.Component<IProps, IState> {

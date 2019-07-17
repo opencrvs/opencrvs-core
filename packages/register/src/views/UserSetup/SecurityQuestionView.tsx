@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
 import { find, at } from 'lodash'
@@ -29,7 +30,7 @@ const messages = defineMessages({
     defaultMessage: `From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.`
   },
   select: {
-    id: 'register.securityquestion.select',
+    id: 'register.select.placeholder',
     defaultMessage: 'Select'
   },
   selectSecurityQuestion: {
@@ -211,6 +212,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
       })
 
       elem.questionList = newQuestionList
+      return elem
     })
 
     this.setState(() => ({

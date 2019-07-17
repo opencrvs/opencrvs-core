@@ -497,6 +497,7 @@ export const BENGALI_STATE: ILanguage = {
     'validations.domLaterThanDob': 'বিয়ের তারিখ জন্ম তারিখের পরে হতে হবে।',
     'validations.requiredSymbol': '',
     'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
+    'register.form.submitIncomplete': 'অসম্পূর্ণ আবেদন পাঠান',
     'register.form.saveAsDraft': 'Save as draft',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
@@ -516,6 +517,14 @@ export const BENGALI_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'আপনি জমা দিতে প্রস্তুত?',
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
+    'register.form.modal.title.submitConfirmation':
+      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+    'register.form.modal.desc.submitConfirmation':
+      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+    'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
+    'register.form.modal.desc.registerConfirmation':
+      'আপনি কি এ ব্যাপারে নিশ্চিত?',
+    'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
     'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
@@ -579,15 +588,24 @@ export const BENGALI_STATE: ILanguage = {
     'register.savedRegistration.buttons.back.duplicate': 'সদৃশে ফেরত যান',
 
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
-    'register.selectInformant.informantTitle':
+    'register.selectInformant.birthInformantTitle':
       'কে জন্ম নিবন্ধনের জন্য আবেদন করছে?',
+    'register.selectInformant.deathInformantTitle':
+      'What relationship does the applicant have to the deceased?',
     'register.selectInformant.mother': 'মাতা',
     'register.selectInformant.father': 'পিতা',
     'register.selectInformant.parents': 'পিতা ও মাতা ',
     'register.selectInformant.someoneElse': 'অন্য কেউ',
     'register.selectInformant.self': 'নিজের',
-    'register.selectInformant.errorMessage':
-      'Please select who is present and applying',
+    'register.selectInformant.spouse': 'স্বামী বা স্ত্রী',
+    'register.selectInformant.son': 'পুত্র',
+    'register.selectInformant.daughter': 'কন্যা',
+    'register.selectInformant.extendedFamily': 'যৌথ পরিবার',
+    'register.selectInformant.birthErrorMessage':
+      'Please select who is present and applying.',
+    'register.selectInformant.deathErrorMessage':
+      'Please select the relationship to the deceased and any relevant contact details.',
+    'register.selectInformant.relationshipLabel': 'মৃত ব্যক্তি সঙ্গে সম্পর্ক',
     'register.selectVitalEvent.registerNewEventTitle': 'নতুন আবেদন',
     'register.selectVitalEvent.registerNewEventHeading':
       'আপনি কি ধরনের ইভেন্ট তৈরি করতে চান',
@@ -777,10 +795,8 @@ export const BENGALI_STATE: ILanguage = {
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
     'register.workQueue.labels.results.duplicate':
       'সম্ভাব্য সদৃশ খুঁজে পাওয়া গেছে',
-    'register.registrarHome.results.reviewDuplicates':
-      'সদৃশগুলো পর্যালোচনা করুন',
-    'register.searchResult.results.reviewDuplicates':
-      'সদৃশগুলো পর্যালোচনা করুন',
+    'register.registrarHome.results.reviewDuplicates': 'পর্যালোচনা',
+    'register.searchResult.results.reviewDuplicates': 'পর্যালোচনা',
     'register.workQueue.buttons.printCertificate': 'সার্টিফিকেট মুদ্রণ',
     'review.edit.modal.preview': 'প্রিভিউতে ফেরত যান',
     'review.edit.modal.editButton': 'সম্পাদন',
@@ -803,6 +819,18 @@ export const BENGALI_STATE: ILanguage = {
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.form.deleteApplication': 'আবেদন বাতিল',
+    'review.header.title.govtName.bgd': 'গণপ্রজাতন্ত্রী বাংলাদেশ সরকার',
+    'review.header.subject.subjectWithoutName':
+      '{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
+    'review.header.subject.subjectWitName':
+      '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
+    'review.inputs.additionalComments': 'কোন মন্তব্য?',
+    'review.actions.title.applicationStatus':
+      'আবেদন {isComplete, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
+    'review.actions.description.confirmInComplete':
+      'এই অসম্পূর্ণ আবেদনটি পাঠিয়ে, একটি ডিজিটাল রেকর্ড তৈরি করা হবে।\n\nআবেদনকারীকে বলুন যে তারা ট্র্যাকিং আইডি সহ একটি এসএমএস পাবেন। 30 দিনের মধ্যে রেজিস্ট্রেশন অফিসে আবেদনটি সম্পূর্ণ করার জন্য তাদের এটি প্রয়োজন হবে। জন্ম নিবন্ধিত হতে পারে আগে আবেদনকারী সব বাধ্যতামূলক তথ্য প্রদান করতে হবে',
+    'review.actions.description.confirmComplete':
+      'পর্যালোচনার জন্য এই আবেদন পাঠানোর মাধ্যমে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের উদ্দেশ্যে এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
     'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
@@ -1109,7 +1137,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.securityquestion.heading': 'আপনার নিরাপত্তা প্রশ্ন সেট করুন',
     'register.securityquestion.description':
       'নীচের ড্রপডাউন তালিকা থেকে আপনার পছন্দের প্রশ্ন নির্বাচন করুন।',
-    'register.securityquestion.select': 'নির্বাচন করুন',
+    'register.select.placeholder': 'নির্বাচন করুন...',
     'register.securityquestion.selectSecurityQuestion':
       'একটি নিরাপত্তা প্রশ্ন নির্বাচন করুন',
     'register.securityquestion.enterResponse':
@@ -1178,11 +1206,17 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'বাবা',
     'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
     'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
-    'register.SelectContactPoint.relationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.birthRelationshipLabel': 'শিশুর সাথে সম্পর্ক',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'ফিরে যান',
     'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
-      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন'
+      'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'register.SelectContactPoint.spouse': 'স্বামী বা স্ত্রী',
+    'register.SelectContactPoint.son': 'পুত্র',
+    'register.SelectContactPoint.daughter': 'কন্যা',
+    'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
+    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
   }
 }

@@ -7,7 +7,8 @@ import {
   StatusOrange,
   StatusProgress,
   StatusGreen,
-  StatusRejected
+  StatusRejected,
+  Duplicate
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
@@ -31,7 +32,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Header } from '@register/components/interface/Header/Header'
 import { IViewHeadingProps } from '@register/components/ViewHeading'
-import { IApplication } from '@register/applications'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
@@ -39,8 +40,8 @@ import {
   goToRegistrarHomeTab as goToRegistrarHomeTabAction
 } from '@register/navigation'
 import {
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_DEATH_FORM,
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
@@ -190,7 +191,7 @@ const messages: {
   },
   reviewDuplicates: {
     id: 'register.registrarHome.results.reviewDuplicates',
-    defaultMessage: 'Review Duplicates',
+    defaultMessage: 'Review',
     description:
       'The title of review duplicates button in expanded area of list item'
   },
@@ -299,12 +300,14 @@ export class RegistrarHomeView extends React.Component<
 
     return transformedData.map(reg => {
       const actions = [] as IAction[]
+      let icon: JSX.Element = <div />
       if (this.userHasRegisterScope()) {
         if (reg.duplicates && reg.duplicates.length > 0) {
           actions.push({
             label: this.props.intl.formatMessage(messages.reviewDuplicates),
             handler: () => this.props.goToReviewDuplicate(reg.id)
           })
+          icon = <Duplicate />
         } else {
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
@@ -332,7 +335,8 @@ export class RegistrarHomeView extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        actions
+        actions,
+        icon
       }
     })
   }
@@ -381,69 +385,74 @@ export class RegistrarHomeView extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IApplication) => {
-      let name
-      let pageRoute: string
-      if (draft.event && draft.event.toString() === 'birth') {
-        name =
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyNameEng &&
-            (!draft.data.child.firstNamesEng
-              ? ''
-              : draft.data.child.firstNamesEng + ' ') +
-              draft.data.child.familyNameEng) ||
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyName &&
-            (!draft.data.child.firstNames
-              ? ''
-              : draft.data.child.firstNames + ' ') +
-              draft.data.child.familyName) ||
-          ''
-        pageRoute = DRAFT_BIRTH_PARENT_FORM
-      } else if (draft.event && draft.event.toString() === 'death') {
-        name =
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyNameEng &&
-            (!draft.data.deceased.firstNamesEng
-              ? ''
-              : draft.data.deceased.firstNamesEng + ' ') +
-              draft.data.deceased.familyNameEng) ||
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyName &&
-            (!draft.data.deceased.firstNames
-              ? ''
-              : draft.data.deceased.firstNames + ' ') +
-              draft.data.deceased.familyName) ||
-          ''
-        pageRoute = DRAFT_DEATH_FORM
-      }
-      const lastModificationDate = draft.modifiedOn || draft.savedOn
-      const actions = [
-        {
-          label: this.props.intl.formatMessage(messages.update),
-          handler: () =>
-            this.props.goToPage(
-              pageRoute,
-              draft.id,
-              '',
-              (draft.event && draft.event.toString()) || ''
-            )
+    return this.props.drafts
+      .filter(
+        draft =>
+          draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      )
+      .map((draft: IApplication) => {
+        let name
+        let pageRoute: string
+        if (draft.event && draft.event.toString() === 'birth') {
+          name =
+            (draft.data &&
+              draft.data.child &&
+              draft.data.child.familyNameEng &&
+              (!draft.data.child.firstNamesEng
+                ? ''
+                : draft.data.child.firstNamesEng + ' ') +
+                draft.data.child.familyNameEng) ||
+            (draft.data &&
+              draft.data.child &&
+              draft.data.child.familyName &&
+              (!draft.data.child.firstNames
+                ? ''
+                : draft.data.child.firstNames + ' ') +
+                draft.data.child.familyName) ||
+            ''
+          pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
+        } else if (draft.event && draft.event.toString() === 'death') {
+          name =
+            (draft.data &&
+              draft.data.deceased &&
+              draft.data.deceased.familyNameEng &&
+              (!draft.data.deceased.firstNamesEng
+                ? ''
+                : draft.data.deceased.firstNamesEng + ' ') +
+                draft.data.deceased.familyNameEng) ||
+            (draft.data &&
+              draft.data.deceased &&
+              draft.data.deceased.familyName &&
+              (!draft.data.deceased.firstNames
+                ? ''
+                : draft.data.deceased.firstNames + ' ') +
+                draft.data.deceased.familyName) ||
+            ''
+          pageRoute = DRAFT_DEATH_FORM_PAGE
         }
-      ]
-      return {
-        id: draft.id,
-        event: (draft.event && sentenceCase(draft.event)) || '',
-        name: name || '',
-        dateOfModification:
-          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
-          '',
-        actions
-      }
-    })
+        const lastModificationDate = draft.modifiedOn || draft.savedOn
+        const actions = [
+          {
+            label: this.props.intl.formatMessage(messages.update),
+            handler: () =>
+              this.props.goToPage(
+                pageRoute,
+                draft.id,
+                'preview',
+                (draft.event && draft.event.toString()) || ''
+              )
+          }
+        ]
+        return {
+          id: draft.id,
+          event: (draft.event && sentenceCase(draft.event)) || '',
+          name: name || '',
+          dateOfModification:
+            (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+            '',
+          actions
+        }
+      })
   }
 
   transformRegisterdContent = (data: GQLQuery) => {
@@ -557,7 +566,14 @@ export class RegistrarHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.inProgress)} (
-                    {(drafts && drafts.length) || 0})
+                    {(drafts &&
+                      drafts.filter(
+                        draft =>
+                          draft.submissionStatus ===
+                          SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+                      ).length) ||
+                      0}
+                    )
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.readyForReview}`}
@@ -704,20 +720,22 @@ export class RegistrarHomeView extends React.Component<
                         label: this.props.intl.formatMessage(
                           messages.listItemApplicationDate
                         ),
-                        width: 23,
+                        width: 20,
                         key: 'applicationTimeElapsed'
                       },
                       {
                         label: this.props.intl.formatMessage(
                           messages.listItemEventDate
                         ),
-                        width: 23,
+                        width: 20,
                         key: 'eventTimeElapsed'
                       },
                       {
-                        label: this.props.intl.formatMessage(
-                          messages.listItemAction
-                        ),
+                        width: 6,
+                        key: 'icons',
+                        isIconColumn: true
+                      },
+                      {
                         width: 20,
                         key: 'actions',
                         isActionColumn: true,

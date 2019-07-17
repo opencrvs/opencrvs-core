@@ -139,7 +139,11 @@ export class ExpandingMenu extends React.Component<IProps> {
                 {this.props.menuItems.map(
                   (item: IMenuItem, index: number) =>
                     item.secondary && (
-                      <MenuItem key={index} onClick={item.onClick}>
+                      <MenuItem
+                        id={`mobile_menu_item_${index}`}
+                        key={index}
+                        onClick={item.onClick}
+                      >
                         <Icon>{item.icon}</Icon>
                         <IconHover>{item.iconHover || item.icon}</IconHover>
                         {item.label}

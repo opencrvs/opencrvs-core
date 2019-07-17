@@ -237,7 +237,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   child?: GQLPerson
   mother?: GQLPerson
   father?: GQLPerson
-  informant?: GQLPerson
+  informant?: GQLRelatedPerson
   eventLocation?: GQLLocation
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -282,6 +282,7 @@ export interface GQLRegistration {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
+  inProgress?: boolean
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
   duplicates?: Array<string | null>
@@ -304,6 +305,7 @@ export interface GQLRegWorkflow {
 }
 
 export enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
@@ -413,9 +415,9 @@ export enum GQLBirthRegType {
 
 export enum GQLBirthRegPresence {
   BOTH_PARENTS = 'BOTH_PARENTS',
-  INFORMANT_ONLY = 'INFORMANT_ONLY',
-  MOTHER_ONLY = 'MOTHER_ONLY',
-  FATHER_ONLY = 'FATHER_ONLY',
+  INFORMANT = 'INFORMANT',
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
   OTHER = 'OTHER'
 }
 
@@ -671,7 +673,7 @@ export interface GQLBirthRegistrationInput {
   child?: GQLPersonInput
   mother?: GQLPersonInput
   father?: GQLPersonInput
-  informant?: GQLPersonInput
+  informant?: GQLRelatedPersonInput
   eventLocation?: GQLLocationInput
   birthType?: GQLBirthType
   weightAtBirth?: number
@@ -698,6 +700,7 @@ export interface GQLRegistrationInput {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
+  inProgress?: boolean
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
@@ -1798,6 +1801,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
+  inProgress?: RegistrationToInProgressResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
   certificates?: RegistrationToCertificatesResolver<TParent>
   duplicates?: RegistrationToDuplicatesResolver<TParent>
@@ -1856,6 +1860,13 @@ export interface RegistrationToStatusResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToInProgressResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

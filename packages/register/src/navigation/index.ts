@@ -1,6 +1,7 @@
 import { push, goBack as back, replace } from 'react-router-redux'
 import {
-  SELECT_INFORMANT,
+  SELECT_BIRTH_INFORMANT,
+  SELECT_DEATH_INFORMANT,
   HOME,
   SEARCH_RESULT,
   DRAFT_BIRTH_PARENT_FORM,
@@ -17,8 +18,9 @@ import {
   SYS_ADMIN_HOME_TAB,
   CREATE_USER,
   CREATE_USER_SECTION,
-  SELECT_PRIMARY_APPLICANT,
-  SELECT_MAIN_CONTACT_POINT
+  SELECT_BIRTH_PRIMARY_APPLICANT,
+  SELECT_BIRTH_MAIN_CONTACT_POINT,
+  SELECT_DEATH_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -75,18 +77,34 @@ type GoToSysAdminHome = {
   }
 }
 
-export function goToBirthRegistration() {
-  return push(SELECT_INFORMANT)
+export function goToBirthInformant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_BIRTH_INFORMANT, {
+      applicationId
+    })
+  )
 }
 
-export function goToMainContactPoint(
-  presentAtReg: string,
-  applicant: string = presentAtReg
-) {
+export function goToDeathInformant(applicationId: string) {
   return push(
-    formatUrl(SELECT_MAIN_CONTACT_POINT, {
-      presentAtReg,
-      applicant
+    formatUrl(SELECT_DEATH_INFORMANT, {
+      applicationId
+    })
+  )
+}
+
+export function goToBirthContactPoint(applicationId: string) {
+  return push(
+    formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
+      applicationId
+    })
+  )
+}
+
+export function goToDeathContactPoint(applicationId: string) {
+  return push(
+    formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
+      applicationId
     })
   )
 }
@@ -149,8 +167,12 @@ export function goToApplicationContact(informant: string) {
     })
   )
 }
-export function goToPrimaryApplicant() {
-  return push(formatUrl(SELECT_PRIMARY_APPLICANT, {}))
+export function goToPrimaryApplicant(applicationId: string) {
+  return push(
+    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
+      applicationId
+    })
+  )
 }
 export function goToReviewDuplicate(applicationId: string) {
   return push(

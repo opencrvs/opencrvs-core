@@ -208,6 +208,14 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
+    async inProgress(task: fhir.Task) {
+      const taskStatus = (task && task.status) || ''
+      if (taskStatus === 'draft') {
+        return true
+      } else {
+        return false
+      }
+    },
     async attachments(task: fhir.Task, _, authHeader) {
       if (!task.focus) {
         throw new Error(
@@ -767,6 +775,16 @@ export const typeResolvers: GQLResolver = {
         `/${patientSection.entry[0].reference}`,
         authHeader
       )
+    },
+    async informant(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )) as fhir.RelatedPerson
     },
     async registration(composition: ITemplatedComposition, _, authHeader) {
       const taskBundle = await fetchFHIR(

@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/notification",
-  "version": "1.0.0-alpha.1.0",
+  "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS notification service",
   "main": "src/index.js",
   "license": "NONE",
@@ -15,7 +15,7 @@
     "test:compilation": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.0",
+    "@opencrvs/commons": "^1.0.0-alpha.1.1",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",
     "@types/joi": "^14.0.0",
@@ -39,14 +39,15 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@types/fhir": "^0.0.30",
     "@types/jest": "^24.0.13",
     "cross-env": "^5.2.0",
     "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
+    "lint-staged": "^7.1.0",
     "nodemon": "^1.17.5",
     "prettier": "^1.15.2",
     "ts-jest": "^24.0.2",
-    "lint-staged": "^7.1.0",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",

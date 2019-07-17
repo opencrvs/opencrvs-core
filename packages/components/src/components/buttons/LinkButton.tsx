@@ -13,6 +13,7 @@ export const LinkButton = styled(Button)`
 
   &:active {
     outline: 0;
+    opacity: 1.0 !important;
     background-color: ${({ theme }) => theme.colors.focus};
   }
 

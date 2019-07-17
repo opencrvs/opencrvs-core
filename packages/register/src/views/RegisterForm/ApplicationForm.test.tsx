@@ -240,83 +240,59 @@ describe('when user has starts a new application', () => {
       })
     })
 
-    describe('when user swipes left from the "child" section', () => {
+    describe('when user goes to preview page', () => {
       beforeEach(async () => {
         app
-          .find('#swipeable_block')
+          .find('#next_section')
           .hostNodes()
-          .simulate('touchStart', {
-            touches: [
-              {
-                clientX: 150,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchMove', {
-            changedTouches: [
-              {
-                clientX: 100,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchEnd', {
-            changedTouches: [
-              {
-                clientX: 50,
-                clientY: 20
-              }
-            ]
-          })
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#btn_change_child_firstNames')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        app
+          .find('#edit_confirm')
+          .hostNodes()
+          .simulate('click')
         await flushPromises()
         app.update()
       })
-      it('changes to the mother details section', () => {
-        expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
-          1
-        )
+
+      it('renders preview page', async () => {
+        app
+          .find('#back-to-review-button')
+          .hostNodes()
+          .simulate('click')
+        await flushPromises()
+        app.update()
+        expect(
+          app.find('#btn_change_child_firstNames').hostNodes()
+        ).toHaveLength(1)
       })
     })
 
-    describe('when user swipes right from the "child" section', () => {
-      beforeEach(async () => {
-        app
-          .find('#swipeable_block')
-          .hostNodes()
-          .simulate('touchStart', {
-            touches: [
-              {
-                clientX: 50,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchMove', {
-            changedTouches: [
-              {
-                clientX: 100,
-                clientY: 20
-              }
-            ]
-          })
-          .simulate('touchEnd', {
-            changedTouches: [
-              {
-                clientX: 150,
-                clientY: 20
-              }
-            ]
-          })
-        await flushPromises()
-        app.update()
-      })
-      it('user still stays in the child details section', () => {
-        expect(app.find('#form_section_title_child').hostNodes()).toHaveLength(
-          1
-        )
-      })
-    })
     describe('when user clicks the "mother" page', () => {
       beforeEach(async () => {
         app
@@ -330,44 +306,6 @@ describe('when user has starts a new application', () => {
         expect(app.find('#form_section_title_mother').hostNodes()).toHaveLength(
           1
         )
-      })
-      describe('when user swipes right from the "mother" section', () => {
-        beforeEach(async () => {
-          app
-            .find('#swipeable_block')
-            .hostNodes()
-            .simulate('touchStart', {
-              touches: [
-                {
-                  clientX: 50,
-                  clientY: 20
-                }
-              ]
-            })
-            .simulate('touchMove', {
-              changedTouches: [
-                {
-                  clientX: 100,
-                  clientY: 20
-                }
-              ]
-            })
-            .simulate('touchEnd', {
-              changedTouches: [
-                {
-                  clientX: 150,
-                  clientY: 20
-                }
-              ]
-            })
-          await flushPromises()
-          app.update()
-        })
-        it('changes to the child details section', () => {
-          expect(
-            app.find('#form_section_title_child').hostNodes()
-          ).toHaveLength(1)
-        })
       })
     })
     describe('when user clicks "next" button', () => {

@@ -9,6 +9,7 @@ export const TertiaryButton = styled(Button)`
   border: 0;
   text-transform: none !important;
   cursor: pointer;
+  height: 32px;
   & > div {
     padding: 0 8px;
   }
@@ -33,7 +34,7 @@ enum ICON_ALIGNMENT {
 
 const ButtonBase = styled.button`
   width: auto;
-  height: 48px;
+  height: 32px;
   border: 0;
   cursor: pointer;
   background: transparent;

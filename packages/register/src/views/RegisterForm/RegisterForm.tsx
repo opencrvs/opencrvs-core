@@ -1,11 +1,19 @@
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
-  TertiaryButton
+  TertiaryButton,
+  LinkButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
-import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import {
+  EventTopBar,
+  ResponsiveModal
+} from '@opencrvs/components/lib/interface'
+import {
+  BodyContent,
+  Container,
+  FullBodyContent
+} from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -14,6 +22,7 @@ import {
   SUBMISSION_STATUS,
   writeApplication
 } from '@register/applications'
+
 import { FormFieldGenerator } from '@register/components/form'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
@@ -29,24 +38,25 @@ import {
   goToHome,
   goToPage as goToPageAction
 } from '@register/navigation'
-import { HOME } from '@register/navigation/routes'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { IOfflineDataState } from '@register/offline/reducer'
+import { HOME } from '@register/navigation/routes'
 import { getOfflineState } from '@register/offline/selectors'
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import { isMobileDevice } from '@register/utils/commonUtils'
-import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge } from 'lodash'
+import {
+  ReviewSection,
+  getErrorsOnFieldsBySection
+} from '@register/views/RegisterForm/review/ReviewSection'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import Swipeable from 'react-swipeable'
 
 const FormSectionTitle = styled.h3`
   ${({ theme }) => theme.fonts.h3Style};
@@ -64,10 +74,9 @@ const Notice = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   margin: 30px -25px;
 `
-const CancelButton = styled.a`
-  text-decoration: underline;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.primary};
+
+const StyledLinkButton = styled(LinkButton)`
+  margin-left: 32px;
 `
 
 export const messages: {
@@ -157,19 +166,39 @@ export const messages: {
     id: 'register.selectVitalEvent.saveExitButton',
     defaultMessage: 'SAVE & EXIT',
     description: 'SAVE & EXIT Button Text'
+  },
+  backToReviewButton: {
+    id: 'register.selectVitalEvent.backToReviewButton',
+    defaultMessage: 'Back to review'
+  },
+  submitConfirmationTitle: {
+    id: 'register.form.modal.title.submitConfirmation',
+    defaultMessage:
+      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+    description: 'Submit title text on modal'
+  },
+  submitConfirmationDesc: {
+    id: 'register.form.modal.desc.submitConfirmation',
+    defaultMessage:
+      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+    description: 'Submit description text on modal'
+  },
+  registerConfirmationTitle: {
+    id: 'register.form.modal.title.registerConfirmation',
+    defaultMessage: 'Register this application?',
+    description: 'Title for register confirmation modal'
+  },
+  registerConfirmationDesc: {
+    id: 'register.form.modal.desc.registerConfirmation',
+    defaultMessage: 'Are you sure?',
+    description: 'Description for register confirmation modal'
+  },
+  registerButtonTitle: {
+    id: 'register.form.modal.button.title.registerConfirmation',
+    defaultMessage: 'Register',
+    description: 'Label for button on register confirmation modal'
   }
 })
-
-const FormContainer = styled.div`
-  padding-bottom: 0;
-`
-
-const FormViewContainer = styled.div`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  background-color: ${({ theme }) => theme.colors.white};
-`
 
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
@@ -178,19 +207,6 @@ const Optional = styled.span.attrs<
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
-`
-
-const ConfirmBtn = styled(PrimaryButton)`
-  min-width: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  &:disabled {
-    background: ${({ theme }) => theme.colors.primary};
-    path {
-      stroke: ${({ theme }) => theme.colors.disabled};
-    }
-  }
 `
 
 const ErrorText = styled.div`
@@ -213,21 +229,6 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   }
 
   return sections[currentIndex + 1]
-}
-
-function getPreviousSection(
-  sections: IFormSection[],
-  fromSection: IFormSection
-) {
-  const currentIndex = sections.findIndex(
-    (section: IFormSection) => section.id === fromSection.id
-  )
-
-  if (currentIndex === 0) {
-    return null
-  }
-
-  return sections[currentIndex - 1]
 }
 
 export interface IFormProps {
@@ -343,43 +344,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
-  makeSwipe(deltaX: number, deltaY: number) {
-    if (Math.abs(deltaX) > Math.abs(deltaY * 4)) {
-      if (deltaX > 0) {
-        this.onSwiped(
-          this.props.application.id,
-          getNextSection(
-            this.props.registerForm.sections,
-            this.props.activeSection
-          ),
-          this.props.pageRoute,
-          this.props.application.event.toLowerCase()
-        )
-      } else {
-        this.onSwiped(
-          this.props.application.id,
-          getPreviousSection(
-            this.props.registerForm.sections,
-            this.props.activeSection
-          ),
-          this.props.pageRoute,
-          this.props.application.event.toLowerCase()
-        )
-      }
-    }
-  }
-
-  onSwiped = (
-    applicationId: string,
-    selectedSection: IFormSection | null,
-    pageRoute: string,
-    event: string
-  ): void => {
-    if (selectedSection) {
-      this.props.goToPage(pageRoute, applicationId, selectedSection.id, event)
-    }
-  }
-
   generateSectionListForReview = (
     disabled: boolean,
     sections: IFormSection[]
@@ -445,7 +409,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSection
     } = this.props
 
-    const isReviewForm = application.review
+    const errorsOnFields = getErrorsOnFieldsBySection(
+      registerForm.sections,
+      application
+    )
+    const isComplete =
+      flatten(
+        // @ts-ignore
+        Object.values(errorsOnFields).map(Object.values)
+        // @ts-ignore
+      ).filter(errors => errors.length > 0).length === 0
 
     let nextSection = getNextSection(
       registerForm.sections,
@@ -458,17 +431,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
         nextSection
       ) as IFormSection
     }
-    const title = isReviewForm
-      ? messages.reviewEventRegistration
-      : activeSection.viewType === VIEW_TYPE.PREVIEW
-      ? messages.previewEventRegistration
-      : messages.newVitalEventRegistration
-    const isReviewSection = activeSection.viewType === VIEW_TYPE.REVIEW
+
+    const title =
+      activeSection.viewType === VIEW_TYPE.REVIEW
+        ? messages.reviewEventRegistration
+        : activeSection.viewType === VIEW_TYPE.PREVIEW
+        ? messages.previewEventRegistration
+        : messages.newVitalEventRegistration
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <FormViewContainer id="informant_parent_view">
+      <Container id="informant_parent_view">
         {isErrorOccured && (
           <ErrorText id="error_message_section">
             {intl.formatMessage(messages.queryError)}
@@ -479,6 +453,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
           <>
             <EventTopBar
               title={intl.formatMessage(title, { event: application.event })}
+              iconColor={
+                application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                  ? 'orange'
+                  : 'violet'
+              }
               saveAction={{
                 handler: this.onSaveAsDraftClicked,
                 label: intl.formatMessage(messages.saveExitButton)
@@ -493,190 +472,200 @@ class RegisterFormView extends React.Component<FullProps, State> {
                 }
               ]}
             />
-            <FormContainer>
-              <BodyContent>
-                <TertiaryButton
-                  align={ICON_ALIGNMENT.LEFT}
-                  icon={() => <BackArrow />}
-                  onClick={this.props.goBack}
-                >
-                  {intl.formatMessage(messages.back)}
-                </TertiaryButton>
-                <Swipeable
-                  disabled={isReviewSection || !isMobileDevice()}
-                  id="swipeable_block"
-                  trackMouse
-                  delta={50}
-                  onSwiped={(e: any, deltaX: number, deltaY: number) =>
-                    this.makeSwipe(deltaX, deltaY)
-                  }
-                >
-                  {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-                    <ReviewSection
-                      pageRoute={this.props.pageRoute}
-                      draft={application}
-                      submitClickEvent={this.submitForm}
-                      saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                      deleteApplicationClickEvent={() => {
-                        this.props.deleteApplication(application)
-                        history.push('/')
-                      }}
-                    />
-                  )}
-                  {activeSection.viewType === VIEW_TYPE.REVIEW && (
-                    <ReviewSection
-                      pageRoute={this.props.pageRoute}
-                      draft={application}
-                      rejectApplicationClickEvent={() => {
-                        this.toggleRejectForm()
-                      }}
-                      registerClickEvent={this.registerApplication}
-                    />
-                  )}
-                  {activeSection.viewType === 'form' && (
-                    <div>
-                      <FormSectionTitle
-                        id={`form_section_title_${activeSection.id}`}
+
+            {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+              <FullBodyContent>
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={application}
+                  submitClickEvent={this.submitForm}
+                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
+                  deleteApplicationClickEvent={() => {
+                    this.props.deleteApplication(application)
+                    history.push('/')
+                  }}
+                />
+              </FullBodyContent>
+            )}
+            {activeSection.viewType === VIEW_TYPE.REVIEW && (
+              <FullBodyContent>
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={application}
+                  rejectApplicationClickEvent={() => {
+                    this.toggleRejectForm()
+                  }}
+                  registerClickEvent={this.registerApplication}
+                />
+              </FullBodyContent>
+            )}
+
+            {activeSection.viewType === 'form' && (
+              <>
+                <BodyContent>
+                  <TertiaryButton
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <BackArrow />}
+                    onClick={this.props.goBack}
+                  >
+                    {intl.formatMessage(messages.back)}
+                  </TertiaryButton>
+                  <FormSectionTitle
+                    id={`form_section_title_${activeSection.id}`}
+                  >
+                    {intl.formatMessage(activeSection.title)}
+                    {activeSection.optional && (
+                      <Optional
+                        id={`form_section_opt_label_${activeSection.id}`}
+                        disabled={activeSection.disabled}
                       >
-                        {intl.formatMessage(activeSection.title)}
-                        {activeSection.optional && (
-                          <Optional
-                            id={`form_section_opt_label_${activeSection.id}`}
-                            disabled={activeSection.disabled}
-                          >
-                            &nbsp;&nbsp;•&nbsp;
-                            {intl.formatMessage(messages.optionalLabel)}
-                          </Optional>
-                        )}
-                      </FormSectionTitle>
-                      {activeSection.notice && (
-                        <Notice id={`form_section_notice_${activeSection.id}`}>
-                          {intl.formatMessage(activeSection.notice)}
-                        </Notice>
-                      )}
-                      <form
-                        id={`form_section_id_${activeSection.id}`}
-                        onSubmit={handleSubmit}
+                        &nbsp;&nbsp;•&nbsp;
+                        {intl.formatMessage(messages.optionalLabel)}
+                      </Optional>
+                    )}
+                  </FormSectionTitle>
+                  {activeSection.notice && (
+                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                      {intl.formatMessage(activeSection.notice)}
+                    </Notice>
+                  )}
+                  <form
+                    id={`form_section_id_${activeSection.id}`}
+                    onSubmit={handleSubmit}
+                  >
+                    <FormFieldGenerator
+                      id={activeSection.id}
+                      onChange={values => {
+                        debouncedModifyApplication(
+                          values,
+                          activeSection,
+                          application
+                        )
+                      }}
+                      setAllFieldsDirty={setAllFieldsDirty}
+                      fields={activeSection.fields}
+                      offlineResources={offlineResources}
+                      draftData={application.data}
+                    />
+                  </form>
+                  {nextSection && (
+                    <FooterArea>
+                      <PrimaryButton
+                        id="next_section"
+                        onClick={() => {
+                          this.continueButtonHandler(
+                            this.props.pageRoute,
+                            application.id,
+                            nextSection.id,
+                            application.event.toLowerCase()
+                          )
+                        }}
                       >
-                        <FormFieldGenerator
-                          id={activeSection.id}
-                          onChange={values => {
-                            debouncedModifyApplication(
-                              values,
-                              activeSection,
-                              application
+                        {intl.formatMessage(messages.continueButton)}
+                      </PrimaryButton>
+                      {application.review && (
+                        <StyledLinkButton
+                          id="back-to-review-button"
+                          className="item"
+                          onClick={() => {
+                            this.continueButtonHandler(
+                              this.props.pageRoute,
+                              application.id,
+                              application.submissionStatus &&
+                                application.submissionStatus ===
+                                  SUBMISSION_STATUS.DRAFT
+                                ? 'preview'
+                                : 'review',
+                              application.event.toLowerCase()
                             )
                           }}
-                          setAllFieldsDirty={setAllFieldsDirty}
-                          fields={activeSection.fields}
-                          offlineResources={offlineResources}
-                          draftData={application.data}
-                        />
-                      </form>
-                      {nextSection && (
-                        <FooterArea>
-                          <PrimaryButton
-                            id="next_section"
-                            onClick={() => {
-                              this.continueButtonHandler(
-                                this.props.pageRoute,
-                                application.id,
-                                nextSection.id,
-                                application.event.toLowerCase()
-                              )
-                            }}
-                          >
-                            {intl.formatMessage(messages.continueButton)}
-                          </PrimaryButton>
-                        </FooterArea>
+                        >
+                          {intl.formatMessage(messages.backToReviewButton)}
+                        </StyledLinkButton>
                       )}
-                    </div>
+                    </FooterArea>
                   )}
-                </Swipeable>
-              </BodyContent>
-            </FormContainer>
+                </BodyContent>
+              </>
+            )}
           </>
         )}
 
-        {this.state.showSubmitModal && (
-          <Modal
-            title={intl.formatMessage(messages.submitConfirmation)}
-            actions={[
-              <ConfirmBtn
-                key="submit"
-                id="submit_confirm"
-                onClick={() =>
-                  this.confirmSubmission(
-                    application,
-                    SUBMISSION_STATUS.READY_TO_SUBMIT,
-                    Action.SUBMIT_FOR_REVIEW
-                  )
+        <ResponsiveModal
+          title={intl.formatMessage(messages.submitConfirmationTitle, {
+            isComplete
+          })}
+          contentHeight={96}
+          actions={[
+            <TertiaryButton
+              id="cancel-btn"
+              key="cancel"
+              onClick={() => {
+                this.toggleSubmitModalOpen()
+                if (document.documentElement) {
+                  document.documentElement.scrollTop = 0
                 }
-              >
-                <>
-                  <TickLarge />
-                  {intl.formatMessage(messages.submitButton)}
-                </>
-              </ConfirmBtn>,
-              <CancelButton
-                id="cancel-btn"
-                key="cancel"
-                onClick={() => {
-                  this.toggleSubmitModalOpen()
-                  if (document.documentElement) {
-                    document.documentElement.scrollTop = 0
-                  }
-                }}
-              >
-                {intl.formatMessage(messages.cancel)}
-              </CancelButton>
-            ]}
-            show={this.state.showSubmitModal}
-            handleClose={this.toggleSubmitModalOpen}
-          >
-            {intl.formatMessage(messages.submitDescription)}
-          </Modal>
-        )}
-        {this.state.showRegisterModal && (
-          <Modal
-            title={intl.formatMessage(messages.submitConfirmation)}
-            actions={[
-              <ConfirmBtn
-                key="register"
-                id="register_confirm"
-                // @ts-ignore
-                onClick={() =>
-                  this.confirmSubmission(
-                    application,
-                    SUBMISSION_STATUS.READY_TO_REGISTER,
-                    Action.REGISTER_APPLICATION
-                  )
+              }}
+            >
+              {intl.formatMessage(messages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              key="submit"
+              id="submit_confirm"
+              onClick={() =>
+                this.confirmSubmission(
+                  application,
+                  SUBMISSION_STATUS.READY_TO_SUBMIT,
+                  Action.SUBMIT_FOR_REVIEW
+                )
+              }
+            >
+              {intl.formatMessage(messages.submitButton)}
+            </PrimaryButton>
+          ]}
+          show={this.state.showSubmitModal}
+          handleClose={this.toggleSubmitModalOpen}
+        >
+          {intl.formatMessage(messages.submitConfirmationDesc, {
+            isComplete
+          })}
+        </ResponsiveModal>
+        <ResponsiveModal
+          title={intl.formatMessage(messages.registerConfirmationTitle)}
+          contentHeight={96}
+          actions={[
+            <TertiaryButton
+              key="register_cancel"
+              id="register_cancel"
+              onClick={() => {
+                this.toggleRegisterModalOpen()
+                if (document.documentElement) {
+                  document.documentElement.scrollTop = 0
                 }
-              >
-                <>
-                  <TickLarge />
-                  {intl.formatMessage(messages.submitButton)}
-                </>
-              </ConfirmBtn>,
-              <CancelButton
-                key="register_cancel"
-                id="register_cancel"
-                onClick={() => {
-                  this.toggleRegisterModalOpen()
-                  if (document.documentElement) {
-                    document.documentElement.scrollTop = 0
-                  }
-                }}
-              >
-                {intl.formatMessage(messages.cancel)}
-              </CancelButton>
-            ]}
-            show={this.state.showRegisterModal}
-            handleClose={this.toggleRegisterModalOpen}
-          >
-            {intl.formatMessage(messages.submitDescription)}
-          </Modal>
-        )}
+              }}
+            >
+              {intl.formatMessage(messages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              key="register"
+              id="register_confirm"
+              // @ts-ignore
+              onClick={() =>
+                this.confirmSubmission(
+                  application,
+                  SUBMISSION_STATUS.READY_TO_REGISTER,
+                  Action.REGISTER_APPLICATION
+                )
+              }
+            >
+              {intl.formatMessage(messages.registerButtonTitle)}
+            </PrimaryButton>
+          ]}
+          show={this.state.showRegisterModal}
+          handleClose={this.toggleRegisterModalOpen}
+        >
+          {intl.formatMessage(messages.registerConfirmationDesc)}
+        </ResponsiveModal>
 
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
@@ -688,7 +677,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             application={application}
           />
         )}
-      </FormViewContainer>
+      </Container>
     )
   }
 }

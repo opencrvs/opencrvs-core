@@ -171,6 +171,7 @@ export interface IFormFieldBase {
   extraValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
+  placeholder?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
   mode?: THEME_MODE
@@ -368,6 +369,7 @@ export interface IConditionals {
   isMarried: IConditional
   identifierIDSelected: IConditional
   otherRelationship: IConditional
+  fatherContactDetailsRequired: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
@@ -424,6 +426,7 @@ export interface Ii18nFormFieldBase {
   conditionals?: IConditional[]
   hideAsterisk?: boolean
   mode?: THEME_MODE
+  placeholder?: string
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

@@ -1,4 +1,5 @@
 enum RegStatus {
+  IN_PROGRESS
   DECLARED
   REGISTERED
   CERTIFIED
@@ -21,9 +22,9 @@ enum RegistrationContactType {
 
 enum BirthRegPresence {
   BOTH_PARENTS
-  INFORMANT_ONLY
-  MOTHER_ONLY
-  FATHER_ONLY
+  INFORMANT
+  MOTHER
+  FATHER
   OTHER
 }
 
@@ -169,7 +170,7 @@ input BirthRegistrationInput {
   child: PersonInput
   mother: PersonInput
   father: PersonInput
-  informant: PersonInput
+  informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
   weightAtBirth: Float # Not in BDRIS2
@@ -192,7 +193,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   child: Person # -> .section(code='child-details').entry.reference
   mother: Person # -> .section(code='mother-details').entry.reference
   father: Person # -> .section(code='father-details').entry.reference
-  informant: Person # -> .section(code='informant-details').entry.reference
+  informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
@@ -251,6 +252,7 @@ input RegistrationInput {
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
+  inProgress: Boolean
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -270,6 +272,7 @@ type Registration { # -> Task
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
+  inProgress: Boolean # -> .status ('draft' | 'requested')
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [ID]

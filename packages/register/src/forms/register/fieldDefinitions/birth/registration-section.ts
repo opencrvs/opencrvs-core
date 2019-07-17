@@ -125,6 +125,10 @@ const messages: {
     description: 'Help text for the notes field',
     defaultMessage:
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.'
+  },
+  select: {
+    id: 'register.select.placeholder',
+    defaultMessage: 'Select'
   }
 })
 
@@ -141,6 +145,7 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       options: [
         {
           value: 'BOTH_PARENTS',
@@ -171,6 +176,7 @@ export const registrationSection: IFormSection = {
       required: false,
       initialValue: '',
       validate: [],
+      placeholder: messages.select,
       options: [
         {
           value: 'BOTH',

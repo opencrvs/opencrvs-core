@@ -14,11 +14,15 @@ const Container = css`
     width: 100%;
   }
 `
-const ControlsContainer = styled.div`
+const ControlsContainer = styled.div.attrs<{ centerController?: boolean }>({})`
   position: absolute;
-  right: 10px;
   z-index: 2;
-  top: 10px;
+  ${({ centerController }) =>
+    centerController
+      ? `right: 24px;
+  top: 40%;`
+      : `right: 16px;
+  top: 16px;`}
   user-select: none;
   border-radius: 2px;
 
@@ -48,6 +52,7 @@ const ControlsContainer = styled.div`
 
 interface IProps {
   image: string
+  controllerCenter?: boolean
 }
 
 export default class PanViewer extends React.Component<IProps> {
@@ -58,9 +63,9 @@ export default class PanViewer extends React.Component<IProps> {
     rotation: 0
   }
 
-  renderPanZoomControls = () => {
+  renderPanZoomControls = (centerController?: boolean) => {
     return (
-      <ControlsContainer>
+      <ControlsContainer centerController={centerController}>
         <div onClick={this.zoomIn}>
           <ZoomIn />
         </div>
@@ -90,7 +95,7 @@ export default class PanViewer extends React.Component<IProps> {
     `
     return (
       <React.Fragment>
-        {this.renderPanZoomControls()}
+        {this.renderPanZoomControls(this.props.controllerCenter)}
         <StyledReactPanZoom
           zoom={this.state.zoom}
           pandx={this.state.dx}

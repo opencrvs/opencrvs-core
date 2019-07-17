@@ -18,7 +18,7 @@ import {
   mockCertificate,
   mockErrorComposition
 } from '@gateway/utils/testUtils'
-import { clone } from 'lodash'
+import { clone, cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -106,6 +106,18 @@ describe('Registration type resolvers', () => {
     })
 
     expect(patient).toBeNull()
+  })
+  it('returns informant', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockRelatedPerson))
+
+    // @ts-ignore
+    const informant = await typeResolvers.BirthRegistration.informant(
+      mockComposition
+    )
+    expect(informant).toBeDefined()
+    expect(informant.resource.resourceType).toEqual('RelatedPerson')
+    expect(informant.resource.relationship.coding[0].code).toEqual('OTHER')
+    expect(informant.resource.relationship.text).toEqual('Nephew')
   })
   it('returns id from identifier', () => {
     const id = typeResolvers.IdentityType.id({
@@ -552,6 +564,13 @@ describe('Registration type resolvers', () => {
       })
       expect(child).toEqual(null)
     })
+    it('returns informant null', async () => {
+      // @ts-ignore
+      const informant = await typeResolvers.BirthRegistration.informant({
+        section: []
+      })
+      expect(informant).toEqual(null)
+    })
     it('returns weight At birth null', async () => {
       // @ts-ignore
       const weight = await typeResolvers.BirthRegistration.weightAtBirth({
@@ -788,6 +807,22 @@ describe('Registration type resolvers', () => {
       )
 
       expect(trackingID).toBe('123')
+    })
+    it('returns inProgress flag from the non-draft task object', async () => {
+      const inProgressFlag = await typeResolvers.Registration.inProgress(
+        mockTask
+      )
+
+      expect(inProgressFlag).toBe(false)
+    })
+    it('returns inProgress flag from the draft task object', async () => {
+      const clonedTask = cloneDeep(mockTask)
+      clonedTask.status = 'draft'
+      const inProgressFlag = await typeResolvers.Registration.inProgress(
+        clonedTask
+      )
+
+      expect(inProgressFlag).toBe(true)
     })
     it('returns birth registration number from the task object', async () => {
       const registrationNumber = await typeResolvers.Registration.registrationNumber(

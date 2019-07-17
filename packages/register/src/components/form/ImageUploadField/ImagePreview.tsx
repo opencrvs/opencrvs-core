@@ -1,47 +1,83 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
 import { IFileValue } from '@register/forms'
-import { ActionPage } from '@opencrvs/components/lib/interface'
-import { OverlayContainer } from '@register/components/form/ImageUploadField/ImageUploadOption'
 
-const PreviewContainer = styled(OverlayContainer)`
-  background: ${({ theme }) => theme.colors.black};
+import { Button } from '@opencrvs/components/lib/buttons'
+import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
+import PanViewer from '@opencrvs/components/lib/interface/components/PanViewer'
+const PreviewContainer = styled.div`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  background: ${({ theme }) => theme.colors.previewBackground};
 `
+const PreviewContainerHeader = styled.div`
+  width: 100%;
+  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  height: 64px;
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 99999;
+`
+
 const ImageHolder = styled.div`
   position: relative;
   width: 100%;
-  height: calc(100vh - 90px);
-`
-const Image = styled.img`
-  position: absolute;
-  max-width: 100vw;
-  max-height: 100%;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
 `
 
+const Title = styled.span`
+  padding-left: 16px;
+  color: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
+const BackButton = styled.button`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+`
 type IProps = {
   previewImage: IFileValue
-  backLabel?: string
   title?: string
   goBack: () => void
+  onDelete: () => void
 }
 
 export class ImagePreview extends React.Component<IProps> {
   render = () => {
-    const { previewImage, title, backLabel, goBack } = this.props
+    const { previewImage, title, goBack, onDelete } = this.props
     return (
-      <PreviewContainer>
-        <ActionPage
-          title={title ? title : 'Preview'}
-          backLabel={backLabel}
-          goBack={goBack}
-        >
-          <ImageHolder>
-            <Image id="preview_image_field" src={previewImage.data} />
-          </ImageHolder>
-        </ActionPage>
+      <PreviewContainer id="preview_image_field">
+        <PreviewContainerHeader>
+          <BackButton onClick={goBack}>
+            <ArrowBack />
+            <Title>{title}</Title>
+          </BackButton>
+          <span>
+            <Button icon={() => <Delete color="white" />} onClick={onDelete} />
+          </span>
+        </PreviewContainerHeader>
+        <ImageHolder>
+          {previewImage.data && (
+            <PanViewer
+              key={Math.random()}
+              image={previewImage.data}
+              controllerCenter={true}
+            />
+          )}
+        </ImageHolder>
       </PreviewContainer>
     )
   }

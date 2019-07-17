@@ -62,7 +62,8 @@ export const internationaliseFieldObject = (
     ...field,
     label:
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
-    description: field.description && intl.formatMessage(field.description)
+    description: field.description && intl.formatMessage(field.description),
+    placeholder: field.placeholder && intl.formatMessage(field.placeholder)
   }
 
   if (
@@ -157,6 +158,7 @@ export const getFieldValidation = (
         )
         const fun = element.validator(...params)
         validate.push(fun)
+        return element
       }
     )
   }
@@ -309,18 +311,19 @@ export function getQueryData(
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
-  resources?: IOfflineDataState
+  resources?: IOfflineDataState,
+  draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {
     return []
   }
 
-  return field.conditionals
-    .filter(conditional =>
-      /* eslint-disable-line  no-eval */
-      eval(conditional.expression)
-    )
-    .map((conditional: IConditional) => conditional.action)
+  return (
+    field.conditionals
+      // eslint-disable-next-line no-eval
+      .filter(conditional => eval(conditional.expression))
+      .map((conditional: IConditional) => conditional.action)
+  )
 }
 
 export const hasFormError = (
@@ -494,5 +497,10 @@ export const conditionals: IConditionals = {
   otherRelationship: {
     action: 'hide',
     expression: 'values.applicantsRelationToDeceased !== "OTHER"'
+  },
+  fatherContactDetailsRequired: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
   }
 }

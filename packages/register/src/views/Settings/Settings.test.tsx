@@ -6,9 +6,8 @@ import { getStorageUserDetailsSuccess } from '@opencrvs/register/src/profile/pro
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 
-const { store } = createStore()
-
 describe('Settings page tests', () => {
+  const { store } = createStore()
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -18,6 +17,40 @@ describe('Settings page tests', () => {
       store
     )
     component = testComponent.component
+  })
+  it('shows nothing', async () => {
+    // const { store } = createStore()
+    store.dispatch(
+      getStorageUserDetailsSuccess(
+        JSON.stringify({
+          catchmentArea: []
+        })
+      )
+    )
+    const comp = createTestComponent(
+      // @ts-ignore
+      <SettingsPage />,
+      store
+    ).component
+
+    expect(
+      comp
+        .find('#Bengali-name')
+        .first()
+        .text()
+    ).toBe('Bengali nameChange')
+    expect(
+      comp
+        .find('#English-name')
+        .first()
+        .text()
+    ).toBe('English nameChange')
+    expect(
+      comp
+        .find('#Phone-number')
+        .first()
+        .text()
+    ).toBe('Phone numberChange')
   })
 
   it('it checks component has loaded', () => {

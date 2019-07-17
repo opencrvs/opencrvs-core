@@ -496,20 +496,30 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.isValidBirthDate': 'Must be a valid birth date',
     'validations.requiredSymbol': '',
     'register.form.submit': 'SEND FOR REVIEW',
+    'register.form.submitIncomplete': 'Send incomplete application',
     'register.form.informationMissing': 'Information missing',
     'register.form.required': 'This field is required',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.selectInformant.newBirthRegistration': 'New birth application',
-    'register.selectInformant.informantTitle':
+    'register.selectInformant.birthInformantTitle':
       'Who is applying for birth registration?',
+    'register.selectInformant.deathInformantTitle':
+      'What relationship does the applicant have to the deceased?',
     'register.selectInformant.mother': 'Mother',
     'register.selectInformant.father': 'Father',
     'register.selectInformant.parents': 'Mother & Father',
     'register.selectInformant.someoneElse': 'Someone Else',
     'register.selectInformant.self': 'Self',
-    'register.selectInformant.errorMessage':
+    'register.selectInformant.spouse': 'Spouse',
+    'register.selectInformant.son': 'Son',
+    'register.selectInformant.daughter': 'Daughter',
+    'register.selectInformant.extendedFamily': 'Extended family',
+    'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying',
+    'register.selectInformant.deathErrorMessage':
+      'Please select the relationship to the deceased and any relevant contact details.',
+    'register.selectInformant.relationshipLabel': 'Relationship to deceased',
     'register.primaryApplicant.registerNewEventHeading':
       'Who is the primary applicant for this application?',
     'register.primaryApplicant.description':
@@ -529,6 +539,14 @@ export const ENGLISH_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'Are you ready to submit?',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
+    'register.form.modal.title.submitConfirmation':
+      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+    'register.form.modal.desc.submitConfirmation':
+      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+    'register.form.modal.title.registerConfirmation':
+      'Register this application?',
+    'register.form.modal.desc.registerConfirmation': 'Are you sure?',
+    'register.form.modal.button.title.registerConfirmation': 'Register',
     'register.form.modal.submitButton': 'Submit',
     'register.home.header.fieldAgent': 'Field Agent',
     'register.home.header.registrationClerk': 'Registration Clerk',
@@ -779,8 +797,8 @@ export const ENGLISH_STATE: ILanguage = {
     'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
     'register.workQueue.labels.results.duplicate': 'Possible duplicate found',
-    'register.registrarHome.results.reviewDuplicates': 'Review Duplicates',
-    'register.searchResult.results.reviewDuplicates': 'Review Duplicates',
+    'register.registrarHome.results.reviewDuplicates': 'Review',
+    'register.searchResult.results.reviewDuplicates': 'Review',
     'register.workQueue.buttons.printCertificate': 'Print Certificate',
     'review.edit.modal.preview': 'Back to Preview',
     'review.edit.modal.editButton': 'Edit',
@@ -805,6 +823,19 @@ export const ENGLISH_STATE: ILanguage = {
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
     'review.form.deleteApplication': 'Delete Application',
+    'review.header.title.govtName.bgd':
+      'Government of the peoples republic of Bangladesh',
+    'review.header.subject.subjectWithoutName':
+      '{eventType, select, birth {Birth} death {Death}} Application',
+    'review.header.subject.subjectWitName':
+      '{eventType, select, birth {Birth} death {Death}} Application for {name}',
+    'review.inputs.additionalComments': 'Any additional comments?',
+    'review.actions.title.applicationStatus':
+      'Application is {isComplete, select, true {complete} false {incomplete}}',
+    'review.actions.description.confirmInComplete':
+      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered',
+    'review.actions.description.confirmComplete':
+      'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
     'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
@@ -1109,7 +1140,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.securityquestion.heading': 'Set your security questions',
     'register.securityquestion.description':
       'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
-    'register.securityquestion.select': 'Select',
+    'register.select.placeholder': 'Select...',
     'register.securityquestion.selectSecurityQuestion':
       'Select a security question',
     'register.securityquestion.enterResponse':
@@ -1180,10 +1211,18 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.fatherLabel': 'Father',
     'register.SelectContactPoint.otherLabel': 'Someone else',
     'register.SelectContactPoint.phoneNoLabel': 'Phone number',
-    'register.SelectContactPoint.relationshipLabel': 'RelationShip to child',
+    'register.SelectContactPoint.birthRelationshipLabel':
+      'RelationShip to child',
+    'register.SelectContactPoint.deathRelationshipLabel': 'Relationship',
     'register.SelectContactPoint.goBack': 'Back',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
-    'register.SelectContactPoint.error': 'Please select a main point of contact'
+    'register.SelectContactPoint.error':
+      'Please select a main point of contact',
+    'register.SelectContactPoint.spouse': 'Spouse',
+    'register.SelectContactPoint.son': 'Son',
+    'register.SelectContactPoint.daughter': 'Daughter',
+    'register.SelectContactPoint.extendedFamily': 'Extended family',
+    'register.selectVitalEvent.backToReviewButton': 'Back to review'
   }
 }
