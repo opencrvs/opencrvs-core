@@ -248,6 +248,7 @@ interface IBaseRegistrarHomeProps {
   goToPrintCertificate: typeof goToPrintCertificateAction
   tabId: string
   drafts: IApplication[]
+  lastModifiedOn: number
 }
 
 interface IRegistrarHomeState {
@@ -255,6 +256,7 @@ interface IRegistrarHomeState {
   reviewCurrentPage: number
   updatesCurrentPage: number
   printCurrentPage: number
+  lastModifiedOn: number
 }
 
 type IRegistrarHomeProps = InjectedIntlProps &
@@ -285,7 +287,8 @@ export class RegistrarHomeView extends React.Component<
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
       updatesCurrentPage: 1,
-      printCurrentPage: 1
+      printCurrentPage: 1,
+      lastModifiedOn: this.props.lastModifiedOn
     }
   }
   userHasRegisterScope() {
@@ -514,6 +517,10 @@ export class RegistrarHomeView extends React.Component<
     const { theme, intl, userDetails, tabId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
+
+    if (this.props.lastModifiedOn !== this.state.lastModifiedOn) {
+      window.location.reload()
+    }
 
     return (
       <>
@@ -967,6 +974,17 @@ export class RegistrarHomeView extends React.Component<
   }
 }
 
+function getLastModifiedOn(applications: IApplication[]) {
+  let lastModifiedon = 0
+  applications &&
+    applications.forEach((application: IApplication) => {
+      if (application.modifiedOn && application.modifiedOn > lastModifiedon) {
+        lastModifiedon = application.modifiedOn
+      }
+    })
+  return lastModifiedon
+}
+
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string }>
@@ -977,7 +995,11 @@ function mapStateToProps(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
-    drafts: state.applicationsState.applications
+    drafts:
+      state.applicationsState && state.applicationsState.applications
+        ? [...state.applicationsState.applications]
+        : [],
+    lastModifiedOn: getLastModifiedOn(state.applicationsState.applications)
   }
 }
 
