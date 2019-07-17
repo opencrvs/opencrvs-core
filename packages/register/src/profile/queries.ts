@@ -6,6 +6,7 @@ export const FETCH_USER = gql`
     getUser(userId: $userId) {
       userMgntUserID
       practitionerId
+      mobile
       role
       type
       status

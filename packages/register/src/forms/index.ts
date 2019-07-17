@@ -357,6 +357,7 @@ export interface IConditionals {
   isMarried: IConditional
   identifierIDSelected: IConditional
   otherRelationship: IConditional
+  fatherContactDetailsRequired: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'

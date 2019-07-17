@@ -497,6 +497,7 @@ export const BENGALI_STATE: ILanguage = {
     'validations.domLaterThanDob': 'বিয়ের তারিখ জন্ম তারিখের পরে হতে হবে।',
     'validations.requiredSymbol': '',
     'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
+    'register.form.submitIncomplete': 'অসম্পূর্ণ আবেদন পাঠান',
     'register.form.saveAsDraft': 'Save as draft',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
@@ -516,6 +517,14 @@ export const BENGALI_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'আপনি জমা দিতে প্রস্তুত?',
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
+    'register.form.modal.title.submitConfirmation':
+      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+    'register.form.modal.desc.submitConfirmation':
+      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+    'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
+    'register.form.modal.desc.registerConfirmation':
+      'আপনি কি এ ব্যাপারে নিশ্চিত?',
+    'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
     'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
@@ -816,6 +825,12 @@ export const BENGALI_STATE: ILanguage = {
     'review.header.subject.subjectWitName':
       '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
     'review.inputs.additionalComments': 'কোন মন্তব্য?',
+    'review.actions.title.applicationStatus':
+      'আবেদন {isComplete, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
+    'review.actions.description.confirmInComplete':
+      'এই অসম্পূর্ণ আবেদনটি পাঠিয়ে, একটি ডিজিটাল রেকর্ড তৈরি করা হবে।\n\nআবেদনকারীকে বলুন যে তারা ট্র্যাকিং আইডি সহ একটি এসএমএস পাবেন। 30 দিনের মধ্যে রেজিস্ট্রেশন অফিসে আবেদনটি সম্পূর্ণ করার জন্য তাদের এটি প্রয়োজন হবে। জন্ম নিবন্ধিত হতে পারে আগে আবেদনকারী সব বাধ্যতামূলক তথ্য প্রদান করতে হবে',
+    'review.actions.description.confirmComplete':
+      'পর্যালোচনার জন্য এই আবেদন পাঠানোর মাধ্যমে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের উদ্দেশ্যে এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
     'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
