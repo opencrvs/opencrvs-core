@@ -24,7 +24,7 @@ jobs:
         - cd packages/resources && yarn save:testData && cd ../..
         - docker logs opencrvs_gateway_1
         - netstat -plant
-        - cd packages/e2e && yarn start --record false
+        - cd packages/e2e && yarn start --record
       env:
         - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
         - CYPRESS_LOGIN_URL=http://localhost:3020/
