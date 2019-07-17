@@ -79,7 +79,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
       if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Birth review found')
         cy.get('#ListItemAction-0-Review')
@@ -244,7 +244,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
       if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Birth review found')
         cy.get('#ListItemAction-0-Review')
