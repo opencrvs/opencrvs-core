@@ -228,6 +228,7 @@ export const fatherSection: IFormSection = {
         { value: true, label: messages.confirm },
         { value: false, label: messages.deny }
       ],
+      conditionals: [conditionals.fatherContactDetailsRequired],
       mapping: {
         mutation: sectionRemoveTransformer
       }

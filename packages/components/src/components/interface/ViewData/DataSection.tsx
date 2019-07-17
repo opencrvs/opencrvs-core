@@ -23,7 +23,7 @@ export class DataSection extends React.Component<IProps> {
       <Container id={id}>
         <Title>{title}</Title>
         {items.map((item: IDataProps, index: number) => (
-          <DataRow key={index} {...item} />
+          <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
         ))}
       </Container>
     )

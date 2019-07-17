@@ -11,16 +11,10 @@ import { IStoreState } from '@register/store'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
 import { getConditionalActionsForField } from '@register/forms/utils'
-import {
-  TickLarge,
-  CrossLarge,
-  Delete,
-  DraftSimple
-} from '@opencrvs/components/lib/icons'
 import { Link } from '@opencrvs/components/lib/typography'
 import { flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToPage, goToDocumentSection } from '@register/navigation'
+import { goToPage } from '@register/navigation'
 
 import {
   ISelectOption as SelectComponentOptions,
@@ -44,12 +38,7 @@ import {
   injectIntl,
   InjectedIntl
 } from 'react-intl'
-import {
-  PrimaryButton,
-  IconAction,
-  ICON_ALIGNMENT,
-  LinkButton
-} from '@opencrvs/components/lib/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
   IFormSection,
@@ -74,9 +63,10 @@ import { ReviewHeader } from './ReviewHeader'
 import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
+import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import { isMobileDevice } from '@register/utils/commonUtils'
+import { FullBodyContent } from '@opencrvs/components/lib/layout'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -101,26 +91,13 @@ const messages: {
     defaultMessage: 'Next',
     description: 'Next button text'
   },
-  valueRegister: {
-    id: 'review.button.register',
-    defaultMessage: 'REGISTER',
-    description: 'Register button text'
-  },
-  valueReject: {
-    id: 'review.button.reject',
-    defaultMessage: 'Reject Application',
-    description: 'Reject application button text'
-  },
+
   requiredField: {
     id: 'register.form.required',
     defaultMessage: 'This field is required',
     description: 'Message when a field doesnt have a value'
   },
-  valueSendForReview: {
-    id: 'register.form.submit',
-    defaultMessage: 'SEND FOR REVIEW',
-    description: 'Submit Button Text'
-  },
+
   valueSaveAsDraft: {
     id: 'register.form.saveDraft',
     defaultMessage: 'Save as draft',
@@ -172,41 +149,6 @@ const messages: {
   }
 })
 
-const ButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-  padding: 25px;
-  margin-bottom: 2px;
-`
-const RejectApplication = styled(IconAction)`
-  background-color: transparent;
-  box-shadow: none;
-  min-height: auto;
-  padding: 0px;
-  width: auto;
-  div:first-of-type {
-    background: ${({ theme }) => theme.colors.warning};
-    padding: 15px 15px 10px;
-    border-radius: 2px;
-  }
-  h3 {
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
-    margin-left: 70px;
-    color: ${({ theme }) => theme.colors.secondary};
-    text-decoration: underline;
-  }
-  &:disabled {
-    div:first-of-type {
-      background: ${({ theme }) => theme.colors.disabled};
-    }
-    g {
-      fill: ${({ theme }) => theme.colors.disabled};
-    }
-    h3 {
-      color: ${({ theme }) => theme.colors.disabled};
-    }
-  }
-`
-
 const RequiredFieldLink = styled(Link)`
   color: ${({ theme }) => theme.colors.error};
 `
@@ -233,9 +175,19 @@ const Column = styled.div`
     width: 100%;
   }
 `
+
 const StyledColumn = styled(Column)`
   ${({ theme }) => theme.shadows.mistyShadow};
 `
+
+const ZeroDocument = styled.div`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+`
+
 const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
   {}
 )`
@@ -243,34 +195,6 @@ const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
   }
-`
-const DButtonContainer = styled(ButtonContainer)`
-  background: transparent;
-`
-const DeleteApplication = styled.a`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.error};
-  text-decoration: underline;
-  cursor: pointer;
-  svg {
-    margin-right: 15px;
-  }
-`
-const SaveDraftText = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  color: ${({ theme }) => theme.colors.secondary};
-  text-decoration: underline;
-  margin-left: 14px;
-`
-
-const DraftButtonContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-  min-height: 83px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding-left: 25px;
-  cursor: pointer;
 `
 
 const FormData = styled.div`
@@ -280,13 +204,6 @@ const FormData = styled.div`
 `
 const InputWrapper = styled.div`
   margin-top: 16px;
-`
-const ZeroDocument = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
@@ -307,7 +224,6 @@ interface IProps {
   offlineResources: IOfflineDataState
   language: string
   onChangeReviewForm?: onChangeReviewForm
-  goToDocumentSection: typeof goToDocumentSection
   writeApplication: typeof writeApplication
 }
 type State = {
@@ -425,7 +341,7 @@ const renderValue = (
   return value
 }
 
-const getErrorsOnFieldsBySection = (
+export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication
 ) => {
@@ -463,6 +379,7 @@ type FullIFileValue = IFileValue & ImageMeta
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
+
     this.state = {
       displayEditDialog: false,
       editClickedSectionId: '',
@@ -584,7 +501,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       const conditionalActions = getConditionalActionsForField(
         field,
         draft.data[section.id] || {},
-        offlineResources
+        offlineResources,
+        draft.data
       )
       return !conditionalActions.includes('hide')
     }
@@ -655,19 +573,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registerClickEvent,
       rejectApplicationClickEvent,
       submitClickEvent,
-      saveDraftClickEvent,
-      deleteApplicationClickEvent,
       pageRoute,
       draft: { event }
     } = this.props
 
     const formSections = getViewableSection(registerForm[event])
+
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
-    const numberOfErrors = flatten(
-      // @ts-ignore
-      Object.values(errorsOnFields).map(Object.values)
-      // @ts-ignore
-    ).filter(errors => errors.length > 0).length
+
+    const isComplete =
+      flatten(
+        // @ts-ignore
+        Object.values(errorsOnFields).map(Object.values)
+        // @ts-ignore
+      ).filter(errors => errors.length > 0).length === 0
 
     const isRejected =
       this.props.draft.registrationStatus &&
@@ -731,59 +650,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
             </FormData>
-            {!!registerClickEvent && (
-              <ButtonContainer>
-                <PrimaryButton
-                  id="registerApplicationBtn"
-                  icon={() => <TickLarge />}
-                  align={ICON_ALIGNMENT.LEFT}
-                  onClick={registerClickEvent}
-                >
-                  {intl.formatMessage(messages.valueRegister)}
-                </PrimaryButton>
-              </ButtonContainer>
-            )}
-
-            {!!rejectApplicationClickEvent && !isRejected && (
-              <ButtonContainer>
-                <RejectApplication
-                  id="rejectApplicationBtn"
-                  title={intl.formatMessage(messages.valueReject)}
-                  icon={() => <CrossLarge />}
-                  onClick={rejectApplicationClickEvent}
-                />
-              </ButtonContainer>
-            )}
-
-            {!!submitClickEvent && (
-              <ButtonContainer>
-                <PrimaryButton
-                  id="submit_form"
-                  icon={() => <TickLarge />}
-                  align={ICON_ALIGNMENT.LEFT}
-                  onClick={submitClickEvent}
-                  disabled={numberOfErrors > 0}
-                >
-                  {intl.formatMessage(
-                    this.userHasRegisterScope()
-                      ? messages.valueRegister
-                      : messages.valueSendForReview
-                  )}
-                </PrimaryButton>
-              </ButtonContainer>
-            )}
-
-            {!!saveDraftClickEvent && (
-              <DraftButtonContainer
-                onClick={saveDraftClickEvent}
-                id="save-draft"
-              >
-                <DraftSimple />
-                <SaveDraftText>
-                  {intl.formatMessage(messages.valueSaveAsDraft)}
-                </SaveDraftText>
-              </DraftButtonContainer>
-            )}
+            <ReviewAction
+              isComplete={isComplete}
+              hasRegisterScope={this.userHasRegisterScope()}
+              isRejected={Boolean(isRejected)}
+              registerAction={registerClickEvent}
+              submitAction={submitClickEvent}
+              rejectAction={rejectApplicationClickEvent}
+            />
           </StyledColumn>
           <Column>
             <ResponsiveDocumentViewer
@@ -804,7 +678,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <LinkButton
                     id="edit-document"
                     onClick={() =>
-                      this.props.goToDocumentSection(draft.id, draft.event)
+                      this.editLinkClickHandler(
+                        documentsSection.id,
+                        this.state.activeSection
+                      )
                     }
                   >
                     {intl.formatMessage(messages.editDocuments)}
@@ -830,17 +707,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )
           }}
         />
-        {deleteApplicationClickEvent && (
-          <DButtonContainer>
-            <DeleteApplication
-              onClick={deleteApplicationClickEvent}
-              id="delete-application"
-            >
-              <Delete />
-              {intl.formatMessage(messages.deleteApplicationBtnTxt)}
-            </DeleteApplication>
-          </DButtonContainer>
-        )}
       </FullBodyContent>
     )
   }
@@ -853,6 +719,5 @@ export const ReviewSection = connect(
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
   }),
-
-  { goToPage, writeApplication, goToDocumentSection }
+  { goToPage, writeApplication }
 )(injectIntl(ReviewSectionComp))
