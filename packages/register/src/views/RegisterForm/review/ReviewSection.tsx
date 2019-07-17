@@ -425,7 +425,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       const conditionalActions = getConditionalActionsForField(
         field,
         draft.data[section.id] || {},
-        offlineResources
+        offlineResources,
+        draft.data
       )
       return !conditionalActions.includes('hide')
     }
