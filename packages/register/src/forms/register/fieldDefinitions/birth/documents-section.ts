@@ -351,46 +351,46 @@ export const documentsSection: IFormSection = {
         mutation: birthFieldToAttachmentTransformer,
         query: birthAttachmentToFieldTransformer
       }
-    },
-    {
-      name: 'paragraph',
-      type: PARAGRAPH,
-      label: messages.paragraph,
-      initialValue: '',
-      validate: []
-    },
-    {
-      name: 'list',
-      type: DYNAMIC_LIST,
-      label: messages.documentsTab,
-      validate: [],
-      initialValue: '',
-      dynamicItems: {
-        dependency: 'child.childBirthDate',
-        valueMapper: diffDoB,
-        items: {
-          within45days: [
-            messages.proofOfMothersID,
-            messages.proofOfFathersID,
-            messages.proofOfBirthPlaceAndDate,
-            messages.proofOfParentPermanentAddress
-          ],
-          between46daysTo5yrs: [
-            messages.proofOfMothersID,
-            messages.proofOfFathersID,
-            messages.proofOfBirthPlaceAndDate,
-            messages.proofOfParentPermanentAddress,
-            messages.proofOfEPICardOfChild
-          ],
-          after5yrs: [
-            messages.proofOfMothersID,
-            messages.proofOfFathersID,
-            messages.proofOfBirthPlaceAndDate,
-            messages.proofOfParentPermanentAddress,
-            messages.proofOfDocCertificateOfChild
-          ]
-        }
-      }
     }
+    // {
+    //   name: 'paragraph',
+    //   type: PARAGRAPH,
+    //   label: messages.paragraph,
+    //   initialValue: '',
+    //   validate: []
+    // }
+    // {
+    //   name: 'list',
+    //   type: DYNAMIC_LIST,
+    //   label: messages.documentsTab,
+    //   validate: [],
+    //   initialValue: '',
+    //   dynamicItems: {
+    //     dependency: 'child.childBirthDate',
+    //     valueMapper: diffDoB,
+    //     items: {
+    //       within45days: [
+    //         messages.proofOfMothersID,
+    //         messages.proofOfFathersID,
+    //         messages.proofOfBirthPlaceAndDate,
+    //         messages.proofOfParentPermanentAddress
+    //       ],
+    //       between46daysTo5yrs: [
+    //         messages.proofOfMothersID,
+    //         messages.proofOfFathersID,
+    //         messages.proofOfBirthPlaceAndDate,
+    //         messages.proofOfParentPermanentAddress,
+    //         messages.proofOfEPICardOfChild
+    //       ],
+    //       after5yrs: [
+    //         messages.proofOfMothersID,
+    //         messages.proofOfFathersID,
+    //         messages.proofOfBirthPlaceAndDate,
+    //         messages.proofOfParentPermanentAddress,
+    //         messages.proofOfDocCertificateOfChild
+    //       ]
+    //     }
+    //   }
+    // }
   ]
 }

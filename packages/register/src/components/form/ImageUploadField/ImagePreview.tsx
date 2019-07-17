@@ -52,7 +52,7 @@ type IProps = {
   previewImage: IFileValue
   title?: string
   goBack: () => void
-  onDelete: () => void
+  onDelete: (image: IFileValue) => void
 }
 
 export class ImagePreview extends React.Component<IProps> {
@@ -66,7 +66,10 @@ export class ImagePreview extends React.Component<IProps> {
             <Title>{title}</Title>
           </BackButton>
           <span>
-            <Button icon={() => <Delete color="white" />} onClick={onDelete} />
+            <Button
+              icon={() => <Delete color="white" />}
+              onClick={() => onDelete(previewImage)}
+            />
           </span>
         </PreviewContainerHeader>
         <ImageHolder>

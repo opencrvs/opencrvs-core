@@ -12,6 +12,7 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
+import { remove, clone } from 'lodash'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -55,16 +56,16 @@ const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `
 const DocumentUploader = styled(ImageUploader)`
-  color: ${({ theme }) => theme.colors.primary}
-  background: ${({ theme }) => theme.colors.white}
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`}
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)
-  border-radius: 2px
-  ${({ theme }) => theme.fonts.buttonStyle}
-  height: 40px
-  text-transform: initial  
-  margin-left: 10px
-  padding: 0px 30px
+  color: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.colors.white};
+  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
+  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  border-radius: 2px;
+  ${({ theme }) => theme.fonts.buttonStyle};
+  height: 40px;
+  text-transform: initial;
+  margin-left: 10px;
+  padding: 0px 30px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 0px;
@@ -90,6 +91,7 @@ type IState = {
   fields: DocumentFields
   uploadedDocuments: IFileValue[]
   previewImage: IFileValue | null
+  dropDownOptions: ISelectOption[]
 }
 
 const getBase64String = (file: File) => {
@@ -111,16 +113,29 @@ class DocumentUploaderWithOptionComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
-    console.log(props, this.props)
     this.state = {
       errorMessage: EMPTY_STRING,
       previewImage: null,
       uploadedDocuments: this.props.files || [],
+      dropDownOptions: this.initializeDropDownOption(),
       fields: {
         documentType: EMPTY_STRING,
         documentData: EMPTY_STRING
       }
     }
+  }
+
+  initializeDropDownOption = (): ISelectOption[] => {
+    const options = clone(this.props.options)
+    this.props.files &&
+      this.props.files.forEach((element: IFileValue) => {
+        remove(
+          options,
+          (option: ISelectOption) => option.value === element.optionValues[1]
+        )
+      })
+
+    return options
   }
 
   onChange = (documentType: string) => {
@@ -169,6 +184,14 @@ class DocumentUploaderWithOptionComp extends React.Component<
             this.props.extraValue,
             this.state.fields.documentType
           ]
+
+          let tempOptions = this.state.dropDownOptions
+          remove(
+            tempOptions,
+            (option: ISelectOption) =>
+              option.value === this.state.fields.documentType
+          )
+
           this.setState(
             prevState => {
               const newDocument: IFileValue = {
@@ -184,7 +207,11 @@ class DocumentUploaderWithOptionComp extends React.Component<
                   documentType: EMPTY_STRING,
                   documentData: EMPTY_STRING
                 },
-                uploadedDocuments: [...prevState.uploadedDocuments, newDocument]
+                uploadedDocuments: [
+                  ...prevState.uploadedDocuments,
+                  newDocument
+                ],
+                dropDownOptions: tempOptions
               }
             },
             () => {
@@ -200,6 +227,16 @@ class DocumentUploaderWithOptionComp extends React.Component<
     })
   }
 
+  onDelete = (image: IFileValue) => {
+    const addableOption = this.props.options.find(
+      (item: ISelectOption) => item.value === image.optionValues[1]
+    ) as ISelectOption
+    const dropDownOptions = this.state.dropDownOptions.concat(addableOption)
+    this.setState(() => ({ dropDownOptions }))
+    remove(this.state.uploadedDocuments, (item: IFileValue) => item === image)
+    this.closePreviewSection()
+  }
+
   closePreviewSection = () => {
     this.setState({ previewImage: null })
   }
@@ -209,10 +246,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   render() {
-    const { label, options, intl } = this.props
-
-    console.log(this.props)
-    console.log(this.state)
+    const { label, intl } = this.props
 
     return (
       <UploaderWrapper>
@@ -229,7 +263,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         />
         <Flex>
           <Select
-            options={options}
+            options={this.state.dropDownOptions}
             value={this.state.fields.documentType}
             onChange={this.onChange}
           />
@@ -246,8 +280,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
           <ImagePreview
             previewImage={this.state.previewImage}
             title={intl.formatMessage(messages.preview)}
-            backLabel={intl.formatMessage(messages.back)}
             goBack={this.closePreviewSection}
+            onDelete={this.onDelete}
           />
         )}
       </UploaderWrapper>
