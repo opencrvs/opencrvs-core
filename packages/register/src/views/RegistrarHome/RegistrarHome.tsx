@@ -1017,7 +1017,7 @@ export class RegistrarHomeView extends React.Component<
 
 function mapStateToProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string; selectorId: string }>
+  props: RouteComponentProps<{ tabId: string; selectorId?: string }>
 ) {
   const { match } = props
   return {
