@@ -328,7 +328,8 @@ export function getQueryData(
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
-  resources?: IOfflineDataState
+  resources?: IOfflineDataState,
+  draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -522,5 +523,10 @@ export const conditionals: IConditionals = {
   otherRelationship: {
     action: 'hide',
     expression: 'values.applicantsRelationToDeceased !== "OTHER"'
+  },
+  fatherContactDetailsRequired: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
   }
 }
