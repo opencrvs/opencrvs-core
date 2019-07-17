@@ -58,6 +58,7 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -238,13 +239,18 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
 function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup
+  fromSectionGroup: IFormSectionGroup,
+  application: IApplication
 ) {
-  const currentGroupIndex = fromSection.groups.findIndex(
+  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+    fromSection,
+    application.data[fromSection.id] || {}
+  )
+  const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
   )
 
-  if (currentGroupIndex === fromSection.groups.length - 1) {
+  if (currentGroupIndex === visibleGroups.length - 1) {
     const currentIndex = sections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
     )
@@ -258,7 +264,7 @@ function getNextSectionIds(
   }
   return {
     sectionId: fromSection.id,
-    groupId: fromSection.groups[currentGroupIndex + 1].id
+    groupId: visibleGroups[currentGroupIndex + 1].id
   }
 }
 
@@ -468,7 +474,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
       activeSection,
-      activeSectionGroup
+      activeSectionGroup,
+      application
     )
     const title =
       activeSection.viewType === VIEW_TYPE.REVIEW
@@ -552,7 +559,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <FormSectionTitle
                     id={`form_section_title_${activeSectionGroup.id}`}
                   >
-                    {(activeSectionGroup.showFieldTitle && (
+                    {(activeSectionGroup.singleFieldPage && (
                       <>
                         {(activeSectionGroup.fields[0].hideHeader = true)}
                         {intl.formatMessage(activeSectionGroup.fields[0].label)}

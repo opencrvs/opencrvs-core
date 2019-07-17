@@ -95,8 +95,8 @@ export const causeOfDeathSection: IFormSection = {
   title: messages.causeOfDeathTitle,
   groups: [
     {
-      id: 'causeOfDeath-view-group',
-      showFieldTitle: true,
+      id: 'causeOfDeath-causeOfDeathEstablished',
+      singleFieldPage: true,
       fields: [
         {
           name: 'causeOfDeathEstablished',
@@ -118,15 +118,14 @@ export const causeOfDeathSection: IFormSection = {
             mutation: ignoreFieldTransformer,
             query: hasCaseOfDeathSectionTransformer
           }
-        },
-        {
-          name: 'methodOfCauseOfDeathSection',
-          type: SUBSECTION,
-          label: messages.causeOfDeathSectionTitle,
-          initialValue: '',
-          validate: [],
-          conditionals: [conditionals.causeOfDeathEstablished]
-        },
+        }
+      ]
+    },
+    {
+      id: 'causeOfDeath-methodOfCauseOfDeathSection',
+      title: messages.causeOfDeathSectionTitle,
+      conditionals: [conditionals.causeOfDeathEstablished],
+      fields: [
         {
           name: 'methodOfCauseOfDeath',
           type: SELECT_WITH_OPTIONS,
@@ -145,7 +144,6 @@ export const causeOfDeathSection: IFormSection = {
               label: messages.medicallyCertified
             }
           ],
-          conditionals: [conditionals.causeOfDeathEstablished],
           mapping: {
             mutation: sectionFieldToBundleFieldTransformer(
               'causeOfDeathMethod'
@@ -159,7 +157,6 @@ export const causeOfDeathSection: IFormSection = {
           initialValue: '',
           label: messages.causeOfDeathCode,
           required: false,
-          conditionals: [conditionals.causeOfDeathEstablished],
           validate: [blockAlphaNumericDot, maxLength(17)],
           mapping: {
             mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),

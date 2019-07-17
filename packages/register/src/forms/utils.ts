@@ -24,7 +24,8 @@ import {
   IFormSection,
   IQuery,
   DATE,
-  IDateFormField
+  IDateFormField,
+  IFormSectionGroup
 } from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -343,6 +344,24 @@ export const getConditionalActionsForField = (
   )
 }
 
+export const getVisibleSectionGroupsBasedOnConditions = (
+  section: IFormSection,
+  values: IFormSectionData
+): IFormSectionGroup[] => {
+  return section.groups.filter(group => {
+    if (!group.conditionals) {
+      return true
+    }
+    return (
+      group.conditionals
+        // eslint-disable-next-line no-eval
+        .filter(conditional => eval(conditional.expression))
+        .map((conditional: IConditional) => conditional.action)
+        .includes('hide') !== true
+    )
+  })
+}
+
 export const getSectionFields = (section: IFormSection) => {
   let fields: IFormField[] = []
   section.groups.forEach(group => (fields = fields.concat(group.fields)))
@@ -496,8 +515,7 @@ export const conditionals: IConditionals = {
   },
   deathPlaceOther: {
     action: 'hide',
-    expression:
-      '(values.deathPlaceAddress !== "PRIVATE_HOME" && values.deathPlaceAddress !== "OTHER")'
+    expression: 'values.deathPlaceAddress !== "OTHER"'
   },
   deathPlaceAtPrivateHome: {
     action: 'hide',
