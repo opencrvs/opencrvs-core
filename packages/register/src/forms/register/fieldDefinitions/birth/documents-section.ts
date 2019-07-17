@@ -10,7 +10,10 @@ import {
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
-import { birthFieldToAttachmentTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  birthFieldToAttachmentTransformer,
+  documentForWhomFhirMapping
+} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
 import { diffDoB } from '@register/forms/utils'
 
@@ -194,8 +197,8 @@ export const documentsSection: IFormSection = {
       name: 'uploadDocForMother',
       type: DOCUMENT_UPLOADER_WITH_OPTION,
       label: messages.proofOfMothersID,
-      required: true,
       initialValue: '',
+      extraValue: documentForWhomFhirMapping.Mother,
       hideAsterisk: true,
       validate: [],
       options: [
@@ -205,14 +208,18 @@ export const documentsSection: IFormSection = {
         { value: 'Passport', label: messages.docTypePassport },
         { value: 'School Certificate', label: messages.docTypeSC },
         { value: 'Other', label: messages.docTypeOther }
-      ]
+      ],
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
     },
     {
       name: 'uploadDocForFather',
       type: DOCUMENT_UPLOADER_WITH_OPTION,
       label: messages.proofOfFathersID,
-      required: true,
       initialValue: '',
+      extraValue: documentForWhomFhirMapping.Father,
       hideAsterisk: true,
       validate: [],
       options: [
@@ -222,7 +229,11 @@ export const documentsSection: IFormSection = {
         { value: 'Passport', label: messages.docTypePassport },
         { value: 'School Certificate', label: messages.docTypeSC },
         { value: 'Other', label: messages.docTypeOther }
-      ]
+      ],
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
     },
     // {
     //   name: 'documentUploader',
@@ -231,13 +242,7 @@ export const documentsSection: IFormSection = {
     //   initialValue: '',
     //   validate: [],
     //   fields: [
-    //     {
-    //       name: 'info-paragraph',
-    //       type: PARAGRAPH,
-    //       label: messages.paragraph,
-    //       initialValue: '',
-    //       validate: []
-    //     }
+
     //   ]
     // },
     {

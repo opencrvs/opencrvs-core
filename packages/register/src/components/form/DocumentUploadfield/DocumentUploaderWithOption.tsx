@@ -1,17 +1,16 @@
-import * as React from 'react'
 import {
-  Select,
+  ImageUploader,
   ISelectOption,
-  ImageUploader
+  Select
 } from '@opencrvs/components/lib/forms'
-import styled from 'styled-components'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import * as Jimp from 'jimp'
-import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-import { IFileValue } from '@register/forms'
 import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
+import { IFileValue, IFormFieldValue } from '@register/forms'
+import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
+import * as Jimp from 'jimp'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 
 const messages: {
@@ -52,9 +51,6 @@ const Flex = styled.div`
   display: flex;
   flex-wrap: wrap;
 `
-const Item = styled.div`
-  flex: 1 1 auto;
-`
 const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `
@@ -71,26 +67,28 @@ const DocumentUploader = styled(ImageUploader)`
   padding: 0px 30px
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 0px
-    margin-top: 10px
+    margin-left: 0px;
+    margin-top: 10px;
   }
 `
 
 type IFullProps = {
   name: string
   label: string
+  extraValue: IFormFieldValue
   options: ISelectOption[]
+  files?: IFileValue[]
   onComplete: (files: IFileValue[]) => void
 } & InjectedIntlProps
 
-export type DocumentFields = {
+type DocumentFields = {
   documentType: string
   documentData: string
 }
 type IState = {
   errorMessage: string
   fields: DocumentFields
-  uploadedDocuments: DocumentFields[]
+  uploadedDocuments: IFileValue[]
   previewImage: IFileValue | null
 }
 
@@ -113,10 +111,11 @@ class DocumentUploaderWithOptionComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
+    console.log(props, this.props)
     this.state = {
       errorMessage: EMPTY_STRING,
       previewImage: null,
-      uploadedDocuments: [],
+      uploadedDocuments: this.props.files || [],
       fields: {
         documentType: EMPTY_STRING,
         documentData: EMPTY_STRING
@@ -166,30 +165,32 @@ class DocumentUploaderWithOptionComp extends React.Component<
           return data as string
         })
         .then(buffer => {
-          this.setState(prevState => {
-            const newDocument: DocumentFields = {
-              documentData: buffer,
-              documentType: this.state.fields.documentType
+          const optionValues = [
+            this.props.extraValue,
+            this.state.fields.documentType
+          ]
+          this.setState(
+            prevState => {
+              const newDocument: IFileValue = {
+                optionValues,
+                type: uploadedImage.type,
+                data: buffer
+              }
+
+              return {
+                ...prevState,
+                errorMessage: EMPTY_STRING,
+                fields: {
+                  documentType: EMPTY_STRING,
+                  documentData: EMPTY_STRING
+                },
+                uploadedDocuments: [...prevState.uploadedDocuments, newDocument]
+              }
+            },
+            () => {
+              this.props.onComplete(this.state.uploadedDocuments)
             }
-
-            return {
-              ...prevState,
-              errorMessage: EMPTY_STRING,
-              fields: {
-                documentType: EMPTY_STRING,
-                documentData: EMPTY_STRING
-              },
-              uploadedDocuments: [...prevState.uploadedDocuments, newDocument]
-            }
-          })
-
-          console.log(this.state)
-
-          // this.props.onComplete({
-          //   optionValues: Object.values(this.state.data),
-          //   type: uploadedImage.type,
-          //   data: buffer
-          // })
+          )
         })
         .catch(e => {
           this.setState({
@@ -203,18 +204,16 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.setState({ previewImage: null })
   }
 
-  selectForPreview = (document: DocumentFields) => {
-    this.setState({
-      previewImage: {
-        data: document.documentData,
-        optionValues: [document.documentType],
-        type: 'jpg'
-      }
-    })
+  selectForPreview = (previewImage: IFileValue) => {
+    this.setState({ previewImage })
   }
 
   render() {
-    const { name, label, options, intl } = this.props
+    const { label, options, intl } = this.props
+
+    console.log(this.props)
+    console.log(this.state)
+
     return (
       <UploaderWrapper>
         <ErrorMessage>

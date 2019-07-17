@@ -443,15 +443,18 @@ const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
   const draftItemName = documentsSection.id
   const documentOptions: SelectComponentOptions[] = []
   const selectOptions: SelectComponentOptions[] = []
+  let uploadedDocuments: IFileValue[] = []
 
-  const uploadedDocuments =
-    draft.data[draftItemName] &&
-    isArray(draft.data[draftItemName].imageUploader)
-      ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
-      : []
+  for (let index in draft.data[draftItemName]) {
+    if (isArray(draft.data[draftItemName][index])) {
+      uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
+        index
+      ] as IFileValue[])
+    }
+  }
 
   uploadedDocuments.map(document => {
-    const label = document.title + ' ' + document.description
+    const label = document.optionValues.join(' ')
     documentOptions.push({
       value: document.data,
       label

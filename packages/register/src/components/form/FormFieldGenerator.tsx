@@ -184,6 +184,8 @@ function GeneratedInputField({
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         options={fieldDefinition.options}
+        files={value as IFileValue[]}
+        extraValue={fieldDefinition.extraValue || ''}
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
         }
@@ -588,7 +590,7 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === DOCUMENT_UPLOADER_WITH_OPTION
+            field.type === DOCUMENT_UPLOADER_WRAPER
           ) {
             return (
               <FormItem key={`${field.name}`}>

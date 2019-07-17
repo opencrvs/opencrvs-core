@@ -2,10 +2,10 @@ import { IFormField, IFormData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
 
 export const documentForWhomFhirMapping = {
-  Child: 'CHILD',
-  Father: 'FATHER',
-  Mother: 'MOTHER',
-  Other: 'OTHER'
+  Child: 'Child',
+  Father: 'Father',
+  Mother: 'Mother',
+  Other: 'Other'
 }
 
 export const documentTypeFhirMapping = {

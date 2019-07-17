@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { DocumentFields } from './DocumentUploaderWithOption'
 import styled from 'styled-components'
 import { PaperClip } from '@opencrvs/components/lib/icons'
+import { IFileValue } from '@register/forms'
 
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -24,8 +24,8 @@ const PreviewLink = styled.p`
 `
 
 type IProps = {
-  documents: DocumentFields[] | null
-  onSelect: (document: DocumentFields) => void
+  documents: IFileValue[] | null
+  onSelect: (document: IFileValue) => void
 }
 
 export class DocumentListPreview extends React.Component<IProps> {
@@ -35,14 +35,13 @@ export class DocumentListPreview extends React.Component<IProps> {
 
   render() {
     const { documents } = this.props
-
     return (
       documents && (
         <Wrapper>
-          {documents.map((document: DocumentFields, key: number) => (
+          {documents.map((document: IFileValue, key: number) => (
             <PreviewLink key={key} onClick={_ => this.props.onSelect(document)}>
               <PaperClip />
-              <span>{document.documentType}</span>
+              <span>{document.optionValues[1]}</span>
             </PreviewLink>
           ))}
         </Wrapper>
