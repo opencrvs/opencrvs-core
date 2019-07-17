@@ -223,13 +223,13 @@ interface IRegistrarHomeState {
 
 type IRegistrarHomeProps = InjectedIntlProps & IBaseRegistrarHomeProps
 
-const TAB_ID = {
+export const TAB_ID = {
   inProgress: 'progress',
   readyForReview: 'review',
   sentForUpdates: 'updates',
   readyForPrint: 'print'
 }
-const SELECTOR_ID = {
+export const SELECTOR_ID = {
   ownDrafts: 'you',
   fieldAgentDrafts: 'field-agents'
 }
