@@ -42,6 +42,3 @@ export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const CREATE_USER = '/createUser'
 export const CREATE_USER_SECTION = '/createUser/:sectionId'
-
-export const FORM_DOCUMENT_SECTION =
-  '/drafts/:applicationId/events/:event/documents'

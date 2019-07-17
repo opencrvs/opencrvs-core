@@ -20,8 +20,7 @@ import {
   CREATE_USER_SECTION,
   SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
-  FORM_DOCUMENT_SECTION
+  SELECT_DEATH_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken } from '@register/utils/authUtils'
@@ -106,15 +105,6 @@ export function goToDeathContactPoint(applicationId: string) {
   return push(
     formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
       applicationId
-    })
-  )
-}
-
-export function goToDocumentSection(applicationId: string, event: string) {
-  return push(
-    formatUrl(FORM_DOCUMENT_SECTION, {
-      applicationId,
-      event
     })
   )
 }
