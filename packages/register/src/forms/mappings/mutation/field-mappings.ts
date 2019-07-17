@@ -293,8 +293,8 @@ export function fieldToAttachmentTransformer(
       return {
         data: attachment.data,
         subject: subjectMapper
-          ? subjectMapper[attachment.optionValues[0]]
-          : attachment.optionValues[0],
+          ? subjectMapper[attachment.optionValues[0]].toUpperCase()
+          : attachment.optionValues[0].toUpperCase(),
         type: typeMapper
           ? typeMapper[attachment.optionValues[1]]
           : attachment.optionValues[1],
@@ -309,7 +309,11 @@ export function fieldToAttachmentTransformer(
     if (!transformedData[selectedSectionId]) {
       transformedData[selectedSectionId] = {}
     }
-    transformedData[selectedSectionId].attachments = attachments
+    transformedData[selectedSectionId].attachments = transformedData[
+      selectedSectionId
+    ].attachments
+      ? transformedData[selectedSectionId].attachments.concat(attachments)
+      : attachments
   }
   return transformedData
 }
