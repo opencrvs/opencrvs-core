@@ -260,21 +260,9 @@ describe('OutBox tests', () => {
       testComp.unmount()
     })
     it('displays empty div if there is no application', () => {
-      // const incompleteBirthApp = {
-      //   ...birthApp,
-      //   event: Event.BIRTH,
-      //   name: '',
-      //   submissionStatus: '',
-      //   statusIndicator: null
-      // }
       const comp = createTestComponent(<OutBox application={[]} />, store)
       const testComp = comp.component
-      // console.log(testComp.debug())
       expect(testComp.find('#row_0').exists()).toBeFalsy()
-      // testComp
-      //   .find('#row_0')
-      //   .find('span')
-      //   .map((span, index) => expect(span.text()).toBe(['Birth', '', 'Waiting to submit', ''][index]))
       testComp.unmount()
     })
   })
