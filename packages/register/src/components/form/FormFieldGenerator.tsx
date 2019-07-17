@@ -488,7 +488,8 @@ class FormSectionComponent extends React.Component<Props> {
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             values,
-            offlineResources
+            offlineResources,
+            draftData
           )
 
           if (conditionalActions.includes('hide')) {
