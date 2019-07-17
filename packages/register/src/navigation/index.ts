@@ -20,7 +20,8 @@ import {
   CREATE_USER_SECTION,
   SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT
+  SELECT_DEATH_MAIN_CONTACT_POINT,
+  SYS_ADMIN_HOME
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getTokenPayload } from '@register/utils/authUtils'
@@ -122,10 +123,12 @@ export function goToHome() {
   if (!scopes) {
     return push(HOME)
   }
-  if (scopes && scopes.includes('register')) {
-    return push('/registrar-home/progress')
+  if (scopes.includes('sysadmin')) {
+    return push(SYS_ADMIN_HOME)
+  } else if (scopes.includes('register')) {
+    return push(formatUrl(REGISTRAR_HOME_TAB, { tabId: 'progress' }))
   } else {
-    return push('/field-agent-home/progress')
+    return push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: 'progress' }))
   }
 }
 
