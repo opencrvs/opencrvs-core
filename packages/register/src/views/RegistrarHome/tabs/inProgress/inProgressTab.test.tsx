@@ -18,6 +18,7 @@ import { createStore } from '@register/store'
 import { createTestComponent, mockUserResponse } from '@register/tests/util'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
+  FETCH_REGISTRATION_BY_COMPOSITION,
   LIST_EVENT_REGISTRATIONS_BY_STATUS
 } from '@register/views/RegistrarHome/queries'
 import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
@@ -671,6 +672,163 @@ describe('In Progress tab', () => {
       testComponent.component.unmount()
     })
 
+    it('renders expanded area for remote draft data', async () => {
+      jest.clearAllMocks()
+      const TIME_STAMP = 1562912635549
+      const drafts: IApplication[] = []
+      drafts.push(createApplication(Event.BIRTH))
+      const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      const graphqlMock = [
+        {
+          request: {
+            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
+            variables: {
+              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
+              status: EVENT_STATUS.IN_PROGRESS,
+              count: 10,
+              skip: 0
+            }
+          },
+          result: {
+            data: {
+              listEventRegistrations: {
+                totalItems: 1,
+                results: [
+                  {
+                    id: applicationId,
+                    registration: {
+                      type: 'BIRTH',
+                      trackingId: 'BQ2IDOP'
+                    },
+                    child: {
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Anik',
+                          familyName: 'Hoque'
+                        }
+                      ]
+                    },
+                    deceased: null,
+                    createdAt: TIME_STAMP
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          request: {
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            variables: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+            }
+          },
+          result: {
+            data: {
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  type: 'BIRTH',
+                  certificates: null,
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-04-03T07:08:24.936Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
+                      },
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'REGISTERED',
+                      comments: [
+                        {
+                          comment: 'reason=duplicate&comment=dup'
+                        }
+                      ]
+                    }
+                  ],
+                  contact: 'MOTHER',
+                  contactPhoneNumber: '01622688231'
+                },
+                child: {
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: 'Mushraful',
+                      familyName: 'Hoque'
+                    }
+                  ],
+                  birthDate: '01-01-1984'
+                },
+                deceased: null,
+                informant: null
+              }
+            }
+          }
+        }
+      ]
+
+      // @ts-ignore
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        />,
+        store,
+        graphqlMock
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+
+      const instance = testComponent.component.find(GridTable).instance() as any
+
+      instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+      expect(
+        testComponent.component.find('#REGISTERED-0').hostNodes().length
+      ).toBe(1)
+
+      testComponent.component.unmount()
+    })
     it('redirects user to draft preview page on update click', async () => {
       jest.clearAllMocks()
       const TIME_STAMP = 1562912635549
