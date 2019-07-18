@@ -233,9 +233,11 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   const currentIndex = sections.findIndex(
     (section: IFormSection) => section.id === fromSection.id
   )
+
   if (currentIndex === sections.length - 1) {
     return null
   }
+
   return sections[currentIndex + 1]
 }
 

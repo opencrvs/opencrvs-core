@@ -29,13 +29,7 @@ export const eventLocationMutationTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (
-    !transformedData.eventLocation ||
-    !transformedData.eventLocation.address
-  ) {
-    if (!transformedData.eventLocation) {
-      transformedData.eventLocation = {}
-    }
+  if (!transformedData.eventLocation.address) {
     transformedData.eventLocation = {
       ...transformedData.eventLocation,
       address: {
@@ -52,12 +46,8 @@ export const eventLocationMutationTransformer = (
       draftData[sectionId][field.name]
   } else if (field.name === 'deathLocation') {
     transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
-    if (transformedData.eventLocation.address) {
-      delete transformedData.eventLocation.address
-    }
-    if (transformedData.eventLocation.type) {
-      delete transformedData.eventLocation.type
-    }
+    delete transformedData.eventLocation.address
+    delete transformedData.eventLocation.type
   } else if (transformedFieldName) {
     transformedData.eventLocation.address[transformedFieldName] =
       draftData[sectionId][field.name]

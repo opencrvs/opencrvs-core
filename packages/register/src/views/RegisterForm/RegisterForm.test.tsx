@@ -824,6 +824,33 @@ describe('when user is in the register form for death event', async () => {
       expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
     })
   })
+  describe('when user is death event section', () => {
+    it('renders the notice label for date field', () => {
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          foform
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: 'deathEvent' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      expect(
+        testComponent.component.find('#deathDate_notice').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
 })
 
 describe('when user is in the register form preview section', () => {
@@ -1095,6 +1122,39 @@ describe('When user is in Preview section death event', async () => {
         hospitalLocatioMockDeathApplicationData as IFormData
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
+  })
+
+  it('Check if death location is deceased parmanent address', () => {
+    const mockDeathApplication = clone(mockDeathApplicationData)
+    mockDeathApplication.deathEvent.deathPlaceAddress = 'PERMANENT'
+
+    expect(
+      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
+        .eventLocation.address.type
+    ).toBe('PERMANENT')
+  })
+
+  it('Death location should be undefined if no decased address is found', () => {
+    const mockDeathApplication = cloneDeep(mockDeathApplicationData)
+    // @ts-ignore
+    mockDeathApplication.deceased = {
+      iDType: 'NATIONAL_ID',
+      iD: '1230000000000',
+      firstNames: 'মকবুল',
+      familyName: 'ইসলাম',
+      firstNamesEng: 'Mokbul',
+      familyNameEng: 'Islam',
+      nationality: 'BGD',
+      gender: 'male',
+      maritalStatus: 'MARRIED',
+      birthDate: '1987-02-16'
+    }
+    mockDeathApplication.deathEvent.deathPlaceAddress = 'CURRENT'
+
+    expect(
+      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
+        .eventLocation
+    ).toBe(undefined)
   })
 })
 
