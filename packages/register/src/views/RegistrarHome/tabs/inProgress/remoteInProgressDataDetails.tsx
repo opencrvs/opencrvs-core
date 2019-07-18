@@ -1,17 +1,9 @@
 import { StatusProgress } from '@opencrvs/components/lib/icons'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLBirthRegistration,
-  GQLContactPoint,
-  GQLDeathRegistration,
-  GQLHumanName,
-  GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import { messages } from './messages'
+import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   CERTIFICATE_DATE_FORMAT,
-  CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT,
   LANG_EN,
   LOCAL_DATE_FORMAT
 } from '@register/utils/constants'
@@ -25,7 +17,7 @@ import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
-import { IApplication } from '@register/applications'
+import { messages } from './messages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -131,25 +123,6 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
     const { locale } = this.props.intl
     const registration =
       data && data.fetchRegistration && data.fetchRegistration.registration
-    const type = (registration && registration.type) || ''
-    let name
-    let dateOfEvent
-    let informant
-    if (type.toLowerCase() === 'birth') {
-      const birthReg = data && (data.fetchRegistration as GQLBirthRegistration)
-      name = (birthReg.child && birthReg.child.name) || []
-      dateOfEvent = birthReg.child && birthReg.child.birthDate
-
-      informant = birthReg && birthReg.informant
-    } else {
-      const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
-      name = (deathReg.deceased && deathReg.deceased.name) || []
-      dateOfEvent =
-        deathReg.deceased &&
-        deathReg.deceased.deceased &&
-        deathReg.deceased.deceased.deathDate
-      informant = deathReg && deathReg.informant
-    }
 
     return {
       informantRelation:

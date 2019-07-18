@@ -1,16 +1,13 @@
 import { StatusProgress } from '@opencrvs/components/lib/icons'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
-import { messages } from './messages'
 import { IStoreState } from '@register/store'
-import {
-  CERTIFICATE_DATE_FORMAT,
-  LOCAL_DATE_FORMAT
-} from '@register/utils/constants'
+import { CERTIFICATE_DATE_FORMAT } from '@register/utils/constants'
 import moment from 'moment'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
+import { messages } from './messages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
