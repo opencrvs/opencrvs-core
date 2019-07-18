@@ -140,12 +140,13 @@ export class GridTable extends React.Component<
     actions: IAction[],
     width: number,
     key: number,
+    idKey: number,
     alignment?: ColumnContentAlignment
   ) => {
     if (this.props.expandable) {
       return (
         <ActionWrapper
-          key={key}
+          key={idKey}
           width={width}
           alignment={alignment}
           id="ActionWrapper"
@@ -268,6 +269,7 @@ export class GridTable extends React.Component<
                         item.id as string,
                         item[preference.key] as IAction[],
                         preference.width,
+                        index,
                         indx,
                         preference.alignment
                       )

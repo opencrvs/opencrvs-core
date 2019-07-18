@@ -3,7 +3,6 @@ import {
   ViewType,
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
-  SUBSECTION,
   TEXT
 } from '@register/forms'
 import { defineMessages } from 'react-intl'
@@ -17,7 +16,7 @@ import { bundleFieldToSectionFieldTransformer } from '@register/forms/mappings/q
 import { hasCaseOfDeathSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/cause-of-death-mappings'
 import { RadioSize } from '@opencrvs/components/lib/forms'
 
-const messages: {
+export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   causeOfDeathTab: {

@@ -279,7 +279,7 @@ export const eventSection: IFormSection = {
           placeholder: messages.select,
           dynamicOptions: {
             resource: OFFLINE_FACILITIES_KEY,
-            dependency: 'placeOfDeath'
+            dependency: 'deathPlaceAddress'
           },
           mapping: {
             mutation: eventLocationMutationTransformer(),

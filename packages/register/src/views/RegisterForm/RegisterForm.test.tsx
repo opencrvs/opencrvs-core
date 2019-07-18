@@ -34,11 +34,13 @@ import { getReviewForm } from '@opencrvs/register/src/forms/register/review-sele
 import { Event, IFormData } from '@opencrvs/register/src/forms'
 import { draftToGqlTransformer } from '@register/transformer'
 import { IForm } from '@register/forms'
-import { clone } from 'lodash'
+import { clone, cloneDeep } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
+
+import { messages } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 
 describe('when user logs in', async () => {
   // Some mock data
@@ -263,6 +265,10 @@ describe('when user is in the register form for death event', async () => {
 
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
+      const clonedForm = cloneDeep(form)
+      clonedForm.sections[2].optional = true
+      clonedForm.sections[2].notice = messages.causeOfDeathNotice
+      clonedForm.sections[2].groups[0].singleFieldPage = false
       const testComponent = createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -270,7 +276,7 @@ describe('when user is in the register form for death event', async () => {
           scope={mock}
           history={history}
           staticContext={mock}
-          registerForm={form}
+          registerForm={clonedForm}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
@@ -287,7 +293,7 @@ describe('when user is in the register form for death event', async () => {
     it('renders the optional label', () => {
       expect(
         component
-          .find('#form_section_opt_label_causeOfDeath-view-group')
+          .find('#form_section_opt_label_causeOfDeath-causeOfDeathEstablished')
           .hostNodes()
       ).toHaveLength(1)
     })
@@ -295,7 +301,7 @@ describe('when user is in the register form for death event', async () => {
     it('renders the notice component', () => {
       expect(
         component
-          .find('#form_section_notice_causeOfDeath-view-group')
+          .find('#form_section_notice_causeOfDeath-causeOfDeathEstablished')
           .hostNodes()
       ).toHaveLength(1)
     })
