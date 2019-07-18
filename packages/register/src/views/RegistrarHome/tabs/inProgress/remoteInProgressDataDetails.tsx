@@ -126,7 +126,7 @@ type IProps = InjectedIntlProps & {
   eventId: string
 }
 
-export class InProgressDataDetailsComponent extends React.Component<IProps> {
+class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
   transformer = (data: GQLQuery) => {
     const { locale } = this.props.intl
     const registration =
@@ -296,6 +296,6 @@ export class InProgressDataDetailsComponent extends React.Component<IProps> {
   }
 }
 
-export const InProgressDataDetails = injectIntl(
-  withTheme(InProgressDataDetailsComponent)
+export const RemoteInProgressDataDetails = injectIntl(
+  withTheme(RemoteInProgressDataDetailsComponent)
 )

@@ -39,8 +39,8 @@ import * as React from 'react'
 import { Query } from 'react-apollo'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { DraftDataDetails } from './draftDataDetails'
-import { InProgressDataDetails } from './inProgressDataDetails'
+import { LocalInProgressDataDetails } from './localInProgressDataDetails'
+import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -503,11 +503,11 @@ export class InProgressTabComponent extends React.Component<
   }
 
   renderDraftDataExpandedComponent = (itemId: string) => {
-    return <DraftDataDetails eventId={itemId} />
+    return <LocalInProgressDataDetails eventId={itemId} />
   }
 
   renderInProgressDataExpandedComponent = (itemId: string) => {
-    return <InProgressDataDetails eventId={itemId} />
+    return <RemoteInProgressDataDetails eventId={itemId} />
   }
 
   render() {

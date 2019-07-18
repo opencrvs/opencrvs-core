@@ -80,7 +80,7 @@ type IProps = InjectedIntlProps & {
   draft: IApplication | undefined
 }
 
-export class DraftDataDetailsComponent extends React.Component<IProps> {
+class LocalInProgressDataDetailsComponent extends React.Component<IProps> {
   transformer = (draft: IApplication | undefined) => {
     return {
       draftStartedOn: draft && draft.savedOn,
@@ -154,7 +154,7 @@ function mapStateToProps(state: IStoreState, props: { eventId: string }) {
   }
 }
 
-export const DraftDataDetails = connect(
+export const LocalInProgressDataDetails = connect(
   mapStateToProps,
   null
-)(injectIntl(DraftDataDetailsComponent))
+)(injectIntl(LocalInProgressDataDetailsComponent))
