@@ -295,32 +295,32 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       selected:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['registration'] &&
-          (this.props.application.data['registration']
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
             .whoseContactDetails as string)) ||
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['informant'] &&
-          (this.props.application.data['informant']
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
             .applicantsRelationToDeceased as string)) ||
         '',
       phoneNumber:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['registration'] &&
-          (this.props.application.data['registration']
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
             .registrationPhone as string)) ||
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['informant'] &&
-          (this.props.application.data['informant']
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
             .applicantPhone as string)) ||
         '',
       relationship:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['informant'] &&
-          (this.props.application.data['informant']
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
             .applicantOtherRelationship as string)) ||
         '',
       isPhoneNoError: false,
@@ -367,7 +367,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         }
       }
       if (event === Event.BIRTH) {
-        newApplication.data.registration = {
+        newApplication.data[registrationSection.id] = {
           ...application.data[registrationSection.id],
           ...{
             registrationPhone: this.state.phoneNumber,
@@ -375,7 +375,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           }
         }
       } else {
-        newApplication.data.informant = {
+        newApplication.data[applicantsSection.id] = {
           ...application.data[applicantsSection.id],
           ...{
             applicantPhone: this.state.phoneNumber,
@@ -402,7 +402,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         }
       }
       if (event === Event.BIRTH) {
-        newApplication.data.registration = {
+        newApplication.data[registrationSection.id] = {
           ...application.data[registrationSection.id],
           ...{
             registrationPhone: this.state.phoneNumber,
@@ -410,7 +410,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           }
         }
       } else {
-        newApplication.data.informant = {
+        newApplication.data[applicantsSection.id] = {
           ...application.data[applicantsSection.id],
           ...{
             applicantPhone: this.state.phoneNumber,

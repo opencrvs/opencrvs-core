@@ -1,5 +1,8 @@
 import { IForm, IFormData } from '@register/forms'
-import { getConditionalActionsForField } from '@register/forms/utils'
+import {
+  getConditionalActionsForField,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@register/forms/utils'
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
@@ -17,7 +20,10 @@ export const draftToGqlTransformer = (
     if (!transformedData[section.id]) {
       transformedData[section.id] = {}
     }
-    section.groups.forEach(groupDef => {
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      draftData[section.id]
+    ).forEach(groupDef => {
       groupDef.fields.forEach(fieldDef => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,

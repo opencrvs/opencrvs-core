@@ -806,7 +806,10 @@ function mapStateToProps(
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
   const visitedSections = registerForm.sections.filter(
-    ({ id }) => id !== 'registration' && Boolean(application.data[id])
+    ({ id }) =>
+      id !== 'registration' &&
+      id !== 'informant' &&
+      Boolean(application.data[id])
   )
 
   const rightMostVisited = visitedSections[visitedSections.length - 1]
