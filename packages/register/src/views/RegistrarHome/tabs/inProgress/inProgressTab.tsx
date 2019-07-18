@@ -21,8 +21,8 @@ import {
   goToRegistrarHomeTab as goToRegistrarHomeTabAction
 } from '@register/navigation'
 import {
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_DEATH_FORM,
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import styled, { ITheme, withTheme } from '@register/styledComponents'
@@ -345,7 +345,7 @@ export class InProgressTabComponent extends React.Component<
               : draft.data.child.firstNames + ' ') +
               draft.data.child.familyName) ||
           ''
-        pageRoute = DRAFT_BIRTH_PARENT_FORM
+        pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (draft.event && draft.event.toString() === 'death') {
         name =
           (draft.data &&
@@ -363,7 +363,7 @@ export class InProgressTabComponent extends React.Component<
               : draft.data.deceased.firstNames + ' ') +
               draft.data.deceased.familyName) ||
           ''
-        pageRoute = DRAFT_DEATH_FORM
+        pageRoute = DRAFT_DEATH_FORM_PAGE
       }
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
@@ -373,7 +373,7 @@ export class InProgressTabComponent extends React.Component<
             this.props.goToPage(
               pageRoute,
               draft.id,
-              '',
+              'preview',
               (draft.event && draft.event.toString()) || ''
             )
         }
