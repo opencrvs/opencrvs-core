@@ -29,8 +29,15 @@ export const eventLocationMutationTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  if (!transformedData.eventLocation) {
+  if (
+    !transformedData.eventLocation ||
+    !transformedData.eventLocation.address
+  ) {
+    if (!transformedData.eventLocation) {
+      transformedData.eventLocation = {}
+    }
     transformedData.eventLocation = {
+      ...transformedData.eventLocation,
       address: {
         country: '',
         state: '',
@@ -43,8 +50,6 @@ export const eventLocationMutationTransformer = (
   if (lineNumber > 0) {
     transformedData.eventLocation.address.line[lineNumber - 1] =
       draftData[sectionId][field.name]
-  } else if (field.name === 'placeOfDeath') {
-    transformedData.eventLocation.type = draftData[sectionId][field.name]
   } else if (field.name === 'deathLocation') {
     transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
     if (transformedData.eventLocation.address) {

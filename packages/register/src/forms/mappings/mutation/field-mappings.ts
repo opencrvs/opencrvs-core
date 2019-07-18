@@ -161,15 +161,18 @@ export const copyEventAddressTransformer = (fromSection: string) => (
   sectionId: string,
   field: IFormField
 ) => {
+  if (
+    draftData[sectionId][field.name] === 'OTHER' ||
+    draftData[sectionId][field.name] === 'PRIVATE_HOME' ||
+    draftData[sectionId][field.name] === 'HEALTH_INSTITUTION'
+  ) {
+    transformedData.eventLocation = { type: draftData[sectionId][field.name] }
+    return transformedData
+  }
   const fromSectionData = transformedData[fromSection]
-
   if (!fromSectionData.address) {
     return transformedData
   }
-  if (draftData[sectionId][field.name] === 'OTHER') {
-    return transformedData
-  }
-
   const address = (fromSectionData.address as [fhir.Address]).find(
     addr => addr.type === draftData[sectionId][field.name]
   )

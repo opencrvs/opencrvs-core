@@ -1069,7 +1069,8 @@ describe('When user is in Preview section death event', async () => {
     const hospitalLocatioMockDeathApplicationData = clone(
       mockDeathApplicationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+      'HEALTH_INSTITUTION'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
     expect(
@@ -1084,7 +1085,8 @@ describe('When user is in Preview section death event', async () => {
     const hospitalLocatioMockDeathApplicationData = clone(
       mockDeathApplicationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+      'HEALTH_INSTITUTION'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
     expect(
