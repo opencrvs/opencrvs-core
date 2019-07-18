@@ -9,7 +9,8 @@ import { getRoutes } from '@gateway/config/routes'
 import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL
+  AUTH_URL,
+  PORT
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
@@ -46,7 +47,7 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    server.log('info', `server started on port ${process.env.PORT || '7070'}`)
+    server.log('info', `server started on port ${PORT}`)
   }
 
   async function stop() {

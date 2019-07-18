@@ -68,7 +68,7 @@ context('Birth Registration Integration Test', () => {
     // MODAL
     cy.get('#submit_confirm').click()
     cy.log('Waiting for application to sync...')
-    cy.wait(20000) // Wait for application to be sync'd
+    cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
@@ -234,7 +234,7 @@ context('Birth Registration Integration Test', () => {
     // MODAL
     cy.get('#submit_confirm').click()
     cy.log('Waiting for application to sync...')
-    cy.wait(20000) // Wait for application to be sync'd
+    cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
