@@ -655,6 +655,11 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
     'formFields.docTypeOther': 'অন্যান্য',
     'formFields.docTypeChildBirthProof': 'জন্ম স্থান এবং জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeMedicalInstitution':
+      'মেডিকেল প্রতিষ্ঠান থেকে জন্ম প্রমাণ',
+    'formFields.docTypebirthAttendant': 'জন্ম পরিচর্যা থেকে জন্ম প্রমাণ',
+    'formFields.docTypeChildAgeProof': 'জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeTaxReceipt': 'কর প্রদান রসিদ',
     'formFields.docTypeEPICard': 'ইপিআই কার্ড',
     'formFields.docTypeDoctorCertificate': 'ডাক্তার সার্টিফিকেট',
     'formFields.proofOfMothersID': 'মায়ের আইডি প্রমাণ',

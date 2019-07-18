@@ -468,8 +468,7 @@ export const ENGLISH_STATE: ILanguage = {
       'For this death registration, the following documents are required:',
     'formFields.typeOfDocument': 'Choose type of document',
     'formFields.docTypePostMortemReport': 'Certified Post Mortem Report',
-    'formFields.docTypeHospitalDischargeCertificate':
-      'Hospital Discharge Certificate',
+    'formFields.docTypeHospitalDischargeCertificate': 'Discharge Certificate',
     'formFields.docTypeLetterOfDeath': 'Attested Letter of Death',
     'formFields.docTypeDeathCertificate': 'Attested Certificate of Death',
     'formFields.docTypeCopyOfBurialReceipt': 'Certified Copy of Burial Receipt',
@@ -652,7 +651,13 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
-    'formFields.docTypeChildBirthProof': 'Proof of Place and Date of Birth',
+    'formFields.docTypeChildBirthProof':
+      'Proof of Place and Date of Birth of Child',
+    'formFields.docTypeMedicalInstitution':
+      'Proof of birth from medical institution',
+    'formFields.docTypebirthAttendant': 'Proof of birth from birth attendant',
+    'formFields.docTypeChildAgeProof': 'Proof of Child Age',
+    'formFields.docTypeTaxReceipt': 'Receipt of tax payment',
     'formFields.docTypeEPICard': 'EPI Card',
     'formFields.docTypeDoctorCertificate': 'Doctor Certificate',
     'formFields.proofOfMothersID': "Proof of Mother's ID",

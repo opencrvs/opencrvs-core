@@ -141,8 +141,13 @@ const messages: {
   },
   docTypeChildBirthProof: {
     id: 'formFields.docTypeChildBirthProof',
-    defaultMessage: 'Proof of Place and Date of Birth',
+    defaultMessage: 'Proof of Place and Date of Birth of Child',
     description: 'Label for select option Child Birth Proof'
+  },
+  docTypeChildAgeProof: {
+    id: 'formFields.docTypeChildAgeProof',
+    defaultMessage: 'Proof of Child Age',
+    description: 'Label for select option Child Age Proof'
   },
   docTypeEPICard: {
     id: 'formFields.docTypeEPICard',
@@ -188,6 +193,22 @@ const messages: {
   select: {
     id: 'register.select.placeholder',
     defaultMessage: 'Select'
+  },
+  dischargeCertificate: {
+    id: 'formFields.docTypeHospitalDischargeCertificate',
+    defaultMessage: 'Discharge Certificate'
+  },
+  birthMedicalInstitution: {
+    id: 'formFields.docTypeMedicalInstitution',
+    defaultMessage: 'Proof of birth from medical institution'
+  },
+  birthAttendant: {
+    id: 'formFields.docTypebirthAttendant',
+    defaultMessage: 'Proof of birth from birth attendant'
+  },
+  docTaxReceipt: {
+    id: 'formFields.docTypeTaxReceipt',
+    defaultMessage: 'Receipt of tax payment'
   }
 })
 
@@ -239,6 +260,73 @@ export const documentsSection: IFormSection = {
         query: birthAttachmentToFieldTransformer
       }
     },
+    {
+      name: 'uploadDocForParentPermanentAddress',
+      type: DOCUMENT_UPLOADER_WITH_OPTION,
+      label: messages.proofOfParentPermanentAddress,
+      initialValue: '',
+      extraValue: documentForWhomFhirMapping.Parent,
+      hideAsterisk: true,
+      validate: [],
+      options: [
+        { value: 'Tax Payment Receipt', label: messages.docTaxReceipt },
+        { value: 'Other', label: messages.docTypeOther }
+      ],
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
+    },
+    {
+      name: 'uploadDocForChildDOB',
+      type: DOCUMENT_UPLOADER_WITH_OPTION,
+      label: messages.docTypeChildBirthProof,
+      initialValue: '',
+      extraValue: documentForWhomFhirMapping.Child,
+      hideAsterisk: true,
+      validate: [],
+      options: [
+        {
+          value: 'Discharge Certificate',
+          label: messages.dischargeCertificate
+        },
+        {
+          value: 'Proof of birth from medical institution',
+          label: messages.birthMedicalInstitution
+        },
+        {
+          value: 'Proof of birth from birth attendant',
+          label: messages.birthAttendant
+        },
+        { value: 'Other', label: messages.docTypeOther }
+      ],
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
+    },
+    {
+      name: 'uploadDocForChildAge',
+      type: DOCUMENT_UPLOADER_WITH_OPTION,
+      label: messages.docTypeChildAgeProof,
+      initialValue: '',
+      extraValue: documentForWhomFhirMapping.ChildAge,
+      hideAsterisk: true,
+      validate: [],
+      options: [
+        {
+          value: 'Doctor Certificate',
+          label: messages.docTypeDoctorCertificate
+        },
+        { value: 'School Certificate', label: messages.docTypeSC },
+        { value: 'Other', label: messages.docTypeOther }
+      ],
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
+    },
+
     // {
     //   name: 'documentUploader',
     //   type: DOCUMENT_UPLOADER_WRAPER,

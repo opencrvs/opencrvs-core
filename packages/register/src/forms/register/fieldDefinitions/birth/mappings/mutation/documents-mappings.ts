@@ -5,7 +5,9 @@ export const documentForWhomFhirMapping = {
   Child: 'Child',
   Father: 'Father',
   Mother: 'Mother',
-  Other: 'Other'
+  Parent: 'Parent',
+  Other: 'Other',
+  ChildAge: 'ChildAge'
 }
 
 export const documentTypeFhirMapping = {
@@ -17,7 +19,11 @@ export const documentTypeFhirMapping = {
   Other: 'OTHER',
   'EPI Card': 'EPI_CARD',
   'Doctor Certificate': 'DOCTOR_CERTIFICATE',
-  'Proof of Place and Date of Birth': 'BIRTH_PLACE_DATE_PROOF'
+  'Proof of Place and Date of Birth': 'BIRTH_PLACE_DATE_PROOF',
+  'Discharge Certificate': 'DISCHARGE_CERTIFICATE',
+  'Proof of birth from medical institution': 'MEDICAL_INSTITUTION',
+  'Proof of birth from birth attendant': 'BIRTH_ATTENDANT',
+  'Tax Payment Receipt': 'TAX_RECEIPT'
 }
 
 export function birthFieldToAttachmentTransformer(
