@@ -58,7 +58,10 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  getVisibleGroupFields
+} from '@register/forms/utils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -614,7 +617,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         )
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
-                      fields={activeSectionGroup.fields}
+                      fields={getVisibleGroupFields(activeSectionGroup)}
                       offlineResources={offlineResources}
                       draftData={application.data}
                     />

@@ -12,6 +12,7 @@ import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
 import {
   getConditionalActionsForField,
+  getVisibleSectionGroupsBasedOnConditions,
   getSectionFields
 } from '@register/forms/utils'
 import { Link } from '@opencrvs/components/lib/typography'
@@ -41,7 +42,6 @@ import {
   injectIntl,
   InjectedIntl
 } from 'react-intl'
-import { ICON_ALIGNMENT, IButtonProps } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
   IFormSection,
@@ -327,7 +327,10 @@ export const getErrorsOnFieldsBySection = (
   draft: IApplication
 ) => {
   return formSections.reduce((sections, section: IFormSection) => {
-    const fields: IFormField[] = getSectionFields(section)
+    const fields: IFormField[] = getSectionFields(
+      section,
+      draft.data[section.id]
+    )
 
     const errors = getValidationErrorsForForm(
       fields,
@@ -449,7 +452,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
     return formSections.map(section => {
       let items: any[] = []
-      section.groups.forEach(group => {
+      getVisibleSectionGroupsBasedOnConditions(
+        section,
+        draft.data[section.id] || {}
+      ).forEach(group => {
         items = items.concat(
           group.fields
             .filter(
@@ -577,9 +583,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               {this.transformSectionData(formSections, errorsOnFields).map(
-                (sec, index) => (
-                  <DataSection key={index} {...sec} />
-                )
+                (sec, index) => {
+                  return <DataSection key={index} {...sec} />
+                }
               )}
               {event === BIRTH && (
                 <InputWrapper>

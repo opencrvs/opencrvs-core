@@ -184,6 +184,9 @@ export const getFieldValidation = (
   return validate
 }
 
+export const getVisibleGroupFields = (group: IFormSectionGroup) => {
+  return group.fields.filter(field => !field.hidden)
+}
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
@@ -362,9 +365,14 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   })
 }
 
-export const getSectionFields = (section: IFormSection) => {
+export const getSectionFields = (
+  section: IFormSection,
+  values?: IFormSectionData
+) => {
   let fields: IFormField[] = []
-  section.groups.forEach(group => (fields = fields.concat(group.fields)))
+  getVisibleSectionGroupsBasedOnConditions(section, values || {}).forEach(
+    group => (fields = fields.concat(group.fields))
+  )
   return fields
 }
 

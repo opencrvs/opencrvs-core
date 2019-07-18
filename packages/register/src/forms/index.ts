@@ -174,6 +174,7 @@ export interface IFormFieldBase {
   hideAsterisk?: boolean
   hideHeader?: boolean
   mode?: THEME_MODE
+  hidden?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -431,6 +432,7 @@ export interface Ii18nFormFieldBase {
   hideHeader?: boolean
   mode?: THEME_MODE
   placeholder?: string
+  hidden?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

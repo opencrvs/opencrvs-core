@@ -171,6 +171,56 @@ const messages: {
     defaultMessage: 'National ID',
     description: 'Label for loader button'
   },
+  applicantsRelationWithDeceased: {
+    id: 'formFields.applicantsRelationWithDeceased',
+    defaultMessage: 'Relationship to Deceased',
+    description: 'Label for Relationship to Deceased select'
+  },
+  relationFather: {
+    id: 'formFields.applicantRelation.father',
+    defaultMessage: 'Father',
+    description: 'Label for option Father'
+  },
+  relationMother: {
+    id: 'formFields.applicantRelation.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother'
+  },
+  relationSpouse: {
+    id: 'formFields.applicantRelation.spouse',
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse'
+  },
+  relationSon: {
+    id: 'formFields.applicantRelation.son',
+    defaultMessage: 'Son',
+    description: 'Label for option Son'
+  },
+  relationDaughter: {
+    id: 'formFields.applicantRelation.daughter',
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter'
+  },
+  relationExtendedFamily: {
+    id: 'formFields.applicantRelation.extendedFamily',
+    defaultMessage: 'Extended Family',
+    description: 'Label for option Extended Family'
+  },
+  relationOther: {
+    id: 'formFields.applicantRelation.other',
+    defaultMessage: 'Other(Specify)',
+    description: 'Label for option Other'
+  },
+  applicantOtherRelationship: {
+    id: 'formFields.applicantOtherRelationship',
+    defaultMessage: 'Other relation',
+    description: 'Label for form field: Other relation'
+  },
+  applicantsPhone: {
+    defaultMessage: 'Phone number',
+    id: 'formFields.applicant.phone',
+    description: 'Input label for phone input'
+  },
   select: {
     id: 'register.select.placeholder',
     defaultMessage: 'Select'
@@ -416,6 +466,82 @@ export const applicantsSection: IFormSection = {
             query: nestedValueToFieldTransformer(
               NESTED_SECTION,
               fieldValueTransformer('birthDate')
+            )
+          }
+        },
+        {
+          name: 'applicantsRelationToDeceased',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.applicantsRelationWithDeceased,
+          required: true,
+          initialValue: '',
+          validate: [],
+          placeholder: messages.select,
+          hidden: true,
+          options: [
+            { value: 'FATHER', label: messages.relationFather },
+            { value: 'MOTHER', label: messages.relationMother },
+            { value: 'SPOUSE', label: messages.relationSpouse },
+            {
+              value: 'SON',
+              label: messages.relationSon
+            },
+            {
+              value: 'DAUGHTER',
+              label: messages.relationDaughter
+            },
+            {
+              value: 'EXTENDED_FAMILY',
+              label: messages.relationExtendedFamily
+            },
+            {
+              value: 'OTHER',
+              label: messages.relationOther
+            }
+          ],
+          mapping: {
+            mutation: fieldValueSectionExchangeTransformer(
+              'informant',
+              'relationship'
+            ),
+            query: sectionFieldExchangeTransformer('informant', 'relationship')
+          }
+        },
+        {
+          name: 'applicantOtherRelationship',
+          type: TEXT,
+          label: messages.applicantOtherRelationship,
+          required: true,
+          initialValue: '',
+          validate: [],
+          mapping: {
+            mutation: fieldValueSectionExchangeTransformer(
+              'informant',
+              'otherRelationship'
+            ),
+            query: sectionFieldExchangeTransformer(
+              'informant',
+              'otherRelationship'
+            )
+          },
+          conditionals: [conditionals.otherRelationship]
+        },
+        {
+          name: 'applicantPhone',
+          type: TEL,
+          label: messages.applicantsPhone,
+          required: true,
+          initialValue: '',
+          validate: [phoneNumberFormat],
+          hidden: true,
+          mapping: {
+            mutation: fieldValueNestingTransformer(
+              NESTED_SECTION,
+              fieldToPhoneNumberTransformer()
+            ),
+            query: nestedValueToFieldTransformer(
+              NESTED_SECTION,
+              phoneNumberToFieldTransformer
             )
           }
         },
