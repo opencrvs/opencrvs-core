@@ -616,6 +616,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
                     comments: null
                   }
                 ],
+                contact: 'MOTHER',
                 contactPhoneNumber: null
               },
               child: null,

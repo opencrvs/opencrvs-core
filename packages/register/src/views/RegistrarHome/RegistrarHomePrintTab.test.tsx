@@ -608,6 +608,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                     ]
                   }
                 ],
+                contact: 'MOTHER',
                 contactPhoneNumber: '01622688231'
               },
               child: {
