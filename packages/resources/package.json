@@ -26,7 +26,8 @@
     "update:statistics": "ts-node -r tsconfig-paths/register src/features/administrative/scripts/update-statistical-data.ts",
     "populate": "yarn save:locations && yarn assign:geo-data && yarn update:locations && yarn prep:facilities && yarn save:facilities && yarn prep:employees && yarn save:employees && yarn prep:statistics && yarn save:statistics && yarn update:statistics",
     "build": "tsc",
-    "postbuild": "ef-tspm"
+    "postbuild": "ef-tspm",
+    "build:clean": "rm -rf build"
   },
   "devDependencies": {
     "csv2json": "^1.4.2",

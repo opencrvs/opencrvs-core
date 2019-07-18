@@ -40,7 +40,8 @@
     "cov:performance": "cd packages/performance && yarn open:cov",
     "cy": "cd packages/e2e && yarn open",
     "build": "lerna run build",
-    "build:image": "docker build -t opencrvs-build ."
+    "build:image": "docker build -t opencrvs-build .",
+    "build:clean": "lerna run build:clean"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

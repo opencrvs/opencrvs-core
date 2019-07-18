@@ -72,7 +72,8 @@
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' -r tsconfig-paths/register src/extract-translations.ts",
-    "graphql:codegen": "graphql-codegen --config codegen.yml"
+    "graphql:codegen": "graphql-codegen --config codegen.yml",
+    "build:clean": "rm -rf build"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

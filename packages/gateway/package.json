@@ -14,7 +14,8 @@
     "gen:types:watch": "nodemon -e graphql -i src/graphql/schema.graphql -x 'yarn gen:types'",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.graphql' build/dist",
-    "postbuild": "ef-tspm"
+    "postbuild": "ef-tspm",
+    "build:clean": "rm -rf build"
   },
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.1.1",
