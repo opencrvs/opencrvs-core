@@ -767,7 +767,7 @@ describe('In Progress tab', () => {
                           state: 'iuyiuy'
                         }
                       },
-                      type: 'REGISTERED',
+                      type: 'IN_PROGRESS',
                       comments: [
                         {
                           comment: 'reason=duplicate&comment=dup'
@@ -824,7 +824,7 @@ describe('In Progress tab', () => {
 
       testComponent.component.update()
       expect(
-        testComponent.component.find('#REGISTERED-0').hostNodes().length
+        testComponent.component.find('#IN_PROGRESS-0').hostNodes().length
       ).toBe(1)
 
       testComponent.component.unmount()
