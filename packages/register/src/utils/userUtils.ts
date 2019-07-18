@@ -22,6 +22,7 @@ export interface IGQLLocation {
 export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
+  mobile?: string
   role?: string
   type?: string
   status?: string
@@ -36,6 +37,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     catchmentArea,
     primaryOffice,
     name,
+    mobile,
     role,
     type,
     status,
@@ -53,6 +55,9 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   }
   if (name) {
     userDetails.name = name
+  }
+  if (mobile) {
+    userDetails.mobile = mobile
   }
   if (role) {
     userDetails.role = role
