@@ -35,6 +35,7 @@ import {
 import { Validation } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { at } from 'lodash'
 
 interface IRange {
   start: number
@@ -317,7 +318,6 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
@@ -502,5 +502,20 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
+  },
+  withIn45Days: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days")'
+  },
+  between46daysTo5yrs: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs")'
+  },
+  after5yrs: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")'
   }
 }

@@ -45,7 +45,8 @@ const messages: {
 } = defineMessages({
   uploadError: {
     id: 'imageUploadOption.upload.error',
-    defaultMessage: 'Must be in JPEG/JPG/PNG format',
+    defaultMessage:
+      'File format not supported. Please attach a png, jpf or pdf (max 5mb)',
     description: 'Show error messages while uploading'
   }
 })

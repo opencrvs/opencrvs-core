@@ -18,6 +18,7 @@ export const documentTypeFhirMapping = {
   'School Certificate': 'SCHOOL_CERTIFICATE',
   Other: 'OTHER',
   'EPI Card': 'EPI_CARD',
+  'EPI Staff Certificate': 'EPI_STAFF_CERTIFICATE',
   'Doctor Certificate': 'DOCTOR_CERTIFICATE',
   'Proof of Place and Date of Birth': 'BIRTH_PLACE_DATE_PROOF',
   'Discharge Certificate': 'DISCHARGE_CERTIFICATE',

@@ -76,7 +76,6 @@ import {
   IFormSection,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD,
-  DOCUMENT_UPLOADER_WRAPER,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 
@@ -103,8 +102,8 @@ const fadeIn = keyframes`
 `
 
 const FormItem = styled.div`
-  min-height: 6.7em;
   animation: ${fadeIn} 500ms;
+  margin-bottom: 40px;
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -346,19 +345,6 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === DOCUMENT_UPLOADER_WRAPER) {
-    return (
-      <DocumentUploadWraper
-        id={inputProps.id}
-        fields={fieldDefinition.fields}
-      />
-    )
-  }
-
-  // if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
-  //   return <DocumentUploaderWithOption definition={fieldDefinition} />
-  // }
-
   if (fieldDefinition.type === SEARCH_FIELD) {
     return (
       <SearchField
@@ -591,8 +577,7 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === DOCUMENT_UPLOADER_WRAPER
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS
           ) {
             return (
               <FormItem key={`${field.name}`}>

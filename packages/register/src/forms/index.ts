@@ -28,7 +28,6 @@ export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
-export const DOCUMENT_UPLOADER_WRAPER = 'DOCUMENT_UPLOADER_WRAPER'
 export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
@@ -250,10 +249,6 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
   optionSection: IFormSection
 }
-export interface IDocumentUploaderWrapperFormField extends IFormFieldBase {
-  type: typeof DOCUMENT_UPLOADER_WRAPER
-  fields: IFormField[]
-}
 export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: ISelectOption[]
@@ -314,7 +309,6 @@ export type IFormField =
   | IListFormField
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
-  | IDocumentUploaderWrapperFormField
   | IDocumentUploaderWithOptionsFormField
   | IWarningField
   | ILink
@@ -370,6 +364,9 @@ export interface IConditionals {
   identifierIDSelected: IConditional
   otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
+  withIn45Days: IConditional
+  between46daysTo5yrs: IConditional
+  after5yrs: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
@@ -503,10 +500,6 @@ export interface Ii18nImageUploaderWithOptionsFormField
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
   optionSection: IFormSection
 }
-export interface Ii18nDocumentUploaderWrapper extends Ii18nFormFieldBase {
-  type: typeof DOCUMENT_UPLOADER_WRAPER
-  fields: IFormField[]
-}
 export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: SelectComponentOption[]
@@ -556,7 +549,6 @@ export type Ii18nFormField =
   | Ii18nListFormField
   | Ii18nParagraphFormField
   | Ii18nImageUploaderWithOptionsFormField
-  | Ii18nDocumentUploaderWrapper
   | Ii18nDocumentUploaderWithOptions
   | Ii18nWarningField
   | Ii18nLinkField

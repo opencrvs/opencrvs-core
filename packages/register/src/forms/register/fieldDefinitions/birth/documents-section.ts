@@ -6,7 +6,6 @@ import {
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
   DYNAMIC_LIST,
-  DOCUMENT_UPLOADER_WRAPER,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
@@ -15,7 +14,7 @@ import {
   documentForWhomFhirMapping
 } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
-import { diffDoB } from '@register/forms/utils'
+import { diffDoB, conditionals } from '@register/forms/utils'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -37,6 +36,18 @@ const messages: {
   },
   paragraph: {
     id: 'register.form.section.documents.paragraph',
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text'
+  },
+  paragraph45daysTo5Years: {
+    id: 'register.form.section.documents.paragraph45daysTo5Years',
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text'
+  },
+  paragraphAbove5Years: {
+    id: 'register.form.section.documents.paragraphAbove5Years',
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text'
@@ -154,6 +165,11 @@ const messages: {
     defaultMessage: 'EPI Card',
     description: 'Label for select option EPI Card'
   },
+  docTypeEPIStaffCertificate: {
+    id: 'formFields.docTypeEPIStaffCertificate',
+    defaultMessage: 'EPI Staff Certificate',
+    description: 'Label for select option EPI Card'
+  },
   docTypeDoctorCertificate: {
     id: 'formFields.docTypeDoctorCertificate',
     defaultMessage: 'Doctor Certificate',
@@ -218,6 +234,33 @@ export const documentsSection: IFormSection = {
   name: messages.documentsTab,
   title: messages.documentsTitle,
   fields: [
+    {
+      name: 'paragraph',
+      type: PARAGRAPH,
+      label: messages.paragraph,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.between46daysTo5yrs, conditionals.after5yrs]
+    },
+    {
+      name: 'paragraph',
+      type: PARAGRAPH,
+      label: messages.paragraph45daysTo5Years,
+      initialValue: '',
+      validate: [],
+      conditionals: [conditionals.withIn45Days, conditionals.after5yrs]
+    },
+    {
+      name: 'paragraph',
+      type: PARAGRAPH,
+      label: messages.paragraphAbove5Years,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        conditionals.withIn45Days,
+        conditionals.between46daysTo5yrs
+      ]
+    },
     {
       name: 'uploadDocForMother',
       type: DOCUMENT_UPLOADER_WITH_OPTION,
@@ -314,6 +357,32 @@ export const documentsSection: IFormSection = {
       hideAsterisk: true,
       validate: [],
       options: [
+        { value: 'EPI Card', label: messages.docTypeEPICard },
+        {
+          value: 'EPI Staff Certificate',
+          label: messages.docTypeEPIStaffCertificate
+        },
+        {
+          value: 'Doctor Certificate',
+          label: messages.docTypeDoctorCertificate
+        },
+        { value: 'Other', label: messages.docTypeOther }
+      ],
+      conditionals: [conditionals.withIn45Days, conditionals.after5yrs],
+      mapping: {
+        mutation: birthFieldToAttachmentTransformer,
+        query: birthAttachmentToFieldTransformer
+      }
+    },
+    {
+      name: 'uploadDocForChildAge',
+      type: DOCUMENT_UPLOADER_WITH_OPTION,
+      label: messages.docTypeChildAgeProof,
+      initialValue: '',
+      extraValue: documentForWhomFhirMapping.ChildAge,
+      hideAsterisk: true,
+      validate: [],
+      options: [
         {
           value: 'Doctor Certificate',
           label: messages.docTypeDoctorCertificate
@@ -321,132 +390,120 @@ export const documentsSection: IFormSection = {
         { value: 'School Certificate', label: messages.docTypeSC },
         { value: 'Other', label: messages.docTypeOther }
       ],
-      mapping: {
-        mutation: birthFieldToAttachmentTransformer,
-        query: birthAttachmentToFieldTransformer
-      }
-    },
-
-    // {
-    //   name: 'documentUploader',
-    //   type: DOCUMENT_UPLOADER_WRAPER,
-    //   label: messages.uploadImage,
-    //   initialValue: '',
-    //   validate: [],
-    //   fields: [
-
-    //   ]
-    // },
-    {
-      name: 'imageUploader',
-      type: IMAGE_UPLOADER_WITH_OPTIONS,
-      label: messages.uploadImage,
-      initialValue: '',
-      validate: [],
-      optionSection: {
-        id: 'documents-upload',
-        viewType: 'form',
-        name: messages.documentsUploadName,
-        title: messages.documentsUploadTitle,
-        fields: [
-          {
-            name: 'uploadDocForWhom',
-            type: RADIO_GROUP,
-            label: messages.uploadDocForWhom,
-            required: true,
-            initialValue: '',
-            hideAsterisk: true,
-            validate: [],
-            options: [
-              { value: 'Child', label: messages.uploadDocForChild },
-              { value: 'Mother', label: messages.uploadDocForMother },
-              { value: 'Father', label: messages.uploadDocForFather },
-              { value: 'Other', label: messages.uploadDocForOther }
-            ]
-          },
-          {
-            name: 'whatDocToUpload',
-            type: SELECT_WITH_DYNAMIC_OPTIONS,
-            label: messages.whatDocToUpload,
-            required: true,
-            hideAsterisk: true,
-            initialValue: '',
-            validate: [],
-            placeholder: messages.select,
-            dynamicOptions: {
-              dependency: 'uploadDocForWhom',
-              options: {
-                Child: [
-                  {
-                    value: 'Proof of Place and Date of Birth',
-                    label: messages.docTypeChildBirthProof
-                  },
-                  { value: 'EPI Card', label: messages.docTypeEPICard },
-                  {
-                    value: 'Doctor Certificate',
-                    label: messages.docTypeDoctorCertificate
-                  },
-                  { value: 'School Certificate', label: messages.docTypeSC }
-                ],
-                Mother: [
-                  { value: 'Birth Registration', label: messages.docTypeBR },
-                  {
-                    value: 'National ID (front)',
-                    label: messages.docTypeNIDFront
-                  },
-                  {
-                    value: 'National ID (back)',
-                    label: messages.docTypeNIDBack
-                  },
-                  { value: 'Passport', label: messages.docTypePassport },
-                  { value: 'School Certificate', label: messages.docTypeSC },
-                  { value: 'Other', label: messages.docTypeOther }
-                ],
-                Father: [
-                  { value: 'Birth Registration', label: messages.docTypeBR },
-                  {
-                    value: 'National ID (front)',
-                    label: messages.docTypeNIDFront
-                  },
-                  {
-                    value: 'National ID (back)',
-                    label: messages.docTypeNIDBack
-                  },
-                  { value: 'Passport', label: messages.docTypePassport },
-                  { value: 'School Certificate', label: messages.docTypeSC },
-                  { value: 'Other', label: messages.docTypeOther }
-                ],
-                Other: [
-                  { value: 'Birth Registration', label: messages.docTypeBR },
-                  {
-                    value: 'National ID (front)',
-                    label: messages.docTypeNIDFront
-                  },
-                  {
-                    value: 'National ID (back)',
-                    label: messages.docTypeNIDBack
-                  },
-                  { value: 'Passport', label: messages.docTypePassport },
-                  { value: 'School Certificate', label: messages.docTypeSC },
-                  { value: 'Other', label: messages.docTypeOther }
-                ]
-              }
-            }
-          }
-        ]
-      },
+      conditionals: [
+        conditionals.withIn45Days,
+        conditionals.between46daysTo5yrs
+      ],
       mapping: {
         mutation: birthFieldToAttachmentTransformer,
         query: birthAttachmentToFieldTransformer
       }
     }
+
     // {
-    //   name: 'paragraph',
-    //   type: PARAGRAPH,
-    //   label: messages.paragraph,
+    //   name: 'imageUploader',
+    //   type: IMAGE_UPLOADER_WITH_OPTIONS,
+    //   label: messages.uploadImage,
     //   initialValue: '',
-    //   validate: []
+    //   validate: [],
+    //   optionSection: {
+    //     id: 'documents-upload',
+    //     viewType: 'form',
+    //     name: messages.documentsUploadName,
+    //     title: messages.documentsUploadTitle,
+    //     fields: [
+    //       {
+    //         name: 'uploadDocForWhom',
+    //         type: RADIO_GROUP,
+    //         label: messages.uploadDocForWhom,
+    //         required: true,
+    //         initialValue: '',
+    //         hideAsterisk: true,
+    //         validate: [],
+    //         options: [
+    //           { value: 'Child', label: messages.uploadDocForChild },
+    //           { value: 'Mother', label: messages.uploadDocForMother },
+    //           { value: 'Father', label: messages.uploadDocForFather },
+    //           { value: 'Other', label: messages.uploadDocForOther }
+    //         ]
+    //       },
+    //       {
+    //         name: 'whatDocToUpload',
+    //         type: SELECT_WITH_DYNAMIC_OPTIONS,
+    //         label: messages.whatDocToUpload,
+    //         required: true,
+    //         hideAsterisk: true,
+    //         initialValue: '',
+    //         validate: [],
+    //         placeholder: messages.select,
+    //         dynamicOptions: {
+    //           dependency: 'uploadDocForWhom',
+    //           options: {
+    //             Child: [
+    //               {
+    //                 value: 'Proof of Place and Date of Birth',
+    //                 label: messages.docTypeChildBirthProof
+    //               },
+    //               { value: 'EPI Card', label: messages.docTypeEPICard },
+    //               {
+    //                 value: 'Doctor Certificate',
+    //                 label: messages.docTypeDoctorCertificate
+    //               },
+    //               { value: 'School Certificate', label: messages.docTypeSC }
+    //             ],
+    //             Mother: [
+    //               { value: 'Birth Registration', label: messages.docTypeBR },
+    //               {
+    //                 value: 'National ID (front)',
+    //                 label: messages.docTypeNIDFront
+    //               },
+    //               {
+    //                 value: 'National ID (back)',
+    //                 label: messages.docTypeNIDBack
+    //               },
+    //               { value: 'Passport', label: messages.docTypePassport },
+    //               { value: 'School Certificate', label: messages.docTypeSC },
+    //               { value: 'Other', label: messages.docTypeOther }
+    //             ],
+    //             Father: [
+    //               { value: 'Birth Registration', label: messages.docTypeBR },
+    //               {
+    //                 value: 'National ID (front)',
+    //                 label: messages.docTypeNIDFront
+    //               },
+    //               {
+    //                 value: 'National ID (back)',
+    //                 label: messages.docTypeNIDBack
+    //               },
+    //               { value: 'Passport', label: messages.docTypePassport },
+    //               { value: 'School Certificate', label: messages.docTypeSC },
+    //               { value: 'Other', label: messages.docTypeOther }
+    //             ],
+    //             Other: [
+    //               { value: 'Birth Registration', label: messages.docTypeBR },
+    //               {
+    //                 value: 'National ID (front)',
+    //                 label: messages.docTypeNIDFront
+    //               },
+    //               {
+    //                 value: 'National ID (back)',
+    //                 label: messages.docTypeNIDBack
+    //               },
+    //               { value: 'Passport', label: messages.docTypePassport },
+    //               { value: 'School Certificate', label: messages.docTypeSC },
+    //               { value: 'Other', label: messages.docTypeOther }
+    //             ]
+    //           }
+    //         }
+    //       }
+    //     ]
+    //   },
+    //   mapping: {
+    //     mutation: birthFieldToAttachmentTransformer,
+    //     query: birthAttachmentToFieldTransformer
+    //   }
     // }
+
     // {
     //   name: 'list',
     //   type: DYNAMIC_LIST,

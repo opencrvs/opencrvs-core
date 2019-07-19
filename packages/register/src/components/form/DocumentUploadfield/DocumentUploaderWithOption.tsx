@@ -19,7 +19,8 @@ const messages: {
 } = defineMessages({
   uploadError: {
     id: 'imageUploadOption.upload.error',
-    defaultMessage: 'Must be in JPEG/JPG/PNG format',
+    defaultMessage:
+      'File format not supported. Please attach a png, jpg or pdf (max 5mb)',
     description: 'Show error messages while uploading'
   },
   documentTypeRequired: {
@@ -36,6 +37,11 @@ const messages: {
     id: 'menu.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
+  },
+  overSized: {
+    id: 'imageUploadOption.upload.overSized',
+    defaultMessage: 'File is too large. Please attach file less than 5mb',
+    description: 'Error message for Attachment size greater than 5MD.'
   }
 })
 
@@ -166,11 +172,15 @@ class DocumentUploaderWithOptionComp extends React.Component<
       Jimp.read(new Buffer(base64String, 'base64'))
         .then(buffer => {
           if (!ALLOWED_IMAGE_TYPE.includes(buffer.getMIME())) {
-            console.log(this.props.intl.formatMessage(messages.uploadError))
             this.setState({
               errorMessage: this.props.intl.formatMessage(messages.uploadError)
             })
             throw new Error('File type not supported')
+          } else if (uploadedImage.size > 5242880) {
+            this.setState({
+              errorMessage: this.props.intl.formatMessage(messages.overSized)
+            })
+            throw new Error(this.props.intl.formatMessage(messages.overSized))
           } else if (uploadedImage.size > 2097152) {
             return buffer
               .resize(2000, Jimp.AUTO)
@@ -221,7 +231,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
         })
         .catch(e => {
           this.setState({
-            errorMessage: this.props.intl.formatMessage(messages.uploadError)
+            errorMessage:
+              this.state.errorMessage ||
+              this.props.intl.formatMessage(messages.uploadError)
           })
         })
     })
