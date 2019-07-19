@@ -8,7 +8,7 @@ context('Death Registration Integration Test', () => {
   it('Tests from application to registration using minimum input', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
@@ -77,7 +77,8 @@ context('Death Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.wait(6000)
+    cy.log('Waiting for application to sync...')
+    cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
@@ -89,7 +90,7 @@ context('Death Registration Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
       if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Death review found')
         cy.get('#ListItemAction-0-Review')
@@ -98,7 +99,7 @@ context('Death Registration Integration Test', () => {
         cy.wait(500)
         cy.get('#registerApplicationBtn').click()
         // MODAL
-        cy.get('#register_confirm').click()
+        cy.get('#submit_confirm').click()
         cy.wait(1000)
       } else {
         cy.log('Death review not found')
@@ -109,7 +110,7 @@ context('Death Registration Integration Test', () => {
   it('Tests from application to registration using maximum input', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
@@ -224,7 +225,8 @@ context('Death Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.wait(6000)
+    cy.log('Waiting for application to sync...')
+    cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
@@ -236,7 +238,7 @@ context('Death Registration Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
       if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Death review found')
         cy.get('#ListItemAction-0-Review')
@@ -245,7 +247,7 @@ context('Death Registration Integration Test', () => {
         cy.wait(500)
         cy.get('#registerApplicationBtn').click()
         // MODAL
-        cy.get('#register_confirm').click()
+        cy.get('#submit_confirm').click()
         cy.wait(1000)
       } else {
         cy.log('Death review not found')

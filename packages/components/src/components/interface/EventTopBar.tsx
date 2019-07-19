@@ -24,11 +24,12 @@ interface IProps {
   id?: string
   title: string
   goHome?: () => void
-  saveAction?: ISaveAction
+  saveAction?: IAction
+  exitAction?: IAction
   menuItems?: IToggleMenuItem[]
   iconColor?: string
 }
-interface ISaveAction {
+interface IAction {
   handler: () => void
   label: string
 }
@@ -39,7 +40,7 @@ interface IToggleMenuItem {
 }
 
 export const EventTopBar = (props: IProps) => {
-  const { goHome, title, saveAction, menuItems, iconColor } = props
+  const { goHome, title, saveAction, exitAction, menuItems, iconColor } = props
   return (
     <TopBar>
       <Item>
@@ -54,6 +55,12 @@ export const EventTopBar = (props: IProps) => {
         {saveAction && (
           <TertiaryButton onClick={saveAction.handler} id="save_draft">
             {saveAction.label}
+          </TertiaryButton>
+        )}
+
+        {exitAction && (
+          <TertiaryButton onClick={exitAction.handler} id="exit_top_bar">
+            {exitAction.label}
           </TertiaryButton>
         )}
 

@@ -2,11 +2,14 @@
   "name": "@opencrvs/commons",
   "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS common modules and utils",
-  "main": "src/index.ts",
+  "main": "build/dist/index.js",
   "scripts": {
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
-    "test:compilation": "tsc --noEmit"
+    "test:compilation": "tsc --noEmit",
+    "postinstall": "yarn build",
+    "build": "tsc -d",
+    "build:clean": "rm -rf build"
   },
   "license": "NONE",
   "private": true,
