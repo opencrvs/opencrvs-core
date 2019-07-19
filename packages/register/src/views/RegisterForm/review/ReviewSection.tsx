@@ -5,7 +5,12 @@ import {
   DataSection
 } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
-import { IApplication, writeApplication } from '@register/applications'
+import {
+  IApplication,
+  writeApplication,
+  SUBMISSION_STATUS,
+  IPayload
+} from '@register/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
@@ -39,7 +44,6 @@ import {
   injectIntl,
   InjectedIntl
 } from 'react-intl'
-import { ICON_ALIGNMENT, IButtonProps } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
   IFormSection,
@@ -199,11 +203,13 @@ interface IProps {
   draft: IApplication
   registerForm: { [key: string]: IForm }
   pageRoute: string
-  registerClickEvent?: () => void
   rejectApplicationClickEvent?: () => void
-  submitClickEvent?: () => void
-  saveDraftClickEvent?: () => void
-  deleteApplicationClickEvent?: () => void
+  submitClickEvent: (
+    application: IApplication,
+    submissionStatus: string,
+    action: string,
+    payload?: IPayload
+  ) => void
   goToPage: typeof goToPage
   scope: Scope | null
   offlineResources: IOfflineDataState
@@ -493,7 +499,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       intl,
       draft,
       registerForm,
-      registerClickEvent,
       rejectApplicationClickEvent,
       submitClickEvent,
       pageRoute,
@@ -510,10 +515,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         Object.values(errorsOnFields).map(Object.values)
         // @ts-ignore
       ).filter(errors => errors.length > 0).length === 0
-
-    const isRejected =
-      this.props.draft.registrationStatus &&
-      this.props.draft.registrationStatus === REJECTED
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -574,9 +575,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             </FormData>
             <ReviewAction
               isComplete={isComplete}
-              hasRegisterScope={this.userHasRegisterScope()}
-              isRejected={Boolean(isRejected)}
-              registerAction={registerClickEvent}
+              isRegister={this.userHasRegisterScope()}
+              isRejected={this.props.draft.registrationStatus === REJECTED}
+              isDraft={
+                this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+              }
+              application={draft}
               submitAction={submitClickEvent}
               rejectAction={rejectApplicationClickEvent}
             />
