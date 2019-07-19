@@ -16,12 +16,12 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button text in the modal'
   },
   cancel: {
-    id: 'formFields.fetchButton.cancel',
+    id: 'form.field.label.fetchButton.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal'
   }

@@ -367,42 +367,42 @@ describe('when user wants to print certificate', () => {
 
   it('renders i18n idType', () => {
     expect(identityNameMapper('NATIONAL_ID')).toEqual({
-      id: 'formFields.iDTypeNationalID',
+      id: 'form.field.label.iDTypeNationalID',
       defaultMessage: 'National ID',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('PASSPORT')).toEqual({
-      id: 'formFields.iDTypePassport',
+      id: 'form.field.label.iDTypePassport',
       defaultMessage: 'Passport',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('DRIVING_LICENSE')).toEqual({
-      id: 'formFields.iDTypeDrivingLicense',
+      id: 'form.field.label.iDTypeDrivingLicense',
       defaultMessage: 'Drivers License',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('BIRTH_REGISTRATION_NUMBER')).toEqual({
-      id: 'formFields.iDTypeBRN',
+      id: 'form.field.label.iDTypeBRN',
       defaultMessage: 'Birth Registration Number',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('DEATH_REGISTRATION_NUMBER')).toEqual({
-      id: 'formFields.iDTypeDRN',
+      id: 'form.field.label.iDTypeDRN',
       defaultMessage: 'Death Registration Number',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('REFUGEE_NUMBER')).toEqual({
-      id: 'formFields.iDTypeRefugeeNumber',
+      id: 'form.field.label.iDTypeRefugeeNumber',
       defaultMessage: 'Refugee Number',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('ALIEN_NUMBER')).toEqual({
-      id: 'formFields.iDTypeAlienNumber',
+      id: 'form.field.label.iDTypeAlienNumber',
       defaultMessage: 'Alien Number',
       description: 'Option for form field: Type of ID'
     })
     expect(identityNameMapper('UNKNOWN')).toEqual({
-      id: 'formFields.iD',
+      id: 'form.field.label.iD',
       defaultMessage: 'ID Number',
       description: 'Label for form field: ID Number'
     })

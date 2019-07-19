@@ -4,37 +4,37 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   maritalStatus: {
-    id: 'formFields.maritalStatus',
+    id: 'form.field.label.maritalStatus',
     defaultMessage: 'Marital status',
     description: 'Label for form field: Marital status'
   },
   maritalStatusSingle: {
-    id: 'formFields.maritalStatusSingle',
+    id: 'form.field.label.maritalStatusSingle',
     defaultMessage: 'Unmarried',
     description: 'Option for form field: Marital status'
   },
   maritalStatusMarried: {
-    id: 'formFields.maritalStatusMarried',
+    id: 'form.field.label.maritalStatusMarried',
     defaultMessage: 'Married',
     description: 'Option for form field: Marital status'
   },
   maritalStatusWidowed: {
-    id: 'formFields.maritalStatusWidowed',
+    id: 'form.field.label.maritalStatusWidowed',
     defaultMessage: 'Widowed',
     description: 'Option for form field: Marital status'
   },
   maritalStatusDivorced: {
-    id: 'formFields.maritalStatusDivorced',
+    id: 'form.field.label.maritalStatusDivorced',
     defaultMessage: 'Divorced',
     description: 'Option for form field: Marital status'
   },
   maritalStatusNotStated: {
-    id: 'formFields.maritalStatusNotStated',
+    id: 'form.field.label.maritalStatusNotStated',
     defaultMessage: 'Not stated',
     description: 'Option for form field: Marital status'
   },
   dateOfMarriage: {
-    id: 'formFields.dateOfMarriage',
+    id: 'form.field.label.dateOfMarriage',
     defaultMessage: 'Date of marriage',
     description: 'Option for form field: Date of marriage'
   }

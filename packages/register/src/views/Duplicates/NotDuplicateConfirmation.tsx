@@ -16,12 +16,12 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   noButton: {
-    id: 'register.duplicates.notDuplicate.modal.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button text on not a duplicate confirmation modal'
   },
   yesButton: {
-    id: 'register.duplicates.notDuplicate.modal.yes',
+    id: 'buttons.yes',
     defaultMessage: 'Yes',
     description: 'Yes button on not a duplicate confirmation modal'
   },

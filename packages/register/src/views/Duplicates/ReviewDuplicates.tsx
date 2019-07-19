@@ -61,7 +61,7 @@ const messages: {
     description: 'The duplicates page title'
   },
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Title of the back link'
   },
@@ -77,12 +77,12 @@ const messages: {
     description: 'Description of the reject modal'
   },
   male: {
-    id: 'register.duplicates.male',
+    id: 'constants.male',
     defaultMessage: 'Male',
     description: 'The duplicates text for male'
   },
   female: {
-    id: 'register.duplicates.female',
+    id: 'constants.female',
     defaultMessage: 'Female',
     description: 'The duplicates text for female'
   },

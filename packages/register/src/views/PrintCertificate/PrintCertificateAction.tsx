@@ -226,7 +226,7 @@ const messages: {
     description: 'The error message shown when a query fails'
   },
   confirm: {
-    id: 'print.certificate.confirm',
+    id: 'buttons.confirm',
     defaultMessage: 'Confirm',
     description:
       'The label for confirm button when all information of the collector is provided'
@@ -285,27 +285,27 @@ const messages: {
     description: 'The label for finish printing certificate button'
   },
   editRegistration: {
-    id: 'certificate.btn.editRegistration',
+    id: 'buttons.editRegistration',
     defaultMessage: 'Edit Registration'
   },
   certificateIsCorrect: {
-    id: 'certificate.txt.isCorrectTxt'
+    id: 'certificate.isCertificateCorrect'
   },
   state: {
-    id: 'formFields.state',
+    id: 'form.field.label.state',
     defaultMessage: 'Division',
     description: 'The label for state of event location'
   },
   district: {
-    id: 'formFields.district',
+    id: 'form.field.label.district',
     defaultMessage: 'District',
     description: 'The label for district of event location'
   },
   certificateConfirmationTxt: {
-    id: 'certificate.txt.confirmationTxt'
+    id: 'certificate.confirmCorrect'
   },
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   }

@@ -16,12 +16,12 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   reviewTab: {
-    id: 'review.form.tabs.reviewTab',
+    id: 'review.form.tabs.review.name',
     defaultMessage: 'Review',
     description: 'Tab title for Review'
   },
   reviewTitle: {
-    id: 'review.form.section.reviewTitle',
+    id: 'review.form.section.review.title',
     defaultMessage: 'Review',
     description: 'Form section title for Review'
   }

@@ -79,7 +79,7 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   typeTrackingId: {
-    id: 'register.home.header.typeTrackingId',
+    id: 'constants.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Search menu tracking id type'
   },
@@ -109,17 +109,17 @@ const messages: {
     description: 'Search menu phone no place holder'
   },
   defaultTitle: {
-    id: 'register.home.header.defaultTitle',
+    id: 'constants.applications',
     defaultMessage: 'Applications',
     description: 'Header default title'
   },
   applicationTitle: {
-    id: 'register.home.header.applicationTitle',
+    id: 'constants.applications',
     defaultMessage: 'Applications',
     description: 'Application title'
   },
   performanceTitle: {
-    id: 'register.home.header.performanceTitle',
+    id: 'constant.performance',
     defaultMessage: 'Performance',
     description: 'Performance title'
   },
@@ -139,7 +139,7 @@ const messages: {
     description: 'Help title'
   },
   logoutTitle: {
-    id: 'register.home.header.logoutTitle',
+    id: 'buttons.logout',
     defaultMessage: 'Logout',
     description: 'logout title'
   }

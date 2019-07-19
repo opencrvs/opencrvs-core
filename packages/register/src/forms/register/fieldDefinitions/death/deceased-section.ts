@@ -60,129 +60,129 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   deceasedTab: {
-    id: 'register.form.tabs.deceasedTab',
+    id: 'register.form.section.deceased.name',
     defaultMessage: 'Deceased',
     description: 'Tab title for Deceased'
   },
   deceasedTitle: {
-    id: 'register.form.section.deceasedTitle',
+    id: 'register.form.section.deceased.title',
     defaultMessage: "Deceased's details",
     description: 'Form section title for Deceased'
   },
   deceasedIdType: {
-    id: 'formFields.deceasedIdType',
+    id: 'form.field.label.deceasedIdType',
     defaultMessage: 'Existing ID',
     description: 'Label for form field: Existing ID'
   },
   fetchDeceasedDetails: {
-    id: 'formFields.fetchDeceasedDetails',
+    id: 'form.field.label.fetchDeceasedDetails',
     defaultMessage: "Retrieve Deceased's Details",
     description: 'Label for loader button'
   },
   fetchIdentifierModalTitle: {
-    id: 'formFields.fetchIdentifierModalTitle',
+    id: 'form.field.label.fetchIdentifierModalTitle',
     defaultMessage: 'Checking',
     description: 'Label for fetch modal title'
   },
   fetchIdentifierModalSuccessTitle: {
-    id: 'formFields.fetchIdentifierModalSuccessTitle',
+    id: 'form.field.label.fetchIdentifierModalSuccessTitle',
     defaultMessage: 'ID valid',
     description: 'Label for fetch modal success title'
   },
   fetchIdentifierModalErrorTitle: {
-    id: 'formFields.fetchIdentifierModalErrorTitle',
+    id: 'form.field.label.fetchIdentifierModalErrorTitle',
     defaultMessage: 'Invalid Id',
     description: 'Label for fetch modal error title'
   },
   fetchRegistrationModalErrorText: {
-    id: 'formFields.fetchRegistrationModalErrorText',
+    id: 'form.field.label.fetchRegistrationModalErrorText',
     defaultMessage: 'No registration found for provided BRN',
     description: 'Label for fetch modal error title'
   },
   fetchPersonByNIDModalErrorText: {
-    id: 'formFields.fetchPersonByNIDModalErrorText',
+    id: 'form.field.label.fetchPersonByNIDModalErrorText',
     defaultMessage: 'No person found for provided NID',
     description: 'Label for fetch modal error title'
   },
   fetchRegistrationModalInfo: {
-    id: 'formFields.fetchRegistrationModalInfo',
+    id: 'form.field.label.fetchRegistrationModalInfo',
     defaultMessage: 'Birth Registration Number',
     description: 'Label for loader button'
   },
   fetchPersonByNIDModalInfo: {
-    id: 'formFields.fetchPersonByNIDModalInfo',
+    id: 'form.field.label.fetchPersonByNIDModalInfo',
     defaultMessage: 'National ID',
     description: 'Label for loader button'
   },
   deceasedGivenNames: {
-    id: 'formFields.deceasedGivenNames',
+    id: 'form.field.label.deceasedGivenNames',
     defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: Given names'
   },
   deceasedFamilyName: {
-    id: 'formFields.deceasedFamilyName',
+    id: 'form.field.label.deceasedFamilyName',
     defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   deceasedGivenNamesEng: {
-    id: 'formFields.deceasedGivenNamesEng',
+    id: 'form.field.label.deceasedGivenNamesEng',
     defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: Given names in english'
   },
   deceasedFamilyNameEng: {
-    id: 'formFields.deceasedFamilyNameEng',
+    id: 'form.field.label.deceasedFamilyNameEng',
     defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   nationality: {
-    id: 'formFields.deceased.nationality',
+    id: 'form.field.label.deceased.nationality',
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality'
   },
   deceasedSex: {
-    id: 'formFields.deceasedSex',
+    id: 'form.field.label.deceasedSex',
     defaultMessage: 'Sex',
     description: 'Label for form field: Sex name'
   },
   deceasedSexMale: {
-    id: 'formFields.deceasedSexMale',
+    id: 'form.field.label.deceasedSexMale',
     defaultMessage: 'Male',
     description: 'Option for form field: Sex name'
   },
   deceasedSexFemale: {
-    id: 'formFields.deceasedSexFemale',
+    id: 'form.field.label.deceasedSexFemale',
     defaultMessage: 'Female',
     description: 'Option for form field: Sex name'
   },
   deceasedSexOther: {
-    id: 'formFields.deceasedSexOther',
+    id: 'form.field.label.deceasedSexOther',
     defaultMessage: 'Other',
     description: 'Option for form field: Sex name'
   },
   deceasedSexUnknown: {
-    id: 'formFields.deceasedSexUnknown',
+    id: 'form.field.label.deceasedSexUnknown',
     defaultMessage: 'Unknown',
     description: 'Option for form field: Sex name'
   },
   deceasedDateOfBirth: {
-    id: 'formFields.deceasedDateOfBirth',
+    id: 'form.field.label.deceasedDateOfBirth',
     defaultMessage: 'Date of Birth',
     description: 'Label for form field: Date of birth'
   },
   currentAddressSameAsPermanent: {
-    id: 'formFields.deceasedCurrentAddressSameAsPermanent',
+    id: 'form.field.label.deceasedCurrentAddressSameAsPermanent',
     defaultMessage:
       'Is deceased’s current address the same as their permanent address?',
     description:
       'Title for the radio button to select that the deceased current address is the same as their permanent address'
   },
   currentAddress: {
-    id: 'formFields.currentAddress',
+    id: 'form.field.label.currentAddress',
     defaultMessage: 'Current Address',
     description: 'Title for the current address fields'
   },
   permanentAddress: {
-    id: 'formFields.permanentAddress',
+    id: 'form.field.label.permanentAddress',
     defaultMessage: 'Permanent Address',
     description: 'Title for the permanent address fields'
   },

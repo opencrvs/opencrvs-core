@@ -153,39 +153,39 @@ const messages: {
     description: 'Label for the workflow timestamp when the status is failed'
   },
   workflowStatusDateRegistered: {
-    id: 'register.workQueue.listItem.status.dateLabel.registered',
+    id: 'register.application.details.item.label.registered',
     defaultMessage: 'Registrated on',
     description:
       'Label for the workflow timestamp when the status is registered'
   },
   workflowStatusDateRejected: {
-    id: 'register.workQueue.listItem.status.dateLabel.rejected',
+    id: 'register.application.details.item.label.rejected',
     defaultMessage: 'Rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
   },
   workflowStatusDateCollected: {
-    id: 'register.workQueue.listItem.status.dateLabel.collected',
+    id: 'register.application.details.item.label.collected',
     defaultMessage: 'Printed on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
   workflowPractitionerLabel: {
-    id: 'register.workQueue.listItem.status.label.byPractitioner',
+    id: 'register.application.details.item.label.by',
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
   },
   workflowStatusDateApplication: {
-    id: 'register.workQueue.listItem.status.dateLabel.application',
+    id: 'register.application.details.item.label.application',
     defaultMessage: 'Application submitted on',
     description:
       'Label for the workflow timestamp when the status is application'
   },
   update: {
-    id: 'register.workQueue.list.buttons.update',
+    id: 'buttons.update',
     defaultMessage: 'Update',
     description: 'The title of update button for draft application'
   },
   retry: {
-    id: 'register.detail.subpag.buttons.retry',
+    id: 'buttons.retry',
     defaultMessage: 'Retry',
     description: 'The title of retry button for failed application'
   },
@@ -195,17 +195,17 @@ const messages: {
     description: 'The title of contact number label'
   },
   workflowApplicantTrackingID: {
-    id: 'register.duplicates.details.trackingId',
+    id: 'constants.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Tracking ID label'
   },
   workflowApplicationRejectReason: {
-    id: 'register.searchResult.labels.results.rejectionReason',
+    id: 'register.application.details.item.label.rejectionReason',
     defaultMessage: 'Reason',
     description: 'Label for rejection reason'
   },
   workflowApplicationRejectComment: {
-    id: 'register.searchResult.labels.results.rejectionComment',
+    id: 'register.application.details.item.label.rejectionComment',
     defaultMessage: 'Comment',
     description: 'Label for rejection comment'
   },

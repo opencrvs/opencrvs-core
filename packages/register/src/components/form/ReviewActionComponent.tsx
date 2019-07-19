@@ -75,22 +75,22 @@ const messages = defineMessages({
       'Description for review action component when complete application'
   },
   valueSendForReview: {
-    id: 'register.form.submit',
+    id: 'buttons.sendForReview',
     defaultMessage: 'SEND FOR REVIEW',
     description: 'Submit Button Text'
   },
   valueSendForReviewIncomplete: {
-    id: 'register.form.submitIncomplete',
+    id: 'buttons.sendIncomplete',
     defaultMessage: 'Send incomplete application',
     description: 'Title for Incomplete submit button'
   },
   valueRegister: {
-    id: 'review.button.register',
+    id: 'buttons.register',
     defaultMessage: 'REGISTER',
     description: 'Register button text'
   },
   valueReject: {
-    id: 'review.button.reject',
+    id: 'buttons.reject',
     defaultMessage: 'Reject Application',
     description: 'Reject application button text'
   }

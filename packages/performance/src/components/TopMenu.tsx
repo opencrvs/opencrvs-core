@@ -20,52 +20,52 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   },
   menu: {
-    id: 'menu.menu',
+    id: 'buttons.menu',
     defaultMessage: 'Menu',
     description: 'Menu'
   },
   homepage: {
-    id: 'menu.items.homepage',
+    id: 'buttons.homepage',
     defaultMessage: 'Homepage',
     description: 'Menu item homepage'
   },
   register: {
-    id: 'menu.items.register',
+    id: 'buttons.register',
     defaultMessage: 'Register',
     description: 'Menu item register'
   },
   drafts: {
-    id: 'menu.items.drafts',
+    id: 'buttons.drafts',
     defaultMessage: 'Drafts',
     description: 'Menu item drafts'
   },
   settings: {
-    id: 'menu.items.settings',
+    id: 'buttons.settings',
     defaultMessage: 'Settings',
     description: 'Menu item settings'
   },
   logout: {
-    id: 'menu.items.logout',
+    id: 'buttons.logout',
     defaultMessage: 'Log out',
     description: 'Menu item logout'
   },
   changeLanguage: {
-    id: 'menu.items.changeLanguage',
+    id: 'buttons.changeLanguage',
     defaultMessage: 'Change Language',
     description: 'Menu item changeLanguage'
   },
   english: {
-    id: 'menu.items.changeLanguage.english',
+    id: 'languages.english',
     defaultMessage: 'English',
     description: 'Menu item english'
   },
   bengali: {
-    id: 'menu.items.changeLanguage.bengali',
+    id: 'languages.bengali',
     defaultMessage: 'Bengali',
     description: 'Menu item bengali'
   }

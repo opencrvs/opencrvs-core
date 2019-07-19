@@ -67,7 +67,7 @@ const messages = defineMessages({
     description: 'Password validation'
   },
   continue: {
-    id: 'button.continue',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue button label'
   },

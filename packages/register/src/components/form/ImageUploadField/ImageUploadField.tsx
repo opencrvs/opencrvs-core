@@ -48,27 +48,27 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   },
   uploadedList: {
-    id: 'formFields.imageUpload.uploadedList',
+    id: 'form.field.label.imageUpload.uploadedList',
     defaultMessage: 'Uploaded:',
     description: 'label for uploaded list'
   },
   delete: {
-    id: 'formFields.imageUpload.delete',
+    id: 'form.field.label.imageUpload.delete',
     defaultMessage: 'Delete',
     description: 'label for delete a uploaded item'
   },
   preview: {
-    id: 'formFields.imageUpload.preview',
+    id: 'form.field.label.imageUpload.preview',
     defaultMessage: 'Preview',
     description: 'label for preview a uploaded item'
   },
   upload: {
-    id: 'register.form.upload',
+    id: 'buttons.upload',
     defaultMessage: 'Upload',
     description: 'title for option view'
   }

@@ -18,34 +18,34 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   certificateHeader: {
-    id: 'register.work-queue.certificate.header'
+    id: 'certificate.receipt.header'
   },
   certificateSubHeader: {
-    id: 'register.work-queue.certificate.subheader'
+    id: 'certificate.receipt.subheader'
   },
   certificateIssuedAt: {
-    id: 'register.work-queue.certificate.issuedAt'
+    id: 'certificate.receipt.issuedAt'
   },
   certificateIssuer: {
-    id: 'register.work-queue.certificate.issuer'
+    id: 'certificate.receipt.issuer'
   },
   certificatePaidAmount: {
-    id: 'register.work-queue.certificate.amount'
+    id: 'certificate.receipt.amount'
   },
   certificateService: {
-    id: 'register.work-queue.certificate.service'
+    id: 'certificate.receipt.service'
   },
   death: {
-    id: 'register.event.death'
+    id: 'certificate.label.death'
   },
   birth: {
-    id: 'register.event.birth'
+    id: 'certificate.label.birth'
   },
   dod: {
-    id: 'register.event.dod'
+    id: 'certificate.label.dod'
   },
   dob: {
-    id: 'register.event.dob'
+    id: 'certificate.label.dob'
   }
 })
 

@@ -14,12 +14,12 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   loginButton: {
-    id: 'login.stepOneTitle',
+    id: 'buttons.login',
     defaultMessage: 'Login',
     description: 'Login button on session expire modal'
   },
   sessionExpireTxt: {
-    id: 'session.expire.text',
+    id: 'login.session.expired',
     defaultMessage: 'Your session has expired. Please login again.',
     description: 'SessionExpire modal confirmation text'
   }

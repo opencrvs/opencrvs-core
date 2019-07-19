@@ -40,7 +40,7 @@ const messages: {
     description: 'Instruction for the setup complete'
   },
   loginButtonLabel: {
-    id: 'userSetup.complete.button.login',
+    id: 'buttons.login',
     defaultMessage: 'Login',
     description: 'Label of login button'
   }

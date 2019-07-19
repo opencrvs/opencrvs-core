@@ -19,7 +19,7 @@ export const messages: {
     description: 'Preview button on edit modal'
   },
   submitButton: {
-    id: 'review.edit.modal.editButton',
+    id: 'buttons.edit',
     defaultMessage: 'Edit',
     description: 'Edit button on edit modal'
   },

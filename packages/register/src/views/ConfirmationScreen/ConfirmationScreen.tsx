@@ -32,12 +32,6 @@ const messages: {
     defaultMessage: 'Back to homescreen',
     description: 'The button to return to the homescreen'
   },
-  boxHeaderTitle: {
-    id: 'register.confirmationScreen.boxHeaderTitle',
-    defaultMessage: `{action, select, completed {All Done} submitted {All Done} rejected {Application rejected} registered {Application registered}
-      approved {Application approved} offlineAction {Almost there}}`,
-    description: 'The box header title that appear on the confirmation screen '
-  },
   boxHeaderDesc: {
     id: 'register.confirmationScreen.boxHeaderDesc',
     defaultMessage: `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.}

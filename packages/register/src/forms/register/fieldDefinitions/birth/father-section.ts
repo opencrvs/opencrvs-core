@@ -80,127 +80,127 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   fatherTab: {
-    id: 'register.form.tabs.fatherTab',
+    id: 'register.form.section.father.name',
     defaultMessage: 'Father',
     description: 'Tab title for Father'
   },
   fatherTitle: {
-    id: 'register.form.section.fatherTitle',
+    id: 'register.form.section.father.title',
     defaultMessage: "Father's details",
     description: 'Form section title for Father'
   },
   fathersDetailsExist: {
-    id: 'formFields.fathersDetailsExist',
+    id: 'form.field.label.fathersDetailsExist',
     defaultMessage: "Do you have the father's details?",
     description: "Question to ask the user if they have the father's details"
   },
   confirm: {
-    id: 'formFields.confirm',
+    id: 'form.field.label.confirm',
     defaultMessage: 'Yes',
     description: 'confirmation label for yes / no radio button'
   },
   deny: {
-    id: 'formFields.deny',
+    id: 'form.field.label.deny',
     defaultMessage: 'No',
     description: 'deny label for yes / no radio button'
   },
   nationality: {
-    id: 'formFields.father.nationality',
+    id: 'form.field.label.father.nationality',
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality'
   },
   nationalityBangladesh: {
-    id: 'formFields.father.nationalityBangladesh',
+    id: 'form.field.label.father.nationalityBangladesh',
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality'
   },
   fatherFirstNames: {
-    id: 'formFields.fatherFirstNames',
+    id: 'form.field.label.fatherFirstNames',
     defaultMessage: 'First Name(s) in Bengali',
     description: 'Label for form field: First name'
   },
   fatherFamilyName: {
-    id: 'formFields.fatherFamilyName',
+    id: 'form.field.label.fatherFamilyName',
     defaultMessage: 'Last Name(s) in Bengali',
     description: 'Label for form field: Family name'
   },
   fatherFirstNamesEng: {
-    id: 'formFields.fatherFirstNamesEng',
+    id: 'form.field.label.fatherFirstNamesEng',
     defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english'
   },
   fatherFamilyNameEng: {
-    id: 'formFields.fatherFamilyNameEng',
+    id: 'form.field.label.fatherFamilyNameEng',
     defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english'
   },
   defaultLabel: {
-    id: 'formFields.defaultLabel',
+    id: 'form.field.label.defaultLabel',
     defaultMessage: 'Label goes here',
     description: 'default label'
   },
   fatherDateOfBirth: {
-    id: 'formFields.fatherDateOfBirth',
+    id: 'form.field.label.fatherDateOfBirth',
     defaultMessage: 'Date of birth',
     description: 'Label for form field: Date of birth'
   },
   fatherEducationAttainment: {
-    id: 'formFields.fatherEducationAttainment',
+    id: 'form.field.label.fatherEducationAttainment',
     defaultMessage: "Father's level of formal education attained",
     description: 'Label for form field: Father education'
   },
   currentAddress: {
-    id: 'formFields.currentAddress',
+    id: 'form.field.label.currentAddress',
     defaultMessage: 'Current Address',
     description: 'Title for the current address fields'
   },
   permanentAddress: {
-    id: 'formFields.permanentAddress',
+    id: 'form.field.label.permanentAddress',
     defaultMessage: 'Permanent Address',
     description: 'Title for the permanent address fields'
   },
   optionalLabel: {
-    id: 'formFields.optionalLabel',
+    id: 'form.field.label.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
   },
   fetchFatherDetails: {
-    id: 'formFields.fetchFatherDetails',
+    id: 'form.field.label.fetchFatherDetails',
     defaultMessage: "Retrieve Father's Details",
     description: 'Label for loader button'
   },
   fetchIdentifierModalTitle: {
-    id: 'formFields.fetchIdentifierModalTitle',
+    id: 'form.field.label.fetchIdentifierModalTitle',
     defaultMessage: 'Checking',
     description: 'Label for fetch modal title'
   },
   fetchIdentifierModalSuccessTitle: {
-    id: 'formFields.fetchIdentifierModalSuccessTitle',
+    id: 'form.field.label.fetchIdentifierModalSuccessTitle',
     defaultMessage: 'ID valid',
     description: 'Label for fetch modal success title'
   },
   fetchIdentifierModalErrorTitle: {
-    id: 'formFields.fetchIdentifierModalErrorTitle',
+    id: 'form.field.label.fetchIdentifierModalErrorTitle',
     defaultMessage: 'Invalid Id',
     description: 'Label for fetch modal error title'
   },
   fetchRegistrationModalErrorText: {
-    id: 'formFields.fetchRegistrationModalErrorText',
+    id: 'form.field.label.fetchRegistrationModalErrorText',
     defaultMessage: 'No registration found for provided BRN',
     description: 'Label for fetch modal error title'
   },
   fetchPersonByNIDModalErrorText: {
-    id: 'formFields.fetchPersonByNIDModalErrorText',
+    id: 'form.field.label.fetchPersonByNIDModalErrorText',
     defaultMessage: 'No person found for provided NID',
     description: 'Label for fetch modal error title'
   },
   fetchRegistrationModalInfo: {
-    id: 'formFields.fetchRegistrationModalInfo',
+    id: 'form.field.label.fetchRegistrationModalInfo',
     defaultMessage: 'Birth Registration Number',
     description: 'Label for loader button'
   },
   fetchPersonByNIDModalInfo: {
-    id: 'formFields.fetchPersonByNIDModalInfo',
+    id: 'form.field.label.fetchPersonByNIDModalInfo',
     defaultMessage: 'National ID',
     description: 'Label for loader button'
   },

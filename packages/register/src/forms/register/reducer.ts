@@ -16,12 +16,12 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   previewTab: {
-    id: 'register.form.tabs.previewTab',
+    id: 'register.form.section.preview.name',
     defaultMessage: 'Preview',
     description: 'Tab title for Preview'
   },
   previewTitle: {
-    id: 'register.form.section.previewTitle',
+    id: 'register.form.section.preview.title',
     defaultMessage: 'Preview',
     description: 'Form section title for Preview'
   }

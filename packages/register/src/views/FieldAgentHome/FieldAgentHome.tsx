@@ -150,17 +150,17 @@ const messages: {
     description: 'The title of rejected days of application'
   },
   listItemName: {
-    id: 'register.registrarHome.listItemName',
+    id: 'register.registrationHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   listItemType: {
-    id: 'register.registrarHome.resultsType',
+    id: 'register.registrationHome.table.label.type',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
   listItemUpdateDate: {
-    id: 'register.registrarHome.results.updateDate',
+    id: 'register.registrationHome.table.label.updateDate',
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item'
   },

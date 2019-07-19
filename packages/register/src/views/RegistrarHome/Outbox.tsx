@@ -18,55 +18,55 @@ import { sentenceCase } from '@register/utils/data-formatting'
 
 const messages = {
   statusWaitingToRegister: {
-    id: 'register.registrarHome.outbox.statusWaitingToRegister',
+    id: 'register.registrationHome.outbox.statusWaitingToRegister',
     defaultMessage: 'Waiting to register',
     description: 'Label for application status waiting for register'
   },
   statusWaitingToReject: {
-    id: 'register.registrarHome.outbox.statusWaitingToReject',
+    id: 'register.registrationHome.outbox.statusWaitingToReject',
     defaultMessage: 'Waiting to reject',
     description: 'Label for application status waiting for reject'
   },
   statusWaitingToSubmit: {
-    id: 'register.registrarHome.outbox.statusWaitingToSubmit',
+    id: 'register.registrationHome.outbox.statusWaitingToSubmit',
     defaultMessage: 'Waiting to submit',
     description: 'Label for application status waiting for reject'
   },
   statusRegistering: {
-    id: 'register.registrarHome.outbox.statusRegistering',
+    id: 'register.registrationHome.outbox.statusRegistering',
     defaultMessage: 'Registering...',
     description: 'Label for application status Registering'
   },
   statusRejecting: {
-    id: 'register.registrarHome.outbox.statusRejecting',
+    id: 'register.registrationHome.outbox.statusRejecting',
     defaultMessage: 'Rejecting...',
     description: 'Label for application status Rejecting'
   },
   statusSubmitting: {
-    id: 'register.registrarHome.outbox.statusSubmitting',
+    id: 'register.registrationHome.outbox.statusSubmitting',
     defaultMessage: 'Submitting...',
     description: 'Label for application status submitting'
   },
 
   // end of status type
   dataTableNoResults: {
-    id: 'register.registrarHome.noResults',
+    id: 'register.registrationHome.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
   },
   listItemType: {
-    id: 'register.registrarHome.resultsType',
+    id: 'register.registrationHome.table.label.type',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
   name: {
-    id: 'register.registrarHome.listItemName',
+    id: 'register.registrationHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   waitingToRetry: {
-    id: 'register.registrarHome.outbox.waitingToRetry'
+    id: 'register.registrationHome.outbox.waitingToRetry'
   }
 }
 

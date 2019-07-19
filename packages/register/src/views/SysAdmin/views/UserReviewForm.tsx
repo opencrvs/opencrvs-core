@@ -45,12 +45,12 @@ type IFullProps = IUserReviewFormProps & InjectedIntlProps
 
 const messages = defineMessages({
   actionChange: {
-    id: 'action.change',
+    id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'Change action'
   },
   submit: {
-    id: 'createUser.buttons.submit',
+    id: 'user.form.buttons.submit',
     defaultMessage: 'Create user',
     description: 'Label for submit button of user creation form'
   }

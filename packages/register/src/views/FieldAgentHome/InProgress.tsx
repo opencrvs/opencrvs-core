@@ -21,22 +21,22 @@ interface IState {
 
 const messages = {
   listItemType: {
-    id: 'register.registrarHome.resultsType',
+    id: 'register.registrationHome.table.label.type',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
   listItemName: {
-    id: 'register.registrarHome.listItemName',
+    id: 'register.registrationHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   listItemModificationDate: {
-    id: 'register.registrarHome.results.modificationDate',
+    id: 'register.registrationHome.table.label.modificationDate',
     defaultMessage: 'Last edited',
     description: 'Label for rejection date in work queue list item'
   },
   dataTableNoResults: {
-    id: 'register.registrarHome.noResults',
+    id: 'register.registrationHome.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'

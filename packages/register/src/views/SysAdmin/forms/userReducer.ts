@@ -28,7 +28,7 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   previewTab: {
-    id: 'createUser.preview.title',
+    id: 'user.form.preview.title',
     defaultMessage: 'Please review the new users details',
     description: 'The title of user preview form'
   },

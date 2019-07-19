@@ -18,15 +18,15 @@ import {
 
 const messages = defineMessages({
   title: {
-    id: 'register.securityquestion.title',
+    id: 'user.form.securityquestion.title',
     defaultMessage: 'Security questions'
   },
   heading: {
-    id: 'register.securityquestion.heading',
+    id: 'user.form.securityquestion.heading',
     defaultMessage: 'Set your security questions'
   },
   description: {
-    id: 'register.securityquestion.description',
+    id: 'user.form.securityquestion.description',
     defaultMessage: `From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.`
   },
   select: {
@@ -34,23 +34,23 @@ const messages = defineMessages({
     defaultMessage: 'Select'
   },
   selectSecurityQuestion: {
-    id: 'register.securityquestion.selectSecurityQuestion',
+    id: 'user.form.securityquestion.selectSecurityQuestion',
     defaultMessage: 'Select a security question'
   },
   answer: {
-    id: 'register.securityquestion.answer',
+    id: 'user.form.securityquestion.answer',
     defaultMessage: 'Answer'
   },
   enterResponse: {
-    id: 'register.securityquestion.enterResponse',
+    id: 'user.form.securityquestion.enterResponse',
     defaultMessage: 'Enter a response to your chosen security question'
   },
   continue: {
-    id: 'button.continue',
+    id: 'buttons.continue',
     defaultMessage: 'Continue'
   },
   securityQuestionLabel: {
-    id: 'register.securityquestion.securityQuestionLabel',
+    id: 'user.form.securityquestion.securityQuestionLabel',
     defaultMessage: 'Security question {count}'
   }
 })

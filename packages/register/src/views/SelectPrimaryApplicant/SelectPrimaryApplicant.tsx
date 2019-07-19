@@ -52,7 +52,7 @@ export const messages: {
     description: 'The title that appears when selecting the parent as informant'
   },
   continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
   },
@@ -62,7 +62,7 @@ export const messages: {
     description: 'Error Message to show when no event is being selected'
   },
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   }

@@ -22,7 +22,7 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   certificateCollectionTitle: {
-    id: 'register.workQueue.title.certificateCollection',
+    id: 'print.certificate.section.title',
     defaultMessage: 'Certificate Collection',
     description: 'The title of print certificate action'
   },
@@ -37,7 +37,7 @@ const messages: {
     description: 'The title of review button in list expansion actions'
   },
   whoToCollect: {
-    id: 'formFields.print.whoToCollect',
+    id: 'form.field.label.print.whoToCollect',
     defaultMessage: 'Who is collecting the certificate?',
     description: 'The label for collector of certificate select'
   },
@@ -66,49 +66,49 @@ const messages: {
       'The label for select value when the collector of certificate is other person'
   },
   confirmMotherDetails: {
-    id: 'formFields.print.confirmMotherInformation',
+    id: 'form.field.label.print.confirmMotherInformation',
     defaultMessage:
       'Does their proof of ID document match the following details?',
     description: 'The label for mother details paragraph'
   },
   confirm: {
-    id: 'formFields.confirm',
+    id: 'form.field.label.confirm',
     defaultMessage: 'Yes',
     description: 'confirmation label for yes / no radio button'
   },
   deny: {
-    id: 'formFields.deny',
+    id: 'form.field.label.deny',
     defaultMessage: 'No',
     description: 'deny label for yes / no radio button'
   },
   givenNames: {
-    id: 'formFields.print.otherPersonGivenNames',
+    id: 'form.field.label.print.otherPersonGivenNames',
     defaultMessage: 'Given name',
     description: 'Label for given name text input'
   },
   familyName: {
-    id: 'formFields.print.otherPersonFamilyName',
+    id: 'form.field.label.print.otherPersonFamilyName',
     defaultMessage: 'Family name',
     description: 'Label for family name text input'
   },
   signedAffidavitConfirmation: {
-    id: 'formFields.print.signedAffidavit',
+    id: 'form.field.label.print.signedAffidavit',
     defaultMessage: 'Do they have a signed affidavit?',
     description: 'Label for signed affidavit confirmation radio group'
   },
   documentNumber: {
-    id: 'formFields.print.documentNumber',
+    id: 'form.field.label.print.documentNumber',
     defaultMessage: 'Document number',
     description: 'Label for document number input field'
   },
   warningNotVerified: {
-    id: 'formFields.print.warningNotVerified',
+    id: 'form.field.label.print.warningNotVerified',
     defaultMessage:
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
     description: 'Label for warning message when the collector is not verified'
   },
   prompt: {
-    id: 'formFields.print.otherPersonPrompt',
+    id: 'form.field.label.print.otherPersonPrompt',
     defaultMessage:
       'Because there are no details of this person on record, we need to capture their details:',
     description: 'Labal for prompt in case of other person collects certificate'

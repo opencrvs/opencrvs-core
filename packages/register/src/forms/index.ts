@@ -39,7 +39,7 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   otherOption: {
-    id: 'formFields.otherOption',
+    id: 'form.field.label.otherOption',
     defaultMessage: 'Other',
     description: 'Other option for select'
   }

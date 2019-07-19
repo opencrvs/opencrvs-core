@@ -106,17 +106,17 @@ export const messages: {
     description: 'The message that appears for new birth registrations'
   },
   saveDraft: {
-    id: 'register.form.saveDraft',
+    id: 'buttons.saveDraft',
     defaultMessage: 'Save draft',
     description: 'Save draft button'
   },
   next: {
-    id: 'register.form.next',
+    id: 'buttons.next',
     defaultMessage: 'Next',
     description: 'Next button'
   },
   cancel: {
-    id: 'register.form.modal.cancel',
+    id: 'buttons.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button on submit modal'
   },
@@ -132,22 +132,22 @@ export const messages: {
     description: 'Submit button on submit modal'
   },
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   },
   valueSaveAsDraft: {
-    id: 'register.form.saveDraft',
+    id: 'buttons.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
   },
   optionalLabel: {
-    id: 'formFields.optionalLabel',
+    id: 'form.field.label.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
   },
   submitConfirmation: {
-    id: 'modal.title.submitConfirmation',
+    id: 'register.form.modal.areYouReadyToSubmit',
     defaultMessage: 'Are you ready to submit?',
     description: 'Title for submit confirmation modal'
   },
@@ -158,12 +158,12 @@ export const messages: {
     description: 'The error message shown when a search query fails'
   },
   continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
   },
   saveExitButton: {
-    id: 'register.selectVitalEvent.saveExitButton',
+    id: 'buttons.saveAndExit',
     defaultMessage: 'SAVE & EXIT',
     description: 'SAVE & EXIT Button Text'
   },

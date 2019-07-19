@@ -78,32 +78,32 @@ const InputSection = styled.div`
 `
 const messages = defineMessages({
   modalTitle: {
-    id: 'formFields.SearchField.modalTitle',
+    id: 'form.field.label.SearchField.modalTitle',
     defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     description: 'Modal title'
   },
   modalCancel: {
-    id: 'formFields.SearchField.modalCancel',
+    id: 'buttons.cancel',
     defaultMessage: 'Cancel',
     description: 'The cancel title'
   },
   modalSelect: {
-    id: 'formFields.SearchField.modalSelect',
+    id: 'buttons.select',
     defaultMessage: 'SELECT',
     description: 'The select title'
   },
   locationId: {
-    id: 'formFields.SearchField.locationId',
+    id: 'form.field.label.SearchField.locationId',
     defaultMessage: 'Id: {locationId}',
     description: 'The location Id column'
   },
   editButton: {
-    id: 'formFields.SearchField.editButton',
+    id: 'form.field.label.SearchField.editButton',
     defaultMessage: 'Change assigned office',
     description: 'Edit button text'
   },
   placeHolderText: {
-    id: 'formFields.SearchField.placeHolderText',
+    id: 'form.field.label.SearchField.placeHolderText',
     defaultMessage: 'Search',
     description: 'Place holder text '
   }

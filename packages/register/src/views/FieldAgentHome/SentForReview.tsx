@@ -28,43 +28,43 @@ const APPLICATIONS_DAY_LIMIT = 7
 
 const messages = {
   submissionStatus: {
-    id: 'register.fieldAgentHome.tableHeader.submissionStatus',
+    id: 'register.fieldAgentHome.table.label.submissionStatus',
     defaultMessage: 'Submission status',
     description: 'Label for table header of column Submission status'
   },
   statusReadyToSubmit: {
-    id: 'register.fieldAgentHome.table.statusReadyToSubmit',
+    id: 'register.fieldAgentHome.table.label.statusReadyToSubmit',
     defaultMessage: 'Waiting to send',
     description: 'Label for application status Ready to Submit'
   },
   statusSubmitting: {
-    id: 'register.fieldAgentHome.table.statusSubmitting',
+    id: 'register.fieldAgentHome.table.label.statusSubmitting',
     defaultMessage: 'Sending...',
     description: 'Label for application status Submitting'
   },
   statusFailed: {
-    id: 'register.fieldAgentHome.table.statusFailed',
+    id: 'register.fieldAgentHome.table.label.statusFailed',
     defaultMessage: 'Failed to send',
     description: 'Label for application status Failed'
   },
   statusPendingConnection: {
-    id: 'register.fieldAgentHome.table.statusPendingConnection',
+    id: 'register.fieldAgentHome.table.label.statusPendingConnection',
     defaultMessage: 'Pending connection',
     description: 'Label for application status Pending Connection'
   },
   dataTableNoResults: {
-    id: 'register.registrarHome.noResults',
+    id: 'register.registrationHome.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
   },
   listItemType: {
-    id: 'register.registrarHome.resultsType',
+    id: 'register.registrationHome.table.label.type',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
   name: {
-    id: 'register.registrarHome.listItemName',
+    id: 'register.registrationHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   }

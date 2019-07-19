@@ -52,17 +52,17 @@ const messages: {
     description: 'Error title'
   },
   errorDescription1: {
-    id: 'error.description1',
+    id: 'error.somethingWentWrong',
     defaultMessage: 'Something went wrong.',
     description: 'Error description'
   },
   errorDescription2: {
-    id: 'error.description2',
+    id: 'error.weAreTryingToFixThisError',
     defaultMessage: "It's not you, it us. This is our fault.",
     description: 'Error description'
   },
   goToHomepage: {
-    id: 'goto.homepage',
+    id: 'buttons.goToHomePage',
     defaultMessage: 'Go to Homepage',
     description: 'Label for Go to Homepage button'
   }

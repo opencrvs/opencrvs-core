@@ -4,17 +4,17 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   name: {
-    id: 'register.registrarHome.listItemName',
+    id: 'register.registrationHome.listItemName',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
   dob: {
-    id: 'register.registrarHome.listItemDoB',
+    id: 'register.registrationHome.listItemDoB',
     defaultMessage: 'D.o.B',
     description: 'Label for DoB in work queue list item'
   },
   dod: {
-    id: 'register.registrarHome.listItemDod',
+    id: 'register.registrationHome.listItemDod',
     defaultMessage: 'D.o.D',
     description: 'Label for DoD in work queue list item'
   },
@@ -60,7 +60,7 @@ export const messages: {
     description: 'Label for DoD in search result list item'
   },
   listItemTrackingNumber: {
-    id: 'register.searchResult.results.trackingId',
+    id: 'constants.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in search result list item'
   },
@@ -72,60 +72,54 @@ export const messages: {
       'Label for event registration number in search result list item'
   },
   listItemRejectionReasonLabel: {
-    id: 'register.searchResult.labels.results.rejectionReason',
+    id: 'register.application.details.item.label.rejectionReason',
     defaultMessage: 'Reason',
     description: 'Label for rejection reason'
   },
   listItemCommentLabel: {
-    id: 'register.searchResult.labels.results.rejectionComment',
+    id: 'register.application.details.item.label.rejectionComment',
     defaultMessage: 'Comment',
     description: 'Label for rejection comment'
   },
-  reviewDuplicates: {
-    id: 'register.searchResult.results.reviewDuplicates',
-    defaultMessage: 'Review Duplicates',
-    description:
-      'The title of review duplicates button in expanded area of list item'
-  },
   review: {
-    id: 'register.searchResult.reviewButton',
+    id: 'buttons.review',
     defaultMessage: 'Review',
     description: 'The title of review button in list item actions'
   },
   print: {
-    id: 'register.searchResult.list.buttons.print',
+    id: 'buttons.print',
     defaultMessage: 'Print',
     description: 'The title of print button in list item actions'
   },
   workflowStatusDateApplication: {
-    id: 'register.searchResult.listItem.status.dateLabel.application',
+    id: 'register.application.details.item.label.application',
     defaultMessage: 'Application submitted on',
     description:
       'Label for the workflow timestamp when the status is application'
   },
   workflowStatusDateRegistered: {
-    id: 'register.searchResult.listItem.status.dateLabel.registered',
+    id: 'register.application.details.item.label.registered',
     defaultMessage: 'Registrated on',
     description:
       'Label for the workflow timestamp when the status is registered'
   },
   workflowStatusDateRejected: {
-    id: 'register.searchResult.listItem.status.dateLabel.rejected',
+    id: 'register.application.details.item.label.rejected',
     defaultMessage: 'Application rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
   },
   workflowStatusDateCollected: {
-    id: 'register.searchResult.listItem.status.dateLabel.collected',
+    id: 'register.application.details.item.label.collected',
     defaultMessage: 'Certificate collected on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
   workflowPractitionerLabel: {
-    id: 'register.searchResult.listItem.status.label.byPractitioner',
+    id: 'register.application.details.item.label.by',
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
   },
   EditBtnText: {
-    id: 'register.searchResult.editButton',
+    id: 'buttons.edit',
     defaultMessage: 'Edit',
     description: 'Edit button text'
   },
@@ -200,10 +194,5 @@ export const messages: {
     id: 'register.SearchResult.rejectComments',
     defaultMessage: 'Comments',
     description: 'The rejected comments'
-  },
-  listItemDuplicateLabel: {
-    id: 'register.workQueue.labels.results.duplicate',
-    defaultMessage: 'Possible duplicate found',
-    description: 'Label for duplicate indication in work queue'
   }
 })

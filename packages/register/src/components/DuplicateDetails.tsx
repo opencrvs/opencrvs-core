@@ -91,7 +91,7 @@ const messages: {
     description: 'Date of application label'
   },
   trackingId: {
-    id: 'register.duplicates.details.trackingId',
+    id: 'constants.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Tracking ID label'
   },

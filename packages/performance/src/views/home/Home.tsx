@@ -32,7 +32,7 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   logoutActionTitle: {
-    id: 'register.home.logout',
+    id: 'buttons.logout',
     defaultMessage: 'Log out',
     description: 'The title for log out on an action'
   },

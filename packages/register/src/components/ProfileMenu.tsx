@@ -36,12 +36,12 @@ const UserRole = styled.div`
 
 const messages = defineMessages({
   settings: {
-    id: 'menu.items.settings',
+    id: 'buttons.settings',
     defaultMessage: 'Settings',
     description: 'Menu item settings'
   },
   logout: {
-    id: 'menu.items.logout',
+    id: 'buttons.logout',
     defaultMessage: 'Log out',
     description: 'Menu item logout'
   }

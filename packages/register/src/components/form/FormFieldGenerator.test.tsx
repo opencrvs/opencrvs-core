@@ -149,7 +149,7 @@ describe('form component registration section', () => {
           type: TEL,
           label: {
             defaultMessage: 'Phone number',
-            id: 'formFields.registration.phone',
+            id: 'form.field.label.application.phone',
             description: 'Input label for phone input'
           },
           required: true,

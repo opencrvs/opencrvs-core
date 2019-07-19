@@ -70,7 +70,7 @@ export const messages: {
       'The message that appears in notification when a new user is created'
   },
   userFormFail: {
-    id: 'register.notification.userFormFail',
+    id: 'register.notification.sorryError',
     defaultMessage: 'Sorry! Something went wrong',
     description:
       'The message that appears in notification when a new user creation fails'

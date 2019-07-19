@@ -70,22 +70,22 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   valueYes: {
-    id: 'register.form.valueYes',
+    id: 'buttons.yes',
     defaultMessage: 'Yes',
     description: 'Label for "Yes" answer'
   },
   valueNo: {
-    id: 'register.form.valueNo',
+    id: 'buttons.no',
     defaultMessage: 'No',
     description: 'Label for "No" answer'
   },
   editLink: {
-    id: 'review.edit.modal.editButton',
+    id: 'buttons.edit',
     defaultMessage: 'Edit',
     description: 'Edit link text'
   },
   valueNext: {
-    id: 'register.form.next',
+    id: 'buttons.next',
     defaultMessage: 'Next',
     description: 'Next button text'
   },
@@ -107,17 +107,17 @@ const messages: {
   },
 
   valueSaveAsDraft: {
-    id: 'register.form.saveDraft',
+    id: 'buttons.saveDraft',
     defaultMessage: 'Save as draft',
     description: 'Save as draft Button Text'
   },
   deleteApplicationBtnTxt: {
-    id: 'review.form.deleteApplication',
+    id: 'buttons.deleteApplication',
     defaultMessage: 'Delete Application',
     description: 'Delete application Button Text'
   },
   actionChange: {
-    id: 'action.change',
+    id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'Change action'
   },

@@ -34,17 +34,17 @@ export const messages: {
     description: 'The section heading on the page'
   },
   birth: {
-    id: 'register.selectVitalEvent.birth',
+    id: 'constants.birth',
     defaultMessage: 'Birth',
     description: 'Birth Text'
   },
   death: {
-    id: 'register.selectVitalEvent.death',
+    id: 'constants.death',
     defaultMessage: 'Death',
     description: 'Death text'
   },
   continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
   },

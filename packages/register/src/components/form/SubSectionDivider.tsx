@@ -10,7 +10,7 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   optionalLabel: {
-    id: 'formFields.optionalLabel',
+    id: 'form.field.label.optionalLabel',
     defaultMessage: 'Optional',
     description: 'Optional label'
   }

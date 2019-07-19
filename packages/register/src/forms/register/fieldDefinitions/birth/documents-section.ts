@@ -15,12 +15,12 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   documentsTab: {
-    id: 'register.form.tabs.documentsTab',
+    id: 'register.form.section.documents.name',
     defaultMessage: 'Documents',
     description: 'Tab title for Documents'
   },
   documentsTitle: {
-    id: 'register.form.section.documentsTitle',
+    id: 'register.form.section.documents.title',
     defaultMessage: 'Supporting documents',
     description: 'Form section title for Documents'
   },
@@ -30,7 +30,7 @@ const messages: {
     description: 'Title for the upload image button'
   },
   paragraph: {
-    id: 'register.form.section.documents.paragraph',
+    id: 'register.form.section.documents.birth.requirements',
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text'
@@ -73,108 +73,108 @@ const messages: {
     description: 'Form section title for Documents'
   },
   uploadDocForWhom: {
-    id: 'formFields.uploadDocForWhom',
+    id: 'form.field.label.uploadDocForWhom',
     defaultMessage: 'Whose suppoting document are you uploading?',
     description: 'Question to ask user, for whom, documents are being uploaded'
   },
   uploadDocForChild: {
-    id: 'formFields.uploadDocForChild',
+    id: 'form.field.label.uploadDocForChild',
     defaultMessage: 'Child',
     description: 'Label for radio option Child'
   },
   uploadDocForMother: {
-    id: 'formFields.uploadDocForMother',
+    id: 'form.field.label.uploadDocForMother',
     defaultMessage: 'Mother',
     description: 'Label for radio option Mother'
   },
   uploadDocForFather: {
-    id: 'formFields.uploadDocForFather',
+    id: 'form.field.label.uploadDocForFather',
     defaultMessage: 'Father',
     description: 'Label for radio option Father'
   },
   uploadDocForOther: {
-    id: 'formFields.uploadDocForOther',
+    id: 'form.field.label.uploadDocForOther',
     defaultMessage: 'Other',
     description: 'Label for radio option Other'
   },
   whatDocToUpload: {
-    id: 'formFields.whatDocToUpload',
+    id: 'form.field.label.whatDocToUpload',
     defaultMessage: 'Which document type are you uploading?',
     description:
       'Question to ask user, what type of documents are being uploaded'
   },
   docTypeBR: {
-    id: 'formFields.docTypeBR',
+    id: 'form.field.label.docTypeBR',
     defaultMessage: 'Birth Registration',
     description: 'Label for radio option Birth Registration'
   },
   docTypeNIDFront: {
-    id: 'formFields.docTypeNIDFront',
+    id: 'form.field.label.docTypeNIDFront',
     defaultMessage: 'National ID (front)',
     description: 'Label for select option radio option NID front'
   },
   docTypeNIDBack: {
-    id: 'formFields.docTypeNIDBack',
+    id: 'form.field.label.docTypeNIDBack',
     defaultMessage: 'National ID (back)',
     description: 'Label for select option radio option NID back'
   },
   docTypePassport: {
-    id: 'formFields.docTypePassport',
+    id: 'form.field.label.docTypePassport',
     defaultMessage: 'Passport',
     description: 'Label for radio option Passport'
   },
   docTypeSC: {
-    id: 'formFields.docTypeSC',
+    id: 'form.field.label.docTypeSC',
     defaultMessage: 'School Certificate',
     description: 'Label for radio option School Certificate'
   },
   docTypeOther: {
-    id: 'formFields.docTypeOther',
+    id: 'form.field.label.docTypeOther',
     defaultMessage: 'Other',
     description: 'Label for radio option Other'
   },
   docTypeChildBirthProof: {
-    id: 'formFields.docTypeChildBirthProof',
+    id: 'form.field.label.docTypeChildBirthProof',
     defaultMessage: 'Proof of Place and Date of Birth',
     description: 'Label for select option Child Birth Proof'
   },
   docTypeEPICard: {
-    id: 'formFields.docTypeEPICard',
+    id: 'form.field.label.docTypeEPICard',
     defaultMessage: 'EPI Card',
     description: 'Label for select option EPI Card'
   },
   docTypeDoctorCertificate: {
-    id: 'formFields.docTypeDoctorCertificate',
+    id: 'form.field.label.docTypeDoctorCertificate',
     defaultMessage: 'Doctor Certificate',
     description: 'Label for select option Doctor Certificate'
   },
   proofOfMothersID: {
-    id: 'formFields.proofOfMothersID',
+    id: 'form.field.label.proofOfMothersID',
     defaultMessage: "Proof of Mother's ID",
     description: 'Label for list item Mother ID Proof'
   },
   proofOfFathersID: {
-    id: 'formFields.proofOfFathersID',
+    id: 'form.field.label.proofOfFathersID',
     defaultMessage: "Proof of Father's ID",
     description: 'Label for list item Father ID Proof'
   },
   proofOfBirthPlaceAndDate: {
-    id: 'formFields.proofOfBirthPlaceAndDate',
+    id: 'form.field.label.proofOfBirthPlaceAndDate',
     defaultMessage: 'Proof of Place and Date of Birth of Child',
     description: 'Label for list item Child Birth Proof'
   },
   proofOfParentPermanentAddress: {
-    id: 'formFields.proofOfParentPermanentAddress',
+    id: 'form.field.label.proofOfParentPermanentAddress',
     defaultMessage: 'Proof of Permanent Address of Parent',
     description: 'Label for list item Parent Permanent Address Proof'
   },
   proofOfEPICardOfChild: {
-    id: 'formFields.proofOfEPICardOfChild',
+    id: 'form.field.label.proofOfEPICardOfChild',
     defaultMessage: 'EPI Card of Child',
     description: 'Label for list item EPI Card of Child'
   },
   proofOfDocCertificateOfChild: {
-    id: 'formFields.proofOfDocCertificateOfChild',
+    id: 'form.field.label.proofOfDocCertificateOfChild',
     defaultMessage:
       "Certificate from doctor to prove child's age OR School certificate",
     description: 'Label for list item Doctor Certificate'

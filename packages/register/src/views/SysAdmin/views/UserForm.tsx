@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 const messages = defineMessages({
   continue: {
-    id: 'button.continue',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue button label'
   }

@@ -19,12 +19,12 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   causeOfDeathTab: {
-    id: 'register.form.tabs.causeOfDeathTab',
+    id: 'register.form.section.causeOfDeath.name',
     defaultMessage: 'Cause of Death',
     description: 'Tab title for Cause of Death'
   },
   causeOfDeathTitle: {
-    id: 'register.form.section.causeOfDeathTitle',
+    id: 'register.form.section.causeOfDeath.title',
     defaultMessage: 'Cause of Death',
     description: 'Form section title for Cause of Death'
   },
@@ -35,37 +35,37 @@ const messages: {
     description: 'Form section notice for Cause of Death'
   },
   causeOfDeathEstablished: {
-    id: 'formFields.causeOfDeathEstablished',
+    id: 'form.field.label.causeOfDeathEstablished',
     defaultMessage: 'Has a Cause of Death been established ?',
     description: 'Label for form field: Cause of Death Established'
   },
   confirm: {
-    id: 'formFields.confirm',
+    id: 'form.field.label.confirm',
     defaultMessage: 'Yes',
     description: 'confirmation label for yes / no radio button'
   },
   deny: {
-    id: 'formFields.deny',
+    id: 'form.field.label.deny',
     defaultMessage: 'No',
     description: 'deny label for yes / no radio button'
   },
   methodOfCauseOfDeath: {
-    id: 'formFields.methodOfCauseOfDeath',
+    id: 'form.field.label.methodOfCauseOfDeath',
     defaultMessage: 'Method of Cause of Death',
     description: 'Label for form field: Method of Cause of Death'
   },
   causeOfDeathCode: {
-    id: 'formFields.causeOfDeathCode',
+    id: 'form.field.label.causeOfDeathCode',
     defaultMessage: 'Cause of Death Code',
     description: 'Label for form field: Cause of Death Code'
   },
   verbalAutopsy: {
-    id: 'formFields.verbalAutopsy',
+    id: 'form.field.label.verbalAutopsy',
     defaultMessage: 'Verbal autopsy',
     description: 'Option for form field: Method of Cause of Death'
   },
   medicallyCertified: {
-    id: 'formFields.medicallyCertified',
+    id: 'form.field.label.medicallyCertified',
     defaultMessage: 'Medically Certified Cause of Death',
     description: 'Option for form field: Method of Cause of Death'
   },

@@ -55,17 +55,17 @@ const messages = defineMessages({
     description: 'The section heading on the page'
   },
   continueButton: {
-    id: 'register.SelectContactPoint.continueButton',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
   },
   motherLabel: {
-    id: 'register.SelectContactPoint.motherLabel',
+    id: 'constants.mother',
     defaultMessage: 'Mother',
     description: 'Mother Label'
   },
   fatherLabel: {
-    id: 'register.SelectContactPoint.fatherLabel',
+    id: 'constants.father',
     defaultMessage: 'Father',
     description: 'Father Label'
   },
@@ -85,12 +85,12 @@ const messages = defineMessages({
     description: 'Relationship Label for birth'
   },
   deathRelationshipLabel: {
-    id: 'register.SelectContactPoint.deathRelationshipLabel',
+    id: 'constants.relationship',
     defaultMessage: 'Relationship',
     description: 'Relationship Label for death'
   },
   goBack: {
-    id: 'register.SelectContactPoint.goBack',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button text'
   },
@@ -110,19 +110,19 @@ const messages = defineMessages({
     description: 'Relationship place holder'
   },
   spouse: {
-    id: 'register.SelectContactPoint.spouse',
+    id: 'constants.spouse',
     defaultMessage: 'Spouse',
     description:
       'The title that appears when selecting spouse as a main point of contact'
   },
   son: {
-    id: 'register.SelectContactPoint.son',
+    id: 'constants.son',
     defaultMessage: 'Son',
     description:
       'The title that appears when selecting son as a main point of contact'
   },
   daughter: {
-    id: 'register.SelectContactPoint.daughter',
+    id: 'constants.daughter',
     defaultMessage: 'Daughter',
     description:
       'The title that appears when selecting daughter as a main point of contact'

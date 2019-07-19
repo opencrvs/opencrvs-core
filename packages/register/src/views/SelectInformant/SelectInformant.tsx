@@ -110,7 +110,7 @@ export const messages: {
       'The title that appears when selecting extended family as informant'
   },
   back: {
-    id: 'menu.back',
+    id: 'buttons.back',
     defaultMessage: 'Back',
     description: 'Back button in the menu'
   },
@@ -126,7 +126,7 @@ export const messages: {
     description: 'Error Message to show when no informant is selected for death'
   },
   continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Continue Button Text'
   },

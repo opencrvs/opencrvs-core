@@ -80,7 +80,7 @@ const messages: {
     description: 'Instruction for the account setup'
   },
   startButtonLabel: {
-    id: 'userSetup.landing.button.start',
+    id: 'buttons.start',
     defaultMessage: 'Start',
     description: 'Label of start button'
   }

@@ -42,102 +42,102 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   deathEventTab: {
-    id: 'register.form.tabs.deathEventTab',
+    id: 'register.form.section.deathEvent.name',
     defaultMessage: 'Event',
     description: 'Tab title for Death Event'
   },
   deathEventTitle: {
-    id: 'register.form.section.deathEventTitle',
+    id: 'register.form.section.deathEvent.title',
     defaultMessage: 'Event details',
     description: 'Form section title for Death Event'
   },
   deathDate: {
-    id: 'formFields.deathDate',
+    id: 'form.field.label.deathDate',
     defaultMessage: 'Date of Occurrence',
     description: 'Label for form field: Date of occurrence'
   },
   manner: {
-    id: 'formFields.manner',
+    id: 'form.field.label.mannerOfDeath',
     defaultMessage: 'Manner of Death',
     description: 'Label for form field: Manner of death'
   },
   mannerNatural: {
-    id: 'formFields.mannerNatural',
+    id: 'form.field.label.mannerOfDeathNatural',
     defaultMessage: 'Natural causes',
     description: 'Option for form field: Manner of death'
   },
   mannerAccident: {
-    id: 'formFields.mannerAccident',
+    id: 'form.field.label.mannerOfDeathAccident',
     defaultMessage: 'Accident',
     description: 'Option for form field: Manner of death'
   },
   mannerSuicide: {
-    id: 'formFields.mannerSuicide',
+    id: 'form.field.label.mannerOfDeathSuicide',
     defaultMessage: 'Suicide',
     description: 'Option for form field: Manner of death'
   },
   mannerHomicide: {
-    id: 'formFields.mannerHomicide',
+    id: 'form.field.label.mannerOfDeathHomicide',
     defaultMessage: 'Homicide',
     description: 'Option for form field: Manner of death'
   },
   mannerUndetermined: {
-    id: 'formFields.mannerUndetermined',
+    id: 'form.field.label.mannerOfDeathUndetermined',
     defaultMessage: 'Manner undetermined',
     description: 'Option for form field: Manner of death'
   },
   deathPlace: {
-    id: 'formFields.deathPlace',
+    id: 'form.field.label.deathPlace',
     defaultMessage: 'Place of Occurrence of Death',
     description: 'Title for place of occurrence of death'
   },
   deathLocation: {
-    id: 'formFields.birthLocation',
+    id: 'form.field.label.birthLocation',
     defaultMessage: 'Hospital / Clinic',
     description: 'Label for form field: Hospital or Health Institution'
   },
   deathPlaceAddress: {
-    id: 'formFields.deathPlaceAddress',
+    id: 'form.field.label.deathPlaceAddress',
     defaultMessage: 'Where did the death occur?',
     description: 'Label for form field: Place of occurrence of death'
   },
   deathPlaceAddressSameAsPermanent: {
-    id: 'formFields.deathPlaceAddressSameAsPermanent',
+    id: 'form.field.label.deathPlaceAddressSameAsPermanent',
     defaultMessage: 'Permanent address of the deceased',
     description: 'Option for form field: Place of occurrence of death'
   },
   deathPlaceAddressSameAsCurrent: {
-    id: 'formFields.deathPlaceAddressSameAsCurrent',
+    id: 'form.field.label.deathPlaceAddressSameAsCurrent',
     defaultMessage: 'Current address of the deceased',
     description: 'Option for form field: Place of occurrence of death'
   },
   deathPlaceAddressOther: {
-    id: 'formFields.deathPlaceAddressOther',
+    id: 'form.field.label.deathPlaceAddressOther',
     defaultMessage: 'Different Address',
     description: 'Option for form field: Place of occurrence of death'
   },
   deathPlaceAddressType: {
-    id: 'formFields.deathPlaceAddressType',
+    id: 'form.field.label.deathPlaceAddressType',
     defaultMessage: 'Type of Place',
     description: 'Label for form field: Type of place of death occurrence'
   },
   hospital: {
-    id: 'formFields.hospital',
+    id: 'form.field.label.hospital',
     defaultMessage: 'Hospital',
     description: 'Select item for hospital'
   },
   otherHealthInstitution: {
-    id: 'formFields.otherHealthInstitution',
+    id: 'form.field.label.otherHealthInstitution',
     defaultMessage: 'Other Health Institution',
     description: 'Select item for Other Health Institution'
   },
   privateHome: {
-    id: 'formFields.privateHome',
+    id: 'form.field.label.privateHome',
     defaultMessage: 'Private Home',
     description: 'Select item for Private Home'
   },
   otherInstitution: {
-    id: 'formFields.otherInstitution',
+    id: 'form.field.label.otherInstitution',
     defaultMessage: 'Other',
     description: 'Select item for Other Institution'
   },

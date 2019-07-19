@@ -15,62 +15,62 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   iDType: {
-    id: 'formFields.iDType',
+    id: 'form.field.label.iDType',
     defaultMessage: 'Type of ID',
     description: 'Label for form field: Type of ID'
   },
   iDTypePassport: {
-    id: 'formFields.iDTypePassport',
+    id: 'form.field.label.iDTypePassport',
     defaultMessage: 'Passport',
     description: 'Option for form field: Type of ID'
   },
   iDTypeNationalID: {
-    id: 'formFields.iDTypeNationalID',
+    id: 'form.field.label.iDTypeNationalID',
     defaultMessage: 'National ID',
     description: 'Option for form field: Type of ID'
   },
   iDTypeDrivingLicense: {
-    id: 'formFields.iDTypeDrivingLicense',
+    id: 'form.field.label.iDTypeDrivingLicense',
     defaultMessage: 'Drivers License',
     description: 'Option for form field: Type of ID'
   },
   iDTypeBRN: {
-    id: 'formFields.iDTypeBRN',
+    id: 'form.field.label.iDTypeBRN',
     defaultMessage: 'Birth Registration Number',
     description: 'Option for form field: Type of ID'
   },
   iDTypeDRN: {
-    id: 'formFields.iDTypeDRN',
+    id: 'form.field.label.iDTypeDRN',
     defaultMessage: 'Death Registration Number',
     description: 'Option for form field: Type of ID'
   },
   iDTypeRefugeeNumber: {
-    id: 'formFields.iDTypeRefugeeNumber',
+    id: 'form.field.label.iDTypeRefugeeNumber',
     defaultMessage: 'Refugee Number',
     description: 'Option for form field: Type of ID'
   },
   iDTypeAlienNumber: {
-    id: 'formFields.iDTypeAlienNumber',
+    id: 'form.field.label.iDTypeAlienNumber',
     defaultMessage: 'Alien Number',
     description: 'Option for form field: Type of ID'
   },
   iDTypeOther: {
-    id: 'formFields.iDTypeOther',
+    id: 'form.field.label.iDTypeOther',
     defaultMessage: 'Other',
     description: 'Option for form field: Type of ID'
   },
   iDTypeNoId: {
-    id: 'formFields.iDTypeNoID',
+    id: 'form.field.label.iDTypeNoID',
     defaultMessage: 'No ID available',
     description: 'Option for form field: Type of ID'
   },
   iDTypeOtherLabel: {
-    id: 'formFields.iDTypeOtherLabel',
+    id: 'form.field.label.iDTypeOtherLabel',
     defaultMessage: 'Other type of ID',
     description: 'Label for form field: Other type of ID'
   },
   iD: {
-    id: 'formFields.iD',
+    id: 'form.field.label.iD',
     defaultMessage: 'ID Number',
     description: 'Label for form field: ID Number'
   }

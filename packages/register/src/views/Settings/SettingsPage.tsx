@@ -28,87 +28,87 @@ export const messages: {
     description: 'Title of the settings page'
   },
   profileTitle: {
-    id: 'profile.title',
+    id: 'settings.profile.tile',
     defaultMessage: 'Profile',
     description: 'Profile header'
   },
   securityTitle: {
-    id: 'security.title',
+    id: 'settings.security.tile',
     defaultMessage: 'Security',
     description: 'Security header'
   },
   accountTitle: {
-    id: 'account.title',
+    id: 'settings.account.tile',
     defaultMessage: 'Account',
     description: 'Account header'
   },
   systemTitle: {
-    id: 'system.title',
+    id: 'settings.system.tile',
     defaultMessage: 'System',
     description: 'System header'
   },
   labelEnglishName: {
-    id: 'label.nameEN',
+    id: 'settings.user.label.nameEN',
     defaultMessage: 'English name',
     description: 'English name label'
   },
   labelBanglaName: {
-    id: 'label.nameBN',
+    id: 'settings.user.label.nameBN',
     defaultMessage: 'Bengali name',
     description: 'Bengali name label'
   },
   labelPhone: {
-    id: 'label.phone',
+    id: 'constants.phoneNumber',
     defaultMessage: 'Phone number',
     description: 'Phone label'
   },
   labelRole: {
-    id: 'label.role',
+    id: 'constants.role',
     defaultMessage: 'Role',
     description: 'Role label'
   },
   labelPassword: {
-    id: 'label.password',
+    id: 'settings.user.label.password',
     defaultMessage: 'Password',
     description: 'Password label'
   },
   labelPin: {
-    id: 'label.pin',
+    id: 'settings.user.label.pin',
     defaultMessage: 'PIN',
     description: 'PIN label'
   },
   labelLanguage: {
-    id: 'label.language',
+    id: 'settings.user.label.language',
     defaultMessage: 'Language',
     description: 'language label'
   },
   actionChange: {
-    id: 'action.change',
+    id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'Change action'
   },
   changeLanguageMessege: {
-    id: 'message.changeLanguage',
+    id: 'settings.message.changeLanguage',
     defaultMessage: 'Your prefered language that you want to use on OpenCRVS',
     description: 'Change language message'
   },
   changeLanguageTitle: {
-    id: 'changeLanguage.title',
+    id: 'settings.changeLanguage',
     defaultMessage: 'Change language',
     description: 'Change language title'
   },
   changeLanguageSuccessMessage: {
-    id: 'changeLanguage.success',
+    id: 'settings.changeLanguage.success',
     defaultMessage: 'Language updted to English',
     description: 'Change language success'
   },
   buttonApply: {
-    id: 'button.apply',
+    id: 'buttons.apply',
     defaultMessage: 'Apply',
     description: 'Apply button label'
   },
   buttonCancel: {
-    id: 'formFields.fetchButton.cancel',
+    id: 'form.field.label.fetchButton.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button label'
   }

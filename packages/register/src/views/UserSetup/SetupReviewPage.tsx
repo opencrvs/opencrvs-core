@@ -40,15 +40,15 @@ const messages = defineMessages({
       'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.'
   },
   labelEnglishName: {
-    id: 'label.nameEN',
+    id: 'settings.user.label.nameEN',
     defaultMessage: 'English name'
   },
   labelBanglaName: {
-    id: 'label.nameBN',
+    id: 'settings.user.label.nameBN',
     defaultMessage: 'Bengali name'
   },
   labelPhone: {
-    id: 'label.phone',
+    id: 'constants.phoneNumber',
     defaultMessage: 'Phone number'
   },
   labelAssignedOffice: {
@@ -56,19 +56,19 @@ const messages = defineMessages({
     defaultMessage: 'Assigned office'
   },
   labelRole: {
-    id: 'table.column.header.role',
+    id: 'constants.role',
     defaultMessage: 'Role'
   },
   labelType: {
-    id: 'table.column.header.type',
+    id: 'constants.type',
     defaultMessage: 'Type'
   },
   actionChange: {
-    id: 'action.change',
+    id: 'buttons.change',
     defaultMessage: 'Change'
   },
   confirm: {
-    id: 'button.confirm',
+    id: 'buttons.confirm',
     defaultMessage: 'Confirm'
   },
   wiating: {

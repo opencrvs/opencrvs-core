@@ -23,7 +23,7 @@ import { NATIONAL_ID } from '@register/forms/identity'
 
 const messages = defineMessages({
   userForm: {
-    id: 'user.form.name',
+    id: 'constants.user',
     defaultMessage: 'User',
     description: 'The name of the user form'
   },
@@ -48,57 +48,57 @@ const messages = defineMessages({
     description: 'Assigned Register Office section'
   },
   firstNameBn: {
-    id: 'label.firstNameBN',
+    id: 'user.form.label.firstNameBN',
     defaultMessage: 'Bengali first name',
     description: 'Bengali first name'
   },
   lastNameBn: {
-    id: 'label.lastNameBN',
+    id: 'user.form.label.lastNameBN',
     defaultMessage: 'Bengali last name',
     description: 'Bengali last name'
   },
   firstNameEn: {
-    id: 'label.firstNameEN',
+    id: 'user.form.label.firstNameEN',
     defaultMessage: 'English first name',
     description: 'English first name'
   },
   lastNameEn: {
-    id: 'label.lastNameEN',
+    id: 'user.form.label.lastNameEN',
     defaultMessage: 'English last name',
     description: 'English last name'
   },
   phoneNumber: {
-    id: 'label.phone',
+    id: 'constants.phoneNumber',
     defaultMessage: 'Phone number',
     description: 'Phone number'
   },
   NID: {
-    id: 'label.NID',
+    id: 'user.form.label.NID',
     defaultMessage: 'NID',
     description: 'National ID'
   },
   username: {
-    id: 'label.username',
+    id: 'user.form.label.username',
     defaultMessage: 'Username',
     description: 'Username'
   },
   userRole: {
-    id: 'label.role',
+    id: 'constants.role',
     defaultMessage: 'Role',
     description: 'User role'
   },
   userType: {
-    id: 'label.type',
+    id: 'constants.type',
     defaultMessage: 'Type',
     description: 'User type'
   },
   userDevice: {
-    id: 'label.userDevice',
+    id: 'user.form.label.userDevice',
     defaultMessage: 'Device',
     description: 'User device'
   },
   registrationOffice: {
-    id: 'label.registrationOffice',
+    id: 'user.form.label.registrationOffice',
     defaultMessage: 'Registration Office',
     description: 'Registration office'
   }

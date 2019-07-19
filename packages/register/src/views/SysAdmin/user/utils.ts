@@ -18,27 +18,27 @@ export enum UserStatus {
 
 export const messages = defineMessages({
   name: {
-    id: 'table.column.header.name',
+    id: 'system.users.table.label.name',
     defaultMessage: 'Name',
     description: 'Title for column'
   },
   username: {
-    id: 'table.column.header.username',
+    id: 'constants.username',
     defaultMessage: 'Username',
     description: 'Title for column'
   },
   role: {
-    id: 'table.column.header.role',
+    id: 'constants.role',
     defaultMessage: 'Role',
     description: 'Title for column'
   },
   type: {
-    id: 'table.column.header.type',
+    id: 'constants.type',
     defaultMessage: 'Type',
     description: 'Title for column'
   },
   status: {
-    id: 'table.column.header.status',
+    id: 'constants.status',
     defaultMessage: 'Status',
     description: 'Title for column'
   },
