@@ -22,13 +22,10 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_birth_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_BOTH_PARENTS').click()
-    cy.get('#continue').click()
-    // SELECT APPLICANT
-    cy.get('#select_father_event').click()
+    cy.get('#select_informant_MOTHER').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_FATHER').click()
+    cy.get('#contact_MOTHER').click()
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // APPLICATION FORM
