@@ -10,7 +10,7 @@ context('Birth Registration Integration Test', () => {
     cy.login('fieldWorker')
     // CREATE PIN
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
@@ -22,10 +22,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_birth_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_BOTH_PARENTS').click()
-    cy.get('#continue').click()
-    // SELECT APPLICANT
-    cy.get('#select_father_event').click()
+    cy.get('#select_informant_MOTHER').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contact_MOTHER').click()
@@ -67,7 +64,8 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.wait(6000)
+    cy.log('Waiting for application to sync...')
+    cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
@@ -79,7 +77,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
       if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Birth review found')
         cy.get('#ListItemAction-0-Review')
@@ -101,7 +99,7 @@ context('Birth Registration Integration Test', () => {
     cy.login('fieldWorker')
     // CREATE PIN
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get(`#keypad-${i % 2}`).click()
     }
@@ -232,7 +230,8 @@ context('Birth Registration Integration Test', () => {
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.wait(6000)
+    cy.log('Waiting for application to sync...')
+    cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_4').click()
@@ -244,7 +243,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
       if ($listItem.find('#ListItemAction-0-Review').length) {
         cy.log('Birth review found')
         cy.get('#ListItemAction-0-Review')
