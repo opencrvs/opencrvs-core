@@ -86,7 +86,7 @@ context('Birth Registration Integration Test', () => {
         cy.wait(500)
         cy.get('#registerApplicationBtn').click()
         // MODAL
-        cy.get('#register_confirm').click()
+        cy.get('#submit_confirm').click()
         cy.wait(1000)
       } else {
         cy.log('Birth review not found')
@@ -115,7 +115,7 @@ context('Birth Registration Integration Test', () => {
     cy.get('#select_mother_event').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_MOTHER').click()
+    cy.get('#contact_FATHER').click()
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // APPLICATION FORM
@@ -183,7 +183,7 @@ context('Birth Registration Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // FATHER DETAILS
-    cy.get('#fathersDetailsExist_true').click()
+    // cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -252,7 +252,7 @@ context('Birth Registration Integration Test', () => {
         cy.wait(500)
         cy.get('#registerApplicationBtn').click()
         // MODAL
-        cy.get('#register_confirm').click()
+        cy.get('#submit_confirm').click()
         cy.wait(1000)
       } else {
         cy.log('Birth review not found')

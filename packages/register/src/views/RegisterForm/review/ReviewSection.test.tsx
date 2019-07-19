@@ -56,7 +56,6 @@ describe('when user is in the review page', () => {
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={draft}
-        registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
         onChangeReviewForm={mockHandler}
@@ -133,21 +132,6 @@ describe('when user is in the review page', () => {
       })
     expect(mockHandler).toBeCalled()
   })
-  it('Should click the Register button', async () => {
-    reviewSectionComponent
-      .find('#registerApplicationBtn')
-      .hostNodes()
-      .simulate('click')
-    expect(mockHandler).toHaveBeenCalled()
-  })
-
-  it('Should click the Reject Application', async () => {
-    reviewSectionComponent
-      .find('#rejectApplicationBtn')
-      .hostNodes()
-      .simulate('click')
-    expect(mockHandler).toHaveBeenCalled()
-  })
 })
 describe('return the correct label on dynamic fields', () => {
   it('Should return the Bengali label', () => {
@@ -189,7 +173,6 @@ describe('when user is in the review page for rejected birth application', () =>
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftBirth}
-        registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
       />,
@@ -212,7 +195,6 @@ describe('when user is in the review page for rejected death application', () =>
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftDeath}
-        registerClickEvent={mockHandler}
         rejectApplicationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
       />,

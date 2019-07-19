@@ -99,7 +99,7 @@ context('Death Registration Integration Test', () => {
         cy.wait(500)
         cy.get('#registerApplicationBtn').click()
         // MODAL
-        cy.get('#register_confirm').click()
+        cy.get('#submit_confirm').click()
         cy.wait(1000)
       } else {
         cy.log('Death review not found')
@@ -247,7 +247,7 @@ context('Death Registration Integration Test', () => {
         cy.wait(500)
         cy.get('#registerApplicationBtn').click()
         // MODAL
-        cy.get('#register_confirm').click()
+        cy.get('#submit_confirm').click()
         cy.wait(1000)
       } else {
         cy.log('Death review not found')
