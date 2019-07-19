@@ -1,4 +1,10 @@
-FROM node:dubnium
+FROM node:dubnium-alpine
+
+# this package has dependencies (iconv) that require build tools
+# --no-cache: download package index on-the-fly, no need to cleanup afterwards
+# --virtual: bundle packages, remove whole bundle at once, when done
+RUN apk --no-cache --virtual build-dependencies add python make g++
+
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
@@ -9,19 +15,15 @@ COPY package.json package.json
 COPY packages/notification/package.json packages/notification/package.json
 COPY packages/commons/package.json packages/commons/package.json
 COPY yarn.lock yarn.lock
-RUN yarn install
+RUN yarn install --production
 
-# Copy package source
-COPY packages/notification packages/notification
+RUN apk del build-dependencies
+
+# Copy package build
+COPY --from=opencrvs-build packages/notification/build packages/notification/build
 
 # Copy dependant package(s) source
 COPY packages/commons packages/commons
-
-# set environment
-ENV PORT=2020
-ENV HOST=0.0.0.0
-# TODO change this for production
-ENV NODE_ENV=DEVELOPMENT
 
 EXPOSE 2020
 WORKDIR /usr/src/app/packages/notification
