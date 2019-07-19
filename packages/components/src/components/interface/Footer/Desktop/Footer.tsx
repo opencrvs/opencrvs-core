@@ -8,6 +8,7 @@ const FooterContainer = styled.footer`
   padding: 8px 16px;
   display: flex;
   flex-grow: 1;
+  z-index: 5;
   max-height: 40px;
   & > p {
     color: ${({ theme }) => theme.colors.white};

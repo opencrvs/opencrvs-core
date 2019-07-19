@@ -513,6 +513,7 @@ export const BENGALI_STATE: ILanguage = {
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': 'নতুন জন্ম ঘোষণা',
     'register.selectVitalEvent.saveExitButton': 'সংরক্ষণ করে বেরিয়ে যান ',
+    'register.review.eventTopBar.exitButton': 'বাহির',
     'register.form.newVitalEventRegistration':
       'নতুন {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewEventRegistration':
@@ -528,7 +529,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.title.submitConfirmation':
       '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
     'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
     'register.form.modal.desc.registerConfirmation':
       'আপনি কি এ ব্যাপারে নিশ্চিত?',
@@ -823,7 +824,7 @@ export const BENGALI_STATE: ILanguage = {
       'স্বাস্থ্য কর্মী সঠিকভাবে আবেদন আপডেট করার জন্য তার কি নির্দেশাবলী প্রয়োজন প্রদান করুন',
     'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.button.register': 'নিবন্ধন',
-    'review.button.reject': 'আবেদন বাতিল',
+    'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.form.deleteApplication': 'আবেদন বাতিল',
@@ -839,6 +840,13 @@ export const BENGALI_STATE: ILanguage = {
       'এই অসম্পূর্ণ আবেদনটি পাঠিয়ে, একটি ডিজিটাল রেকর্ড তৈরি করা হবে।\n\nআবেদনকারীকে বলুন যে তারা ট্র্যাকিং আইডি সহ একটি এসএমএস পাবেন। 30 দিনের মধ্যে রেজিস্ট্রেশন অফিসে আবেদনটি সম্পূর্ণ করার জন্য তাদের এটি প্রয়োজন হবে। জন্ম নিবন্ধিত হতে পারে আগে আবেদনকারী সব বাধ্যতামূলক তথ্য প্রদান করতে হবে',
     'review.actions.description.confirmComplete':
       'পর্যালোচনার জন্য এই আবেদন পাঠানোর মাধ্যমে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের উদ্দেশ্যে এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।',
+    'register.actions.description.confirmInComplete':
+      'বাধ্যতামূলক তথ্য অনুপস্থিত। এই তথ্য যোগ করুন যাতে আপনি নিবন্ধন প্রক্রিয়াটি সম্পূর্ণ করতে পারেন।',
+    'register.actions.description.confirmComplete':
+      'নিবন্ধন ক্লিক করে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের জন্য এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।\n\nএই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের মাধ্যমে একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'register.actions.description':
+      'এই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের জন্য একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'register.actions.title.applicationStatus': 'নিবন্ধন বা বাতিল?',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
     'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
@@ -1220,6 +1228,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'review.documents.zeroDocumentsText':
+      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
+    'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
     'register.SelectContactPoint.spouse': 'স্বামী বা স্ত্রী',
     'register.SelectContactPoint.son': 'পুত্র',
     'register.SelectContactPoint.daughter': 'কন্যা',

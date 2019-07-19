@@ -1,4 +1,4 @@
-FROM node:dubnium
+FROM node:dubnium-alpine
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
@@ -9,18 +9,13 @@ COPY package.json package.json
 COPY packages/workflow/package.json packages/workflow/package.json
 COPY packages/commons/package.json packages/commons/package.json
 COPY yarn.lock yarn.lock
-RUN yarn install
+RUN yarn install --production
 
 # Copy package source
-COPY packages/workflow packages/workflow
+COPY --from=opencrvs-build packages/workflow/build packages/workflow/build
 
 # Copy dependant package(s) source
 COPY packages/commons packages/commons
-
-# set environment
-ENV PORT=5050
-# TODO change this for production
-ENV NODE_ENV=DEVELOPMENT
 
 EXPOSE 5050
 WORKDIR /usr/src/app/packages/workflow

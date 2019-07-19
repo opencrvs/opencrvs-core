@@ -234,6 +234,7 @@ export const applicantsSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.applicantTab,
   title: messages.applicantTitle,
+  hasDocumentSection: true,
   groups: [
     {
       id: 'informant-view-group',
