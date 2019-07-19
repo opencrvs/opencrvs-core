@@ -18,7 +18,7 @@ import {
   getEventType,
   isInProgressApplication
 } from '@workflow/features/registration/utils'
-import { hasRegisterScope } from '@workflow/utils/authUtils'
+import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 
 export enum Events {
   BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration',
@@ -37,6 +37,8 @@ export enum Events {
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
+  BIRTH_NEW_VALIDATE = 'events/birth/new-validation',
+  DEATH_NEW_VALIDATE = 'events/death/new-validation',
   UNKNOWN = 'unknown'
 }
 
@@ -65,6 +67,11 @@ function detectEvent(request: Hapi.Request): Events {
             if (hasRegisterScope(request)) {
               return Events.BIRTH_NEW_REG
             }
+
+            if (hasValidateScope(request)) {
+              return Events.BIRTH_NEW_VALIDATE
+            }
+
             return isInProgressApplication(fhirBundle)
               ? Events.BIRTH_IN_PROGRESS_DEC
               : Events.BIRTH_NEW_DEC
@@ -80,6 +87,11 @@ function detectEvent(request: Hapi.Request): Events {
             if (hasRegisterScope(request)) {
               return Events.DEATH_NEW_REG
             }
+
+            if (hasValidateScope(request)) {
+              return Events.DEATH_NEW_VALIDATE
+            }
+
             return isInProgressApplication(fhirBundle)
               ? Events.DEATH_IN_PROGRESS_DEC
               : Events.DEATH_NEW_DEC
@@ -205,6 +217,14 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_MARK_VOID:
       response = await updateTaskHandler(request, h)
       forwardToOpenHim(Events.DEATH_MARK_VOID, request)
+      break
+    case Events.BIRTH_NEW_VALIDATE:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
+      break
+    case Events.DEATH_NEW_VALIDATE:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
       break
     default:
       // forward as-is to hearth
