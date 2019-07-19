@@ -14,27 +14,27 @@ import {
 import {
   createApplication,
   createReviewApplication,
-  storeApplication,
-  modifyApplication
+  storeApplication
 } from '@register/applications'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
-import { Event } from '@register/forms'
+import { Event as ApplicationEvent } from '@register/forms'
 import { v4 as uuid } from 'uuid'
 import { REJECTED } from '@register/utils/constants'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
-const draft = createApplication(Event.BIRTH)
+
+const draft = createApplication(ApplicationEvent.BIRTH)
 const rejectedDraftBirth = createReviewApplication(
   uuid(),
   {},
-  Event.BIRTH,
+  ApplicationEvent.BIRTH,
   REJECTED
 )
 const rejectedDraftDeath = createReviewApplication(
   uuid(),
   {},
-  Event.DEATH,
+  ApplicationEvent.DEATH,
   REJECTED
 )
 
@@ -48,6 +48,13 @@ draft.data = {
     commentsOrNotes: ''
   }
 }
+
+Object.defineProperty(window.navigator, 'userAgent', {
+  value: 'Desktop'
+})
+Object.defineProperty(window, 'outerWidth', {
+  value: 1034
+})
 
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
@@ -63,6 +70,16 @@ describe('when user is in the review page', () => {
       store
     )
     reviewSectionComponent = testComponent.component
+  })
+
+  it('Goes to child document while scroll to child section', async () => {
+    window.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    reviewSectionComponent.update()
+
+    expect(
+      reviewSectionComponent.find('#document_section_child').hostNodes()
+    ).toHaveLength(1)
   })
 
   describe('when user clicks on change link', () => {

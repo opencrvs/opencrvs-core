@@ -388,6 +388,7 @@ export interface IFormSection {
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapping
+  hasDocumentSection?: boolean
 }
 
 export interface IForm {

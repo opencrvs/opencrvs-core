@@ -1220,6 +1220,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'review.documents.zeroDocumentsText':
+      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
+    'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
     'register.SelectContactPoint.spouse': 'স্বামী বা স্ত্রী',
     'register.SelectContactPoint.son': 'পুত্র',
     'register.SelectContactPoint.daughter': 'কন্যা',

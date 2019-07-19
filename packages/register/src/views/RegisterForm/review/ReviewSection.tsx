@@ -16,7 +16,6 @@ import { IStoreState } from '@register/store'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
 import { getConditionalActionsForField } from '@register/forms/utils'
-import { TickLarge, CrossLarge, Upload } from '@opencrvs/components/lib/icons'
 import { Link } from '@opencrvs/components/lib/typography'
 import { flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -44,6 +43,7 @@ import {
   injectIntl,
   InjectedIntl
 } from 'react-intl'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
   IFormSection,
@@ -69,6 +69,9 @@ import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'
+import { findDOMNode } from 'react-dom'
+import { isMobileDevice } from '@register/utils/commonUtils'
+import { FullBodyContent } from '@opencrvs/components/lib/layout'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -98,16 +101,6 @@ const messages: {
     id: 'register.form.required',
     defaultMessage: 'This field is required',
     description: 'Message when a field doesnt have a value'
-  },
-  documentViewerTitle: {
-    id: 'review.documentViewer.title',
-    defaultMessage: 'Supporting Documents',
-    description: 'Document Viewer Title'
-  },
-  documentViewerTagline: {
-    id: 'review.documentViewer.tagline',
-    defaultMessage: 'Select to Preview',
-    description: 'Document Viewer Tagline'
   },
 
   valueSaveAsDraft: {
@@ -147,6 +140,17 @@ const messages: {
     id: 'review.inputs.additionalComments',
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments'
+  },
+  zeroDocumentsText: {
+    id: 'review.documents.zeroDocumentsText',
+    defaultMessage:
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
+    description: 'Zero documents text'
+  },
+  editDocuments: {
+    id: 'review.documents.editDocuments',
+    defaultMessage: 'Add attachement',
+    description: 'Edit documents text'
   }
 })
 
@@ -163,7 +167,6 @@ const Row = styled.div`
 const Column = styled.div`
   width: 50%;
   margin: 0px 15px;
-  ${({ theme }) => theme.shadows.mistyShadow};
 
   &:first-child {
     margin-left: 0px;
@@ -177,6 +180,19 @@ const Column = styled.div`
     width: 100%;
   }
 `
+
+const StyledColumn = styled(Column)`
+  ${({ theme }) => theme.shadows.mistyShadow};
+`
+
+const ZeroDocument = styled.div`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+`
+
 const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
   {}
 )`
@@ -221,6 +237,7 @@ type State = {
   displayEditDialog: boolean
   editClickedSectionId: string
   editClickFieldName: string
+  activeSection: string
 }
 type FullProps = IProps & InjectedIntlProps
 
@@ -228,6 +245,12 @@ const getViewableSection = (registerForm: IForm): IFormSection[] => {
   return registerForm.sections.filter(
     ({ id, viewType }) =>
       id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+  )
+}
+
+const getDocumentSections = (registerForm: IForm): IFormSection[] => {
+  return registerForm.sections.filter(
+    ({ hasDocumentSection }) => hasDocumentSection
   )
 }
 
@@ -324,8 +347,7 @@ const renderValue = (
   }
   return value
 }
-
-export const getErrorsOnFieldsBySection = (
+const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication
 ) => {
@@ -360,35 +382,6 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
-  const draftItemName = documentsSection.id
-  const documentOptions: SelectComponentOptions[] = []
-  const selectOptions: SelectComponentOptions[] = []
-
-  const uploadedDocuments =
-    draft.data[draftItemName] &&
-    isArray(draft.data[draftItemName].imageUploader)
-      ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
-      : []
-
-  uploadedDocuments.map(document => {
-    const label = document.title + ' ' + document.description
-    documentOptions.push({
-      value: document.data,
-      label
-    })
-    selectOptions.push({
-      value: label,
-      label
-    })
-    return null
-  })
-  return {
-    selectOptions,
-    documentOptions
-  }
-}
-
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -396,7 +389,90 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.state = {
       displayEditDialog: false,
       editClickedSectionId: '',
-      editClickFieldName: ''
+      editClickFieldName: '',
+      activeSection: ''
+    }
+  }
+
+  componentDidMount() {
+    !isMobileDevice() && window.addEventListener('scroll', this.onScroll)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll)
+  }
+
+  docSections = getDocumentSections(
+    this.props.registerForm[this.props.draft.event]
+  )
+
+  onScroll = () => {
+    const scrollY = window.scrollY + window.innerHeight / 2
+    let minDistance = 100000
+    let sectionYTop = 0
+    let sectionYBottom = 0
+    let distance = 0
+    let sectionElement: HTMLElement
+    let activeSection = this.state.activeSection
+
+    const node = findDOMNode(this) as HTMLElement
+
+    this.docSections.forEach((section: IFormSection) => {
+      sectionElement = node.querySelector(
+        '#Section_' + section.id
+      ) as HTMLElement
+      sectionYTop = sectionElement.offsetTop
+      sectionYBottom = sectionElement.offsetTop + sectionElement.offsetHeight
+
+      distance = Math.abs(sectionYTop - scrollY)
+      if (distance < minDistance) {
+        minDistance = distance
+        activeSection = section.id
+      }
+
+      distance = Math.abs(sectionYBottom - scrollY)
+      if (distance < minDistance) {
+        minDistance = distance
+        activeSection = section.id
+      }
+    })
+    this.setState({
+      activeSection
+    })
+  }
+
+  prepSectionDocuments = (
+    draft: IApplication,
+    activeSection: string
+  ): IDocumentViewerOptions => {
+    const draftItemName = documentsSection.id
+    const documentOptions: SelectComponentOptions[] = []
+    const selectOptions: SelectComponentOptions[] = []
+    let uploadedDocuments =
+      draft.data[draftItemName] &&
+      isArray(draft.data[draftItemName].imageUploader)
+        ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
+        : []
+
+    uploadedDocuments = uploadedDocuments.filter(document => {
+      return document.title.toUpperCase() === activeSection.toUpperCase()
+    })
+
+    uploadedDocuments.forEach(document => {
+      const label = document.title + ' ' + document.description
+      documentOptions.push({
+        value: document.data,
+        label
+      })
+      selectOptions.push({
+        value: label,
+        label
+      })
+    })
+
+    return {
+      selectOptions,
+      documentOptions
     }
   }
 
@@ -443,6 +519,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       )
     }
     return formSections.map(section => ({
+      id: section.id,
       title: intl.formatMessage(section.title),
       items: section.fields
         .filter(field => isVisibleField(field, section) && !isViewOnly(field))
@@ -531,12 +608,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ignoreMediaQuery: true
     }
 
+    const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
 
     return (
-      <>
+      <FullBodyContent>
         <Row>
-          <Column>
+          <StyledColumn>
             <ReviewHeader
               id="review_header"
               logoSource={SEAL_BD_GOVT}
@@ -557,7 +635,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <FormData>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
-                  <DataSection key={index} {...sec} />
+                  <DataSection key={index} {...sec} id={'Section_' + sec.id} />
                 )
               )}
               {event === BIRTH && (
@@ -584,16 +662,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               submitAction={submitClickEvent}
               rejectAction={rejectApplicationClickEvent}
             />
-          </Column>
+          </StyledColumn>
           <Column>
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
             >
               <DocumentViewer
-                title={intl.formatMessage(messages.documentViewerTitle)}
-                tagline={intl.formatMessage(messages.documentViewerTagline)}
-                options={prepDocumentOption(draft)}
-              />
+                id={'document_section_' + this.state.activeSection}
+                key={'Document_section_' + this.state.activeSection}
+                options={this.prepSectionDocuments(
+                  draft,
+                  this.state.activeSection || formSections[0].id
+                )}
+              >
+                <ZeroDocument>
+                  {intl.formatMessage(messages.zeroDocumentsText, {
+                    section: sectionName
+                  })}
+                  <LinkButton
+                    id="edit-document"
+                    onClick={() =>
+                      this.editLinkClickHandler(
+                        documentsSection.id,
+                        this.state.activeSection
+                      )
+                    }
+                  >
+                    {intl.formatMessage(messages.editDocuments)}
+                  </LinkButton>
+                </ZeroDocument>
+              </DocumentViewer>
             </ResponsiveDocumentViewer>
           </Column>
         </Row>
@@ -613,7 +711,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )
           }}
         />
-      </>
+      </FullBodyContent>
     )
   }
 }

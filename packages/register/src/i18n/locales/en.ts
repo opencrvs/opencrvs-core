@@ -1225,6 +1225,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
     'register.SelectContactPoint.error':
       'Please select a main point of contact',
+    'review.documents.zeroDocumentsText':
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
+    'review.documents.editDocuments': 'Add attachement',
     'register.SelectContactPoint.spouse': 'Spouse',
     'register.SelectContactPoint.son': 'Son',
     'register.SelectContactPoint.daughter': 'Daughter',
