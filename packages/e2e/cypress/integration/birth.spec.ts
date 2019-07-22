@@ -80,21 +80,14 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
-      if ($listItem.find('#ListItemAction-0-Review').length) {
-        cy.log('Birth review found')
-        cy.get('#ListItemAction-0-Review')
-          .first()
-          .click()
-        cy.wait(500)
-        cy.get('#registerApplicationBtn').click()
-        // MODAL
-        cy.get('#submit_confirm').click()
-        cy.wait(6000)
-      } else {
-        cy.log('Birth review not found')
-      }
-    })
+    cy.get('#ListItemAction-0-Review').should('exist')
+    cy.get('#ListItemAction-0-Review')
+      .first()
+      .click()
+    cy.get('#registerApplicationBtn').click()
+    // MODAL
+    cy.get('#submit_confirm').click()
+    cy.wait(5000)
   })
 
   it('Tests from application to registration using maximum input', () => {
@@ -246,21 +239,14 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
-      if ($listItem.find('#ListItemAction-0-Review').length) {
-        cy.log('Birth review found')
-        cy.get('#ListItemAction-0-Review')
-          .first()
-          .click()
-        cy.wait(500)
-        cy.get('#registerApplicationBtn').click()
-        // MODAL
-        cy.get('#submit_confirm').click()
-        cy.wait(6000)
-      } else {
-        cy.log('Birth review not found')
-      }
-    })
+    cy.get('#ListItemAction-0-Review').should('exist')
+    cy.get('#ListItemAction-0-Review')
+      .first()
+      .click()
+    cy.get('#registerApplicationBtn').click()
+    // MODAL
+    cy.get('#submit_confirm').click()
+    cy.wait(5000)
   })
 
   it('Tests from application to rejection using minimum input', () => {
@@ -337,25 +323,18 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
-      if ($listItem.find('#ListItemAction-0-Review').length) {
-        cy.log('Birth review found')
-        cy.get('#ListItemAction-0-Review')
-          .first()
-          .click()
-        cy.wait(500)
-        cy.get('#rejectApplicationBtn').click()
-        cy.wait(500)
-        cy.get('#rejectionReasonOther').click()
-        cy.get('#rejectionCommentForHealthWorker').type(
-          'Lack of information, please notify informant about it.'
-        )
-        cy.get('#submit_reject_form').click()
-        cy.wait(6000)
-      } else {
-        cy.log('Birth review not found')
-      }
-    })
+    cy.get('#ListItemAction-0-Review').should('exist')
+    cy.get('#ListItemAction-0-Review')
+      .first()
+      .click()
+    cy.get('#rejectApplicationBtn').click()
+    // REJECT MODAL
+    cy.get('#rejectionReasonOther').click()
+    cy.get('#rejectionCommentForHealthWorker').type(
+      'Lack of information, please notify informant about it.'
+    )
+    cy.get('#submit_reject_form').click()
+    cy.wait(5000)
   })
 
   it('Tests from application to rejection using maximum input', () => {
@@ -506,24 +485,17 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     // LANDING PAGE
     cy.wait(3000)
-    cy.get('#row_0').then($listItem => {
-      if ($listItem.find('#ListItemAction-0-Review').length) {
-        cy.log('Birth review found')
-        cy.get('#ListItemAction-0-Review')
-          .first()
-          .click()
-        cy.wait(500)
-        cy.get('#rejectApplicationBtn').click()
-        cy.wait(500)
-        cy.get('#rejectionReasonOther').click()
-        cy.get('#rejectionCommentForHealthWorker').type(
-          'Lack of information, please notify informant about it.'
-        )
-        cy.get('#submit_reject_form').click()
-        cy.wait(6000)
-      } else {
-        cy.log('Birth review not found')
-      }
-    })
+    cy.get('#ListItemAction-0-Review').should('exist')
+    cy.get('#ListItemAction-0-Review')
+      .first()
+      .click()
+    cy.get('#rejectApplicationBtn').click()
+    // REJECT MODAL
+    cy.get('#rejectionReasonOther').click()
+    cy.get('#rejectionCommentForHealthWorker').type(
+      'Lack of information, please notify informant about it.'
+    )
+    cy.get('#submit_reject_form').click()
+    cy.wait(5000)
   })
 })
