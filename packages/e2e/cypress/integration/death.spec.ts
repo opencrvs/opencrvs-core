@@ -40,11 +40,13 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.get('#currentAddressSameAsPermanent_true').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
+    cy.wait(500)
     cy.get('#next_section').click()
     cy.get('#next_section').click()
     cy.get('#deathPlaceAddress_PERMANENT').click()
@@ -98,7 +100,7 @@ context('Death Registration Integration Test', () => {
     })
   })
 
-  it('Tests from application to registration using maximum input', () => {
+  it.only('Tests from application to registration using maximum input', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
@@ -149,15 +151,18 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
+    cy.wait(500)
     cy.get('#next_section').click()
     cy.get('#manner_HOMICIDE').click()
     cy.get('#next_section').click()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
@@ -170,6 +175,7 @@ context('Death Registration Integration Test', () => {
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     cy.selectOption(
       '#methodOfCauseOfDeath',
