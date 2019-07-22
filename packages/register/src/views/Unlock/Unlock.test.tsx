@@ -96,7 +96,7 @@ describe('For wrong inputs', async () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Incorrect pin. Please try again')
-    }, 1000)
+    }, 2000)
   })
 
   it('Should display the Last try message', async () => {
@@ -126,7 +126,7 @@ describe('For wrong inputs', async () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Last Try')
-    }, 1000)
+    }, 2000)
   })
 
   it('Should display Locked Message', async () => {
@@ -145,7 +145,7 @@ describe('For wrong inputs', async () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Locked')
-    }, 1000)
+    }, 2000)
   })
 
   it('Should not accept any attempt during timeout', async () => {
@@ -164,7 +164,7 @@ describe('For wrong inputs', async () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Locked')
-    }, 1000)
+    }, 2000)
   })
 
   it('Should not accept correct pin while locked', async () => {
@@ -184,7 +184,7 @@ describe('For wrong inputs', async () => {
         .hostNodes()
         .text()
       expect(errorElem).toBe('Locked')
-    }, 1000)
+    }, 2000)
   })
 })
 

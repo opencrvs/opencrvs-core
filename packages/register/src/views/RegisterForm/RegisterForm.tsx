@@ -5,15 +5,8 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import {
-  EventTopBar,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
-import {
-  BodyContent,
-  Container,
-  FullBodyContent
-} from '@opencrvs/components/lib/layout'
+import { EventTopBar } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -26,7 +19,6 @@ import {
 import { FormFieldGenerator } from '@register/components/form'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
-  Action,
   Event,
   IForm,
   IFormField,
@@ -46,11 +38,8 @@ import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import {
-  ReviewSection,
-  getErrorsOnFieldsBySection
-} from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge, flatten } from 'lodash'
+import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
+import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
@@ -345,34 +334,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
       intl,
       setAllFieldsDirty,
       application,
-      history,
       registerForm,
       offlineResources,
       handleSubmit,
-      duplicate
+      duplicate,
+      activeSection
     } = this.props
 
-    let activeSection: IFormSection = this.props.activeSection
-
-    const errorsOnFields = getErrorsOnFieldsBySection(
+    let nextSection = getNextSection(
       registerForm.sections,
-      application
-    )
-    const isComplete =
-      flatten(
-        // @ts-ignore
-        Object.values(errorsOnFields).map(Object.values)
-        // @ts-ignore
-      ).filter(errors => errors.length > 0).length === 0
+      activeSection
+    ) as IFormSection
 
-    if (activeSection.viewType === 'hidden') {
-      const nextSec = getNextSection(registerForm.sections, activeSection)
-      if (nextSec) {
-        activeSection = nextSec
-      }
+    if (nextSection && nextSection.viewType === 'hidden') {
+      nextSection = getNextSection(
+        registerForm.sections,
+        nextSection
+      ) as IFormSection
     }
 
-    const nextSection = getNextSection(registerForm.sections, activeSection)
     const title =
       activeSection.viewType === VIEW_TYPE.REVIEW
         ? messages.reviewEventRegistration
@@ -416,13 +396,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     }
                   ]}
                 />
-                <FullBodyContent>
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={application}
-                    submitClickEvent={this.confirmSubmission}
-                  />
-                </FullBodyContent>
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={application}
+                  submitClickEvent={this.confirmSubmission}
+                />
               </>
             )}
             {activeSection.viewType === VIEW_TYPE.REVIEW && (
@@ -441,14 +419,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     label: intl.formatMessage(messages.exitButton)
                   }}
                 />
-                <FullBodyContent>
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={application}
-                    rejectApplicationClickEvent={this.toggleRejectForm}
-                    submitClickEvent={this.confirmSubmission}
-                  />
-                </FullBodyContent>
+                <ReviewSection
+                  pageRoute={this.props.pageRoute}
+                  draft={application}
+                  rejectApplicationClickEvent={this.toggleRejectForm}
+                  submitClickEvent={this.confirmSubmission}
+                />
               </>
             )}
 

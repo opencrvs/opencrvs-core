@@ -1,11 +1,10 @@
 import * as React from 'react'
 import ReactPanZoom from './PanDraggable'
 import styled, { css } from 'styled-components'
-import {} from '../../icons'
 import { ZoomIn, ZoomOut, RotateLeft } from '../../icons'
 const Container = css`
   width: 100%;
-  min-height: calc(100vh - 500px);
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
   align-items: center;

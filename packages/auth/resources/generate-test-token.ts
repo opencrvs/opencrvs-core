@@ -20,7 +20,12 @@ const optionList = [
     name: 'audience',
     type: String,
     multiple: true,
-    defaultValue: ['opencrvs:auth-user', 'opencrvs:user-mgnt-user', 'opencrvs:hearth-user', 'opencrvs:gateway-user']
+    defaultValue: [
+      'opencrvs:auth-user',
+      'opencrvs:user-mgnt-user',
+      'opencrvs:hearth-user',
+      'opencrvs:gateway-user'
+    ]
   },
   { name: 'help', type: Boolean, description: 'Show this menu' }
 ]
@@ -45,10 +50,14 @@ process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, '../test/cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, '../test/cert.key.pub')
 
 // tslint:disable-next-line no-var-requires
-const { createToken } = require('src/features/authenticate/service')
+const { createToken } = require('@auth/features/authenticate/service')
 
-createToken(options.userId, options.role, options.audience, options.issuer).then(
-  (token: string) =>
-    // tslint:disable-next-line no-console
-    console.log(token)
+createToken(
+  options.userId,
+  options.role,
+  options.audience,
+  options.issuer
+).then((token: string) =>
+  // tslint:disable-next-line no-console
+  console.log(token)
 )

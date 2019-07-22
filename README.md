@@ -23,7 +23,7 @@ Then:
 1. Clone the repo
 2. Run `yarn` to install deps
 3. Run `docker swarm init` - out host has to be a swarm to use the overlay network as we use in staging and qa
-4. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose` (dependencies) and `yarn start` (services in this repo)
+4. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` (services in this repo)
 5. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
 
 Apps can be found running in following URLs:
@@ -35,7 +35,7 @@ Apps can be found running in following URLs:
 
 You can open all of them by running `yarn open`
 
-**Troubleshooting (necessary for OSX):** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose`
+**Troubleshooting (necessary for OSX):** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose:deps`
 
 ### Manual backup setup (already done for you if you restore the pre-populated db dump)
 
@@ -74,7 +74,7 @@ The `yarn compose:*` scripts only setup the dependencies in docker containers an
 
 For the command above there is:
 
-- base scripts which build and start the containers. E.g. `yarn compose`
+- base scripts which build and start the containers. E.g. `yarn compose:deps`
 - `*:build` scripts which just build the images
 - `*:up` scripts which just run pre-build images in containers
 - `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
