@@ -177,7 +177,6 @@ export const eventSection: IFormSection = {
   groups: [
     {
       id: 'deathEvent-deathDate',
-      singleFieldPage: true,
       fields: [
         {
           name: 'deathDate',
@@ -197,7 +196,6 @@ export const eventSection: IFormSection = {
     },
     {
       id: 'deathEvent-deathManner',
-      singleFieldPage: true,
       fields: [
         {
           name: 'manner',
@@ -233,7 +231,6 @@ export const eventSection: IFormSection = {
     },
     {
       id: 'deathEvent-deathPlaceAddress',
-      singleFieldPage: true,
       fields: [
         {
           name: 'deathPlaceAddress',
@@ -266,7 +263,6 @@ export const eventSection: IFormSection = {
     },
     {
       id: 'deathEvent-deathLocation',
-      singleFieldPage: true,
       conditionals: [conditionals.deathPlaceAddressTypeHeathInstitue],
       fields: [
         {

@@ -268,7 +268,7 @@ describe('when user is in the register form for death event', async () => {
       const clonedForm = cloneDeep(form)
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].notice = messages.causeOfDeathNotice
-      clonedForm.sections[2].groups[0].singleFieldPage = false
+      clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
       const testComponent = createTestComponent(
         // @ts-ignore
         <RegisterForm

@@ -135,6 +135,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
   })
 
   it('renders all items returned from graphql query in inProgress tab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
     const { store } = createStore()
     const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const drafts = [

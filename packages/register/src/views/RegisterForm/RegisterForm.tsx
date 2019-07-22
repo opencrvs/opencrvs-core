@@ -516,23 +516,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <FormSectionTitle
                     id={`form_section_title_${activeSectionGroup.id}`}
                   >
-                    {(activeSectionGroup.singleFieldPage && (
-                      <>
-                        {(activeSectionGroup.fields[0].hideHeader = true)}
-                        {intl.formatMessage(activeSectionGroup.fields[0].label)}
-                        {activeSectionGroup.fields[0].required && (
-                          <Required
-                            disabled={
-                              activeSectionGroup.disabled ||
-                              activeSection.disabled ||
-                              false
-                            }
-                          >
-                            &nbsp;*
-                          </Required>
-                        )}
-                      </>
-                    )) || (
+                    {(!activeSectionGroup.ignoreSingleFieldView &&
+                      activeSectionGroup.fields.length === 1 && (
+                        <>
+                          {(activeSectionGroup.fields[0].hideHeader = true)}
+                          {intl.formatMessage(
+                            activeSectionGroup.fields[0].label
+                          )}
+                          {activeSectionGroup.fields[0].required && (
+                            <Required
+                              disabled={
+                                activeSectionGroup.disabled ||
+                                activeSection.disabled ||
+                                false
+                              }
+                            >
+                              &nbsp;*
+                            </Required>
+                          )}
+                        </>
+                      )) || (
                       <>
                         {intl.formatMessage(
                           activeSectionGroup.title || activeSection.title

@@ -95,7 +95,6 @@ export const causeOfDeathSection: IFormSection = {
   groups: [
     {
       id: 'causeOfDeath-causeOfDeathEstablished',
-      singleFieldPage: true,
       fields: [
         {
           name: 'causeOfDeathEstablished',
