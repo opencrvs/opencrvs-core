@@ -51,6 +51,8 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   getVisibleGroupFields
 } from '@register/forms/utils'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -687,8 +689,8 @@ function mapStateToProps(
   }
   const visitedSections = registerForm.sections.filter(
     ({ id }) =>
-      id !== 'registration' &&
-      id !== 'informant' &&
+      id !== registrationSection.id &&
+      id !== applicantsSection.id &&
       Boolean(application.data[id])
   )
 

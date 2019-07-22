@@ -40,22 +40,17 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.get('#currentAddressSameAsPermanent_true').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(1000)
     cy.get('#next_section').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     cy.get('#deathPlaceAddress_PERMANENT').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'No ID available', 'No ID available')
@@ -66,10 +61,8 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
-    cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
     cy.get('#submit_form').click()
@@ -156,19 +149,15 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
     cy.get('#next_section').click()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(1000)
     cy.get('#next_section').click()
     cy.get('#manner_HOMICIDE').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
@@ -178,11 +167,9 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     cy.selectOption(
       '#methodOfCauseOfDeath',
@@ -190,7 +177,6 @@ context('Death Registration Integration Test', () => {
       'Medically Certified Cause of Death'
     )
     cy.get('#causeOfDeathCode').type('1009')
-    cy.wait(1000)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers License', 'Drivers License')
@@ -219,10 +205,8 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(1000)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
-    cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
     cy.get('#submit_form').click()
