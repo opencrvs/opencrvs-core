@@ -98,9 +98,7 @@ class CreatePinComponent extends React.Component<IProps> {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(pin, salt)
 
-    // TODO: this should be moved to the user object when the support for multiple user has been added
     const currentUserID = await getCurrentUserID()
-
     const userData = (await storage.getItem('USER_DATA')) || '[]'
     const allUserData = JSON.parse(userData) as IUserData[]
     const currentUserData = allUserData.find(
