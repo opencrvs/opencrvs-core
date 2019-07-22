@@ -523,3 +523,175 @@ context('Birth Integration Test', () => {
     cy.wait(5000)
   })
 })
+
+context('Birth Registration By Registrar Integration Test', () => {
+  beforeEach(() => {
+    indexedDB.deleteDatabase('OpenCRVS')
+  })
+
+  it('Tests from application to registration', () => {
+    // LOGIN AS FIELD WORKER
+    cy.login('registrar')
+    // CREATE PIN
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
+    for (let i = 1; i <= 8; i++) {
+      cy.get(`#keypad-${i % 2}`).click()
+    }
+    // LANDING PAGE
+    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
+    cy.get('#new_event_declaration').click()
+    // EVENTS
+    cy.get('#select_vital_event_view').should('be.visible')
+    cy.get('#select_birth_event').click()
+    cy.get('#continue').click()
+    cy.get('#select_informant_BOTH_PARENTS').click()
+    cy.get('#continue').click()
+    cy.get('#select_mother_event').click()
+    cy.get('#continue').click()
+    // SELECT MAIN CONTACT POINT
+    cy.get('#contact_FATHER').click()
+    cy.get('#phone_number_input').type('01526972106')
+    cy.get('#continue').click()
+    // APPLICATION FORM
+    // CHILD DETAILS
+    cy.get('#firstNames').type('মারুফ')
+    cy.get('#familyName').type('হোসাইন')
+    cy.get('#firstNamesEng').type('Maruf')
+    cy.get('#familyNameEng').type('Hossain')
+    cy.selectOption('#gender', 'Male', 'Male')
+    cy.get('#childBirthDate-dd').type('22')
+    cy.get('#childBirthDate-mm').type('10')
+    cy.get('#childBirthDate-yyyy').type('1994')
+    cy.selectOption('#attendantAtBirth', 'Physician', 'Physician')
+    cy.selectOption('#birthType', 'Single', 'Single')
+    cy.get('#multipleBirth').type('1')
+    cy.get('#weightAtBirth').type('1.5')
+    cy.selectOption('#placeOfBirth', 'Private Home', 'Private Home')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // MOTHER DETAILS
+    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.get('#iD').type('1234567898765')
+    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
+    cy.get('#firstNames').type('হাবিবা')
+    cy.get('#familyName').type('আক্তার')
+    cy.get('#firstNamesEng').type('Habiba')
+    cy.get('#familyNameEng').type('Aktar')
+    cy.get('#motherBirthDate-dd').type('23')
+    cy.get('#motherBirthDate-mm').type('10')
+    cy.get('#motherBirthDate-yyyy').type('1971')
+    cy.selectOption('#maritalStatus', 'Married', 'Married')
+    cy.get('#dateOfMarriage-dd').type('05')
+    cy.get('#dateOfMarriage-mm').type('05')
+    cy.get('#dateOfMarriage-yyyy').type('1990')
+    cy.selectOption(
+      '#educationalAttainment',
+      'Upper secondary',
+      'Upper secondary'
+    )
+    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
+    cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
+    cy.selectOption('#addressLine4Permanent', 'Matlab Uttar', 'Matlab Uttar')
+    cy.selectOption('#addressLine3Permanent', 'Satnal', 'Satnal')
+    cy.get('#addressLine2Permanent').type('Ruhitarpar')
+    cy.get('#addressLine1Permanent').type('40')
+    cy.get('#postCodePermanent').type('1024')
+    cy.get('#currentAddressSameAsPermanent_false').click()
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // FATHER DETAILS
+    // cy.get('#fathersDetailsExist_true').click()
+    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.get('#iD').type('1234567898765')
+    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
+    cy.get('#firstNames').type('বোরহান')
+    cy.get('#familyName').type('উদ্দিন')
+    cy.get('#firstNamesEng').type('Borhan')
+    cy.get('#familyNameEng').type('Uddin')
+    cy.get('#fatherBirthDate-dd').type('01')
+    cy.get('#fatherBirthDate-mm').type('08')
+    cy.get('#fatherBirthDate-yyyy').type('1966')
+    cy.selectOption('#maritalStatus', 'Married', 'Married')
+    cy.get('#dateOfMarriage-dd').type('05')
+    cy.get('#dateOfMarriage-mm').type('05')
+    cy.get('#dateOfMarriage-yyyy').type('1990')
+    cy.selectOption(
+      '#educationalAttainment',
+      'Upper secondary',
+      'Upper secondary'
+    )
+    cy.get('#addressSameAsMother_false').click()
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
+    cy.get('#permanentAddressSameAsMother_false').click()
+    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
+    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3Permanent', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2Permanent').type('My street')
+    cy.get('#addressLine1Permanent').type('40')
+    cy.get('#postCodePermanent').type('1024')
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // DOCUMENTS
+    cy.wait(1000)
+    cy.get('#next_section').click()
+    // PREVIEW
+    cy.get('#submit_form').click()
+    // MODAL
+    cy.get('#submit_confirm').click()
+    cy.log('Waiting for application to sync...')
+    cy.wait(6000) // Wait for application to be sync'd
+    // LOG OUT
+    cy.get('#mobile_header_left').click()
+    cy.get('#mobile_menu_item_4').click()
+    // LOGIN AS LOCAL REGISTRAR
+    cy.get('#username').type('mohammad.ashraful')
+    cy.get('#password').type('test')
+    cy.get('#login-mobile-submit').click()
+    cy.get('#code').type('000000')
+    cy.get('#login-mobile-submit').click()
+    // LANDING PAGE
+    cy.wait(3000)
+    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
+      if ($listItem.find('#ListItemAction-0-Review').length) {
+        cy.log('Birth review found')
+        cy.get('#ListItemAction-0-Review')
+          .first()
+          .click()
+        cy.wait(500)
+        cy.get('#registerApplicationBtn').click()
+        // MODAL
+        cy.get('#submit_confirm').click()
+        cy.wait(1000)
+      } else {
+        cy.log('Birth review not found')
+      }
+    })
+  })
+})
