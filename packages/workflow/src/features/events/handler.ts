@@ -2,7 +2,8 @@ import * as Hapi from 'hapi'
 import {
   createRegistrationHandler,
   markEventAsRegisteredHandler,
-  markEventAsCertifiedHandler
+  markEventAsCertifiedHandler,
+  markEventAsValidatedHandler
 } from '@workflow/features/registration/handler'
 import {
   hasBirthRegistrationNumber,
@@ -203,6 +204,12 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.DEATH_NEW_REG, request)
+      break
+    case Events.BIRTH_MARK_VALID:
+      response = await markEventAsValidatedHandler(request, h, event)
+      break
+    case Events.DEATH_MARK_VALID:
+      response = await markEventAsValidatedHandler(request, h, event)
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
