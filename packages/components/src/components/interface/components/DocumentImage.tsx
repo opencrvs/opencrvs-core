@@ -3,13 +3,14 @@ import styled from 'styled-components'
 import { isEqual } from 'lodash'
 import PanViewer from './PanViewer'
 const ImageContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.placeholder};
+  top: 0px;
   text-align: center;
-  min-height: calc(100vh - 200px);
-  position: relative;
+  height: 100%;
+  position: absolute;
   overflow: hidden;
 `
 interface IProps {
+  id?: string
   image: string
 }
 
@@ -19,9 +20,9 @@ export class DocumentImage extends React.Component<IProps> {
   }
 
   render() {
-    const { image } = this.props
+    const { image, id } = this.props
     return (
-      <ImageContainer>
+      <ImageContainer id={id}>
         {image && <PanViewer key={Math.random()} image={image} />}
       </ImageContainer>
     )

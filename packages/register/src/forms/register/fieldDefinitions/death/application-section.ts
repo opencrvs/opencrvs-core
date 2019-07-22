@@ -239,6 +239,7 @@ export const applicantsSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.applicantTab,
   title: messages.applicantTitle,
+  hasDocumentSection: true,
   fields: [
     {
       name: 'iDType',

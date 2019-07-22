@@ -215,6 +215,7 @@ export const fatherSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.fatherTab,
   title: messages.fatherTitle,
+  hasDocumentSection: true,
   fields: [
     {
       name: 'fathersDetailsExist',
@@ -227,6 +228,7 @@ export const fatherSection: IFormSection = {
         { value: true, label: messages.confirm },
         { value: false, label: messages.deny }
       ],
+      conditionals: [conditionals.fatherContactDetailsRequired],
       mapping: {
         mutation: sectionRemoveTransformer
       }

@@ -63,7 +63,8 @@
     "start": "concurrently 'styleguidist server' 'tsc -w'",
     "postinstall": "patch-package && yarn build",
     "build": "yarn clean && tsc",
-    "lint:css": "stylelint 'src/**/*.{ts,tsx}'"
+    "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
+    "build:clean": "rm -rf lib"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
