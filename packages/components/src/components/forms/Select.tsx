@@ -18,6 +18,7 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   hideBorder?: boolean
   options: ISelectOption[]
   ignoreMediaQuery?: boolean
+  color?: string
   placeholder?: string
 }
 
@@ -36,7 +37,8 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
 
   ${({ theme }) => theme.fonts.bodyStyle};
   .react-select__control {
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme, color }) =>
+      color ? color : theme.colors.background};
     border-radius: 0;
     height: 40px;
     box-shadow: none;
@@ -91,6 +93,7 @@ export interface ISelectProps
   extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
+  color?: string
 }
 
 export class Select extends React.Component<ISelectProps> {

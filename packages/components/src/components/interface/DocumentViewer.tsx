@@ -1,52 +1,46 @@
 import * as React from 'react'
 import * as Sticky from 'react-stickynode'
 import styled from 'styled-components'
-import { SupportingDocument } from './../icons'
 import { Select, ISelectOption as SelectComponentOptions } from './../forms'
 import { DocumentImage } from './components/DocumentImage'
-import { isEqual } from 'lodash'
 
-const Header = styled.div`
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-`
-
-const Box = styled.div`
-  padding: 14px 18px;
-`
-const Icon = styled.div`
-  margin-right: 15px;
-`
-const TitleContainer = styled.div`
-  width: 276px;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
-`
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-`
-const SelectContainer = styled.div`
-  width: 70%;
-`
-const WhiteBackground = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-
+const Container = styled.div`
+  background-color: ${({ theme }) => theme.colors.background};
+  outline: 2px solid ${({ theme }) => theme.colors.chartAreaGradientStart};
+  box-sizing: border-box;
+  height: 720px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
-`
 
+  > div {
+    width: 100%;
+    padding-top: 16px;
+    padding-left: 16px;
+  }
+
+  > div#select_document {
+    z-index: 2;
+    background: ${({ theme }) => theme.colors.lightGreyBackground};
+    top: 16px;
+    left: 16px;
+    width: 200px;
+    padding-top: 0px;
+    padding-left: 0px;
+  }
+
+  > div#document_image {
+    padding-top: 0px;
+    padding-left: 0px;
+  }
+`
 export interface IDocumentViewerOptions {
   selectOptions: SelectComponentOptions[]
   documentOptions: SelectComponentOptions[]
 }
 
 interface IProps {
-  title: string
-  tagline?: string
-  icon?: React.ReactNode
+  id?: string
   options: IDocumentViewerOptions
 }
 
@@ -72,23 +66,17 @@ export class DocumentViewer extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { title, tagline, options, icon } = this.props
+    const { options, children, id } = this.props
+
     return (
       <Sticky enabled={true} top="#form_tabs_container">
-        <WhiteBackground>
-          <Box>
-            <Header>
-              <Icon>{icon || <SupportingDocument />}</Icon>
-              <TitleContainer>
-                <Title>{title}</Title>
-                {tagline}
-              </TitleContainer>
-            </Header>
-
-            <SelectContainer>
+        <Container id={id}>
+          {options.documentOptions.length > 0 && (
+            <>
               <Select
-                id="selectDocument"
+                id="select_document"
                 options={options.selectOptions}
+                color="inherit"
                 value={this.state.selectedOption as string}
                 onChange={(val: string) => {
                   const imgArray = options.documentOptions.filter(doc => {
@@ -102,13 +90,16 @@ export class DocumentViewer extends React.Component<IProps, IState> {
                   }
                 }}
               />
-            </SelectContainer>
-          </Box>
-
-          {this.state.selectedDocument && (
-            <DocumentImage image={this.state.selectedDocument} />
+              {this.state.selectedDocument && (
+                <DocumentImage
+                  id="document_image"
+                  image={this.state.selectedDocument}
+                />
+              )}
+            </>
           )}
-        </WhiteBackground>
+          {options.documentOptions.length === 0 && children}
+        </Container>
       </Sticky>
     )
   }

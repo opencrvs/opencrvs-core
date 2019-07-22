@@ -361,7 +361,7 @@ export const nestedValueToFieldTransformer = (
       clonedData[nestedFieldName] = {}
     }
     transformMethod(clonedData, queryData[sectionId], nestedFieldName, field)
-    if (!clonedData[nestedFieldName][field.name]) {
+    if (clonedData[nestedFieldName][field.name] === undefined) {
       return transformedData
     }
     transformedData[sectionId][field.name] =

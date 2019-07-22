@@ -88,6 +88,8 @@ const Footer = styled.div`
 
 const Action = styled.div`
   margin: 0 12px;
+  display: flex;
+  align-items: center;
   & button {
     width: 100%;
   }

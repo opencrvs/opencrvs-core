@@ -26,5 +26,8 @@ export const PrimaryButton = styled(Button)`
     background: ${({ theme }) => theme.colors.disabled};
     cursor: not-allowed;
     color: ${({ theme }) => theme.colors.placeholder};
+    path {
+      stroke: ${({ theme }) => theme.colors.placeholder};
+    }
   }
 `
