@@ -10,19 +10,20 @@ const Title = styled.div`
   margin-bottom: 16px;
 `
 interface IProps {
+  id?: string
   title: string
   items: IDataProps[]
 }
 
 export class DataSection extends React.Component<IProps> {
   render() {
-    const { title, items } = this.props
+    const { id, title, items } = this.props
 
     return (
-      <Container>
+      <Container id={id}>
         <Title>{title}</Title>
         {items.map((item: IDataProps, index: number) => (
-          <DataRow key={index} {...item} />
+          <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
         ))}
       </Container>
     )

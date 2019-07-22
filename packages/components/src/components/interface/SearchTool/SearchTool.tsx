@@ -16,7 +16,7 @@ const Wrapper = styled.form`
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 10px;
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.bodyStyle};
   flex-grow: 1;
   &:focus {
     outline: none;

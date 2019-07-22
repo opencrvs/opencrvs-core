@@ -430,24 +430,6 @@ describe('when user is previewing the form data', () => {
       app.update()
     })
 
-    it('preview link will close the modal', async () => {
-      jest.setMock('react-apollo', { default: ReactApollo })
-
-      app
-        .find('#registerApplicationBtn')
-        .hostNodes()
-        .simulate('click')
-
-      app
-        .find('#register_cancel')
-        .hostNodes()
-        .simulate('click')
-
-      await flushPromises()
-      app.update()
-
-      expect(app.find('#register_cancel').hostNodes()).toHaveLength(0)
-    })
     it('rejecting application redirects to home screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 
@@ -653,7 +635,7 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
 
       app
-        .find('#register_confirm')
+        .find('#submit_confirm')
         .hostNodes()
         .simulate('click')
 

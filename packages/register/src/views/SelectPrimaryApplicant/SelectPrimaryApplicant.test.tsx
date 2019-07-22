@@ -4,7 +4,7 @@ import {
   storeApplication
 } from '@register/applications'
 import { Event } from '@register/forms'
-import { SELECT_PRIMARY_APPLICANT } from '@register/navigation/routes'
+import { SELECT_BIRTH_PRIMARY_APPLICANT } from '@register/navigation/routes'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storage } from '@register/storage'
 import {
@@ -60,7 +60,7 @@ describe('when user is selecting the vital event', () => {
       draft = createApplication(Event.BIRTH)
       store.dispatch(storeApplication(draft))
       history.replace(
-        SELECT_PRIMARY_APPLICANT.replace(':applicationId', draft.id)
+        SELECT_BIRTH_PRIMARY_APPLICANT.replace(':applicationId', draft.id)
       )
       await flushPromises()
       app.update()

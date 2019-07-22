@@ -8,6 +8,7 @@ import { TertiaryButton } from './TertiaryButton'
 const Container = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
   margin-left: 1px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0px;

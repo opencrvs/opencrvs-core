@@ -779,13 +779,12 @@ describe('RegistrarHome sent for review tab related tests', () => {
       setTimeout(resolve, 500)
     })
     testComponent.component.update()
+
     expect(
-      testComponent.component
-        .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Review')
-        .hostNodes()
+      testComponent.component.find('#ListItemAction-0-Review').hostNodes()
     ).toHaveLength(1)
     testComponent.component
-      .find('#ListItemAction-e302f7c5-ad87-4117-91c1-35eaf2ea7be8-Review')
+      .find('#ListItemAction-0-Review')
       .hostNodes()
       .simulate('click')
 

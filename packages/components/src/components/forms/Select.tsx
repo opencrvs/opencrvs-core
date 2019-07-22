@@ -18,6 +18,8 @@ export interface IStyledSelectProps extends Props<ISelectOption> {
   hideBorder?: boolean
   options: ISelectOption[]
   ignoreMediaQuery?: boolean
+  color?: string
+  placeholder?: string
 }
 
 const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
@@ -35,12 +37,13 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
 
   ${({ theme }) => theme.fonts.bodyStyle};
   .react-select__control {
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme, color }) =>
+      color ? color : theme.colors.background};
     border-radius: 0;
     height: 40px;
     box-shadow: none;
     ${({ theme }) => theme.fonts.bodyStyle};
-    padding: 0 5px;
+    padding: 0 8px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')}
       ${({ error, touched, theme }) =>
         error && touched ? theme.colors.error : theme.colors.copy};
@@ -90,6 +93,7 @@ export interface ISelectProps
   extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
+  color?: string
 }
 
 export class Select extends React.Component<ISelectProps> {

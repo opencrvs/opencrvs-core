@@ -17,7 +17,7 @@ import {
   goBack,
   goToBirthRegistrationAsParent,
   goToHome,
-  goToMainContactPoint
+  goToBirthContactPoint
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
@@ -98,7 +98,7 @@ type IFullProps = InjectedIntlProps &
     modifyApplication: typeof modifyApplication
     goBack: typeof goBack
     goToHome: typeof goToHome
-    goToMainContactPoint: typeof goToMainContactPoint
+    goToBirthContactPoint: typeof goToBirthContactPoint
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   }
 
@@ -128,7 +128,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
       this.state.applicant === APPLICANT.MOTHER ||
       this.state.applicant === APPLICANT.FATHER
     ) {
-      const { application, goToMainContactPoint } = this.props
+      const { application, goToBirthContactPoint } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -141,7 +141,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
           }
         }
       })
-      goToMainContactPoint(this.props.match.params.applicationId)
+      goToBirthContactPoint(this.props.match.params.applicationId)
     } else {
       this.setState({ applicant: 'error' })
     }
@@ -220,7 +220,7 @@ export const SelectPrimaryApplicant = connect(
   {
     goBack,
     goToHome,
-    goToMainContactPoint,
+    goToBirthContactPoint,
     goToBirthRegistrationAsParent,
     modifyApplication
   }
