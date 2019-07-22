@@ -67,24 +67,22 @@ const Wrapper = styled.div`
   padding: 0 32px;
   align-items: center;
   justify-content: space-between;
-  display: inline-flex;
+  display: flex;
   width: 100%;
 `
 const CenterWrapper = styled.div`
   padding: 0 8px;
   align-items: center;
   justify-content: center;
-  display: inline-flex;
+  display: flex;
 `
 const LeftButtonIcon = styled.div`
-  position: relative !important;
-  margin-right: 20px;
+  display: flex;
+  margin-right: 16px;
 `
 const RightButtonIcon = styled.div`
-  position: relative !important;
   display: flex;
-  justify-content: center;
-  margin-left: 20px;
+  margin-left: 16px;
 `
 const IconOnly = styled.div`
   display: flex;

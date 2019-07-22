@@ -280,6 +280,8 @@ class SettingsView extends React.Component<IProps & IState, IState> {
       )}`
     }
 
+    const mobile = (userDetails && userDetails.mobile) || ''
+
     const role =
       userDetails && userDetails.role
         ? intl.formatMessage(roleMessages[userDetails.role])
@@ -312,7 +314,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
           },
           {
             label: intl.formatMessage(messages.labelPhone),
-            value: '01711111111',
+            value: mobile,
             action: {
               label: intl.formatMessage(messages.actionChange),
               disabled: true

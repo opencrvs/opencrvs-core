@@ -4,8 +4,11 @@ import {
   TertiaryButton,
   LinkButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow, TickLarge } from '@opencrvs/components/lib/icons'
-import { EventTopBar, Modal } from '@opencrvs/components/lib/interface'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import {
+  EventTopBar,
+  ResponsiveModal
+} from '@opencrvs/components/lib/interface'
 import {
   BodyContent,
   Container,
@@ -43,8 +46,11 @@ import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge } from 'lodash'
+import {
+  ReviewSection,
+  getErrorsOnFieldsBySection
+} from '@register/views/RegisterForm/review/ReviewSection'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
@@ -68,11 +74,7 @@ const Notice = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   margin: 30px -25px;
 `
-const CancelButton = styled.a`
-  text-decoration: underline;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.primary};
-`
+
 const StyledLinkButton = styled(LinkButton)`
   margin-left: 32px;
 `
@@ -113,21 +115,11 @@ export const messages: {
     defaultMessage: 'Next',
     description: 'Next button'
   },
-  cancel: {
-    id: 'register.form.modal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Cancel button on submit modal'
-  },
   submitDescription: {
     id: 'register.form.modal.submitDescription',
     defaultMessage:
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     description: 'Submit description text on submit modal'
-  },
-  submitButton: {
-    id: 'register.form.modal.submitButton',
-    defaultMessage: 'Submit',
-    description: 'Submit button on submit modal'
   },
   back: {
     id: 'menu.back',
@@ -165,6 +157,11 @@ export const messages: {
     defaultMessage: 'SAVE & EXIT',
     description: 'SAVE & EXIT Button Text'
   },
+  exitButton: {
+    id: 'register.review.eventTopBar.exitButton',
+    defaultMessage: 'EXIT',
+    description: 'Label for Exit button on EventTopBar'
+  },
   backToReviewButton: {
     id: 'register.selectVitalEvent.backToReviewButton',
     defaultMessage: 'Back to review'
@@ -178,19 +175,6 @@ const Optional = styled.span.attrs<
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
   flex-grow: 0;
-`
-
-const ConfirmBtn = styled(PrimaryButton)`
-  min-width: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  &:disabled {
-    background: ${({ theme }) => theme.colors.primary};
-    path {
-      stroke: ${({ theme }) => theme.colors.disabled};
-    }
-  }
 `
 
 const ErrorText = styled.div`
@@ -248,8 +232,6 @@ export type FullProps = IFormProps &
   }>
 
 type State = {
-  showSubmitModal: boolean
-  showRegisterModal: boolean
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
@@ -263,10 +245,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
-      showSubmitModal: false,
       isDataAltered: false,
       rejectFormOpen: false,
-      showRegisterModal: false,
       hasError: false
     }
   }
@@ -295,10 +275,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  submitForm = () => {
-    this.setState({ showSubmitModal: true })
-  }
-
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
@@ -310,22 +286,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application.payload = payload
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
-  }
-
-  registerApplication = () => {
-    this.setState({ showRegisterModal: true })
-  }
-
-  toggleSubmitModalOpen = () => {
-    this.setState((prevState: State) => ({
-      showSubmitModal: !prevState.showSubmitModal
-    }))
-  }
-
-  toggleRegisterModalOpen = () => {
-    this.setState((prevState: State) => ({
-      showRegisterModal: !prevState.showRegisterModal
-    }))
   }
 
   generateSectionListForReview = (
@@ -394,6 +354,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     let activeSection: IFormSection = this.props.activeSection
 
+    const errorsOnFields = getErrorsOnFieldsBySection(
+      registerForm.sections,
+      application
+    )
+    const isComplete =
+      flatten(
+        // @ts-ignore
+        Object.values(errorsOnFields).map(Object.values)
+        // @ts-ignore
+      ).filter(errors => errors.length > 0).length === 0
+
     if (activeSection.viewType === 'hidden') {
       const nextSec = getNextSection(registerForm.sections, activeSection)
       if (nextSec) {
@@ -418,60 +389,94 @@ class RegisterFormView extends React.Component<FullProps, State> {
             {intl.formatMessage(messages.queryError)}
           </ErrorText>
         )}
-
         {!isErrorOccured && (
           <>
-            <EventTopBar
-              title={intl.formatMessage(title, { event: application.event })}
-              iconColor={
-                application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                  ? 'orange'
-                  : 'violet'
-              }
-              saveAction={{
-                handler: this.onSaveAsDraftClicked,
-                label: intl.formatMessage(messages.saveExitButton)
-              }}
-              menuItems={[
-                {
-                  label: 'Delete Application',
-                  handler: () => {
-                    this.props.deleteApplication(application)
-                    this.props.goToHome()
-                  }
-                }
-              ]}
-            />
-
             {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-              <FullBodyContent>
-                <ReviewSection
-                  pageRoute={this.props.pageRoute}
-                  draft={application}
-                  submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                  deleteApplicationClickEvent={() => {
-                    this.props.deleteApplication(application)
-                    history.push('/')
+              <>
+                <EventTopBar
+                  title={intl.formatMessage(title, {
+                    event: application.event
+                  })}
+                  iconColor={
+                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                      ? 'orange'
+                      : 'violet'
+                  }
+                  saveAction={{
+                    handler: this.onSaveAsDraftClicked,
+                    label: intl.formatMessage(messages.saveExitButton)
                   }}
+                  menuItems={[
+                    {
+                      label: 'Delete Application',
+                      handler: () => {
+                        this.props.deleteApplication(application)
+                        this.props.goToHome()
+                      }
+                    }
+                  ]}
                 />
-              </FullBodyContent>
+                <FullBodyContent>
+                  <ReviewSection
+                    pageRoute={this.props.pageRoute}
+                    draft={application}
+                    submitClickEvent={this.confirmSubmission}
+                  />
+                </FullBodyContent>
+              </>
             )}
             {activeSection.viewType === VIEW_TYPE.REVIEW && (
-              <FullBodyContent>
-                <ReviewSection
-                  pageRoute={this.props.pageRoute}
-                  draft={application}
-                  rejectApplicationClickEvent={() => {
-                    this.toggleRejectForm()
+              <>
+                <EventTopBar
+                  title={intl.formatMessage(title, {
+                    event: application.event
+                  })}
+                  iconColor={
+                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                      ? 'orange'
+                      : 'violet'
+                  }
+                  saveAction={{
+                    handler: this.props.goToHome,
+                    label: intl.formatMessage(messages.exitButton)
                   }}
-                  registerClickEvent={this.registerApplication}
                 />
-              </FullBodyContent>
+                <FullBodyContent>
+                  <ReviewSection
+                    pageRoute={this.props.pageRoute}
+                    draft={application}
+                    rejectApplicationClickEvent={this.toggleRejectForm}
+                    submitClickEvent={this.confirmSubmission}
+                  />
+                </FullBodyContent>
+              </>
             )}
 
             {activeSection.viewType === 'form' && (
               <>
+                <EventTopBar
+                  title={intl.formatMessage(title, {
+                    event: application.event
+                  })}
+                  iconColor={
+                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                      ? 'orange'
+                      : 'violet'
+                  }
+                  saveAction={{
+                    handler: this.onSaveAsDraftClicked,
+                    label: intl.formatMessage(messages.saveExitButton)
+                  }}
+                  menuItems={[
+                    {
+                      label: 'Delete Application',
+                      handler: () => {
+                        this.props.deleteApplication(application)
+                        this.props.goToHome()
+                      }
+                    }
+                  ]}
+                />
                 <BodyContent>
                   <TertiaryButton
                     align={ICON_ALIGNMENT.LEFT}
@@ -560,87 +565,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
             )}
           </>
         )}
-
-        {this.state.showSubmitModal && (
-          <Modal
-            title={intl.formatMessage(messages.submitConfirmation)}
-            actions={[
-              <ConfirmBtn
-                key="submit"
-                id="submit_confirm"
-                onClick={() =>
-                  this.confirmSubmission(
-                    application,
-                    SUBMISSION_STATUS.READY_TO_SUBMIT,
-                    Action.SUBMIT_FOR_REVIEW
-                  )
-                }
-              >
-                <>
-                  <TickLarge />
-                  {intl.formatMessage(messages.submitButton)}
-                </>
-              </ConfirmBtn>,
-              <CancelButton
-                id="cancel-btn"
-                key="cancel"
-                onClick={() => {
-                  this.toggleSubmitModalOpen()
-                  if (document.documentElement) {
-                    document.documentElement.scrollTop = 0
-                  }
-                }}
-              >
-                {intl.formatMessage(messages.cancel)}
-              </CancelButton>
-            ]}
-            show={this.state.showSubmitModal}
-            handleClose={this.toggleSubmitModalOpen}
-          >
-            {intl.formatMessage(messages.submitDescription)}
-          </Modal>
-        )}
-        {this.state.showRegisterModal && (
-          <Modal
-            title={intl.formatMessage(messages.submitConfirmation)}
-            actions={[
-              <ConfirmBtn
-                key="register"
-                id="register_confirm"
-                // @ts-ignore
-                onClick={() =>
-                  this.confirmSubmission(
-                    application,
-                    SUBMISSION_STATUS.READY_TO_REGISTER,
-                    Action.REGISTER_APPLICATION
-                  )
-                }
-              >
-                <>
-                  <TickLarge />
-                  {intl.formatMessage(messages.submitButton)}
-                </>
-              </ConfirmBtn>,
-              <CancelButton
-                key="register_cancel"
-                id="register_cancel"
-                onClick={() => {
-                  this.toggleRegisterModalOpen()
-                  if (document.documentElement) {
-                    document.documentElement.scrollTop = 0
-                  }
-                }}
-              >
-                {intl.formatMessage(messages.cancel)}
-              </CancelButton>
-            ]}
-            show={this.state.showRegisterModal}
-            handleClose={this.toggleRegisterModalOpen}
-          >
-            {intl.formatMessage(messages.submitDescription)}
-          </Modal>
-        )}
-
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}

@@ -1,14 +1,10 @@
-import * as Bunyan from 'bunyan'
 import * as Hapi from 'hapi'
+import { HOST, PORT } from '@gateway/constants'
 
-export const getServer = (
-  env: string | undefined,
-  myPort: string | undefined,
-  logger: Bunyan
-): Hapi.Server => {
-  const port = myPort ? myPort : '7070'
+export const getServer = (): Hapi.Server => {
   const server = new Hapi.Server({
-    port,
+    host: HOST,
+    port: PORT,
     routes: {
       cors: { origin: ['*'] },
       payload: { maxBytes: 52428800 }

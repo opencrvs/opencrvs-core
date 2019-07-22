@@ -17,12 +17,13 @@ interface IProps {
 export class DataSection extends React.Component<IProps> {
   render() {
     const { title, items } = this.props
+    // console.log(JSON.stringify(items, null, 2))
 
     return (
       <Container>
         <Title>{title}</Title>
         {items.map((item: IDataProps, index: number) => (
-          <DataRow key={index} {...item} />
+          <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
         ))}
       </Container>
     )
