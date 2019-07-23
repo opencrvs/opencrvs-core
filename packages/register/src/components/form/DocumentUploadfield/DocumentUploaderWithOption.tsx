@@ -4,7 +4,7 @@ import {
   Select
 } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
+import { DocumentPreview } from '@register/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue } from '@register/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as Jimp from 'jimp'
@@ -289,7 +289,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         </Flex>
 
         {this.state.previewImage && (
-          <ImagePreview
+          <DocumentPreview
             previewImage={this.state.previewImage}
             title={intl.formatMessage(messages.preview)}
             goBack={this.closePreviewSection}

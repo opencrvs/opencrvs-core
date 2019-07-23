@@ -55,7 +55,7 @@ type IProps = {
   onDelete: (image: IFileValue) => void
 }
 
-export class ImagePreview extends React.Component<IProps> {
+export class DocumentPreview extends React.Component<IProps> {
   render = () => {
     const { previewImage, title, goBack, onDelete } = this.props
     return (
