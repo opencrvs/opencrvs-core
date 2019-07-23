@@ -221,9 +221,9 @@ describe('when user has starts a new application', () => {
           app.update()
         })
 
-        it('renders list of document requirements', () => {
+        it('renders list of document upload field', () => {
           const fileInputs = app
-            .find('#form_section_id_documents')
+            .find('#form_section_id_documents-view-group')
             .find('section')
             .children().length
 
