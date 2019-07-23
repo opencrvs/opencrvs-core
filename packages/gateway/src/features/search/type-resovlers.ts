@@ -10,7 +10,7 @@ interface ISearchDataTemplate {
 }
 export interface ISearchCriteria {
   applicationLocationId?: string
-  status?: string
+  status?: string[]
   trackingId?: string
   contactNumber?: string
   registrationNumber?: string

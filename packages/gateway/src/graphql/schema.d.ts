@@ -505,6 +505,7 @@ export interface GQLBirthRegistrationWithIn45D {
 
 export interface GQLEventCount {
   declared?: number
+  validated?: number
   registered?: number
   rejected?: number
 }
@@ -1170,9 +1171,9 @@ export interface QueryToCountEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToSearchEventsArgs {
-  status?: string
   userId?: string
   locationIds?: Array<string | null>
+  status?: Array<string | null>
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
@@ -2424,11 +2425,16 @@ export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
 
 export interface GQLEventCountTypeResolver<TParent = any> {
   declared?: EventCountToDeclaredResolver<TParent>
+  validated?: EventCountToValidatedResolver<TParent>
   registered?: EventCountToRegisteredResolver<TParent>
   rejected?: EventCountToRejectedResolver<TParent>
 }
 
 export interface EventCountToDeclaredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventCountToValidatedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
