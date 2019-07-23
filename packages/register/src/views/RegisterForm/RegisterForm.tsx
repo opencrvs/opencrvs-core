@@ -386,22 +386,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       offlineResources,
       handleSubmit,
-      duplicate
+      duplicate,
+      activeSection,
+      activeSectionGroup
     } = this.props
 
-    let activeSection: IFormSection = this.props.activeSection
-    let activeSectionGroup: IFormSectionGroup = this.props.activeSectionGroup
+    let nextSection: IFormSection = getNextSection(
+      registerForm.sections,
+      activeSection
+    ) as IFormSection
 
-    if (activeSection.viewType === VIEW_TYPE.HIDDEN) {
-      const nextSection = getNextSection(registerForm.sections, activeSection)
-      if (nextSection) {
-        activeSection = nextSection
-        activeSectionGroup = nextSection.groups[0]
-      }
+    if (nextSection && nextSection.viewType === VIEW_TYPE.HIDDEN) {
+      nextSection = getNextSection(
+        registerForm.sections,
+        nextSection
+      ) as IFormSection
     }
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
-      activeSection,
+      nextSection || activeSection,
       activeSectionGroup,
       application
     )
