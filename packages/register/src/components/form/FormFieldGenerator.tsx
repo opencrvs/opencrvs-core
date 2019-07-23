@@ -1,100 +1,92 @@
-import * as React from 'react'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
-  withFormik,
-  FastField,
-  Field,
-  FormikProps,
-  FieldProps,
-  FormikTouched,
-  FormikValues
-} from 'formik'
-import { isEqual } from 'lodash'
-import {
-  InjectedIntlProps,
-  injectIntl,
-  FormattedHTMLMessage,
-  FormattedMessage,
-  MessageValue
-} from 'react-intl'
-import {
-  TextInput,
-  Select,
-  RadioGroup,
   CheckboxGroup,
   DateField,
+  PDFViewer,
+  RadioGroup,
+  Select,
   TextArea,
-  WarningMessage,
-  PDFViewer
+  TextInput,
+  WarningMessage
 } from '@opencrvs/components/lib/forms'
-import { Paragraph, Link } from '@opencrvs/components/lib/typography'
-import {
-  internationaliseFieldObject,
-  getConditionalActionsForField,
-  getFieldOptions,
-  getFieldLabel,
-  getFieldOptionsByValueMapper,
-  getFieldType,
-  getQueryData
-} from '@register/forms/utils'
-
-import styled, { keyframes } from '@register/styledComponents'
-
-import {
-  IFormField,
-  Ii18nFormField,
-  IFormSectionData,
-  IFormFieldValue,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  SELECT_WITH_OPTIONS,
-  RADIO_GROUP,
-  CHECKBOX_GROUP,
-  DATE,
-  TEXTAREA,
-  NUMBER,
-  SUBSECTION,
-  LIST,
-  PARAGRAPH,
-  IMAGE_UPLOADER_WITH_OPTIONS,
-  IFileValue,
-  TEL,
-  INFORMATIVE_RADIO_GROUP,
-  WARNING,
-  ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  ITextFormField,
-  IDynamicFormField,
-  LINK,
-  PDF_DOCUMENT_VIEWER,
-  DYNAMIC_LIST,
-  IDynamicListFormField,
-  IListFormField,
-  IFormData,
-  FETCH_BUTTON,
-  ILoaderButton,
-  IForm,
-  IFormSection,
-  FIELD_GROUP_TITLE,
-  SEARCH_FIELD,
-  DOCUMENT_UPLOADER_WITH_OPTION
-} from '@register/forms'
-
-import { IValidationResult } from '@register/utils/validate'
-import { IOfflineDataState } from '@register/offline/reducer'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import { Link, Paragraph } from '@opencrvs/components/lib/typography'
+import { FetchButtonField } from '@register/components/form/FetchButton'
+import { FormList } from '@register/components/form/FormList'
 import { InputField } from '@register/components/form/InputField'
 import { SubSectionDivider } from '@register/components/form/SubSectionDivider'
-
-import { FormList } from '@register/components/form/FormList'
-import { ImageUploadField } from '@register/components/form/ImageUploadField'
-import { FetchButtonField } from '@register/components/form/FetchButton'
-
-import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
+import {
+  CHECKBOX_GROUP,
+  DATE,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  DYNAMIC_LIST,
+  FETCH_BUTTON,
+  FIELD_GROUP_TITLE,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IDynamicFormField,
+  IDynamicListFormField,
+  IFileValue,
+  IForm,
+  IFormData,
+  IFormField,
+  IFormFieldValue,
+  IFormSection,
+  IFormSectionData,
+  Ii18nFormField,
+  IListFormField,
+  ILoaderButton,
+  INFORMATIVE_RADIO_GROUP,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
+  ITextFormField,
+  LINK,
+  LIST,
+  NUMBER,
+  PARAGRAPH,
+  PDF_DOCUMENT_VIEWER,
+  RADIO_GROUP,
+  SEARCH_FIELD,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  SUBSECTION,
+  TEL,
+  TEXTAREA,
+  WARNING
+} from '@register/forms'
+import {
+  getConditionalActionsForField,
+  getFieldLabel,
+  getFieldOptions,
+  getFieldOptionsByValueMapper,
+  getFieldType,
+  getQueryData,
+  internationaliseFieldObject
+} from '@register/forms/utils'
+import { getValidationErrorsForForm } from '@register/forms/validation'
+import { IOfflineDataState } from '@register/offline/reducer'
+import styled, { keyframes } from '@register/styledComponents'
 import { gqlToDraftTransformer } from '@register/transformer'
-import { SearchField } from './SearchField'
-import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { DocumentUploadWraper } from './DocumentUploadfield/DocumentUploadField'
+import { IValidationResult } from '@register/utils/validate'
+import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
+import {
+  FastField,
+  Field,
+  FieldProps,
+  FormikProps,
+  FormikTouched,
+  FormikValues,
+  withFormik
+} from 'formik'
+import { isEqual } from 'lodash'
+import * as React from 'react'
+import {
+  FormattedHTMLMessage,
+  FormattedMessage,
+  InjectedIntlProps,
+  injectIntl,
+  MessageValue
+} from 'react-intl'
 import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
+import { SearchField } from './SearchField'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -331,20 +323,6 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
-    return (
-      <ImageUploadField
-        id={inputProps.id}
-        title={fieldDefinition.label}
-        optionSection={fieldDefinition.optionSection}
-        files={value as IFileValue[]}
-        onComplete={(files: IFileValue[]) =>
-          onSetFieldValue(fieldDefinition.name, files)
-        }
-      />
-    )
-  }
-
   if (fieldDefinition.type === SEARCH_FIELD) {
     return (
       <SearchField
@@ -574,7 +552,6 @@ class FormSectionComponent extends React.Component<Props> {
 
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
-            field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
