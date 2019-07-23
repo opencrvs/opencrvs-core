@@ -77,7 +77,7 @@ const messages: {
   applicantTab: {
     id: 'register.form.section.applicant.name',
     defaultMessage: 'Applicant',
-    description: 'Tab title for Applicant'
+    description: 'Form section name for Applicant'
   },
   applicantTitle: {
     id: 'register.form.section.applicant.title',

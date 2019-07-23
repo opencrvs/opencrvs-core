@@ -18,7 +18,7 @@ const messages: {
   previewTab: {
     id: 'register.form.section.preview.name',
     defaultMessage: 'Preview',
-    description: 'Tab title for Preview'
+    description: 'Form section name for Preview'
   },
   previewTitle: {
     id: 'register.form.section.preview.title',

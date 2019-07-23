@@ -26,7 +26,7 @@ const messages: {
   registrationTab: {
     id: 'register.form.section.application.name',
     defaultMessage: 'Registration',
-    description: 'Tab title for Registration'
+    description: 'Form section name for Registration'
   },
   registrationTitle: {
     id: 'register.form.section.application.title',

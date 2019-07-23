@@ -17,7 +17,7 @@ const messages: {
   documentsTab: {
     id: 'register.form.section.documents.name',
     defaultMessage: 'Documents',
-    description: 'Tab title for Documents'
+    description: 'Form section name for Documents'
   },
   documentsTitle: {
     id: 'register.form.section.documents.title',
@@ -32,7 +32,7 @@ const messages: {
   documentsUploadName: {
     id: 'register.form.section.upload.documentsName',
     defaultMessage: 'Documents Upload',
-    description: 'Tab title for Documents Upload'
+    description: 'Form section name for Documents Upload'
   },
   documentsUploadTitle: {
     id: 'register.form.section.upload.documentsTitle',

@@ -76,7 +76,7 @@ const messages: {
   motherTab: {
     id: 'register.form.section.mother.name',
     defaultMessage: 'Mother',
-    description: 'Tab title for Mother'
+    description: 'Form section name for Mother'
   },
   motherTitle: {
     id: 'register.form.section.mother.title',

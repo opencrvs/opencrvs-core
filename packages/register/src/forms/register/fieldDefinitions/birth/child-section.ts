@@ -50,194 +50,194 @@ export interface IChildSectionFormData {
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
-  childTab: {
-    id: 'register.form.section.child.name',
-    defaultMessage: 'Child',
-    description: 'Tab title for Child'
-  },
-  childTitle: {
-    id: 'register.form.section.child.title',
-    defaultMessage: "Child's details",
-    description: 'Form section title for Child'
-  },
-  childFirstNames: {
-    id: 'form.field.label.childFirstNames',
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: First names'
-  },
-  childFamilyName: {
-    id: 'form.field.label.childFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
-  },
-  childFirstNamesEng: {
-    id: 'form.field.label.childFirstNamesEng',
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english'
-  },
-  childFamilyNameEng: {
-    id: 'form.field.label.childFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
-  },
-  childSex: {
-    id: 'form.field.label.childSex',
-    defaultMessage: 'Sex',
-    description: 'Label for form field: Sex name'
-  },
-  childSexMale: {
-    id: 'form.field.label.childSexMale',
-    defaultMessage: 'Male',
-    description: 'Option for form field: Sex name'
-  },
-  childSexFemale: {
-    id: 'form.field.label.childSexFemale',
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name'
-  },
-  childSexOther: {
-    id: 'form.field.label.childSexOther',
-    defaultMessage: 'Other',
-    description: 'Option for form field: Sex name'
-  },
-  childSexUnknown: {
-    id: 'form.field.label.childSexUnknown',
-    defaultMessage: 'Unknown',
-    description: 'Option for form field: Sex name'
-  },
-  childDateOfBirth: {
-    id: 'form.field.label.childDateOfBirth',
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth'
-  },
   attendantAtBirth: {
-    id: 'form.field.label.attendantAtBirth',
     defaultMessage: 'Attendant at birth',
-    description: 'Label for form field: Attendant at birth'
-  },
-  attendantAtBirthPhysician: {
-    id: 'form.field.label.attendantAtBirthPhysician',
-    defaultMessage: 'Physician',
-    description: 'Label for form field: Attendant at birth'
-  },
-  attendantAtBirthNurse: {
-    id: 'form.field.label.attendantAtBirthNurse',
-    defaultMessage: 'Nurse',
-    description: 'Label for form field: Attendant at birth'
-  },
-  attendantAtBirthMidwife: {
-    id: 'form.field.label.attendantAtBirthMidwife',
-    defaultMessage: 'Midwife',
-    description: 'Label for form field: Attendant at birth'
-  },
-  attendantAtBirthOtherParamedicalPersonnel: {
-    id: 'form.field.label.attendantAtBirthOtherParamedicalPersonnel',
-    defaultMessage: 'Other paramedical personnel',
-    description: 'Label for form field: Attendant at birth'
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirth'
   },
   attendantAtBirthLayperson: {
-    id: 'form.field.label.attendantAtBirthLayperson',
     defaultMessage: 'Layperson',
-    description: 'Label for form field: Attendant at birth'
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthLayperson'
+  },
+  attendantAtBirthMidwife: {
+    defaultMessage: 'Midwife',
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthMidwife'
   },
   attendantAtBirthNone: {
-    id: 'form.field.label.attendantAtBirthNone',
     defaultMessage: 'None',
-    description: 'Label for form field: Attendant at birth'
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthNone'
+  },
+  attendantAtBirthNurse: {
+    defaultMessage: 'Nurse',
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthNurse'
   },
   attendantAtBirthOther: {
-    id: 'form.field.label.attendantAtBirthOther',
     defaultMessage: 'Other',
-    description: 'Label for form field: Attendant at birth'
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthOther'
   },
-  birthType: {
-    id: 'form.field.label.birthType',
-    defaultMessage: 'Type of birth',
-    description: 'Label for form field: Type of birth'
+  attendantAtBirthOtherParamedicalPersonnel: {
+    defaultMessage: 'Other paramedical personnel',
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthOtherParamedicalPersonnel'
   },
-  birthTypeSingle: {
-    id: 'form.field.label.birthTypeSingle',
-    defaultMessage: 'Single',
-    description: 'Label for form field: Type of birth'
-  },
-  birthTypeTwin: {
-    id: 'form.field.label.birthTypeTwin',
-    defaultMessage: 'Twin',
-    description: 'Label for form field: Type of birth'
-  },
-  birthTypeTriplet: {
-    id: 'form.field.label.birthTypeTriplet',
-    defaultMessage: 'Triplet',
-    description: 'Label for form field: Type of birth'
-  },
-  birthTypeQuadruplet: {
-    id: 'form.field.label.birthTypeQuadruplet',
-    defaultMessage: 'Quadruplet',
-    description: 'Label for form field: Type of birth'
-  },
-  birthTypeHigherMultipleDelivery: {
-    id: 'form.field.label.birthTypeHigherMultipleDelivery',
-    defaultMessage: 'Higher multiple delivery',
-    description: 'Label for form field: Type of birth'
-  },
-  multipleBirth: {
-    id: 'form.field.label.multipleBirth',
-    defaultMessage: 'Order of birth (number)',
-    description: 'Label for form field: Order of birth'
-  },
-  weightAtBirth: {
-    id: 'form.field.label.weightAtBirth',
-    defaultMessage: 'Weight at birth',
-    description: 'Label for form field: Weight at birth'
-  },
-  placeOfBirth: {
-    id: 'form.field.label.placeOfBirth',
-    defaultMessage: 'Place of delivery',
-    description: 'Label for form field: Place of delivery'
+  attendantAtBirthPhysician: {
+    defaultMessage: 'Physician',
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthPhysician'
   },
   birthLocation: {
-    id: 'form.field.label.birthLocation',
     defaultMessage: 'Hospital / Clinic',
-    description: 'Label for form field: Hospital or Health Institution'
+    description: 'Label for form field: Hospital or Health Institution',
+    id: 'form.field.label.birthLocation'
   },
-  deliveryInstitution: {
-    id: 'form.field.label.deliveryInstitution',
-    defaultMessage: 'Type or select institution',
-    description: 'Label for form field: Type or select institution'
+  birthType: {
+    defaultMessage: 'Type of birth',
+    description: 'Label for form field: Type of birth',
+    id: 'form.field.label.birthType'
+  },
+  birthTypeHigherMultipleDelivery: {
+    defaultMessage: 'Higher multiple delivery',
+    description: 'Label for form field: Type of birth',
+    id: 'form.field.label.birthTypeHigherMultipleDelivery'
+  },
+  birthTypeQuadruplet: {
+    defaultMessage: 'Quadruplet',
+    description: 'Label for form field: Type of birth',
+    id: 'form.field.label.birthTypeQuadruplet'
+  },
+  birthTypeSingle: {
+    defaultMessage: 'Single',
+    description: 'Label for form field: Type of birth',
+    id: 'form.field.label.birthTypeSingle'
+  },
+  birthTypeTriplet: {
+    defaultMessage: 'Triplet',
+    description: 'Label for form field: Type of birth',
+    id: 'form.field.label.birthTypeTriplet'
+  },
+  birthTypeTwin: {
+    defaultMessage: 'Twin',
+    description: 'Label for form field: Type of birth',
+    id: 'form.field.label.birthTypeTwin'
+  },
+  childDateOfBirth: {
+    defaultMessage: 'Date of birth',
+    description: 'Label for form field: Date of birth',
+    id: 'form.field.label.childDateOfBirth'
+  },
+  childFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.childFamilyName'
+  },
+  childFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.childFamilyNameEng'
+  },
+  childFirstNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: First names',
+    id: 'form.field.label.childFirstNames'
+  },
+  childFirstNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: First names in english',
+    id: 'form.field.label.childFirstNamesEng'
+  },
+  childSex: {
+    defaultMessage: 'Sex',
+    description: 'Label for form field: Sex name',
+    id: 'form.field.label.childSex'
+  },
+  childSexFemale: {
+    defaultMessage: 'Female',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.childSexFemale'
+  },
+  childSexMale: {
+    defaultMessage: 'Male',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.childSexMale'
+  },
+  childSexOther: {
+    defaultMessage: 'Other',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.childSexOther'
+  },
+  childSexUnknown: {
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.childSexUnknown'
+  },
+  childTab: {
+    defaultMessage: 'Child',
+    description: 'Form section name for Child',
+    id: 'register.form.section.child.name'
+  },
+  childTitle: {
+    defaultMessage: "Child's details",
+    description: 'Form section title for Child',
+    id: 'register.form.section.child.title'
   },
   deliveryAddress: {
-    id: 'form.field.label.deliveryAddress',
     defaultMessage: 'Address of place of delivery',
-    description: 'Label for form field: Address of place of delivery'
+    description: 'Label for form field: Address of place of delivery',
+    id: 'form.field.label.deliveryAddress'
+  },
+  deliveryInstitution: {
+    defaultMessage: 'Type or select institution',
+    description: 'Label for form field: Type or select institution',
+    id: 'form.field.label.deliveryInstitution'
   },
   hospital: {
-    id: 'form.field.label.hospital',
     defaultMessage: 'Hospital',
-    description: 'Select item for hospital'
+    description: 'Select item for hospital',
+    id: 'form.field.label.hospital'
   },
-  otherHealthInstitution: {
-    id: 'form.field.label.otherHealthInstitution',
-    defaultMessage: 'Other Health Institution',
-    description: 'Select item for Other Health Institution'
-  },
-  privateHome: {
-    id: 'form.field.label.privateHome',
-    defaultMessage: 'Private Home',
-    description: 'Select item for Private Home'
-  },
-  otherInstitution: {
-    id: 'form.field.label.otherInstitution',
-    defaultMessage: 'Other Institution',
-    description: 'Select item for Other Institution'
+  multipleBirth: {
+    defaultMessage: 'Order of birth (number)',
+    description: 'Label for form field: Order of birth',
+    id: 'form.field.label.multipleBirth'
   },
   optionalLabel: {
-    id: 'form.field.label.optionalLabel',
     defaultMessage: 'Optional',
-    description: 'Optional label'
+    description: 'Optional label',
+    id: 'form.field.label.optionalLabel'
+  },
+  otherHealthInstitution: {
+    defaultMessage: 'Other Health Institution',
+    description: 'Select item for Other Health Institution',
+    id: 'form.field.label.otherHealthInstitution'
+  },
+  otherInstitution: {
+    defaultMessage: 'Other Institution',
+    description: 'Select item for Other Institution',
+    id: 'form.field.label.otherInstitution'
+  },
+  placeOfBirth: {
+    defaultMessage: 'Place of delivery',
+    description: 'Label for form field: Place of delivery',
+    id: 'form.field.label.placeOfBirth'
+  },
+  privateHome: {
+    defaultMessage: 'Private Home',
+    description: 'Select item for Private Home',
+    id: 'form.field.label.privateHome'
   },
   select: {
-    id: 'register.select.placeholder',
-    defaultMessage: 'Select'
+    defaultMessage: 'Select',
+    id: 'register.select.placeholder'
+  },
+  weightAtBirth: {
+    defaultMessage: 'Weight at birth',
+    description: 'Label for form field: Weight at birth',
+    id: 'form.field.label.weightAtBirth'
   }
 })
 

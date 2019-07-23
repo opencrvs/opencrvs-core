@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from '@register/styledComponents'
 import { IconAction } from '@opencrvs/components/lib/buttons'
 import { Camera } from '@opencrvs/components/lib/icons'
@@ -9,6 +9,7 @@ import { FileItem } from '@opencrvs/components/lib/files'
 import { IFormSection, IFileValue } from '@register/forms'
 import { ImageUploadOption } from '@register/components/form/ImageUploadField/ImageUploadOption'
 import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
+import { buttonMessages, formMessages } from '@opencrvs/commons'
 
 const Container = styled.div`
   width: 100%;
@@ -44,35 +45,6 @@ const FileViewerLabel = styled.label`
 const FileItemContainer = styled.div`
   margin-top: 12px;
 `
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  back: {
-    id: 'buttons.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-  uploadedList: {
-    id: 'form.field.label.imageUpload.uploadedList',
-    defaultMessage: 'Uploaded:',
-    description: 'label for uploaded list'
-  },
-  delete: {
-    id: 'form.field.label.imageUpload.delete',
-    defaultMessage: 'Delete',
-    description: 'label for delete a uploaded item'
-  },
-  preview: {
-    id: 'form.field.label.imageUpload.preview',
-    defaultMessage: 'Preview',
-    description: 'label for preview a uploaded item'
-  },
-  upload: {
-    id: 'buttons.upload',
-    defaultMessage: 'Upload',
-    description: 'title for option view'
-  }
-})
 
 type IProps = {
   files?: IFileValue[]
@@ -156,9 +128,9 @@ class ImageUploadComponent extends React.Component<
             <FileItem
               id={`file_item_${index}`}
               file={augmentedFile}
-              deleteLabel={intl.formatMessage(messages.delete)}
+              deleteLabel={intl.formatMessage(buttonMessages.delete)}
               onDelete={() => this.onDelete(index)}
-              previewLabel={intl.formatMessage(messages.preview)}
+              previewLabel={intl.formatMessage(buttonMessages.preview)}
               onPreview={() => this.onPreview(file, index)}
             />
           </FileItemContainer>
@@ -177,7 +149,7 @@ class ImageUploadComponent extends React.Component<
         {fileList && fileList.length > 0 && (
           <FileViewer id="file_list_viewer">
             <FileViewerLabel>
-              {intl.formatMessage(messages.uploadedList)}
+              {intl.formatMessage(formMessages.uploadedList)}
             </FileViewerLabel>
             {fileList}
           </FileViewer>
@@ -186,8 +158,8 @@ class ImageUploadComponent extends React.Component<
         {this.state.showNestedOptionSection && (
           <ImageUploadOption
             option={optionSection}
-            title={intl.formatMessage(messages.upload)}
-            backLabel={intl.formatMessage(messages.back)}
+            title={intl.formatMessage(buttonMessages.upload)}
+            backLabel={intl.formatMessage(buttonMessages.back)}
             onComplete={this.onComplete}
             toggleNestedSection={this.toggleNestedSection}
           />

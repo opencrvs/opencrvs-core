@@ -21,7 +21,7 @@ const messages: {
   causeOfDeathTab: {
     id: 'register.form.section.causeOfDeath.name',
     defaultMessage: 'Cause of Death',
-    description: 'Tab title for Cause of Death'
+    description: 'Form section name for Cause of Death'
   },
   causeOfDeathTitle: {
     id: 'register.form.section.causeOfDeath.title',

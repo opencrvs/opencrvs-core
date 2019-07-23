@@ -44,7 +44,7 @@ const messages: {
   deathEventTab: {
     id: 'register.form.section.deathEvent.name',
     defaultMessage: 'Event',
-    description: 'Tab title for Death Event'
+    description: 'Form section name for Death Event'
   },
   deathEventTitle: {
     id: 'register.form.section.deathEvent.title',

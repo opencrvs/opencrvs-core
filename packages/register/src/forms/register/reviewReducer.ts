@@ -18,7 +18,7 @@ const messages: {
   reviewTab: {
     id: 'review.form.tabs.review.name',
     defaultMessage: 'Review',
-    description: 'Tab title for Review'
+    description: 'Form section name for Review'
   },
   reviewTitle: {
     id: 'review.form.section.review.title',

@@ -82,7 +82,7 @@ const messages: {
   fatherTab: {
     id: 'register.form.section.father.name',
     defaultMessage: 'Father',
-    description: 'Tab title for Father'
+    description: 'Form section name for Father'
   },
   fatherTitle: {
     id: 'register.form.section.father.title',

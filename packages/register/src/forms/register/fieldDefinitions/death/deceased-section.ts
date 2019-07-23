@@ -62,7 +62,7 @@ const messages: {
   deceasedTab: {
     id: 'register.form.section.deceased.name',
     defaultMessage: 'Deceased',
-    description: 'Tab title for Deceased'
+    description: 'Form section name for Deceased'
   },
   deceasedTitle: {
     id: 'register.form.section.deceased.title',
