@@ -23,6 +23,7 @@ import { draftToGqlTransformer } from '@register/transformer'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
+import { getSectionFields } from '@register/forms/utils'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -62,7 +63,7 @@ class UserReviewFormComponent extends React.Component<
   transformSectionData = () => {
     const { intl, section } = this.props
     const sections: ISectionData[] = []
-    section.fields.forEach((field: IFormField) => {
+    getSectionFields(section).forEach((field: IFormField) => {
       if (field && field.type === FIELD_GROUP_TITLE) {
         sections.push({ title: intl.formatMessage(field.label), items: [] })
       } else if (field && sections.length > 0) {

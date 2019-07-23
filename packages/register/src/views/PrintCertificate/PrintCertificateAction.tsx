@@ -419,14 +419,14 @@ class PrintCertificateActionComponent extends React.Component<
   shouldEnableConfirmButton = (documentData: IFormSectionData) => {
     const form = this.getForm(this.state.currentForm)
     if (form.id !== 'certificatePreview') {
-      return documentData && !hasFormError(form.fields, documentData)
+      return documentData && !hasFormError(form.groups[0].fields, documentData)
     } else {
       return false
     }
   }
 
   addPDFToField(form: IFormSection) {
-    form.fields.map((field: IFormField) => {
+    form.groups[0].fields.map((field: IFormField) => {
       if (field.type === PDF_DOCUMENT_VIEWER) {
         field.initialValue = this.state.certificatePdf
       }
@@ -507,7 +507,7 @@ class PrintCertificateActionComponent extends React.Component<
     const { intl, paymentFormSection, event } = this.props
     const { enableConfirmButton } = this.state
     const issuerDetails = this.getIssuerDetails()
-    const amountObj = paymentFormSection.fields.find(
+    const amountObj = paymentFormSection.groups[0].fields.find(
       i => i.name === 'paymentAmount'
     )
     let amount = ''
@@ -667,7 +667,7 @@ class PrintCertificateActionComponent extends React.Component<
     switch (currentForm) {
       case COLLECT_CERTIFICATE:
         const { paymentFormSection } = this.props
-        const paymentAmountField = paymentFormSection.fields.find(
+        const paymentAmountField = paymentFormSection.groups[0].fields.find(
           field => field.name === 'paymentAmount'
         )
         paymentAmountField && Number(paymentAmountField.initialValue) > 0
@@ -979,7 +979,7 @@ class PrintCertificateActionComponent extends React.Component<
                   if (data) {
                     // @ts-ignore
                     const retrievedData = data[dataKey]
-                    let fields = collectCertificateForm.fields
+                    let fields = collectCertificateForm.groups[0].fields
                     fields = fields.map(field => {
                       if (field && field.type === INFORMATIVE_RADIO_GROUP) {
                         if (field.dynamicInformationRetriever) {
@@ -1001,7 +1001,7 @@ class PrintCertificateActionComponent extends React.Component<
                       .replace(' ago', '')
                       .replace(' আগে', '')
 
-                    paymentFormSection.fields.map(field => {
+                    paymentFormSection.groups[0].fields.map(field => {
                       if (
                         field &&
                         field.type === PARAGRAPH &&
@@ -1012,7 +1012,7 @@ class PrintCertificateActionComponent extends React.Component<
                       return field
                     })
 
-                    paymentFormSection.fields.map(field => {
+                    paymentFormSection.groups[0].fields.map(field => {
                       if (
                         field &&
                         field.type === PARAGRAPH &&
@@ -1040,7 +1040,7 @@ class PrintCertificateActionComponent extends React.Component<
                     )
                     if (
                       event === Event.BIRTH &&
-                      form.fields.filter(
+                      form.groups[0].fields.filter(
                         field => field.name === 'personCollectingCertificate'
                       ).length === 0 &&
                       form === collectCertificateForm
@@ -1049,9 +1049,9 @@ class PrintCertificateActionComponent extends React.Component<
                         transData.father &&
                         transData.father.fathersDetailsExist
                       ) {
-                        form.fields.unshift(fatherDataExists)
+                        form.groups[0].fields.unshift(fatherDataExists)
                       } else {
-                        form.fields.unshift(fatherDataDoesNotExist)
+                        form.groups[0].fields.unshift(fatherDataDoesNotExist)
                       }
                     }
                     const reviewDraft = createReviewApplication(
@@ -1072,7 +1072,7 @@ class PrintCertificateActionComponent extends React.Component<
                             id={form.id}
                             onChange={this.storeData}
                             setAllFieldsDirty={false}
-                            fields={form.fields}
+                            fields={form.groups[0].fields}
                           />
                         </Box>
                         <Column>

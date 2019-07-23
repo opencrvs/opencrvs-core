@@ -5,15 +5,8 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import {
-  EventTopBar,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
-import {
-  BodyContent,
-  Container,
-  FullBodyContent
-} from '@opencrvs/components/lib/layout'
+import { EventTopBar } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
   IApplication,
@@ -26,17 +19,17 @@ import {
 import { FormFieldGenerator } from '@register/components/form'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
-  Action,
   Event,
   IForm,
   IFormField,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  IFormSectionGroup
 } from '@register/forms'
 import {
   goBack as goBackAction,
   goToHome,
-  goToPage as goToPageAction
+  goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { IOfflineDataState } from '@register/offline/reducer'
@@ -46,20 +39,23 @@ import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import {
-  ReviewSection,
-  getErrorsOnFieldsBySection
-} from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge, flatten } from 'lodash'
+import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
+import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  getVisibleGroupFields
+} from '@register/forms/utils'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 
-const FormSectionTitle = styled.h3`
-  ${({ theme }) => theme.fonts.h3Style};
+const FormSectionTitle = styled.h4`
+  ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FooterArea = styled.div`
@@ -77,6 +73,14 @@ const Notice = styled.div`
 
 const StyledLinkButton = styled(LinkButton)`
   margin-left: 32px;
+`
+const Required = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.error};
+  flex-grow: 0;
 `
 
 export const messages: {
@@ -115,21 +119,11 @@ export const messages: {
     defaultMessage: 'Next',
     description: 'Next button'
   },
-  cancel: {
-    id: 'buttons.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Cancel button on submit modal'
-  },
   submitDescription: {
     id: 'register.form.modal.submitDescription',
     defaultMessage:
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     description: 'Submit description text on submit modal'
-  },
-  submitButton: {
-    id: 'register.form.modal.submitButton',
-    defaultMessage: 'Submit',
-    description: 'Submit button on submit modal'
   },
   back: {
     id: 'buttons.back',
@@ -167,36 +161,14 @@ export const messages: {
     defaultMessage: 'SAVE & EXIT',
     description: 'SAVE & EXIT Button Text'
   },
+  exitButton: {
+    id: 'buttons.exit',
+    defaultMessage: 'EXIT',
+    description: 'Label for Exit button on EventTopBar'
+  },
   backToReviewButton: {
     id: 'register.selectVitalEvent.backToReviewButton',
     defaultMessage: 'Back to review'
-  },
-  submitConfirmationTitle: {
-    id: 'register.form.modal.title.submitConfirmation',
-    defaultMessage:
-      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
-    description: 'Submit title text on modal'
-  },
-  submitConfirmationDesc: {
-    id: 'register.form.modal.desc.submitConfirmation',
-    defaultMessage:
-      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
-    description: 'Submit description text on modal'
-  },
-  registerConfirmationTitle: {
-    id: 'register.form.modal.title.registerConfirmation',
-    defaultMessage: 'Register this application?',
-    description: 'Title for register confirmation modal'
-  },
-  registerConfirmationDesc: {
-    id: 'register.form.modal.desc.registerConfirmation',
-    defaultMessage: 'Are you sure?',
-    description: 'Description for register confirmation modal'
-  },
-  registerButtonTitle: {
-    id: 'register.form.modal.button.title.registerConfirmation',
-    defaultMessage: 'Register',
-    description: 'Label for button on register confirmation modal'
   }
 })
 
@@ -215,9 +187,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-function getActiveSectionId(form: IForm, viewParams: { pageId?: string }) {
-  return viewParams.pageId || form.sections[0].id
-}
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   const currentIndex = sections.findIndex(
@@ -231,6 +200,38 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
+function getNextSectionIds(
+  sections: IFormSection[],
+  fromSection: IFormSection,
+  fromSectionGroup: IFormSectionGroup,
+  application: IApplication
+) {
+  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+    fromSection,
+    application.data[fromSection.id] || {}
+  )
+  const currentGroupIndex = visibleGroups.findIndex(
+    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
+  )
+
+  if (currentGroupIndex === visibleGroups.length - 1) {
+    const currentIndex = sections.findIndex(
+      (section: IFormSection) => section.id === fromSection.id
+    )
+    if (currentIndex === sections.length - 1) {
+      return null
+    }
+    return {
+      sectionId: sections[currentIndex + 1].id,
+      groupId: sections[currentIndex + 1].groups[0].id
+    }
+  }
+  return {
+    sectionId: fromSection.id,
+    groupId: visibleGroups[currentGroupIndex + 1].id
+  }
+}
+
 export interface IFormProps {
   application: IApplication
   registerForm: IForm
@@ -239,7 +240,7 @@ export interface IFormProps {
 }
 
 type DispatchProps = {
-  goToPage: typeof goToPageAction
+  goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
   writeApplication: typeof writeApplication
@@ -251,6 +252,7 @@ type DispatchProps = {
 
 type Props = {
   activeSection: IFormSection
+  activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
   offlineResources: IOfflineDataState
 }
@@ -260,29 +262,28 @@ export type FullProps = IFormProps &
   DispatchProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
     pageId: string
+    groupId?: string
     applicationId: string
   }>
 
 type State = {
-  showSubmitModal: boolean
-  showRegisterModal: boolean
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
 }
 const VIEW_TYPE = {
+  FORM: 'form',
   REVIEW: 'review',
-  PREVIEW: 'preview'
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
     this.state = {
-      showSubmitModal: false,
       isDataAltered: false,
       rejectFormOpen: false,
-      showRegisterModal: false,
       hasError: false
     }
   }
@@ -311,10 +312,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  submitForm = () => {
-    this.setState({ showSubmitModal: true })
-  }
-
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
@@ -326,22 +323,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application.payload = payload
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
-  }
-
-  registerApplication = () => {
-    this.setState({ showRegisterModal: true })
-  }
-
-  toggleSubmitModalOpen = () => {
-    this.setState((prevState: State) => ({
-      showSubmitModal: !prevState.showSubmitModal
-    }))
-  }
-
-  toggleRegisterModalOpen = () => {
-    this.setState((prevState: State) => ({
-      showRegisterModal: !prevState.showRegisterModal
-    }))
   }
 
   generateSectionListForReview = (
@@ -390,10 +371,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     pageRoute: string,
     applicationId: string,
     pageId: string,
+    groupId: string,
     event: string
   ) => {
     this.props.writeApplication(this.props.application)
-    this.props.goToPage(pageRoute, applicationId, pageId, event)
+    this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
   }
 
   render() {
@@ -401,7 +383,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       intl,
       setAllFieldsDirty,
       application,
-      history,
       registerForm,
       offlineResources,
       handleSubmit,
@@ -409,32 +390,29 @@ class RegisterFormView extends React.Component<FullProps, State> {
     } = this.props
 
     let activeSection: IFormSection = this.props.activeSection
+    let activeSectionGroup: IFormSectionGroup = this.props.activeSectionGroup
 
-    const errorsOnFields = getErrorsOnFieldsBySection(
-      registerForm.sections,
-      application
-    )
-    const isComplete =
-      flatten(
-        // @ts-ignore
-        Object.values(errorsOnFields).map(Object.values)
-        // @ts-ignore
-      ).filter(errors => errors.length > 0).length === 0
-
-    if (activeSection.viewType === 'hidden') {
-      const nextSec = getNextSection(registerForm.sections, activeSection)
-      if (nextSec) {
-        activeSection = nextSec
+    if (activeSection.viewType === VIEW_TYPE.HIDDEN) {
+      const nextSection = getNextSection(registerForm.sections, activeSection)
+      if (nextSection) {
+        activeSection = nextSection
+        activeSectionGroup = nextSection.groups[0]
       }
     }
+    const nextSectionGroup = getNextSectionIds(
+      registerForm.sections,
+      activeSection,
+      activeSectionGroup,
+      application
+    )
 
-    const nextSection = getNextSection(registerForm.sections, activeSection)
     const title =
       activeSection.viewType === VIEW_TYPE.REVIEW
         ? messages.reviewEventRegistration
         : activeSection.viewType === VIEW_TYPE.PREVIEW
         ? messages.previewEventRegistration
         : messages.newVitalEventRegistration
+
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -445,60 +423,90 @@ class RegisterFormView extends React.Component<FullProps, State> {
             {intl.formatMessage(messages.queryError)}
           </ErrorText>
         )}
-
         {!isErrorOccured && (
           <>
-            <EventTopBar
-              title={intl.formatMessage(title, { event: application.event })}
-              iconColor={
-                application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                  ? 'orange'
-                  : 'violet'
-              }
-              saveAction={{
-                handler: this.onSaveAsDraftClicked,
-                label: intl.formatMessage(messages.saveExitButton)
-              }}
-              menuItems={[
-                {
-                  label: 'Delete Application',
-                  handler: () => {
-                    this.props.deleteApplication(application)
-                    this.props.goToHome()
-                  }
-                }
-              ]}
-            />
-
             {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-              <FullBodyContent>
+              <>
+                <EventTopBar
+                  title={intl.formatMessage(title, {
+                    event: application.event
+                  })}
+                  iconColor={
+                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                      ? 'orange'
+                      : 'violet'
+                  }
+                  saveAction={{
+                    handler: this.onSaveAsDraftClicked,
+                    label: intl.formatMessage(messages.saveExitButton)
+                  }}
+                  menuItems={[
+                    {
+                      label: 'Delete Application',
+                      handler: () => {
+                        this.props.deleteApplication(application)
+                        this.props.goToHome()
+                      }
+                    }
+                  ]}
+                />
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={application}
-                  submitClickEvent={this.submitForm}
-                  saveDraftClickEvent={() => this.onSaveAsDraftClicked()}
-                  deleteApplicationClickEvent={() => {
-                    this.props.deleteApplication(application)
-                    history.push('/')
-                  }}
+                  submitClickEvent={this.confirmSubmission}
                 />
-              </FullBodyContent>
+              </>
             )}
             {activeSection.viewType === VIEW_TYPE.REVIEW && (
-              <FullBodyContent>
+              <>
+                <EventTopBar
+                  title={intl.formatMessage(title, {
+                    event: application.event
+                  })}
+                  iconColor={
+                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                      ? 'orange'
+                      : 'violet'
+                  }
+                  saveAction={{
+                    handler: this.props.goToHome,
+                    label: intl.formatMessage(messages.exitButton)
+                  }}
+                />
                 <ReviewSection
                   pageRoute={this.props.pageRoute}
                   draft={application}
-                  rejectApplicationClickEvent={() => {
-                    this.toggleRejectForm()
-                  }}
-                  registerClickEvent={this.registerApplication}
+                  rejectApplicationClickEvent={this.toggleRejectForm}
+                  submitClickEvent={this.confirmSubmission}
                 />
-              </FullBodyContent>
+              </>
             )}
 
-            {activeSection.viewType === 'form' && (
+            {activeSection.viewType === VIEW_TYPE.FORM && (
               <>
+                <EventTopBar
+                  title={intl.formatMessage(title, {
+                    event: application.event
+                  })}
+                  iconColor={
+                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                      ? 'orange'
+                      : 'violet'
+                  }
+                  saveAction={{
+                    handler: this.onSaveAsDraftClicked,
+                    label: intl.formatMessage(messages.saveExitButton)
+                  }}
+                  menuItems={[
+                    {
+                      label: 'Delete Application',
+                      handler: () => {
+                        this.props.deleteApplication(application)
+                        this.props.goToHome()
+                      }
+                    }
+                  ]}
+                />
                 <BodyContent>
                   <TertiaryButton
                     align={ICON_ALIGNMENT.LEFT}
@@ -508,30 +516,58 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     {intl.formatMessage(messages.back)}
                   </TertiaryButton>
                   <FormSectionTitle
-                    id={`form_section_title_${activeSection.id}`}
+                    id={`form_section_title_${activeSectionGroup.id}`}
                   >
-                    {intl.formatMessage(activeSection.title)}
-                    {activeSection.optional && (
-                      <Optional
-                        id={`form_section_opt_label_${activeSection.id}`}
-                        disabled={activeSection.disabled}
-                      >
-                        &nbsp;&nbsp;•&nbsp;
-                        {intl.formatMessage(messages.optionalLabel)}
-                      </Optional>
+                    {(!activeSectionGroup.ignoreSingleFieldView &&
+                      activeSectionGroup.fields.length === 1 && (
+                        <>
+                          {(activeSectionGroup.fields[0].hideHeader = true)}
+                          {intl.formatMessage(
+                            activeSectionGroup.fields[0].label
+                          )}
+                          {activeSectionGroup.fields[0].required && (
+                            <Required
+                              disabled={
+                                activeSectionGroup.disabled ||
+                                activeSection.disabled ||
+                                false
+                              }
+                            >
+                              &nbsp;*
+                            </Required>
+                          )}
+                        </>
+                      )) || (
+                      <>
+                        {intl.formatMessage(
+                          activeSectionGroup.title || activeSection.title
+                        )}
+                        {activeSection.optional && (
+                          <Optional
+                            id={`form_section_opt_label_${activeSectionGroup.id}`}
+                            disabled={
+                              activeSectionGroup.disabled ||
+                              activeSection.disabled
+                            }
+                          >
+                            &nbsp;&nbsp;•&nbsp;
+                            {intl.formatMessage(messages.optionalLabel)}
+                          </Optional>
+                        )}
+                      </>
                     )}
                   </FormSectionTitle>
                   {activeSection.notice && (
-                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                    <Notice id={`form_section_notice_${activeSectionGroup.id}`}>
                       {intl.formatMessage(activeSection.notice)}
                     </Notice>
                   )}
                   <form
-                    id={`form_section_id_${activeSection.id}`}
+                    id={`form_section_id_${activeSectionGroup.id}`}
                     onSubmit={handleSubmit}
                   >
                     <FormFieldGenerator
-                      id={activeSection.id}
+                      id={activeSectionGroup.id}
                       onChange={values => {
                         debouncedModifyApplication(
                           values,
@@ -540,12 +576,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         )
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
-                      fields={activeSection.fields}
+                      fields={getVisibleGroupFields(activeSectionGroup)}
                       offlineResources={offlineResources}
                       draftData={application.data}
                     />
                   </form>
-                  {nextSection && (
+                  {nextSectionGroup && (
                     <FooterArea>
                       <PrimaryButton
                         id="next_section"
@@ -553,7 +589,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           this.continueButtonHandler(
                             this.props.pageRoute,
                             application.id,
-                            nextSection.id,
+                            nextSectionGroup.sectionId,
+                            nextSectionGroup.groupId,
                             application.event.toLowerCase()
                           )
                         }}
@@ -573,6 +610,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                   SUBMISSION_STATUS.DRAFT
                                 ? 'preview'
                                 : 'review',
+                              application.submissionStatus &&
+                                application.submissionStatus ===
+                                  SUBMISSION_STATUS.DRAFT
+                                ? 'preview-view-group'
+                                : 'review-view-group',
                               application.event.toLowerCase()
                             )
                           }}
@@ -587,83 +629,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
             )}
           </>
         )}
-
-        <ResponsiveModal
-          title={intl.formatMessage(messages.submitConfirmationTitle, {
-            isComplete
-          })}
-          contentHeight={96}
-          actions={[
-            <TertiaryButton
-              id="cancel-btn"
-              key="cancel"
-              onClick={() => {
-                this.toggleSubmitModalOpen()
-                if (document.documentElement) {
-                  document.documentElement.scrollTop = 0
-                }
-              }}
-            >
-              {intl.formatMessage(messages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              key="submit"
-              id="submit_confirm"
-              onClick={() =>
-                this.confirmSubmission(
-                  application,
-                  SUBMISSION_STATUS.READY_TO_SUBMIT,
-                  Action.SUBMIT_FOR_REVIEW
-                )
-              }
-            >
-              {intl.formatMessage(messages.submitButton)}
-            </PrimaryButton>
-          ]}
-          show={this.state.showSubmitModal}
-          handleClose={this.toggleSubmitModalOpen}
-        >
-          {intl.formatMessage(messages.submitConfirmationDesc, {
-            isComplete
-          })}
-        </ResponsiveModal>
-        <ResponsiveModal
-          title={intl.formatMessage(messages.registerConfirmationTitle)}
-          contentHeight={96}
-          actions={[
-            <TertiaryButton
-              key="register_cancel"
-              id="register_cancel"
-              onClick={() => {
-                this.toggleRegisterModalOpen()
-                if (document.documentElement) {
-                  document.documentElement.scrollTop = 0
-                }
-              }}
-            >
-              {intl.formatMessage(messages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              key="register"
-              id="register_confirm"
-              // @ts-ignore
-              onClick={() =>
-                this.confirmSubmission(
-                  application,
-                  SUBMISSION_STATUS.READY_TO_REGISTER,
-                  Action.REGISTER_APPLICATION
-                )
-              }
-            >
-              {intl.formatMessage(messages.registerButtonTitle)}
-            </PrimaryButton>
-          ]}
-          show={this.state.showRegisterModal}
-          handleClose={this.toggleRegisterModalOpen}
-        >
-          {intl.formatMessage(messages.registerConfirmationDesc)}
-        </ResponsiveModal>
-
         {this.state.rejectFormOpen && (
           <RejectRegistrationForm
             onBack={this.toggleRejectForm}
@@ -694,25 +659,39 @@ function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
     Props &
-    RouteComponentProps<{ pageId: string; applicationId: string }>
+    RouteComponentProps<{
+      pageId: string
+      groupId?: string
+      applicationId: string
+    }>
 ) {
   const { match, registerForm, application } = props
 
-  const activeSectionId = getActiveSectionId(registerForm, match.params)
-
+  const sectionId = match.params.pageId || registerForm.sections[0].id
   const activeSection = registerForm.sections.find(
-    ({ id }) => id === activeSectionId
+    section => section.id === sectionId
   )
-
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
+  }
+  const groupId = match.params.groupId || activeSection.groups[0].id
+  const activeSectionGroup = activeSection.groups.find(
+    group => group.id === groupId
+  )
+  if (!activeSectionGroup) {
+    throw new Error(
+      `Configuration for group "${match.params.groupId}" missing!`
+    )
   }
 
   if (!application) {
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
-  const visitedSections = registerForm.sections.filter(({ id }) =>
-    Boolean(application.data[id])
+  const visitedSections = registerForm.sections.filter(
+    ({ id }) =>
+      id !== registrationSection.id &&
+      id !== applicantsSection.id &&
+      Boolean(application.data[id])
   )
 
   const rightMostVisited = visitedSections[visitedSections.length - 1]
@@ -723,8 +702,8 @@ function mapStateToProps(
       registerForm.sections.indexOf(rightMostVisited)
 
   const fields = replaceInitialValues(
-    activeSection.fields,
-    application.data[activeSectionId] || {}
+    activeSectionGroup.fields,
+    application.data[activeSection.id] || {}
   )
 
   const offlineResources = getOfflineState(state)
@@ -734,8 +713,9 @@ function mapStateToProps(
     scope: getScope(state),
     setAllFieldsDirty,
     offlineResources,
-    activeSection: {
-      ...activeSection,
+    activeSection,
+    activeSectionGroup: {
+      ...activeSectionGroup,
       fields
     },
     application
@@ -753,7 +733,7 @@ export const RegisterForm = connect<
     writeApplication,
     modifyApplication,
     deleteApplication,
-    goToPage: goToPageAction,
+    goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
     toggleDraftSavedNotification,

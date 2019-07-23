@@ -48,23 +48,33 @@ export const initialState: IReviewFormState = {
           viewType: 'review',
           name: messages.reviewTab,
           title: messages.reviewTitle,
-          fields: []
+          groups: [
+            {
+              id: 'review-group',
+              fields: []
+            }
+          ]
         }
       ]
     },
     death: {
       sections: [
         deceasedSection,
-        applicantsSection,
         eventSection,
         causeOfDeathSection,
+        applicantsSection,
         deathDocumentsSection,
         {
           id: 'review',
           viewType: 'review',
           name: messages.reviewTab,
           title: messages.reviewTitle,
-          fields: []
+          groups: [
+            {
+              id: 'review-group',
+              fields: []
+            }
+          ]
         }
       ]
     }

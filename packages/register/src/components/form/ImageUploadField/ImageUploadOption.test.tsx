@@ -11,8 +11,8 @@ describe('image upload component', () => {
     <IntlProvider locale="en">
       <ImageUploadOption
         option={
-          (documentsSection.fields[0] as IImageUploaderWithOptionsFormField)
-            .optionSection
+          (documentsSection.groups[0]
+            .fields[0] as IImageUploaderWithOptionsFormField).optionSection
         }
         onComplete={mock}
         toggleNestedSection={mock}

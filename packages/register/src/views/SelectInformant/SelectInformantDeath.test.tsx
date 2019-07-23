@@ -54,7 +54,7 @@ describe('when user is selecting the informant', () => {
     history = testApp.history
     store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-    draft = createApplication(Event.BIRTH)
+    draft = createApplication(Event.DEATH)
     store.dispatch(storeApplication(draft))
     history.replace(SELECT_DEATH_INFORMANT.replace(':applicationId', draft.id))
     await flushPromises()
@@ -260,5 +260,55 @@ describe('when user is selecting the informant', () => {
 
       expect(window.location.href).toContain('/')
     })
+  })
+})
+describe('when select informant page loads with existing data', () => {
+  it('loads data properly while initiating', async () => {
+    getItem.mockReturnValue(validToken)
+    setItem.mockClear()
+    fetch.resetMocks()
+    fetch.mockResponses(
+      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
+      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
+    )
+    const testApp = createTestApp()
+    const app = testApp.app
+    await flushPromises()
+    app.update()
+    const history = testApp.history
+    const store = testApp.store
+    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+    const draft = createApplication(Event.DEATH, {
+      informant: {
+        applicantsRelationToDeceased: 'OTHER',
+        applicantPhone: '01622688231',
+        applicantOtherRelationship: 'Grand Mother'
+      }
+    })
+    store.dispatch(storeApplication(draft))
+    history.replace(SELECT_DEATH_INFORMANT.replace(':applicationId', draft.id))
+    await flushPromises()
+    app.update()
+    app
+      .find('#createPinBtn')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    app.update()
+    for (let i = 1; i <= 8; i++) {
+      app
+        .find(`#keypad-${i % 2}`)
+        .hostNodes()
+        .simulate('click')
+    }
+    await flushPromises()
+    app.update()
+
+    expect(
+      app
+        .find('#select_informant_OTHER')
+        .hostNodes()
+        .props().checked
+    ).toBe(true)
   })
 })

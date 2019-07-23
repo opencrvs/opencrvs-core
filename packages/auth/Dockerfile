@@ -1,4 +1,4 @@
-FROM node:dubnium
+FROM node:dubnium-alpine
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
@@ -8,16 +8,10 @@ ENV NPM_CONFIG_LOGLEVEL warn
 COPY package.json package.json
 COPY packages/auth/package.json packages/auth/package.json
 COPY yarn.lock yarn.lock
-RUN yarn install
+RUN yarn install --production
 
-# Copy package source
-COPY packages/auth packages/auth
-
-# set environment
-ENV AUTH_PORT=4040
-ENV AUTH_HOST=0.0.0.0
-# TODO change this for production
-ENV NODE_ENV=DEVELOPMENT
+# Copy package build
+COPY --from=opencrvs-build /packages/auth/build packages/auth/build
 
 EXPOSE 4040
 WORKDIR /usr/src/app/packages/auth

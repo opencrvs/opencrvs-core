@@ -15,6 +15,7 @@ export const BENGALI_STATE: ILanguage = {
     'buttons.drafts': 'খসড়া',
     'buttons.edit': 'সম্পাদন',
     'buttons.editRegistration': 'নিবন্ধন সম���পাদনা করুন',
+    'buttons.exit': 'বাহির',
     'buttons.goToHomePage': 'Go to Homepage',
     'buttons.homepage': 'হোম পেইজ',
     'buttons.login': 'লগইন',
@@ -450,6 +451,10 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.currentAddressSameAsPermanent':
       'তার বর্তমান এবং স্থায়ী বাসস্থান কি একই?',
     'form.field.label.dateOfMarriage': 'বিয়ের তারিখ',
+    'form.field.label.deathAtFacility': 'কোন হাসপাতালে মৃত্যু ঘটেছে?',
+    'form.field.label.deathAtPrivateHome': 'বাড়ির ঠিকানা কি?',
+    'form.field.label.deathAtOtherLocation':
+      'অন্য কোন ঠিকানা তিনি মারা গিয়েছিলেন?',
     'form.field.label.deathDate': 'ঘটনার তারিখ',
     'form.field.label.deathPlace': 'মৃত্যুর ঘটনাস্থল',
     'form.field.label.deathPlaceAddress': 'কোথায় মৃত্যু ঘটেছে?',
@@ -540,6 +545,7 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.fetchRegistrationModalErrorText':
       'প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ',
     'form.field.label.fetchRegistrationModalInfo': 'জন্ম নিবন্ধন নম্বর',
+    'form.field.label.healthInstitution': 'স্বাস্থ্য সেবা প্রতিষ্ঠান',
     'form.field.label.hospital': 'হাসপাতাল',
     'form.field.label.iD': 'আইডি নম্বর',
     'form.field.label.iDType': "আইডি'র প্রকার",
@@ -614,6 +620,7 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.SearchField.locationId': 'আইডি: {locationId}',
     'form.field.label.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
     'form.field.label.SearchField.placeHolderText': 'অনুসন্ধান',
+    'form.field.label.selectOne': 'অনুগ্রহ করে নির্বাচন করুন',
     'form.field.label.state': 'বিভাগ',
     'form.field.label.typeOfDocument': 'নথির ধরন নির্বাচন করুন',
     'form.field.label.uploadDocForChild': 'শিশু',
@@ -675,6 +682,13 @@ export const BENGALI_STATE: ILanguage = {
       'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
     'print.certificate.userReviewed':
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
+    'register.actions.description.confirmInComplete':
+      'বাধ্যতামূলক তথ্য অনুপস্থিত। এই তথ্য যোগ করুন যাতে আপনি নিবন্ধন প্রক্রিয়াটি সম্পূর্ণ করতে পারেন।',
+    'register.actions.description.confirmComplete':
+      'নিবন্ধন ক্লিক করে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের জন্য এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।\n\nএই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের মাধ্যমে একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'register.actions.description':
+      'এই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের জন্য একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'register.actions.title.applicationStatus': 'নিবন্ধন বা বাতিল?',
     'register.application.details.item.label.application': 'আবেদন জমা',
     'register.application.details.item.label.by': 'কর্তৃক',
     'register.application.details.item.label.collected': 'সার্টিফিকেট মুদ্রণ',
@@ -963,6 +977,9 @@ export const BENGALI_STATE: ILanguage = {
       'আবেদন {isComplete, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
     'review.birthRegistration.queryError':
       'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
+    'review.documents.zeroDocumentsText':
+      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
+    'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.edit.modal.confirmationText': 'আপনি কি আবেদন সম্পাদনা করতে ইচ্ছুক?',

@@ -213,7 +213,7 @@ describe('when user wants to print certificate', () => {
     })
 
     testComponent.component.update()
-    const fields = collectBirthCertificateFormSection.fields
+    const fields = collectBirthCertificateFormSection.groups[0].fields
     ;(fields[1] as IInformativeRadioGroupFormField).information = {
       // @ts-ignore
       name: [
@@ -696,7 +696,7 @@ describe('when user wants to print certificate', () => {
     })
 
     it('renders the form', () => {
-      const fields = collectBirthCertificateFormSection.fields
+      const fields = collectBirthCertificateFormSection.groups[0].fields
       ;(fields[1] as IInformativeRadioGroupFormField).information = {
         // @ts-ignore
         name: [
@@ -828,7 +828,7 @@ describe('when user wants to print certificate', () => {
         .simulate('click')
 
       component.update()
-      const fields = paymentFormSection.fields
+      const fields = paymentFormSection.groups[0].fields
 
       fields[2].initialValue = '50.00'
       fields[3].initialValue = '24'

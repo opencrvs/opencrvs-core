@@ -14,6 +14,7 @@ export const ENGLISH_STATE: ILanguage = {
     'buttons.deleteApplication': 'Delete Application',
     'buttons.drafts': 'Drafts',
     'buttons.edit': 'Edit',
+    'buttons.exit': 'EXIT',
     'buttons.editRegistration': 'Edit Registration',
     'buttons.goToHomePage': 'Go to Homepage',
     'buttons.homepage': 'Homepage',
@@ -454,6 +455,11 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.currentAddressSameAsPermanent':
       'Is her current address the same as her permanent address?',
     'form.field.label.dateOfMarriage': 'Date of marriage',
+    'form.field.label.deathAtFacility': 'What hospital did the death occur at?',
+    'form.field.label.deathAtOtherLocation':
+      'What is the other address did the death occur at?',
+    'form.field.label.deathAtPrivateHome':
+      'What is the address of the private home?',
     'form.field.label.deathDate': 'Date of Occurrence',
     'form.field.label.deathPlace': 'Place of Occurrence of Death',
     'form.field.label.deathPlaceAddress': 'Where did the death occur?',
@@ -540,6 +546,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.fetchRegistrationModalErrorText':
       'No registration found for provided BRN',
     'form.field.label.fetchRegistrationModalInfo': 'Birth Registration Number',
+    'form.field.label.healthInstitution': 'Health Institution',
     'form.field.label.hospital': 'Hospital',
     'form.field.label.iD': 'ID Number',
     'form.field.label.iDType': 'Type of ID',
@@ -613,6 +620,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.SearchField.locationId': 'Id: {locationId}',
     'form.field.label.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     'form.field.label.SearchField.placeHolderText': 'Search',
+    'form.field.label.selectOne': 'Please select an option',
     'form.field.label.state': 'Division',
     'form.field.label.typeOfDocument': 'Choose type of document',
     'form.field.label.uploadDocForChild': 'Child',
@@ -675,6 +683,13 @@ export const ENGLISH_STATE: ILanguage = {
     'print.certificate.signature.person2': 'Local Registrar Mohammad Ashraful',
     'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
+    'register.actions.description.confirmInComplete':
+      'Mandatory information is missing. Please add this information so that you can complete the registration process.',
+    'register.actions.description.confirmComplete':
+      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'register.actions.description':
+      'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'register.actions.title.applicationStatus': 'Register or reject?',
     'register.application.details.item.label.application':
       'Application submitted on',
     'register.application.details.item.label.by': 'By',
@@ -965,6 +980,9 @@ export const ENGLISH_STATE: ILanguage = {
       'Application is {isComplete, select, true {complete} false {incomplete}}',
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
+    'review.documents.editDocuments': 'Add attachment',
+    'review.documents.zeroDocumentsText':
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
     'review.documentViewer.tagline': 'Select to Preview',
     'review.documentViewer.title': 'Supporting Documents',
     'review.edit.modal.confirmationText':
