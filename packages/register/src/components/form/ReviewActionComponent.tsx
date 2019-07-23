@@ -22,6 +22,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
   isComplete: boolean
   isRegister?: boolean
+  isRegistrationAgent?: boolean
   isDraft?: boolean
   isRejected: boolean
   application: IApplication
@@ -133,6 +134,11 @@ const messages = defineMessages({
     defaultMessage: 'REGISTER',
     description: 'Register button text'
   },
+  valueApprove: {
+    id: 'review.button.approve',
+    defaultMessage: 'Send for approval',
+    description: 'Label for Send For Approval button'
+  },
   valueReject: {
     id: 'review.button.reject',
     defaultMessage: 'Reject Application',
@@ -174,6 +180,23 @@ const messages = defineMessages({
     id: 'register.form.modal.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button on submit modal'
+  },
+  validateActionDescription: {
+    id: 'review.validate.action.description',
+    defaultMessage:
+      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
+    description: 'Description is shown when validation'
+  },
+  validateConfirmationTitle: {
+    id: 'register.form.modal.title.validateConfirmation',
+    defaultMessage: 'Send for approval?',
+    description: 'Title for validate confirmation modal'
+  },
+  validateConfirmationDesc: {
+    id: 'register.form.modal.desc.validateConfirmation',
+    defaultMessage:
+      'This application will be sent to the registrar from them to approve.',
+    description: 'Description for validate confirmation modal'
   }
 })
 
@@ -194,6 +217,7 @@ class ReviewActionComponent extends React.Component<
     const {
       id,
       isRegister,
+      isRegistrationAgent,
       isRejected,
       isComplete,
       application,
@@ -215,6 +239,7 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {!isRegister &&
+              !isRegistrationAgent &&
               intl.formatMessage(
                 isComplete
                   ? messages.reviewActionDescriptionComplete
@@ -228,9 +253,13 @@ class ReviewActionComponent extends React.Component<
                     : messages.registerActionDescriptionComplete
                   : messages.registerActionDescriptionIncomplete
               )}
+            {isRegistrationAgent &&
+              intl.formatMessage(messages.validateActionDescription, {
+                isComplete
+              })}
           </Description>
           <ActionContainer>
-            {!isRegister && (
+            {!isRegister && !isRegistrationAgent && (
               <PrimaryButton
                 id="submit_form"
                 icon={() => <Upload />}
@@ -258,6 +287,18 @@ class ReviewActionComponent extends React.Component<
               </SuccessButton>
             )}
 
+            {isRegistrationAgent && (
+              <PrimaryButton
+                id="validateApplicationBtn"
+                icon={() => <Upload />}
+                onClick={this.toggleSubmitModalOpen}
+                disabled={!isComplete}
+                align={ICON_ALIGNMENT.LEFT}
+              >
+                {intl.formatMessage(messages.valueApprove)}
+              </PrimaryButton>
+            )}
+
             {rejectAction && !isRejected && (
               <DangerButton
                 id="rejectApplicationBtn"
@@ -274,6 +315,8 @@ class ReviewActionComponent extends React.Component<
           title={
             isRegister
               ? intl.formatMessage(messages.registerConfirmationTitle)
+              : isRegistrationAgent
+              ? intl.formatMessage(messages.validateConfirmationTitle)
               : intl.formatMessage(messages.submitConfirmationTitle, {
                   isComplete
                 })
@@ -319,6 +362,8 @@ class ReviewActionComponent extends React.Component<
         >
           {isRegister
             ? intl.formatMessage(messages.registerConfirmationDesc)
+            : isRegistrationAgent
+            ? intl.formatMessage(messages.validateConfirmationDesc)
             : intl.formatMessage(messages.submitConfirmationDesc, {
                 isComplete
               })}

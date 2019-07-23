@@ -147,6 +147,12 @@ const messages: {
     id: 'review.inputs.additionalComments',
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments'
+  },
+  formDataHeader: {
+    id: 'review.formData.header',
+    defaultMessage:
+      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
+    description: 'Label for form data header text'
   }
 })
 
@@ -190,6 +196,9 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+`
+const FormDataHeader = styled.div`
+  ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
   margin-top: 16px;
@@ -422,6 +431,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  userHasValidateScope() {
+    if (this.props.scope) {
+      return this.props.scope && this.props.scope.includes('validate')
+    } else {
+      return false
+    }
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: any
@@ -532,6 +549,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
+    const isDraft =
+      this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
 
     return (
       <>
@@ -555,6 +574,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
+              <FormDataHeader>
+                {intl.formatMessage(messages.formDataHeader, { isDraft })}
+              </FormDataHeader>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
                   <DataSection key={index} {...sec} />
@@ -576,10 +598,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <ReviewAction
               isComplete={isComplete}
               isRegister={this.userHasRegisterScope()}
+              isRegistrationAgent={this.userHasValidateScope()}
               isRejected={this.props.draft.registrationStatus === REJECTED}
-              isDraft={
-                this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
-              }
+              isDraft={isDraft}
               application={draft}
               submitAction={submitClickEvent}
               rejectAction={rejectApplicationClickEvent}

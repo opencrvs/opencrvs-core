@@ -820,6 +820,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
     'review.rejection.form.submitButton': 'Submit rejection',
     'review.button.register': 'Register',
+    'review.button.approve': 'Send for approval',
     'review.button.reject': 'Reject',
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
@@ -843,6 +844,13 @@ export const ENGLISH_STATE: ILanguage = {
       'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
     'register.actions.description':
       'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'review.validate.action.description':
+      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
+    'register.form.modal.title.validateConfirmation': 'Send for approval?',
+    'register.form.modal.desc.validateConfirmation':
+      'This application will be sent to the registrar from them to approve.',
+    'review.formData.header':
+      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
     'register.actions.title.applicationStatus': 'Register or reject?',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
