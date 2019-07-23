@@ -35,7 +35,6 @@ import {
 import { Validation } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
-import { at } from 'lodash'
 
 interface IRange {
   start: number

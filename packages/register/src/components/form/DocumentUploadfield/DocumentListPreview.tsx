@@ -29,10 +29,6 @@ type IProps = {
 }
 
 export class DocumentListPreview extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props)
-  }
-
   render() {
     const { documents } = this.props
     return (

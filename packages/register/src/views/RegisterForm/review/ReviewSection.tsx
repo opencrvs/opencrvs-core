@@ -382,38 +382,6 @@ type ImageMeta = {
 }
 type FullIFileValue = IFileValue & ImageMeta
 
-const prepDocumentOption = (draft: IApplication): IDocumentViewerOptions => {
-  const draftItemName = documentsSection.id
-  const documentOptions: SelectComponentOptions[] = []
-  const selectOptions: SelectComponentOptions[] = []
-  let uploadedDocuments: IFileValue[] = []
-
-  for (let index in draft.data[draftItemName]) {
-    if (isArray(draft.data[draftItemName][index])) {
-      uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
-        index
-      ] as IFileValue[])
-    }
-  }
-
-  uploadedDocuments.map(document => {
-    const label = document.optionValues.join(' ')
-    documentOptions.push({
-      value: document.data,
-      label
-    })
-    selectOptions.push({
-      value: label,
-      label
-    })
-    return null
-  })
-  return {
-    selectOptions,
-    documentOptions
-  }
-}
-
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
