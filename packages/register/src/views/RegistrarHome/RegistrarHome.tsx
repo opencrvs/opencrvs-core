@@ -1,14 +1,16 @@
 import {
   Button,
   IButtonProps,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  FloatingActionButton
 } from '@opencrvs/components/lib/buttons'
 import {
   StatusOrange,
   StatusProgress,
   StatusGreen,
   StatusRejected,
-  Duplicate
+  Duplicate,
+  PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
@@ -37,7 +39,8 @@ import {
   goToPrintCertificate as goToPrintCertificateAction,
   goToReviewDuplicate as goToReviewDuplicateAction,
   goToPage as goToPageAction,
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction
+  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goToEvents as goToEventsAction
 } from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -94,6 +97,14 @@ const ErrorText = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
+`
+const FABContainer = styled.div`
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -248,6 +259,7 @@ interface IBaseRegistrarHomeProps {
   goToPrintCertificate: typeof goToPrintCertificateAction
   tabId: string
   drafts: IApplication[]
+  goToEvents: typeof goToEventsAction
 }
 
 interface IRegistrarHomeState {
@@ -962,6 +974,13 @@ export class RegistrarHomeView extends React.Component<
             }}
           </Query>
         )}
+        <FABContainer>
+          <FloatingActionButton
+            id="new_event_declaration"
+            onClick={this.props.goToEvents}
+            icon={() => <PlusTransparentWhite />}
+          />
+        </FABContainer>
         <NotificationToast />
       </>
     )
@@ -985,6 +1004,7 @@ function mapStateToProps(
 export const RegistrarHome = connect(
   mapStateToProps,
   {
+    goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,

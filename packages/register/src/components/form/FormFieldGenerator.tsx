@@ -38,8 +38,10 @@ import {
 } from '@register/forms/utils'
 
 import styled, { keyframes } from '@register/styledComponents'
-
+import { gqlToDraftTransformer } from '@register/transformer'
 import {
+  IForm,
+  IFormSection,
   IFormField,
   Ii18nFormField,
   IFormSectionData,
@@ -72,8 +74,6 @@ import {
   IFormData,
   FETCH_BUTTON,
   ILoaderButton,
-  IForm,
-  IFormSection,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD
 } from '@register/forms'
@@ -89,7 +89,6 @@ import { ImageUploadField } from '@register/components/form/ImageUploadField'
 import { FetchButtonField } from '@register/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
-import { gqlToDraftTransformer } from '@register/transformer'
 import { SearchField } from './SearchField'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
@@ -143,6 +142,7 @@ function GeneratedInputField({
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,
+    hideInputHeader: fieldDefinition.hideHeader,
     error,
     touched,
     mode: fieldDefinition.mode
@@ -180,6 +180,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
+          size={fieldDefinition.size}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)
@@ -187,6 +188,7 @@ function GeneratedInputField({
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
+          notice={fieldDefinition.notice}
         />
       </InputField>
     )
@@ -225,6 +227,8 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <DateField
           {...inputProps}
+          notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
         />
@@ -531,7 +535,12 @@ class FormSectionComponent extends React.Component<Props> {
                   onFetch: response => {
                     const section = {
                       id: this.props.id,
-                      fields: fieldsWithValuesDefined
+                      groups: [
+                        {
+                          id: `${this.props.id}-view-group`,
+                          fields: fieldsWithValuesDefined
+                        }
+                      ]
                     } as IFormSection
 
                     const form = {

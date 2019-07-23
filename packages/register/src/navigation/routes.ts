@@ -9,6 +9,7 @@ export const SELECT_BIRTH_MAIN_CONTACT_POINT = `/drafts/:applicationId/events/${
 
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:applicationId/events/${Event.BIRTH}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:applicationId/events/${Event.BIRTH}/:pageId`
+export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:applicationId/events/${Event.BIRTH}/:pageId/group/:groupId`
 export const DRAFT_BIRTH_APPLICANT_FORM = `/events/${Event.BIRTH}/contact`
 export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:applicationId/events/${Event.BIRTH}/parent/:tabId`
 
@@ -16,6 +17,7 @@ export const SELECT_DEATH_INFORMANT = `/drafts/:applicationId/events/${Event.DEA
 export const SELECT_DEATH_MAIN_CONTACT_POINT = `/drafts/:applicationId/events/${Event.DEATH}/registration/contact`
 export const DRAFT_DEATH_FORM = `/drafts/:applicationId/events/${Event.DEATH}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:applicationId/events/${Event.DEATH}/:pageId`
+export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:applicationId/events/${Event.DEATH}/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:applicationId/events/:event/parent/:pageId'
