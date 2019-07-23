@@ -50,6 +50,7 @@ export interface IInputFieldProps {
   ignoreMediaQuery?: boolean
   hideAsterisk?: boolean
   hideErrorLabel?: boolean
+  hideInputHeader?: boolean
   mode?: THEME_MODE
 }
 
@@ -69,6 +70,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       ignoreMediaQuery,
       hideAsterisk,
       hideErrorLabel,
+      hideInputHeader = false,
       mode
     } = this.props
 
@@ -90,20 +92,22 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     )
     return (
       <div>
-        <InputHeader>
-          {label && (
-            <InputLabel
-              id={`${id}_label`}
-              disabled={this.props.disabled}
-              ignoreMediaQuery={ignoreMediaQuery}
-              color={color}
-              required={required}
-              hideAsterisk={hideAsterisk}
-            >
-              {label}
-            </InputLabel>
-          )}
-        </InputHeader>
+        {!hideInputHeader && (
+          <InputHeader>
+            {label && (
+              <InputLabel
+                id={`${id}_label`}
+                disabled={this.props.disabled}
+                ignoreMediaQuery={ignoreMediaQuery}
+                color={color}
+                required={required}
+                hideAsterisk={hideAsterisk}
+              >
+                {label}
+              </InputLabel>
+            )}
+          </InputHeader>
+        )}
 
         <ComponentWrapper>
           {prefix && <Padding>{prefix}</Padding>}

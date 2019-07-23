@@ -4,7 +4,8 @@ import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
   ICheckboxOption as CheckboxComponentOption,
-  THEME_MODE
+  THEME_MODE,
+  RadioSize
 } from '@opencrvs/components/lib/forms'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
@@ -171,7 +172,9 @@ export interface IFormFieldBase {
   placeholder?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
+  hideHeader?: boolean
   mode?: THEME_MODE
+  hidden?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -191,6 +194,8 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
+  size?: RadioSize
+  notice?: FormattedMessage.MessageDescriptor
 }
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
@@ -217,6 +222,8 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
 }
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
+  notice?: FormattedMessage.MessageDescriptor
+  ignorePlaceHolder?: boolean
 }
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
@@ -343,9 +350,8 @@ export interface IConditionals {
   deathCertificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  placeOfDeathHospital: IConditional
+  deathPlaceAddressTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
-  otherDeathEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isNotCityLocationPermanent: IConditional
@@ -353,6 +359,8 @@ export interface IConditionals {
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
+  deathPlaceAtPrivateHome: IConditional
+  deathPlaceAtOtherLocation: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
@@ -383,11 +391,21 @@ export interface IFormSection {
   viewType: ViewType
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
-  fields: IFormField[]
+  groups: IFormSectionGroup[]
   disabled?: boolean
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapping
+  hasDocumentSection?: boolean
+}
+
+export interface IFormSectionGroup {
+  id: string
+  title?: FormattedMessage.MessageDescriptor
+  fields: IFormField[]
+  disabled?: boolean
+  ignoreSingleFieldView?: boolean
+  conditionals?: IConditional[]
 }
 
 export interface IForm {
@@ -412,8 +430,10 @@ export interface Ii18nFormFieldBase {
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
+  hideHeader?: boolean
   mode?: THEME_MODE
   placeholder?: string
+  hidden?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -424,6 +444,8 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
+  size?: RadioSize
+  notice?: string
 }
 
 type Name = {
@@ -464,6 +486,8 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
+  notice?: string
+  ignorePlaceHolder?: boolean
 }
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
