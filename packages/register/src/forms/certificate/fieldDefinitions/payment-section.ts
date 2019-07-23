@@ -47,38 +47,43 @@ export const paymentFormSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.payment,
   title: messages.payment,
-  fields: [
+  groups: [
     {
-      name: 'paymentMethod',
-      type: SELECT_WITH_OPTIONS,
-      label: messages.paymentMethod,
-      initialValue: 'MANUAL',
-      required: true,
-      validate: [],
-      options: [{ value: 'MANUAL', label: messages.manualPaymentMethod }]
-    },
-    {
-      name: 'collectPayment',
-      type: PARAGRAPH,
-      label: messages.collectPayment,
-      initialValue: '',
-      validate: []
-    },
-    {
-      name: 'service',
-      type: PARAGRAPH,
-      label: messages.service,
-      initialValue: '',
-      validate: []
-    },
-    {
-      name: 'paymentAmount',
-      type: PARAGRAPH,
-      label: messages.paymentAmount,
-      initialValue: '',
-      fontSize: 'h1FontStyle',
-      required: false,
-      validate: []
+      id: 'payment-view-group',
+      fields: [
+        {
+          name: 'paymentMethod',
+          type: SELECT_WITH_OPTIONS,
+          label: messages.paymentMethod,
+          initialValue: 'MANUAL',
+          required: true,
+          validate: [],
+          options: [{ value: 'MANUAL', label: messages.manualPaymentMethod }]
+        },
+        {
+          name: 'collectPayment',
+          type: PARAGRAPH,
+          label: messages.collectPayment,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'service',
+          type: PARAGRAPH,
+          label: messages.service,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'paymentAmount',
+          type: PARAGRAPH,
+          label: messages.paymentAmount,
+          initialValue: '',
+          fontSize: 'h1FontStyle',
+          required: false,
+          validate: []
+        }
+      ]
     }
   ]
 }

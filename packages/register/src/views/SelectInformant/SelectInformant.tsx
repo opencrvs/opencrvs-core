@@ -29,6 +29,7 @@ import {
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 import {
   InputField,
   TextInput,
@@ -337,6 +338,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           this.props.application.data[registrationSection.id] &&
           (this.props.application.data[registrationSection.id]
             .presentAtBirthRegistration as string)) ||
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
+            .applicantsRelationToDeceased as string)) ||
         '',
       phoneNumber:
         (this.props.application &&
@@ -344,8 +350,19 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           this.props.application.data[registrationSection.id] &&
           (this.props.application.data[registrationSection.id]
             .registrationPhone as string)) ||
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
+            .applicantPhone as string)) ||
         '',
-      relationship: '',
+      relationship:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
+            .applicantOtherRelationship as string)) ||
+        '',
       isPhoneNoError: false,
       touched: false,
       isError: false
@@ -353,6 +370,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
   }
 
   handleContinue = () => {
+    const event = this.props.location.pathname.includes(Event.BIRTH)
+      ? Event.BIRTH
+      : Event.DEATH
     if (
       this.state.informant &&
       this.state.informant !== 'error' &&
@@ -382,24 +402,40 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         goToBirthContactPoint,
         goToDeathContactPoint
       } = this.props
-      this.props.modifyApplication({
+      const newApplication = {
         ...application,
         data: {
-          ...application.data,
-          registration: {
-            ...application.data[registrationSection.id],
-            ...{
-              presentAtBirthRegistration: this.state.informant,
-              applicant: this.state.informant
-            }
+          ...application.data
+        }
+      }
+      if (event === Event.BIRTH) {
+        newApplication.data[registrationSection.id] = {
+          ...application.data[registrationSection.id],
+          ...{
+            presentAtBirthRegistration: this.state.informant,
+            applicant: this.state.informant
           }
         }
-      })
+      } else {
+        newApplication.data[applicantsSection.id] = {
+          ...application.data[applicantsSection.id],
+          ...{
+            // Need to empty those bacause next screen will fill this up
+            // TODO: currently contact point is the informant,
+            // need to define the difference between informant and contact point on death schema
+            applicantsRelationToDeceased: '',
+            applicantPhone: '',
+            applicantOtherRelationship: ''
+          }
+        }
+      }
+      this.props.modifyApplication(newApplication)
 
       this.props.location.pathname.includes(Event.BIRTH)
         ? goToBirthContactPoint(this.props.match.params.applicationId)
         : goToDeathContactPoint(this.props.match.params.applicationId)
     } else if (
+      event === Event.DEATH &&
       this.state.informant &&
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.SOMEONE_ELSE &&
@@ -412,13 +448,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         ...application,
         data: {
           ...application.data,
-          registration: {
-            ...application.data[registrationSection.id],
+          [applicantsSection.id]: {
+            ...application.data[applicantsSection.id],
             ...{
-              presentAtBirthRegistration: this.state.informant,
-              applicant: this.state.informant,
-              registrationPhone: this.state.phoneNumber,
-              whoseContactDetails: this.state.relationship,
+              applicantsRelationToDeceased: this.state.informant,
+              applicantPhone: this.state.phoneNumber,
               applicantOtherRelationship: this.state.relationship
             }
           }
@@ -546,6 +580,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                       id="relationship_input"
                       name="relationship"
                       isSmallSized={true}
+                      value={this.state.relationship}
                       onChange={e =>
                         this.handleRelationshipChange(e.target.value)
                       }

@@ -6,8 +6,8 @@ import {
   FullProps
 } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+  DRAFT_DEATH_FORM_PAGE_GROUP
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
@@ -16,8 +16,8 @@ import { Event, IForm } from '@register/forms'
 import { IApplication } from '@register/applications'
 
 const pageRoute: { [key in Event]: string } = {
-  birth: DRAFT_BIRTH_PARENT_FORM_PAGE,
-  death: DRAFT_DEATH_FORM_PAGE
+  birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+  death: DRAFT_DEATH_FORM_PAGE_GROUP
 }
 export class ApplicationFormView extends React.Component<FullProps> {
   render() {
@@ -62,6 +62,11 @@ function mapStatetoProps(
 export const ApplicationForm = connect<
   StateProps,
   {},
-  IFormProps & RouteComponentProps<{ pageId: string; applicationId: string }>,
+  IFormProps &
+    RouteComponentProps<{
+      pageId: string
+      groupId: string
+      applicationId: string
+    }>,
   IStoreState
 >(mapStatetoProps)(ApplicationFormView)

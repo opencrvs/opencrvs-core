@@ -14,8 +14,9 @@ import {
 } from '@register/forms/mappings/mutation/field-mappings'
 import { bundleFieldToSectionFieldTransformer } from '@register/forms/mappings/query/field-mappings'
 import { hasCaseOfDeathSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/cause-of-death-mappings'
+import { RadioSize } from '@opencrvs/components/lib/forms'
 
-const messages: {
+export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   causeOfDeathTab: {
@@ -36,7 +37,7 @@ const messages: {
   },
   causeOfDeathEstablished: {
     id: 'formFields.causeOfDeathEstablished',
-    defaultMessage: 'Has a Cause of Death been established ?',
+    defaultMessage: 'Has an official cause of death been established ?',
     description: 'Label for form field: Cause of Death Established'
   },
   confirm: {
@@ -48,6 +49,11 @@ const messages: {
     id: 'formFields.deny',
     defaultMessage: 'No',
     description: 'deny label for yes / no radio button'
+  },
+  causeOfDeathSectionTitle: {
+    id: 'register.form.section.causeOfDeathSectionTitle',
+    defaultMessage: 'What is the official cause of death?',
+    description: 'Form section title for Cause of Death'
   },
   methodOfCauseOfDeath: {
     id: 'formFields.methodOfCauseOfDeath',
@@ -86,64 +92,76 @@ export const causeOfDeathSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.causeOfDeathTab,
   title: messages.causeOfDeathTitle,
-  optional: true,
-  notice: messages.causeOfDeathNotice,
-  fields: [
+  groups: [
     {
-      name: 'causeOfDeathEstablished',
-      type: RADIO_GROUP,
-      label: messages.causeOfDeathEstablished,
-      required: false,
-      initialValue: false,
-      validate: [],
-      options: [
+      id: 'causeOfDeath-causeOfDeathEstablished',
+      fields: [
         {
-          value: false,
-          label: messages.deny
-        },
-        { value: true, label: messages.confirm }
-      ],
-      mapping: {
-        mutation: ignoreFieldTransformer,
-        query: hasCaseOfDeathSectionTransformer
-      }
-    },
-    {
-      name: 'methodOfCauseOfDeath',
-      type: SELECT_WITH_OPTIONS,
-      initialValue: '',
-      label: messages.methodOfCauseOfDeath,
-      validate: [],
-      placeholder: messages.select,
-      required: false,
-      options: [
-        {
-          value: 'VERBAL_AUTOPSY',
-          label: messages.verbalAutopsy
-        },
-        {
-          value: 'MEDICALLY_CERTIFIED',
-          label: messages.medicallyCertified
+          name: 'causeOfDeathEstablished',
+          type: RADIO_GROUP,
+          label: messages.causeOfDeathEstablished,
+          notice: messages.causeOfDeathNotice,
+          required: false,
+          initialValue: false,
+          size: RadioSize.LARGE,
+          validate: [],
+          options: [
+            { value: true, label: messages.confirm },
+            {
+              value: false,
+              label: messages.deny
+            }
+          ],
+          mapping: {
+            mutation: ignoreFieldTransformer,
+            query: hasCaseOfDeathSectionTransformer
+          }
         }
-      ],
-      conditionals: [conditionals.causeOfDeathEstablished],
-      mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('causeOfDeathMethod'),
-        query: bundleFieldToSectionFieldTransformer('causeOfDeathMethod')
-      }
+      ]
     },
     {
-      name: 'causeOfDeathCode',
-      type: TEXT,
-      initialValue: '',
-      label: messages.causeOfDeathCode,
-      required: false,
+      id: 'causeOfDeath-methodOfCauseOfDeathSection',
+      title: messages.causeOfDeathSectionTitle,
       conditionals: [conditionals.causeOfDeathEstablished],
-      validate: [blockAlphaNumericDot, maxLength(17)],
-      mapping: {
-        mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
-        query: bundleFieldToSectionFieldTransformer('causeOfDeath')
-      }
+      fields: [
+        {
+          name: 'methodOfCauseOfDeath',
+          type: SELECT_WITH_OPTIONS,
+          initialValue: '',
+          label: messages.methodOfCauseOfDeath,
+          validate: [],
+          placeholder: messages.select,
+          required: false,
+          options: [
+            {
+              value: 'VERBAL_AUTOPSY',
+              label: messages.verbalAutopsy
+            },
+            {
+              value: 'MEDICALLY_CERTIFIED',
+              label: messages.medicallyCertified
+            }
+          ],
+          mapping: {
+            mutation: sectionFieldToBundleFieldTransformer(
+              'causeOfDeathMethod'
+            ),
+            query: bundleFieldToSectionFieldTransformer('causeOfDeathMethod')
+          }
+        },
+        {
+          name: 'causeOfDeathCode',
+          type: TEXT,
+          initialValue: '',
+          label: messages.causeOfDeathCode,
+          required: false,
+          validate: [blockAlphaNumericDot, maxLength(17)],
+          mapping: {
+            mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
+            query: bundleFieldToSectionFieldTransformer('causeOfDeath')
+          }
+        }
+      ]
     }
   ]
 }

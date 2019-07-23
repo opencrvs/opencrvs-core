@@ -23,12 +23,13 @@ import {
   IForm,
   IFormField,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  IFormSectionGroup
 } from '@register/forms'
 import {
   goBack as goBackAction,
   goToHome,
-  goToPage as goToPageAction
+  goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { IOfflineDataState } from '@register/offline/reducer'
@@ -46,9 +47,15 @@ import * as React from 'react'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  getVisibleGroupFields
+} from '@register/forms/utils'
+import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 
-const FormSectionTitle = styled.h3`
-  ${({ theme }) => theme.fonts.h3Style};
+const FormSectionTitle = styled.h4`
+  ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
 `
 const FooterArea = styled.div`
@@ -66,6 +73,14 @@ const Notice = styled.div`
 
 const StyledLinkButton = styled(LinkButton)`
   margin-left: 32px;
+`
+const Required = styled.span.attrs<
+  { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
+>({})`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.error};
+  flex-grow: 0;
 `
 
 export const messages: {
@@ -172,9 +187,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-function getActiveSectionId(form: IForm, viewParams: { pageId?: string }) {
-  return viewParams.pageId || form.sections[0].id
-}
 
 function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   const currentIndex = sections.findIndex(
@@ -188,6 +200,38 @@ function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
   return sections[currentIndex + 1]
 }
 
+function getNextSectionIds(
+  sections: IFormSection[],
+  fromSection: IFormSection,
+  fromSectionGroup: IFormSectionGroup,
+  application: IApplication
+) {
+  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+    fromSection,
+    application.data[fromSection.id] || {}
+  )
+  const currentGroupIndex = visibleGroups.findIndex(
+    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
+  )
+
+  if (currentGroupIndex === visibleGroups.length - 1) {
+    const currentIndex = sections.findIndex(
+      (section: IFormSection) => section.id === fromSection.id
+    )
+    if (currentIndex === sections.length - 1) {
+      return null
+    }
+    return {
+      sectionId: sections[currentIndex + 1].id,
+      groupId: sections[currentIndex + 1].groups[0].id
+    }
+  }
+  return {
+    sectionId: fromSection.id,
+    groupId: visibleGroups[currentGroupIndex + 1].id
+  }
+}
+
 export interface IFormProps {
   application: IApplication
   registerForm: IForm
@@ -196,7 +240,7 @@ export interface IFormProps {
 }
 
 type DispatchProps = {
-  goToPage: typeof goToPageAction
+  goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
   writeApplication: typeof writeApplication
@@ -208,6 +252,7 @@ type DispatchProps = {
 
 type Props = {
   activeSection: IFormSection
+  activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
   offlineResources: IOfflineDataState
 }
@@ -217,6 +262,7 @@ export type FullProps = IFormProps &
   DispatchProps &
   InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
     pageId: string
+    groupId?: string
     applicationId: string
   }>
 
@@ -226,8 +272,10 @@ type State = {
   hasError: boolean
 }
 const VIEW_TYPE = {
+  FORM: 'form',
   REVIEW: 'review',
-  PREVIEW: 'preview'
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
@@ -323,10 +371,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     pageRoute: string,
     applicationId: string,
     pageId: string,
+    groupId: string,
     event: string
   ) => {
     this.props.writeApplication(this.props.application)
-    this.props.goToPage(pageRoute, applicationId, pageId, event)
+    this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
   }
 
   render() {
@@ -337,21 +386,25 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       offlineResources,
       handleSubmit,
-      duplicate,
-      activeSection
+      duplicate
     } = this.props
 
-    let nextSection = getNextSection(
-      registerForm.sections,
-      activeSection
-    ) as IFormSection
+    let activeSection: IFormSection = this.props.activeSection
+    let activeSectionGroup: IFormSectionGroup = this.props.activeSectionGroup
 
-    if (nextSection && nextSection.viewType === 'hidden') {
-      nextSection = getNextSection(
-        registerForm.sections,
-        nextSection
-      ) as IFormSection
+    if (activeSection.viewType === VIEW_TYPE.HIDDEN) {
+      const nextSection = getNextSection(registerForm.sections, activeSection)
+      if (nextSection) {
+        activeSection = nextSection
+        activeSectionGroup = nextSection.groups[0]
+      }
     }
+    const nextSectionGroup = getNextSectionIds(
+      registerForm.sections,
+      activeSection,
+      activeSectionGroup,
+      application
+    )
 
     const title =
       activeSection.viewType === VIEW_TYPE.REVIEW
@@ -359,6 +412,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         : activeSection.viewType === VIEW_TYPE.PREVIEW
         ? messages.previewEventRegistration
         : messages.newVitalEventRegistration
+
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -428,7 +482,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               </>
             )}
 
-            {activeSection.viewType === 'form' && (
+            {activeSection.viewType === VIEW_TYPE.FORM && (
               <>
                 <EventTopBar
                   title={intl.formatMessage(title, {
@@ -462,30 +516,58 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     {intl.formatMessage(messages.back)}
                   </TertiaryButton>
                   <FormSectionTitle
-                    id={`form_section_title_${activeSection.id}`}
+                    id={`form_section_title_${activeSectionGroup.id}`}
                   >
-                    {intl.formatMessage(activeSection.title)}
-                    {activeSection.optional && (
-                      <Optional
-                        id={`form_section_opt_label_${activeSection.id}`}
-                        disabled={activeSection.disabled}
-                      >
-                        &nbsp;&nbsp;•&nbsp;
-                        {intl.formatMessage(messages.optionalLabel)}
-                      </Optional>
+                    {(!activeSectionGroup.ignoreSingleFieldView &&
+                      activeSectionGroup.fields.length === 1 && (
+                        <>
+                          {(activeSectionGroup.fields[0].hideHeader = true)}
+                          {intl.formatMessage(
+                            activeSectionGroup.fields[0].label
+                          )}
+                          {activeSectionGroup.fields[0].required && (
+                            <Required
+                              disabled={
+                                activeSectionGroup.disabled ||
+                                activeSection.disabled ||
+                                false
+                              }
+                            >
+                              &nbsp;*
+                            </Required>
+                          )}
+                        </>
+                      )) || (
+                      <>
+                        {intl.formatMessage(
+                          activeSectionGroup.title || activeSection.title
+                        )}
+                        {activeSection.optional && (
+                          <Optional
+                            id={`form_section_opt_label_${activeSectionGroup.id}`}
+                            disabled={
+                              activeSectionGroup.disabled ||
+                              activeSection.disabled
+                            }
+                          >
+                            &nbsp;&nbsp;•&nbsp;
+                            {intl.formatMessage(messages.optionalLabel)}
+                          </Optional>
+                        )}
+                      </>
                     )}
                   </FormSectionTitle>
                   {activeSection.notice && (
-                    <Notice id={`form_section_notice_${activeSection.id}`}>
+                    <Notice id={`form_section_notice_${activeSectionGroup.id}`}>
                       {intl.formatMessage(activeSection.notice)}
                     </Notice>
                   )}
                   <form
-                    id={`form_section_id_${activeSection.id}`}
+                    id={`form_section_id_${activeSectionGroup.id}`}
                     onSubmit={handleSubmit}
                   >
                     <FormFieldGenerator
-                      id={activeSection.id}
+                      id={activeSectionGroup.id}
                       onChange={values => {
                         debouncedModifyApplication(
                           values,
@@ -494,12 +576,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         )
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
-                      fields={activeSection.fields}
+                      fields={getVisibleGroupFields(activeSectionGroup)}
                       offlineResources={offlineResources}
                       draftData={application.data}
                     />
                   </form>
-                  {nextSection && (
+                  {nextSectionGroup && (
                     <FooterArea>
                       <PrimaryButton
                         id="next_section"
@@ -507,7 +589,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           this.continueButtonHandler(
                             this.props.pageRoute,
                             application.id,
-                            nextSection.id,
+                            nextSectionGroup.sectionId,
+                            nextSectionGroup.groupId,
                             application.event.toLowerCase()
                           )
                         }}
@@ -527,6 +610,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                   SUBMISSION_STATUS.DRAFT
                                 ? 'preview'
                                 : 'review',
+                              application.submissionStatus &&
+                                application.submissionStatus ===
+                                  SUBMISSION_STATUS.DRAFT
+                                ? 'preview-view-group'
+                                : 'review-view-group',
                               application.event.toLowerCase()
                             )
                           }}
@@ -571,25 +659,39 @@ function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
     Props &
-    RouteComponentProps<{ pageId: string; applicationId: string }>
+    RouteComponentProps<{
+      pageId: string
+      groupId?: string
+      applicationId: string
+    }>
 ) {
   const { match, registerForm, application } = props
 
-  const activeSectionId = getActiveSectionId(registerForm, match.params)
-
+  const sectionId = match.params.pageId || registerForm.sections[0].id
   const activeSection = registerForm.sections.find(
-    ({ id }) => id === activeSectionId
+    section => section.id === sectionId
   )
-
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
+  }
+  const groupId = match.params.groupId || activeSection.groups[0].id
+  const activeSectionGroup = activeSection.groups.find(
+    group => group.id === groupId
+  )
+  if (!activeSectionGroup) {
+    throw new Error(
+      `Configuration for group "${match.params.groupId}" missing!`
+    )
   }
 
   if (!application) {
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
-  const visitedSections = registerForm.sections.filter(({ id }) =>
-    Boolean(application.data[id])
+  const visitedSections = registerForm.sections.filter(
+    ({ id }) =>
+      id !== registrationSection.id &&
+      id !== applicantsSection.id &&
+      Boolean(application.data[id])
   )
 
   const rightMostVisited = visitedSections[visitedSections.length - 1]
@@ -600,8 +702,8 @@ function mapStateToProps(
       registerForm.sections.indexOf(rightMostVisited)
 
   const fields = replaceInitialValues(
-    activeSection.fields,
-    application.data[activeSectionId] || {}
+    activeSectionGroup.fields,
+    application.data[activeSection.id] || {}
   )
 
   const offlineResources = getOfflineState(state)
@@ -611,8 +713,9 @@ function mapStateToProps(
     scope: getScope(state),
     setAllFieldsDirty,
     offlineResources,
-    activeSection: {
-      ...activeSection,
+    activeSection,
+    activeSectionGroup: {
+      ...activeSectionGroup,
       fields
     },
     application
@@ -630,7 +733,7 @@ export const RegisterForm = connect<
     writeApplication,
     modifyApplication,
     deleteApplication,
-    goToPage: goToPageAction,
+    goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
     toggleDraftSavedNotification,
