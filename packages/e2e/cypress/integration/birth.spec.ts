@@ -93,6 +93,7 @@ context('Birth Integration Test', () => {
     cy.get('#registerApplicationBtn').click()
     // MODAL
     cy.get('#submit_confirm').click()
+    cy.log('Waiting for application to sync...')
     cy.wait(5000)
   })
 
@@ -258,6 +259,7 @@ context('Birth Integration Test', () => {
     cy.get('#registerApplicationBtn').click()
     // MODAL
     cy.get('#submit_confirm').click()
+    cy.log('Waiting for application to sync...')
     cy.wait(5000)
   })
 
@@ -352,6 +354,7 @@ context('Birth Integration Test', () => {
       'Lack of information, please notify informant about it.'
     )
     cy.get('#submit_reject_form').click()
+    cy.log('Waiting for application to sync...')
     cy.wait(5000)
   })
 
@@ -520,16 +523,11 @@ context('Birth Integration Test', () => {
       'Lack of information, please notify informant about it.'
     )
     cy.get('#submit_reject_form').click()
+    cy.log('Waiting for application to sync...')
     cy.wait(5000)
   })
-})
 
-context('Birth Registration By Registrar Integration Test', () => {
-  beforeEach(() => {
-    indexedDB.deleteDatabase('OpenCRVS')
-  })
-
-  it('Tests from application to registration', () => {
+  it('Tests registration by registrar using maximum input', () => {
     // LOGIN AS FIELD WORKER
     cy.login('registrar')
     // CREATE PIN
@@ -662,36 +660,10 @@ context('Birth Registration By Registrar Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
-    cy.get('#submit_form').click()
+    cy.get('#registerApplicationBtn').click()
     // MODAL
     cy.get('#submit_confirm').click()
     cy.log('Waiting for application to sync...')
-    cy.wait(6000) // Wait for application to be sync'd
-    // LOG OUT
-    cy.get('#mobile_header_left').click()
-    cy.get('#mobile_menu_item_4').click()
-    // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
-    // LANDING PAGE
-    cy.wait(3000)
-    cy.get('#row_0', { timeout: 30000 }).then($listItem => {
-      if ($listItem.find('#ListItemAction-0-Review').length) {
-        cy.log('Birth review found')
-        cy.get('#ListItemAction-0-Review')
-          .first()
-          .click()
-        cy.wait(500)
-        cy.get('#registerApplicationBtn').click()
-        // MODAL
-        cy.get('#submit_confirm').click()
-        cy.wait(1000)
-      } else {
-        cy.log('Birth review not found')
-      }
-    })
+    cy.wait(5000) // Wait for application to be sync'd
   })
 })
