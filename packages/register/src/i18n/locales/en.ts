@@ -756,6 +756,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Certificate collected on',
     'register.searchResult.listItem.status.dateLabel.application':
       'Application submitted on',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'Application reviewed on',
     'register.searchResult.listItem.status.dateLabel.registered':
       'Registered on',
     'register.searchResult.listItem.status.dateLabel.rejected':
