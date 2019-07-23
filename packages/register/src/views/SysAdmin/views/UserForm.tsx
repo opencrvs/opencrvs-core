@@ -2,7 +2,8 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@register/components/form'
 import { IFormSection, IFormSectionData } from '@register/forms'
-import { hasFormError } from '@register/forms/utils'
+import { getSectionFields, hasFormError } from '@register/forms/utils'
+
 import { goToCreateUserSection, goToHome } from '@register/navigation'
 import styled from '@register/styledComponents'
 import {
@@ -48,7 +49,7 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   handleFormAction = () => {
     const { section, formData } = this.props
-    if (hasFormError(section.fields, formData)) {
+    if (hasFormError(getSectionFields(section), formData)) {
       this.showAllValidationErrors()
     } else {
       this.props.goToCreateUserSection('preview')
@@ -56,7 +57,7 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 
   showAllValidationErrors = () => {
-    const touched = this.props.section.fields.reduce(
+    const touched = getSectionFields(this.props.section).reduce(
       (memo, { name }) => ({ ...memo, [name]: true }),
       {}
     )
@@ -82,7 +83,7 @@ class UserFormComponent extends React.Component<IFullProps> {
             id={section.id}
             onChange={this.props.modifyUserFormData}
             setAllFieldsDirty={false}
-            fields={section.fields}
+            fields={getSectionFields(section)}
             onSetTouched={setTouchedFunc => {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}

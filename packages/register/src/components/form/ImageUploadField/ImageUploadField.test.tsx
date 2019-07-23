@@ -14,8 +14,8 @@ describe('image upload component', () => {
         title="Upload a photo of the supporting document"
         onComplete={mock}
         optionSection={
-          (documentsSection.fields[0] as IImageUploaderWithOptionsFormField)
-            .optionSection
+          (documentsSection.groups[0]
+            .fields[0] as IImageUploaderWithOptionsFormField).optionSection
         }
       />
     </IntlProvider>

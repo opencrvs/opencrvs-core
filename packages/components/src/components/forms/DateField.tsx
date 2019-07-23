@@ -1,13 +1,22 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, TextInput } from './TextInput'
+import { InputLabel } from './InputField/InputLabel'
 import { Omit } from '../omit'
 
+const DateWrapper = styled.div`
+  width: 100%;
+`
+export const NoticeWrapper = styled.div`
+  padding-bottom: 15px;
+`
 export interface IProps {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }
   focusInput?: boolean
+  notice?: string
+  ignorePlaceHolder?: boolean
   onChange: (dateString: string) => void
 }
 
@@ -125,54 +134,68 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const { id, meta, focusInput, ...props } = this.props
+    const {
+      id,
+      meta,
+      focusInput,
+      notice,
+      ignorePlaceHolder,
+      ...props
+    } = this.props
 
     return (
-      <div id={id}>
-        <DateSegment
-          {...props}
-          id={`${id}-dd`}
-          innerRef={this.dd}
-          error={Boolean(meta && meta.error)}
-          touched={meta && meta.touched}
-          focusInput={focusInput}
-          placeholder="dd"
-          type="number"
-          min={1}
-          max={31}
-          value={this.state.dd}
-          onChange={this.change}
-        />
-        <DateSegment
-          {...props}
-          id={`${id}-mm`}
-          innerRef={this.mm}
-          error={Boolean(meta && meta.error)}
-          touched={meta && meta.touched}
-          focusInput={false}
-          placeholder="mm"
-          type="number"
-          maxLength={2}
-          min={1}
-          max={12}
-          value={this.state.mm}
-          onChange={this.change}
-        />
-        <DateSegment
-          {...props}
-          id={`${id}-yyyy`}
-          innerRef={this.yyyy}
-          error={Boolean(meta && meta.error)}
-          touched={meta && meta.touched}
-          focusInput={false}
-          placeholder="yyyy"
-          type="number"
-          maxLength={4}
-          min={1900}
-          value={this.state.yyyy}
-          onChange={this.change}
-        />
-      </div>
+      <>
+        <DateWrapper id={id}>
+          {notice && (
+            <NoticeWrapper>
+              <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
+            </NoticeWrapper>
+          )}
+          <DateSegment
+            {...props}
+            id={`${id}-dd`}
+            innerRef={this.dd}
+            error={Boolean(meta && meta.error)}
+            touched={meta && meta.touched}
+            focusInput={focusInput}
+            type="number"
+            placeholder={ignorePlaceHolder ? '' : 'dd'}
+            min={1}
+            max={31}
+            value={this.state.dd}
+            onChange={this.change}
+          />
+          <DateSegment
+            {...props}
+            id={`${id}-mm`}
+            innerRef={this.mm}
+            error={Boolean(meta && meta.error)}
+            touched={meta && meta.touched}
+            focusInput={false}
+            type="number"
+            placeholder={ignorePlaceHolder ? '' : 'mm'}
+            maxLength={2}
+            min={1}
+            max={12}
+            value={this.state.mm}
+            onChange={this.change}
+          />
+          <DateSegment
+            {...props}
+            id={`${id}-yyyy`}
+            innerRef={this.yyyy}
+            error={Boolean(meta && meta.error)}
+            touched={meta && meta.touched}
+            focusInput={false}
+            type="number"
+            placeholder={ignorePlaceHolder ? '' : 'yyyy'}
+            maxLength={4}
+            min={1900}
+            value={this.state.yyyy}
+            onChange={this.change}
+          />
+        </DateWrapper>
+      </>
     )
   }
 }
