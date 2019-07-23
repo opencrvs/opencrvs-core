@@ -10,6 +10,18 @@ export const documentForWhomFhirMapping = {
   ChildAge: 'ChildAge'
 }
 
+export const sectionMapping = {
+  CHILD: [
+    documentForWhomFhirMapping.Child,
+    documentForWhomFhirMapping.ChildAge
+  ],
+  MOTHER: [
+    documentForWhomFhirMapping.Mother,
+    documentForWhomFhirMapping.Parent
+  ],
+  FATHER: [documentForWhomFhirMapping.Father, documentForWhomFhirMapping]
+}
+
 export const documentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
