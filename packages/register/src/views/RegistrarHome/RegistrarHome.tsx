@@ -60,6 +60,8 @@ import {
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
 import { transformData } from '@register/search/transformer'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+import ReactTooltip from 'react-tooltip'
+import { findDOMNode } from 'react-dom'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -106,6 +108,9 @@ const FABContainer = styled.div`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+`
+const ToolTipContainer = styled.span`
+  text-align: center;
 `
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -324,7 +329,7 @@ export class RegistrarHomeView extends React.Component<
           icon = <Duplicate />
         } else {
           if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
-            icon = <Validate />
+            icon = <Validate data-tip data-for="validateTooltip" />
           }
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
@@ -716,6 +721,12 @@ export class RegistrarHomeView extends React.Component<
               }
               return (
                 <BodyContent>
+                  <ReactTooltip id="validateTooltip">
+                    <ToolTipContainer>
+                      Application has been validated <br /> by a registration
+                      agent
+                    </ToolTipContainer>
+                  </ReactTooltip>
                   <GridTable
                     content={this.transformDeclaredContent(data)}
                     columns={[
