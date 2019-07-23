@@ -206,6 +206,8 @@ describe('Search root resolvers', () => {
               hits: [
                 { _type: 'composition', _source: {} },
                 { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} },
                 { _type: 'composition', _source: {} }
               ]
             }

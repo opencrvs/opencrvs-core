@@ -209,6 +209,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 0,
               registered: 7,
               rejected: 5
             }
@@ -257,7 +258,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.REGISTERED,
+            status: [EVENT_STATUS.REGISTERED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -373,7 +374,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.REGISTERED,
+            status: [EVENT_STATUS.REGISTERED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -422,7 +423,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.REGISTERED,
+            status: [EVENT_STATUS.REGISTERED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -474,7 +475,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.REGISTERED,
+            status: [EVENT_STATUS.REGISTERED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -664,7 +665,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.REJECTED,
+            status: [EVENT_STATUS.REJECTED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -798,6 +799,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 0,
               registered: 2,
               rejected: 5
             }
@@ -808,7 +810,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.REGISTERED,
+            status: [EVENT_STATUS.REGISTERED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0

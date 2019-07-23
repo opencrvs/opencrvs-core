@@ -4,6 +4,7 @@ export const COUNT_REGISTRATION_QUERY = gql`
   query data($locationIds: [String]) {
     countEvents(locationIds: $locationIds) {
       declared
+      validated
       registered
       rejected
     }
@@ -15,7 +16,7 @@ export const SEARCH_EVENTS = gql`
     $trackingId: String
     $contactNumber: String
     $registrationNumber: String
-    $status: String
+    $status: [String]
     $locationIds: [String]
     $count: Int
     $skip: Int

@@ -209,6 +209,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 2,
               registered: 7,
               rejected: 5
             }
@@ -246,7 +247,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         .find('#tab_review')
         .hostNodes()
         .text()
-    ).toContain('Ready for review (10)')
+    ).toContain('Ready for review (12)')
     testComponent.component.unmount()
   })
 
@@ -258,7 +259,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -385,7 +386,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -434,7 +435,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -486,7 +487,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -686,7 +687,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0

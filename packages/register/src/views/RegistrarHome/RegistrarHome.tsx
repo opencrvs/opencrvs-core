@@ -271,6 +271,7 @@ const TAB_ID = {
 
 export const EVENT_STATUS = {
   DECLARED: 'DECLARED',
+  VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED'
 }
@@ -586,7 +587,7 @@ export class RegistrarHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {data.countEvents.declared})
+                    {data.countEvents.declared + data.countEvents.validated})
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}
@@ -663,7 +664,7 @@ export class RegistrarHomeView extends React.Component<
           <Query
             query={SEARCH_EVENTS}
             variables={{
-              status: EVENT_STATUS.DECLARED,
+              status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
               locationIds: [registrarUnion],
               count: this.pageSize,
               skip: (this.state.reviewCurrentPage - 1) * this.pageSize
@@ -765,7 +766,7 @@ export class RegistrarHomeView extends React.Component<
           <Query
             query={SEARCH_EVENTS}
             variables={{
-              status: EVENT_STATUS.REJECTED,
+              status: [EVENT_STATUS.REJECTED],
               locationIds: [registrarUnion],
               count: this.pageSize,
               skip: (this.state.updatesCurrentPage - 1) * this.pageSize
@@ -865,7 +866,7 @@ export class RegistrarHomeView extends React.Component<
           <Query
             query={SEARCH_EVENTS}
             variables={{
-              status: EVENT_STATUS.REGISTERED,
+              status: [EVENT_STATUS.REGISTERED],
               locationIds: [registrarUnion],
               count: this.pageSize,
               skip: (this.state.printCurrentPage - 1) * this.pageSize

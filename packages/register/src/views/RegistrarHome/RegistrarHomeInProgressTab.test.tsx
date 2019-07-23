@@ -87,6 +87,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 2,
               registered: 7,
               rejected: 5
             }
@@ -135,6 +136,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
   })
 
   it('renders all items returned from graphql query in inProgress tab', async () => {
+    Date.now = jest.fn(() => 1563732000000) // 2019-07-21
     const { store } = createStore()
     const TIME_STAMP = '2018-12-07T13:11:49.380Z'
     const drafts = [
@@ -208,7 +210,6 @@ describe('RegistrarHome In Progress tab related tests', () => {
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
-    Date.now = jest.fn(() => 1563732000000) // 2019-07-21
     const EXPECTED_DATE_OF_REJECTION = moment(
       TIME_STAMP,
       'YYYY-MM-DD'
