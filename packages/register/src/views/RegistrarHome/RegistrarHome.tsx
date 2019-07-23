@@ -10,6 +10,7 @@ import {
   StatusGreen,
   StatusRejected,
   Duplicate,
+  Validate,
   PlusTransparentWhite
 } from '@opencrvs/components/lib/icons'
 import {
@@ -322,6 +323,9 @@ export class RegistrarHomeView extends React.Component<
           })
           icon = <Duplicate />
         } else {
+          if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
+            icon = <Validate />
+          }
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
             handler: () =>
