@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   CheckboxGroup,
@@ -9,31 +10,39 @@ import {
   TextInput,
   WarningMessage
 } from '@opencrvs/components/lib/forms'
-import { Link, Paragraph } from '@opencrvs/components/lib/typography'
-import { FetchButtonField } from '@register/components/form/FetchButton'
-import { FormList } from '@register/components/form/FormList'
-import { InputField } from '@register/components/form/InputField'
-import { SubSectionDivider } from '@register/components/form/SubSectionDivider'
+import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
+  internationaliseFieldObject,
+  getConditionalActionsForField,
+  getFieldOptions,
+  getFieldLabel,
+  getFieldOptionsByValueMapper,
+  getFieldType,
+  getQueryData
+} from '@register/forms/utils'
+
+import styled, { keyframes } from '@register/styledComponents'
+import { gqlToDraftTransformer } from '@register/transformer'
+import {
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  RADIO_GROUP,
   CHECKBOX_GROUP,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  DYNAMIC_LIST,
-  FETCH_BUTTON,
-  FIELD_GROUP_TITLE,
+  TEXTAREA,
+  TEL,
+  SUBSECTION,
+  WARNING,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IDynamicFormField,
-  IDynamicListFormField,
   IFileValue,
   IForm,
-  IFormData,
   IFormField,
   IFormFieldValue,
   IFormSection,
   IFormSectionData,
   Ii18nFormField,
-  IListFormField,
-  ILoaderButton,
   INFORMATIVE_RADIO_GROUP,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
@@ -43,50 +52,44 @@ import {
   NUMBER,
   PARAGRAPH,
   PDF_DOCUMENT_VIEWER,
-  RADIO_GROUP,
-  SEARCH_FIELD,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  SELECT_WITH_OPTIONS,
-  SUBSECTION,
-  TEL,
-  TEXTAREA,
-  WARNING
+  DYNAMIC_LIST,
+  IDynamicListFormField,
+  IListFormField,
+  IFormData,
+  FETCH_BUTTON,
+  ILoaderButton,
+  FIELD_GROUP_TITLE,
+  SEARCH_FIELD
 } from '@register/forms'
-import {
-  getConditionalActionsForField,
-  getFieldLabel,
-  getFieldOptions,
-  getFieldOptionsByValueMapper,
-  getFieldType,
-  getQueryData,
-  internationaliseFieldObject
-} from '@register/forms/utils'
 import { getValidationErrorsForForm } from '@register/forms/validation'
-import { IOfflineDataState } from '@register/offline/reducer'
-import styled, { keyframes } from '@register/styledComponents'
-import { gqlToDraftTransformer } from '@register/transformer'
-import { IValidationResult } from '@register/utils/validate'
+import { InputField } from '@register/components/form/InputField'
+import { SubSectionDivider } from '@register/components/form/SubSectionDivider'
+
+import { FormList } from '@register/components/form/FormList'
+import { FetchButtonField } from '@register/components/form/FetchButton'
+
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
+import { SearchField } from './SearchField'
+import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
 import {
-  FastField,
-  Field,
-  FieldProps,
-  FormikProps,
-  FormikTouched,
-  FormikValues,
-  withFormik
-} from 'formik'
-import { isEqual } from 'lodash'
-import * as React from 'react'
-import {
-  FormattedHTMLMessage,
-  FormattedMessage,
   InjectedIntlProps,
   injectIntl,
+  FormattedHTMLMessage,
+  FormattedMessage,
   MessageValue
 } from 'react-intl'
-import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
-import { SearchField } from './SearchField'
+import {
+  withFormik,
+  FastField,
+  Field,
+  FormikProps,
+  FieldProps,
+  FormikTouched,
+  FormikValues
+} from 'formik'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { isEqual } from 'lodash'
+import { IValidationResult } from '@register/utils/validate'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -138,6 +141,7 @@ function GeneratedInputField({
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,
+    hideInputHeader: fieldDefinition.hideHeader,
     error,
     touched,
     mode: fieldDefinition.mode
@@ -189,6 +193,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
+          size={fieldDefinition.size}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)
@@ -196,6 +201,7 @@ function GeneratedInputField({
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
+          notice={fieldDefinition.notice}
         />
       </InputField>
     )
@@ -234,6 +240,8 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <DateField
           {...inputProps}
+          notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
         />
@@ -526,7 +534,12 @@ class FormSectionComponent extends React.Component<Props> {
                   onFetch: response => {
                     const section = {
                       id: this.props.id,
-                      fields: fieldsWithValuesDefined
+                      groups: [
+                        {
+                          id: `${this.props.id}-view-group`,
+                          fields: fieldsWithValuesDefined
+                        }
+                      ]
                     } as IFormSection
 
                     const form = {

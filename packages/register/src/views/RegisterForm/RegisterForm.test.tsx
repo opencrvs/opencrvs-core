@@ -26,18 +26,21 @@ import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
-  HOME
+  HOME,
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
 } from '@opencrvs/register/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
 import { Event, IFormData } from '@opencrvs/register/src/forms'
 import { draftToGqlTransformer } from '@register/transformer'
 import { IForm } from '@register/forms'
-import { clone } from 'lodash'
+import { clone, cloneDeep } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/queries/registration'
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
+
+import { messages } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 
 describe('when user logs in', async () => {
   // Some mock data
@@ -175,7 +178,7 @@ describe('when user is in the register form before initial draft load', () => {
           application={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: '', pageId: '' },
+            params: { applicationId: '', pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
@@ -211,9 +214,13 @@ describe('when user is in the register form for birth event', async () => {
           staticContext={mock}
           registerForm={form}
           application={draft}
-          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
+          pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
           match={{
-            params: { applicationId: draft.id, pageId: 'mother' },
+            params: {
+              applicationId: draft.id,
+              pageId: 'mother',
+              groupId: 'mother-view-group'
+            },
             isExact: true,
             path: '',
             url: ''
@@ -225,7 +232,7 @@ describe('when user is in the register form for birth event', async () => {
     })
     it('renders the page', () => {
       expect(
-        component.find('#form_section_title_mother').hostNodes()
+        component.find('#form_section_title_mother-view-group').hostNodes()
       ).toHaveLength(1)
     })
     it('changes the country select', async () => {
@@ -258,6 +265,10 @@ describe('when user is in the register form for death event', async () => {
 
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
+      const clonedForm = cloneDeep(form)
+      clonedForm.sections[2].optional = true
+      clonedForm.sections[2].notice = messages.causeOfDeathNotice
+      clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
       const testComponent = createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -265,7 +276,7 @@ describe('when user is in the register form for death event', async () => {
           scope={mock}
           history={history}
           staticContext={mock}
-          registerForm={form}
+          registerForm={clonedForm}
           application={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
@@ -281,13 +292,17 @@ describe('when user is in the register form for death event', async () => {
     })
     it('renders the optional label', () => {
       expect(
-        component.find('#form_section_opt_label_causeOfDeath').hostNodes()
+        component
+          .find('#form_section_opt_label_causeOfDeath-causeOfDeathEstablished')
+          .hostNodes()
       ).toHaveLength(1)
     })
 
     it('renders the notice component', () => {
       expect(
-        component.find('#form_section_notice_causeOfDeath').hostNodes()
+        component
+          .find('#form_section_notice_causeOfDeath-causeOfDeathEstablished')
+          .hostNodes()
       ).toHaveLength(1)
     })
   })
@@ -809,6 +824,33 @@ describe('when user is in the register form for death event', async () => {
       expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
     })
   })
+  describe('when user is death event section', () => {
+    it('renders the notice label for date field', () => {
+      const testComponent = createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          foform
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: 'deathEvent' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      expect(
+        testComponent.component.find('#deathDate_notice').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
 })
 
 describe('when user is in the register form preview section', () => {
@@ -976,53 +1018,6 @@ describe('when user is in the register form review section', () => {
   })
 })
 
-describe('when user is in the register form for death event', async () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
-  let component: ReactWrapper<{}, {}>
-
-  const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())[Event.DEATH]
-
-  describe('when user is in optional cause of death section', () => {
-    beforeEach(async () => {
-      const testComponent = createTestComponent(
-        // @ts-ignore
-        <RegisterForm
-          location={mock}
-          scope={mock}
-          history={history}
-          staticContext={mock}
-          registerForm={form}
-          application={draft}
-          pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: { applicationId: draft.id, pageId: 'causeOfDeath' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        store
-      )
-      component = testComponent.component
-    })
-    it('renders the optional label', () => {
-      expect(
-        component.find('#form_section_opt_label_causeOfDeath').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('renders the notice component', () => {
-      expect(
-        component.find('#form_section_notice_causeOfDeath').hostNodes()
-      ).toHaveLength(1)
-    })
-  })
-})
-
 describe('When user is in Preview section death event', async () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
@@ -1101,7 +1096,8 @@ describe('When user is in Preview section death event', async () => {
     const hospitalLocatioMockDeathApplicationData = clone(
       mockDeathApplicationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+      'HEALTH_INSTITUTION'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
     expect(
@@ -1116,7 +1112,8 @@ describe('When user is in Preview section death event', async () => {
     const hospitalLocatioMockDeathApplicationData = clone(
       mockDeathApplicationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.placeOfDeath = 'HOSPITAL'
+    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+      'HEALTH_INSTITUTION'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
     expect(
@@ -1125,6 +1122,39 @@ describe('When user is in Preview section death event', async () => {
         hospitalLocatioMockDeathApplicationData as IFormData
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
+  })
+
+  it('Check if death location is deceased parmanent address', () => {
+    const mockDeathApplication = clone(mockDeathApplicationData)
+    mockDeathApplication.deathEvent.deathPlaceAddress = 'PERMANENT'
+
+    expect(
+      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
+        .eventLocation.address.type
+    ).toBe('PERMANENT')
+  })
+
+  it('Death location should be undefined if no decased address is found', () => {
+    const mockDeathApplication = cloneDeep(mockDeathApplicationData)
+    // @ts-ignore
+    mockDeathApplication.deceased = {
+      iDType: 'NATIONAL_ID',
+      iD: '1230000000000',
+      firstNames: 'মকবুল',
+      familyName: 'ইসলাম',
+      firstNamesEng: 'Mokbul',
+      familyNameEng: 'Islam',
+      nationality: 'BGD',
+      gender: 'male',
+      maritalStatus: 'MARRIED',
+      birthDate: '1987-02-16'
+    }
+    mockDeathApplication.deathEvent.deathPlaceAddress = 'CURRENT'
+
+    expect(
+      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
+        .eventLocation
+    ).toBe(undefined)
   })
 })
 

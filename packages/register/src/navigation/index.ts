@@ -43,11 +43,13 @@ type GoToPageAction = {
     pageRoute: string
     applicationId: string
     pageId: string
+    groupId?: string
     event: string
     fieldNameHash?: string
     historyState?: IDynamicValues
   }
 }
+
 export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
 type GoToRegistrarHome = {
   type: typeof GO_TO_REGISTRAR_HOME
@@ -249,6 +251,29 @@ export function goToCreateUserSection(
   }
 }
 
+export function goToPageGroup(
+  pageRoute: string,
+  applicationId: string,
+  pageId: string,
+  groupId: string,
+  event: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+) {
+  return {
+    type: GO_TO_PAGE,
+    payload: {
+      applicationId,
+      pageId,
+      groupId,
+      event,
+      fieldNameHash,
+      pageRoute,
+      historyState
+    }
+  }
+}
+
 export function goToPage(
   pageRoute: string,
   applicationId: string,
@@ -279,6 +304,7 @@ export function navigationReducer(state: INavigationState, action: any) {
         fieldNameHash,
         applicationId,
         pageId,
+        groupId,
         event,
         pageRoute,
         historyState
@@ -290,6 +316,7 @@ export function navigationReducer(state: INavigationState, action: any) {
             formatUrl(pageRoute, {
               applicationId: applicationId.toString(),
               pageId,
+              groupId,
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState

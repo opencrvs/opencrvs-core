@@ -111,12 +111,24 @@ export class App extends React.Component<IAppProps> {
                                 />
                                 <ProtectedRoute
                                   exact
+                                  path={
+                                    routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
+                                  }
+                                  component={ApplicationForm}
+                                />
+                                <ProtectedRoute
+                                  exact
                                   path={routes.DRAFT_DEATH_FORM}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute
                                   exact
                                   path={routes.DRAFT_DEATH_FORM_PAGE}
+                                  component={ApplicationForm}
+                                />
+                                <ProtectedRoute
+                                  exact
+                                  path={routes.DRAFT_DEATH_FORM_PAGE_GROUP}
                                   component={ApplicationForm}
                                 />
                                 <ProtectedRoute

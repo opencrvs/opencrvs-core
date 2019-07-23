@@ -40,38 +40,31 @@ context('Death Registration Integration Test', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.get('#currentAddressSameAsPermanent_true').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
-    // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'No ID available', 'No ID available')
-    cy.get('#applicantFamilyName').type('উদ্দিন')
-    cy.get('#applicantFamilyNameEng').type('Uddin')
-    cy.selectOption(
-      '#applicantsRelationToDeceased',
-      'Extended Family',
-      'Extended Family'
-    )
-    cy.get('#applicantPhone').type('01712345678')
-    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#state', 'Dhaka', 'Dhaka')
-    cy.selectOption('#district', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
-    cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
-    cy.wait(1000)
+    cy.wait(500)
     cy.get('#next_section').click()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
+    cy.wait(500)
+    cy.get('#next_section').click()
+    cy.get('#next_section').click()
     cy.get('#deathPlaceAddress_PERMANENT').click()
-    cy.wait(1000)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
-    cy.wait(1000)
+    cy.get('#next_section').click()
+    // APPLICANT DETAILS
+    cy.selectOption('#iDType', 'No ID available', 'No ID available')
+    cy.get('#applicantFamilyName').type('উদ্দিন')
+    cy.get('#applicantFamilyNameEng').type('Uddin')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
-    cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
     cy.get('#submit_form').click()
@@ -107,7 +100,7 @@ context('Death Registration Integration Test', () => {
     })
   })
 
-  it('Tests from application to registration using maximum input', () => {
+  it.only('Tests from application to registration using maximum input', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
@@ -158,7 +151,38 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
+    cy.wait(500)
+    cy.get('#next_section').click()
+    // EVENT DETAILS
+    cy.get('#deathDate-dd').type('18')
+    cy.get('#deathDate-mm').type('01')
+    cy.get('#deathDate-yyyy').type('2019')
+    cy.wait(500)
+    cy.get('#next_section').click()
+    cy.get('#manner_HOMICIDE').click()
+    cy.get('#next_section').click()
+    cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
+    cy.wait(500)
+    cy.get('#next_section').click()
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
+    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
+    cy.get('#addressLine2').type('My street')
+    cy.get('#addressLine1').type('40')
+    cy.get('#postCode').type('1024')
+    cy.get('#next_section').click()
+    // CAUSE OF DEATH DETAILS
+    cy.get('#causeOfDeathEstablished_true').click()
+    cy.wait(500)
+    cy.get('#next_section').click()
+    cy.selectOption(
+      '#methodOfCauseOfDeath',
+      'Medically Certified Cause of Death',
+      'Medically Certified Cause of Death'
+    )
+    cy.get('#causeOfDeathCode').type('1009')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers License', 'Drivers License')
@@ -170,8 +194,6 @@ context('Death Registration Integration Test', () => {
     cy.get('#applicantBirthDate-dd').type('17')
     cy.get('#applicantBirthDate-mm').type('10')
     cy.get('#applicantBirthDate-yyyy').type('1956')
-    cy.selectOption('#applicantsRelationToDeceased', 'Father', 'Father')
-    cy.get('#applicantPhone').type('01712345678')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -189,37 +211,8 @@ context('Death Registration Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
-    // EVENT DETAILS
-    cy.get('#deathDate-dd').type('18')
-    cy.get('#deathDate-mm').type('01')
-    cy.get('#deathDate-yyyy').type('2019')
-    cy.selectOption('#manner', 'Homicide', 'Homicide')
-    cy.get('#deathPlaceAddress_OTHER').click()
-    cy.selectOption('#placeOfDeath', 'Private Home', 'Private Home')
-    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#state', 'Dhaka', 'Dhaka')
-    cy.selectOption('#district', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
-    cy.selectOption('#addressLine3', 'Bahadursadi', 'Bahadursadi')
-    cy.get('#addressLine2').type('My street')
-    cy.get('#addressLine1').type('40')
-    cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
-    // CAUSE OF DEATH DETAILS
-    cy.get('#causeOfDeathEstablished_true').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'Medically Certified Cause of Death',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
-    cy.wait(1000)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
-    cy.wait(1000)
     cy.get('#next_section').click()
     // PREVIEW
     cy.get('#submit_form').click()
