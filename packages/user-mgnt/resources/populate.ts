@@ -65,6 +65,34 @@ const registrationClerk = new User({
   securityQuestionAnswers: []
 })
 
+const regitstrationAgent = new User({
+  name: [
+    {
+      use: 'en',
+      given: ['Tamim'],
+      family: 'Iqbal'
+    }
+  ],
+  username: 'tamim.iqbal',
+  email: 'test@test.org',
+  mobile: '+8801721111111',
+  passwordHash: pass.hash,
+  salt: pass.salt,
+  role: 'REGISTRATION_CLERK',
+  type: 'ENTREPENEUR',
+  scope: ['validate', 'demo'],
+  status: 'active',
+  practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
+  primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
+  catchmentAreaIds: [
+    'd2898740-42e4-4680-b5a7-2f0a12a15199',
+    '4af73d73-aa6e-4770-b1d9-4274949e431e',
+    'd757aee6-0691-42d5-92dd-ab731cb640d6',
+    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+  ],
+  securityQuestionAnswers: []
+})
+
 const localRegistrar = new User({
   name: [
     {
@@ -190,37 +218,10 @@ const sysAdmin = new User({
   securityQuestionAnswers: []
 })
 
-const sysAdmin = new User({
-  name: [
-    {
-      use: 'en',
-      given: ['Sahriar'],
-      family: 'Nafis'
-    }
-  ],
-  username: 'shahriar.nafis',
-  email: 'test@test.org',
-  mobile: '+8801721111111',
-  passwordHash: pass.hash,
-  salt: pass.salt,
-  role: 'LOCAL_SYSTEM_ADMIN',
-  type: 'LOCAL_SYSTEM_ADMIN',
-  scope: ['sysadmin', 'demo'],
-  status: 'active',
-  practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
-  catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
-  ],
-  securityQuestionAnswers: []
-})
-
 const users = [
   fieldAgent,
   registrationClerk,
+  regitstrationAgent,
   localRegistrar,
   districtRegistrar,
   stateRegistrar,
