@@ -9,6 +9,58 @@ export const COUNT_REGISTRATION_QUERY = gql`
     }
   }
 `
+
+export const COUNT_EVENT_REGISTRATION_BY_STATUS = gql`
+  query data($locationIds: [String], $status: String) {
+    countEventRegistrationsByStatus(
+      locationIds: $locationIds
+      status: $status
+    ) {
+      count
+    }
+  }
+`
+
+export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
+  query data($locationIds: [String], $status: String, $count: Int, $skip: Int) {
+    listEventRegistrations(
+      locationIds: $locationIds
+      status: $status
+      count: $count
+      skip: $skip
+    ) {
+      totalItems
+      results {
+        id
+        registration {
+          type
+          trackingId
+        }
+        ... on BirthRegistration {
+          child {
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+          createdAt
+        }
+        ... on DeathRegistration {
+          deceased {
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+          createdAt
+        }
+      }
+    }
+  }
+`
+
 export const SEARCH_EVENTS = gql`
   query(
     $sort: String
@@ -102,6 +154,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
             comment
           }
         }
+        contact
         contactPhoneNumber
       }
       ... on BirthRegistration {

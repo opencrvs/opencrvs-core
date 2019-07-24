@@ -44,10 +44,10 @@ const mockUserData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
   type: 'Birth',
   registration: {
-    status: 'DECLARED',
+    status: 'REGISTERED',
     contactNumber: '01622688231',
     trackingId: 'BW0UTHR',
-    registrationNumber: null,
+    registrationNumber: '20190203323443BW0UTHR',
     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
     duplicates: null,
     createdAt: '2018-05-23T14:44:58+02:00',
@@ -121,7 +121,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('RegistrarHome sent for review tab related tests', () => {
+describe('RegistrarHome ready to print tab related tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
@@ -135,7 +135,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
       <RegistrarHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'print'
           },
           isExact: true,
           path: '',
@@ -168,7 +168,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
       <RegistrarHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'print'
           },
           isExact: true,
           path: '',
@@ -188,7 +188,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     expect(
       testComponent.component
-        .find('#search-result-error-text-review')
+        .find('#search-result-error-text-print')
         .children()
         .text()
     ).toBe('An error occurred while searching')
@@ -196,7 +196,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
     testComponent.component.unmount()
   })
 
-  it('check sent for review tab count', async () => {
+  it('check ready to print applications count', async () => {
     const graphqlMock = [
       {
         request: {
@@ -222,7 +222,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
       <RegistrarHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'print'
           },
           isExact: true,
           path: '',
@@ -243,14 +243,13 @@ describe('RegistrarHome sent for review tab related tests', () => {
     const app = testComponent.component
     expect(
       app
-        .find('#tab_review')
+        .find('#tab_print')
         .hostNodes()
         .text()
-    ).toContain('Ready for review (10)')
-    testComponent.component.unmount()
+    ).toContain('Ready to print (7)')
   })
 
-  it('renders all items returned from graphql query in ready for reivew', async () => {
+  it('renders all items returned from graphql query in ready for print', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
@@ -258,7 +257,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: EVENT_STATUS.REGISTERED,
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -273,10 +272,10 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   type: 'Birth',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REGISTERED',
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
-                    registrationNumber: null,
+                    registrationNumber: '2019333494BBONT7U7',
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
@@ -303,15 +302,15 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REGISTERED',
                     trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
+                    registrationNumber: '2019333494B8I0NEB9',
+                    contactNumber: '01622688231',
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
+                    modifiedAt: null
                   },
                   dateOfBirth: null,
                   childName: null,
@@ -338,17 +337,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -369,8 +358,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].eventTimeElapsed).toBe('8 years ago')
-    expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
+    expect(data[0].dateOfRegistration).toBe(EXPECTED_DATE_OF_APPLICATION)
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
@@ -385,7 +373,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: EVENT_STATUS.REGISTERED,
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -402,7 +390,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
       <RegistrarHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'print'
           },
           isExact: true,
           path: '',
@@ -427,14 +415,14 @@ describe('RegistrarHome sent for review tab related tests', () => {
     testComponent.component.unmount()
   })
 
-  it('should show pagination bar if items more than 11 in ReviewTab', async () => {
+  it('should show pagination bar if items are more than 11 in ready for print tab', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: EVENT_STATUS.REGISTERED,
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -453,7 +441,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'review' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -479,14 +467,14 @@ describe('RegistrarHome sent for review tab related tests', () => {
     testComponent.component.unmount()
   })
 
-  it('renders expanded area for ready to review', async () => {
+  it('renders expanded area for ready to print', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: EVENT_STATUS.REGISTERED,
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -501,7 +489,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   type: 'Birth',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REGISTERED',
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
@@ -531,7 +519,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REGISTERED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
                     contactNumber: null,
@@ -566,16 +554,16 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: FETCH_REGISTRATION_BY_COMPOSITION,
           variables: {
-            id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95'
+            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
           }
         },
         result: {
           data: {
             fetchRegistration: {
-              id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
               registration: {
                 id: '345678',
-                type: 'DEATH',
+                type: 'BIRTH',
                 certificates: null,
                 status: [
                   {
@@ -612,14 +600,18 @@ describe('RegistrarHome sent for review tab related tests', () => {
                         state: 'iuyiuy'
                       }
                     },
-                    type: 'DECLARED',
-                    comments: null
+                    type: 'REGISTERED',
+                    comments: [
+                      {
+                        comment: 'reason=duplicate&comment=dup'
+                      }
+                    ]
                   }
                 ],
-                contactPhoneNumber: null
+                contact: 'MOTHER',
+                contactPhoneNumber: '01622688231'
               },
-              child: null,
-              deceased: {
+              child: {
                 name: [
                   {
                     use: 'en',
@@ -627,21 +619,10 @@ describe('RegistrarHome sent for review tab related tests', () => {
                     familyName: 'Hoque'
                   }
                 ],
-                deceased: {
-                  deathDate: '01-01-1984'
-                }
+                birthDate: '01-01-1984'
               },
-              informant: {
-                individual: {
-                  telecom: [
-                    {
-                      use: null,
-                      system: 'phone',
-                      value: '01686972106'
-                    }
-                  ]
-                }
-              }
+              deceased: null,
+              informant: null
             }
           }
         }
@@ -650,7 +631,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'review' } }} />,
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -665,28 +646,26 @@ describe('RegistrarHome sent for review tab related tests', () => {
     testComponent.component.update()
     const instance = testComponent.component.find(GridTable).instance() as any
 
-    instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
       setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
-    expect(testComponent.component.find('#DECLARED-0').hostNodes().length).toBe(
-      1
-    )
+    expect(
+      testComponent.component.find('#REGISTERED-0').hostNodes().length
+    ).toBe(1)
     testComponent.component.unmount()
   })
 
-  it('redirects user to review page on review action click', async () => {
-    const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
+  it('expanded block renders error text when an error occurs', async () => {
     const graphqlMock = [
       {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: EVENT_STATUS.REJECTED,
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -701,15 +680,15 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                   type: 'Birth',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REJECTED',
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
                   },
                   dateOfBirth: '2010-10-10',
                   childName: [
@@ -731,15 +710,159 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'REJECTED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
                     contactNumber: null,
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
+                    createdAt: '2007-01-01',
+                    modifiedAt: '2007-01-01'
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+          }
+        },
+        error: new Error('boom')
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const instance = testComponent.component.find(GridTable).instance() as any
+
+    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+    expect(
+      testComponent.component
+        .find('#search-result-error-text-expanded')
+        .children()
+        .text()
+    ).toBe('An error occurred while searching')
+    testComponent.component.unmount()
+  })
+
+  it('redirects to print form if print button is clicked', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['123456789']
+          }
+        },
+        result: {
+          data: {
+            countEvents: {
+              declared: 10,
+              registered: 2,
+              rejected: 5
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: EVENT_STATUS.REGISTERED,
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: '2007-01-01',
+                    modifiedAt: '2007-01-01'
                   },
                   dateOfBirth: null,
                   childName: null,
@@ -766,7 +889,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome />,
+      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -776,15 +899,11 @@ describe('RegistrarHome sent for review tab related tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 500)
+      setTimeout(resolve, 100)
     })
     testComponent.component.update()
-
-    expect(
-      testComponent.component.find('#ListItemAction-0-Review').hostNodes()
-    ).toHaveLength(1)
     testComponent.component
-      .find('#ListItemAction-0-Review')
+      .find('#ListItemAction-0-Print')
       .hostNodes()
       .simulate('click')
 
@@ -794,7 +913,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
     testComponent.component.update()
 
     expect(window.location.href).toContain(
-      '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      '/print/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
     testComponent.component.unmount()
   })
