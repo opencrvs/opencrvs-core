@@ -716,14 +716,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
               <ReviewAction
-                isComplete={isComplete}
-                isRegister={this.userHasRegisterScope()}
-                isRegistrationAgent={this.userHasValidateScope()}
-                isRejected={this.props.draft.registrationStatus === REJECTED}
-                isDraft={isDraft}
+                completeApplication={isComplete}
+                applicationToBeRegistered={this.userHasRegisterScope()}
+                applicationToBeValidated={this.userHasValidateScope()}
+                alreadyRejectedApplication={
+                  this.props.draft.registrationStatus === REJECTED
+                }
+                draftApplication={isDraft}
                 application={draft}
-                submitAction={submitClickEvent}
-                rejectAction={rejectApplicationClickEvent}
+                submitApplicationAction={submitClickEvent}
+                rejectApplicationAction={rejectApplicationClickEvent}
               />
             </FormData>
           </StyledColumn>
