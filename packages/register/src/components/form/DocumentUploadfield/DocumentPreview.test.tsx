@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { createShallowRenderedComponent } from '@register/tests/util'
-import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
+import { DocumentPreview } from '@register/components/form/DocumentUploadfield/DocumentPreview'
 
 describe('image upload component', () => {
   const mock = jest.fn()
   const testComponent = createShallowRenderedComponent(
-    <ImagePreview
+    <DocumentPreview
       previewImage={{
         optionValues: [],
         type: 'image/png',

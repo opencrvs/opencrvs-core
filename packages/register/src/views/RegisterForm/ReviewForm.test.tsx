@@ -511,7 +511,7 @@ describe('ReviewForm tests', async () => {
       .find(RegisterForm)
       .prop('application') as IApplication
 
-    expect(data.data.documents.imageUploader).toEqual([
+    expect(data.data.documents.uploadDocForMother).toEqual([
       {
         optionValues: ['Mother', 'Birth Registration'],
         type: 'image/jpeg',

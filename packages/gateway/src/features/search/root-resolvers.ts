@@ -41,7 +41,7 @@ export const resolvers: GQLResolver = {
         searchCriteria.from = skip
       }
       if (status) {
-        searchCriteria.status = status
+        searchCriteria.status = status as string[]
       }
       if (userId) {
         searchCriteria.createdBy = userId
@@ -63,19 +63,25 @@ export const resolvers: GQLResolver = {
         {}
       const declaredCriteria: ISearchCriteria = {
         ...searchCriteria,
-        status: 'DECLARED'
+        status: ['DECLARED']
       }
       const declaredResult = await postSearch(authHeader, declaredCriteria)
 
+      const validatedCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: ['VALIDATED']
+      }
+      const validatedResult = await postSearch(authHeader, validatedCriteria)
+
       const registeredCriteria: ISearchCriteria = {
         ...searchCriteria,
-        status: 'REGISTERED'
+        status: ['REGISTERED']
       }
       const registeredResult = await postSearch(authHeader, registeredCriteria)
 
       const rejectedCriteria: ISearchCriteria = {
         ...searchCriteria,
-        status: 'REJECTED'
+        status: ['REJECTED']
       }
       const rejectedResult = await postSearch(authHeader, rejectedCriteria)
       return {
@@ -83,6 +89,11 @@ export const resolvers: GQLResolver = {
           (declaredResult &&
             declaredResult.hits &&
             declaredResult.hits.total) ||
+          0,
+        validated:
+          (validatedResult &&
+            validatedResult.hits &&
+            validatedResult.hits.total) ||
           0,
         registered:
           (registeredResult &&
