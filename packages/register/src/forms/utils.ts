@@ -21,7 +21,11 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   IFieldInput,
-  IQuery
+  IFormSection,
+  IQuery,
+  DATE,
+  IDateFormField,
+  IFormSectionGroup
 } from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -67,11 +71,27 @@ export const internationaliseFieldObject = (
 
   if (
     base.type === SELECT_WITH_OPTIONS ||
-    base.type === RADIO_GROUP ||
     base.type === INFORMATIVE_RADIO_GROUP ||
     base.type === CHECKBOX_GROUP
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
+  }
+
+  if (base.type === RADIO_GROUP) {
+    ;(base as any).options = internationaliseOptions(intl, base.options)
+    if ((field as IDateFormField).notice) {
+      ;(base as any).notice = intl.formatMessage(
+        // @ts-ignore
+        (field as IRadioGroupFormField).notice
+      )
+    }
+  }
+
+  if (base.type === DATE && (field as IDateFormField).notice) {
+    ;(base as any).notice = intl.formatMessage(
+      // @ts-ignore
+      (field as IDateFormField).notice
+    )
   }
 
   if (base.type === FETCH_BUTTON) {
@@ -164,6 +184,9 @@ export const getFieldValidation = (
   return validate
 }
 
+export const getVisibleGroupFields = (group: IFormSectionGroup) => {
+  return group.fields.filter(field => !field.hidden)
+}
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
@@ -309,7 +332,8 @@ export function getQueryData(
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
-  resources?: IOfflineDataState
+  resources?: IOfflineDataState,
+  draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -321,6 +345,35 @@ export const getConditionalActionsForField = (
       .filter(conditional => eval(conditional.expression))
       .map((conditional: IConditional) => conditional.action)
   )
+}
+
+export const getVisibleSectionGroupsBasedOnConditions = (
+  section: IFormSection,
+  values: IFormSectionData
+): IFormSectionGroup[] => {
+  return section.groups.filter(group => {
+    if (!group.conditionals) {
+      return true
+    }
+    return (
+      group.conditionals
+        // eslint-disable-next-line no-eval
+        .filter(conditional => eval(conditional.expression))
+        .map((conditional: IConditional) => conditional.action)
+        .includes('hide') !== true
+    )
+  })
+}
+
+export const getSectionFields = (
+  section: IFormSection,
+  values?: IFormSectionData
+) => {
+  let fields: IFormField[] = []
+  getVisibleSectionGroupsBasedOnConditions(section, values || {}).forEach(
+    group => (fields = fields.concat(group.fields))
+  )
+  return fields
 }
 
 export const hasFormError = (
@@ -431,20 +484,14 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  placeOfDeathHospital: {
+  deathPlaceAddressTypeHeathInstitue: {
     action: 'hide',
-    expression:
-      '(values.placeOfDeath!="HOSPITAL" && values.placeOfDeath!="OTHER_HEALTH_INSTITUTION")'
+    expression: 'values.deathPlaceAddress!="HEALTH_INSTITUTION"'
   },
   otherBirthEventLocation: {
     action: 'hide',
     expression:
       '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
-  },
-  otherDeathEventLocation: {
-    action: 'hide',
-    expression:
-      '(values.placeOfDeath!="OTHER" && values.placeOfDeath!="PRIVATE_HOME")'
   },
   isNotCityLocation: {
     action: 'hide',
@@ -468,13 +515,21 @@ export const conditionals: IConditionals = {
   },
   iDAvailable: {
     action: 'hide',
-    expression: 'values.iDType === "NO_ID"'
+    expression: '!values.iDType || values.iDType === "NO_ID"'
   },
   applicantPermanentAddressSameAsCurrent: {
     action: 'hide',
     expression: 'values.applicantPermanentAddressSameAsCurrent'
   },
   deathPlaceOther: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "OTHER"'
+  },
+  deathPlaceAtPrivateHome: {
+    action: 'hide',
+    expression: 'values.deathPlaceAddress !== "PRIVATE_HOME"'
+  },
+  deathPlaceAtOtherLocation: {
     action: 'hide',
     expression: 'values.deathPlaceAddress !== "OTHER"'
   },
@@ -494,5 +549,10 @@ export const conditionals: IConditionals = {
   otherRelationship: {
     action: 'hide',
     expression: 'values.applicantsRelationToDeceased !== "OTHER"'
+  },
+  fatherContactDetailsRequired: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
   }
 }

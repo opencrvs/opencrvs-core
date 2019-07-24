@@ -1,3 +1,5 @@
+export const HOST = process.env.HOST || '0.0.0.0'
+export const PORT = process.env.PORT || 7070
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'

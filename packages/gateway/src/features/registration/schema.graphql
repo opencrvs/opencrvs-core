@@ -22,9 +22,9 @@ enum RegistrationContactType {
 
 enum BirthRegPresence {
   BOTH_PARENTS
-  INFORMANT_ONLY
-  MOTHER_ONLY
-  FATHER_ONLY
+  INFORMANT
+  MOTHER
+  FATHER
   OTHER
 }
 

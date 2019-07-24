@@ -25,7 +25,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.addressLine3CityOption': 'ওয়ার্ড',
     'formFields.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'formFields.postCode': 'পোস্ট কোড',
-    'formFields.permanentAddress': 'স্থায়ী ঠিকানা',
+    'formFields.permanentAddress': 'তাদের স্থায়ী ঠিকানা কি ছিল?',
     'formFields.confirm': 'হ্যাঁ',
     'formFields.deny': 'না',
     'formFields.addressSameAsMother':
@@ -353,9 +353,9 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.fatherFamilyNameEng': 'পারিবারিক নাম (ইংরেজিতে)',
     'formFields.fatherDateOfBirth': 'জন্ম তারিখ',
     'formFields.fatherEducationAttainment': 'পিতার আনুষ্ঠানিক শিক্ষা',
-    'formFields.currentAddress': 'বর্তমান ঠিকানা',
+    'formFields.currentAddress': 'তাদের বর্তমান ঠিকানা কি?',
     'formFields.currentAddressSameAsPermanent':
-      'তার বর্তমান এবং স্থায়ী বাসস্থান কি একই?',
+      'তাদের বর্তমান এবং স্থায়ী বাসস্থান কি একই?',
     'register.form.tabs.motherTab': 'মা',
     'register.form.section.motherTitle': "মা'র বিবরণ",
     'formFields.mother.nationality': 'জাতীয়তা',
@@ -368,9 +368,13 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.motherEducationAttainment': 'মায়ের আনুষ্ঠানিক শিক্ষা',
     'formFields.optionalLabel': 'ঐচ্ছিক',
     'formFields.hospital': 'হাসপাতাল',
+    'formFields.healthInstitution': 'স্বাস্থ্য সেবা প্রতিষ্ঠান',
     'formFields.otherHealthInstitution': 'অন্যান্য স্বাস্থ্য সেবা প্রতিষ্ঠান',
     'formFields.privateHome': 'ব্যক্তিগত বাসস্থান',
     'formFields.otherInstitution': 'অন্যান্য',
+    'formFields.deathAtFacility': 'কোন হাসপাতালে মৃত্যু ঘটেছে?',
+    'formFields.deathAtPrivateHome': 'বাড়ির ঠিকানা কি?',
+    'formFields.deathAtOtherLocation': 'অন্য কোন ঠিকানা তিনি মারা গিয়েছিলেন?',
     'register.form.tabs.documentsTab': 'কাগজপত্রাদি',
     'register.form.section.documentsTitle': 'প্রমানক',
     'register.form.tabs.previewTab': 'প্রিভিউ',
@@ -414,8 +418,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes.description':
       'প্রাসঙ্গিক মন্তব্য এই স্থানে যোগ করুন। এই মন্তব্য তথ্যপ্রদানকারীর সঙ্গে আলোচনা করা হবে না।',
     'register.form.tabs.deceasedTab': 'মৃত',
-    'register.form.section.deceasedTitle': 'মৃতের বিবরণ',
-    'formFields.deceasedIdType': 'বিদ্যমান আইডি',
+    'register.form.section.deceasedTitle': 'মৃত ব্যক্তির বিস্তারিত কি?',
+    'formFields.deceasedIdType': 'আইডি টাইপ',
     'formFields.iDTypeNoID': 'আইডি পাওয়া যায় নি',
     'formFields.deceasedGivenNames': 'নামের প্রথমাংশ বাংলায়',
     'formFields.deceasedFamilyName': 'নামের শেষাংশ বাংলায়',
@@ -432,8 +436,10 @@ export const BENGALI_STATE: ILanguage = {
       'মৃত ব্যক্তির স্থায়ী ঠিকানা কি বর্তমান ঠিকানার মত একই?',
     'register.form.tabs.deathEventTab': 'ঘটনা',
     'register.form.section.deathEventTitle': 'ঘটনার বিবরন',
+    'register.form.section.deathEventDateTitle': 'কখন মৃত্যু ঘটেছিল?',
+    'register.form.section.deathEventMannerTitle': 'মৃত্যুর পদ্ধতি কি ছিল?',
     'formFields.deathDate': 'ঘটনার তারিখ',
-    'formFields.manner': 'মৃত্যুর ধরন',
+    'formFields.manner': 'একটি ধরন নির্বাচন করুন',
     'formFields.mannerNatural': 'প্রাকৃতিক কারণ',
     'formFields.mannerAccident': 'দুর্ঘটনা',
     'formFields.mannerSuicide': 'আত্মহত্যা',
@@ -452,6 +458,7 @@ export const BENGALI_STATE: ILanguage = {
       'আবেদন জমা দেয়ার জন্য মৃত্যুর আনুষ্ঠানিক কারণ বাধ্যতামূলক নয়। মৃত্যুর কারণ পরবর্তী তারিখে জমা দেয়া যেতে পারে।',
     'formFields.causeOfDeathEstablished':
       'মৃত্যুর কোন একটি কারণ কি প্রতিষ্ঠিত হয়েছে?',
+    'register.form.section.causeOfDeathSectionTitle': 'মৃত্যুর কারণ কি?',
     'formFields.methodOfCauseOfDeath': 'মৃত্যুর কারণ নির্ণয়ের পদ্ধতি',
     'formFields.causeOfDeathCode': 'মৃত্যুর কারণের কোড',
     'formFields.verbalAutopsy': 'মৌখিক ময়না তদন্ত',
@@ -473,6 +480,7 @@ export const BENGALI_STATE: ILanguage = {
       'সমাধিস্থলের রশিদের প্রত্যয়িত কপি',
     'formFields.docTypeFuneralReceipt':
       'অন্ত্যেষ্টিক্রিয়া রশিদের প্রত্যয়িত কপি',
+    'formFields.selectOne': 'অনুগ্রহ করে নির্বাচন করুন',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
@@ -497,6 +505,7 @@ export const BENGALI_STATE: ILanguage = {
     'validations.domLaterThanDob': 'বিয়ের তারিখ জন্ম তারিখের পরে হতে হবে।',
     'validations.requiredSymbol': '',
     'register.form.submit': 'পর্যালোচনার জন্য পাঠান',
+    'register.form.submitIncomplete': 'অসম্পূর্ণ আবেদন পাঠান',
     'register.form.saveAsDraft': 'Save as draft',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.required': 'ঘরটি অবশ্যই পূরণ করতে হবে',
@@ -504,6 +513,7 @@ export const BENGALI_STATE: ILanguage = {
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.newBirthRegistration': 'নতুন জন্ম ঘোষণা',
     'register.selectVitalEvent.saveExitButton': 'সংরক্ষণ করে বেরিয়ে যান ',
+    'register.review.eventTopBar.exitButton': 'বাহির',
     'register.form.newVitalEventRegistration':
       'নতুন {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewEventRegistration':
@@ -516,6 +526,14 @@ export const BENGALI_STATE: ILanguage = {
     'modal.title.submitConfirmation': 'আপনি জমা দিতে প্রস্তুত?',
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
+    'register.form.modal.title.submitConfirmation':
+      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+    'register.form.modal.desc.submitConfirmation':
+      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+    'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
+    'register.form.modal.desc.registerConfirmation':
+      'আপনি কি এ ব্যাপারে নিশ্চিত?',
+    'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
     'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
@@ -806,7 +824,7 @@ export const BENGALI_STATE: ILanguage = {
       'স্বাস্থ্য কর্মী সঠিকভাবে আবেদন আপডেট করার জন্য তার কি নির্দেশাবলী প্রয়োজন প্রদান করুন',
     'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.button.register': 'নিবন্ধন',
-    'review.button.reject': 'আবেদন বাতিল',
+    'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.form.deleteApplication': 'আবেদন বাতিল',
@@ -816,6 +834,19 @@ export const BENGALI_STATE: ILanguage = {
     'review.header.subject.subjectWitName':
       '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
     'review.inputs.additionalComments': 'কোন মন্তব্য?',
+    'review.actions.title.applicationStatus':
+      'আবেদন {isComplete, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
+    'review.actions.description.confirmInComplete':
+      'এই অসম্পূর্ণ আবেদনটি পাঠিয়ে, একটি ডিজিটাল রেকর্ড তৈরি করা হবে।\n\nআবেদনকারীকে বলুন যে তারা ট্র্যাকিং আইডি সহ একটি এসএমএস পাবেন। 30 দিনের মধ্যে রেজিস্ট্রেশন অফিসে আবেদনটি সম্পূর্ণ করার জন্য তাদের এটি প্রয়োজন হবে। জন্ম নিবন্ধিত হতে পারে আগে আবেদনকারী সব বাধ্যতামূলক তথ্য প্রদান করতে হবে',
+    'review.actions.description.confirmComplete':
+      'পর্যালোচনার জন্য এই আবেদন পাঠানোর মাধ্যমে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের উদ্দেশ্যে এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।',
+    'register.actions.description.confirmInComplete':
+      'বাধ্যতামূলক তথ্য অনুপস্থিত। এই তথ্য যোগ করুন যাতে আপনি নিবন্ধন প্রক্রিয়াটি সম্পূর্ণ করতে পারেন।',
+    'register.actions.description.confirmComplete':
+      'নিবন্ধন ক্লিক করে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের জন্য এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।\n\nএই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের মাধ্যমে একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'register.actions.description':
+      'এই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের জন্য একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'register.actions.title.applicationStatus': 'নিবন্ধন বা বাতিল?',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
     'app.logout.modal.confirmationText': 'আপনি কি লগ আউট করতে চান?',
@@ -887,7 +918,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.registrar': 'রেজিস্ট্রার',
     'register.duplicates.queryError': 'তথ্য আনয়ন করার সময় একটি ত্রুটি ঘটেছে',
     'register.form.tabs.applicantTab': 'আবেদনকারী',
-    'register.form.section.applicantTitle': 'আবেদনকারীর বিবরণ',
+    'register.form.section.applicantTitle': 'আবেদনকারীর বিবরণ কি?',
     'formFields.applicantsIdType': 'বিদ্যমান আইডি',
     'formFields.applicantsGivenNames': 'নামের প্রথমাংশ বাংলায়',
     'formFields.applicantsFamilyName': 'নামের শেষাংশ বাংলায়',
@@ -1197,6 +1228,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
+    'review.documents.zeroDocumentsText':
+      '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
+    'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
     'register.SelectContactPoint.spouse': 'স্বামী বা স্ত্রী',
     'register.SelectContactPoint.son': 'পুত্র',
     'register.SelectContactPoint.daughter': 'কন্যা',

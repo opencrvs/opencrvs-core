@@ -1808,6 +1808,7 @@ export const userDetails = {
     { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
   ],
   role: 'FIELD_AGENT',
+  mobile: '01677701431',
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
     name: 'Kaliganj Union Sub Center',
@@ -2121,9 +2122,7 @@ export const mockDeathApplicationData = {
   deathEvent: {
     deathDate: '1987-02-16',
     manner: 'ACCIDENT',
-    deathPlace: '',
     deathPlaceAddress: 'OTHER',
-    placeOfDeath: 'OTHER',
     deathLocation: '',
     addressType: '',
     country: 'BGD',

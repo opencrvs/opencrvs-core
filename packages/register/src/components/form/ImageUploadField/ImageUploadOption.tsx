@@ -4,7 +4,7 @@ import { ActionPage, Box } from '@opencrvs/components/lib/interface'
 import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ArrowForward } from '@opencrvs/components/lib/icons'
 import { FormFieldGenerator } from '@register/components/form'
-import { IFormSection, IFormSectionData, IFileValue } from '@register/forms'
+import { IFormSectionData, IFileValue, IFormSection } from '@register/forms'
 import { hasFormError } from '@register/forms/utils'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Jimp from 'jimp'
@@ -98,7 +98,10 @@ export class ImageUploadOptionClass extends React.Component<IFullProps, State> {
   }
 
   shouldShowUploadButton = (documentData: IFormSectionData) => {
-    return documentData && !hasFormError(this.props.option.fields, documentData)
+    return (
+      documentData &&
+      !hasFormError(this.props.option.groups[0].fields, documentData)
+    )
   }
 
   handleFileChange = (uploadedImage: File) => {
@@ -148,7 +151,7 @@ export class ImageUploadOptionClass extends React.Component<IFullProps, State> {
                   id={option.id}
                   onChange={this.storeData}
                   setAllFieldsDirty={false}
-                  fields={option.fields}
+                  fields={option.groups[0].fields}
                 />
                 {this.state.showUploadButton && (
                   <FormAction>

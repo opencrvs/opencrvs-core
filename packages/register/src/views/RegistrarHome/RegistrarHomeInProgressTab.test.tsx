@@ -208,6 +208,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
     })
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
+    Date.now = jest.fn(() => 1563732000000) // 2019-07-21
     const EXPECTED_DATE_OF_REJECTION = moment(
       TIME_STAMP,
       'YYYY-MM-DD'

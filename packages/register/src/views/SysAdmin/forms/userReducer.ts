@@ -48,7 +48,12 @@ const initialState: IUserFormState = {
         viewType: 'preview',
         name: messages.previewTab,
         title: messages.previewTitle,
-        fields: userSection.fields
+        groups: [
+          {
+            id: 'preview-view-group',
+            fields: userSection.groups[0].fields
+          }
+        ]
       }
     ]
   },
@@ -153,7 +158,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case UPDATE_FORM_FIELD_DEFINITIONS:
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
       const updatedFields = transformRoleDataToDefinitions(
-        state.userForm.sections[0].fields,
+        state.userForm.sections[0].groups[0].fields,
         data
       )
       const updatedSection = { ...userSection, fields: updatedFields }
