@@ -158,7 +158,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'r.tagore',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
                     status: 'active'
                   },
@@ -268,7 +268,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'r.tagore',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
                     status: 'active'
                   },
@@ -375,7 +375,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'r.tagore',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
                     status: 'active'
                   },
@@ -459,7 +459,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'l.khatun',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
                   },
@@ -487,7 +487,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'ms.farid',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
                   },
@@ -557,7 +557,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'r.tagore',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
                     status: 'active'
                   },
@@ -641,7 +641,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'l.khatun',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
                   },
@@ -669,7 +669,7 @@ describe('User tab tests', async () => {
                       }
                     ],
                     username: 'ms.farid',
-                    role: 'REGISTRATION_CLERK',
+                    role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
                     status: 'active'
                   },

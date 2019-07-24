@@ -37,35 +37,7 @@ const fieldAgent = new User({
   securityQuestionAnswers: []
 })
 
-const registrationClerk = new User({
-  name: [
-    {
-      use: 'en',
-      given: ['Rabindranath'],
-      family: 'Tagore'
-    }
-  ],
-  username: 'robi.tagore',
-  email: 'test@test.org',
-  mobile: '+8801722222222',
-  passwordHash: pass.hash,
-  salt: pass.salt,
-  role: 'REGISTRATION_CLERK',
-  type: 'ENTREPENEUR',
-  scope: ['register', 'performance', 'certify', 'demo'],
-  status: 'active',
-  practitionerId: '1c1318b7-c17b-4f16-a622-12eac6c74f36',
-  primaryOfficeId: '128a657e-851d-4a48-b0f8-cd2d14c5aa09',
-  catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '6555e1d3-36ec-413b-9599-eb96676ac6fd',
-    '4cfda6cf-e194-49f4-9574-c1bb5d26865d',
-    '128a657e-851d-4a48-b0f8-cd2d14c5aa09'
-  ],
-  securityQuestionAnswers: []
-})
-
-const regitstrationAgent = new User({
+const registrationAgent = new User({
   name: [
     {
       use: 'en',
@@ -78,7 +50,7 @@ const regitstrationAgent = new User({
   mobile: '+8801721111111',
   passwordHash: pass.hash,
   salt: pass.salt,
-  role: 'REGISTRATION_CLERK',
+  role: 'REGISTRATION_AGENT',
   type: 'ENTREPENEUR',
   scope: ['validate', 'demo'],
   status: 'active',
@@ -220,8 +192,7 @@ const sysAdmin = new User({
 
 const users = [
   fieldAgent,
-  registrationClerk,
-  regitstrationAgent,
+  registrationAgent,
   localRegistrar,
   districtRegistrar,
   stateRegistrar,
@@ -239,7 +210,7 @@ const fieldAgentRole = new Role({
 
 const regitstrationAgentRole = new Role({
   title: 'Registration Agent',
-  value: 'REGISTRATION_CLERK',
+  value: 'REGISTRATION_AGENT',
   types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK'],
   active: true
 })
