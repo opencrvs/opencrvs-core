@@ -187,17 +187,11 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
-function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
-  const currentIndex = sections.findIndex(
-    (section: IFormSection) => section.id === fromSection.id
-  )
-
-  if (currentIndex === sections.length - 1) {
-    return null
-  }
-
-  return sections[currentIndex + 1]
+const VIEW_TYPE = {
+  FORM: 'form',
+  REVIEW: 'review',
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
 }
 
 function getNextSectionIds(
@@ -215,15 +209,18 @@ function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const currentIndex = sections.findIndex(
+    const visibleSections = sections.filter(
+      section => section.viewType !== VIEW_TYPE.HIDDEN
+    )
+    const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
     )
-    if (currentIndex === sections.length - 1) {
+    if (currentIndex === visibleSections.length - 1) {
       return null
     }
     return {
-      sectionId: sections[currentIndex + 1].id,
-      groupId: sections[currentIndex + 1].groups[0].id
+      sectionId: visibleSections[currentIndex + 1].id,
+      groupId: visibleSections[currentIndex + 1].groups[0].id
     }
   }
   return {
@@ -270,12 +267,6 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
-}
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
@@ -387,19 +378,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       offlineResources,
       handleSubmit,
-      duplicate
+      duplicate,
+      activeSection,
+      activeSectionGroup
     } = this.props
 
-    let activeSection: IFormSection = this.props.activeSection
-    let activeSectionGroup: IFormSectionGroup = this.props.activeSectionGroup
-
-    if (activeSection.viewType === VIEW_TYPE.HIDDEN) {
-      const nextSection = getNextSection(registerForm.sections, activeSection)
-      if (nextSection) {
-        activeSection = nextSection
-        activeSectionGroup = nextSection.groups[0]
-      }
-    }
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
       activeSection,

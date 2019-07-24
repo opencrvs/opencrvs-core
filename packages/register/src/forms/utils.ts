@@ -25,7 +25,8 @@ import {
   IQuery,
   DATE,
   IDateFormField,
-  IFormSectionGroup
+  IFormSectionGroup,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -72,7 +73,8 @@ export const internationaliseFieldObject = (
   if (
     base.type === SELECT_WITH_OPTIONS ||
     base.type === INFORMATIVE_RADIO_GROUP ||
-    base.type === CHECKBOX_GROUP
+    base.type === CHECKBOX_GROUP ||
+    base.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
@@ -338,7 +340,6 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
@@ -554,5 +555,20 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
+  },
+  withIn45Days: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days")'
+  },
+  between46daysTo5yrs: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs")'
+  },
+  after5yrs: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")'
   }
 }

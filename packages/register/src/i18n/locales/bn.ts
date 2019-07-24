@@ -380,7 +380,11 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.tabs.previewTab': 'প্রিভিউ',
     'review.form.tabs.reviewTab': 'পর্যালোচনা',
     'register.form.section.documents.paragraph':
-      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৫ বছরের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৪৫ দিনের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+    'register.form.section.documents.paragraph45daysTo5Years':
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৪৫ দিনের অধিক ৫ বছরের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+    'register.form.section.documents.paragraphAbove5Years':
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৫ বছরের অধিক বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
     'register.form.section.documents.list.informantAttestation':
       'তথ্যপ্রদানকারীর সত্যায়িত পরিচয় পত্র অথবা,',
     'register.form.section.documents.list.attestedVaccination':
@@ -664,7 +668,13 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
     'formFields.docTypeOther': 'অন্যান্য',
     'formFields.docTypeChildBirthProof': 'জন্ম স্থান এবং জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeMedicalInstitution':
+      'মেডিকেল প্রতিষ্ঠান থেকে জন্ম প্রমাণ',
+    'formFields.docTypebirthAttendant': 'জন্ম পরিচর্যা থেকে জন্ম প্রমাণ',
+    'formFields.docTypeChildAgeProof': 'জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeTaxReceipt': 'কর প্রদান রসিদ',
     'formFields.docTypeEPICard': 'ইপিআই কার্ড',
+    'formFields.docTypeEPIStaffCertificate': 'ইপিআই সার্টিফিকেট',
     'formFields.docTypeDoctorCertificate': 'ডাক্তার সার্টিফিকেট',
     'formFields.proofOfMothersID': 'মায়ের আইডি প্রমাণ',
     'formFields.proofOfFathersID': 'পিতার আইডি প্রমাণ',
@@ -1027,7 +1037,11 @@ export const BENGALI_STATE: ILanguage = {
     'error.description1': 'Something went wrong.',
     'error.description2': "It's not you, it us. This is our fault.",
     'goto.homepage': 'Go to Homepage',
-    'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
+    'imageUploadOption.upload.error':
+      'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে (সর্বোচ্চ ৫ মে:বা:)',
+    'imageUploadOption.upload.overSized':
+      'ফাইল খুব বড়। দয়া করে ৫ মে:বা: এর ছোট ছবি প্রদান করুন',
+    'imageUploadOption.upload.documentType': 'প্রথমে নথি ধরন নির্বাচন করুন',
     'register.SearchResult.searchingFor': '“{param}” এর অনুসন্ধান চলসে ',
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {“{param}” এর জন্য কোন ফলাফল পাওয়া যায়নি} other {“{param}” এর অনুসন্ধান ফলাফল}}',
