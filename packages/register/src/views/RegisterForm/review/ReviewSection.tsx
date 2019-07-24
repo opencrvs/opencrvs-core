@@ -76,6 +76,7 @@ import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import { sectionMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -459,26 +460,38 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
     const selectOptions: SelectComponentOptions[] = []
-    let uploadedDocuments =
-      draft.data[draftItemName] &&
-      isArray(draft.data[draftItemName].imageUploader)
-        ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
-        : []
+
+    let uploadedDocuments: IFileValue[] = []
+
+    for (let index in draft.data[draftItemName]) {
+      if (isArray(draft.data[draftItemName][index]))
+        uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
+          index
+        ] as IFileValue[])
+    }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
-      return document.title.toUpperCase() === activeSection.toUpperCase()
-    })
+      const index = activeSection.toUpperCase()
+      // @ts-ignore
+      const allowedDocumentType = sectionMapping[index] || []
 
-    uploadedDocuments.forEach(document => {
-      const label = document.title + ' ' + document.description
-      documentOptions.push({
-        value: document.data,
-        label
-      })
-      selectOptions.push({
-        value: label,
-        label
-      })
+      if (
+        allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
+      ) {
+        // const label = document.title + ' ' + document.description
+        const label = document.optionValues[0] + ' ' + document.optionValues[1]
+
+        documentOptions.push({
+          value: document.data,
+          label
+        })
+        selectOptions.push({
+          value: label,
+          label
+        })
+        return true
+      }
+      return false
     })
 
     return {
