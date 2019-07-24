@@ -1,4 +1,4 @@
-import { Duplicate } from '@opencrvs/components/lib/icons'
+import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -11,7 +11,7 @@ import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
 import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
-import { ITheme } from '@register/styledComponents'
+import styled, { ITheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
@@ -28,7 +28,11 @@ import {
   StyledSpinner
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
+import ReactTooltip from 'react-tooltip'
 
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
 interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
@@ -77,6 +81,9 @@ class ReviewTabComponent extends React.Component<
           })
           icon = <Duplicate />
         } else {
+          if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
+            icon = <Validate data-tip data-for="validateTooltip" />
+          }
           actions.push({
             label: this.props.intl.formatMessage(messages.review),
             handler: () =>
@@ -124,7 +131,7 @@ class ReviewTabComponent extends React.Component<
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: EVENT_STATUS.DECLARED,
+          status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
           locationIds: [registrarUnion],
           count: this.pageSize,
           skip: (this.state.reviewCurrentPage - 1) * this.pageSize
@@ -160,6 +167,13 @@ class ReviewTabComponent extends React.Component<
           }
           return (
             <BodyContent>
+              <ReactTooltip id="validateTooltip">
+                <ToolTipContainer>
+                  {this.props.intl.formatMessage(
+                    messages.validatedApplicationTooltip
+                  )}
+                </ToolTipContainer>
+              </ReactTooltip>
               <GridTable
                 content={this.transformDeclaredContent(data)}
                 columns={[

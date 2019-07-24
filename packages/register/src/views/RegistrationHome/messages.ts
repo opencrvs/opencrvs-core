@@ -154,5 +154,10 @@ export const messages: {
     id: 'column.name.error.value',
     defaultMessage: 'No name provided',
     description: 'Text to display if the name column has no value provided'
+  },
+  validatedApplicationTooltip: {
+    id: 'register.registrarHome.validated.tooltip',
+    defaultMessage: 'Application has been validated by a registration agent',
+    description: 'Text to display for validated application as tooltip'
   }
 })

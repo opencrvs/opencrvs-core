@@ -1,11 +1,8 @@
 import * as React from 'react'
 import OutBox from '@register/views/RegistrationHome/Outbox'
-import { IApplication, createApplication } from '@register/applications'
-import { Event, IFormData } from '@register/forms'
-import {
-  createTestComponent,
-  currentUserApplications
-} from '@register/tests/util'
+import { IApplication } from '@register/applications'
+import { Event } from '@register/forms'
+import { createTestComponent } from '@register/tests/util'
 import { createStore } from '@register/store'
 
 describe('OutBox tests', () => {

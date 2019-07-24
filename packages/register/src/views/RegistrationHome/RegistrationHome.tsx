@@ -5,7 +5,6 @@ import {
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import {
-  Duplicate,
   PlusTransparentWhite,
   StatusGreen,
   StatusOrange,
@@ -27,15 +26,10 @@ import {
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
   goToReviewDuplicate as goToReviewDuplicateAction
 } from '@register/navigation'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE
-} from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import { sentenceCase } from '@register/utils/data-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import NotificationToast from '@register/views/RegistrationHome/NotificatoinToast'
 import {
@@ -44,7 +38,6 @@ import {
 } from '@register/views/RegistrationHome/queries'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
-import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
@@ -102,7 +95,6 @@ const FABContainer = styled.div`
     display: none;
   }
 `
-
 interface IBaseRegistrationHomeProps {
   theme: ITheme
   language: string
@@ -138,6 +130,7 @@ const TAB_ID = {
 export const EVENT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
   DECLARED: 'DECLARED',
+  VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED'
 }
@@ -152,83 +145,6 @@ export class RegistrationHomeView extends React.Component<
       reviewCurrentPage: 1,
       updatesCurrentPage: 1
     }
-  }
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
-  }
-
-  transformDraftContent = () => {
-    if (!this.props.drafts || this.props.drafts.length <= 0) {
-      return []
-    }
-    return this.props.drafts
-      .filter(
-        draft =>
-          draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      )
-      .map((draft: IApplication) => {
-        let name
-        let pageRoute: string
-        if (draft.event && draft.event.toString() === 'birth') {
-          name =
-            (draft.data &&
-              draft.data.child &&
-              draft.data.child.familyNameEng &&
-              (!draft.data.child.firstNamesEng
-                ? ''
-                : draft.data.child.firstNamesEng + ' ') +
-                draft.data.child.familyNameEng) ||
-            (draft.data &&
-              draft.data.child &&
-              draft.data.child.familyName &&
-              (!draft.data.child.firstNames
-                ? ''
-                : draft.data.child.firstNames + ' ') +
-                draft.data.child.familyName) ||
-            ''
-          pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
-        } else if (draft.event && draft.event.toString() === 'death') {
-          name =
-            (draft.data &&
-              draft.data.deceased &&
-              draft.data.deceased.familyNameEng &&
-              (!draft.data.deceased.firstNamesEng
-                ? ''
-                : draft.data.deceased.firstNamesEng + ' ') +
-                draft.data.deceased.familyNameEng) ||
-            (draft.data &&
-              draft.data.deceased &&
-              draft.data.deceased.familyName &&
-              (!draft.data.deceased.firstNames
-                ? ''
-                : draft.data.deceased.firstNames + ' ') +
-                draft.data.deceased.familyName) ||
-            ''
-          pageRoute = DRAFT_DEATH_FORM_PAGE
-        }
-        const lastModificationDate = draft.modifiedOn || draft.savedOn
-        const actions = [
-          {
-            label: this.props.intl.formatMessage(messages.update),
-            handler: () =>
-              this.props.goToPage(
-                pageRoute,
-                draft.id,
-                'preview',
-                (draft.event && draft.event.toString()) || ''
-              )
-          }
-        ]
-        return {
-          id: draft.id,
-          event: (draft.event && sentenceCase(draft.event)) || '',
-          name: name || '',
-          dateOfModification:
-            (lastModificationDate && moment(lastModificationDate).fromNow()) ||
-            '',
-          actions
-        }
-      })
   }
 
   renderInProgressTabWithCount = (
@@ -367,7 +283,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {data.countEvents.declared})
+                    {data.countEvents.declared + data.countEvents.validated})
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}

@@ -26,12 +26,12 @@ import {
   REJECT_COMMENTS,
   LOCAL_DATE_FORMAT,
   CERTIFICATE_DATE_FORMAT,
-  DECLARED,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
 } from '@register/utils/constants'
 import { messages } from '@register/search/messages'
 import moment from 'moment'
 import {
+  StatusGray,
   StatusGreen,
   StatusOrange,
   StatusRejected
@@ -241,6 +241,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             <StatusOrange />
           </StatusIcon>
         )
+      case 'VALIDATED':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
       case 'REGISTERED':
         return (
           <StatusIcon>
@@ -266,6 +272,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     switch (status) {
       case 'DECLARED':
         return messages.workflowStatusDateApplication
+      case 'VALIDATED':
+        return messages.workflowStatusDateValidated
       case 'REGISTERED':
         return messages.workflowStatusDateRegistered
       case 'REJECTED':

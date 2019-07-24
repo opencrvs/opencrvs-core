@@ -114,7 +114,7 @@ class RejectTabComponent extends React.Component<
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: EVENT_STATUS.REJECTED,
+          status: [EVENT_STATUS.REJECTED],
           locationIds: [registrarUnion],
           count: this.pageSize,
           skip: (this.state.updatesCurrentPage - 1) * this.pageSize

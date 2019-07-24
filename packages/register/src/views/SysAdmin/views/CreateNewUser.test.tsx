@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createTestComponent, flushPromises, wait } from '@register/tests/util'
+import { createTestComponent, flushPromises } from '@register/tests/util'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { createStore } from '@register/store'
 import { ReactWrapper } from 'enzyme'
