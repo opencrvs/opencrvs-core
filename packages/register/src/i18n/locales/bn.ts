@@ -1235,6 +1235,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.son': 'পুত্র',
     'register.SelectContactPoint.daughter': 'কন্যা',
     'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
-    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
+    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান',
+    'tab.inProgress.selector.own.drafts': 'আপনার',
+    'tab.inProgress.selector.field.agents': 'মাঠ কর্মী',
+    'column.name.error.value': 'নাম সরবরাহ করা হয়নি',
+    'application.creation.label': 'শুরুর সময়',
+    'application.informant.label': 'তথ্যপ্রদানকারী',
+    'application.informant.value.mother': 'মা',
+    'application.informant.value.mother.only': 'মা',
+    'application.informant.value.father': 'বাবা',
+    'application.initiator.label': 'কর্মী',
+    'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে'
   }
 }
