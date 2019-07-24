@@ -36,6 +36,8 @@ import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import { PAGE_TRANSITIONS_CLASSNAME } from './utils/constants'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -46,6 +48,25 @@ const MainSection = styled.section`
   flex-grow: 8;
   background: ${({ theme }) => theme.colors.background};
 `
+
+const getAnimationKey = (location: any): string => {
+  const parts = location.pathname.split('/')
+  const tabId = (parts && parts.length && parts[parts.length - 1]) || ''
+  let key = 'other'
+
+  if (
+    [
+      routes.HOME,
+      routes.FIELD_AGENT_HOME_TAB.replace(':tabId', tabId),
+      routes.REGISTRAR_HOME,
+      routes.REGISTRAR_HOME_TAB.replace(':tabId', tabId)
+    ].includes(location.pathname.toString())
+  ) {
+    key = 'home'
+  }
+
+  return key
+}
 export const store = createStore()
 
 export class App extends React.Component<IAppProps> {
@@ -68,131 +89,166 @@ export class App extends React.Component<IAppProps> {
                         <Page>
                           <MainSection>
                             <ProtectedPage>
-                              <Switch>
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.HOME}
-                                  component={FieldAgentHome}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.FIELD_AGENT_HOME_TAB}
-                                  component={FieldAgentHome}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SELECT_VITAL_EVENT}
-                                  component={SelectVitalEvent}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SELECT_BIRTH_PRIMARY_APPLICANT}
-                                  component={SelectPrimaryApplicant}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SELECT_BIRTH_INFORMANT}
-                                  component={SelectInformant}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SELECT_DEATH_INFORMANT}
-                                  component={SelectInformant}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.DRAFT_BIRTH_PARENT_FORM}
-                                  component={ApplicationForm}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE}
-                                  component={ApplicationForm}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.DRAFT_DEATH_FORM}
-                                  component={ApplicationForm}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.DRAFT_DEATH_FORM_PAGE}
-                                  component={ApplicationForm}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.REVIEW_EVENT_PARENT_FORM_PAGE}
-                                  component={ReviewForm}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.REGISTRAR_HOME}
-                                  component={RegistrarHome}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.REGISTRAR_HOME_TAB}
-                                  component={RegistrarHome}
-                                />
-                                <ProtectedRoute
-                                  path={routes.CONFIRMATION_SCREEN}
-                                  component={ConfirmationScreen}
-                                />
-                                <ProtectedRoute
-                                  path={routes.SEARCH}
-                                  component={SearchResult}
-                                />
-                                <ProtectedRoute
-                                  path={routes.SEARCH_RESULT}
-                                  component={SearchResult}
-                                />
-                                <ProtectedRoute
-                                  path={routes.REVIEW_DUPLICATES}
-                                  component={ReviewDuplicates}
-                                />
-                                <ProtectedRoute
-                                  path={routes.PRINT_CERTIFICATE}
-                                  component={PrintCertificateAction}
-                                />
-                                <ProtectedRoute
-                                  path={routes.SETTINGS}
-                                  component={SettingsPage}
-                                />
-                                <ProtectedRoute
-                                  path={routes.APPLICATION_DETAIL}
-                                  component={Details}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SYS_ADMIN_HOME}
-                                  component={SysAdminHome}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SYS_ADMIN_HOME_TAB}
-                                  component={SysAdminHome}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.CREATE_USER}
-                                  component={CreateNewUser}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.CREATE_USER_SECTION}
-                                  component={CreateNewUser}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SELECT_DEATH_MAIN_CONTACT_POINT}
-                                  component={SelectContactPoint}
-                                />
-                                <ProtectedRoute
-                                  exact
-                                  path={routes.SELECT_BIRTH_MAIN_CONTACT_POINT}
-                                  component={SelectContactPoint}
-                                />
-                              </Switch>
+                              <ProtectedRoute
+                                render={({ location }: { location: any }) => {
+                                  return (
+                                    <>
+                                      <TransitionGroup component={null}>
+                                        <CSSTransition
+                                          timeout={{
+                                            enter: 300,
+                                            exit: 300
+                                          }}
+                                          classNames={
+                                            PAGE_TRANSITIONS_CLASSNAME
+                                          }
+                                          key={getAnimationKey(location)}
+                                        >
+                                          <Switch location={location}>
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.FIELD_AGENT_HOME_TAB}
+                                              component={FieldAgentHome}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.HOME}
+                                              component={FieldAgentHome}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.SELECT_VITAL_EVENT}
+                                              component={SelectVitalEvent}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.REGISTRAR_HOME}
+                                              component={RegistrarHome}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.DRAFT_BIRTH_PARENT_FORM
+                                              }
+                                              component={ApplicationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.DRAFT_BIRTH_PARENT_FORM_PAGE
+                                              }
+                                              component={ApplicationForm}
+                                            />
+                                          </Switch>
+                                        </CSSTransition>
+                                      </TransitionGroup>
+                                      <Switch>
+                                        <ProtectedRoute
+                                          exact
+                                          path={
+                                            routes.SELECT_BIRTH_PRIMARY_APPLICANT
+                                          }
+                                          component={SelectPrimaryApplicant}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.SELECT_BIRTH_INFORMANT}
+                                          component={SelectInformant}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.SELECT_DEATH_INFORMANT}
+                                          component={SelectInformant}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.DRAFT_DEATH_FORM}
+                                          component={ApplicationForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.DRAFT_DEATH_FORM_PAGE}
+                                          component={ApplicationForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={
+                                            routes.REVIEW_EVENT_PARENT_FORM_PAGE
+                                          }
+                                          component={ReviewForm}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.REGISTRAR_HOME_TAB}
+                                          component={RegistrarHome}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.CONFIRMATION_SCREEN}
+                                          component={ConfirmationScreen}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.SEARCH}
+                                          component={SearchResult}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.SEARCH_RESULT}
+                                          component={SearchResult}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.REVIEW_DUPLICATES}
+                                          component={ReviewDuplicates}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.PRINT_CERTIFICATE}
+                                          component={PrintCertificateAction}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.SETTINGS}
+                                          component={SettingsPage}
+                                        />
+                                        <ProtectedRoute
+                                          path={routes.APPLICATION_DETAIL}
+                                          component={Details}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.SYS_ADMIN_HOME}
+                                          component={SysAdminHome}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.SYS_ADMIN_HOME_TAB}
+                                          component={SysAdminHome}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.CREATE_USER}
+                                          component={CreateNewUser}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={routes.CREATE_USER_SECTION}
+                                          component={CreateNewUser}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={
+                                            routes.SELECT_DEATH_MAIN_CONTACT_POINT
+                                          }
+                                          component={SelectContactPoint}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          path={
+                                            routes.SELECT_BIRTH_MAIN_CONTACT_POINT
+                                          }
+                                          component={SelectContactPoint}
+                                        />
+                                      </Switch>
+                                    </>
+                                  )
+                                }}
+                              />
                             </ProtectedPage>
                           </MainSection>
                           <Footer>
