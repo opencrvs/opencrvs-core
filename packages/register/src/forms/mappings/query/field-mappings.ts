@@ -232,19 +232,21 @@ export function attachmentToFieldTransformer(
   field: IFormField,
   alternateSectionId?: string,
   subjectMapper?: any,
-  typeMapper?: any
+  typeMapper?: any,
+  fieldNameMapping?: any
 ) {
   const selectedSectionId = alternateSectionId ? alternateSectionId : sectionId
-  const attachments =
-    queryData[selectedSectionId].attachments &&
-    ((queryData[selectedSectionId].attachments as GQLAttachment[]).map(
+  let attachments: IAttachment[] = []
+
+  if (queryData[selectedSectionId].attachments) {
+    ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
       attachment => {
-        let subject = attachment.subject
+        let subject = attachment.subject as string
         if (subjectMapper) {
           // @ts-ignore
           subject =
             Object.keys(subjectMapper).find(
-              key => subjectMapper[key] === attachment.subject
+              key => subjectMapper[key].toUpperCase() === subject.toUpperCase()
             ) || attachment.subject
         }
         let type = attachment.type
@@ -255,16 +257,22 @@ export function attachmentToFieldTransformer(
               key => typeMapper[key] === attachment.type
             ) || attachment.type
         }
-        return {
-          data: attachment.data,
-          type: attachment.contentType,
-          optionValues: [subject, type],
-          title: subject,
-          description: type
+
+        console.log(field)
+        if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
+          attachments.push({
+            data: attachment.data,
+            type: attachment.contentType,
+            optionValues: [subject, type],
+            title: subject,
+            description: type
+          } as IAttachment)
         }
       }
-    ) as IAttachment[])
+    )
+  }
 
+  console.log(attachments)
   if (attachments) {
     transformedData[sectionId][field.name] = attachments
   }
@@ -353,7 +361,7 @@ export const nestedValueToFieldTransformer = (
       clonedData[nestedFieldName] = {}
     }
     transformMethod(clonedData, queryData[sectionId], nestedFieldName, field)
-    if (!clonedData[nestedFieldName][field.name]) {
+    if (clonedData[nestedFieldName][field.name] === undefined) {
       return transformedData
     }
     transformedData[sectionId][field.name] =

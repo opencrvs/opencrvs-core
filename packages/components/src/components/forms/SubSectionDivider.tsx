@@ -9,13 +9,10 @@ const SubSectionWrapper = styled.div`
   padding-left: 25px;
   padding-right: 25px;
   flex-direction: row;
-  h2 {
-    display: inline;
-  }
 `
 
-const Title = styled.h2`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
 `
 const Optional = styled.span.attrs<

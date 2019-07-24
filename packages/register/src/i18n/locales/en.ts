@@ -25,7 +25,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.addressLine3CityOption': 'Ward',
     'formFields.addressLine4': 'Upazila (Thana) / City',
     'formFields.postCode': 'Postcode',
-    'formFields.permanentAddress': 'Permanent Address',
+    'formFields.permanentAddress': 'What was their permanent address?',
     'formFields.confirm': 'Yes',
     'formFields.deny': 'No',
     'formFields.addressSameAsMother':
@@ -352,9 +352,9 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.fatherDateOfBirth': 'Date of birth',
     'formFields.fatherEducationAttainment':
       "Father's level of formal education attained",
-    'formFields.currentAddress': 'Current Address',
+    'formFields.currentAddress': 'What is their current address?',
     'formFields.currentAddressSameAsPermanent':
-      'Is her current address the same as her permanent address?',
+      'Is their current address the same as the permanent address?',
     'register.form.tabs.motherTab': 'Mother',
     'register.form.section.motherTitle': "Mother's details",
     'formFields.mother.nationality': 'Nationality',
@@ -368,17 +368,22 @@ export const ENGLISH_STATE: ILanguage = {
       "Mother's level of formal education attained",
     'formFields.optionalLabel': 'Optional',
     'formFields.hospital': 'Hospital',
+    'formFields.healthInstitution': 'Health Institution',
     'formFields.otherHealthInstitution': 'Other Health Institution',
     'formFields.privateHome': 'Private Home',
     'formFields.otherInstitution': 'Other',
     'register.form.tabs.documentsTab': 'Documents',
-    'register.form.section.documentsTitle': 'Supporting documents',
+    'register.form.section.documentsTitle': 'Attach Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
     'review.form.tabs.reviewTab': 'Review',
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
-      'For birth registration of children below 5 years old, one of the documents listed below is required:',
+      'For birth registration of birth occurring within 45 days old the following documents are required:',
+    'register.form.section.documents.paragraph45daysTo5Years':
+      'For birth registration of births occurring within 45 days and and 5 years old the following documents are required:',
+    'register.form.section.documents.paragraphAbove5Years':
+      'For birth registration of births occurring after 5 years the following documents are required:',
     'register.form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
     'register.form.section.documents.list.attestedVaccination':
@@ -415,13 +420,13 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes.description':
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this application. This information won’t be shared with the informants.',
     'register.form.tabs.deceasedTab': 'Deceased',
-    'register.form.section.deceasedTitle': "Deceased's details",
-    'formFields.deceasedIdType': 'Existing ID',
+    'register.form.section.deceasedTitle': 'What are the deceased details?',
+    'formFields.deceasedIdType': 'Type of ID',
     'formFields.iDTypeNoID': 'No ID available',
-    'formFields.deceasedGivenNames': 'First Name(s) in Bengali',
-    'formFields.deceasedFamilyName': 'Last Name(s) in Bengali',
-    'formFields.deceasedGivenNamesEng': 'First Name(s) in English',
-    'formFields.deceasedFamilyNameEng': 'Last Name(s) in English',
+    'formFields.deceasedGivenNames': 'Bengali Given Name',
+    'formFields.deceasedFamilyName': 'Bengali Family Name',
+    'formFields.deceasedGivenNamesEng': 'English Given Name',
+    'formFields.deceasedFamilyNameEng': 'English Family Name',
     'formFields.deceased.nationality': 'Nationality',
     'formFields.deceasedSex': 'Sex',
     'formFields.deceasedSexMale': 'Male',
@@ -433,8 +438,12 @@ export const ENGLISH_STATE: ILanguage = {
       'Is deceased’s current address the same as their permanent address?',
     'register.form.tabs.deathEventTab': 'Event',
     'register.form.section.deathEventTitle': 'Event details',
-    'formFields.deathDate': 'Date of Occurrence',
-    'formFields.manner': 'Manner of Death',
+    'register.form.section.deathEventDateTitle': 'When did the death occur?',
+    'register.form.section.deathEventMannerTitle':
+      'What was the manner of death?',
+    'formFields.deathDate':
+      'Enter the date in the format day, month and year. For example 24 10 2020.',
+    'formFields.manner': 'Please select one manner',
     'formFields.mannerNatural': 'Natural causes',
     'formFields.mannerAccident': 'Accident',
     'formFields.mannerSuicide': 'Suicide',
@@ -453,7 +462,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.section.causeOfDeathNotice':
       'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
     'formFields.causeOfDeathEstablished':
-      'Has a Cause of Death been established ?',
+      'Has an official cause of death been established?',
+    'register.form.section.causeOfDeathSectionTitle':
+      'What is the official cause of death?',
     'formFields.methodOfCauseOfDeath': 'Method of Cause of Death',
     'formFields.causeOfDeathCode': 'Cause of Death Code',
     'formFields.verbalAutopsy': 'Verbal autopsy',
@@ -468,12 +479,16 @@ export const ENGLISH_STATE: ILanguage = {
       'For this death registration, the following documents are required:',
     'formFields.typeOfDocument': 'Choose type of document',
     'formFields.docTypePostMortemReport': 'Certified Post Mortem Report',
-    'formFields.docTypeHospitalDischargeCertificate':
-      'Hospital Discharge Certificate',
+    'formFields.docTypeHospitalDischargeCertificate': 'Discharge Certificate',
     'formFields.docTypeLetterOfDeath': 'Attested Letter of Death',
     'formFields.docTypeDeathCertificate': 'Attested Certificate of Death',
     'formFields.docTypeCopyOfBurialReceipt': 'Certified Copy of Burial Receipt',
     'formFields.docTypeFuneralReceipt': 'Certified Copy of Funeral Receipt',
+    'formFields.selectOne': 'Please select an option',
+    'formFields.deathAtFacility': 'What hospital did the death occur at?',
+    'formFields.deathAtPrivateHome': 'What is the address of the private home?',
+    'formFields.deathAtOtherLocation':
+      'What is the other address did the death occur at?',
     'validations.required': 'This field must be completed.',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': 'Must not be more than {max} characters',
@@ -542,12 +557,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.title.submitConfirmation':
       '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     'register.form.modal.title.registerConfirmation':
       'Register this application?',
     'register.form.modal.desc.registerConfirmation': 'Are you sure?',
     'register.form.modal.button.title.registerConfirmation': 'Register',
-    'register.form.modal.submitButton': 'Submit',
+    'register.form.modal.submitButton': 'Send',
     'register.home.header.fieldAgent': 'Field Agent',
     'register.home.header.registrationClerk': 'Registration Clerk',
     'register.home.header.localRegistrar': 'Registrar',
@@ -611,6 +626,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.savedRegistration.buttons.newDeclaration': 'New application',
     'register.savedRegistration.buttons.back.duplicate': 'Back to duplicate',
     'register.selectVitalEvent.saveExitButton': 'SAVE & EXIT',
+    'register.review.eventTopBar.exitButton': 'EXIT',
     'register.selectVitalEvent.registerNewEventTitle': 'New application',
     'register.selectVitalEvent.registerNewEventHeading':
       'What type of event do you want to declare?',
@@ -652,8 +668,15 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
-    'formFields.docTypeChildBirthProof': 'Proof of Place and Date of Birth',
+    'formFields.docTypeChildBirthProof':
+      'Proof of Place and Date of Birth of Child',
+    'formFields.docTypeMedicalInstitution':
+      'Proof of birth from medical institution',
+    'formFields.docTypebirthAttendant': 'Proof of birth from birth attendant',
+    'formFields.docTypeChildAgeProof': 'Proof of Child Age',
+    'formFields.docTypeTaxReceipt': 'Receipt of tax payment',
     'formFields.docTypeEPICard': 'EPI Card',
+    'formFields.docTypeEPIStaffCertificate': 'EPI Staff Certificate',
     'formFields.docTypeDoctorCertificate': 'Doctor Certificate',
     'formFields.proofOfMothersID': "Proof of Mother's ID",
     'formFields.proofOfFathersID': "Proof of Father's ID",
@@ -743,6 +766,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Certificate collected on',
     'register.searchResult.listItem.status.dateLabel.application':
       'Application submitted on',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'Application reviewed on',
     'register.searchResult.listItem.status.dateLabel.registered':
       'Registered on',
     'register.searchResult.listItem.status.dateLabel.rejected':
@@ -818,8 +843,8 @@ export const ENGLISH_STATE: ILanguage = {
     'review.rejection.form.commentInstruction':
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
     'review.rejection.form.submitButton': 'Submit rejection',
-    'review.button.register': 'REGISTER',
-    'review.button.reject': 'Reject Application',
+    'review.button.register': 'Register',
+    'review.button.reject': 'Reject',
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
     'review.form.deleteApplication': 'Delete Application',
@@ -833,9 +858,16 @@ export const ENGLISH_STATE: ILanguage = {
     'review.actions.title.applicationStatus':
       'Application is {isComplete, select, true {complete} false {incomplete}}',
     'review.actions.description.confirmInComplete':
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered',
+      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
     'review.actions.description.confirmComplete':
       'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
+    'register.actions.description.confirmInComplete':
+      'Mandatory information is missing. Please add this information so that you can complete the registration process.',
+    'register.actions.description.confirmComplete':
+      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'register.actions.description':
+      'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'register.actions.title.applicationStatus': 'Register or reject?',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
     'app.logout.modal.confirmationText': 'Are you sure you wish to log out?',
@@ -909,12 +941,12 @@ export const ENGLISH_STATE: ILanguage = {
     'register.duplicates.modal.reject':
       'Are you sure you want to reject this application for being a duplicate ?',
     'register.form.tabs.applicantTab': 'Applicant',
-    'register.form.section.applicantTitle': "Applicant's details",
-    'formFields.applicantsIdType': 'Existing ID',
-    'formFields.applicantsGivenNames': 'First Name(s) in Bengali',
-    'formFields.applicantsFamilyName': 'Last Name(s) in Bengali',
-    'formFields.applicantsGivenNamesEng': 'First Name(s) in English',
-    'formFields.applicantsFamilyNameEng': 'Last Name(s) in English',
+    'register.form.section.applicantTitle': "What are the applicant's details?",
+    'formFields.applicantsIdType': 'Type of ID',
+    'formFields.applicantsGivenNames': 'Bengali Given Name',
+    'formFields.applicantsFamilyName': 'Bengali Family Name',
+    'formFields.applicantsGivenNamesEng': 'English Given Name',
+    'formFields.applicantsFamilyNameEng': 'English Family Name',
     'formFields.applicants.nationality': 'Nationality',
     'formFields.applicantsDateOfBirth': 'Date of Birth',
     'formFields.applicantsRelationWithDeceased': 'Relationship to Deceased',
@@ -1009,7 +1041,12 @@ export const ENGLISH_STATE: ILanguage = {
     'error.description1': 'Something went wrong.',
     'error.description2': "It's not you, it us. This is our fault.",
     'goto.homepage': 'Go to Homepage',
-    'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
+    'imageUploadOption.upload.error':
+      'File format not supported. Please attach a png, jpg or pdf (max 5mb)',
+    'imageUploadOption.upload.overSized':
+      'File is too large. Please attach file less than 5mb',
+    'imageUploadOption.upload.documentType':
+      'Please select the type of document first',
     'register.SearchResult.searchingFor': 'Searching for “{param}”',
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
@@ -1217,10 +1254,25 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
     'register.SelectContactPoint.error':
       'Please select a main point of contact',
+    'review.documents.zeroDocumentsText':
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
+    'review.documents.editDocuments': 'Add attachement',
     'register.SelectContactPoint.spouse': 'Spouse',
     'register.SelectContactPoint.son': 'Son',
     'register.SelectContactPoint.daughter': 'Daughter',
     'register.SelectContactPoint.extendedFamily': 'Extended family',
-    'register.selectVitalEvent.backToReviewButton': 'Back to review'
+    'register.selectVitalEvent.backToReviewButton': 'Back to review',
+    'tab.inProgress.selector.own.drafts': 'Yours',
+    'tab.inProgress.selector.field.agents': 'Field agents',
+    'column.name.error.value': 'No name provided',
+    'application.creation.label': 'Started on',
+    'application.informant.label': 'Informant',
+    'application.informant.value.mother': 'Mother',
+    'application.informant.value.mother.only': 'Mother',
+    'application.informant.value.father': 'Father',
+    'application.initiator.label': 'By',
+    'expansion.info.queryError': 'An error occurred while fetching details',
+    'register.registrarHome.validated.tooltip':
+      'Application has been validated by a registration agent'
   }
 }

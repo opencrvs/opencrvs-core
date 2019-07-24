@@ -13,6 +13,7 @@
     "@types/react-intl": "^2.3.8",
     "@types/react-redux": "^6.0.0",
     "@types/react-router-redux": "^5.0.14",
+    "@types/react-tooltip": "^3.9.3",
     "@types/redux-sentry-middleware": "^0.0.1",
     "@types/xregexp": "^3.0.29",
     "apollo-boost": "^0.1.6",
@@ -51,6 +52,7 @@
     "react-scripts": "^3.0.1",
     "react-stickynode": "^2.0.1",
     "react-transition-group": "^4.2.1",
+    "react-tooltip": "^3.10.0",
     "redux": "^4.0.1",
     "redux-loop": "^5.0.0",
     "redux-sentry-middleware": "^0.0.15",
@@ -73,7 +75,8 @@
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' -r tsconfig-paths/register src/extract-translations.ts",
-    "graphql:codegen": "graphql-codegen --config codegen.yml"
+    "graphql:codegen": "graphql-codegen --config codegen.yml",
+    "build:clean": "rm -rf build"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

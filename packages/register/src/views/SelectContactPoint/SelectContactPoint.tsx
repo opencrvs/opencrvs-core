@@ -40,6 +40,7 @@ import {
 } from '@register/utils/constants'
 import { phoneNumberFormat } from '@register/utils/validate'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
+import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 import { IInformantField } from '@register/views/SelectInformant/SelectInformant'
 import { Event } from '@register/forms'
 
@@ -294,18 +295,34 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       selected:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['registration'] &&
-          (this.props.application.data['registration']
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
             .whoseContactDetails as string)) ||
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
+            .applicantsRelationToDeceased as string)) ||
         '',
       phoneNumber:
         (this.props.application &&
           this.props.application.data &&
-          this.props.application.data['registration'] &&
-          (this.props.application.data['registration']
+          this.props.application.data[registrationSection.id] &&
+          (this.props.application.data[registrationSection.id]
             .registrationPhone as string)) ||
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
+            .applicantPhone as string)) ||
         '',
-      relationship: '',
+      relationship:
+        (this.props.application &&
+          this.props.application.data &&
+          this.props.application.data[applicantsSection.id] &&
+          (this.props.application.data[applicantsSection.id]
+            .applicantOtherRelationship as string)) ||
+        '',
       isPhoneNoError: false,
       touched: false,
       isError: false
@@ -334,53 +351,68 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       goToDeathRegistration
     } = this.props
     e.preventDefault()
+    const event = this.props.location.pathname.includes(Event.BIRTH)
+      ? Event.BIRTH
+      : Event.DEATH
+
     if (
       this.state.phoneNumber &&
       !this.state.isPhoneNoError &&
       this.state.selected !== ContactPoint.OTHER
     ) {
-      await modifyApplication({
+      const newApplication = {
         ...application,
         data: {
-          ...application.data,
-          registration: {
-            ...application.data[registrationSection.id],
-            ...{
-              registrationPhone: this.state.phoneNumber,
-              whoseContactDetails: this.state.selected
-            }
+          ...application.data
+        }
+      }
+      if (event === Event.BIRTH) {
+        newApplication.data[registrationSection.id] = {
+          ...application.data[registrationSection.id],
+          ...{
+            registrationPhone: this.state.phoneNumber,
+            whoseContactDetails: this.state.selected
           }
         }
-      })
+      } else {
+        newApplication.data[applicantsSection.id] = {
+          ...application.data[applicantsSection.id],
+          ...{
+            applicantPhone: this.state.phoneNumber,
+            applicantsRelationToDeceased: this.state.selected
+          }
+        }
+      }
+      await modifyApplication(newApplication)
 
       writeApplication(this.props.application)
-      this.props.location.pathname.includes(Event.BIRTH)
+      event === Event.BIRTH
         ? goToBirthRegistrationAsParent(application.id)
         : goToDeathRegistration(application.id)
     } else if (
       this.state.phoneNumber &&
       !this.state.isPhoneNoError &&
       this.state.selected === ContactPoint.OTHER &&
-      this.state.relationship !== ''
+      this.state.relationship !== '' &&
+      event === Event.DEATH
     ) {
       await modifyApplication({
         ...application,
         data: {
           ...application.data,
-          registration: {
-            ...application.data[registrationSection.id],
+          [applicantsSection.id]: {
+            ...application.data[applicantsSection.id],
             ...{
-              registrationPhone: this.state.phoneNumber,
-              whoseContactDetails: this.state.relationship
+              applicantPhone: this.state.phoneNumber,
+              applicantsRelationToDeceased: this.state.selected,
+              applicantOtherRelationship: this.state.relationship
             }
           }
         }
       })
 
       writeApplication(this.props.application)
-      this.props.location.pathname.includes(Event.BIRTH)
-        ? goToBirthRegistrationAsParent(application.id)
-        : goToDeathRegistration(application.id)
+      goToDeathRegistration(application.id)
     } else {
       this.setState({
         isError: true
@@ -511,6 +543,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                       placeholder={intl.formatMessage(
                         messages.relationshipPlaceHolder
                       )}
+                      value={this.state.relationship}
                       isSmallSized={true}
                       onChange={e =>
                         this.handleRelationshipChange(e.target.value)

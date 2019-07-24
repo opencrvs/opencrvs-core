@@ -10,7 +10,7 @@ describe('elasticsearch db helper', async () => {
       contactNumber: 'dummy',
       registrationNumber: 'dummy',
       event: 'EMPTY_STRING',
-      status: 'EMPTY_STRING',
+      status: ['DECLARED'],
       applicationLocationId: 'EMPTY_STRING',
       from: 0,
       size: 10
@@ -21,11 +21,7 @@ describe('elasticsearch db helper', async () => {
 
   it('should index a composition with minimum configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
-    const searchQuery = {
-      from: 0,
-      size: 10
-    }
-    searchComposition(searchQuery)
+    searchComposition({})
     expect(searchSpy).toBeCalled()
   })
 })

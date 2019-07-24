@@ -95,8 +95,7 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
 
 const mapStateToProps = (state: IStoreState, props: Props) => {
   const sectionId =
-    (props.match.params.sectionId && props.match.params.sectionId) ||
-    state.userForm.userForm.sections[0].id
+    props.match.params.sectionId || state.userForm.userForm.sections[0].id
   const section = state.userForm.userForm.sections.find(
     section => section.id === sectionId
   )
@@ -106,16 +105,14 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   }
 
   const fields = replaceInitialValues(
-    section.fields,
+    section.groups[0].fields,
     state.userForm.userFormData
   )
+  section.groups[0].fields = fields
 
   return {
     sectionId: sectionId,
-    section: {
-      ...section,
-      fields
-    },
+    section,
     formData: state.userForm.userFormData,
     submitting: state.userForm.submitting
   }

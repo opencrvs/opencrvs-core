@@ -328,7 +328,7 @@ class FieldAgentHomeView extends React.Component<
               query={COUNT_USER_WISE_APPLICATIONS}
               variables={{
                 userId: userDetails ? userDetails.practitionerId : '',
-                status: EVENT_STATUS.REJECTED,
+                status: [EVENT_STATUS.REJECTED],
                 locationIds: [fieldAgentLocation]
               }}
             >
@@ -427,7 +427,7 @@ class FieldAgentHomeView extends React.Component<
                 query={SEARCH_APPLICATIONS_USER_WISE}
                 variables={{
                   userId: userDetails ? userDetails.practitionerId : '',
-                  status: EVENT_STATUS.REJECTED,
+                  status: [EVENT_STATUS.REJECTED],
                   locationIds: [fieldAgentLocation],
                   count: this.pageSize,
                   skip: (this.state.requireUpdatesPage - 1) * this.pageSize
