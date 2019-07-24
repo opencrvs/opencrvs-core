@@ -914,7 +914,7 @@ describe('when user is in the register form preview section', () => {
       component = nTestComponent.component
     })
 
-    it('Should be able to click the Save Draft button', () => {
+    it('Should be able to click the Save Draft button as a registrar', () => {
       localStorage.getItem = jest.fn(
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMjYzNTU4LCJleHAiOjE1NjM4NjgzNTgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.lM2MiAT50csvGPG4JMU2Ka8r2pussSPGGPzQ0LqK9zjz1iNxJLC6IVBGzdNawCKBRyJTx24XSKx-LasQDFw8mjMNeihzzONG4fGvH49QOvc245u50QWqJXka70vsK1tNElO3eKYoRKEvlyVk8ry0_HrnfkhUjMsKR4PKD7lu0_sBA6c3OIv6ao9FsVlvx5bKS6QC2WB8mitYDfejlPMpx32Hxgx68oJGxrdu1Iq_xxzZ_OgndifoO6WDd4rcHayC35zUcanYHVgrjR7lvArQF5kTghmF8osrT7D4KgZPRglMhMEFMX2ZcnIC9RBQAyFp5U9HsZzVutuuWK_-su08og'
@@ -939,6 +939,53 @@ describe('when user is in the register form preview section', () => {
       expect(global.window.location.pathname).toEqual(
         '/registrar-home/progress'
       )
+    })
+
+    it('Should be able to click the Save Draft button as a system admin', () => {
+      localStorage.getItem = jest.fn(
+        (key: string) =>
+          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNTYzMzQ0MzY2LCJleHAiOjE1NjM5NDkxNjYsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMzcifQ.XW6ThzNL0LAKfVgHJbjjx-X_GBDMcLbRJQ6QltytxjLaMXUVBTlJ7U07lxx7_tgO0Ku4UOmrU1nu39mEtdiPWvbRSaK2heDhRS_0Pl4YKKh_HD0piy37LxzE36jVsP5rJnLW8DHJUjtRmNgUeTq5U1fhQ5VkLyVzUaOKiE-yyxvjPI0OrVJX1XB_egdKh6w5yE7KVyXWIVGsxKA6eWMWIS074A73wZcuPpoL_cnrs2PH3dBQzeFD_EFEQfeSDIiT9bbuWnWJMSZeVtRGdjkaTPjZzDVpIPOsBrhaaIX5BRKS1fRJwTnunS3pHcN1O7yKHs9EilfELj_hYnIXJcPowA'
+      )
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      // @ts-ignore
+      global.window = { location: { pathname: null } }
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toMatch('/')
+
+      const saveDraftButton = component.find('#save-draft').hostNodes()
+      saveDraftButton.simulate('click')
+      component.update()
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toEqual('/sys-admin-home')
+    })
+
+    it('Should be able to click the Save Draft button even if there is no scope', () => {
+      localStorage.getItem = jest.fn((key: string) => 'No Scope!')
+      component
+        .find('#submit_form')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      // @ts-ignore
+      global.window = { location: { pathname: null } }
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toMatch('/')
+
+      const saveDraftButton = component.find('#save-draft').hostNodes()
+      saveDraftButton.simulate('click')
+      component.update()
+
+      // @ts-ignore
+      expect(global.window.location.pathname).toEqual('/')
     })
 
     it('should be able to submit the form', () => {
