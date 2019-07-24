@@ -30,8 +30,8 @@ const PhotoIconAction = styled(IconAction)`
   /* stylelint-disable */
   ${ActionTitle} {
     /* stylelint-enable */
-    ${({ theme }) => theme.fonts.bigBodyStyle};
-    margin-left: 75px;
+    ${({ theme }) => theme.fonts.bigBodyStyle}
+    margin-left: 75px
   }
 `
 const FileViewer = styled.div`

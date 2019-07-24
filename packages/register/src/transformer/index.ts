@@ -1,5 +1,8 @@
 import { IForm, IFormData } from '@register/forms'
-import { getConditionalActionsForField } from '@register/forms/utils'
+import {
+  getConditionalActionsForField,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@register/forms/utils'
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
@@ -17,41 +20,46 @@ export const draftToGqlTransformer = (
     if (!transformedData[section.id]) {
       transformedData[section.id] = {}
     }
-    section.fields.forEach(fieldDef => {
-      const conditionalActions: string[] = getConditionalActionsForField(
-        fieldDef,
-        draftData[section.id]
-      )
-      if (
-        fieldDef.required &&
-        !conditionalActions.includes('hide') &&
-        (draftData[section.id][fieldDef.name] === undefined ||
-          draftData[section.id][fieldDef.name] === '')
-      ) {
-        console.error(
-          `Data is missing for a required field: ${fieldDef.name}` +
-            `on section ${section.id}`
+    getVisibleSectionGroupsBasedOnConditions(
+      section,
+      draftData[section.id]
+    ).forEach(groupDef => {
+      groupDef.fields.forEach(fieldDef => {
+        const conditionalActions: string[] = getConditionalActionsForField(
+          fieldDef,
+          draftData[section.id]
         )
-        inCompleteData = true
-        return
-      }
-      if (
-        draftData[section.id][fieldDef.name] &&
-        draftData[section.id][fieldDef.name] !== '' &&
-        !conditionalActions.includes('hide')
-      ) {
-        if (fieldDef.mapping && fieldDef.mapping.mutation) {
-          fieldDef.mapping.mutation(
-            transformedData,
-            draftData,
-            section.id,
-            fieldDef
+        if (
+          fieldDef.required &&
+          !conditionalActions.includes('hide') &&
+          (draftData[section.id][fieldDef.name] === undefined ||
+            draftData[section.id][fieldDef.name] === '')
+        ) {
+          console.error(
+            `Data is missing for a required field: ${fieldDef.name}` +
+              `on section ${section.id}`
           )
-        } else {
-          transformedData[section.id][fieldDef.name] =
-            draftData[section.id][fieldDef.name]
+          inCompleteData = true
+          return
         }
-      }
+        if (
+          draftData[section.id][fieldDef.name] &&
+          draftData[section.id][fieldDef.name] !== '' &&
+          !conditionalActions.includes('hide')
+        ) {
+          if (fieldDef.mapping && fieldDef.mapping.mutation) {
+            fieldDef.mapping.mutation(
+              transformedData,
+              draftData,
+              section.id,
+              fieldDef
+            )
+          } else {
+            transformedData[section.id][fieldDef.name] =
+              draftData[section.id][fieldDef.name]
+          }
+        }
+      })
     })
     if (draftData[section.id]._fhirID) {
       transformedData[section.id]._fhirID = draftData[section.id]._fhirID
@@ -92,17 +100,24 @@ export const gqlToDraftTransformer = (
   const transformedData: IFormData = {}
   formDefinition.sections.forEach(section => {
     transformedData[section.id] = {}
-    section.fields.forEach(fieldDef => {
-      if (fieldDef.mapping && fieldDef.mapping.query) {
-        fieldDef.mapping.query(transformedData, queryData, section.id, fieldDef)
-      } else if (
-        queryData[section.id] &&
-        queryData[section.id][fieldDef.name] &&
-        queryData[section.id][fieldDef.name] !== ''
-      ) {
-        transformedData[section.id][fieldDef.name] =
-          queryData[section.id][fieldDef.name]
-      }
+    section.groups.forEach(groupDef => {
+      groupDef.fields.forEach(fieldDef => {
+        if (fieldDef.mapping && fieldDef.mapping.query) {
+          fieldDef.mapping.query(
+            transformedData,
+            queryData,
+            section.id,
+            fieldDef
+          )
+        } else if (
+          queryData[section.id] &&
+          queryData[section.id][fieldDef.name] &&
+          queryData[section.id][fieldDef.name] !== ''
+        ) {
+          transformedData[section.id][fieldDef.name] =
+            queryData[section.id][fieldDef.name]
+        }
+      })
     })
     if (queryData[section.id] && queryData[section.id].id) {
       transformedData[section.id]._fhirID = queryData[section.id].id
