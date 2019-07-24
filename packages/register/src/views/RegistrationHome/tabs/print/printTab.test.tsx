@@ -5,15 +5,15 @@ import { merge } from 'lodash'
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import {
-  RegistrarHome,
+  RegistrationHome,
   EVENT_STATUS
-} from '@register/views/RegistrarHome/RegistrarHome'
+} from '@register/views/RegistrationHome/RegistrationHome'
 import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
 import {
   COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATION_BY_COMPOSITION,
   SEARCH_EVENTS
-} from '@register/views/RegistrarHome/queries'
+} from '@register/views/RegistrationHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
 
@@ -132,7 +132,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome
+      <RegistrationHome
         match={{
           params: {
             tabId: 'print'
@@ -165,7 +165,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome
+      <RegistrationHome
         match={{
           params: {
             tabId: 'print'
@@ -219,7 +219,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome
+      <RegistrationHome
         match={{
           params: {
             tabId: 'print'
@@ -337,7 +337,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -387,7 +387,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome
+      <RegistrationHome
         match={{
           params: {
             tabId: 'print'
@@ -441,7 +441,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -631,7 +631,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )
@@ -754,7 +754,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'updates' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
       graphqlMock
     )
@@ -889,7 +889,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'print' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
       graphqlMock
     )

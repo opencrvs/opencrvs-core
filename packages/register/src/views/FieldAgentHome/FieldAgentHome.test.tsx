@@ -17,7 +17,7 @@ import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { createStore } from '@register/store'
 import { checkAuth } from '@register/profile/profileActions'
-import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
+import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE

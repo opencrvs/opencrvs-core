@@ -1,5 +1,5 @@
 import * as React from 'react'
-import OutBox from '@register/views/RegistrarHome/Outbox'
+import OutBox from '@register/views/RegistrationHome/Outbox'
 import { IApplication, createApplication } from '@register/applications'
 import { Event, IFormData } from '@register/forms'
 import {

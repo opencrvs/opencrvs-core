@@ -20,8 +20,8 @@ import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   FETCH_REGISTRATION_BY_COMPOSITION,
   LIST_EVENT_REGISTRATIONS_BY_STATUS
-} from '@register/views/RegistrarHome/queries'
-import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
+} from '@register/views/RegistrationHome/queries'
+import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import { merge } from 'lodash'
 import moment from 'moment'
 import * as React from 'react'

@@ -37,12 +37,12 @@ import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
+import NotificationToast from '@register/views/RegistrationHome/NotificatoinToast'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrarHome/queries'
-import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+} from '@register/views/RegistrationHome/queries'
+import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
@@ -103,7 +103,7 @@ const FABContainer = styled.div`
   }
 `
 
-interface IBaseRegistrarHomeProps {
+interface IBaseRegistrationHomeProps {
   theme: ITheme
   language: string
   scope: Scope | null
@@ -118,15 +118,15 @@ interface IBaseRegistrarHomeProps {
   goToEvents: typeof goToEventsAction
 }
 
-interface IRegistrarHomeState {
+interface IRegistrationHomeState {
   reviewCurrentPage: number
   updatesCurrentPage: number
 }
 
-type IRegistrarHomeProps = InjectedIntlProps &
+type IRegistrationHomeProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseRegistrarHomeProps
+  IBaseRegistrationHomeProps
 
 const TAB_ID = {
   inProgress: 'progress',
@@ -141,12 +141,12 @@ export const EVENT_STATUS = {
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED'
 }
-export class RegistrarHomeView extends React.Component<
-  IRegistrarHomeProps,
-  IRegistrarHomeState
+export class RegistrationHomeView extends React.Component<
+  IRegistrationHomeProps,
+  IRegistrationHomeState
 > {
   pageSize = 10
-  constructor(props: IRegistrarHomeProps) {
+  constructor(props: IRegistrationHomeProps) {
     super(props)
     this.state = {
       reviewCurrentPage: 1,
@@ -461,7 +461,7 @@ function mapStateToProps(
   }
 }
 
-export const RegistrarHome = connect(
+export const RegistrationHome = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
@@ -470,4 +470,4 @@ export const RegistrarHome = connect(
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(RegistrarHomeView)))
+)(injectIntl(withTheme(RegistrationHomeView)))

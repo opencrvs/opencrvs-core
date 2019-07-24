@@ -53,7 +53,7 @@ import {
   SEARCH_APPLICATIONS_USER_WISE,
   COUNT_USER_WISE_APPLICATIONS
 } from '@register/search/queries'
-import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
+import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import * as Sentry from '@sentry/browser'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { BodyContent } from '@opencrvs/components/lib/layout'
