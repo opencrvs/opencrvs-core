@@ -33,7 +33,7 @@ export const CONFIRMATION_SCREEN = '/confirm'
 export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registrar-home'
-export const REGISTRAR_HOME_TAB = '/registrar-home/:tabId'
+export const REGISTRAR_HOME_TAB = '/registrar-home/:tabId/:selectorId?'
 export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
 
