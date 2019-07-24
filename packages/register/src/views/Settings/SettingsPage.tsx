@@ -18,6 +18,8 @@ import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { roleMessages } from '@register/utils/roleTypeMessages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
+import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
+import { IntlState } from '@register/i18n/reducer'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -51,11 +53,6 @@ export const messages: {
     id: 'label.nameEN',
     defaultMessage: 'English name',
     description: 'English name label'
-  },
-  labelBanglaName: {
-    id: 'label.nameBN',
-    defaultMessage: 'Bengali name',
-    description: 'Bengali name label'
   },
   labelPhone: {
     id: 'label.phone',
@@ -192,6 +189,7 @@ const CancelButton = styled(TertiaryButton)`
 `
 type IProps = InjectedIntlProps & {
   language: string
+  languages: IntlState['languages']
   userDetails: IUserDetails | null
   modifyUserDetails: typeof modifyUserDetailsAction
 }
@@ -214,7 +212,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
       showSuccessNotification: false,
       selectedLanguage: this.props.userDetails
         ? this.props.userDetails.language
-        : window.config.LANGUAGE
+        : getDefaultLanguage()
     }
   }
 
@@ -234,7 +232,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
     this.setState(state => ({
       selectedLanguage: this.props.userDetails
         ? this.props.userDetails.language
-        : window.config.LANGUAGE,
+        : getDefaultLanguage(),
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
@@ -250,28 +248,22 @@ class SettingsView extends React.Component<IProps & IState, IState> {
   }
 
   render() {
-    const { userDetails, intl } = this.props
-    let bengaliName = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName | null) => {
-          const name = storedName as GQLHumanName
-          return name.use === 'bn'
-        }
-      ) as GQLHumanName
-      if (nameObj) {
-        bengaliName = `${String(nameObj.firstNames)} ${String(
-          nameObj.familyName
-        )}`
-      }
-    }
+    const { userDetails, intl, languages } = this.props
+    const langChoice = [] as ILanguageOptions[]
+    const availableLangs = getAvailableLanguages()
+    availableLangs.map((lang: string) => {
+      langChoice.push({
+        value: lang,
+        label: languages[lang].displayName
+      })
+    })
 
     let englishName = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName | null) => {
           const name = storedName as GQLHumanName
-          return name.use === 'en'
+          return name.use === getDefaultLanguage()
         }
       ) as GQLHumanName
 
@@ -286,24 +278,10 @@ class SettingsView extends React.Component<IProps & IState, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(roleMessages[userDetails.role])
         : ''
-
-    const language: ILanguageOptions = {
-      bn: 'বাংলা',
-      en: 'English'
-    }
-
     const sections = [
       {
         title: intl.formatMessage(messages.profileTitle),
         items: [
-          {
-            label: intl.formatMessage(messages.labelBanglaName),
-            value: bengaliName,
-            action: {
-              label: intl.formatMessage(messages.actionChange),
-              disabled: true
-            }
-          },
           {
             label: intl.formatMessage(messages.labelEnglishName),
             value: englishName,
@@ -361,7 +339,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
         items: [
           {
             label: intl.formatMessage(messages.labelLanguage),
-            value: language[this.state.selectedLanguage],
+            value: languages[this.state.selectedLanguage].displayName,
             action: {
               id: 'BtnChangeLanguage',
               label: intl.formatMessage(messages.actionChange),
@@ -424,10 +402,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
               })
             }}
             value={this.state.selectedLanguage}
-            options={[
-              { value: 'bn', label: 'বাংলা' },
-              { value: 'en', label: 'English' }
-            ]}
+            options={langChoice}
             placeholder=""
           />
         </ResponsiveModal>
@@ -446,6 +421,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
 export const SettingsPage = connect(
   (store: IStoreState) => ({
     language: store.i18n.language,
+    languages: store.i18n.languages,
     userDetails: getUserDetails(store)
   }),
   {
