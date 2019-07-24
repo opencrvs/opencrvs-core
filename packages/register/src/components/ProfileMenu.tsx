@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import styled from '@register/styledComponents'
-import {
-  injectIntl,
-  InjectedIntlProps,
-  defineMessages,
-  InjectedIntl
-} from 'react-intl'
+import { injectIntl, InjectedIntlProps, InjectedIntl } from 'react-intl'
 import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
 import {
   SettingsBlack,
@@ -21,6 +16,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { roleMessages } from '@register/utils/roleTypeMessages'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { goToSettings } from '@register/navigation'
+import { buttonMessages } from '@register/i18n/messages'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -33,19 +29,6 @@ const UserRole = styled.div`
   height: 24px;
   ${({ theme }) => theme.fonts.captionStyle};
 `
-
-const messages = defineMessages({
-  settings: {
-    id: 'buttons.settings',
-    defaultMessage: 'Settings',
-    description: 'Menu item settings'
-  },
-  logout: {
-    id: 'buttons.logout',
-    defaultMessage: 'Log out',
-    description: 'Menu item logout'
-  }
-})
 
 interface IProps {
   language: string
@@ -65,12 +48,12 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     const items = [] as IToggleMenuItem[]
     items.push({
       icon: <SettingsBlack />,
-      label: intl.formatMessage(messages.settings),
+      label: intl.formatMessage(buttonMessages.settings),
       handler: this.props.goToSettings
     })
     items.push({
       icon: <LogoutBlack />,
-      label: intl.formatMessage(messages.logout),
+      label: intl.formatMessage(buttonMessages.logout),
       handler: () => this.props.redirectToAuthentication()
     })
     return items

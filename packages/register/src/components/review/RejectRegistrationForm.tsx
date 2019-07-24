@@ -7,7 +7,7 @@ import { hasFormError } from '@register/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import {
   IApplication,
@@ -16,26 +16,8 @@ import {
 } from '@register/applications'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { goToSearchResult } from '@register/navigation'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  back: {
-    id: 'buttons.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-  rejectionFormTitle: {
-    id: 'review.rejection.form.title',
-    defaultMessage: 'Reasons for rejection',
-    description: 'Rejection form title'
-  },
-  rejectionReasonSubmit: {
-    id: 'review.rejection.form.submitButton',
-    defaultMessage: 'Submit rejection',
-    description: 'Rejection form submit button'
-  }
-})
+import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/reject'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -139,7 +121,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
       <OverlayContainer id="reject-registration-form-container">
         <ActionPage
           title={intl.formatMessage(messages.rejectionFormTitle)}
-          backLabel={intl.formatMessage(messages.back)}
+          backLabel={intl.formatMessage(buttonMessages.back)}
           goBack={this.props.onBack}
         >
           <FormContainer>

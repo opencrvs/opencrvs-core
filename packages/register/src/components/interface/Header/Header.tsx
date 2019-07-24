@@ -35,7 +35,7 @@ import { IUserDetails } from '@register/utils/userUtils'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { IStoreState } from '@register/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import {
   goToHome,
   goToPerformance,
@@ -53,6 +53,8 @@ import {
 } from '@register/utils/constants'
 import styled from 'styled-components'
 import { roleMessages } from '@register/utils/roleTypeMessages'
+import { messages } from '@register/i18n/messages/views/header'
+import { constantsMessages, buttonMessages } from '@register/i18n/messages'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails | null
@@ -74,76 +76,6 @@ interface IState {
   showMenu: boolean
   showLogoutModal: boolean
 }
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  typeTrackingId: {
-    id: 'constants.trackingId',
-    defaultMessage: 'Tracking ID',
-    description: 'Search menu tracking id type'
-  },
-  typeBrnDrn: {
-    id: 'register.home.header.typeBrnDrn',
-    defaultMessage: 'BRN/DRN',
-    description: 'Search menu brn drn type'
-  },
-  typePhone: {
-    id: 'register.home.header.typePhone',
-    defaultMessage: 'Phone No.',
-    description: 'Search menu phone no type'
-  },
-  placeHolderTrackingId: {
-    id: 'register.home.header.placeHolderTrackingId',
-    defaultMessage: 'Enter Tracking ID',
-    description: 'Search menu tracking id place holder'
-  },
-  placeHolderBrnDrn: {
-    id: 'register.home.header.placeHolderBrnDrn',
-    defaultMessage: 'Enter BRN/DRN',
-    description: 'Search menu brn drn place holder'
-  },
-  placeHolderPhone: {
-    id: 'register.home.header.placeHolderPhone',
-    defaultMessage: 'Enter Phone No.',
-    description: 'Search menu phone no place holder'
-  },
-  defaultTitle: {
-    id: 'constants.applications',
-    defaultMessage: 'Applications',
-    description: 'Header default title'
-  },
-  applicationTitle: {
-    id: 'constants.applications',
-    defaultMessage: 'Applications',
-    description: 'Application title'
-  },
-  performanceTitle: {
-    id: 'constant.performance',
-    defaultMessage: 'Performance',
-    description: 'Performance title'
-  },
-  systemTitle: {
-    id: 'register.home.header.systemTitle',
-    defaultMessage: 'System',
-    description: 'System title'
-  },
-  settingsTitle: {
-    id: 'register.home.header.settingsTitle',
-    defaultMessage: 'Settings',
-    description: 'settings title'
-  },
-  helpTitle: {
-    id: 'register.home.header.helpTitle',
-    defaultMessage: 'Help',
-    description: 'Help title'
-  },
-  logoutTitle: {
-    id: 'buttons.logout',
-    defaultMessage: 'Logout',
-    description: 'logout title'
-  }
-})
 
 const StyledPrimaryButton = styled(IconButton)`
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -188,13 +120,17 @@ class HeaderComp extends React.Component<IProps, IState> {
       {
         icon: <ApplicationBlack />,
         iconHover: <ApplicationBlue />,
-        label: this.props.intl.formatMessage(messages.applicationTitle),
+        label: this.props.intl.formatMessage(
+          constantsMessages.applicationTitle
+        ),
         onClick: this.props.goToHomeAction
       },
       {
         icon: <StatsBlack />,
         iconHover: <StatsBlue />,
-        label: this.props.intl.formatMessage(messages.performanceTitle),
+        label: this.props.intl.formatMessage(
+          constantsMessages.performanceTitle
+        ),
         onClick: goToPerformance
       },
       {
@@ -212,7 +148,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       {
         icon: <LogoutBlack />,
         iconHover: <LogoutBlue />,
-        label: this.props.intl.formatMessage(messages.logoutTitle),
+        label: this.props.intl.formatMessage(buttonMessages.logout),
         secondary: true,
         onClick: this.logout
       }
@@ -245,7 +181,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         {
           icon: <LogoutBlack />,
           iconHover: <LogoutBlue />,
-          label: this.props.intl.formatMessage(messages.logoutTitle),
+          label: this.props.intl.formatMessage(buttonMessages.logout),
           secondary: true,
           onClick: this.logout
         }
@@ -281,7 +217,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const searchTypeList: ISearchType[] = [
       {
-        label: intl.formatMessage(messages.typeTrackingId),
+        label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
@@ -322,18 +258,19 @@ class HeaderComp extends React.Component<IProps, IState> {
       goToHomeAction,
       goToPerformanceAction
     } = this.props
-    const title = this.props.title || intl.formatMessage(messages.defaultTitle)
+    const title =
+      this.props.title || intl.formatMessage(constantsMessages.applicationTitle)
 
     let menuItems = [
       {
         key: 'application',
-        title: intl.formatMessage(messages.applicationTitle),
+        title: intl.formatMessage(constantsMessages.applicationTitle),
         onClick: goToHomeAction,
         selected: enableMenuSelection !== undefined ? enableMenuSelection : true
       },
       {
         key: 'performance',
-        title: intl.formatMessage(messages.performanceTitle),
+        title: intl.formatMessage(constantsMessages.performanceTitle),
         onClick: goToPerformanceAction,
         selected: false
       }

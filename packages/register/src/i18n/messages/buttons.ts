@@ -9,12 +9,17 @@ interface IButtonsMessages {
   sendForReview: ReactIntl.FormattedMessage.MessageDescriptor
   sendIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
   register: ReactIntl.FormattedMessage.MessageDescriptor
-  reject: ReactIntl.FormattedMessage.MessageDescriptor
+  rejectApplication: ReactIntl.FormattedMessage.MessageDescriptor
   send: ReactIntl.FormattedMessage.MessageDescriptor
   select: ReactIntl.FormattedMessage.MessageDescriptor
+  logout: ReactIntl.FormattedMessage.MessageDescriptor
+  reject: ReactIntl.FormattedMessage.MessageDescriptor
+  settings: ReactIntl.FormattedMessage.MessageDescriptor
+  login: ReactIntl.FormattedMessage.MessageDescriptor
+  goToHomepage: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
-const messaegsToDefine: IButtonsMessages = {
+const messagesToDefine: IButtonsMessages = {
   back: {
     id: 'buttons.back',
     defaultMessage: 'Back',
@@ -50,8 +55,8 @@ const messaegsToDefine: IButtonsMessages = {
     defaultMessage: 'Send incomplete application',
     description: 'Title for Incomplete submit button'
   },
-  reject: {
-    id: 'buttons.reject',
+  rejectApplication: {
+    id: 'buttons.rejectApplication',
     defaultMessage: 'Reject Application',
     description: 'Reject application button text'
   },
@@ -69,7 +74,32 @@ const messaegsToDefine: IButtonsMessages = {
     id: 'buttons.select',
     defaultMessage: 'SELECT',
     description: 'The select title'
+  },
+  logout: {
+    id: 'buttons.logout',
+    defaultMessage: 'Logout',
+    description: 'logout title'
+  },
+  settings: {
+    id: 'buttons.settings',
+    defaultMessage: 'Settings',
+    description: 'Menu item settings'
+  },
+  reject: {
+    id: 'buttons.reject',
+    defaultMessage: 'Reject',
+    description: 'A label for reject link'
+  },
+  login: {
+    id: 'buttons.login',
+    defaultMessage: 'Login',
+    description: 'Login button on session expire modal'
+  },
+  goToHomepage: {
+    id: 'buttons.goToHomePage',
+    defaultMessage: 'Go to Homepage',
+    description: 'Label for Go to Homepage button'
   }
 }
 
-export const buttonMessages: IButtonsMessages = defineMessages(messaegsToDefine)
+export const buttonMessages: IButtonsMessages = defineMessages(messagesToDefine)

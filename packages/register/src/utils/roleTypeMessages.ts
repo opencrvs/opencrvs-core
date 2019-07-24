@@ -34,7 +34,7 @@ export const roleMessages: {
     description: 'The description for NATIONAL_REGISTRAR role'
   },
   LOCAL_SYSTEM_ADMIN: {
-    id: 'register.home.header.localSystemAdmin',
+    id: 'home.header.localSystemAdmin',
     defaultMessage: 'Sysadmin',
     description: 'The description for Sysadmin role'
   },

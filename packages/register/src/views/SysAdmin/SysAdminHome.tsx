@@ -65,7 +65,7 @@ const messages = defineMessages({
     description: 'The title of config tab'
   },
   systemTitle: {
-    id: 'register.home.header.systemTitle',
+    id: 'home.header.systemTitle',
     defaultMessage: 'System',
     description: 'System title'
   }

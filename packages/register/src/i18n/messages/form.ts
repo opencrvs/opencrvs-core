@@ -8,7 +8,7 @@ interface IFormMessages {
   changeAssignedOffice: ReactIntl.FormattedMessage.MessageDescriptor
   searchFieldPlaceHolderText: ReactIntl.FormattedMessage.MessageDescriptor
 }
-const messaegsToDefine: IFormMessages = {
+const messagesToDefine: IFormMessages = {
   uploadedList: {
     id: 'form.field.label.imageUpload.uploadedList',
     defaultMessage: 'Uploaded:',
@@ -41,4 +41,4 @@ const messaegsToDefine: IFormMessages = {
   }
 }
 
-export const formMessages: IFormMessages = defineMessages(messaegsToDefine)
+export const formMessages: IFormMessages = defineMessages(messagesToDefine)

@@ -42,32 +42,32 @@ const messages: {
     description: 'Title for the user'
   },
   FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
+    id: 'home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_CLERK: {
-    id: 'register.home.header.REGISTRATION_CLERK',
+    id: 'home.header.REGISTRATION_CLERK',
     defaultMessage: 'Registration Clerk',
     description: 'The description for REGISTRATION_CLERK role'
   },
   LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
+    id: 'home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
   },
   DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
+    id: 'home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role'
   },
   STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
+    id: 'home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role'
   },
   NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
+    id: 'home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
   },

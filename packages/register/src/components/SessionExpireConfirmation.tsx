@@ -1,29 +1,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@register/store'
 import { redirectToAuthentication } from '@register/profile/profileActions'
+import { messages } from '@register/i18n/messages/views/session'
+import { buttonMessages } from '@register/i18n/messages'
 
 const StyledModal = styled(Modal)`
   z-index: 4;
 `
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  loginButton: {
-    id: 'buttons.login',
-    defaultMessage: 'Login',
-    description: 'Login button on session expire modal'
-  },
-  sessionExpireTxt: {
-    id: 'login.session.expired',
-    defaultMessage: 'Your session has expired. Please login again.',
-    description: 'SessionExpire modal confirmation text'
-  }
-})
 type SessionExpireProps = {
   sessionExpired: boolean
 }
@@ -50,7 +38,7 @@ class SessionExpireComponent extends React.Component<
                 id="login"
                 onClick={this.props.redirectToAuthentication}
               >
-                {intl.formatMessage(messages.loginButton)}
+                {intl.formatMessage(buttonMessages.login)}
               </PrimaryButton>
             ]}
             show={true}

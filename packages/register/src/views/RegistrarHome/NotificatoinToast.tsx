@@ -9,12 +9,12 @@ import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 const messages = defineMessages({
   processingText: {
-    id: 'register.notification.processingText',
+    id: 'notification.processingText',
     defaultMessage: '{num} application processing...',
     description: 'Application processing text'
   },
   outboxText: {
-    id: 'register.notification.outboxText',
+    id: 'notification.outboxText',
     defaultMessage: 'Outbox({num})',
     description: 'Application outbox text'
   }

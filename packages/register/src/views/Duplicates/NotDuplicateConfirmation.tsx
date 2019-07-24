@@ -26,7 +26,7 @@ export const messages: {
     description: 'Yes button on not a duplicate confirmation modal'
   },
   notDuplicateConfirmationTxt: {
-    id: 'register.duplicates.notDuplicate.modal.confirmationText',
+    id: 'duplicates.notDuplicate.modal.confirmationText',
     defaultMessage: 'Are you sure this is not a duplicate application?',
     description: 'Not a duplicate modal confirmation text'
   }

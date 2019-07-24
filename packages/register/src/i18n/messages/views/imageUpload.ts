@@ -1,10 +1,10 @@
 import { defineMessages } from 'react-intl'
 
-interface IFormMessages {
+interface IImageUploadMessages {
   uploadError: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
-const messaegsToDefine: IFormMessages = {
+const messagesToDefine: IImageUploadMessages = {
   uploadError: {
     id: 'imageUpload.upload.error',
     defaultMessage: 'Must be in JPEG/JPG/PNG format',
@@ -12,4 +12,4 @@ const messaegsToDefine: IFormMessages = {
   }
 }
 
-export const messages: IFormMessages = defineMessages(messaegsToDefine)
+export const messages: IImageUploadMessages = defineMessages(messagesToDefine)

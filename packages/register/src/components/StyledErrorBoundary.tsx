@@ -1,10 +1,11 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
 import styled from '@register/styledComponents'
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@register/store'
+import { errorMessages, buttonMessages } from '@register/i18n/messages'
 
 const ErrorContainer = styled.div`
   display: flex;
@@ -32,41 +33,6 @@ const GoToHomepage = styled(Button)`
   cursor: pointer;
   margin-top: 60px;
 `
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  errorCodeUnauthorized: {
-    id: 'error.code',
-    defaultMessage: '401',
-    description: 'Error code'
-  },
-  errorTitleUnauthorized: {
-    id: 'error.title.unauthorized',
-    defaultMessage: 'Unauthorized!',
-    description: 'Error title unauthorized'
-  },
-  errorTitle: {
-    id: 'error.title',
-    defaultMessage: 'Whoops!',
-    description: 'Error title'
-  },
-  errorDescription1: {
-    id: 'error.somethingWentWrong',
-    defaultMessage: 'Something went wrong.',
-    description: 'Error description'
-  },
-  errorDescription2: {
-    id: 'error.weAreTryingToFixThisError',
-    defaultMessage: "It's not you, it us. This is our fault.",
-    description: 'Error description'
-  },
-  goToHomepage: {
-    id: 'buttons.goToHomePage',
-    defaultMessage: 'Go to Homepage',
-    description: 'Label for Go to Homepage button'
-  }
-})
 
 type IFullProps = InjectedIntlProps
 
@@ -102,24 +68,24 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
         <ErrorContainer>
           <ErrorTitle>
             {this.state.authError &&
-              intl.formatMessage(messages.errorCodeUnauthorized)}
+              intl.formatMessage(errorMessages.errorCodeUnauthorized)}
           </ErrorTitle>
           <ErrorTitle>
             {this.state.authError
-              ? intl.formatMessage(messages.errorTitleUnauthorized)
-              : intl.formatMessage(messages.errorTitle)}
+              ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
+              : intl.formatMessage(errorMessages.errorTitle)}
           </ErrorTitle>
           <ErrorMessage>
-            {intl.formatMessage(messages.errorDescription1)}
+            {intl.formatMessage(errorMessages.errorDescription1)}
           </ErrorMessage>
           <ErrorMessage>
-            {intl.formatMessage(messages.errorDescription2)}
+            {intl.formatMessage(errorMessages.errorDescription2)}
           </ErrorMessage>
           <GoToHomepage
             id="GoToHomepage"
             onClick={() => (window.location.href = '/')}
           >
-            {intl.formatMessage(messages.goToHomepage)}
+            {intl.formatMessage(buttonMessages.goToHomepage)}
           </GoToHomepage>
         </ErrorContainer>
       )

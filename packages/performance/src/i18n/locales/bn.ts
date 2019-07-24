@@ -43,11 +43,11 @@ export const BENGALI_STATE = {
     'performance.graph.category.gender.male': 'পুরুষ',
     'performance.header.hello': 'হ্যালো {fullName}',
     'performance.graph.queryError': 'অনুসন্ধান করার সময় ত্রুটি ঘটেছে',
-    'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
-    'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
-    'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
-    'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
-    'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
-    'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক'
+    'home.header.FIELD_AGENT': 'মাঠকর্মী',
+    'home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
+    'home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
+    'home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
+    'home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
+    'home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক'
   }
 }

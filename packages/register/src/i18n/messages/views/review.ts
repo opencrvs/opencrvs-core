@@ -13,7 +13,7 @@ interface IReviewMessages {
   registerConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
-const messaegsToDefine: IReviewMessages = {
+const messagesToDefine: IReviewMessages = {
   reviewActionTitle: {
     id: 'review.actions.title.applicationStatus',
     defaultMessage:
@@ -72,4 +72,4 @@ const messaegsToDefine: IReviewMessages = {
   }
 }
 
-export const messages: IReviewMessages = defineMessages(messaegsToDefine)
+export const messages: IReviewMessages = defineMessages(messagesToDefine)

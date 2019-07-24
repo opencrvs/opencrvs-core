@@ -45,18 +45,18 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   title: {
-    id: 'register.duplicates.title',
+    id: 'duplicates.title',
     defaultMessage: 'Possible duplicates found',
     description: 'The title of the text box in the duplicates page'
   },
   description: {
-    id: 'register.duplicates.description',
+    id: 'duplicates.description',
     defaultMessage:
       'The following application has been flagged as a possible duplicate of an existing registered record.',
     description: 'The description at the top of the duplicates page'
   },
   pageTitle: {
-    id: 'register.duplicates.pageTitle',
+    id: 'duplicates.pageTitle',
     defaultMessage: 'Possible duplicate',
     description: 'The duplicates page title'
   },
@@ -66,12 +66,12 @@ const messages: {
     description: 'Title of the back link'
   },
   rejectButton: {
-    id: 'register.duplicates.button.reject',
+    id: 'buttons.reject',
     defaultMessage: 'Reject',
     description: 'Title of the reject button'
   },
   rejectDescription: {
-    id: 'register.duplicates.modal.reject',
+    id: 'duplicates.modal.reject',
     defaultMessage:
       'Are you sure you want to reject this application for being a duplicate ?',
     description: 'Description of the reject modal'
@@ -87,7 +87,7 @@ const messages: {
     description: 'The duplicates text for female'
   },
   queryError: {
-    id: 'register.duplicates.queryError',
+    id: 'duplicates.queryError',
     defaultMessage: 'An error occurred while fetching data',
     description: 'The error message shown when a query fails'
   }

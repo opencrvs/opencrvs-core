@@ -1,20 +1,11 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import {
   ISubSectionProps,
   SubSectionDivider as SubSectionDividerComponent
 } from '@opencrvs/components/lib/forms'
 import { Omit } from '@opencrvs/register/src/utils'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  optionalLabel: {
-    id: 'form.field.label.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
-  }
-})
+import { formMessages } from '@register/i18n/messages'
 
 export const SubSectionDivider = injectIntl(function FormInputField(
   props: Omit<ISubSectionProps, 'optionalLabel'> & InjectedIntlProps
@@ -22,7 +13,7 @@ export const SubSectionDivider = injectIntl(function FormInputField(
   return (
     <SubSectionDividerComponent
       {...props}
-      optionalLabel={props.intl.formatMessage(messages.optionalLabel)}
+      optionalLabel={props.intl.formatMessage(formMessages.optionalLabel)}
     />
   )
 })
