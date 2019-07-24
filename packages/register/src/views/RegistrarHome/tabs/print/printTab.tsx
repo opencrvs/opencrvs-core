@@ -99,7 +99,7 @@ class PrintTabComponent extends React.Component<
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: EVENT_STATUS.REGISTERED,
+          status: [EVENT_STATUS.REGISTERED],
           locationIds: [registrarUnion],
           count: this.pageSize,
           skip: (this.state.printCurrentPage - 1) * this.pageSize

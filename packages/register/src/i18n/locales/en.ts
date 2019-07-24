@@ -766,6 +766,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Certificate collected on',
     'register.searchResult.listItem.status.dateLabel.application':
       'Application submitted on',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'Application reviewed on',
     'register.searchResult.listItem.status.dateLabel.registered':
       'Registered on',
     'register.searchResult.listItem.status.dateLabel.rejected':
@@ -1269,6 +1271,8 @@ export const ENGLISH_STATE: ILanguage = {
     'application.informant.value.mother.only': 'Mother',
     'application.informant.value.father': 'Father',
     'application.initiator.label': 'By',
-    'expansion.info.queryError': 'An error occurred while fetching details'
+    'expansion.info.queryError': 'An error occurred while fetching details',
+    'register.registrarHome.validated.tooltip':
+      'Application has been validated by a registration agent'
   }
 }

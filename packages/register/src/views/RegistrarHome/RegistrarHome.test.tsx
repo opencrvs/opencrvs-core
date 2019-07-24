@@ -86,6 +86,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 0,
               registered: 7,
               rejected: 5
             }
@@ -155,6 +156,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 0,
               registered: 7,
               rejected: 5
             }

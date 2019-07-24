@@ -759,6 +759,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.collected':
       'সার্টিফিকেট মুদ্রণ',
     'register.searchResult.listItem.status.dateLabel.application': 'আবেদন জমা',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'আবেদন পর্যালোচনা',
     'register.searchResult.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.searchResult.listItem.status.dateLabel.rejected':
       'আবেদন প্রত্যাখ্যাত',
@@ -1259,6 +1261,8 @@ export const BENGALI_STATE: ILanguage = {
     'application.informant.value.mother.only': 'মা',
     'application.informant.value.father': 'বাবা',
     'application.initiator.label': 'কর্মী',
-    'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে'
+    'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে',
+    'register.registrarHome.validated.tooltip':
+      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে'
   }
 }

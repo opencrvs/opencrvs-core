@@ -103,6 +103,11 @@ export const messages: {
     description:
       'Label for the workflow timestamp when the status is application'
   },
+  workflowStatusDateValidated: {
+    id: 'register.searchResult.listItem.status.dateLabel.validated',
+    defaultMessage: 'Application reviewed on',
+    description: 'Label for the workflow timestamp when the status is validated'
+  },
   workflowStatusDateRegistered: {
     id: 'register.searchResult.listItem.status.dateLabel.registered',
     defaultMessage: 'Registrated on',

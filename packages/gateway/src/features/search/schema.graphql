@@ -42,6 +42,7 @@ type DeathEventSearchSet implements EventSearchSet {
 
 type EventCount {
   declared: Int
+  validated: Int
   registered: Int
   rejected: Int
 }
@@ -49,10 +50,9 @@ type EventCount {
 type Query {
   countEvents(locationIds: [String]): EventCount
   searchEvents(
-    status: String
     userId: String
     locationIds: [String]
-    status: String
+    status: [String]
     trackingId: String
     registrationNumber: String
     contactNumber: String
