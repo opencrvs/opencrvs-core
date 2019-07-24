@@ -221,21 +221,13 @@ describe('when user has starts a new application', () => {
           app.update()
         })
 
-        it('renders list of document requirements', () => {
-          expect(
-            app
-              .find('#list')
-              .hostNodes()
-              .children()
-          ).toHaveLength(5)
+        it('renders list of document upload field', () => {
+          const fileInputs = app
+            .find('#form_section_id_documents-view-group')
+            .find('section')
+            .children().length
 
-          expect(
-            app
-              .find('#list')
-              .hostNodes()
-              .childAt(4)
-              .text()
-          ).toBe('EPI Card of Child')
+          expect(fileInputs).toEqual(6)
         })
       })
     })
@@ -351,162 +343,7 @@ describe('when user has starts a new application', () => {
         app.update()
       })
       it('image upload field is rendered', () => {
-        expect(app.find('#imageUploader').hostNodes()).toHaveLength(1)
-      })
-      describe('when user clicks image upload field', () => {
-        beforeEach(async () => {
-          app
-            .find('#imageUploader')
-            .hostNodes()
-            .simulate('click')
-
-          await flushPromises()
-          app.update()
-        })
-        it('user should be asked, for whom they are uploading documents', () => {
-          expect(
-            app
-              .find('#uploadDocForWhom_label')
-              .hostNodes()
-              .text()
-          ).toEqual('Whose suppoting document are you uploading?')
-        })
-        describe('when user selects for whom they want to upload document', () => {
-          beforeEach(async () => {
-            app
-              .find('#uploadDocForWhom_Mother')
-              .hostNodes()
-              .simulate('change')
-
-            await flushPromises()
-            app.update()
-          })
-          it('user should be asked about the type of documents', () => {
-            expect(
-              app
-                .find('#whatDocToUpload_label')
-                .hostNodes()
-                .text()
-            ).toEqual('Which document type are you uploading?')
-          })
-          describe('when user selects the type of document', () => {
-            beforeEach(async () => {
-              selectOption(app, '#whatDocToUpload', 'National ID (front)')
-
-              await flushPromises()
-              app.update()
-            })
-            it('upload button should appear now', () => {
-              expect(app.find('#upload_document').hostNodes()).toHaveLength(1)
-            })
-            describe('when image is uploaded/captured', () => {
-              beforeEach(async () => {
-                app
-                  .find('#image_file_uploader_field')
-                  .hostNodes()
-                  .simulate('change', {
-                    target: {
-                      files: [
-                        getFileFromBase64String(
-                          validImageB64String,
-                          'index.png',
-                          'image/png'
-                        )
-                      ]
-                    }
-                  })
-                await flushPromises()
-
-                app.update()
-
-                app
-                  .find('#action_page_back_button')
-                  .hostNodes()
-                  .simulate('click')
-                await new Promise(resolve => {
-                  setTimeout(() => {
-                    resolve()
-                  }, 100)
-                })
-
-                app.update()
-              })
-              it('uploaded section should appear now', () => {
-                expect(app.find('#file_list_viewer').hostNodes()).toHaveLength(
-                  1
-                )
-              })
-              describe('when preview link is clicked for an uploaded image', () => {
-                beforeEach(async () => {
-                  app
-                    .find('#file_item_0_preview_link')
-                    .hostNodes()
-                    .simulate('click')
-
-                  await flushPromises()
-                  app.update()
-                })
-                it('preview image is loaded', () => {
-                  expect(
-                    app.find('#preview_image_field').hostNodes()
-                  ).toHaveLength(1)
-                })
-              })
-              describe('when delete link is clicked for an uploaded image', () => {
-                beforeEach(async () => {
-                  app
-                    .find('#file_item_0_delete_link')
-                    .hostNodes()
-                    .simulate('click')
-                  await flushPromises()
-                  app.update()
-                })
-                it('uploaded image should not be available anymore', () => {
-                  expect(app.find('#file_item_0').hostNodes()).toHaveLength(0)
-                })
-              })
-            })
-
-            describe('when invalid image is uploaded/captured', () => {
-              beforeEach(async () => {
-                app
-                  .find('#image_file_uploader_field')
-                  .hostNodes()
-                  .simulate('change', {
-                    target: {
-                      files: [
-                        getFileFromBase64String(
-                          inValidImageB64String,
-                          'index.png',
-                          'image/png'
-                        )
-                      ]
-                    }
-                  })
-                await flushPromises()
-
-                app.update()
-
-                app
-                  .find('#action_page_back_button')
-                  .hostNodes()
-                  .simulate('click')
-                await new Promise(resolve => {
-                  setTimeout(() => {
-                    resolve()
-                  }, 100)
-                })
-
-                app.update()
-              })
-              it('uploaded section should not appear now', () => {
-                expect(app.find('#file_list_viewer').hostNodes()).toHaveLength(
-                  0
-                )
-              })
-            })
-          })
-        })
+        expect(app.find('#upload_document').hostNodes()).toHaveLength(6)
       })
     })
   })

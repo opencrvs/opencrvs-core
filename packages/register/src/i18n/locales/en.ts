@@ -373,13 +373,17 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.privateHome': 'Private Home',
     'formFields.otherInstitution': 'Other',
     'register.form.tabs.documentsTab': 'Documents',
-    'register.form.section.documentsTitle': 'Supporting documents',
+    'register.form.section.documentsTitle': 'Attach Supporting documents',
     'register.form.tabs.previewTab': 'Preview',
     'review.form.tabs.reviewTab': 'Review',
     'register.form.section.previewTitle': 'Preview',
     'register.form.section.reviewTitle': 'Review',
     'register.form.section.documents.paragraph':
-      'For birth registration of children below 5 years old, one of the documents listed below is required:',
+      'For birth registration of birth occurring within 45 days old the following documents are required:',
+    'register.form.section.documents.paragraph45daysTo5Years':
+      'For birth registration of births occurring within 45 days and and 5 years old the following documents are required:',
+    'register.form.section.documents.paragraphAbove5Years':
+      'For birth registration of births occurring after 5 years the following documents are required:',
     'register.form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
     'register.form.section.documents.list.attestedVaccination':
@@ -475,8 +479,7 @@ export const ENGLISH_STATE: ILanguage = {
       'For this death registration, the following documents are required:',
     'formFields.typeOfDocument': 'Choose type of document',
     'formFields.docTypePostMortemReport': 'Certified Post Mortem Report',
-    'formFields.docTypeHospitalDischargeCertificate':
-      'Hospital Discharge Certificate',
+    'formFields.docTypeHospitalDischargeCertificate': 'Discharge Certificate',
     'formFields.docTypeLetterOfDeath': 'Attested Letter of Death',
     'formFields.docTypeDeathCertificate': 'Attested Certificate of Death',
     'formFields.docTypeCopyOfBurialReceipt': 'Certified Copy of Burial Receipt',
@@ -665,8 +668,15 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.docTypePassport': 'Passport',
     'formFields.docTypeSC': 'School Certificate',
     'formFields.docTypeOther': 'Other',
-    'formFields.docTypeChildBirthProof': 'Proof of Place and Date of Birth',
+    'formFields.docTypeChildBirthProof':
+      'Proof of Place and Date of Birth of Child',
+    'formFields.docTypeMedicalInstitution':
+      'Proof of birth from medical institution',
+    'formFields.docTypebirthAttendant': 'Proof of birth from birth attendant',
+    'formFields.docTypeChildAgeProof': 'Proof of Child Age',
+    'formFields.docTypeTaxReceipt': 'Receipt of tax payment',
     'formFields.docTypeEPICard': 'EPI Card',
+    'formFields.docTypeEPIStaffCertificate': 'EPI Staff Certificate',
     'formFields.docTypeDoctorCertificate': 'Doctor Certificate',
     'formFields.proofOfMothersID': "Proof of Mother's ID",
     'formFields.proofOfFathersID': "Proof of Father's ID",
@@ -756,6 +766,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Certificate collected on',
     'register.searchResult.listItem.status.dateLabel.application':
       'Application submitted on',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'Application reviewed on',
     'register.searchResult.listItem.status.dateLabel.registered':
       'Registered on',
     'register.searchResult.listItem.status.dateLabel.rejected':
@@ -1029,7 +1041,12 @@ export const ENGLISH_STATE: ILanguage = {
     'error.description1': 'Something went wrong.',
     'error.description2': "It's not you, it us. This is our fault.",
     'goto.homepage': 'Go to Homepage',
-    'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
+    'imageUploadOption.upload.error':
+      'File format not supported. Please attach a png, jpg or pdf (max 5mb)',
+    'imageUploadOption.upload.overSized':
+      'File is too large. Please attach file less than 5mb',
+    'imageUploadOption.upload.documentType':
+      'Please select the type of document first',
     'register.SearchResult.searchingFor': 'Searching for “{param}”',
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
@@ -1244,6 +1261,18 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SelectContactPoint.son': 'Son',
     'register.SelectContactPoint.daughter': 'Daughter',
     'register.SelectContactPoint.extendedFamily': 'Extended family',
-    'register.selectVitalEvent.backToReviewButton': 'Back to review'
+    'register.selectVitalEvent.backToReviewButton': 'Back to review',
+    'tab.inProgress.selector.own.drafts': 'Yours',
+    'tab.inProgress.selector.field.agents': 'Field agents',
+    'column.name.error.value': 'No name provided',
+    'application.creation.label': 'Started on',
+    'application.informant.label': 'Informant',
+    'application.informant.value.mother': 'Mother',
+    'application.informant.value.mother.only': 'Mother',
+    'application.informant.value.father': 'Father',
+    'application.initiator.label': 'By',
+    'expansion.info.queryError': 'An error occurred while fetching details',
+    'register.registrarHome.validated.tooltip':
+      'Application has been validated by a registration agent'
   }
 }

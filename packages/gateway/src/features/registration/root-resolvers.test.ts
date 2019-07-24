@@ -157,6 +157,40 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a register scope')
     })
   })
+  describe('countEventRegistrationsByStatus()', () => {
+    it('returns total number of compositions by status', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
+        })
+      )
+
+      // @ts-ignore
+      const result = await resolvers.Query.countEventRegistrationsByStatus(
+        {},
+        {
+          status: 'IN_PROGRESS',
+          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
+        },
+        authHeaderRegCert
+      )
+
+      expect(result).toBeDefined()
+      expect(result.count).toBe(2)
+    })
+    it('throws error if user does not have register scope', async () => {
+      await expect(
+        resolvers.Query.countEventRegistrationsByStatus(
+          {},
+          {
+            status: 'IN_PROGRES',
+            locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
+          },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
+    })
+  })
   describe('countEventRegistrations()', () => {
     it('returns total number of declared and rejected compositions', async () => {
       fetch.mockResponse(
