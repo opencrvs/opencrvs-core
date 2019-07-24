@@ -51,15 +51,18 @@ const MainSection = styled.section`
 
 const getAnimationKey = (location: any): string => {
   const parts = location.pathname.split('/')
-  const tabId = (parts && parts.length && parts[parts.length - 1]) || ''
+  const length = parts && parts.length > 2 && parts.length
   let key = 'other'
 
   if (
     [
       routes.HOME,
-      routes.FIELD_AGENT_HOME_TAB.replace(':tabId', tabId),
+      routes.FIELD_AGENT_HOME_TAB.replace(':tabId', parts[length - 1]),
       routes.REGISTRAR_HOME,
-      routes.REGISTRAR_HOME_TAB.replace(':tabId', tabId)
+      routes.REGISTRAR_HOME_TAB.replace(':tabId', parts[length - 2]).replace(
+        ':selectorId?',
+        parts[length - 1]
+      )
     ].includes(location.pathname.toString())
   ) {
     key = 'home'

@@ -29,7 +29,8 @@ import {
 import {
   goBack as goBackAction,
   goToHome,
-  goToPageGroup as goToPageGroupAction
+  goToPageGroup as goToPageGroupAction,
+  goToRegistrarHomeTab
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 import { IOfflineDataState } from '@register/offline/reducer'
@@ -240,6 +241,7 @@ type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -354,8 +356,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToHome()
-    this.props.toggleDraftSavedNotification()
+    this.userHasRegisterScope()
+      ? this.props.goToRegistrarHomeTab('progress')
+      : this.props.goToHome()
+    //  this.props.toggleDraftSavedNotification()
   }
 
   continueButtonHandler = (
@@ -428,7 +432,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       label: 'Delete Application',
                       handler: () => {
                         this.props.deleteApplication(application)
-                        this.props.goToHome()
+                        this.userHasRegisterScope()
+                          ? this.props.goToRegistrarHomeTab('progress')
+                          : this.props.goToHome()
                       }
                     }
                   ]}
@@ -719,6 +725,7 @@ export const RegisterForm = connect<
     goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
+    goToRegistrarHomeTab,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {
       console.log(values)

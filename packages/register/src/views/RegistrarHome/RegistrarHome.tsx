@@ -28,7 +28,11 @@ import {
 } from '@register/navigation'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
-import styled, { ITheme, withTheme } from '@register/styledComponents'
+import styled, {
+  ITheme,
+  withTheme,
+  keyframes
+} from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
@@ -48,6 +52,7 @@ import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
+import { PAGE_TRANSITIONS_CLASSNAME } from '@register/utils/constants'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -93,6 +98,26 @@ const FABContainer = styled.div`
   bottom: 55px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
+  }
+`
+
+const fadeFromTop = keyframes`
+from {
+   -webkit-transform: translateY(-100%);
+   transform: translateY(-100%); }
+`
+const StyledContainer = styled.div`
+  min-height: calc(100vh - 40px);
+  width: 100%;
+  background: ${({ theme }) => theme.colors.background};
+
+  &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
+    animation: ${fadeFromTop} 300ms ease-in-out both;
+  }
+
+  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {
+    position: fixed;
+    z-index: 999;
   }
 `
 interface IBaseRegistrarHomeProps {
@@ -228,7 +253,7 @@ export class RegistrarHomeView extends React.Component<
     let parentQueryLoading = false
 
     return (
-      <>
+      <StyledContainer className={PAGE_TRANSITIONS_CLASSNAME}>
         <Header />
         <Query
           query={COUNT_REGISTRATION_QUERY}
@@ -350,7 +375,7 @@ export class RegistrarHomeView extends React.Component<
           />
         </FABContainer>
         <NotificationToast />
-      </>
+      </StyledContainer>
     )
   }
 }
