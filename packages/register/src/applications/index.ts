@@ -190,7 +190,7 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
-    return '{}'
+    return JSON.stringify({ applications: [] })
   }
 
   const currentUserID = await getCurrentUserID()
