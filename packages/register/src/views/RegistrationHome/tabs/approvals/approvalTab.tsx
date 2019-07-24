@@ -1,18 +1,15 @@
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+import { Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction
+  GridTable
 } from '@opencrvs/components/lib/interface'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPage, goToReviewDuplicate } from '@register/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+import { goToPage } from '@register/navigation'
 import { getScope } from '@register/profile/profileSelectors'
 import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
 import styled, { ITheme } from '@register/styledComponents'
-import { Scope } from '@register/utils/authUtils'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
@@ -33,91 +30,66 @@ import ReactTooltip from 'react-tooltip'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-interface IBaseReviewTabProps {
+interface IBaseApprovalTabProps {
   theme: ITheme
-  scope: Scope | null
   goToPage: typeof goToPage
-  goToReviewDuplicate: typeof goToReviewDuplicate
   registrarUnion: string | null
   parentQueryLoading?: boolean
 }
 
-interface IReviewTabState {
-  reviewCurrentPage: number
+interface IApprovalTabState {
+  approvalCurrentPage: number
 }
 
-type IReviewTabProps = InjectedIntlProps & IBaseReviewTabProps
+type IApprovalTabProps = InjectedIntlProps & IBaseApprovalTabProps
 
-class ReviewTabComponent extends React.Component<
-  IReviewTabProps,
-  IReviewTabState
+class ApprovalTabComponent extends React.Component<
+  IApprovalTabProps,
+  IApprovalTabState
 > {
   pageSize = 10
-  constructor(props: IReviewTabProps) {
+  constructor(props: IApprovalTabProps) {
     super(props)
     this.state = {
-      reviewCurrentPage: 1
+      approvalCurrentPage: 1
     }
   }
 
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
-  }
-
-  transformDeclaredContent = (data: GQLQuery) => {
+  transformValidatedContent = (data: GQLQuery) => {
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
     const transformedData = transformData(data, this.props.intl)
 
     return transformedData.map(reg => {
-      const actions = [] as IAction[]
-      let icon: JSX.Element = <div />
-      if (this.userHasRegisterScope()) {
-        if (reg.duplicates && reg.duplicates.length > 0) {
-          actions.push({
-            label: this.props.intl.formatMessage(messages.reviewDuplicates),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
-          })
-          icon = <Duplicate />
-        } else {
-          if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
-            icon = <Validate data-tip data-for="validateTooltip" />
-          }
-          actions.push({
-            label: this.props.intl.formatMessage(messages.review),
-            handler: () =>
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
-              )
-          })
-        }
-      }
-
+      const icon: JSX.Element = (
+        <Validate data-tip data-for="validatedTooltip" />
+      )
       return {
         ...reg,
         eventTimeElapsed:
           (reg.dateOfEvent &&
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
           '',
-        applicationTimeElapsed:
+        dateOfApproval:
+          (reg.modifiedAt &&
+            moment(
+              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
           (reg.createdAt &&
             moment(
               moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        actions,
         icon
       }
     })
   }
 
   onPageChange = (newPageNumber: number) => {
-    this.setState({ reviewCurrentPage: newPageNumber })
+    this.setState({ approvalCurrentPage: newPageNumber })
   }
 
   renderExpandedComponent = (itemId: string) => {
@@ -131,10 +103,10 @@ class ReviewTabComponent extends React.Component<
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+          status: [EVENT_STATUS.VALIDATED],
           locationIds: [registrarUnion],
           count: this.pageSize,
-          skip: (this.state.reviewCurrentPage - 1) * this.pageSize
+          skip: (this.state.approvalCurrentPage - 1) * this.pageSize
         }}
       >
         {({
@@ -160,22 +132,22 @@ class ReviewTabComponent extends React.Component<
           if (error) {
             Sentry.captureException(error)
             return (
-              <ErrorText id="search-result-error-text-review">
+              <ErrorText id="search-result-error-text-approvals">
                 {intl.formatMessage(messages.queryError)}
               </ErrorText>
             )
           }
           return (
             <BodyContent>
-              <ReactTooltip id="validateTooltip">
+              <ReactTooltip id="validatedTooltip">
                 <ToolTipContainer>
                   {this.props.intl.formatMessage(
-                    messages.validatedApplicationTooltipForRegistrar
+                    messages.validatedApplicationTooltipForRegistrationAgent
                   )}
                 </ToolTipContainer>
               </ReactTooltip>
               <GridTable
-                content={this.transformDeclaredContent(data)}
+                content={this.transformValidatedContent(data)}
                 columns={[
                   {
                     label: this.props.intl.formatMessage(messages.listItemType),
@@ -191,25 +163,25 @@ class ReviewTabComponent extends React.Component<
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.listItemApplicationDate
-                    ),
-                    width: 20,
-                    key: 'applicationTimeElapsed'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
                       messages.listItemEventDate
                     ),
-                    width: 20,
+                    width: 28,
                     key: 'eventTimeElapsed'
                   },
                   {
-                    width: 6,
+                    label: this.props.intl.formatMessage(
+                      messages.sentForApprovals
+                    ),
+                    width: 28,
+                    key: 'dateOfApproval'
+                  },
+                  {
+                    width: 5,
                     key: 'icons',
                     isIconColumn: true
                   },
                   {
-                    width: 20,
+                    width: 5,
                     key: 'actions',
                     isActionColumn: true,
                     alignment: ColumnContentAlignment.CENTER
@@ -222,7 +194,7 @@ class ReviewTabComponent extends React.Component<
                 }}
                 pageSize={this.pageSize}
                 totalItems={data.searchEvents && data.searchEvents.totalItems}
-                currentPage={this.state.reviewCurrentPage}
+                currentPage={this.state.approvalCurrentPage}
                 expandable={true}
               />
             </BodyContent>
@@ -239,10 +211,9 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const ReviewTab = connect(
+export const ApprovalTab = connect(
   mapStateToProps,
   {
-    goToPage: goToPage,
-    goToReviewDuplicate: goToReviewDuplicate
+    goToPage: goToPage
   }
-)(injectIntl(withTheme(ReviewTabComponent)))
+)(injectIntl(withTheme(ApprovalTabComponent)))

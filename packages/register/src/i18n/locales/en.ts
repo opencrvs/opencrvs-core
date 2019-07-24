@@ -1273,7 +1273,9 @@ export const ENGLISH_STATE: ILanguage = {
     'application.informant.value.father': 'Father',
     'application.initiator.label': 'By',
     'expansion.info.queryError': 'An error occurred while fetching details',
-    'register.registrarHome.validated.tooltip':
-      'Application has been validated by a registration agent'
+    'register.registrarHome.validated.registrar.tooltip':
+      'Application has been validated by a registration agent',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'Application has been validated and waiting for approval'
   }
 }

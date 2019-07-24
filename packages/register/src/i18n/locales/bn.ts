@@ -1263,7 +1263,9 @@ export const BENGALI_STATE: ILanguage = {
     'application.informant.value.father': 'বাবা',
     'application.initiator.label': 'কর্মী',
     'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে',
-    'register.registrarHome.validated.tooltip':
-      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে'
+    'register.registrarHome.validated.registrar.tooltip':
+      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে'
   }
 }

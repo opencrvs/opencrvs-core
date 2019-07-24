@@ -49,6 +49,7 @@ import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
+import { ApprovalTab } from './tabs/approvals/approvalTab'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -310,7 +311,7 @@ export class RegistrationHomeView extends React.Component<
                     {intl.formatMessage(messages.sentForUpdates)} (
                     {data.countEvents.rejected})
                   </IconTab>
-                  {!this.userHasValidateScope() && (
+                  {this.userHasValidateScope() && (
                     <IconTab
                       id={`tab_${TAB_ID.sentForApproval}`}
                       key={TAB_ID.sentForApproval}
@@ -359,6 +360,12 @@ export class RegistrationHomeView extends React.Component<
         )}
         {tabId === TAB_ID.sentForUpdates && (
           <RejectTab
+            registrarUnion={registrarUnion}
+            parentQueryLoading={parentQueryLoading}
+          />
+        )}
+        {tabId === TAB_ID.sentForApproval && (
+          <ApprovalTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
           />

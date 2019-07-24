@@ -160,9 +160,14 @@ export const messages: {
     defaultMessage: 'No name provided',
     description: 'Text to display if the name column has no value provided'
   },
-  validatedApplicationTooltip: {
-    id: 'register.registrarHome.validated.tooltip',
+  validatedApplicationTooltipForRegistrar: {
+    id: 'register.registrarHome.validated.registrar.tooltip',
     defaultMessage: 'Application has been validated by a registration agent',
+    description: 'Text to display for validated application as tooltip'
+  },
+  validatedApplicationTooltipForRegistrationAgent: {
+    id: 'register.registrarHome.validated.registrationAgent.tooltip',
+    defaultMessage: 'Application has been validated and waiting for approval',
     description: 'Text to display for validated application as tooltip'
   }
 })
