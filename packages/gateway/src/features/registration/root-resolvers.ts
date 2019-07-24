@@ -91,6 +91,26 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async countEventRegistrationsByStatus(
+      _,
+      { status = null, locationIds = null },
+      authHeader
+    ) {
+      if (hasScope(authHeader, 'register')) {
+        const registrations = await getCompositions(
+          status,
+          locationIds,
+          authHeader,
+          0,
+          0
+        )
+        return { count: registrations.totalItems }
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register scope')
+        )
+      }
+    },
     async countEventRegistrations(_, { locationIds = null }, authHeader) {
       const declaredBundle = await getCompositions(
         'DECLARED',

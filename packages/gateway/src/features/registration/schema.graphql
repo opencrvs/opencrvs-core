@@ -345,6 +345,10 @@ type EventRegResultSet {
   totalItems: Int
 }
 
+type EventRegCount {
+  count: Int
+}
+
 type RegistrationCount {
   declared: Int
   rejected: Int
@@ -388,6 +392,10 @@ type Query {
     count: Int
     skip: Int
   ): EventRegResultSet
+  countEventRegistrationsByStatus(
+    locationIds: [String]
+    status: String
+  ): EventRegCount
   countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
 }

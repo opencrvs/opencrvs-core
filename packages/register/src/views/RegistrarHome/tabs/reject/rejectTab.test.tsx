@@ -606,6 +606,7 @@ describe('RegistrarHome sent for update tab related tests', () => {
                     ]
                   }
                 ],
+                contact: 'MOTHER',
                 contactPhoneNumber: '01622688231'
               },
               child: {

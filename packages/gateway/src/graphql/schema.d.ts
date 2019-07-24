@@ -20,6 +20,7 @@ export interface GQLQuery {
   listDeathRegistrations?: GQLDeathRegResultSet
   fetchEventRegistration?: GQLEventRegistration
   listEventRegistrations?: GQLEventRegResultSet
+  countEventRegistrationsByStatus?: GQLEventRegCount
   countEventRegistrations?: GQLRegistrationCount
   fetchRegistration?: GQLEventRegistration
   locationsByParent?: Array<GQLLocation | null>
@@ -470,6 +471,10 @@ export interface GQLEventRegResultSet {
   totalItems?: number
 }
 
+export interface GQLEventRegCount {
+  count?: number
+}
+
 export interface GQLRegistrationCount {
   declared?: number
   rejected?: number
@@ -854,6 +859,7 @@ export interface GQLResolver {
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   DeathRegResultSet?: GQLDeathRegResultSetTypeResolver
   EventRegResultSet?: GQLEventRegResultSetTypeResolver
+  EventRegCount?: GQLEventRegCountTypeResolver
   RegistrationCount?: GQLRegistrationCountTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
   BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
@@ -887,6 +893,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listDeathRegistrations?: QueryToListDeathRegistrationsResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   listEventRegistrations?: QueryToListEventRegistrationsResolver<TParent>
+  countEventRegistrationsByStatus?: QueryToCountEventRegistrationsByStatusResolver<
+    TParent
+  >
   countEventRegistrations?: QueryToCountEventRegistrationsResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
@@ -1052,6 +1061,22 @@ export interface QueryToListEventRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToListEventRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToCountEventRegistrationsByStatusArgs {
+  locationIds?: Array<string | null>
+  status?: string
+}
+export interface QueryToCountEventRegistrationsByStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToCountEventRegistrationsByStatusArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2262,6 +2287,14 @@ export interface EventRegResultSetToTotalItemsResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventRegCountTypeResolver<TParent = any> {
+  count?: EventRegCountToCountResolver<TParent>
+}
+
+export interface EventRegCountToCountResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
