@@ -44,7 +44,7 @@ export const ENGLISH_STATE = {
     'performance.header.hello': 'Hello {fullName}',
     'performance.graph.queryError': 'An error occurred while searching',
     'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_CLERK': 'Registration Clerk',
+    'register.home.header.REGISTRATION_AGENT': 'Registration Agent',
     'register.home.header.LOCAL_REGISTRAR': 'Registrar',
     'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
     'register.home.header.STATE_REGISTRAR': 'State Registrar',

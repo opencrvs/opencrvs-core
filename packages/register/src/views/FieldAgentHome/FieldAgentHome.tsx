@@ -514,6 +514,7 @@ class FieldAgentHomeView extends React.Component<
             </FABContainer>
           </>
         )}
+        {console.log(role)}
         {role && SYS_ADMIN_ROLES.includes(role) && (
           <Redirect to={SYS_ADMIN_HOME} />
         )}
