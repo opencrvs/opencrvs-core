@@ -4,6 +4,7 @@ interface Window {
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     DESKTOP_TIME_OUT_MILLISECONDS: number
+    LANGUAGES: string
     LANGUAGE: string
     LOGIN_URL: string
     PERFORMANCE_URL: string

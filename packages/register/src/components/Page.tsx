@@ -19,6 +19,7 @@ import { storage } from '@register/storage'
 import { changeLanguage } from '@register/i18n/actions'
 import { Ii18n } from '@register/type/i18n'
 import { USER_DETAILS } from '@register/utils/userUtils'
+import { getDefaultLanguage } from '@register/utils'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -126,7 +127,7 @@ class Component extends React.Component<
     )
 
     this.props.changeLanguage({
-      language: userDetails.language || window.config.LANGUAGE
+      language: userDetails.language || getDefaultLanguage()
     })
   }
 

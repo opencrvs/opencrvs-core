@@ -5,6 +5,7 @@ window.config = {
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGE: 'en',
+  LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040/'

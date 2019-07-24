@@ -2,6 +2,7 @@ import { ILanguage } from '@register/i18n/reducer'
 
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
+  displayName: 'English',
   messages: {
     'session.expire.text': 'Your session has expired. Please login again.',
     'login.stepOneTitle': 'Login',

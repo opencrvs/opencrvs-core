@@ -5,6 +5,7 @@ import {
   GQLIdentifier
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/register/src/storage'
+import { getDefaultLanguage } from '@register/utils'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -45,7 +46,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     practitionerId
   } = user
   const userDetails: IUserDetails = {
-    language: window.config.LANGUAGE
+    language: getDefaultLanguage()
   }
   if (userMgntUserID) {
     userDetails.userMgntUserID = userMgntUserID

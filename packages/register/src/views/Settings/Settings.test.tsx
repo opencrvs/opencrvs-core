@@ -35,12 +35,6 @@ describe('Settings page tests', () => {
 
     expect(
       comp
-        .find('#Bengali-name')
-        .first()
-        .text()
-    ).toBe('Bengali nameChange')
-    expect(
-      comp
         .find('#English-name')
         .first()
         .text()

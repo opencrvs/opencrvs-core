@@ -2,6 +2,7 @@ import { ILanguage } from '@register/i18n/reducer'
 
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
+  displayName: 'বাংলা',
   messages: {
     'session.expire.text': 'আপনার সেশনের মেয়াদ শেষ হয়ে গেছে',
     'login.stepOneTitle': 'লগইন',

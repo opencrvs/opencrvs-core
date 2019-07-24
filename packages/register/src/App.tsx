@@ -36,6 +36,7 @@ import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
+import { getDefaultLanguage } from '@register/utils'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -58,7 +59,7 @@ export class App extends React.Component<IAppProps> {
           <Provider store={this.props.store}>
             <I18nContainer>
               <ThemeProvider
-                theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+                theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
               >
                 <StyledErrorBoundary>
                   <ConnectedRouter history={this.props.history}>
