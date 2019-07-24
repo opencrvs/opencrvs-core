@@ -24,7 +24,6 @@ export enum Event {
 
 export enum Action {
   IN_PROGRESS = 'IN_PROGRESS',
-  VALIDATED = 'VALIDATED',
   DECLARED = 'DECLARED',
   VALIDATED = 'VALIDATED',
   REJECTED = 'REJECTED',
