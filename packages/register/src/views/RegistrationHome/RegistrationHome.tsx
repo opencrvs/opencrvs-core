@@ -7,6 +7,7 @@ import {
 import {
   PlusTransparentWhite,
   StatusGreen,
+  StatusGray,
   StatusOrange,
   StatusProgress,
   StatusRejected
@@ -124,6 +125,7 @@ const TAB_ID = {
   inProgress: 'progress',
   readyForReview: 'review',
   sentForUpdates: 'updates',
+  sentForApproval: 'approvals',
   readyForPrint: 'print'
 }
 
@@ -145,6 +147,13 @@ export class RegistrationHomeView extends React.Component<
       reviewCurrentPage: 1,
       updatesCurrentPage: 1
     }
+  }
+
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
   }
 
   renderInProgressTabWithCount = (
@@ -283,7 +292,10 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {data.countEvents.declared + data.countEvents.validated})
+                    {this.userHasRegisterScope()
+                      ? data.countEvents.declared + data.countEvents.validated
+                      : data.countEvents.declared}
+                    )
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}
@@ -298,6 +310,21 @@ export class RegistrationHomeView extends React.Component<
                     {intl.formatMessage(messages.sentForUpdates)} (
                     {data.countEvents.rejected})
                   </IconTab>
+                  {!this.userHasValidateScope() && (
+                    <IconTab
+                      id={`tab_${TAB_ID.sentForApproval}`}
+                      key={TAB_ID.sentForApproval}
+                      active={tabId === TAB_ID.sentForApproval}
+                      align={ICON_ALIGNMENT.LEFT}
+                      icon={() => <StatusGray />}
+                      onClick={() =>
+                        this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
+                      }
+                    >
+                      {intl.formatMessage(messages.sentForApprovals)} (
+                      {data.countEvents.validated})
+                    </IconTab>
+                  )}
                   <IconTab
                     id={`tab_${TAB_ID.readyForPrint}`}
                     key={TAB_ID.readyForPrint}

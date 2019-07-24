@@ -69,6 +69,11 @@ export const messages: {
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab'
   },
+  sentForApprovals: {
+    id: 'register.registrarHome.sentForApprovals',
+    defaultMessage: 'Sent for approval',
+    description: 'The title of sent for approvals tab'
+  },
   listItemType: {
     id: 'register.registrarHome.resultsType',
     defaultMessage: 'Type',

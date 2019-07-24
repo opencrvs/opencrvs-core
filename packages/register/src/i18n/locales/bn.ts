@@ -730,6 +730,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'চলমান',
     'register.registrarHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
     'register.registrarHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
+    'register.registrarHome.sentForApprovals': 'অনুমোদনের জন্য প্রস্তুত',
     'register.registrarHome.results.eventDate': 'ঘটনা তারিখ',
     'register.registrarHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
