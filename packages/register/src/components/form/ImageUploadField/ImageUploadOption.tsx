@@ -9,7 +9,8 @@ import { hasFormError } from '@register/forms/utils'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import * as Jimp from 'jimp'
 import { ALLOWED_IMAGE_TYPE } from '@register/utils/constants'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { messages } from '@register/i18n/messages/views/imageUpload'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -39,16 +40,6 @@ const UploadErrorSec = styled.div`
   color: ${({ theme }) => theme.colors.error};
   margin-top: 10px;
 `
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  uploadError: {
-    id: 'imageUploadOption.upload.error',
-    defaultMessage: 'Must be in JPEG/JPG/PNG format',
-    description: 'Show error messages while uploading'
-  }
-})
 
 type State = {
   data: IFormSectionData

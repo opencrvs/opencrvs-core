@@ -108,7 +108,7 @@ export const messages: {
     description: 'Apply button label'
   },
   buttonCancel: {
-    id: 'form.field.label.fetchButton.cancel',
+    id: 'buttons.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button label'
   }

@@ -9,7 +9,7 @@ import { FileItem } from '@opencrvs/components/lib/files'
 import { IFormSection, IFileValue } from '@register/forms'
 import { ImageUploadOption } from '@register/components/form/ImageUploadField/ImageUploadOption'
 import { ImagePreview } from '@register/components/form/ImageUploadField/ImagePreview'
-import { buttonMessages, formMessages } from '@opencrvs/commons'
+import { buttonMessages, formMessages } from '@register/i18n/messages'
 
 const Container = styled.div`
   width: 100%;

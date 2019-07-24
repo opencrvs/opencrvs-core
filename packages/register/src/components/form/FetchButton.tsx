@@ -3,29 +3,13 @@ import styled from '@register/styledComponents'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
 import * as Sentry from '@sentry/browser'
-
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
-
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { buttonMessages } from '@register/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/register/src/forms'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  back: {
-    id: 'buttons.back',
-    defaultMessage: 'Back',
-    description: 'Back button text in the modal'
-  },
-  cancel: {
-    id: 'form.field.label.fetchButton.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Cancel button text in the modal'
-  }
-})
 
 interface IFetchButtonProps {
   id: string
@@ -212,14 +196,14 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
                           {this.getModalInfo(intl)}
                           <StyledSpinner id="loader-button-spinner" />
                           <ConfirmButton onClick={this.hideModal}>
-                            {intl.formatMessage(messages.cancel)}
+                            {intl.formatMessage(buttonMessages.cancel)}
                           </ConfirmButton>
                         </>
                       )}
 
                       {!loading && (
                         <ConfirmButton onClick={this.hideModal}>
-                          {intl.formatMessage(messages.back)}
+                          {intl.formatMessage(buttonMessages.back)}
                         </ConfirmButton>
                       )}
                     </ModalContent>

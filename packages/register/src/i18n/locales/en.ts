@@ -67,6 +67,7 @@ export const ENGLISH_STATE: ILanguage = {
       '{event} Registration after {DOBDiff} of {DOE}',
     'constant.performance': 'Performance',
     'constants.applications': 'Applications',
+    'constants.areYouSure': 'Are you sure?',
     'constants.bbs': 'BBS',
     'constants.birth': 'Birth',
     'constants.cabinetDivision': 'Cabinet Division',
@@ -532,7 +533,6 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.fatherFirstNames': 'First Name(s) in Bengali',
     'form.field.label.fatherFirstNamesEng': 'First Name(s) in English',
     'form.field.label.fathersDetailsExist': "Do you have the father's details?",
-    'form.field.label.fetchButton.cancel': 'Cancel',
     'form.field.label.fetchDeceasedDetails': "Retrieve Deceased's Details",
     'form.field.label.fetchFatherDetails': "Retrieve Father's Details",
     'form.field.label.fetchIdentifierModalErrorTitle': 'Invalid Id',
@@ -616,10 +616,10 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.proofOfMothersID': "Proof of Mother's ID",
     'form.field.label.proofOfParentPermanentAddress':
       'Proof of Permanent Address of Parent',
-    'form.field.label.SearchField.editButton': 'Change assigned office',
-    'form.field.label.SearchField.locationId': 'Id: {locationId}',
-    'form.field.label.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
-    'form.field.label.SearchField.placeHolderText': 'Search',
+    'form.field.SearchField.changeAssignedOffice': 'Change assigned office',
+    'form.field.SearchField.officeLocationId': 'Id: {locationId}',
+    'form.field.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    'form.field.SearchField.placeHolderText': 'Search',
     'form.field.label.selectOne': 'Please select an option',
     'form.field.label.state': 'Division',
     'form.field.label.typeOfDocument': 'Choose type of document',
@@ -633,7 +633,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.weightAtBirth': 'Weight at birth',
     'form.field.label.whatDocToUpload':
       'Which document type are you uploading?',
-    'imageUploadOption.upload.error': 'Must be in JPEG/JPG/PNG format',
+    'imageUpload.upload.error': 'Must be in JPEG/JPG/PNG format',
     'label.assignedOffice': 'Assigned office',
     'languages.bengali': 'Bengali',
     'languages.english': 'English',
@@ -683,13 +683,13 @@ export const ENGLISH_STATE: ILanguage = {
     'print.certificate.signature.person2': 'Local Registrar Mohammad Ashraful',
     'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
-    'register.actions.description.confirmInComplete':
+    'review.actions.description.registerConfirmInComplete':
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
-    'register.actions.description.confirmComplete':
+    'review.actions.description.registerConfirmComplete':
       'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
-    'register.actions.description':
+    'review.actions.description':
       'By registering this birth, a birth certificate will be generated with your signature for issuance.',
-    'register.actions.title.applicationStatus': 'Register or reject?',
+    'review.actions.title.registerActionTitle': 'Register or reject?',
     'register.application.details.item.label.application':
       'Application submitted on',
     'register.application.details.item.label.by': 'By',
@@ -765,16 +765,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
     'register.form.modal.areYouReadyToSubmit': 'Are you ready to submit?',
-    'register.form.modal.button.title.registerConfirmation': 'Register',
-    'register.form.modal.desc.registerConfirmation': 'Are you sure?',
-    'register.form.modal.desc.submitConfirmation':
+    'review.modal.desc.submitConfirmation':
       '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
-    'register.form.modal.submitButton': 'Submit',
+    'buttons.send': 'Submit',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
-    'register.form.modal.title.registerConfirmation':
-      'Register this application?',
-    'register.form.modal.title.submitConfirmation':
+    'review.modal.title.registerConfirmation': 'Register this application?',
+    'review.modal.title.submitConfirmation':
       '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':

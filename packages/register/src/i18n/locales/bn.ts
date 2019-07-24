@@ -66,6 +66,7 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.receipt.subheader': '{DOE} {DOBDiff} পর {event} নিবন্ধন',
     'constant.performance': 'কর্মদক্ষতা',
     'constants.applications': 'আবেদন',
+    'constants.areYouSure': 'আপনি কি এ ব্যাপারে নিশ্চিত?',
     'constants.birth': 'জন্ম',
     'constants.bbs': 'পরিসংখ্যান ব্যুরো বাংলাদেশ',
     'constants.cabinetDivision': 'মন্ত্রিপরিষদ বিভাগ',
@@ -525,7 +526,6 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.fatherFirstNames': 'নামের প্রথমাংশ বাংলায়',
     'form.field.label.fatherFirstNamesEng': 'নামের প্রথমাংশ (ইংরেজিতে)',
     'form.field.label.fathersDetailsExist': 'আপনার কাছে কি পিতার বিবরণ আছে?',
-    'form.field.label.fetchButton.cancel': 'বাতিল',
     'form.field.label.fetchDeceasedDetails': 'মৃত ব্যক্তির তথ্য উত্তোলন করুন',
     'form.field.label.fetchFatherDetails': 'পিতার তথ্য উত্তোলন করুন',
     'form.field.label.fetchIdentifierModalErrorTitle': 'অকার্যকর আইডি',
@@ -616,10 +616,10 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.proofOfMothersID': 'মায়ের আইডি প্রমাণ',
     'form.field.label.proofOfParentPermanentAddress':
       'পিতা মাতার স্থায়ী ঠিকানা প্রমাণ',
-    'form.field.label.SearchField.editButton': 'নিবন্ধন অফিস হালনাগাদ করুন',
-    'form.field.label.SearchField.locationId': 'আইডি: {locationId}',
-    'form.field.label.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
-    'form.field.label.SearchField.placeHolderText': 'অনুসন্ধান',
+    'form.field.SearchField.changeAssignedOffice': 'নিবন্ধন অফিস হালনাগাদ করুন',
+    'form.field.SearchField.officeLocationId': 'আইডি: {locationId}',
+    'form.field.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
+    'form.field.SearchField.placeHolderText': 'অনুসন্ধান',
     'form.field.label.selectOne': 'অনুগ্রহ করে নির্বাচন করুন',
     'form.field.label.state': 'বিভাগ',
     'form.field.label.typeOfDocument': 'নথির ধরন নির্বাচন করুন',
@@ -632,7 +632,7 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.verbalAutopsy': 'মৌখিক ময়না তদন্ত',
     'form.field.label.weightAtBirth': 'জন্মের সময় ওজন',
     'form.field.label.whatDocToUpload': 'আপনি কোন ধরনের ডকুমেন্ট আপলোড করছেন?',
-    'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
+    'imageUpload.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
     'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
     'languages.bengali': 'বাংলা',
     'languages.english': 'ইংরেজি',
@@ -682,13 +682,13 @@ export const BENGALI_STATE: ILanguage = {
       'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
     'print.certificate.userReviewed':
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
-    'register.actions.description.confirmInComplete':
+    'review.actions.description.registerConfirmInComplete':
       'বাধ্যতামূলক তথ্য অনুপস্থিত। এই তথ্য যোগ করুন যাতে আপনি নিবন্ধন প্রক্রিয়াটি সম্পূর্ণ করতে পারেন।',
-    'register.actions.description.confirmComplete':
+    'review.actions.description.registerConfirmComplete':
       'নিবন্ধন ক্লিক করে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের জন্য এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।\n\nএই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের মাধ্যমে একটি জন্ম শংসাপত্র তৈরি করা হবে।',
-    'register.actions.description':
+    'review.actions.description':
       'এই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের জন্য একটি জন্ম শংসাপত্র তৈরি করা হবে।',
-    'register.actions.title.applicationStatus': 'নিবন্ধন বা বাতিল?',
+    'review.actions.title.registerActionTitle': 'নিবন্ধন বা বাতিল?',
     'register.application.details.item.label.application': 'আবেদন জমা',
     'register.application.details.item.label.by': 'কর্তৃক',
     'register.application.details.item.label.collected': 'সার্টিফিকেট মুদ্রণ',
@@ -761,16 +761,13 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
     'register.form.modal.areYouReadyToSubmit': 'আপনি জমা দিতে প্রস্তুত?',
-    'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
-    'register.form.modal.desc.registerConfirmation':
-      'আপনি কি এ ব্যাপারে নিশ্চিত?',
-    'register.form.modal.desc.submitConfirmation':
+    'review.modal.desc.submitConfirmation':
       '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
-    'register.form.modal.submitButton': 'জমা দিন',
+    'buttons.send': 'জমা দিন',
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
-    'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
-    'register.form.modal.title.submitConfirmation':
+    'review.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
+    'review.modal.title.submitConfirmation':
       '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
     'register.form.newBirthRegistration': 'নতুন জন্ম ঘোষণা',
     'register.form.newVitalEventRegistration':

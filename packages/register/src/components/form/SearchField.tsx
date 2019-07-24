@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getLanguage } from '@register/i18n/selectors'
@@ -16,6 +16,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
+import { buttonMessages, formMessages } from '@register/i18n/messages'
 
 const SelectButton = styled(PrimaryButton)`
   height: 40px;
@@ -76,39 +77,6 @@ const InputSection = styled.div`
     margin-top: 12px;
   }
 `
-const messages = defineMessages({
-  modalTitle: {
-    id: 'form.field.label.SearchField.modalTitle',
-    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
-    description: 'Modal title'
-  },
-  modalCancel: {
-    id: 'buttons.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The cancel title'
-  },
-  modalSelect: {
-    id: 'buttons.select',
-    defaultMessage: 'SELECT',
-    description: 'The select title'
-  },
-  locationId: {
-    id: 'form.field.label.SearchField.locationId',
-    defaultMessage: 'Id: {locationId}',
-    description: 'The location Id column'
-  },
-  editButton: {
-    id: 'form.field.label.SearchField.editButton',
-    defaultMessage: 'Change assigned office',
-    description: 'Edit button text'
-  },
-  placeHolderText: {
-    id: 'form.field.label.SearchField.placeHolderText',
-    defaultMessage: 'Search',
-    description: 'Place holder text '
-  }
-})
-
 interface IProps {
   theme: ITheme
   language: string
@@ -188,7 +156,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
   render() {
     const { intl, fieldLabel, fieldName, isFieldRequired } = this.props
-    const placeHolderText = intl.formatMessage(messages.placeHolderText)
+    const placeHolderText = intl.formatMessage(
+      formMessages.searchFieldPlaceHolderText
+    )
     const locations: ILocation[] = [
       {
         id: '454b4008-7ffd-4808-9ed4-4613d4047021',
@@ -230,7 +200,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           <Item width={250}>{location.detailedLocation}</Item>
           <Item isRight={true} color={this.props.theme.colors.black}>
             {location.name === selectedValue &&
-              intl.formatMessage(messages.locationId, {
+              intl.formatMessage(formMessages.officeLocationId, {
                 locationId: location.id
               })}
           </Item>
@@ -256,7 +226,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
               className="item"
               onClick={this.handleClick}
             >
-              {intl.formatMessage(messages.editButton)}
+              {intl.formatMessage(formMessages.changeAssignedOffice)}
             </LinkButton>
           </InputSection>
         )}
@@ -270,7 +240,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
         <ResponsiveModal
           id="office-search-modal"
-          title={intl.formatMessage(messages.modalTitle, {
+          title={intl.formatMessage(formMessages.searchFieldModalTitle, {
             fieldName: fieldName
           })}
           width={918}
@@ -283,14 +253,14 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
               id="modal_cancel"
               onClick={this.onModalClose}
             >
-              {intl.formatMessage(messages.modalCancel)}
+              {intl.formatMessage(buttonMessages.cancel)}
             </CancelButton>,
             <SelectButton
               key="modal_select"
               id="modal_select"
               onClick={() => this.onModalComplete(selectedLocation)}
             >
-              {intl.formatMessage(messages.modalSelect)}
+              {intl.formatMessage(buttonMessages.select)}
             </SelectButton>
           ]}
         >
