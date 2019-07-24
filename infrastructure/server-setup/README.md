@@ -36,6 +36,8 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 ```
 
+Note: the Ansible script will install the UFW firewall, however, Docker manages it's own iptables. This means that even if there are UFW rules to block certain ports these will be overridden for ports where Docker is publishing a container port. Ensure only the necessary ports are published via the docker-compose files. Only the necessary ports are published by default, however, you may want to check this when doing security audits.
+
 Now, from the root folder of the repository run the deployment as follows:
 
 ```

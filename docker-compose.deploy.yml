@@ -2,12 +2,13 @@ version: '3.3'
 
 services:
   # Configure reverse proxy for public endpoints
+  # Note: these published port will override UFW rules as Docker manages it's own iptables
+  # Only publish the exact ports that are required for OpenCRVS to work
   traefik:
     image: traefik
     ports:
       - '80:80'
       - '443:443'
-      - '8090:8080'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
