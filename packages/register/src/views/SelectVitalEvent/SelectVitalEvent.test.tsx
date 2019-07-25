@@ -51,6 +51,7 @@ describe('when user is selecting the vital event', () => {
   describe('when user is in vital event selection view', () => {
     beforeEach(async () => {
       history.replace(SELECT_VITAL_EVENT)
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')

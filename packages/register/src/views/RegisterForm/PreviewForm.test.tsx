@@ -170,6 +170,7 @@ describe('when user is previewing the form data', () => {
         )
       )
 
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')
@@ -404,6 +405,7 @@ describe('when user is previewing the form data', () => {
           .replace(':event', 'birth')
           .replace(':pageId', 'review')
       )
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')
@@ -606,6 +608,7 @@ describe('when user is previewing the form data', () => {
           .replace(':event', 'death')
           .replace(':pageId', 'review')
       )
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')
