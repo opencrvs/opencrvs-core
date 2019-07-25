@@ -52,7 +52,7 @@ const registrationAgent = new User({
   salt: pass.salt,
   role: 'REGISTRATION_AGENT',
   type: 'ENTREPENEUR',
-  scope: ['validate', 'demo'],
+  scope: ['validate', 'certify', 'demo'],
   status: 'active',
   practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
   primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
