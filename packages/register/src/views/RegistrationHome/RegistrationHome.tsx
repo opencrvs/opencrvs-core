@@ -7,6 +7,7 @@ import {
 import {
   PlusTransparentWhite,
   StatusGreen,
+  StatusGray,
   StatusOrange,
   StatusProgress,
   StatusRejected
@@ -31,12 +32,12 @@ import { IStoreState } from '@register/store'
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
+import NotificationToast from '@register/views/RegistrationHome/NotificatoinToast'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrarHome/queries'
-import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+} from '@register/views/RegistrationHome/queries'
+import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
 import { Query } from 'react-apollo'
@@ -48,6 +49,7 @@ import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
+import { ApprovalTab } from './tabs/approvals/approvalTab'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -95,7 +97,7 @@ const FABContainer = styled.div`
     display: none;
   }
 `
-interface IBaseRegistrarHomeProps {
+interface IBaseRegistrationHomeProps {
   theme: ITheme
   language: string
   scope: Scope | null
@@ -110,20 +112,21 @@ interface IBaseRegistrarHomeProps {
   goToEvents: typeof goToEventsAction
 }
 
-interface IRegistrarHomeState {
+interface IRegistrationHomeState {
   reviewCurrentPage: number
   updatesCurrentPage: number
 }
 
-type IRegistrarHomeProps = InjectedIntlProps &
+type IRegistrationHomeProps = InjectedIntlProps &
   IViewHeadingProps &
   ISearchInputProps &
-  IBaseRegistrarHomeProps
+  IBaseRegistrationHomeProps
 
 const TAB_ID = {
   inProgress: 'progress',
   readyForReview: 'review',
   sentForUpdates: 'updates',
+  sentForApproval: 'approvals',
   readyForPrint: 'print'
 }
 
@@ -134,17 +137,24 @@ export const EVENT_STATUS = {
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED'
 }
-export class RegistrarHomeView extends React.Component<
-  IRegistrarHomeProps,
-  IRegistrarHomeState
+export class RegistrationHomeView extends React.Component<
+  IRegistrationHomeProps,
+  IRegistrationHomeState
 > {
   pageSize = 10
-  constructor(props: IRegistrarHomeProps) {
+  constructor(props: IRegistrationHomeProps) {
     super(props)
     this.state = {
       reviewCurrentPage: 1,
       updatesCurrentPage: 1
     }
+  }
+
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
   }
 
   renderInProgressTabWithCount = (
@@ -283,7 +293,10 @@ export class RegistrarHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {data.countEvents.declared + data.countEvents.validated})
+                    {this.userHasRegisterScope()
+                      ? data.countEvents.declared + data.countEvents.validated
+                      : data.countEvents.declared}
+                    )
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}
@@ -298,6 +311,21 @@ export class RegistrarHomeView extends React.Component<
                     {intl.formatMessage(messages.sentForUpdates)} (
                     {data.countEvents.rejected})
                   </IconTab>
+                  {this.userHasValidateScope() && (
+                    <IconTab
+                      id={`tab_${TAB_ID.sentForApproval}`}
+                      key={TAB_ID.sentForApproval}
+                      active={tabId === TAB_ID.sentForApproval}
+                      align={ICON_ALIGNMENT.LEFT}
+                      icon={() => <StatusGray />}
+                      onClick={() =>
+                        this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
+                      }
+                    >
+                      {intl.formatMessage(messages.sentForApprovals)} (
+                      {data.countEvents.validated})
+                    </IconTab>
+                  )}
                   <IconTab
                     id={`tab_${TAB_ID.readyForPrint}`}
                     key={TAB_ID.readyForPrint}
@@ -332,6 +360,12 @@ export class RegistrarHomeView extends React.Component<
         )}
         {tabId === TAB_ID.sentForUpdates && (
           <RejectTab
+            registrarUnion={registrarUnion}
+            parentQueryLoading={parentQueryLoading}
+          />
+        )}
+        {tabId === TAB_ID.sentForApproval && (
+          <ApprovalTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
           />
@@ -377,7 +411,7 @@ function mapStateToProps(
   }
 }
 
-export const RegistrarHome = connect(
+export const RegistrationHome = connect(
   mapStateToProps,
   {
     goToEvents: goToEventsAction,
@@ -386,4 +420,4 @@ export const RegistrarHome = connect(
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(RegistrarHomeView)))
+)(injectIntl(withTheme(RegistrationHomeView)))

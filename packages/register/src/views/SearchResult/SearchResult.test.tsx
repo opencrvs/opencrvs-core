@@ -1,8 +1,4 @@
-import {
-  DataTable,
-  ListItem,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { DataTable, Spinner } from '@opencrvs/components/lib/interface'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -10,7 +6,6 @@ import { queries } from '@register/profile/queries'
 import { SEARCH_EVENTS } from '@register/search/queries'
 import { createStore } from '@register/store'
 import { createTestComponent, mockUserResponse } from '@register/tests/util'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { SearchResult } from '@register/views/SearchResult/SearchResult'
 import { goToSearch } from '@register/navigation'
 
