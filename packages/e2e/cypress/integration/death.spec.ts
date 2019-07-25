@@ -182,6 +182,7 @@ context('Death Integration Test', () => {
       'Medically Certified Cause of Death'
     )
     cy.get('#causeOfDeathCode').type('1009')
+    cy.wait(500)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers License', 'Drivers License')
