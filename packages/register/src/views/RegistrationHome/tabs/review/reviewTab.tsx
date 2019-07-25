@@ -126,12 +126,14 @@ class ReviewTabComponent extends React.Component<
 
   render() {
     const { theme, intl, registrarUnion, parentQueryLoading } = this.props
-
+    const queryStatuses = this.userHasRegisterScope()
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
     return (
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+          status: queryStatuses,
           locationIds: [registrarUnion],
           count: this.pageSize,
           skip: (this.state.reviewCurrentPage - 1) * this.pageSize
