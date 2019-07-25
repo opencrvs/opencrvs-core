@@ -416,6 +416,332 @@ describe('Verify handler', () => {
   })
 })
 
+describe('markEventAsValidatedHandler handler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        resourceType: 'Bundle',
+        entry: [
+          {
+            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'birth-registration'
+                  }
+                ]
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/paper-form-id',
+                  value: '12345678'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'B5WGYJE'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                }
+              ],
+              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+            }
+          }
+        ]
+      })
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: testFhirBundleWithIds,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('returns OK with full fhir bundle as payload for death', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        resourceType: 'Bundle',
+        entry: [
+          {
+            fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'death-registration'
+                  }
+                ]
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                  value: 'D5WGYJE'
+                }
+              ],
+              id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+            }
+          }
+        ]
+      })
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: testFhirBundleWithIdsForDeath,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('returns OK with task entry as payload for birth', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    fetch.resetMocks()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Task/12423/_history/1' }
+            }
+          ]
+        })
+      ],
+      [compositionMock, { status: 200 }],
+      [motherMock, { status: 200 }]
+    )
+    const taskBundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+          resource: {
+            resourceType: 'Task',
+            status: 'requested',
+            focus: {
+              reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
+            },
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/types',
+                  code: 'birth-registration'
+                }
+              ]
+            },
+            identifier: [
+              {
+                system: 'http://opencrvs.org/specs/id/paper-form-id',
+                value: '12345678'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                value: 'B5WGYJE'
+              }
+            ],
+            extension: [
+              {
+                url: 'http://opencrvs.org/specs/extension/contact-person',
+                valueString: 'MOTHER'
+              }
+            ],
+            id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+          }
+        }
+      ]
+    }
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+  it('returns OK with task entry as payload for death', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    fetch.resetMocks()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { location: 'Task/12423/_history/1' }
+            }
+          ]
+        })
+      ],
+      [compositionMock, { status: 200 }],
+      [motherMock, { status: 200 }]
+    )
+    const taskBundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+          resource: {
+            resourceType: 'Task',
+            status: 'requested',
+            focus: {
+              reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
+            },
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/types',
+                  code: 'DEATH'
+                }
+              ]
+            },
+            identifier: [
+              {
+                system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                value: 'D5WGYJE'
+              }
+            ],
+            id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+          }
+        }
+      ]
+    }
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
 describe('markEventAsRegisteredHandler handler', () => {
   let server: any
 

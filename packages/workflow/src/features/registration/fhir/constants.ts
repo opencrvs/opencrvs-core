@@ -5,6 +5,7 @@ export const CHILD_SECTION_CODE = 'child-details'
 export const DECEASED_SECTION_CODE = 'deceased-details'
 export const REG_STATUS_IN_PROGRESS = 'IN_PROGRESS'
 export const REG_STATUS_DECLARED = 'DECLARED'
+export const REG_STATUS_VALIDATED = 'VALIDATED'
 export const REG_STATUS_REGISTERED = 'REGISTERED'
 export const REG_STATUS_CERTIFIED = 'CERTIFIED'
 export enum EVENT_TYPE {

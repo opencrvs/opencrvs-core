@@ -751,9 +751,10 @@ export const getMetrics = (
 
 export async function getDeclarationIdsFromResponse(
   resBody: fhir.Bundle,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  compId?: string
 ) {
-  const compositionId = getIDFromResponse(resBody)
+  const compositionId = compId || getIDFromResponse(resBody)
   const compositionBundle = await fetchFHIR(
     `/Composition/${compositionId}`,
     authHeader
