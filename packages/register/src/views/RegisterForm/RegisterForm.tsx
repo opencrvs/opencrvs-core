@@ -29,6 +29,7 @@ import {
 import {
   goBack as goBackAction,
   goToHome,
+  goToInProgressTab,
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
@@ -240,6 +241,7 @@ type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
+  goToInProgressTab: typeof goToInProgressTab
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -354,7 +356,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToHome()
+    this.props.goToInProgressTab()
     this.props.toggleDraftSavedNotification()
   }
 
@@ -719,6 +721,7 @@ export const RegisterForm = connect<
     goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
+    goToInProgressTab,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {
       console.log(values)

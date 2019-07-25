@@ -24,7 +24,7 @@ import {
   SYS_ADMIN_HOME
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken, getTokenPayload } from '@register/utils/authUtils'
+import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -122,13 +122,14 @@ export function goBack() {
 }
 
 export function goToHome() {
-  const scopes = (getTokenPayload(getToken()) || { scope: '' }).scope
-  if (!scopes) {
-    return push(HOME)
-  }
-  if (scopes.includes('sysadmin')) {
+  return push(HOME)
+}
+
+export function goToInProgressTab() {
+  const scope = getCurrentUserScope()
+  if (scope.includes('sysadmin')) {
     return push(SYS_ADMIN_HOME)
-  } else if (scopes.includes('register')) {
+  } else if (scope.includes('register')) {
     return push(formatUrl(REGISTRAR_HOME_TAB, { tabId: 'progress' }))
   } else {
     return push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: 'progress' }))
