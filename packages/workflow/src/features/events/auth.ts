@@ -12,6 +12,7 @@ function getEventToScopeMap() {
     [Events.BIRTH_MARK_CERT]: [USER_SCOPE.CERTIFY],
     [Events.BIRTH_MARK_VOID]: [
       USER_SCOPE.DECLARE,
+      USER_SCOPE.VALIDATE,
       USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY
     ],
@@ -24,6 +25,7 @@ function getEventToScopeMap() {
     [Events.DEATH_MARK_CERT]: [USER_SCOPE.CERTIFY],
     [Events.DEATH_MARK_VOID]: [
       USER_SCOPE.DECLARE,
+      USER_SCOPE.VALIDATE,
       USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY
     ]
