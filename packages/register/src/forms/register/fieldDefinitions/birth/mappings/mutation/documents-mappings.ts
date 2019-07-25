@@ -1,5 +1,29 @@
 import { IFormField, IFormData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
+import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
+import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
+import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
+import { defineMessages } from 'react-intl'
+
+const messages: {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+} = defineMessages({
+  child: {
+    id: 'register.form.tabs.childTab',
+    defaultMessage: 'Child',
+    description: 'Document for whom showd in the preview dropdown for document'
+  },
+  mother: {
+    id: 'register.form.tabs.motherTab',
+    defaultMessage: 'Mother',
+    description: 'Document for whom showd in the preview dropdown for document'
+  },
+  father: {
+    id: 'register.form.tabs.fatherTab',
+    defaultMessage: 'Father',
+    description: 'Document for whom showd in the preview dropdown for document'
+  }
+})
 
 export const documentForWhomFhirMapping = {
   Child: 'Child',
@@ -11,15 +35,24 @@ export const documentForWhomFhirMapping = {
 }
 
 export const sectionMapping = {
-  CHILD: [
+  [childSection.id]: [
     documentForWhomFhirMapping.Child,
     documentForWhomFhirMapping.ChildAge
   ],
-  MOTHER: [
+  [motherSection.id]: [
     documentForWhomFhirMapping.Mother,
     documentForWhomFhirMapping.Parent
   ],
-  FATHER: [documentForWhomFhirMapping.Father, documentForWhomFhirMapping]
+  [fatherSection.id]: [
+    documentForWhomFhirMapping.Father,
+    documentForWhomFhirMapping
+  ]
+}
+
+export const sectionTitle = {
+  [childSection.id]: messages.child,
+  [motherSection.id]: messages.mother,
+  [fatherSection.id]: messages.father
 }
 
 export const documentTypeFhirMapping = {
