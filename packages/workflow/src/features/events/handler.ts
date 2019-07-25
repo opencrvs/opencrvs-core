@@ -2,7 +2,8 @@ import * as Hapi from 'hapi'
 import {
   createRegistrationHandler,
   markEventAsRegisteredHandler,
-  markEventAsCertifiedHandler
+  markEventAsCertifiedHandler,
+  markEventAsValidatedHandler
 } from '@workflow/features/registration/handler'
 import {
   hasBirthRegistrationNumber,
@@ -27,6 +28,7 @@ export enum Events {
   BIRTH_NEW_REG = '/events/birth/new-registration',
   BIRTH_REG = '/events/birth/registration',
   BIRTH_MARK_REG = '/events/birth/mark-registered',
+  BIRTH_MARK_VALID = '/event/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
   DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration',
@@ -35,6 +37,7 @@ export enum Events {
   DEATH_NEW_REG = '/events/death/new-registration',
   DEATH_REG = '/events/death/registration',
   DEATH_MARK_REG = '/events/death/mark-registered',
+  DEATH_MARK_VALID = '/event/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   BIRTH_NEW_VALIDATE = 'events/birth/new-validation',
@@ -59,7 +62,12 @@ function detectEvent(request: Hapi.Request): Events {
         if (eventType === EVENT_TYPE.BIRTH) {
           if (firstEntry.id) {
             if (!hasBirthRegistrationNumber(fhirBundle)) {
-              return Events.BIRTH_MARK_REG
+              if (hasValidateScope(request)) {
+                return Events.BIRTH_MARK_VALID
+              }
+              if (hasRegisterScope(request)) {
+                return Events.BIRTH_MARK_REG
+              }
             } else {
               return Events.BIRTH_MARK_CERT
             }
@@ -79,7 +87,12 @@ function detectEvent(request: Hapi.Request): Events {
         } else if (eventType === EVENT_TYPE.DEATH) {
           if (firstEntry.id) {
             if (!hasDeathRegistrationNumber(fhirBundle)) {
-              return Events.DEATH_MARK_REG
+              if (hasValidateScope(request)) {
+                return Events.DEATH_MARK_VALID
+              }
+              if (hasRegisterScope(request)) {
+                return Events.DEATH_MARK_REG
+              }
             } else {
               return Events.DEATH_MARK_CERT
             }
@@ -101,9 +114,19 @@ function detectEvent(request: Hapi.Request): Events {
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
-          return Events.BIRTH_MARK_REG
+          if (hasValidateScope(request)) {
+            return Events.BIRTH_MARK_VALID
+          }
+          if (hasRegisterScope(request)) {
+            return Events.BIRTH_MARK_REG
+          }
         } else if (eventType === EVENT_TYPE.DEATH) {
-          return Events.DEATH_MARK_REG
+          if (hasValidateScope(request)) {
+            return Events.DEATH_MARK_VALID
+          }
+          if (hasRegisterScope(request)) {
+            return Events.DEATH_MARK_REG
+          }
         }
       }
     }
@@ -193,6 +216,12 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.DEATH_NEW_REG, request)
+      break
+    case Events.BIRTH_MARK_VALID:
+      response = await markEventAsValidatedHandler(request, h, event)
+      break
+    case Events.DEATH_MARK_VALID:
+      response = await markEventAsValidatedHandler(request, h, event)
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
