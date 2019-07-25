@@ -78,6 +78,12 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
+    // CREATE PIN
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
+    for (let i = 1; i <= 8; i++) {
+      cy.get(`#keypad-${i % 2}`).click()
+    }
     // LANDING PAGE
     cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
@@ -237,6 +243,12 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
+    // CREATE PIN
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
+    for (let i = 1; i <= 8; i++) {
+      cy.get(`#keypad-${i % 2}`).click()
+    }
     // LANDING PAGE
     cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
@@ -321,6 +333,12 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
+    // CREATE PIN
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
+    for (let i = 1; i <= 8; i++) {
+      cy.get(`#keypad-${i % 2}`).click()
+    }
     // LANDING PAGE
     cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
@@ -483,6 +501,12 @@ context('Birth Integration Test', () => {
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
+    // CREATE PIN
+    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+    cy.get('#createPinBtn', { timeout: 30000 }).click()
+    for (let i = 1; i <= 8; i++) {
+      cy.get(`#keypad-${i % 2}`).click()
+    }
     // LANDING PAGE
     cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
