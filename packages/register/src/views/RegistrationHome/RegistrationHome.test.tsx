@@ -7,11 +7,11 @@ import { createTestComponent, mockUserResponse } from '@register/tests/util'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrarHome/queries'
+} from '@register/views/RegistrationHome/queries'
 import {
   EVENT_STATUS,
-  RegistrarHome
-} from '@register/views/RegistrarHome/RegistrarHome'
+  RegistrationHome
+} from '@register/views/RegistrationHome/RegistrationHome'
 import { merge } from 'lodash'
 import * as React from 'react'
 
@@ -50,11 +50,11 @@ beforeAll(() => {
   store.dispatch(checkAuth({ '?token': registerScopeToken }))
 })
 
-describe('RegistrarHome In Progress tab related tests', () => {
+describe('RegistrationHome In Progress tab related tests', () => {
   it('sets loading state while waiting for data', () => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome
+      <RegistrationHome
         match={{
           params: {
             tabId: 'progress'
@@ -112,7 +112,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
       store,
       graphqlMock
     )
@@ -183,7 +183,7 @@ describe('RegistrarHome In Progress tab related tests', () => {
     // store.dispatch(storeApplication(createApplication(Event.BIRTH)))
     const testComponent = createTestComponent(
       // @ts-ignore
-      <RegistrarHome match={{ params: { tabId: 'progress' } }} />,
+      <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
       store,
       graphqlMock
     )

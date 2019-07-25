@@ -1,12 +1,17 @@
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  IAction
 } from '@opencrvs/components/lib/interface'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPrintCertificate } from '@register/navigation'
+import { goToPage, goToReviewDuplicate } from '@register/navigation'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+import { getScope } from '@register/profile/profileSelectors'
 import { transformData } from '@register/search/transformer'
+import { IStoreState } from '@register/store'
 import { ITheme } from '@register/styledComponents'
+import { Scope } from '@register/utils/authUtils'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
@@ -14,78 +19,88 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrarHome/messages'
-import { SEARCH_EVENTS } from '@register/views/RegistrarHome/queries'
+import { messages } from '@register/views/RegistrationHome/messages'
+import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
   EVENT_STATUS,
   StyledSpinner
-} from '@register/views/RegistrarHome/RegistrarHome'
-import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+} from '@register/views/RegistrationHome/RegistrationHome'
+import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 
-interface IBasePrintTabProps {
+interface IBaseRejectTabProps {
   theme: ITheme
-  goToPrintCertificate: typeof goToPrintCertificate
+  scope: Scope | null
+  goToPage: typeof goToPage
+  goToReviewDuplicate: typeof goToReviewDuplicate
   registrarUnion: string | null
   parentQueryLoading?: boolean
 }
 
-interface IPrintTabState {
-  printCurrentPage: number
+interface IRejectTabState {
+  updatesCurrentPage: number
 }
 
-type IPrintTabProps = InjectedIntlProps & IBasePrintTabProps
+type IRejectTabProps = InjectedIntlProps & IBaseRejectTabProps
 
-class PrintTabComponent extends React.Component<
-  IPrintTabProps,
-  IPrintTabState
+class RejectTabComponent extends React.Component<
+  IRejectTabProps,
+  IRejectTabState
 > {
   pageSize = 10
-  constructor(props: IPrintTabProps) {
+  constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
-      printCurrentPage: 1
+      updatesCurrentPage: 1
     }
   }
 
-  transformRegisterdContent = (data: GQLQuery) => {
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
+  transformRejectedContent = (data: GQLQuery) => {
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
-      const actions = [
-        {
-          label: this.props.intl.formatMessage(messages.print),
-          handler: () =>
-            this.props.goToPrintCertificate(
-              reg.id,
-              reg.event.toLocaleLowerCase() || ''
-            )
+      const actions = [] as IAction[]
+      if (this.userHasRegisterScope()) {
+        if (reg.duplicates && reg.duplicates.length > 0) {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.reviewDuplicates),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(messages.update),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event ? reg.event.toLowerCase() : ''
+              )
+          })
         }
-      ]
+      }
       return {
         ...reg,
-        dateOfRegistration:
+        dateOfRejection:
           (reg.modifiedAt &&
             moment(
               moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
-          ((reg.createdAt &&
-            moment(
-              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
-            ''),
+          '',
         actions
       }
     })
   }
 
   onPageChange = (newPageNumber: number) => {
-    this.setState({ printCurrentPage: newPageNumber })
+    this.setState({ updatesCurrentPage: newPageNumber })
   }
 
   renderExpandedComponent = (itemId: string) => {
@@ -99,10 +114,10 @@ class PrintTabComponent extends React.Component<
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: [EVENT_STATUS.REGISTERED],
+          status: [EVENT_STATUS.REJECTED],
           locationIds: [registrarUnion],
           count: this.pageSize,
-          skip: (this.state.printCurrentPage - 1) * this.pageSize
+          skip: (this.state.updatesCurrentPage - 1) * this.pageSize
         }}
       >
         {({
@@ -118,7 +133,7 @@ class PrintTabComponent extends React.Component<
             return (
               (!parentQueryLoading && (
                 <StyledSpinner
-                  id="search-result-spinner-print"
+                  id="search-result-spinner"
                   baseColor={theme.colors.background}
                 />
               )) ||
@@ -128,7 +143,7 @@ class PrintTabComponent extends React.Component<
           if (error) {
             Sentry.captureException(error)
             return (
-              <ErrorText id="search-result-error-text-print">
+              <ErrorText id="search-result-error-text-reject">
                 {intl.formatMessage(messages.queryError)}
               </ErrorText>
             )
@@ -136,7 +151,7 @@ class PrintTabComponent extends React.Component<
           return (
             <BodyContent>
               <GridTable
-                content={this.transformRegisterdContent(data)}
+                content={this.transformRejectedContent(data)}
                 columns={[
                   {
                     label: this.props.intl.formatMessage(messages.listItemType),
@@ -145,31 +160,31 @@ class PrintTabComponent extends React.Component<
                   },
                   {
                     label: this.props.intl.formatMessage(messages.listItemName),
-                    width: 25,
+                    width: 23,
                     key: 'name'
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.listItemRegisteredDate
+                      messages.listItemApplicantNumber
                     ),
-                    width: 24,
-                    key: 'dateOfRegistration'
+                    width: 21,
+                    key: 'contactNumber'
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.registrationNumber
+                      messages.listItemUpdateDate
                     ),
-                    width: 25,
-                    key: 'registrationNumber'
+                    width: 22,
+                    key: 'dateOfRejection'
                   },
                   {
                     label: this.props.intl.formatMessage(
                       messages.listItemAction
                     ),
-                    width: 12,
+                    width: 20,
                     key: 'actions',
-                    alignment: ColumnContentAlignment.CENTER,
-                    isActionColumn: true
+                    isActionColumn: true,
+                    alignment: ColumnContentAlignment.CENTER
                   }
                 ]}
                 renderExpandedComponent={this.renderExpandedComponent}
@@ -179,7 +194,7 @@ class PrintTabComponent extends React.Component<
                 }}
                 pageSize={this.pageSize}
                 totalItems={data.searchEvents && data.searchEvents.totalItems}
-                currentPage={this.state.printCurrentPage}
+                currentPage={this.state.updatesCurrentPage}
                 expandable={true}
               />
             </BodyContent>
@@ -190,9 +205,16 @@ class PrintTabComponent extends React.Component<
   }
 }
 
-export const PrintTab = connect(
-  null,
-  {
-    goToPrintCertificate: goToPrintCertificate
+function mapStateToProps(state: IStoreState) {
+  return {
+    scope: getScope(state)
   }
-)(injectIntl(withTheme(PrintTabComponent)))
+}
+
+export const RejectTab = connect(
+  mapStateToProps,
+  {
+    goToPage: goToPage,
+    goToReviewDuplicate: goToReviewDuplicate
+  }
+)(injectIntl(withTheme(RejectTabComponent)))

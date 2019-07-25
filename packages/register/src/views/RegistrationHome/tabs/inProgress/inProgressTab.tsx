@@ -14,7 +14,7 @@ import {
   GQLEventRegistration,
   GQLHumanName,
   GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema.d'
+} from '@opencrvs/gateway/src/graphql/schema'
 import { IApplication } from '@register/applications'
 import {
   goToPage as goToPageAction,
@@ -31,7 +31,7 @@ import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   LIST_EVENT_REGISTRATIONS_BY_STATUS
-} from '@register/views/RegistrarHome/queries'
+} from '@register/views/RegistrationHome/queries'
 import { messages as eventMessages } from '@register/views/SelectVitalEvent/SelectVitalEvent'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
@@ -39,10 +39,10 @@ import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { messages } from '@register/views/RegistrarHome/messages'
+import { messages } from '@register/views/RegistrationHome/messages'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
-import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
+import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
