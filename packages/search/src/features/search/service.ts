@@ -12,7 +12,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     contactNumber = EMPTY_STRING,
     registrationNumber = EMPTY_STRING,
     event = EMPTY_STRING,
-    status = EMPTY_STRING,
+    status,
     applicationLocationId = EMPTY_STRING,
     createdBy = EMPTY_STRING,
     from = 0,

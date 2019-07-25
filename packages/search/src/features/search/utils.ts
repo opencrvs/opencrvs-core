@@ -90,9 +90,9 @@ export function queryBuilder(
     })
   }
 
-  if (filters.status !== EMPTY_STRING) {
+  if (filters.status) {
     must.push({
-      term: {
+      terms: {
         'type.keyword': filters.status
       }
     })

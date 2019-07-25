@@ -5,6 +5,14 @@ import {
   documentTypeFhirMapping
 } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
+const fieldNameMapping = {
+  [documentForWhomFhirMapping.Mother]: 'uploadDocForMother',
+  [documentForWhomFhirMapping.Father]: 'uploadDocForFather',
+  [documentForWhomFhirMapping.Parent]: 'uploadDocForParentPermanentAddress',
+  [documentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
+  [documentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge'
+}
+
 export function birthAttachmentToFieldTransformer(
   transformedData: IFormData,
   queryData: any,
@@ -18,6 +26,7 @@ export function birthAttachmentToFieldTransformer(
     field,
     'registration',
     documentForWhomFhirMapping,
-    documentTypeFhirMapping
+    documentTypeFhirMapping,
+    fieldNameMapping
   )
 }

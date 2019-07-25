@@ -209,6 +209,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
           data: {
             countEvents: {
               declared: 10,
+              validated: 2,
               registered: 7,
               rejected: 5
             }
@@ -246,7 +247,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         .find('#tab_review')
         .hostNodes()
         .text()
-    ).toContain('Ready for review (10)')
+    ).toContain('Ready for review (12)')
     testComponent.component.unmount()
   })
 
@@ -258,7 +259,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -303,7 +304,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'VALIDATED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
                     contactNumber: null,
@@ -385,7 +386,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -434,7 +435,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -479,14 +480,213 @@ describe('RegistrarHome sent for review tab related tests', () => {
     testComponent.component.unmount()
   })
 
-  it('renders expanded area for ready to review', async () => {
+  it('renders expanded area for validated status', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'DECLARED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'VALIDATED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: '2007-01-01',
+                    modifiedAt: '2007-01-01'
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+              registration: {
+                id: '345678',
+                type: 'DEATH',
+                certificates: null,
+                status: [
+                  {
+                    id:
+                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                    timestamp: '2019-04-03T07:08:24.936Z',
+                    user: {
+                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                      name: [
+                        {
+                          use: 'en',
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful'
+                        },
+                        {
+                          use: 'bn',
+                          firstNames: '',
+                          familyName: ''
+                        }
+                      ],
+                      role: 'LOCAL_REGISTRAR'
+                    },
+                    location: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: ['']
+                    },
+                    office: {
+                      id: '123',
+                      name: 'Kaliganj Union Sub Center',
+                      alias: [''],
+                      address: {
+                        district: '7876',
+                        state: 'iuyiuy'
+                      }
+                    },
+                    type: 'VALIDATED',
+                    comments: null
+                  }
+                ],
+                contact: 'MOTHER',
+                contactPhoneNumber: null
+              },
+              child: null,
+              deceased: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: 'Mushraful',
+                    familyName: 'Hoque'
+                  }
+                ],
+                deceased: {
+                  deathDate: '01-01-1984'
+                }
+              },
+              informant: {
+                individual: {
+                  telecom: [
+                    {
+                      use: null,
+                      system: 'phone',
+                      value: '01686972106'
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrarHome match={{ params: { tabId: 'review' } }} />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+    testComponent.component.update()
+    const instance = testComponent.component.find(GridTable).instance() as any
+
+    instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#VALIDATED-0').hostNodes().length
+    ).toBe(1)
+    testComponent.component.unmount()
+  })
+
+  it('renders expanded area for declared status', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -671,7 +871,6 @@ describe('RegistrarHome sent for review tab related tests', () => {
     await new Promise(resolve => {
       setTimeout(resolve, 100)
     })
-
     testComponent.component.update()
     expect(testComponent.component.find('#DECLARED-0').hostNodes().length).toBe(
       1
@@ -687,7 +886,7 @@ describe('RegistrarHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: EVENT_STATUS.DECLARED,
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
