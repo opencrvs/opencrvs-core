@@ -1,6 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import { IForm } from '@register/forms'
-import { defineMessages } from 'react-intl'
 import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
 import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
 import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
@@ -11,21 +10,7 @@ import { applicantsSection } from '@register/forms/register/fieldDefinitions/dea
 import { eventSection } from '@register/forms/register/fieldDefinitions/death/event-section'
 import { causeOfDeathSection } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 import { documentsSection as deathDocumentsSection } from '@register/forms/register/fieldDefinitions/death/documents-section'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  previewTab: {
-    id: 'register.form.section.preview.name',
-    defaultMessage: 'Preview',
-    description: 'Form section name for Preview'
-  },
-  previewTitle: {
-    id: 'register.form.section.preview.title',
-    defaultMessage: 'Preview',
-    description: 'Form section title for Preview'
-  }
-})
+import { messages } from '@register/i18n/messages/views/review'
 
 export type IRegisterFormState = {
   registerForm: {
@@ -46,7 +31,7 @@ export const initialState: IRegisterFormState = {
         {
           id: 'preview',
           viewType: 'preview',
-          name: messages.previewTab,
+          name: messages.previewName,
           title: messages.previewTitle,
           groups: [
             {
@@ -67,7 +52,7 @@ export const initialState: IRegisterFormState = {
         {
           id: 'preview',
           viewType: 'preview',
-          name: messages.previewTab,
+          name: messages.previewName,
           title: messages.previewTitle,
           groups: [
             {

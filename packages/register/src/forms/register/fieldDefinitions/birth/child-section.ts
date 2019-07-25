@@ -1,4 +1,3 @@
-import { defineMessages } from 'react-intl'
 import {
   ViewType,
   TEXT,
@@ -20,7 +19,7 @@ import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@register/offline/reducer'
-import { messages as addressMessages } from '@register/forms/address'
+import { formMessages as messages, formMessages } from '@register/i18n/messages'
 import { countries } from '@register/forms/countries'
 import {
   fieldToNameTransformer,
@@ -46,200 +45,6 @@ export interface IChildSectionFormData {
   bar: string
   baz: string
 }
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  attendantAtBirth: {
-    defaultMessage: 'Attendant at birth',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirth'
-  },
-  attendantAtBirthLayperson: {
-    defaultMessage: 'Layperson',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthLayperson'
-  },
-  attendantAtBirthMidwife: {
-    defaultMessage: 'Midwife',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthMidwife'
-  },
-  attendantAtBirthNone: {
-    defaultMessage: 'None',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthNone'
-  },
-  attendantAtBirthNurse: {
-    defaultMessage: 'Nurse',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthNurse'
-  },
-  attendantAtBirthOther: {
-    defaultMessage: 'Other',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthOther'
-  },
-  attendantAtBirthOtherParamedicalPersonnel: {
-    defaultMessage: 'Other paramedical personnel',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthOtherParamedicalPersonnel'
-  },
-  attendantAtBirthPhysician: {
-    defaultMessage: 'Physician',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthPhysician'
-  },
-  birthLocation: {
-    defaultMessage: 'Hospital / Clinic',
-    description: 'Label for form field: Hospital or Health Institution',
-    id: 'form.field.label.birthLocation'
-  },
-  birthType: {
-    defaultMessage: 'Type of birth',
-    description: 'Label for form field: Type of birth',
-    id: 'form.field.label.birthType'
-  },
-  birthTypeHigherMultipleDelivery: {
-    defaultMessage: 'Higher multiple delivery',
-    description: 'Label for form field: Type of birth',
-    id: 'form.field.label.birthTypeHigherMultipleDelivery'
-  },
-  birthTypeQuadruplet: {
-    defaultMessage: 'Quadruplet',
-    description: 'Label for form field: Type of birth',
-    id: 'form.field.label.birthTypeQuadruplet'
-  },
-  birthTypeSingle: {
-    defaultMessage: 'Single',
-    description: 'Label for form field: Type of birth',
-    id: 'form.field.label.birthTypeSingle'
-  },
-  birthTypeTriplet: {
-    defaultMessage: 'Triplet',
-    description: 'Label for form field: Type of birth',
-    id: 'form.field.label.birthTypeTriplet'
-  },
-  birthTypeTwin: {
-    defaultMessage: 'Twin',
-    description: 'Label for form field: Type of birth',
-    id: 'form.field.label.birthTypeTwin'
-  },
-  childDateOfBirth: {
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth',
-    id: 'form.field.label.childDateOfBirth'
-  },
-  childFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name',
-    id: 'form.field.label.childFamilyName'
-  },
-  childFamilyNameEng: {
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english',
-    id: 'form.field.label.childFamilyNameEng'
-  },
-  childFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: First names',
-    id: 'form.field.label.childFirstNames'
-  },
-  childFirstNamesEng: {
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english',
-    id: 'form.field.label.childFirstNamesEng'
-  },
-  childSex: {
-    defaultMessage: 'Sex',
-    description: 'Label for form field: Sex name',
-    id: 'form.field.label.childSex'
-  },
-  childSexFemale: {
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexFemale'
-  },
-  childSexMale: {
-    defaultMessage: 'Male',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexMale'
-  },
-  childSexOther: {
-    defaultMessage: 'Other',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexOther'
-  },
-  childSexUnknown: {
-    defaultMessage: 'Unknown',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexUnknown'
-  },
-  childTab: {
-    defaultMessage: 'Child',
-    description: 'Form section name for Child',
-    id: 'register.form.section.child.name'
-  },
-  childTitle: {
-    defaultMessage: "Child's details",
-    description: 'Form section title for Child',
-    id: 'register.form.section.child.title'
-  },
-  deliveryAddress: {
-    defaultMessage: 'Address of place of delivery',
-    description: 'Label for form field: Address of place of delivery',
-    id: 'form.field.label.deliveryAddress'
-  },
-  deliveryInstitution: {
-    defaultMessage: 'Type or select institution',
-    description: 'Label for form field: Type or select institution',
-    id: 'form.field.label.deliveryInstitution'
-  },
-  hospital: {
-    defaultMessage: 'Hospital',
-    description: 'Select item for hospital',
-    id: 'form.field.label.hospital'
-  },
-  multipleBirth: {
-    defaultMessage: 'Order of birth (number)',
-    description: 'Label for form field: Order of birth',
-    id: 'form.field.label.multipleBirth'
-  },
-  optionalLabel: {
-    defaultMessage: 'Optional',
-    description: 'Optional label',
-    id: 'form.field.label.optionalLabel'
-  },
-  otherHealthInstitution: {
-    defaultMessage: 'Other Health Institution',
-    description: 'Select item for Other Health Institution',
-    id: 'form.field.label.otherHealthInstitution'
-  },
-  otherInstitution: {
-    defaultMessage: 'Other Institution',
-    description: 'Select item for Other Institution',
-    id: 'form.field.label.otherInstitution'
-  },
-  placeOfBirth: {
-    defaultMessage: 'Place of delivery',
-    description: 'Label for form field: Place of delivery',
-    id: 'form.field.label.placeOfBirth'
-  },
-  privateHome: {
-    defaultMessage: 'Private Home',
-    description: 'Select item for Private Home',
-    id: 'form.field.label.privateHome'
-  },
-  select: {
-    defaultMessage: 'Select',
-    id: 'register.select.placeholder'
-  },
-  weightAtBirth: {
-    defaultMessage: 'Weight at birth',
-    description: 'Label for form field: Weight at birth',
-    id: 'form.field.label.weightAtBirth'
-  }
-})
 
 export const childSection: IFormSection = {
   id: 'child',
@@ -443,7 +248,7 @@ export const childSection: IFormSection = {
         {
           name: 'country',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: formMessages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -458,7 +263,7 @@ export const childSection: IFormSection = {
         {
           name: 'state',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: formMessages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -479,7 +284,7 @@ export const childSection: IFormSection = {
         {
           name: 'district',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: formMessages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -501,7 +306,7 @@ export const childSection: IFormSection = {
         {
           name: 'addressLine4',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: formMessages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -524,7 +329,7 @@ export const childSection: IFormSection = {
         {
           name: 'addressLine3',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: formMessages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -549,7 +354,7 @@ export const childSection: IFormSection = {
         {
           name: 'addressLine3CityOption',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: formMessages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -569,7 +374,7 @@ export const childSection: IFormSection = {
         {
           name: 'addressLine2',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: formMessages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -589,7 +394,7 @@ export const childSection: IFormSection = {
         {
           name: 'addressLine1CityOption',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: formMessages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -609,7 +414,7 @@ export const childSection: IFormSection = {
         {
           name: 'postCodeCityOption',
           type: NUMBER,
-          label: addressMessages.postCode,
+          label: formMessages.postCode,
           required: false,
           initialValue: '',
           validate: [],
@@ -629,7 +434,7 @@ export const childSection: IFormSection = {
         {
           name: 'addressLine1',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: formMessages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -649,7 +454,7 @@ export const childSection: IFormSection = {
         {
           name: 'postCode',
           type: NUMBER,
-          label: addressMessages.postCode,
+          label: formMessages.postCode,
           required: false,
           initialValue: '',
           validate: [],

@@ -12,7 +12,7 @@ import {
 import { RadioSize } from '@opencrvs/components/lib/forms'
 import { defineMessages } from 'react-intl'
 import { isValidDeathOccurrenceDate } from '@register/utils/validate'
-import { messages as addressMessages } from '@register/forms/address'
+import { formMessages as messages } from '@register/i18n/messages'
 import { countries } from '@register/forms/countries'
 import { conditionals } from '@register/forms/utils'
 import {
@@ -39,140 +39,10 @@ import {
   getRegistrationSectionTransformer
 } from '@register/forms/register/fieldDefinitions/death/mappings/query/event-mappings'
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  deathEventTab: {
-    id: 'register.form.section.deathEvent.name',
-    defaultMessage: 'When did the death occur?',
-    description: 'Form section name for Death Event'
-  },
-  deathEventTitle: {
-    id: 'register.form.section.deathEvent.title',
-    defaultMessage: 'When did the death occur?',
-    description: 'Form section title for Death Event'
-  },
-  deathDate: {
-    id: 'form.field.label.deathDate',
-    defaultMessage:
-      'Enter the date in the format day, month and year. For example 24 10 2020.',
-    description: 'Label for form field: Date of occurrence'
-  },
-  manner: {
-    id: 'form.field.label.mannerOfDeath',
-    defaultMessage: 'What was the manner of death?',
-    description: 'Label for form field: Manner of death'
-  },
-  selectOne: {
-    id: 'form.field.label.selectOne',
-    defaultMessage: 'Please select an option',
-    description: 'Generic label for select on option'
-  },
-  mannerNatural: {
-    id: 'form.field.label.mannerOfDeathNatural',
-    defaultMessage: 'Natural causes',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerAccident: {
-    id: 'form.field.label.mannerOfDeathAccident',
-    defaultMessage: 'Accident',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerSuicide: {
-    id: 'form.field.label.mannerOfDeathSuicide',
-    defaultMessage: 'Suicide',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerHomicide: {
-    id: 'form.field.label.mannerOfDeathHomicide',
-    defaultMessage: 'Homicide',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerUndetermined: {
-    id: 'form.field.label.mannerOfDeathUndetermined',
-    defaultMessage: 'Manner undetermined',
-    description: 'Option for form field: Manner of death'
-  },
-  deathPlace: {
-    id: 'form.field.label.deathPlace',
-    defaultMessage: 'Place of Occurrence of Death',
-    description: 'Title for place of occurrence of death'
-  },
-  deathAtFacility: {
-    id: 'form.field.label.deathAtFacility',
-    defaultMessage: 'What hospital did the death occur at?',
-    description: 'Label for form field: Hospital or Health Institution'
-  },
-  deathAtPrivateHome: {
-    id: 'form.field.label.deathAtPrivateHome',
-    defaultMessage: 'What is the address of the private home?',
-    description: 'Label for form field: Private Home Address'
-  },
-  deathAtOtherLocation: {
-    id: 'form.field.label.deathAtOtherLocation',
-    defaultMessage: 'What is the other address did the death occur at?',
-    description: 'Label for form field: Other Location Address'
-  },
-  deathPlaceAddress: {
-    id: 'form.field.label.deathPlaceAddress',
-    defaultMessage: 'Where did the death occur?',
-    description: 'Label for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressSameAsPermanent: {
-    id: 'form.field.label.deathPlaceAddressSameAsPermanent',
-    defaultMessage: 'Permanent address of the deceased',
-    description: 'Option for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressSameAsCurrent: {
-    id: 'form.field.label.deathPlaceAddressSameAsCurrent',
-    defaultMessage: 'Current address of the deceased',
-    description: 'Option for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressOther: {
-    id: 'form.field.label.deathPlaceAddressOther',
-    defaultMessage: 'Different Address',
-    description: 'Option for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressType: {
-    id: 'form.field.label.deathPlaceAddressType',
-    defaultMessage: 'Type of Place',
-    description: 'Label for form field: Type of place of death occurrence'
-  },
-  hospital: {
-    id: 'form.field.label.hospital',
-    defaultMessage: 'Hospital',
-    description: 'Select item for hospital'
-  },
-  otherHealthInstitution: {
-    id: 'form.field.label.otherHealthInstitution',
-    defaultMessage: 'Other Health Institution',
-    description: 'Select item for Other Health Institution'
-  },
-  healthInstitution: {
-    id: 'form.field.label.healthInstitution',
-    defaultMessage: 'Health Institution',
-    description: 'Select item for Health Institution'
-  },
-  privateHome: {
-    id: 'form.field.label.privateHome',
-    defaultMessage: 'Private Home',
-    description: 'Select item for Private Home'
-  },
-  otherInstitution: {
-    id: 'form.field.label.otherInstitution',
-    defaultMessage: 'Other',
-    description: 'Select item for Other Institution'
-  },
-  select: {
-    id: 'register.select.placeholder',
-    defaultMessage: 'Select'
-  }
-})
-
 export const eventSection: IFormSection = {
   id: 'deathEvent',
   viewType: 'form' as ViewType,
-  name: messages.deathEventTab,
+  name: messages.deathEventName,
   title: messages.deathEventTitle,
   groups: [
     {
@@ -200,7 +70,7 @@ export const eventSection: IFormSection = {
         {
           name: 'manner',
           type: RADIO_GROUP,
-          label: messages.deathEventMannerTitle,
+          label: messages.manner,
           required: false,
           initialValue: '',
           validate: [],
@@ -292,7 +162,7 @@ export const eventSection: IFormSection = {
         {
           name: 'country',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: messages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -306,7 +176,7 @@ export const eventSection: IFormSection = {
         {
           name: 'state',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: messages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -324,7 +194,7 @@ export const eventSection: IFormSection = {
         {
           name: 'district',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: messages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -342,7 +212,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine4',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: messages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -364,7 +234,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine3',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: messages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -388,7 +258,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine3CityOption',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: messages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -407,7 +277,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine2',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: messages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -426,7 +296,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine1CityOption',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -445,7 +315,7 @@ export const eventSection: IFormSection = {
         {
           name: 'postCodeCityOption',
           type: NUMBER,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [],
@@ -464,7 +334,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine1',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -483,7 +353,7 @@ export const eventSection: IFormSection = {
         {
           name: 'postCode',
           type: NUMBER,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [],
@@ -509,7 +379,7 @@ export const eventSection: IFormSection = {
         {
           name: 'country',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: messages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -523,7 +393,7 @@ export const eventSection: IFormSection = {
         {
           name: 'state',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: messages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -541,7 +411,7 @@ export const eventSection: IFormSection = {
         {
           name: 'district',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: messages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -559,7 +429,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine4',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: messages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -581,7 +451,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine3',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: messages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -605,7 +475,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine3CityOption',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: messages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -624,7 +494,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine2',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: messages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -643,7 +513,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine1CityOption',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -662,7 +532,7 @@ export const eventSection: IFormSection = {
         {
           name: 'postCodeCityOption',
           type: NUMBER,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [],
@@ -681,7 +551,7 @@ export const eventSection: IFormSection = {
         {
           name: 'addressLine1',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -700,7 +570,7 @@ export const eventSection: IFormSection = {
         {
           name: 'postCode',
           type: NUMBER,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [],

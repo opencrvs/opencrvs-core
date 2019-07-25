@@ -1,4 +1,4 @@
-import { defineMessages } from 'react-intl'
+import { formMessages as messages } from '@register/i18n/messages'
 import {
   IFormSection,
   PARAGRAPH,
@@ -11,184 +11,10 @@ import { birthFieldToAttachmentTransformer } from '@register/forms/register/fiel
 import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
 import { diffDoB } from '@register/forms/utils'
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  documentsTab: {
-    id: 'register.form.section.documents.name',
-    defaultMessage: 'Documents',
-    description: 'Form section name for Documents'
-  },
-  documentsTitle: {
-    id: 'register.form.section.documents.title',
-    defaultMessage: 'Supporting documents',
-    description: 'Form section title for Documents'
-  },
-  uploadImage: {
-    id: 'register.form.section.documents.uploadImage',
-    defaultMessage: 'Upload a photo of the supporting document',
-    description: 'Title for the upload image button'
-  },
-  paragraph: {
-    id: 'register.form.section.documents.birth.requirements',
-    defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
-    description: 'Documents Paragraph text'
-  },
-  informantAttestation: {
-    id: 'register.form.section.documents.list.informantAttestation',
-    defaultMessage: 'Attestation of the informant, or',
-    description: 'Attested document of the informant'
-  },
-  attestedVaccination: {
-    id: 'register.form.section.documents.list.attestedVaccination',
-    defaultMessage: 'Attested copy of the vaccination (EPI) card, or',
-    description: 'Attested copy of the vaccination card'
-  },
-  attestedBirthRecord: {
-    id: 'register.form.section.documents.list.attestedBirthRecord',
-    defaultMessage: 'Attested copy of hospital document or birth record, or',
-    description: 'Attested copy of hospital document'
-  },
-  certification: {
-    id: 'register.form.section.documents.list.certification',
-    defaultMessage:
-      'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
-    description: 'Certification regarding NGO worker'
-  },
-  otherDocuments: {
-    id: 'register.form.section.documents.list.otherDocuments',
-    defaultMessage:
-      'Attested copy(s) of the document as prescribed by the Registrar',
-    description: 'Attested copy(s) of the document'
-  },
-  documentsUploadName: {
-    id: 'register.form.section.upload.documentsName',
-    defaultMessage: 'Documents Upload',
-    description: 'Form section name for Documents Upload'
-  },
-  documentsUploadTitle: {
-    id: 'register.form.section.upload.documentsTitle',
-    defaultMessage: 'Supporting documents',
-    description: 'Form section title for Documents'
-  },
-  uploadDocForWhom: {
-    id: 'form.field.label.uploadDocForWhom',
-    defaultMessage: 'Whose suppoting document are you uploading?',
-    description: 'Question to ask user, for whom, documents are being uploaded'
-  },
-  uploadDocForChild: {
-    id: 'form.field.label.uploadDocForChild',
-    defaultMessage: 'Child',
-    description: 'Label for radio option Child'
-  },
-  uploadDocForMother: {
-    id: 'form.field.label.uploadDocForMother',
-    defaultMessage: 'Mother',
-    description: 'Label for radio option Mother'
-  },
-  uploadDocForFather: {
-    id: 'form.field.label.uploadDocForFather',
-    defaultMessage: 'Father',
-    description: 'Label for radio option Father'
-  },
-  uploadDocForOther: {
-    id: 'form.field.label.uploadDocForOther',
-    defaultMessage: 'Other',
-    description: 'Label for radio option Other'
-  },
-  whatDocToUpload: {
-    id: 'form.field.label.whatDocToUpload',
-    defaultMessage: 'Which document type are you uploading?',
-    description:
-      'Question to ask user, what type of documents are being uploaded'
-  },
-  docTypeBR: {
-    id: 'form.field.label.docTypeBR',
-    defaultMessage: 'Birth Registration',
-    description: 'Label for radio option Birth Registration'
-  },
-  docTypeNIDFront: {
-    id: 'form.field.label.docTypeNIDFront',
-    defaultMessage: 'National ID (front)',
-    description: 'Label for select option radio option NID front'
-  },
-  docTypeNIDBack: {
-    id: 'form.field.label.docTypeNIDBack',
-    defaultMessage: 'National ID (back)',
-    description: 'Label for select option radio option NID back'
-  },
-  docTypePassport: {
-    id: 'form.field.label.docTypePassport',
-    defaultMessage: 'Passport',
-    description: 'Label for radio option Passport'
-  },
-  docTypeSC: {
-    id: 'form.field.label.docTypeSC',
-    defaultMessage: 'School Certificate',
-    description: 'Label for radio option School Certificate'
-  },
-  docTypeOther: {
-    id: 'form.field.label.docTypeOther',
-    defaultMessage: 'Other',
-    description: 'Label for radio option Other'
-  },
-  docTypeChildBirthProof: {
-    id: 'form.field.label.docTypeChildBirthProof',
-    defaultMessage: 'Proof of Place and Date of Birth',
-    description: 'Label for select option Child Birth Proof'
-  },
-  docTypeEPICard: {
-    id: 'form.field.label.docTypeEPICard',
-    defaultMessage: 'EPI Card',
-    description: 'Label for select option EPI Card'
-  },
-  docTypeDoctorCertificate: {
-    id: 'form.field.label.docTypeDoctorCertificate',
-    defaultMessage: 'Doctor Certificate',
-    description: 'Label for select option Doctor Certificate'
-  },
-  proofOfMothersID: {
-    id: 'form.field.label.proofOfMothersID',
-    defaultMessage: "Proof of Mother's ID",
-    description: 'Label for list item Mother ID Proof'
-  },
-  proofOfFathersID: {
-    id: 'form.field.label.proofOfFathersID',
-    defaultMessage: "Proof of Father's ID",
-    description: 'Label for list item Father ID Proof'
-  },
-  proofOfBirthPlaceAndDate: {
-    id: 'form.field.label.proofOfBirthPlaceAndDate',
-    defaultMessage: 'Proof of Place and Date of Birth of Child',
-    description: 'Label for list item Child Birth Proof'
-  },
-  proofOfParentPermanentAddress: {
-    id: 'form.field.label.proofOfParentPermanentAddress',
-    defaultMessage: 'Proof of Permanent Address of Parent',
-    description: 'Label for list item Parent Permanent Address Proof'
-  },
-  proofOfEPICardOfChild: {
-    id: 'form.field.label.proofOfEPICardOfChild',
-    defaultMessage: 'EPI Card of Child',
-    description: 'Label for list item EPI Card of Child'
-  },
-  proofOfDocCertificateOfChild: {
-    id: 'form.field.label.proofOfDocCertificateOfChild',
-    defaultMessage:
-      "Certificate from doctor to prove child's age OR School certificate",
-    description: 'Label for list item Doctor Certificate'
-  },
-  select: {
-    id: 'register.select.placeholder',
-    defaultMessage: 'Select'
-  }
-})
-
 export const documentsSection: IFormSection = {
   id: 'documents',
   viewType: 'form',
-  name: messages.documentsTab,
+  name: messages.documentsName,
   title: messages.documentsTitle,
   groups: [
     {
@@ -342,7 +168,7 @@ export const documentsSection: IFormSection = {
         {
           name: 'list',
           type: DYNAMIC_LIST,
-          label: messages.documentsTab,
+          label: messages.documentsName,
           validate: [],
           initialValue: '',
           dynamicItems: {

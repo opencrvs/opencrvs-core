@@ -1,4 +1,4 @@
-import { messages } from '@register/forms/countryMessages'
+import { countryMessages as messages } from '@register/i18n/messages'
 
 export const countries = [
   { value: 'AFG', label: messages.AFG },

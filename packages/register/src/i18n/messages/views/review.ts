@@ -11,9 +11,33 @@ interface IReviewMessages {
   submitConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
   submitConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
   registerConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  previewName: ReactIntl.FormattedMessage.MessageDescriptor
+  previewTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  reviewName: ReactIntl.FormattedMessage.MessageDescriptor
+  reviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
+  reviewName: {
+    id: 'review.form.section.review.name',
+    defaultMessage: 'Review',
+    description: 'Form section name for Review'
+  },
+  reviewTitle: {
+    id: 'review.form.section.review.title',
+    defaultMessage: 'Review',
+    description: 'Form section title for Review'
+  },
+  previewName: {
+    id: 'register.form.section.preview.name',
+    defaultMessage: 'Preview',
+    description: 'Form section name for Preview'
+  },
+  previewTitle: {
+    id: 'register.form.section.preview.title',
+    defaultMessage: 'Preview',
+    description: 'Form section title for Preview'
+  },
   reviewActionTitle: {
     id: 'review.actions.title.applicationStatus',
     defaultMessage:

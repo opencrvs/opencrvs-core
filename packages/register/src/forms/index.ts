@@ -1,5 +1,5 @@
 import { Validation, ValidationInitializer } from '@register/utils/validate'
-import { FormattedMessage, defineMessages } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
@@ -9,7 +9,6 @@ import {
 } from '@opencrvs/components/lib/forms'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 export const TEXT = 'TEXT'
@@ -35,16 +34,6 @@ export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const SEARCH_FIELD = 'SEARCH_FIELD'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  otherOption: {
-    id: 'form.field.label.otherOption',
-    defaultMessage: 'Other',
-    description: 'Other option for select'
-  }
-})
 
 export enum Event {
   BIRTH = 'birth',

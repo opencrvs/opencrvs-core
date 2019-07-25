@@ -619,7 +619,8 @@ export const ENGLISH_STATE: ILanguage = {
       'Do they have a signed affidavit?',
     'form.field.label.print.warningNotVerified':
       'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
-    'form.field.label.print.whoToCollect': 'Who is collecting the certificate?',
+    'print.certificate.collector.whoToCollect':
+      'Who is collecting the certificate?',
     'form.field.label.privateHome': 'Private Home',
     'form.field.label.proofOfBirthPlaceAndDate':
       'Proof of Place and Date of Birth of Child',
@@ -776,45 +777,45 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.required': 'This field is required',
     'register.form.reviewEventRegistration':
       '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Registration Review',
-    'register.form.section.applicant.name': 'Applicant',
-    'register.form.section.applicant.title': "Applicant's details",
-    'register.form.section.application.name': 'Application',
-    'register.form.section.application.title': 'Application',
-    'register.form.section.causeOfDeath.name': 'Cause of Death',
-    'register.form.section.causeOfDeath.title': 'Cause of Death',
-    'register.form.section.causeOfDeathNotice':
+    'form.section.applicant.name': 'Applicant',
+    'form.section.applicant.title': "Applicant's details",
+    'form.section.application.name': 'Application',
+    'form.section.application.title': 'Application',
+    'form.section.causeOfDeath.name': 'Cause of Death',
+    'form.section.causeOfDeath.title': 'Cause of Death',
+    'form.section.causeOfDeathNotice':
       'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
-    'register.form.section.child.name': 'Child',
-    'register.form.section.child.title': "Child's details",
-    'register.form.section.deathEvent.name': 'Event',
-    'register.form.section.deathEvent.title': 'Event details',
-    'register.form.section.deceased.name': 'Deceased',
-    'register.form.section.deceased.title': "Deceased's details",
-    'register.form.section.documents.birth.requirements':
+    'birth.form.section.child.name': 'Child',
+    'birth.form.section.child.title': "Child's details",
+    'form.section.deathEvent.name': 'Event',
+    'form.section.deathEvent.title': 'Event details',
+    'form.section.deceased.name': 'Deceased',
+    'form.section.deceased.title': "Deceased's details",
+    'form.section.documents.birth.requirements':
       'For birth registration of children below 5 years old, one of the documents listed below is required:',
-    'register.form.section.documents.list.attestedBirthRecord':
+    'form.section.documents.list.attestedBirthRecord':
       'Attested copy of hospital document or birth record, or',
-    'register.form.section.documents.list.attestedVaccination':
+    'form.section.documents.list.attestedVaccination':
       'Attested copy of the vaccination (EPI) card, or',
-    'register.form.section.documents.list.certification':
+    'form.section.documents.list.certification':
       'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
-    'register.form.section.documents.list.informantAttestation':
+    'form.section.documents.list.informantAttestation':
       'Attestation of the informant, or',
-    'register.form.section.documents.list.otherDocuments':
+    'form.section.documents.list.otherDocuments':
       'Attested copy(s) of the document as prescribed by the Registrar',
-    'register.form.section.documents.name': 'Documents',
-    'register.form.section.documents.title': 'Supporting documents',
-    'register.form.section.documents.uploadImage':
+    'form.section.documents.name': 'Documents',
+    'form.section.documents.title': 'Supporting documents',
+    'form.section.documents.uploadImage':
       'Upload a photo of the supporting document',
-    'register.form.section.father.name': 'Father',
-    'register.form.section.father.title': "Father's details",
-    'register.form.section.mother.name': 'Mother',
-    'register.form.section.mother.title': "Mother's details",
+    'form.section.father.name': 'Father',
+    'form.section.father.title': "Father's details",
+    'form.section.mother.name': 'Mother',
+    'form.section.mother.title': "Mother's details",
     'register.form.section.preview.name': 'Preview',
     'register.form.section.preview.title': 'Preview',
     'register.form.section.review.title': 'Review',
-    'register.form.section.upload.documentsName': 'Documents Upload',
-    'register.form.section.upload.documentsTitle': 'Supporting documents',
+    'form.section.upload.documentsName': 'Documents Upload',
+    'form.section.upload.documentsTitle': 'Supporting documents',
     'home.header.helpTitle': 'Help',
     'home.header.localSystemAdmin': 'Sysadmin',
     'home.header.placeHolderBrnDrn': 'Enter BRN/DRN',
@@ -824,7 +825,7 @@ export const ENGLISH_STATE: ILanguage = {
     'home.header.systemTitle': 'System',
     'home.header.typeBrnDrn': 'BRN/DRN',
     'home.header.typePhone': 'Phone No.',
-    'register.noLabel': ' ',
+    'print.certificate.noLabel': ' ',
     'notification.declarationsSynced':
       'As you have connectivity, we have synced {syncCount} new birth applications.',
     'notification.draftsSaved': 'Your draft has been saved',
@@ -901,7 +902,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.SearchResult.title': 'Search',
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
-    'register.select.placeholder': 'Select...',
+    'form.field.select.placeholder': 'Select...',
     'register.SelectContactPoint.birthRelationshipLabel':
       'RelationShip to child',
     'register.SelectContactPoint.error':
@@ -982,7 +983,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.edit.modal.preview': 'Back to Preview',
     'review.error.unauthorized': 'We are unable to display this page to you',
     'review.form.section.review.title': 'Review',
-    'review.form.tabs.review.name': 'Review',
+    'review.form.section.review.name': 'Review',
     'review.header.subject.subjectWithoutName':
       '{eventType, select, birth {Birth} death {Death}} Application',
     'review.header.subject.subjectWitName':

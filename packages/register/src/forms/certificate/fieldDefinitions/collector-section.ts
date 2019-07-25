@@ -9,144 +9,47 @@ import {
   PARAGRAPH,
   FIELD_WITH_DYNAMIC_DEFINITIONS
 } from '@register/forms'
-import { defineMessages } from 'react-intl'
 import { conditionals } from '@register/forms/utils'
 import {
-  messages as identityMessages,
   identityTypeMapper,
   identityNameMapper
 } from '@register/forms/identity'
 import { validIDNumber } from '@register/utils/validate'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  certificateCollectionTitle: {
-    id: 'print.certificate.section.title',
-    defaultMessage: 'Certificate Collection',
-    description: 'The title of print certificate action'
-  },
-  printCertificate: {
-    id: 'print.certificate.form.name',
-    defaultMessage: 'Print',
-    description: 'The title of review button in list expansion actions'
-  },
-  print: {
-    id: 'print.certificate.form.title',
-    defaultMessage: 'Print certificate',
-    description: 'The title of review button in list expansion actions'
-  },
-  whoToCollect: {
-    id: 'form.field.label.print.whoToCollect',
-    defaultMessage: 'Who is collecting the certificate?',
-    description: 'The label for collector of certificate select'
-  },
-  informant: {
-    id: 'print.certificate.collector.informant',
-    defaultMessage: 'Informant',
-    description:
-      'The label for select value when informant is the collector of certificate'
-  },
-  mother: {
-    id: 'print.certificate.collector.mother',
-    defaultMessage: 'Mother',
-    description:
-      'The label for select value when mother is the collector of certificate'
-  },
-  father: {
-    id: 'print.certificate.collector.father',
-    defaultMessage: 'Father',
-    description:
-      'The label for select value when father is the collector of certificate'
-  },
-  other: {
-    id: 'print.certificate.collector.other',
-    defaultMessage: 'Other',
-    description:
-      'The label for select value when the collector of certificate is other person'
-  },
-  confirmMotherDetails: {
-    id: 'form.field.label.print.confirmMotherInformation',
-    defaultMessage:
-      'Does their proof of ID document match the following details?',
-    description: 'The label for mother details paragraph'
-  },
-  confirm: {
-    id: 'form.field.label.confirm',
-    defaultMessage: 'Yes',
-    description: 'confirmation label for yes / no radio button'
-  },
-  deny: {
-    id: 'form.field.label.deny',
-    defaultMessage: 'No',
-    description: 'deny label for yes / no radio button'
-  },
-  givenNames: {
-    id: 'form.field.label.print.otherPersonGivenNames',
-    defaultMessage: 'Given name',
-    description: 'Label for given name text input'
-  },
-  familyName: {
-    id: 'form.field.label.print.otherPersonFamilyName',
-    defaultMessage: 'Family name',
-    description: 'Label for family name text input'
-  },
-  signedAffidavitConfirmation: {
-    id: 'form.field.label.print.signedAffidavit',
-    defaultMessage: 'Do they have a signed affidavit?',
-    description: 'Label for signed affidavit confirmation radio group'
-  },
-  documentNumber: {
-    id: 'form.field.label.print.documentNumber',
-    defaultMessage: 'Document number',
-    description: 'Label for document number input field'
-  },
-  warningNotVerified: {
-    id: 'form.field.label.print.warningNotVerified',
-    defaultMessage:
-      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
-    description: 'Label for warning message when the collector is not verified'
-  },
-  prompt: {
-    id: 'form.field.label.print.otherPersonPrompt',
-    defaultMessage:
-      'Because there are no details of this person on record, we need to capture their details:',
-    description: 'Labal for prompt in case of other person collects certificate'
-  }
-})
+import { formMessages as messages } from '@register/i18n/messages'
+import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 
 export const fatherDataExists: IFormField = {
   name: 'personCollectingCertificate',
   type: SELECT_WITH_OPTIONS,
-  label: messages.whoToCollect,
+  label: certificateMessages.whoToCollect,
   required: true,
   initialValue: '',
   validate: [],
   options: [
-    { value: 'MOTHER', label: messages.mother },
-    { value: 'FATHER', label: messages.father },
-    { value: 'OTHER', label: messages.other }
+    { value: 'MOTHER', label: certificateMessages.mother },
+    { value: 'FATHER', label: certificateMessages.father },
+    { value: 'OTHER', label: certificateMessages.other }
   ]
 }
 
 export const fatherDataDoesNotExist: IFormField = {
   name: 'personCollectingCertificate',
   type: SELECT_WITH_OPTIONS,
-  label: messages.whoToCollect,
+  label: certificateMessages.whoToCollect,
   required: true,
   initialValue: '',
   validate: [],
   options: [
-    { value: 'MOTHER', label: messages.mother },
-    { value: 'OTHER', label: messages.other }
+    { value: 'MOTHER', label: certificateMessages.mother },
+    { value: 'OTHER', label: certificateMessages.other }
   ]
 }
 
 export const collectBirthCertificateFormSection: IFormSection = {
   id: 'collectCertificate',
   viewType: 'form',
-  name: messages.printCertificate,
-  title: messages.certificateCollectionTitle,
+  name: certificateMessages.printCertificate,
+  title: certificateMessages.certificateCollectionTitle,
   groups: [
     {
       id: 'collect-certificate-view-group',
@@ -192,30 +95,30 @@ export const collectBirthCertificateFormSection: IFormSection = {
         {
           name: 'otherPersonIDType',
           type: SELECT_WITH_OPTIONS,
-          label: identityMessages.iDType,
+          label: messages.iDType,
           required: true,
           initialValue: '',
           validate: [],
           options: [
-            { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-            { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
+            { value: 'PASSPORT', label: messages.iDTypePassport },
+            { value: 'NATIONAL_ID', label: messages.iDTypeNationalID },
             {
               value: 'DRIVING_LICENSE',
-              label: identityMessages.iDTypeDrivingLicense
+              label: messages.iDTypeDrivingLicense
             },
             {
               value: 'BIRTH_REGISTRATION_NUMBER',
-              label: identityMessages.iDTypeBRN
+              label: messages.iDTypeBRN
             },
             {
               value: 'DEATH_REGISTRATION_NUMBER',
-              label: identityMessages.iDTypeDRN
+              label: messages.iDTypeDRN
             },
             {
               value: 'REFUGEE_NUMBER',
-              label: identityMessages.iDTypeRefugeeNumber
+              label: messages.iDTypeRefugeeNumber
             },
-            { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+            { value: 'ALIEN_NUMBER', label: messages.iDTypeAlienNumber }
           ],
           conditionals: [conditionals.otherPersonCollectsCertificate]
         },
@@ -292,8 +195,8 @@ export const collectBirthCertificateFormSection: IFormSection = {
 export const collectDeathCertificateFormSection: IFormSection = {
   id: 'collectDeathCertificate',
   viewType: 'form',
-  name: messages.printCertificate,
-  title: messages.certificateCollectionTitle,
+  name: certificateMessages.printCertificate,
+  title: certificateMessages.certificateCollectionTitle,
   groups: [
     {
       id: 'collect-death-certificate-view-group',
@@ -301,13 +204,13 @@ export const collectDeathCertificateFormSection: IFormSection = {
         {
           name: 'personCollectingCertificate',
           type: SELECT_WITH_OPTIONS,
-          label: messages.whoToCollect,
+          label: certificateMessages.whoToCollect,
           required: true,
           initialValue: '',
           validate: [],
           options: [
-            { value: 'INFORMANT', label: messages.informant },
-            { value: 'OTHER', label: messages.other }
+            { value: 'INFORMANT', label: certificateMessages.informant },
+            { value: 'OTHER', label: certificateMessages.other }
           ]
         },
         {
@@ -336,30 +239,30 @@ export const collectDeathCertificateFormSection: IFormSection = {
         {
           name: 'otherPersonIDType',
           type: SELECT_WITH_OPTIONS,
-          label: identityMessages.iDType,
+          label: messages.iDType,
           required: true,
           initialValue: '',
           validate: [],
           options: [
-            { value: 'PASSPORT', label: identityMessages.iDTypePassport },
-            { value: 'NATIONAL_ID', label: identityMessages.iDTypeNationalID },
+            { value: 'PASSPORT', label: messages.iDTypePassport },
+            { value: 'NATIONAL_ID', label: messages.iDTypeNationalID },
             {
               value: 'DRIVING_LICENSE',
-              label: identityMessages.iDTypeDrivingLicense
+              label: messages.iDTypeDrivingLicense
             },
             {
               value: 'BIRTH_REGISTRATION_NUMBER',
-              label: identityMessages.iDTypeBRN
+              label: messages.iDTypeBRN
             },
             {
               value: 'DEATH_REGISTRATION_NUMBER',
-              label: identityMessages.iDTypeDRN
+              label: messages.iDTypeDRN
             },
             {
               value: 'REFUGEE_NUMBER',
-              label: identityMessages.iDTypeRefugeeNumber
+              label: messages.iDTypeRefugeeNumber
             },
-            { value: 'ALIEN_NUMBER', label: identityMessages.iDTypeAlienNumber }
+            { value: 'ALIEN_NUMBER', label: messages.iDTypeAlienNumber }
           ],
           conditionals: [conditionals.otherPersonCollectsCertificate]
         },

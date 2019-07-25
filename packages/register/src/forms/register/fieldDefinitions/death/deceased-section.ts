@@ -11,7 +11,7 @@ import {
   FETCH_BUTTON,
   TEL
 } from '@register/forms'
-import { defineMessages } from 'react-intl'
+import { formMessages as messages } from '@register/i18n/messages'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
@@ -21,16 +21,11 @@ import {
   maxLength
 } from '@register/utils/validate'
 import { countries } from '@register/forms/countries'
-
 import {
-  messages as identityMessages,
   identityNameMapper,
   identityTypeMapper,
   deathIdentityOptions
 } from '@register/forms/identity'
-import { messages as maritalStatusMessages } from '@register/forms/maritalStatus'
-import { messages as addressMessages } from '@register/forms/address'
-
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import { conditionals } from '@register/forms/utils'
 import {
@@ -56,146 +51,10 @@ import {
   transformPersonData
 } from '@opencrvs/register/src/forms/register/queries/person'
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  deceasedTab: {
-    id: 'register.form.section.deceased.name',
-    defaultMessage: 'Deceased',
-    description: 'Form section name for Deceased'
-  },
-  deceasedTitle: {
-    id: 'register.form.section.deceased.title',
-    defaultMessage: 'What are the deceased details?',
-    description: 'Form section title for Deceased'
-  },
-  deceasedIdType: {
-    id: 'form.field.label.deceasedIdType',
-    defaultMessage: 'Type of ID',
-    description: 'Label for form field: Existing ID'
-  },
-  fetchDeceasedDetails: {
-    id: 'form.field.label.fetchDeceasedDetails',
-    defaultMessage: "Retrieve Deceased's Details",
-    description: 'Label for loader button'
-  },
-  fetchIdentifierModalTitle: {
-    id: 'form.field.label.fetchIdentifierModalTitle',
-    defaultMessage: 'Checking',
-    description: 'Label for fetch modal title'
-  },
-  fetchIdentifierModalSuccessTitle: {
-    id: 'form.field.label.fetchIdentifierModalSuccessTitle',
-    defaultMessage: 'ID valid',
-    description: 'Label for fetch modal success title'
-  },
-  fetchIdentifierModalErrorTitle: {
-    id: 'form.field.label.fetchIdentifierModalErrorTitle',
-    defaultMessage: 'Invalid Id',
-    description: 'Label for fetch modal error title'
-  },
-  fetchRegistrationModalErrorText: {
-    id: 'form.field.label.fetchRegistrationModalErrorText',
-    defaultMessage: 'No registration found for provided BRN',
-    description: 'Label for fetch modal error title'
-  },
-  fetchPersonByNIDModalErrorText: {
-    id: 'form.field.label.fetchPersonByNIDModalErrorText',
-    defaultMessage: 'No person found for provided NID',
-    description: 'Label for fetch modal error title'
-  },
-  fetchRegistrationModalInfo: {
-    id: 'form.field.label.fetchRegistrationModalInfo',
-    defaultMessage: 'Birth Registration Number',
-    description: 'Label for loader button'
-  },
-  fetchPersonByNIDModalInfo: {
-    id: 'form.field.label.fetchPersonByNIDModalInfo',
-    defaultMessage: 'National ID',
-    description: 'Label for loader button'
-  },
-  deceasedGivenNames: {
-    id: 'form.field.label.deceasedGivenNames',
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: Given names'
-  },
-  deceasedFamilyName: {
-    id: 'form.field.label.deceasedFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
-  },
-  deceasedGivenNamesEng: {
-    id: 'form.field.label.deceasedGivenNamesEng',
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: Given names in english'
-  },
-  deceasedFamilyNameEng: {
-    id: 'form.field.label.deceasedFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
-  },
-  nationality: {
-    id: 'form.field.label.deceased.nationality',
-    defaultMessage: 'Nationality',
-    description: 'Label for form field: Nationality'
-  },
-  deceasedSex: {
-    id: 'form.field.label.deceasedSex',
-    defaultMessage: 'Sex',
-    description: 'Label for form field: Sex name'
-  },
-  deceasedSexMale: {
-    id: 'form.field.label.deceasedSexMale',
-    defaultMessage: 'Male',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexFemale: {
-    id: 'form.field.label.deceasedSexFemale',
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexOther: {
-    id: 'form.field.label.deceasedSexOther',
-    defaultMessage: 'Other',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexUnknown: {
-    id: 'form.field.label.deceasedSexUnknown',
-    defaultMessage: 'Unknown',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedDateOfBirth: {
-    id: 'form.field.label.deceasedDateOfBirth',
-    defaultMessage: 'Date of Birth',
-    description: 'Label for form field: Date of birth'
-  },
-  currentAddressSameAsPermanent: {
-    id: 'form.field.label.deceasedCurrentAddressSameAsPermanent',
-    defaultMessage:
-      'Is deceased’s current address the same as their permanent address?',
-    description:
-      'Title for the radio button to select that the deceased current address is the same as their permanent address'
-  },
-  currentAddress: {
-    id: 'form.field.label.currentAddress',
-    defaultMessage: 'Current Address',
-    description: 'Title for the current address fields'
-  },
-  permanentAddress: {
-    id: 'form.field.label.permanentAddress',
-    defaultMessage: 'What was their permanent address?',
-    description: 'Title for the permanent address fields'
-  },
-  select: {
-    id: 'register.select.placeholder',
-    defaultMessage: 'Select'
-  }
-})
-
 export const deceasedSection: IFormSection = {
   id: 'deceased',
   viewType: 'form' as ViewType,
-  name: messages.deceasedTab,
+  name: messages.deceasedName,
   title: messages.deceasedTitle,
   hasDocumentSection: true,
   groups: [
@@ -219,7 +78,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'iDTypeOther',
           type: TEXT,
-          label: identityMessages.iDTypeOtherLabel,
+          label: messages.iDTypeOtherLabel,
           required: true,
           initialValue: '',
           validate: [],
@@ -249,7 +108,7 @@ export const deceasedSection: IFormSection = {
               }
             ]
           },
-          label: identityMessages.iD,
+          label: messages.iD,
           required: true,
           initialValue: '',
           validate: [],
@@ -388,7 +247,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'maritalStatus',
           type: SELECT_WITH_OPTIONS,
-          label: maritalStatusMessages.maritalStatus,
+          label: messages.maritalStatus,
           required: false,
           initialValue: 'MARRIED',
           validate: [],
@@ -396,23 +255,23 @@ export const deceasedSection: IFormSection = {
           options: [
             {
               value: 'SINGLE',
-              label: maritalStatusMessages.maritalStatusSingle
+              label: messages.maritalStatusSingle
             },
             {
               value: 'MARRIED',
-              label: maritalStatusMessages.maritalStatusMarried
+              label: messages.maritalStatusMarried
             },
             {
               value: 'WIDOWED',
-              label: maritalStatusMessages.maritalStatusWidowed
+              label: messages.maritalStatusWidowed
             },
             {
               value: 'DIVORCED',
-              label: maritalStatusMessages.maritalStatusDivorced
+              label: messages.maritalStatusDivorced
             },
             {
               value: 'NOT_STATED',
-              label: maritalStatusMessages.maritalStatusNotStated
+              label: messages.maritalStatusNotStated
             }
           ]
         },
@@ -426,7 +285,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'countryPermanent',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: messages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -439,7 +298,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'statePermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: messages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -457,7 +316,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'districtPermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: messages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -478,7 +337,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine4Permanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: messages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -500,7 +359,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine3Permanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: messages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -524,7 +383,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine3CityOptionPermanent',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: messages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -543,7 +402,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine2Permanent',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: messages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -562,7 +421,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine1CityOptionPermanent',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -581,7 +440,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'postCodeCityOptionPermanent',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],
@@ -600,7 +459,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine1Permanent',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -619,7 +478,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'postCodePermanent',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],
@@ -638,13 +497,13 @@ export const deceasedSection: IFormSection = {
         {
           name: 'currentAddressSameAsPermanent',
           type: RADIO_GROUP,
-          label: messages.currentAddressSameAsPermanent,
+          label: messages.deceasedCurrentAddressSameAsPermanent,
           required: true,
           initialValue: true,
           validate: [],
           options: [
-            { value: true, label: addressMessages.confirm },
-            { value: false, label: addressMessages.deny }
+            { value: true, label: messages.confirm },
+            { value: false, label: messages.deny }
           ],
           conditionals: [],
           mapping: {
@@ -665,7 +524,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'country',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: messages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -680,7 +539,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'state',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: messages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -701,7 +560,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'district',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: messages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -723,7 +582,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine4',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: messages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -746,7 +605,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine3',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: messages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -771,7 +630,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine3CityOption',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: messages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -791,7 +650,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine2',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: messages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -811,7 +670,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine1CityOption',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -831,7 +690,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'postCodeCityOption',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],
@@ -851,7 +710,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'addressLine1',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -871,7 +730,7 @@ export const deceasedSection: IFormSection = {
         {
           name: 'postCode',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],

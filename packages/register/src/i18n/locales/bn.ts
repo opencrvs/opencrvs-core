@@ -619,7 +619,7 @@ export const BENGALI_STATE: ILanguage = {
       'তার কি একটি স্বাক্ষরিত হলফনামা আছে?',
     'form.field.label.print.warningNotVerified':
       'দয়া করে সতর্ক থাকুন। আপনি যদি আরো অগ্রসর হন তবে সংগ্রাহক থেকে প্রয়োজনীয় প্রমাণক ছাড়াই আপনি একটি সার্টিফিকেট দেওয়ার জন্য দায়বদ্ধ হবেন।',
-    'form.field.label.print.whoToCollect': 'সার্টিফিকেটটি কে সংগ্রহ করছে?',
+    'print.certificate.collector.whoToCollect': 'সার্টিফিকেটটি কে সংগ্রহ করছে?',
     'form.field.label.privateHome': 'ব্যক্তিগত বাসস্থান',
     'form.field.label.proofOfBirthPlaceAndDate':
       'জন্ম স্থান এবং জন্ম তারিখ প্রমাণ',
@@ -773,45 +773,44 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.reviewEventRegistration':
       ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} আবেদনপত্র পর্যালোচনা',
     'register.form.saveAsDraft': 'Save as draft',
-    'register.form.section.applicant.name': 'আবেদনকারী',
-    'register.form.section.applicant.title': 'আবেদনকারীর বিবরণ',
-    'register.form.section.application.name': 'নিবন্ধন',
-    'register.form.section.application.title': 'নিবন্ধন',
-    'register.form.section.causeOfDeath.name': 'মৃত্যুর কারণ',
-    'register.form.section.causeOfDeath.title': 'মৃত্যুর কারণ',
-    'register.form.section.causeOfDeathNotice':
+    'form.section.applicant.name': 'আবেদনকারী',
+    'form.section.applicant.title': 'আবেদনকারীর বিবরণ',
+    'form.section.application.name': 'নিবন্ধন',
+    'form.section.application.title': 'নিবন্ধন',
+    'form.section.causeOfDeath.name': 'মৃত্যুর কারণ',
+    'form.section.causeOfDeath.title': 'মৃত্যুর কারণ',
+    'form.section.causeOfDeathNotice':
       'আবেদন জমা দেয়ার জন্য মৃত্যুর আনুষ্ঠানিক কারণ বাধ্যতামূলক নয়। মৃত্যুর কারণ পরবর্তী তারিখে জমা দেয়া যেতে পারে।',
-    'register.form.section.child.name': 'শিশু',
-    'register.form.section.child.title': 'শিশুর বিবরণ',
-    'register.form.section.deathEvent.name': 'ঘটনা',
-    'register.form.section.deathEvent.title': 'ঘটনার বিবরন',
-    'register.form.section.deceased.name': 'মৃত',
-    'register.form.section.deceased.title': 'মৃতের বিবরণ',
-    'register.form.section.documents.birth.requirements':
+    'birth.form.section.child.name': 'শিশু',
+    'birth.form.section.child.title': 'শিশুর বিবরণ',
+    'form.section.deathEvent.name': 'ঘটনা',
+    'form.section.deathEvent.title': 'ঘটনার বিবরন',
+    'form.section.deceased.name': 'মৃত',
+    'form.section.deceased.title': 'মৃতের বিবরণ',
+    'form.section.documents.birth.requirements':
       'নিম্নে উল্লেখিত কাগজ পত্রাদি ৫ বছরের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
-    'register.form.section.documents.list.attestedBirthRecord':
+    'form.section.documents.list.attestedBirthRecord':
       'হাসপাতালের ডকুমেন্টের সত্যায়িত  অনুলিপি অথবা জন্ম রেকর্ড অথবা',
-    'register.form.section.documents.list.attestedVaccination':
+    'form.section.documents.list.attestedVaccination':
       'ইপিআই কার্ডের সত্যায়িত অনুলিপি',
-    'register.form.section.documents.list.certification':
-      'অনুমোদিত জন্ম রেজিস্টার',
-    'register.form.section.documents.list.informantAttestation':
+    'form.section.documents.list.certification': 'অনুমোদিত জন্ম রেজিস্টার',
+    'form.section.documents.list.informantAttestation':
       'তথ্যপ্রদানকারীর সত্যায়িত পরিচয় পত্র অথবা,',
-    'register.form.section.documents.list.otherDocuments':
+    'form.section.documents.list.otherDocuments':
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি',
-    'register.form.section.documents.name': 'কাগজপত্রাদি',
-    'register.form.section.documents.title': 'প্রমানক',
-    'register.form.section.documents.uploadImage':
+    'form.section.documents.name': 'কাগজপত্রাদি',
+    'form.section.documents.title': 'প্রমানক',
+    'form.section.documents.uploadImage':
       'প্রমাণক ডকুমেন্টের একটি ছবি আপলোড করুন',
-    'register.form.section.father.name': 'পিতা',
-    'register.form.section.father.title': "পিতা'র বিবরণ",
-    'register.form.section.mother.name': 'মা',
-    'register.form.section.mother.title': "মা'র বিবরণ",
+    'form.section.father.name': 'পিতা',
+    'form.section.father.title': "পিতা'র বিবরণ",
+    'form.section.mother.name': 'মা',
+    'form.section.mother.title': "মা'র বিবরণ",
     'register.form.section.preview.name': 'প্রিভিউ',
     'register.form.section.preview.title': 'প্রিভিউ',
     'register.form.section.review.title': 'পর্যালোচনা',
-    'register.form.section.upload.documentsName': 'ডকুমেন্ট আপলোড',
-    'register.form.section.upload.documentsTitle': 'প্রমাণক ডকুমেন্ট',
+    'form.section.upload.documentsName': 'ডকুমেন্ট আপলোড',
+    'form.section.upload.documentsTitle': 'প্রমাণক ডকুমেন্ট',
     'home.header.helpTitle': 'সাহায্য',
     'home.header.localSystemAdmin': 'সিস এডমিন ',
     'home.header.placeHolderBrnDrn': 'বিআরএন/ডিআরএন প্রবেশ করান',
@@ -821,7 +820,7 @@ export const BENGALI_STATE: ILanguage = {
     'home.header.systemTitle': 'সিস্টেম',
     'home.header.typeBrnDrn': 'বিআরএন/ডিআরএন',
     'home.header.typePhone': 'ফোন নম্বর',
-    'register.noLabel': ' ',
+    'print.certificate.noLabel': ' ',
     'notification.declarationsSynced':
       'ইন্টারনেট সংযোগ ফিরে আসায় আমরা {syncCount} টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি',
     'notification.draftsSaved': 'আপনার খসড়া সংরক্ষণ করা হয়েছে',
@@ -900,7 +899,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.SearchResult.title': 'অনুসন্ধান',
     'register.SearchResult.totalResultText':
       '{total, plural, =0 {} one {#টি ফলাফল পাওয়া গেছে} other {#টি ফলাফল পাওয়া গেছে}} ',
-    'register.select.placeholder': 'নির্বাচন করুন...',
+    'form.field.select.placeholder': 'নির্বাচন করুন...',
     'register.SelectContactPoint.birthRelationshipLabel': 'শিশুর সাথে সম্পর্ক',
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
@@ -978,7 +977,7 @@ export const BENGALI_STATE: ILanguage = {
     'review.edit.modal.preview': 'প্রিভিউতে ফেরত যান',
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'review.form.section.review.title': 'পর্যালোচনা',
-    'review.form.tabs.review.name': 'পর্যালোচনা',
+    'review.form.section.review.name': 'পর্যালোচনা',
     'review.header.subject.subjectWithoutName':
       '{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
     'review.header.subject.subjectWitName':
