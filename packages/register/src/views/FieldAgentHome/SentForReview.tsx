@@ -21,7 +21,6 @@ import {
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
-import styled from '@register/styledComponents'
 import { goToApplicationDetails } from '@register/navigation'
 
 const APPLICATIONS_DAY_LIMIT = 7

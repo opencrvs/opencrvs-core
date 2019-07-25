@@ -1,6 +1,7 @@
 enum RegStatus {
   IN_PROGRESS
   DECLARED
+  VALIDATED
   REGISTERED
   CERTIFIED
   REJECTED
@@ -66,7 +67,12 @@ enum AttachmentType {
   FUNERAL_RECEIPT
   DOCTOR_CERTIFICATE
   EPI_CARD
+  EPI_STAFF_CERTIFICATE
   BIRTH_PLACE_DATE_PROOF
+  DISCHARGE_CERTIFICATE
+  MEDICAL_INSTITUTION
+  BIRTH_ATTENDANT
+  TAX_RECEIPT
 }
 
 enum AttachmentSubject {
@@ -74,6 +80,8 @@ enum AttachmentSubject {
   FATHER
   CHILD
   OTHER
+  PARENT
+  CHILDAGE
   DECEASED_ID_PROOF
   DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
@@ -338,6 +346,10 @@ type EventRegResultSet {
   totalItems: Int
 }
 
+type EventRegCount {
+  count: Int
+}
+
 type RegistrationCount {
   declared: Int
   rejected: Int
@@ -381,6 +393,10 @@ type Query {
     count: Int
     skip: Int
   ): EventRegResultSet
+  countEventRegistrationsByStatus(
+    locationIds: [String]
+    status: String
+  ): EventRegCount
   countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
 }
@@ -394,6 +410,7 @@ type Mutation {
     id: ID!
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration - internally call update if details exists
+  markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
@@ -406,6 +423,7 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput
   ): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
+  markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
 }

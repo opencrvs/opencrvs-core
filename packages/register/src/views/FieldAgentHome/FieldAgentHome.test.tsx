@@ -17,7 +17,7 @@ import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { createStore } from '@register/store'
 import { checkAuth } from '@register/profile/profileActions'
-import { EVENT_STATUS } from '@register/views/RegistrarHome/RegistrarHome'
+import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
@@ -50,7 +50,7 @@ const countQueryGraphqlMock = {
     query: COUNT_USER_WISE_APPLICATIONS,
     variables: {
       userId: nameObj.data.getUser.practitionerId,
-      status: EVENT_STATUS.REJECTED,
+      status: [EVENT_STATUS.REJECTED],
       locationIds: ['123456789']
     }
   },
@@ -106,7 +106,7 @@ describe('FieldAgentHome tests', () => {
         request: {
           query: COUNT_USER_WISE_APPLICATIONS,
           variables: {
-            status: EVENT_STATUS.REJECTED,
+            status: [EVENT_STATUS.REJECTED],
             locationIds: ['123456789']
           }
         },
@@ -209,7 +209,7 @@ describe('FieldAgentHome tests', () => {
         query: SEARCH_APPLICATIONS_USER_WISE,
         variables: {
           userId: nameObj.data.getUser.practitionerId,
-          status: EVENT_STATUS.REJECTED,
+          status: [EVENT_STATUS.REJECTED],
           locationIds: ['123456789'],
           count: 10,
           skip: 0
@@ -290,7 +290,7 @@ describe('FieldAgentHome tests', () => {
         query: SEARCH_APPLICATIONS_USER_WISE,
         variables: {
           userId: nameObj.data.getUser.practitionerId,
-          status: EVENT_STATUS.REJECTED,
+          status: [EVENT_STATUS.REJECTED],
           locationIds: ['123456789'],
           count: 10,
           skip: 0

@@ -1,30 +1,14 @@
 import * as React from 'react'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
-  withFormik,
-  FastField,
-  Field,
-  FormikProps,
-  FieldProps,
-  FormikTouched,
-  FormikValues
-} from 'formik'
-import { isEqual } from 'lodash'
-import {
-  InjectedIntlProps,
-  injectIntl,
-  FormattedHTMLMessage,
-  FormattedMessage,
-  MessageValue
-} from 'react-intl'
-import {
-  TextInput,
-  Select,
-  RadioGroup,
   CheckboxGroup,
   DateField,
+  PDFViewer,
+  RadioGroup,
+  Select,
   TextArea,
-  WarningMessage,
-  PDFViewer
+  TextInput,
+  WarningMessage
 } from '@opencrvs/components/lib/forms'
 import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
@@ -38,33 +22,35 @@ import {
 } from '@register/forms/utils'
 
 import styled, { keyframes } from '@register/styledComponents'
-
+import { gqlToDraftTransformer } from '@register/transformer'
 import {
-  IFormField,
-  Ii18nFormField,
-  IFormSectionData,
-  IFormFieldValue,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
   DATE,
+  DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
-  NUMBER,
-  SUBSECTION,
-  LIST,
-  PARAGRAPH,
-  IMAGE_UPLOADER_WITH_OPTIONS,
-  IFileValue,
   TEL,
-  INFORMATIVE_RADIO_GROUP,
+  SUBSECTION,
   WARNING,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IDynamicFormField,
+  IFileValue,
+  IForm,
+  IFormField,
+  IFormFieldValue,
+  IFormSection,
+  IFormSectionData,
+  Ii18nFormField,
+  INFORMATIVE_RADIO_GROUP,
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
   ITextFormField,
-  IDynamicFormField,
   LINK,
+  LIST,
+  NUMBER,
+  PARAGRAPH,
   PDF_DOCUMENT_VIEWER,
   DYNAMIC_LIST,
   IDynamicListFormField,
@@ -72,26 +58,38 @@ import {
   IFormData,
   FETCH_BUTTON,
   ILoaderButton,
-  IForm,
-  IFormSection,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD
 } from '@register/forms'
-
-import { IValidationResult } from '@register/utils/validate'
-import { IOfflineDataState } from '@register/offline/reducer'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { InputField } from '@register/components/form/InputField'
 import { SubSectionDivider } from '@register/components/form/SubSectionDivider'
 
 import { FormList } from '@register/components/form/FormList'
-import { ImageUploadField } from '@register/components/form/ImageUploadField'
 import { FetchButtonField } from '@register/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@register/views/PrintCertificate/InformativeRadioGroup'
-import { gqlToDraftTransformer } from '@register/transformer'
 import { SearchField } from './SearchField'
-import { IDynamicValues } from '@opencrvs/components/lib/common-types'
+import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
+import {
+  InjectedIntlProps,
+  injectIntl,
+  FormattedHTMLMessage,
+  FormattedMessage,
+  MessageValue
+} from 'react-intl'
+import {
+  withFormik,
+  FastField,
+  Field,
+  FormikProps,
+  FieldProps,
+  FormikTouched,
+  FormikValues
+} from 'formik'
+import { IOfflineDataState } from '@register/offline/reducer'
+import { isEqual } from 'lodash'
+import { IValidationResult } from '@register/utils/validate'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -99,8 +97,8 @@ const fadeIn = keyframes`
 `
 
 const FormItem = styled.div`
-  min-height: 6.7em;
   animation: ${fadeIn} 500ms;
+  margin-bottom: 40px;
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -143,6 +141,7 @@ function GeneratedInputField({
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,
+    hideInputHeader: fieldDefinition.hideHeader,
     error,
     touched,
     mode: fieldDefinition.mode
@@ -175,11 +174,26 @@ function GeneratedInputField({
       </InputField>
     )
   }
+  if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
+    return (
+      <DocumentUploaderWithOption
+        name={fieldDefinition.name}
+        label={fieldDefinition.label}
+        options={fieldDefinition.options}
+        files={value as IFileValue[]}
+        extraValue={fieldDefinition.extraValue || ''}
+        onComplete={(files: IFileValue[]) =>
+          onSetFieldValue(fieldDefinition.name, files)
+        }
+      />
+    )
+  }
   if (fieldDefinition.type === RADIO_GROUP) {
     return (
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
+          size={fieldDefinition.size}
           onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)
@@ -187,6 +201,7 @@ function GeneratedInputField({
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
+          notice={fieldDefinition.notice}
         />
       </InputField>
     )
@@ -225,6 +240,8 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <DateField
           {...inputProps}
+          notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
         />
@@ -310,20 +327,6 @@ function GeneratedInputField({
       <PDFViewer
         id={fieldDefinition.name}
         pdfSource={fieldDefinition.initialValue as string}
-      />
-    )
-  }
-
-  if (fieldDefinition.type === IMAGE_UPLOADER_WITH_OPTIONS) {
-    return (
-      <ImageUploadField
-        id={inputProps.id}
-        title={fieldDefinition.label}
-        optionSection={fieldDefinition.optionSection}
-        files={value as IFileValue[]}
-        onComplete={(files: IFileValue[]) =>
-          onSetFieldValue(fieldDefinition.name, files)
-        }
       />
     )
   }
@@ -531,7 +534,12 @@ class FormSectionComponent extends React.Component<Props> {
                   onFetch: response => {
                     const section = {
                       id: this.props.id,
-                      fields: fieldsWithValuesDefined
+                      groups: [
+                        {
+                          id: `${this.props.id}-view-group`,
+                          fields: fieldsWithValuesDefined
+                        }
+                      ]
                     } as IFormSection
 
                     const form = {
@@ -557,7 +565,6 @@ class FormSectionComponent extends React.Component<Props> {
 
           if (
             field.type === PDF_DOCUMENT_VIEWER ||
-            field.type === IMAGE_UPLOADER_WITH_OPTIONS ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS

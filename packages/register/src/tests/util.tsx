@@ -2122,9 +2122,7 @@ export const mockDeathApplicationData = {
   deathEvent: {
     deathDate: '1987-02-16',
     manner: 'ACCIDENT',
-    deathPlace: '',
     deathPlaceAddress: 'OTHER',
-    placeOfDeath: 'OTHER',
     deathLocation: '',
     addressType: '',
     country: 'BGD',

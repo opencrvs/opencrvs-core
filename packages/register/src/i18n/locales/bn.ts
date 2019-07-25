@@ -25,7 +25,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.addressLine3CityOption': 'ওয়ার্ড',
     'formFields.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'formFields.postCode': 'পোস্ট কোড',
-    'formFields.permanentAddress': 'স্থায়ী ঠিকানা',
+    'formFields.permanentAddress': 'তাদের স্থায়ী ঠিকানা কি ছিল?',
     'formFields.confirm': 'হ্যাঁ',
     'formFields.deny': 'না',
     'formFields.addressSameAsMother':
@@ -353,9 +353,9 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.fatherFamilyNameEng': 'পারিবারিক নাম (ইংরেজিতে)',
     'formFields.fatherDateOfBirth': 'জন্ম তারিখ',
     'formFields.fatherEducationAttainment': 'পিতার আনুষ্ঠানিক শিক্ষা',
-    'formFields.currentAddress': 'বর্তমান ঠিকানা',
+    'formFields.currentAddress': 'তাদের বর্তমান ঠিকানা কি?',
     'formFields.currentAddressSameAsPermanent':
-      'তার বর্তমান এবং স্থায়ী বাসস্থান কি একই?',
+      'তাদের বর্তমান এবং স্থায়ী বাসস্থান কি একই?',
     'register.form.tabs.motherTab': 'মা',
     'register.form.section.motherTitle': "মা'র বিবরণ",
     'formFields.mother.nationality': 'জাতীয়তা',
@@ -368,15 +368,23 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.motherEducationAttainment': 'মায়ের আনুষ্ঠানিক শিক্ষা',
     'formFields.optionalLabel': 'ঐচ্ছিক',
     'formFields.hospital': 'হাসপাতাল',
+    'formFields.healthInstitution': 'স্বাস্থ্য সেবা প্রতিষ্ঠান',
     'formFields.otherHealthInstitution': 'অন্যান্য স্বাস্থ্য সেবা প্রতিষ্ঠান',
     'formFields.privateHome': 'ব্যক্তিগত বাসস্থান',
     'formFields.otherInstitution': 'অন্যান্য',
+    'formFields.deathAtFacility': 'কোন হাসপাতালে মৃত্যু ঘটেছে?',
+    'formFields.deathAtPrivateHome': 'বাড়ির ঠিকানা কি?',
+    'formFields.deathAtOtherLocation': 'অন্য কোন ঠিকানা তিনি মারা গিয়েছিলেন?',
     'register.form.tabs.documentsTab': 'কাগজপত্রাদি',
     'register.form.section.documentsTitle': 'প্রমানক',
     'register.form.tabs.previewTab': 'প্রিভিউ',
     'review.form.tabs.reviewTab': 'পর্যালোচনা',
     'register.form.section.documents.paragraph':
-      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৫ বছরের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৪৫ দিনের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+    'register.form.section.documents.paragraph45daysTo5Years':
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৪৫ দিনের অধিক ৫ বছরের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+    'register.form.section.documents.paragraphAbove5Years':
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৫ বছরের অধিক বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
     'register.form.section.documents.list.informantAttestation':
       'তথ্যপ্রদানকারীর সত্যায়িত পরিচয় পত্র অথবা,',
     'register.form.section.documents.list.attestedVaccination':
@@ -414,8 +422,8 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.registration.commentsOrNotes.description':
       'প্রাসঙ্গিক মন্তব্য এই স্থানে যোগ করুন। এই মন্তব্য তথ্যপ্রদানকারীর সঙ্গে আলোচনা করা হবে না।',
     'register.form.tabs.deceasedTab': 'মৃত',
-    'register.form.section.deceasedTitle': 'মৃতের বিবরণ',
-    'formFields.deceasedIdType': 'বিদ্যমান আইডি',
+    'register.form.section.deceasedTitle': 'মৃত ব্যক্তির বিস্তারিত কি?',
+    'formFields.deceasedIdType': 'আইডি টাইপ',
     'formFields.iDTypeNoID': 'আইডি পাওয়া যায় নি',
     'formFields.deceasedGivenNames': 'নামের প্রথমাংশ বাংলায়',
     'formFields.deceasedFamilyName': 'নামের শেষাংশ বাংলায়',
@@ -432,8 +440,10 @@ export const BENGALI_STATE: ILanguage = {
       'মৃত ব্যক্তির স্থায়ী ঠিকানা কি বর্তমান ঠিকানার মত একই?',
     'register.form.tabs.deathEventTab': 'ঘটনা',
     'register.form.section.deathEventTitle': 'ঘটনার বিবরন',
+    'register.form.section.deathEventDateTitle': 'কখন মৃত্যু ঘটেছিল?',
+    'register.form.section.deathEventMannerTitle': 'মৃত্যুর পদ্ধতি কি ছিল?',
     'formFields.deathDate': 'ঘটনার তারিখ',
-    'formFields.manner': 'মৃত্যুর ধরন',
+    'formFields.manner': 'একটি ধরন নির্বাচন করুন',
     'formFields.mannerNatural': 'প্রাকৃতিক কারণ',
     'formFields.mannerAccident': 'দুর্ঘটনা',
     'formFields.mannerSuicide': 'আত্মহত্যা',
@@ -452,6 +462,7 @@ export const BENGALI_STATE: ILanguage = {
       'আবেদন জমা দেয়ার জন্য মৃত্যুর আনুষ্ঠানিক কারণ বাধ্যতামূলক নয়। মৃত্যুর কারণ পরবর্তী তারিখে জমা দেয়া যেতে পারে।',
     'formFields.causeOfDeathEstablished':
       'মৃত্যুর কোন একটি কারণ কি প্রতিষ্ঠিত হয়েছে?',
+    'register.form.section.causeOfDeathSectionTitle': 'মৃত্যুর কারণ কি?',
     'formFields.methodOfCauseOfDeath': 'মৃত্যুর কারণ নির্ণয়ের পদ্ধতি',
     'formFields.causeOfDeathCode': 'মৃত্যুর কারণের কোড',
     'formFields.verbalAutopsy': 'মৌখিক ময়না তদন্ত',
@@ -473,6 +484,7 @@ export const BENGALI_STATE: ILanguage = {
       'সমাধিস্থলের রশিদের প্রত্যয়িত কপি',
     'formFields.docTypeFuneralReceipt':
       'অন্ত্যেষ্টিক্রিয়া রশিদের প্রত্যয়িত কপি',
+    'formFields.selectOne': 'অনুগ্রহ করে নির্বাচন করুন',
     'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
@@ -528,7 +540,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
-    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.registrationAgent': 'নিবন্ধন এজেন্ট',
     'register.home.header.localRegistrar': 'নিবন্ধক',
     'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
     'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',
@@ -656,7 +668,13 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.docTypeSC': 'স্কুল সার্টিফিকেট',
     'formFields.docTypeOther': 'অন্যান্য',
     'formFields.docTypeChildBirthProof': 'জন্ম স্থান এবং জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeMedicalInstitution':
+      'মেডিকেল প্রতিষ্ঠান থেকে জন্ম প্রমাণ',
+    'formFields.docTypebirthAttendant': 'জন্ম পরিচর্যা থেকে জন্ম প্রমাণ',
+    'formFields.docTypeChildAgeProof': 'জন্ম তারিখ প্রমাণ',
+    'formFields.docTypeTaxReceipt': 'কর প্রদান রসিদ',
     'formFields.docTypeEPICard': 'ইপিআই কার্ড',
+    'formFields.docTypeEPIStaffCertificate': 'ইপিআই সার্টিফিকেট',
     'formFields.docTypeDoctorCertificate': 'ডাক্তার সার্টিফিকেট',
     'formFields.proofOfMothersID': 'মায়ের আইডি প্রমাণ',
     'formFields.proofOfFathersID': 'পিতার আইডি প্রমাণ',
@@ -712,6 +730,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'চলমান',
     'register.registrarHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
     'register.registrarHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
+    'register.registrarHome.sentForApprovals': 'অনুমোদনের জন্য প্রস্তুত',
     'register.registrarHome.results.eventDate': 'ঘটনা তারিখ',
     'register.registrarHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
@@ -741,6 +760,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.collected':
       'সার্টিফিকেট মুদ্রণ',
     'register.searchResult.listItem.status.dateLabel.application': 'আবেদন জমা',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'আবেদন পর্যালোচনা',
     'register.searchResult.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.searchResult.listItem.status.dateLabel.rejected':
       'আবেদন প্রত্যাখ্যাত',
@@ -910,7 +931,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.duplicates.registrar': 'রেজিস্ট্রার',
     'register.duplicates.queryError': 'তথ্য আনয়ন করার সময় একটি ত্রুটি ঘটেছে',
     'register.form.tabs.applicantTab': 'আবেদনকারী',
-    'register.form.section.applicantTitle': 'আবেদনকারীর বিবরণ',
+    'register.form.section.applicantTitle': 'আবেদনকারীর বিবরণ কি?',
     'formFields.applicantsIdType': 'বিদ্যমান আইডি',
     'formFields.applicantsGivenNames': 'নামের প্রথমাংশ বাংলায়',
     'formFields.applicantsFamilyName': 'নামের শেষাংশ বাংলায়',
@@ -1017,7 +1038,11 @@ export const BENGALI_STATE: ILanguage = {
     'error.description1': 'Something went wrong.',
     'error.description2': "It's not you, it us. This is our fault.",
     'goto.homepage': 'Go to Homepage',
-    'imageUploadOption.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
+    'imageUploadOption.upload.error':
+      'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে (সর্বোচ্চ ৫ মে:বা:)',
+    'imageUploadOption.upload.overSized':
+      'ফাইল খুব বড়। দয়া করে ৫ মে:বা: এর ছোট ছবি প্রদান করুন',
+    'imageUploadOption.upload.documentType': 'প্রথমে নথি ধরন নির্বাচন করুন',
     'register.SearchResult.searchingFor': '“{param}” এর অনুসন্ধান চলসে ',
     'register.SearchResult.searchResultFor':
       '{total, plural, =0 {“{param}” এর জন্য কোন ফলাফল পাওয়া যায়নি} other {“{param}” এর অনুসন্ধান ফলাফল}}',
@@ -1227,6 +1252,20 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.son': 'পুত্র',
     'register.SelectContactPoint.daughter': 'কন্যা',
     'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
-    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান'
+    'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান',
+    'tab.inProgress.selector.own.drafts': 'আপনার',
+    'tab.inProgress.selector.field.agents': 'মাঠ কর্মী',
+    'column.name.error.value': 'নাম সরবরাহ করা হয়নি',
+    'application.creation.label': 'শুরুর সময়',
+    'application.informant.label': 'তথ্যপ্রদানকারী',
+    'application.informant.value.mother': 'মা',
+    'application.informant.value.mother.only': 'মা',
+    'application.informant.value.father': 'বাবা',
+    'application.initiator.label': 'কর্মী',
+    'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে',
+    'register.registrarHome.validated.registrar.tooltip':
+      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে'
   }
 }

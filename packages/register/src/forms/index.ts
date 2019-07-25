@@ -4,7 +4,8 @@ import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
   ICheckboxOption as CheckboxComponentOption,
-  THEME_MODE
+  THEME_MODE,
+  RadioSize
 } from '@opencrvs/components/lib/forms'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
@@ -28,6 +29,7 @@ export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
+export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
@@ -166,12 +168,15 @@ export interface IFormFieldBase {
   postfix?: string
   disabled?: boolean
   initialValue?: IFormFieldValue
+  extraValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: FormattedMessage.MessageDescriptor
   placeholder?: FormattedMessage.MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
+  hideHeader?: boolean
   mode?: THEME_MODE
+  hidden?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -191,6 +196,8 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
+  size?: RadioSize
+  notice?: FormattedMessage.MessageDescriptor
 }
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
@@ -217,6 +224,8 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
 }
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
+  notice?: FormattedMessage.MessageDescriptor
+  ignorePlaceHolder?: boolean
 }
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
@@ -247,7 +256,10 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
   optionSection: IFormSection
 }
-
+export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
+  type: typeof DOCUMENT_UPLOADER_WITH_OPTION
+  options: ISelectOption[]
+}
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
   onCompleted?: (response: string) => void
@@ -304,6 +316,7 @@ export type IFormField =
   | IListFormField
   | IParagraphFormField
   | IImageUploaderWithOptionsFormField
+  | IDocumentUploaderWithOptionsFormField
   | IWarningField
   | ILink
   | IPDFDocumentViewerFormField
@@ -343,9 +356,8 @@ export interface IConditionals {
   deathCertificateCollectorNotVerified: IConditional
   currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  placeOfDeathHospital: IConditional
+  deathPlaceAddressTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
-  otherDeathEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isNotCityLocationPermanent: IConditional
@@ -353,11 +365,16 @@ export interface IConditionals {
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
+  deathPlaceAtPrivateHome: IConditional
+  deathPlaceAtOtherLocation: IConditional
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
   otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
+  withIn45Days: IConditional
+  between46daysTo5yrs: IConditional
+  after5yrs: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
@@ -383,12 +400,21 @@ export interface IFormSection {
   viewType: ViewType
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
-  fields: IFormField[]
+  groups: IFormSectionGroup[]
   disabled?: boolean
   optional?: boolean
   notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapping
   hasDocumentSection?: boolean
+}
+
+export interface IFormSectionGroup {
+  id: string
+  title?: FormattedMessage.MessageDescriptor
+  fields: IFormField[]
+  disabled?: boolean
+  ignoreSingleFieldView?: boolean
+  conditionals?: IConditional[]
 }
 
 export interface IForm {
@@ -409,12 +435,15 @@ export interface Ii18nFormFieldBase {
   required?: boolean
   prefix?: string
   initialValue?: IFormFieldValue
+  extraValue?: IFormFieldValue
   postfix?: string
   disabled?: boolean
   conditionals?: IConditional[]
   hideAsterisk?: boolean
+  hideHeader?: boolean
   mode?: THEME_MODE
   placeholder?: string
+  hidden?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -425,6 +454,8 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
+  size?: RadioSize
+  notice?: string
 }
 
 type Name = {
@@ -465,6 +496,8 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
+  notice?: string
+  ignorePlaceHolder?: boolean
 }
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
@@ -491,7 +524,10 @@ export interface Ii18nImageUploaderWithOptionsFormField
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
   optionSection: IFormSection
 }
-
+export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
+  type: typeof DOCUMENT_UPLOADER_WITH_OPTION
+  options: SelectComponentOption[]
+}
 export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
   onCompleted?: (response: string) => void
@@ -537,6 +573,7 @@ export type Ii18nFormField =
   | Ii18nListFormField
   | Ii18nParagraphFormField
   | Ii18nImageUploaderWithOptionsFormField
+  | Ii18nDocumentUploaderWithOptions
   | Ii18nWarningField
   | Ii18nLinkField
   | Ii18nPDFDocumentViewerFormField

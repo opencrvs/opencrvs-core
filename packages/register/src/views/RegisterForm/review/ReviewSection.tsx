@@ -15,11 +15,15 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
-import { getConditionalActionsForField } from '@register/forms/utils'
+import {
+  getConditionalActionsForField,
+  getVisibleSectionGroupsBasedOnConditions,
+  getSectionFields
+} from '@register/forms/utils'
 import { Link } from '@opencrvs/components/lib/typography'
 import { flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToPage } from '@register/navigation'
+import { goToPageGroup } from '@register/navigation'
 
 import {
   ISelectOption as SelectComponentOptions,
@@ -72,6 +76,7 @@ import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import { sectionMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -220,13 +225,13 @@ interface IProps {
   registerForm: { [key: string]: IForm }
   pageRoute: string
   rejectApplicationClickEvent?: () => void
+  goToPageGroup: typeof goToPageGroup
   submitClickEvent: (
     application: IApplication,
     submissionStatus: string,
     action: string,
     payload?: IPayload
   ) => void
-  goToPage: typeof goToPage
   scope: Scope | null
   offlineResources: IOfflineDataState
   language: string
@@ -236,6 +241,7 @@ interface IProps {
 type State = {
   displayEditDialog: boolean
   editClickedSectionId: string
+  editClickedSectionGroupId: string
   editClickFieldName: string
   activeSection: string
 }
@@ -352,14 +358,19 @@ const getErrorsOnFieldsBySection = (
   draft: IApplication
 ) => {
   return formSections.reduce((sections, section: IFormSection) => {
+    const fields: IFormField[] = getSectionFields(
+      section,
+      draft.data[section.id]
+    )
+
     const errors = getValidationErrorsForForm(
-      section.fields,
+      fields,
       draft.data[section.id] || {}
     )
 
     return {
       ...sections,
-      [section.id]: section.fields.reduce((fields, field) => {
+      [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
         const validationErrors = errors[field.name]
 
@@ -389,6 +400,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.state = {
       displayEditDialog: false,
       editClickedSectionId: '',
+      editClickedSectionGroupId: '',
       editClickFieldName: '',
       activeSection: ''
     }
@@ -448,26 +460,38 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
     const selectOptions: SelectComponentOptions[] = []
-    let uploadedDocuments =
-      draft.data[draftItemName] &&
-      isArray(draft.data[draftItemName].imageUploader)
-        ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
-        : []
+
+    let uploadedDocuments: IFileValue[] = []
+
+    for (let index in draft.data[draftItemName]) {
+      if (isArray(draft.data[draftItemName][index]))
+        uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
+          index
+        ] as IFileValue[])
+    }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
-      return document.title.toUpperCase() === activeSection.toUpperCase()
-    })
+      const index = activeSection.toUpperCase()
+      // @ts-ignore
+      const allowedDocumentType = sectionMapping[index] || []
 
-    uploadedDocuments.forEach(document => {
-      const label = document.title + ' ' + document.description
-      documentOptions.push({
-        value: document.data,
-        label
-      })
-      selectOptions.push({
-        value: label,
-        label
-      })
+      if (
+        allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
+      ) {
+        // const label = document.title + ' ' + document.description
+        const label = document.optionValues[0] + ' ' + document.optionValues[1]
+
+        documentOptions.push({
+          value: document.data,
+          label
+        })
+        selectOptions.push({
+          value: label,
+          label
+        })
+        return true
+      }
+      return false
     })
 
     return {
@@ -482,9 +506,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }))
   }
 
-  editLinkClickHandler = (sectionId: string, fieldName: string) => {
+  editLinkClickHandler = (
+    sectionId: string,
+    sectionGroupId: string,
+    fieldName: string
+  ) => {
     this.setState(() => ({
       editClickedSectionId: sectionId,
+      editClickedSectionGroupId: sectionGroupId,
       editClickFieldName: fieldName
     }))
     this.toggleDisplayDialog()
@@ -518,57 +547,71 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         type => type === field.type
       )
     }
-    return formSections.map(section => ({
-      id: section.id,
-      title: intl.formatMessage(section.title),
-      items: section.fields
-        .filter(field => isVisibleField(field, section) && !isViewOnly(field))
-        .map(field => {
-          const errorsOnField =
-            // @ts-ignore
-            errorsOnFields[section.id][field.name]
+    return formSections.map(section => {
+      let items: any[] = []
+      getVisibleSectionGroupsBasedOnConditions(
+        section,
+        draft.data[section.id] || {}
+      ).forEach(group => {
+        items = items.concat(
+          group.fields
+            .filter(
+              field => isVisibleField(field, section) && !isViewOnly(field)
+            )
+            .map(field => {
+              const errorsOnField =
+                // @ts-ignore
+                errorsOnFields[section.id][field.name]
 
-          return {
-            label: intl.formatMessage(field.label),
-            value:
-              errorsOnField.length > 0 ? (
-                <RequiredFieldLink
-                  id={`required_link_${section.id}_${field.name}`}
-                  onClick={() => {
-                    this.props.goToPage(
-                      pageRoute,
-                      draft.id,
-                      section.id,
-                      draft.event.toLowerCase(),
-                      field.name
+              return {
+                label: intl.formatMessage(field.label),
+                value:
+                  errorsOnField.length > 0 ? (
+                    <RequiredFieldLink
+                      id={`required_link_${section.id}_${field.name}`}
+                      onClick={() => {
+                        this.props.goToPageGroup(
+                          pageRoute,
+                          draft.id,
+                          section.id,
+                          group.id,
+                          draft.event.toLowerCase(),
+                          field.name
+                        )
+                      }}
+                    >
+                      {intl.formatMessage(
+                        errorsOnField[0].message,
+                        errorsOnField[0].props
+                      )}
+                    </RequiredFieldLink>
+                  ) : (
+                    renderValue(
+                      draft,
+                      section,
+                      field,
+                      intl,
+                      offlineResources,
+                      language
                     )
-                  }}
-                >
-                  {intl.formatMessage(
-                    errorsOnField[0].message,
-                    errorsOnField[0].props
-                  )}
-                </RequiredFieldLink>
-              ) : (
-                renderValue(
-                  draft,
-                  section,
-                  field,
-                  intl,
-                  offlineResources,
-                  language
-                )
-              ),
-            action: {
-              id: `btn_change_${section.id}_${field.name}`,
-              label: intl.formatMessage(messages.actionChange),
-              handler: () => {
-                this.editLinkClickHandler(section.id, field.name)
+                  ),
+                action: {
+                  id: `btn_change_${section.id}_${field.name}`,
+                  label: intl.formatMessage(messages.actionChange),
+                  handler: () => {
+                    this.editLinkClickHandler(section.id, group.id, field.name)
+                  }
+                }
               }
-            }
-          }
-        })
-    }))
+            })
+        )
+      })
+      return {
+        id: section.id,
+        title: intl.formatMessage(section.title),
+        items
+      }
+    })
   }
 
   render() {
@@ -684,6 +727,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     onClick={() =>
                       this.editLinkClickHandler(
                         documentsSection.id,
+                        documentsSection.groups[0].id,
                         this.state.activeSection
                       )
                     }
@@ -702,10 +746,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             const application = this.props.draft
             application.review = true
             this.props.writeApplication(application)
-            this.props.goToPage(
+            this.props.goToPageGroup(
               pageRoute,
               draft.id,
               this.state.editClickedSectionId,
+              this.state.editClickedSectionGroupId,
               draft.event.toLowerCase(),
               this.state.editClickFieldName
             )
@@ -723,5 +768,5 @@ export const ReviewSection = connect(
     offlineResources: getOfflineState(state),
     language: getLanguage(state)
   }),
-  { goToPage, writeApplication }
+  { goToPageGroup, writeApplication }
 )(injectIntl(ReviewSectionComp))
