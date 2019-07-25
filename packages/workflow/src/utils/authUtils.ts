@@ -5,8 +5,7 @@ export enum USER_SCOPE {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
-  CERTIFY = 'certify',
-  VALIDATE = 'validate'
+  CERTIFY = 'certify'
 }
 
 export interface ITokenPayload {
@@ -49,10 +48,6 @@ export const hasScope = (request: Hapi.Request, scope: string): boolean => {
 
 export function hasRegisterScope(request: Hapi.Request): boolean {
   return hasScope(request, USER_SCOPE.REGISTER)
-}
-
-export function hasValidateScope(request: Hapi.Request): boolean {
-  return hasScope(request, USER_SCOPE.VALIDATE)
 }
 
 export function hasValidateScope(request: Hapi.Request): boolean {

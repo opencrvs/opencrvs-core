@@ -201,6 +201,14 @@ export async function fhirWorkflowEventHandler(
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
       break
+    case Events.BIRTH_NEW_VALIDATE:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
+      break
+    case Events.DEATH_NEW_VALIDATE:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
+      break
     case Events.BIRTH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_REG, request)
@@ -246,14 +254,6 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_MARK_VOID:
       response = await updateTaskHandler(request, h)
       forwardToOpenHim(Events.DEATH_MARK_VOID, request)
-      break
-    case Events.BIRTH_NEW_VALIDATE:
-      response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
-      break
-    case Events.DEATH_NEW_VALIDATE:
-      response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
       break
     default:
       // forward as-is to hearth
