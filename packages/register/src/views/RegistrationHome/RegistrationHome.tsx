@@ -110,6 +110,7 @@ interface IBaseRegistrationHomeProps {
   selectorId: string
   drafts: IApplication[]
   goToEvents: typeof goToEventsAction
+  lastModifiedOn: number
 }
 
 interface IRegistrationHomeState {
@@ -245,15 +246,20 @@ export class RegistrationHomeView extends React.Component<
           variables={{
             locationIds: [registrarUnion]
           }}
+          pollInterval={500}
         >
           {({
             loading,
             error,
-            data
+            data,
+            startPolling,
+            stopPolling
           }: {
             loading: any
             error?: any
             data: any
+            startPolling?: any
+            stopPolling?: any
           }) => {
             if (loading) {
               parentQueryLoading = true
@@ -273,6 +279,8 @@ export class RegistrationHomeView extends React.Component<
                 </ErrorText>
               )
             }
+
+            setTimeout(() => stopPolling(), 1500)
 
             return (
               <>
@@ -389,6 +397,17 @@ export class RegistrationHomeView extends React.Component<
   }
 }
 
+function getLastModifiedOn(applications: IApplication[]) {
+  let lastModifiedon = 0
+  applications &&
+    applications.forEach((application: IApplication) => {
+      if (application.modifiedOn && application.modifiedOn > lastModifiedon) {
+        lastModifiedon = application.modifiedOn
+      }
+    })
+  return lastModifiedon
+}
+
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string; selectorId?: string }>
@@ -407,7 +426,8 @@ function mapStateToProps(
             application.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
-      []
+      [],
+    lastModifiedOn: getLastModifiedOn(state.applicationsState.applications)
   }
 }
 
