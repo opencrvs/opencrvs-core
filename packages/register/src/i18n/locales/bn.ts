@@ -540,7 +540,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
-    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.registrationAgent': 'নিবন্ধন এজেন্ট',
     'register.home.header.localRegistrar': 'নিবন্ধক',
     'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
     'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',

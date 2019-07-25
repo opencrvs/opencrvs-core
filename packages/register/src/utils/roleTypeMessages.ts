@@ -8,10 +8,10 @@ export const roleMessages: {
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
-  REGISTRATION_CLERK: {
-    id: 'register.home.header.registrationClerk',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
+  REGISTRATION_AGENT: {
+    id: 'register.home.header.registrationAgent',
+    defaultMessage: 'Registration Agent',
+    description: 'The description for REGISTRATION_AGENT role'
   },
   LOCAL_REGISTRAR: {
     id: 'register.home.header.localRegistrar',

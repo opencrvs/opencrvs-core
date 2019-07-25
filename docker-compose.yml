@@ -112,6 +112,7 @@ services:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - AUTH_URL=http://auth:4040
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
+      - FHIR_URL=http://openhim-core:5001/fhir
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}

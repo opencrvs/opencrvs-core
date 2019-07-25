@@ -3,6 +3,7 @@ import * as Hapi from 'hapi'
 
 export enum USER_SCOPE {
   DECLARE = 'declare',
+  VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify'
 }
@@ -46,5 +47,9 @@ export const hasScope = (request: Hapi.Request, scope: string): boolean => {
 }
 
 export function hasRegisterScope(request: Hapi.Request): boolean {
-  return hasScope(request, 'register')
+  return hasScope(request, USER_SCOPE.REGISTER)
+}
+
+export function hasValidateScope(request: Hapi.Request): boolean {
+  return hasScope(request, USER_SCOPE.VALIDATE)
 }
