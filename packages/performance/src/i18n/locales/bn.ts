@@ -44,7 +44,7 @@ export const BENGALI_STATE = {
     'performance.header.hello': 'হ্যালো {fullName}',
     'performance.graph.queryError': 'অনুসন্ধান করার সময় ত্রুটি ঘটেছে',
     'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
-    'register.home.header.REGISTRATION_CLERK': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.REGISTRATION_AGENT': 'নিবন্ধন এজেন্ট',
     'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
     'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
     'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',

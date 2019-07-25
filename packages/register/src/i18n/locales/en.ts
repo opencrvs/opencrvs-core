@@ -564,7 +564,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.button.title.registerConfirmation': 'Register',
     'register.form.modal.submitButton': 'Send',
     'register.home.header.fieldAgent': 'Field Agent',
-    'register.home.header.registrationClerk': 'Registration Clerk',
+    'register.home.header.registrationAgent': 'Registration Agent',
     'register.home.header.localRegistrar': 'Registrar',
     'register.home.header.districtRegistrar': 'District Registrar',
     'register.home.header.stateRegistrar': 'State Registrar',
