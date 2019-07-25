@@ -11,6 +11,10 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  top: 0;
+  width: 100%;
+  position: fixed;
+  z-index: 1;
 `
 const TopBarTitle = styled.h4`
   ${({ theme }) => theme.fonts.bigBodyStyle};
