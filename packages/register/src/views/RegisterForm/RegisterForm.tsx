@@ -332,6 +332,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           section
         )
       )
+      return
     })
     return result
   }

@@ -1,20 +1,21 @@
-import * as Hapi from 'hapi'
-import fetch from 'node-fetch'
 import { HEARTH_URL } from '@workflow/constants'
+import { Events } from '@workflow/features/events/handler'
 import {
-  modifyRegistrationBundle,
-  markBundleAsRegistered,
   markBundleAsCertified,
+  markBundleAsRegistered,
+  markBundleAsValidated,
+  modifyRegistrationBundle,
   setTrackingId
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { getToken } from '@workflow/utils/authUtils'
-import { sendEventNotification } from '@workflow/features/registration/utils'
 import {
-  postToHearth,
-  getSharedContactMsisdn
+  getSharedContactMsisdn,
+  postToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
+import { sendEventNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
-import { Events } from '@workflow/features/events/handler'
+import { getToken } from '@workflow/utils/authUtils'
+import * as Hapi from 'hapi'
+import fetch from 'node-fetch'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -98,6 +99,24 @@ export async function createRegistrationHandler(
     logger.error(
       `Workflow/createRegistrationHandler[${event}]: error: ${error}`
     )
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsValidatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit,
+  event: Events
+) {
+  try {
+    const payload = await markBundleAsValidated(
+      request.payload as fhir.Bundle & fhir.BundleEntry,
+      getToken(request)
+    )
+
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(`Workflow/markAsValidatedHandler[${event}]: error: ${error}`)
     throw new Error(error)
   }
 }

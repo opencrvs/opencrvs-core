@@ -26,7 +26,8 @@ const enum RouteScope {
   REGISTER = 'register',
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin'
+  SYSADMIN = 'sysadmin',
+  VALIDATE = 'validate'
 }
 
 export const getRoutes = () => {
@@ -66,7 +67,8 @@ export const getRoutes = () => {
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
             RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
           ]
         },
         validate: {
@@ -88,7 +90,8 @@ export const getRoutes = () => {
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
             RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
           ]
         },
         validate: {
@@ -110,7 +113,8 @@ export const getRoutes = () => {
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
             RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
           ]
         },
         validate: {
@@ -143,7 +147,8 @@ export const getRoutes = () => {
             RouteScope.REGISTER,
             RouteScope.CERTIFY,
             RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
           ]
         },
         validate: {

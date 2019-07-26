@@ -540,7 +540,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
-    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.registrationAgent': 'নিবন্ধন এজেন্ট',
     'register.home.header.localRegistrar': 'নিবন্ধক',
     'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
     'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',
@@ -730,6 +730,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'চলমান',
     'register.registrarHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
     'register.registrarHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
+    'register.registrarHome.sentForApprovals': 'অনুমোদনের জন্য প্রস্তুত',
     'register.registrarHome.results.eventDate': 'ঘটনা তারিখ',
     'register.registrarHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
@@ -1262,7 +1263,9 @@ export const BENGALI_STATE: ILanguage = {
     'application.informant.value.father': 'বাবা',
     'application.initiator.label': 'কর্মী',
     'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে',
-    'register.registrarHome.validated.tooltip':
-      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে'
+    'register.registrarHome.validated.registrar.tooltip':
+      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে'
   }
 }

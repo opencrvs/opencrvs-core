@@ -90,6 +90,7 @@ describe('when user logs in', async () => {
       case 'USER_DATA':
       case 'USER_DETAILS':
         indexedDB[key] = value
+        break
       default:
         break
     }

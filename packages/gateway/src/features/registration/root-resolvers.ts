@@ -1,18 +1,18 @@
+import { IAuthHeader } from '@gateway/common-types'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import {
+  fetchFHIR,
+  getDeclarationIdsFromResponse,
+  getIDFromResponse,
+  getRegistrationIdsFromResponse,
+  removeDuplicatesFromComposition
+} from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
-import { GQLResolver } from '@gateway/graphql/schema'
-import {
-  fetchFHIR,
-  getIDFromResponse,
-  getDeclarationIdsFromResponse,
-  getRegistrationIdsFromResponse,
-  removeDuplicatesFromComposition
-} from '@gateway/features/fhir/utils'
-import { IAuthHeader } from '@gateway/common-types'
 import { hasScope } from '@gateway/features/user/utils'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -162,6 +162,20 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async markBirthAsValidated(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'validate')) {
+        await markEventAsValidated(id, authHeader, EVENT_TYPE.BIRTH, details)
+      } else {
+        await Promise.reject(new Error('User does not have a validate scope'))
+      }
+    },
+    async markDeathAsValidated(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'validate')) {
+        await markEventAsValidated(id, authHeader, EVENT_TYPE.DEATH, details)
+      } else {
+        await Promise.reject(new Error('User does not have a validate scope'))
+      }
+    },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
         return await markEventAsRegistered(
@@ -276,6 +290,33 @@ async function createEventRegistration(
     // return tracking-id
     return await getDeclarationIdsFromResponse(res, authHeader)
   }
+}
+
+async function markEventAsValidated(
+  id: string,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE,
+  details?: any
+) {
+  let doc
+  if (!details) {
+    const taskBundle = await fetchFHIR(
+      `/Task?focus=Composition/${id}`,
+      authHeader
+    )
+    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+      throw new Error('Task does not exist')
+    }
+    doc = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: taskBundle.entry
+    }
+  } else {
+    doc = await buildFHIRBundle(details, event)
+  }
+
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 }
 
 async function markEventAsRegistered(
