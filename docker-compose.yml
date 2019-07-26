@@ -121,7 +121,7 @@ services:
       dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
-      - LANGUAGE=bn
+      - LANGUAGES=bn,en
       - AUTH_URL=http://auth:4040
 
   resources:
