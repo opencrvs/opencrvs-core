@@ -28,7 +28,7 @@ import { PrintCertificateAction } from '@register/views/PrintCertificate/PrintCe
 import { ErrorBoundary } from '@register/components/ErrorBoundary'
 import { Details } from '@register/views/Home/Details'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
-import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
+import { RegistrationHome } from '@register/views/RegistrationHome/RegistrationHome'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
@@ -139,12 +139,12 @@ export class App extends React.Component<IAppProps> {
                                 <ProtectedRoute
                                   exact
                                   path={routes.REGISTRAR_HOME}
-                                  component={RegistrarHome}
+                                  component={RegistrationHome}
                                 />
                                 <ProtectedRoute
                                   exact
                                   path={routes.REGISTRAR_HOME_TAB}
-                                  component={RegistrarHome}
+                                  component={RegistrationHome}
                                 />
                                 <ProtectedRoute
                                   path={routes.CONFIRMATION_SCREEN}

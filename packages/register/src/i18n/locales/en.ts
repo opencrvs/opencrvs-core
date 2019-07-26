@@ -1085,6 +1085,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'In progress',
     'register.registrarHome.readyForReview': 'Ready for review',
     'register.registrarHome.sentForUpdates': 'Sent for updates',
+    'register.registrarHome.sentForApprovals': 'Sent for approval',
     'register.registrarHome.action': 'Action',
     'register.fieldAgentHome.tableHeader.submissionStatus': 'Submission status',
     'register.fieldAgentHome.table.statusReadyToSubmit': 'Waiting to send',
@@ -1280,7 +1281,9 @@ export const ENGLISH_STATE: ILanguage = {
     'application.informant.value.father': 'Father',
     'application.initiator.label': 'By',
     'expansion.info.queryError': 'An error occurred while fetching details',
-    'register.registrarHome.validated.tooltip':
-      'Application has been validated by a registration agent'
+    'register.registrarHome.validated.registrar.tooltip':
+      'Application has been validated by a registration agent',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'Application has been validated and waiting for approval'
   }
 }

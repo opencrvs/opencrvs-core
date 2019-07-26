@@ -99,6 +99,7 @@ export type Action =
 
 export interface IUserData {
   userID: string
+  userPIN?: string
   applications: IApplication[]
 }
 
