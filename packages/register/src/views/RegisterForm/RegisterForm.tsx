@@ -456,6 +456,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   pageRoute={this.props.pageRoute}
                   draft={application}
                   submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyApplication}
                 />
               </>
             )}
@@ -480,6 +481,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft={application}
                   rejectApplicationClickEvent={this.toggleRejectForm}
                   submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyApplication}
                 />
               </>
             )}

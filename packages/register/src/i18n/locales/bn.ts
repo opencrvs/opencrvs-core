@@ -837,6 +837,7 @@ export const BENGALI_STATE: ILanguage = {
       'স্বাস্থ্য কর্মী সঠিকভাবে আবেদন আপডেট করার জন্য তার কি নির্দেশাবলী প্রয়োজন প্রদান করুন',
     'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.button.register': 'নিবন্ধন',
+    'review.button.approve': 'অনুমোদনের জন্য পাঠান',
     'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
@@ -859,6 +860,13 @@ export const BENGALI_STATE: ILanguage = {
       'নিবন্ধন ক্লিক করে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের জন্য এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।\n\nএই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের মাধ্যমে একটি জন্ম শংসাপত্র তৈরি করা হবে।',
     'register.actions.description':
       'এই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের জন্য একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'review.validate.action.description':
+      '{isComplete, select, true {অনুমোদনের জন্য পাঠানোর মাধ্যমে আপনি নিশ্চিত করেছেন যে তথ্যটি আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে এবং এটি অনুমোদনের জন্য প্রস্তুত।} false {বাধ্যতামূলক তথ্য অনুপস্থিত। দয়া করে এই তথ্যটি যোগ করুন যাতে আপনি অনুমোদনের জন্য পাঠাতে পারেন।}}',
+    'register.form.modal.title.validateConfirmation': 'অনুমোদনের জন্য পাঠাবেন?',
+    'register.form.modal.desc.validateConfirmation':
+      'এই আবেদন অনুমোদন করার জন্য নিবন্ধকের কাছে পাঠানো হবে।',
+    'review.formData.header':
+      '{isDraft, select, true {পর্যালোচনার জন্য পাঠানোর আগে আবেদনকারী সঙ্গে যাচাই করুন} false {সমর্থনকারী নথির সাথে উত্তর পর্যালোচনা করুন}}',
     'register.actions.title.applicationStatus': 'নিবন্ধন বা বাতিল?',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',

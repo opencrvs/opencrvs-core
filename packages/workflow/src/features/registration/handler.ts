@@ -78,6 +78,14 @@ export async function createRegistrationHandler(
         payload as fhir.Bundle,
         getToken(request)
       )
+    } else if (
+      event === Events.BIRTH_NEW_VALIDATE ||
+      event === Events.DEATH_NEW_VALIDATE
+    ) {
+      payload = await markBundleAsValidated(
+        payload as fhir.Bundle,
+        getToken(request)
+      )
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
@@ -87,7 +95,9 @@ export async function createRegistrationHandler(
     if (
       msisdn &&
       (event !== Events.BIRTH_IN_PROGRESS_DEC &&
-        event !== Events.DEATH_IN_PROGRESS_DEC)
+        event !== Events.DEATH_IN_PROGRESS_DEC &&
+        event !== Events.BIRTH_NEW_VALIDATE &&
+        event !== Events.DEATH_NEW_VALIDATE)
     ) {
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
