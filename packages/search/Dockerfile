@@ -15,7 +15,7 @@ RUN yarn install --production
 COPY --from=opencrvs-build packages/search/build packages/search/build
 
 # Copy dependant package(s) source
-COPY packages/commons packages/commons
+COPY --from=opencrvs-build packages/commons packages/commons
 
 EXPOSE 9090
 WORKDIR /usr/src/app/packages/search
