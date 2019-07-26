@@ -267,7 +267,7 @@ describe('when user is in the register form for birth event', async () => {
         .hostNodes()
         .simulate('click')
       expect(
-        history.location.pathname.includes('/registrar-home/progress')
+        history.location.pathname.includes('/registration-home/progress')
       ).toBeTruthy()
     })
     it('takes system admin to declaration submitted page when save button is clicked', () => {
