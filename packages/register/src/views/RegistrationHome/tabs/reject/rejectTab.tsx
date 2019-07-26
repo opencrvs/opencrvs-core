@@ -24,7 +24,8 @@ import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
   EVENT_STATUS,
-  StyledSpinner
+  StyledSpinner,
+  stopPollingAsync
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 
@@ -35,12 +36,11 @@ interface IBaseRejectTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarUnion: string | null
   parentQueryLoading?: boolean
-  lastModifiedOn: number
+  isApplicationsModified: boolean
 }
 
 interface IRejectTabState {
   updatesCurrentPage: number
-  lastModifiedOn: number
 }
 
 type IRejectTabProps = InjectedIntlProps & IBaseRejectTabProps
@@ -53,8 +53,7 @@ class RejectTabComponent extends React.Component<
   constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
-      updatesCurrentPage: 1,
-      lastModifiedOn: this.props.lastModifiedOn
+      updatesCurrentPage: 1
     }
   }
 
@@ -122,9 +121,7 @@ class RejectTabComponent extends React.Component<
           count: this.pageSize,
           skip: (this.state.updatesCurrentPage - 1) * this.pageSize
         }}
-        pollInterval={
-          this.props.lastModifiedOn !== this.state.lastModifiedOn ? 400 : 0
-        }
+        pollInterval={this.props.isApplicationsModified ? 400 : 0}
       >
         {({
           loading,
@@ -136,8 +133,8 @@ class RejectTabComponent extends React.Component<
           loading: any
           error?: any
           data: any
-          startPolling?: any
-          stopPolling?: any
+          startPolling: any
+          stopPolling: () => void
         }) => {
           if (loading) {
             return (
@@ -159,9 +156,7 @@ class RejectTabComponent extends React.Component<
             )
           }
 
-          if (this.props.lastModifiedOn !== this.state.lastModifiedOn) {
-            setTimeout(() => stopPolling(), 1200)
-          }
+          stopPollingAsync(this.props.isApplicationsModified, stopPolling)
 
           return (
             <BodyContent>

@@ -139,6 +139,18 @@ export const EVENT_STATUS = {
   REGISTERED: 'REGISTERED',
   REJECTED: 'REJECTED'
 }
+
+export const stopPollingAsync = (
+  isApplicationsModified: boolean,
+  stopPolling: () => void
+) => {
+  if (isApplicationsModified) {
+    setTimeout(() => {
+      stopPolling()
+    }, 2000)
+  }
+}
+
 export class RegistrationHomeView extends React.Component<
   IRegistrationHomeProps,
   IRegistrationHomeState
@@ -239,6 +251,8 @@ export class RegistrationHomeView extends React.Component<
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
+    const isApplicationsModified =
+      this.props.lastModifiedOn !== this.state.lastModifiedOn
 
     return (
       <>
@@ -248,9 +262,7 @@ export class RegistrationHomeView extends React.Component<
           variables={{
             locationIds: [registrarUnion]
           }}
-          pollInterval={
-            this.props.lastModifiedOn !== this.state.lastModifiedOn ? 400 : 0
-          }
+          pollInterval={isApplicationsModified ? 200 : 0}
         >
           {({
             loading,
@@ -262,8 +274,8 @@ export class RegistrationHomeView extends React.Component<
             loading: any
             error?: any
             data: any
-            startPolling?: any
-            stopPolling?: any
+            startPolling: any
+            stopPolling: () => void
           }) => {
             if (loading) {
               parentQueryLoading = true
@@ -284,9 +296,7 @@ export class RegistrationHomeView extends React.Component<
               )
             }
 
-            if (this.props.lastModifiedOn !== this.state.lastModifiedOn) {
-              setTimeout(() => stopPolling(), 1200)
-            }
+            stopPollingAsync(isApplicationsModified, stopPolling)
 
             return (
               <>
@@ -370,14 +380,14 @@ export class RegistrationHomeView extends React.Component<
           <ReviewTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
-            lastModifiedOn={this.props.lastModifiedOn}
+            isApplicationsModified={isApplicationsModified}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
           <RejectTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
-            lastModifiedOn={this.props.lastModifiedOn}
+            isApplicationsModified={isApplicationsModified}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
