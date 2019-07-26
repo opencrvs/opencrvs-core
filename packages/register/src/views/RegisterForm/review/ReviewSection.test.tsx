@@ -1,30 +1,37 @@
-import * as React from 'react'
-import {
-  ReviewSection,
-  renderSelectDynamicLabel
-} from '@register/views/RegisterForm/review/ReviewSection'
-import { ReactWrapper } from 'enzyme'
-import { createStore } from '@register/store'
-import {
-  createTestComponent,
-  mockOfflineData,
-  intl,
-  flushPromises
-} from '@register/tests/util'
 import {
   createApplication,
   createReviewApplication,
   storeApplication
 } from '@register/applications'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { Event as ApplicationEvent } from '@register/forms'
-import { v4 as uuid } from 'uuid'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+import * as profileSelectors from '@register/profile/profileSelectors'
+import { createStore } from '@register/store'
+import {
+  createTestComponent,
+  flushPromises,
+  intl,
+  mockOfflineData
+} from '@register/tests/util'
 import { REJECTED } from '@register/utils/constants'
+import {
+  renderSelectDynamicLabel,
+  ReviewSection
+} from '@register/views/RegisterForm/review/ReviewSection'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { v4 as uuid } from 'uuid'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
 
 const draft = createApplication(ApplicationEvent.BIRTH)
+
+const declaredBirthApplication = createReviewApplication(
+  uuid(),
+  {},
+  ApplicationEvent.BIRTH
+)
 const rejectedDraftBirth = createReviewApplication(
   uuid(),
   {},
@@ -186,6 +193,7 @@ describe('return the correct label on dynamic fields', () => {
 describe('when user is in the review page for rejected birth application', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
     const testComponent = createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -224,5 +232,36 @@ describe('when user is in the review page for rejected death application', () =>
     const rejectButton = reviewSectionComponent.find('#rejectApplicationBtn')
       .length
     expect(rejectButton).toEqual(0)
+  })
+})
+
+describe('when user is in the review page to validate birth application', () => {
+  let reviewSectionComponent: ReactWrapper<{}, {}>
+  beforeEach(async () => {
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
+    const testComponent = createTestComponent(
+      <ReviewSection
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        draft={declaredBirthApplication}
+        rejectApplicationClickEvent={mockHandler}
+        submitClickEvent={mockHandler}
+      />,
+      store
+    )
+    reviewSectionComponent = testComponent.component
+  })
+
+  it('Should click the Validate Application Button', async () => {
+    const rejectButton = reviewSectionComponent
+      .find('#validateApplicationBtn')
+      .hostNodes().length
+    expect(rejectButton).toEqual(1)
+  })
+
+  it('Should click the Reject Application Button', async () => {
+    const rejectButton = reviewSectionComponent
+      .find('#rejectApplicationBtn')
+      .hostNodes().length
+    expect(rejectButton).toEqual(1)
   })
 })

@@ -717,8 +717,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               )}
               <ReviewAction
                 completeApplication={isComplete}
-                applicationToBeRegistered={this.userHasRegisterScope()}
                 applicationToBeValidated={this.userHasValidateScope()}
+                applicationToBeRegistered={this.userHasRegisterScope()}
                 alreadyRejectedApplication={
                   this.props.draft.registrationStatus === REJECTED
                 }
