@@ -14,6 +14,12 @@ import {
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { merge } from 'lodash'
 import * as React from 'react'
+import {
+  createApplication,
+  storeApplication,
+  modifyApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -201,6 +207,74 @@ describe('RegistrationHome In Progress tab related tests', () => {
         .hostNodes()
         .text()
     ).toContain('In progress (5)')
+    testComponent.component.unmount()
+  })
+
+  it('update page after application modified', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['123456789']
+          }
+        },
+        result: {
+          data: {
+            countEvents: {
+              declared: 10,
+              validated: 0,
+              registered: 7,
+              rejected: 5
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
+          variables: {
+            locationIds: ['123456789'],
+            status: EVENT_STATUS.IN_PROGRESS
+          }
+        },
+        result: {
+          data: {
+            countEventRegistrationsByStatus: {
+              count: 3
+            }
+          }
+        }
+      }
+    ]
+
+    const draft = createApplication(Event.BIRTH)
+    store.dispatch(storeApplication(draft))
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+
+    store.dispatch(modifyApplication(draft))
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 500)
+    })
+
+    testComponent.component.update()
+
+    expect(testComponent.component).toBeDefined()
+
     testComponent.component.unmount()
   })
 })
