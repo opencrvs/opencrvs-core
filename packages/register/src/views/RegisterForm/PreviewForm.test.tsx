@@ -721,20 +721,6 @@ describe('when user is previewing the form data', () => {
           .replace(':pageId', 'review')
       )
       app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      for (let i = 1; i <= 8; i++) {
-        app
-          .find(`#keypad-${i % 2}`)
-          .hostNodes()
-          .simulate('click')
-      }
-      await flushPromises()
-      app.update()
     })
 
     it('shows send for approval button', () => {
