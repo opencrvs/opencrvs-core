@@ -138,15 +138,20 @@ class ReviewTabComponent extends React.Component<
           count: this.pageSize,
           skip: (this.state.reviewCurrentPage - 1) * this.pageSize
         }}
+        pollInterval={500}
       >
         {({
           loading,
           error,
-          data
+          data,
+          startPolling,
+          stopPolling
         }: {
           loading: any
           error?: any
           data: any
+          startPolling?: any
+          stopPolling?: any
         }) => {
           if (loading) {
             return (
@@ -167,6 +172,9 @@ class ReviewTabComponent extends React.Component<
               </ErrorText>
             )
           }
+
+          setTimeout(() => stopPolling(), 1500)
+
           return (
             <BodyContent>
               <ReactTooltip id="validateTooltip">
