@@ -343,7 +343,7 @@ describe('when user has starts a new application', () => {
         app.update()
       })
       it('image upload field is rendered', () => {
-        expect(app.find('#upload_document').hostNodes()).toHaveLength(6)
+        expect(app.find('#upload_document').hostNodes()).toHaveLength(4)
       })
     })
   })
