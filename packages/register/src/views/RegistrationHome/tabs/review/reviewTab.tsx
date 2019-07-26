@@ -40,10 +40,12 @@ interface IBaseReviewTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarUnion: string | null
   parentQueryLoading?: boolean
+  lastModifiedOn: number
 }
 
 interface IReviewTabState {
   reviewCurrentPage: number
+  lastModifiedOn: number
 }
 
 type IReviewTabProps = InjectedIntlProps & IBaseReviewTabProps
@@ -56,7 +58,8 @@ class ReviewTabComponent extends React.Component<
   constructor(props: IReviewTabProps) {
     super(props)
     this.state = {
-      reviewCurrentPage: 1
+      reviewCurrentPage: 1,
+      lastModifiedOn: this.props.lastModifiedOn
     }
   }
 
@@ -138,7 +141,9 @@ class ReviewTabComponent extends React.Component<
           count: this.pageSize,
           skip: (this.state.reviewCurrentPage - 1) * this.pageSize
         }}
-        pollInterval={500}
+        pollInterval={
+          this.props.lastModifiedOn !== this.state.lastModifiedOn ? 400 : 0
+        }
       >
         {({
           loading,
@@ -173,7 +178,9 @@ class ReviewTabComponent extends React.Component<
             )
           }
 
-          setTimeout(() => stopPolling(), 1500)
+          if (this.props.lastModifiedOn !== this.state.lastModifiedOn) {
+            setTimeout(() => stopPolling(), 1200)
+          }
 
           return (
             <BodyContent>

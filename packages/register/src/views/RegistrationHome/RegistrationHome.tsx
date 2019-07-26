@@ -116,6 +116,7 @@ interface IBaseRegistrationHomeProps {
 interface IRegistrationHomeState {
   reviewCurrentPage: number
   updatesCurrentPage: number
+  lastModifiedOn: number
 }
 
 type IRegistrationHomeProps = InjectedIntlProps &
@@ -147,7 +148,8 @@ export class RegistrationHomeView extends React.Component<
     super(props)
     this.state = {
       reviewCurrentPage: 1,
-      updatesCurrentPage: 1
+      updatesCurrentPage: 1,
+      lastModifiedOn: this.props.lastModifiedOn
     }
   }
 
@@ -246,7 +248,9 @@ export class RegistrationHomeView extends React.Component<
           variables={{
             locationIds: [registrarUnion]
           }}
-          pollInterval={500}
+          pollInterval={
+            this.props.lastModifiedOn !== this.state.lastModifiedOn ? 400 : 0
+          }
         >
           {({
             loading,
@@ -280,7 +284,9 @@ export class RegistrationHomeView extends React.Component<
               )
             }
 
-            setTimeout(() => stopPolling(), 1500)
+            if (this.props.lastModifiedOn !== this.state.lastModifiedOn) {
+              setTimeout(() => stopPolling(), 1200)
+            }
 
             return (
               <>
@@ -364,6 +370,7 @@ export class RegistrationHomeView extends React.Component<
           <ReviewTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
+            lastModifiedOn={this.props.lastModifiedOn}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
