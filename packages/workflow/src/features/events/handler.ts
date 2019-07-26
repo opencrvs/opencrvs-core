@@ -40,8 +40,8 @@ export enum Events {
   DEATH_MARK_VALID = '/event/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
-  BIRTH_NEW_VALIDATE = 'events/birth/new-validation',
-  DEATH_NEW_VALIDATE = 'events/death/new-validation',
+  BIRTH_NEW_VALIDATE = '/events/birth/new-validation',
+  DEATH_NEW_VALIDATE = '/events/death/new-validation',
   UNKNOWN = 'unknown'
 }
 
