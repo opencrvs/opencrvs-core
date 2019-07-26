@@ -559,16 +559,21 @@ export const conditionals: IConditionals = {
   withIn45Days: {
     action: 'hide',
     expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days")'
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days") || !draftData.child.childBirthDate'
   },
   between46daysTo5yrs: {
     action: 'hide',
     expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs")'
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs") || !draftData.child.childBirthDate'
   },
   after5yrs: {
     action: 'hide',
     expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")'
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")  || !draftData.child.childBirthDate'
+  },
+  deceasedNationIdSelected: {
+    action: 'hide',
+    expression:
+      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1] > -1)))'
   }
 }

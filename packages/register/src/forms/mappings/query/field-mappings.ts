@@ -244,10 +244,7 @@ export function attachmentToFieldTransformer(
         let subject = attachment.subject as string
         if (subjectMapper) {
           // @ts-ignore
-          subject =
-            Object.keys(subjectMapper).find(
-              key => subjectMapper[key].toUpperCase() === subject.toUpperCase()
-            ) || attachment.subject
+          subject = attachment.subject
         }
         let type = attachment.type
         if (typeMapper) {
@@ -257,8 +254,6 @@ export function attachmentToFieldTransformer(
               key => typeMapper[key] === attachment.type
             ) || attachment.type
         }
-
-        console.log(field)
         if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
           attachments.push({
             data: attachment.data,
@@ -271,8 +266,6 @@ export function attachmentToFieldTransformer(
       }
     )
   }
-
-  console.log(attachments)
   if (attachments) {
     transformedData[sectionId][field.name] = attachments
   }

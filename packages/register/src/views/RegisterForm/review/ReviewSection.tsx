@@ -490,7 +490,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (
         allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
       ) {
-        const title = this.props.intl.formatMessage(sectionTitle[activeSection])
+        const title = sectionTitle[activeSection]
         const label = title + ' ' + document.optionValues[1]
 
         documentOptions.push({

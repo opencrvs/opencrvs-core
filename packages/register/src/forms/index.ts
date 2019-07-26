@@ -375,6 +375,7 @@ export interface IConditionals {
   withIn45Days: IConditional
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
+  deceasedNationIdSelected: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'

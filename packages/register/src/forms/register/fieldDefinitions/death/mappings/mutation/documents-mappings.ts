@@ -2,22 +2,6 @@ import { IFormField, IFormData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
 import { deceasedSection } from '@register/forms/register/fieldDefinitions/death/deceased-section'
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
-import { defineMessages } from 'react-intl'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  deceased: {
-    id: 'register.form.tabs.deceasedTab',
-    defaultMessage: 'Deceased',
-    description: 'Document for whom showd in the preview dropdown for document'
-  },
-  applicant: {
-    id: 'register.form.tabs.applicantTab',
-    defaultMessage: 'Applicant',
-    description: 'Document for whom showd in the preview dropdown for document'
-  }
-})
 
 export const documentForWhomFhirMapping = {
   "Proof of Deceased's ID": 'DECEASED_ID_PROOF',
@@ -40,8 +24,8 @@ export const sectionMapping = {
 }
 
 export const sectionTitle = {
-  [deceasedSection.id]: messages.deceased,
-  [applicantsSection.id]: messages.applicant
+  [deceasedSection.id]: 'Deceased',
+  [applicantsSection.id]: 'Applicant'
 }
 
 export const documentTypeFhirMapping = {

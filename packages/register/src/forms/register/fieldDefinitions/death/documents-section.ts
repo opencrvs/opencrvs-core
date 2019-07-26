@@ -14,6 +14,7 @@ import {
   documentForWhomFhirMapping
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 import { deathAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
+import { conditionals } from '@register/forms/utils'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -250,26 +251,7 @@ export const documentsSection: IFormSection = {
             { value: 'Birth Registration', label: messages.docTypeBR },
             { value: 'Passport', label: messages.docTypePassport }
           ],
-          mapping: {
-            mutation: deathFieldToAttachmentTransformer,
-            query: deathAttachmentToFieldTransformer
-          }
-        },
-        {
-          name: 'uploadDocForDeceasedDOB',
-          type: DOCUMENT_UPLOADER_WITH_OPTION,
-          label: messages.deceasedDoBProof,
-          initialValue: '',
-          extraValue:
-            documentForWhomFhirMapping['Proof of Date of Birth of Deceased'],
-          hideAsterisk: true,
-          validate: [],
-          options: [
-            { value: 'National ID (front)', label: messages.docTypeNIDFront },
-            { value: 'National ID (back)', label: messages.docTypeNIDBack },
-            { value: 'Birth Registration', label: messages.docTypeBR },
-            { value: 'Passport', label: messages.docTypePassport }
-          ],
+          conditionals: [conditionals.deceasedNationIdSelected],
           mapping: {
             mutation: deathFieldToAttachmentTransformer,
             query: deathAttachmentToFieldTransformer
