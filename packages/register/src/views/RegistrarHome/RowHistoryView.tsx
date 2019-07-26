@@ -29,7 +29,8 @@ import {
   DECLARED,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
 } from '@register/utils/constants'
-import { messages } from '@register/search/messages'
+import { constantsMessages, errorMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/search'
 import moment from 'moment'
 import {
   StatusGreen,
@@ -219,7 +220,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     REJECT_REASON
                   )) ||
                 '',
-              rejectComments:
+              comment:
                 (status &&
                   status.type === REJECTED &&
                   extractCommentFragmentValue(
@@ -265,13 +266,13 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DECLARED':
-        return messages.workflowStatusDateApplication
+        return constantsMessages.applicationSubmittedOn
       case 'REGISTERED':
-        return messages.workflowStatusDateRegistered
+        return constantsMessages.applicationRegisteredOn
       case 'REJECTED':
-        return messages.workflowStatusDateRejected
+        return constantsMessages.applicationRejectedOn
       default:
-        return messages.workflowStatusDateApplication
+        return constantsMessages.applicationSubmittedOn
     }
   }
 
@@ -298,7 +299,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-expanded">
-                  {intl.formatMessage(messages.queryError)}
+                  {intl.formatMessage(errorMessages.queryError)}
                 </ErrorText>
               )
             } else if (loading) {
@@ -316,15 +317,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               <>
                 <BorderedPaddedContent>
                   <ExpansionContainer>
-                    <label>{intl.formatMessage(messages.name)}:</label>
+                    <label>{intl.formatMessage(constantsMessages.name)}:</label>
                     <BoldSpan>{transformedData.name}</BoldSpan>
                   </ExpansionContainer>
                   <ExpansionContainer>
                     <label>
                       {intl.formatMessage(
                         transformedData.type.toLowerCase() === 'birth'
-                          ? messages.dob
-                          : messages.dod
+                          ? constantsMessages.dob
+                          : constantsMessages.dod
                       )}
                       :
                     </label>
@@ -344,7 +345,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         practitionerName,
                         practitionerRole,
                         rejectReasons,
-                        rejectComments
+                        comment
                       } = status
                       const type = status.type as string
                       const officeName = status.officeName as string
@@ -366,7 +367,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                               <ValueContainer>
                                 <StyledLabel>
                                   {this.props.intl.formatMessage(
-                                    messages.workflowPractitionerLabel
+                                    constantsMessages.by
                                   )}
                                   :
                                 </StyledLabel>
@@ -382,15 +383,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                                 <>
                                   <LabelValue
                                     label={intl.formatMessage(
-                                      messages.rejectReason
+                                      constantsMessages.update
                                     )}
                                     value={rejectReasons}
                                   />
                                   <LabelValue
                                     label={intl.formatMessage(
-                                      messages.rejectComments
+                                      constantsMessages.comment
                                     )}
-                                    value={rejectComments}
+                                    value={comment}
                                   />
                                 </>
                               )}

@@ -6,9 +6,15 @@ interface IErrorMessages {
   errorTitle: ReactIntl.FormattedMessage.MessageDescriptor
   errorDescription1: ReactIntl.FormattedMessage.MessageDescriptor
   errorDescription2: ReactIntl.FormattedMessage.MessageDescriptor
+  queryError: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
+  queryError: {
+    id: 'error.search',
+    defaultMessage: 'An error occurred while searching',
+    description: 'The error message shown when a search query fails'
+  },
   errorCodeUnauthorized: {
     id: 'error.code',
     defaultMessage: '401',

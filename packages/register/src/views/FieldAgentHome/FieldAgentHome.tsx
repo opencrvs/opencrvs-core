@@ -149,8 +149,8 @@ const messages: {
     defaultMessage: 'Rejected {text}',
     description: 'The title of rejected days of application'
   },
-  listItemName: {
-    id: 'register.registrationHome.listItemName',
+  name: {
+    id: 'constants.name',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
@@ -462,7 +462,7 @@ class FieldAgentHomeView extends React.Component<
                               },
                               {
                                 label: this.props.intl.formatMessage(
-                                  messages.listItemName
+                                  messages.name
                                 ),
                                 width: 40,
                                 key: 'name',

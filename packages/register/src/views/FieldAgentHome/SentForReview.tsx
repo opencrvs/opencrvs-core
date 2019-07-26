@@ -64,7 +64,7 @@ const messages = {
     description: 'Label for type of event in work queue list item'
   },
   name: {
-    id: 'register.registrationHome.listItemName',
+    id: 'constants.name',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   }

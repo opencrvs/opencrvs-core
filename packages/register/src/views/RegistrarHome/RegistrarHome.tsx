@@ -155,7 +155,7 @@ const messages: {
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
-  listItemTrackingNumber: {
+  trackingId: {
     id: 'constants.trackingId',
     defaultMessage: 'Tracking ID',
     description: 'Label for tracking ID in work queue list item'
@@ -195,8 +195,8 @@ const messages: {
     defaultMessage: 'Update',
     description: 'The title of update button in list item actions'
   },
-  listItemName: {
-    id: 'register.registrationHome.listItemName',
+  name: {
+    id: 'constants.name',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
@@ -621,7 +621,7 @@ export class RegistrarHomeView extends React.Component<
                   key: 'event'
                 },
                 {
-                  label: this.props.intl.formatMessage(messages.listItemName),
+                  label: this.props.intl.formatMessage(messages.name),
                   width: 35,
                   key: 'name'
                 },
@@ -702,7 +702,7 @@ export class RegistrarHomeView extends React.Component<
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemTrackingNumber
+                          messages.trackingId
                         ),
                         width: 20,
                         key: 'trackingId'
@@ -803,9 +803,7 @@ export class RegistrarHomeView extends React.Component<
                         key: 'event'
                       },
                       {
-                        label: this.props.intl.formatMessage(
-                          messages.listItemName
-                        ),
+                        label: this.props.intl.formatMessage(messages.name),
                         width: 23,
                         key: 'name'
                       },
@@ -903,9 +901,7 @@ export class RegistrarHomeView extends React.Component<
                         key: 'event'
                       },
                       {
-                        label: this.props.intl.formatMessage(
-                          messages.listItemName
-                        ),
+                        label: this.props.intl.formatMessage(messages.name),
                         width: 25,
                         key: 'name'
                       },

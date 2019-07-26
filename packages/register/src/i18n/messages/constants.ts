@@ -15,16 +15,84 @@ interface IConstantsMessages {
   by: ReactIntl.FormattedMessage.MessageDescriptor
   reason: ReactIntl.FormattedMessage.MessageDescriptor
   review: ReactIntl.FormattedMessage.MessageDescriptor
+  update: ReactIntl.FormattedMessage.MessageDescriptor
   birth: ReactIntl.FormattedMessage.MessageDescriptor
   death: ReactIntl.FormattedMessage.MessageDescriptor
   application: ReactIntl.FormattedMessage.MessageDescriptor
   declared: ReactIntl.FormattedMessage.MessageDescriptor
   rejected: ReactIntl.FormattedMessage.MessageDescriptor
   registered: ReactIntl.FormattedMessage.MessageDescriptor
+  collected: ReactIntl.FormattedMessage.MessageDescriptor
   certified: ReactIntl.FormattedMessage.MessageDescriptor
   trackingId: ReactIntl.FormattedMessage.MessageDescriptor
+  search: ReactIntl.FormattedMessage.MessageDescriptor
+  dod: ReactIntl.FormattedMessage.MessageDescriptor
+  comment: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationSubmittedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationRegisteredOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationRejectedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationCollectedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  collectedBy: ReactIntl.FormattedMessage.MessageDescriptor
+  issuedBy: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  dod: {
+    id: 'constants.dod',
+    defaultMessage: 'D.o.D',
+    description: 'Label for DoD in work queue list item'
+  },
+  comment: {
+    id: 'constants.comment',
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment'
+  },
+  applicationSubmittedOn: {
+    id: 'constants.applicationSubmittedOn',
+    defaultMessage: 'Application submitted on',
+    description:
+      'Label for the workflow timestamp when the status is application'
+  },
+  applicationRegisteredOn: {
+    id: 'constants.applicationRegisteredOn',
+    defaultMessage: 'Registrated on',
+    description:
+      'Label for the workflow timestamp when the status is registered'
+  },
+  applicationRejectedOn: {
+    id: 'constants.applicationRejectedOn',
+    defaultMessage: 'Application rejected on',
+    description: 'Label for the workflow timestamp when the status is rejected'
+  },
+  applicationCollectedOn: {
+    id: 'constants.applicationCollectedOn',
+    defaultMessage: 'Certificate collected on',
+    description: 'Label for the workflow timestamp when the status is collected'
+  },
+  collected: {
+    id: 'constants.collected',
+    defaultMessage: 'collected',
+    description: 'The status label for collected'
+  },
+  search: {
+    id: 'constants.search',
+    defaultMessage: 'Search',
+    description: 'The title of the page'
+  },
+  collectedBy: {
+    id: 'constants.collectedBy',
+    defaultMessage: 'Collected by',
+    description: 'The collected by sec text'
+  },
+  issuedBy: {
+    id: 'constants.issuedBy',
+    defaultMessage: 'Issued by',
+    description: 'The issued by sec text'
+  },
+  update: {
+    id: 'constants.update',
+    defaultMessage: 'Update',
+    description: 'The title of reject button in list item actions'
+  },
   areYouSure: {
     id: 'constants.areYouSure',
     defaultMessage: 'Are you sure?',

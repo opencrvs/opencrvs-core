@@ -25,8 +25,8 @@ const messages = {
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
-  listItemName: {
-    id: 'register.registrationHome.listItemName',
+  name: {
+    id: 'constants.name',
     defaultMessage: 'Name',
     description: 'Label for name in work queue list item'
   },
@@ -135,7 +135,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
               key: 'event'
             },
             {
-              label: this.props.intl.formatMessage(messages.listItemName),
+              label: this.props.intl.formatMessage(messages.name),
               width: 40,
               key: 'name',
               errorValue: 'No name provided'

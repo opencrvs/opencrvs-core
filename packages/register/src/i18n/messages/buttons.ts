@@ -17,9 +17,27 @@ interface IButtonsMessages {
   settings: ReactIntl.FormattedMessage.MessageDescriptor
   login: ReactIntl.FormattedMessage.MessageDescriptor
   goToHomepage: ReactIntl.FormattedMessage.MessageDescriptor
+  review: ReactIntl.FormattedMessage.MessageDescriptor
+  print: ReactIntl.FormattedMessage.MessageDescriptor
+  edit: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  review: {
+    id: 'buttons.review',
+    defaultMessage: 'Review',
+    description: 'Review button text'
+  },
+  print: {
+    id: 'buttons.print',
+    defaultMessage: 'Print',
+    description: 'Print button text'
+  },
+  edit: {
+    id: 'buttons.edit',
+    defaultMessage: 'Edit',
+    description: 'Edit button text'
+  },
   back: {
     id: 'buttons.back',
     defaultMessage: 'Back',

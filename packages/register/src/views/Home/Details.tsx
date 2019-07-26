@@ -152,29 +152,29 @@ const messages: {
     defaultMessage: 'Failed to send on',
     description: 'Label for the workflow timestamp when the status is failed'
   },
-  workflowStatusDateRegistered: {
-    id: 'register.application.details.item.label.registered',
+  applicationRegisteredOn: {
+    id: 'constants.applicationRegisteredOn',
     defaultMessage: 'Registrated on',
     description:
       'Label for the workflow timestamp when the status is registered'
   },
-  workflowStatusDateRejected: {
-    id: 'register.application.details.item.label.rejected',
+  applicationRejectedOn: {
+    id: 'constants.applicationRejectedOn',
     defaultMessage: 'Rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
   },
-  workflowStatusDateCollected: {
-    id: 'register.application.details.item.label.collected',
+  applicationCollectedOn: {
+    id: 'constants.applicationCollectedOn',
     defaultMessage: 'Printed on',
     description: 'Label for the workflow timestamp when the status is collected'
   },
-  workflowPractitionerLabel: {
-    id: 'register.application.details.item.label.by',
+  by: {
+    id: 'constants.by',
     defaultMessage: 'By',
     description: 'Label for the practitioner name in workflow'
   },
-  workflowStatusDateApplication: {
-    id: 'register.application.details.item.label.application',
+  applicationSubmittedOn: {
+    id: 'constants.applicationSubmittedOn',
     defaultMessage: 'Application submitted on',
     description:
       'Label for the workflow timestamp when the status is application'
@@ -200,12 +200,12 @@ const messages: {
     description: 'Tracking ID label'
   },
   workflowApplicationRejectReason: {
-    id: 'register.application.details.item.label.rejectionReason',
+    id: 'constants.reason',
     defaultMessage: 'Reason',
     description: 'Label for rejection reason'
   },
   workflowApplicationRejectComment: {
-    id: 'register.application.details.item.label.rejectionComment',
+    id: 'constants.comment',
     defaultMessage: 'Comment',
     description: 'Label for rejection comment'
   },
@@ -286,15 +286,15 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
       case 'FAILED':
         return messages.workflowStatusDateFailed
       case 'DECLARED':
-        return messages.workflowStatusDateApplication
+        return messages.applicationSubmittedOn
       case 'REGISTERED':
-        return messages.workflowStatusDateRegistered
+        return messages.applicationRegisteredOn
       case 'REJECTED':
-        return messages.workflowStatusDateRejected
+        return messages.applicationRejectedOn
       case 'CERTIFIED':
-        return messages.workflowStatusDateCollected
+        return messages.applicationCollectedOn
       default:
-        return messages.workflowStatusDateApplication
+        return messages.applicationSubmittedOn
     }
   }
   getWorkflowStatusIcon = (status: string) => {
@@ -531,7 +531,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                     <ValuesWithSeparator
                       strings={[
                         `${this.props.intl.formatMessage(
-                          messages.workflowPractitionerLabel
+                          messages.by
                         )}: ${practitionerName}`,
                         practitionerRole,
                         (officeName && (officeName as string)) || ''

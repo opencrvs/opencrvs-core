@@ -705,16 +705,11 @@ export const ENGLISH_STATE: ILanguage = {
     'review.actions.description':
       'By registering this birth, a birth certificate will be generated with your signature for issuance.',
     'review.actions.title.registerActionTitle': 'Register or reject?',
-    'register.application.details.item.label.application':
-      'Application submitted on',
-    'register.application.details.item.label.by': 'By',
-    'register.application.details.item.label.collected':
-      'Certificate collected on',
-    'register.application.details.item.label.registered': 'Registered on',
-    'register.application.details.item.label.rejected':
-      'Application rejected on',
-    'register.application.details.item.label.rejectionComment': 'Comment',
-    'register.application.details.item.label.rejectionReason': 'Reason',
+    'constants.applicationSubmittedOn': 'Application submitted on',
+    'constants.applicationCollectedOn': 'Certificate collected on',
+    'constants.applicationRegisteredOn': 'Registered on',
+    'constants.applicationRejectedOn': 'Application rejected on',
+    'constants.comment': 'Comment',
     'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.} duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.} certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.} offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
     'register.confirmationScreen.buttons.back': 'Back to homescreen',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',
@@ -844,9 +839,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registerForm.queryError':
       'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
     'register.registrationHome.inProgress': 'In progress',
-    'register.registrationHome.listItemDoB': 'D.o.B.',
-    'register.registrationHome.listItemDod': 'D.o.D.',
-    'register.registrationHome.listItemName': 'Name',
+    'constants.dod': 'D.o.D.',
     'register.registrationHome.noResults': 'No result to display',
     'register.registrationHome.outbox.statusRegistering': 'Registering...',
     'register.registrationHome.outbox.statusRejecting': 'Rejecting...',
@@ -876,31 +869,21 @@ export const ENGLISH_STATE: ILanguage = {
       'Application registered',
     'register.registrationHome.table.label.type': 'Type',
     'register.registrationHome.table.label.updateDate': 'Sent on',
-    'register.SearchResult.collectedBy': 'Collected by',
-    'register.SearchResult.informantContact': 'Informant contact number',
-    'register.SearchResult.issuedBy': 'Issued by',
-    'register.searchResult.labels.events.birth': 'Birth',
-    'register.searchResult.labels.events.death': 'Death',
-    'register.searchResult.labels.results.eventRegistrationNumber':
+    'constants.collectedBy': 'Collected by',
+    'search.informantContact': 'Informant contact number',
+    'constants.issuedBy': 'Issued by',
+    'search.labels.results.eventRegistrationNumber':
       '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
-    'register.searchResult.labels.statuses.application': 'Application',
-    'register.searchResult.labels.statuses.collected': 'Collected',
-    'register.searchResult.labels.statuses.registered': 'Registered',
-    'register.searchResult.labels.statuses.rejected': 'Rejected',
-    'register.searchResult.listItemDoB': 'D.o.B.',
-    'register.searchResult.listItemDod': 'D.o.D.',
-    'register.searchResult.listItemName': 'Name',
-    'register.searchResult.noResults': 'No result to display',
-    'register.searchResult.queryError': 'An error occurred while searching',
-    'register.SearchResult.reject': 'Update',
-    'register.SearchResult.rejectComments': 'Comments',
-    'register.SearchResult.rejectReason': 'Reason',
-    'register.searchResult.results': 'Results',
-    'register.SearchResult.searchingFor': 'Searching for “{param}”',
-    'register.SearchResult.searchResultFor':
+    'constants.collected': 'Collected',
+    'search.noResults': 'No result to display',
+    'error.search': 'An error occurred while searching',
+    'constants.update': 'Update',
+    'search.results': 'Results',
+    'search.searchingFor': 'Searching for “{param}”',
+    'search.searchResultFor':
       '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
-    'register.SearchResult.title': 'Search',
-    'register.SearchResult.totalResultText':
+    'constants.search': 'Search',
+    'search.totalResultText':
       '{total, plural, =0 {} one {# record found} other {# records found}} ',
     'form.field.select.placeholder': 'Select...',
     'register.SelectContactPoint.birthRelationshipLabel':

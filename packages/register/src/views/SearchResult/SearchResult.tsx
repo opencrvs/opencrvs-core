@@ -40,8 +40,13 @@ import {
 } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope, getUserDetails } from '@register/profile/profileSelectors'
-import { messages as rejectionMessages } from '@register/review/reject-registration'
-import { messages } from '@register/search/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/search'
+import { messages as rejectMessages } from '@register/i18n/messages/views/reject'
 import { SEARCH_EVENTS } from '@register/search/queries'
 import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
@@ -180,15 +185,15 @@ function formatRoleCode(str: string) {
 export function getRejectionReasonDisplayValue(reason: string) {
   switch (reason.toLowerCase()) {
     case 'duplicate':
-      return rejectionMessages.rejectionReasonDuplicate
+      return rejectMessages.rejectionReasonDuplicate
     case 'misspelling':
-      return rejectionMessages.rejectionReasonMisspelling
+      return rejectMessages.rejectionReasonMisspelling
     case 'missing_supporting_doc':
-      return rejectionMessages.rejectionReasonMissingSupportingDoc
+      return rejectMessages.rejectionReasonMissingSupportingDoc
     case 'other':
-      return rejectionMessages.rejectionReasonOther
+      return rejectMessages.rejectionReasonOther
     default:
-      return rejectionMessages.rejectionReasonOther
+      return rejectMessages.rejectionReasonOther
   }
 }
 
@@ -286,41 +291,41 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
       case 'DECLARED':
-        return this.props.intl.formatMessage(messages.application)
+        return this.props.intl.formatMessage(constantsMessages.application)
       case 'REGISTERED':
-        return this.props.intl.formatMessage(messages.registered)
+        return this.props.intl.formatMessage(constantsMessages.registered)
       case 'REJECTED':
-        return this.props.intl.formatMessage(messages.rejected)
+        return this.props.intl.formatMessage(constantsMessages.rejected)
       case 'CERTIFIED':
-        return this.props.intl.formatMessage(messages.collected)
+        return this.props.intl.formatMessage(constantsMessages.collected)
       default:
-        return this.props.intl.formatMessage(messages.application)
+        return this.props.intl.formatMessage(constantsMessages.application)
     }
   }
 
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DECLARED':
-        return messages.workflowStatusDateApplication
+        return constantsMessages.applicationSubmittedOn
       case 'REGISTERED':
-        return messages.workflowStatusDateRegistered
+        return constantsMessages.applicationRegisteredOn
       case 'REJECTED':
-        return messages.workflowStatusDateRejected
+        return constantsMessages.applicationRejectedOn
       case 'CERTIFIED':
-        return messages.workflowStatusDateCollected
+        return constantsMessages.applicationCollectedOn
       default:
-        return messages.workflowStatusDateApplication
+        return constantsMessages.applicationSubmittedOn
     }
   }
 
   getEventLabel = (status: string) => {
     switch (status.toUpperCase()) {
       case 'BIRTH':
-        return this.props.intl.formatMessage(messages.filtersBirth)
+        return this.props.intl.formatMessage(constantsMessages.birth)
       case 'DEATH':
-        return this.props.intl.formatMessage(messages.filtersDeath)
+        return this.props.intl.formatMessage(constantsMessages.death)
       default:
-        return this.props.intl.formatMessage(messages.filtersBirth)
+        return this.props.intl.formatMessage(constantsMessages.birth)
     }
   }
 
@@ -391,7 +396,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
               REJECT_REASON
             )) ||
           '',
-        rejectComments:
+        comment:
           (status &&
             status.type === REJECTED &&
             extractCommentFragmentValue(
@@ -447,7 +452,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   collectorName,
                   collectorType,
                   rejectReasons,
-                  rejectComments,
+                  comment,
                   informantContactNumber
                 } = status
                 const type = status.type as string
@@ -476,7 +481,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       )}
                       {collectorType && (
                         <LabelValue
-                          label={intl.formatMessage(messages.collectedBy)}
+                          label={intl.formatMessage(
+                            constantsMessages.collectedBy
+                          )}
                           value={collectorInfo}
                         />
                       )}
@@ -484,8 +491,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                         <StyledLabel>
                           {this.props.intl.formatMessage(
                             collectorType
-                              ? messages.issuedBy
-                              : messages.workflowPractitionerLabel
+                              ? constantsMessages.issuedBy
+                              : constantsMessages.by
                           )}
                           :
                         </StyledLabel>
@@ -500,12 +507,14 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       {rejectReasons && (
                         <>
                           <LabelValue
-                            label={intl.formatMessage(messages.rejectReason)}
+                            label={intl.formatMessage(constantsMessages.reason)}
                             value={rejectReasons}
                           />
                           <LabelValue
-                            label={intl.formatMessage(messages.rejectComments)}
-                            value={rejectComments}
+                            label={intl.formatMessage(
+                              constantsMessages.comment
+                            )}
+                            value={comment}
                           />
                         </>
                       )}
@@ -532,18 +541,18 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const icons = []
 
     info.push({
-      label: this.props.intl.formatMessage(messages.listItemName),
+      label: this.props.intl.formatMessage(constantsMessages.name),
       value: item.name
     })
     if (item.dob) {
       info.push({
-        label: this.props.intl.formatMessage(messages.listItemDob),
+        label: this.props.intl.formatMessage(constantsMessages.dob),
         value: item.dob
       })
     }
     if (item.dod) {
       info.push({
-        label: this.props.intl.formatMessage(messages.listItemDod),
+        label: this.props.intl.formatMessage(constantsMessages.dod),
         value: item.dod
       })
     }
@@ -557,7 +566,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       })
     } else {
       info.push({
-        label: this.props.intl.formatMessage(messages.listItemTrackingNumber),
+        label: this.props.intl.formatMessage(constantsMessages.trackingId),
         value: item.trackingId
       })
     }
@@ -576,9 +585,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       const rejectComment = item.rejectionComment
 
       info.push({
-        label: this.props.intl.formatMessage(
-          messages.listItemRejectionReasonLabel
-        ),
+        label: this.props.intl.formatMessage(constantsMessages.reason),
         value:
           reasons &&
           reasons
@@ -596,7 +603,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
       if (rejectComment) {
         info.push({
-          label: this.props.intl.formatMessage(messages.listItemCommentLabel),
+          label: this.props.intl.formatMessage(constantsMessages.comment),
           value: rejectComment
         })
       }
@@ -612,7 +619,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     if (this.userHasCertifyScope()) {
       if (applicationIsRegistered || applicationIsCertified) {
         listItemActions.push({
-          label: this.props.intl.formatMessage(messages.print),
+          label: this.props.intl.formatMessage(buttonMessages.print),
           handler: () => this.props.goToPrintCertificate(item.id, item.event)
         })
       }
@@ -626,7 +633,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         !applicationIsCertified
       ) {
         listItemActions.push({
-          label: this.props.intl.formatMessage(messages.review),
+          label: this.props.intl.formatMessage(constantsMessages.review),
           handler: () =>
             this.props.goToPage(
               REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -637,7 +644,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         })
       } else if (applicationIsRejected) {
         listItemActions.push({
-          label: this.props.intl.formatMessage(messages.reject),
+          label: this.props.intl.formatMessage(constantsMessages.update),
           handler: () =>
             this.props.goToPage(
               REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -656,7 +663,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       !applicationIsRejected
     ) {
       listItemActions.push({
-        label: this.props.intl.formatMessage(messages.reviewDuplicates),
+        label: this.props.intl.formatMessage(constantsMessages.review),
         handler: () => this.props.goToReviewDuplicate(item.id)
       })
     }
@@ -667,7 +674,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           disabled={true}
         >
           <Edit />
-          {this.props.intl.formatMessage(messages.EditBtnText)}
+          {this.props.intl.formatMessage(buttonMessages.edit)}
         </StyledSecondaryButton>
       )
     }
@@ -767,7 +774,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
                     return (
                       <ErrorText id="search-result-error-text">
-                        {intl.formatMessage(messages.queryError)}
+                        {intl.formatMessage(errorMessages.queryError)}
                       </ErrorText>
                     )
                   }
