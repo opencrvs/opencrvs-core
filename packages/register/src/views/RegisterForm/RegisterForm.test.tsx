@@ -4,7 +4,8 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames
+  mockDeathApplicationDataWithoutFirstNames,
+  flushPromises
 } from '@register/tests/util'
 import { RegisterForm } from '@register/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -39,6 +40,7 @@ import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/querie
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
+import { getToken } from '@register/utils/authUtils'
 
 import { messages } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 
@@ -244,12 +246,29 @@ describe('when user is in the register form for birth event', async () => {
       )
       expect(component.find(select).text()).toEqual('United States of America')
     })
-    it('takes user to declaration submitted page when save button is clicked', () => {
+    it('takes field agent to declaration submitted page when save button is clicked', () => {
+      localStorage.getItem = jest.fn(
+        (key: string) =>
+          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NjMyNTYyNDIsImV4cCI6MTU2Mzg2MTA0MiwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkMWM1YTJhNTgxNjM0MDBlZjFkMDEyOSJ9.hZu0em2JA0sl-5uzck4mn4HfYdzxSmgoERA8SbWRPXEmriSYjs4PEPk9StXF_Ed5kd53VlNF9xf39DDGWqyyn76gpcMPbHJAL8nqLV82hot8fgU1WtEk865U8-9oAxaVmxAsjpHayiuD6zfKuR-ixrLFdoRKP13LdORktFCQe5e7To2w7vXArjUb6SDpSHST4Fbkhg8vzOcykweSGiNlmoEVtLzkpamS6fcTGRHkNpb_Wk_AQW9TAdw6NqG5lDEAO10auNgJpKxO8X-DQKhvEfY5TbpblR51L_U8pUXpDCAvGegMLnwmfAIoH1hMj--Wd2JhqgUvj0YrlDKI99fntA'
+      )
       component
         .find('#save_draft')
         .hostNodes()
         .simulate('click')
-      expect(history.location.pathname).toEqual('/')
+      expect(history.location.pathname).toEqual('/field-agent-home/progress')
+    })
+    it('takes registrar to declaration submitted page when save button is clicked', () => {
+      localStorage.getItem = jest.fn(
+        (key: string) =>
+          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzOTcyOTQ0LCJleHAiOjE1NjQ1Nzc3NDQsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.VrH31goeitKvLHQchy5HQJkQWjhK-cWisxSgQUXChK4MZQis9Ufzn7dWK3s2s0dSpnFqk-0Yj5cVlq7JgQVcniO26WhnSyXHYQk7DG-TSA5FXGYoKMhjMZCh5qOZTRaVI6yvnEsLKTYeNvkXKJ2wb6M9U5OWjUh1KGPexd9mSjUsUwZ5BDTvI0WjnBTgQ_a0-KhxjjypT8Y_VXiiY-KWLxuOpVGalv3P3nbH8dAUzEuzKsrq6q0MJsaJkgDliaz2pZd10JxnJE1VYUob2SNHFnmJnz8Llwe1lH4xa8rluIA6YBmxdkrU2VkhCBPD6VxGYRHrD3LKRa3Cgm1X0qNQTw'
+      )
+      component
+        .find('#save_draft')
+        .hostNodes()
+        .simulate('click')
+      expect(
+        history.location.pathname.includes('/registration-home/progress')
+      ).toBeTruthy()
     })
   })
 })

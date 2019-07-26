@@ -5,7 +5,8 @@ import {
   validToken,
   getItem,
   flushPromises,
-  setItem
+  setItem,
+  mockApplicationData
 } from '@register/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -29,8 +30,20 @@ import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import * as CommonUtils from '@register/utils/commonUtils'
 
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
+
+const validateToken = jwt.sign(
+  { scope: ['validate'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
 
 interface IPersonDetails {
   [key: string]: any
@@ -677,6 +690,46 @@ describe('when user is previewing the form data', () => {
       await flushPromises()
       app.update()
       expect(store.dispatch).toBeCalled()
+    })
+  })
+
+  describe('when user has validate scope', () => {
+    beforeEach(async () => {
+      getItem.mockReturnValue(validateToken)
+      store.dispatch(checkAuth({ '?token': validateToken }))
+      const data = {
+        _fhirIDMap: {
+          composition: '16'
+        },
+        ...mockApplicationData
+      }
+
+      const customDraft = {
+        id: uuid(),
+        data,
+        review: true,
+        event: Event.BIRTH
+      }
+
+      store.dispatch(storeApplication(customDraft))
+      history.replace(
+        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
+          ':applicationId',
+          customDraft.id.toString()
+        )
+          .replace(':event', 'birth')
+          .replace(':pageId', 'review')
+      )
+      app.update()
+    })
+
+    it('shows send for approval button', () => {
+      expect(
+        app
+          .find('#validateApplicationBtn')
+          .hostNodes()
+          .text()
+      ).toBe('Send for approval')
     })
   })
 })

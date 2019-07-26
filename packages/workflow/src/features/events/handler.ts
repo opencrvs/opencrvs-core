@@ -40,6 +40,8 @@ export enum Events {
   DEATH_MARK_VALID = '/event/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
+  BIRTH_NEW_VALIDATE = '/events/birth/new-validation',
+  DEATH_NEW_VALIDATE = '/events/death/new-validation',
   UNKNOWN = 'unknown'
 }
 
@@ -73,6 +75,11 @@ function detectEvent(request: Hapi.Request): Events {
             if (hasRegisterScope(request)) {
               return Events.BIRTH_NEW_REG
             }
+
+            if (hasValidateScope(request)) {
+              return Events.BIRTH_NEW_VALIDATE
+            }
+
             return isInProgressApplication(fhirBundle)
               ? Events.BIRTH_IN_PROGRESS_DEC
               : Events.BIRTH_NEW_DEC
@@ -93,6 +100,11 @@ function detectEvent(request: Hapi.Request): Events {
             if (hasRegisterScope(request)) {
               return Events.DEATH_NEW_REG
             }
+
+            if (hasValidateScope(request)) {
+              return Events.DEATH_NEW_VALIDATE
+            }
+
             return isInProgressApplication(fhirBundle)
               ? Events.DEATH_IN_PROGRESS_DEC
               : Events.DEATH_NEW_DEC
@@ -188,6 +200,14 @@ export async function fhirWorkflowEventHandler(
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
       forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
+      break
+    case Events.BIRTH_NEW_VALIDATE:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
+      break
+    case Events.DEATH_NEW_VALIDATE:
+      response = await createRegistrationHandler(request, h, event)
+      forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
       break
     case Events.BIRTH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
