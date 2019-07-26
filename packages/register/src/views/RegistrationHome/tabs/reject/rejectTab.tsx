@@ -35,10 +35,12 @@ interface IBaseRejectTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarUnion: string | null
   parentQueryLoading?: boolean
+  lastModifiedOn: number
 }
 
 interface IRejectTabState {
   updatesCurrentPage: number
+  lastModifiedOn: number
 }
 
 type IRejectTabProps = InjectedIntlProps & IBaseRejectTabProps
@@ -51,7 +53,8 @@ class RejectTabComponent extends React.Component<
   constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
-      updatesCurrentPage: 1
+      updatesCurrentPage: 1,
+      lastModifiedOn: this.props.lastModifiedOn
     }
   }
 
@@ -119,15 +122,22 @@ class RejectTabComponent extends React.Component<
           count: this.pageSize,
           skip: (this.state.updatesCurrentPage - 1) * this.pageSize
         }}
+        pollInterval={
+          this.props.lastModifiedOn !== this.state.lastModifiedOn ? 400 : 0
+        }
       >
         {({
           loading,
           error,
-          data
+          data,
+          startPolling,
+          stopPolling
         }: {
           loading: any
           error?: any
           data: any
+          startPolling?: any
+          stopPolling?: any
         }) => {
           if (loading) {
             return (
@@ -148,6 +158,11 @@ class RejectTabComponent extends React.Component<
               </ErrorText>
             )
           }
+
+          if (this.props.lastModifiedOn !== this.state.lastModifiedOn) {
+            setTimeout(() => stopPolling(), 1200)
+          }
+
           return (
             <BodyContent>
               <GridTable

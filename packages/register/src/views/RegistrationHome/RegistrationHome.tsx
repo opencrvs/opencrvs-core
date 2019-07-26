@@ -377,6 +377,7 @@ export class RegistrationHomeView extends React.Component<
           <RejectTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
+            lastModifiedOn={this.props.lastModifiedOn}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
