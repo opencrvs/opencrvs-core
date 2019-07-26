@@ -46,7 +46,7 @@ interface IToggleMenuItem {
 export const EventTopBar = (props: IProps) => {
   const { goHome, title, saveAction, exitAction, menuItems, iconColor } = props
   return (
-    <TopBar>
+    <TopBar id="eventtopbar">
       <Item>
         <ApplicationIcon color={iconColor} /> <TopBarTitle>{title}</TopBarTitle>
       </Item>
