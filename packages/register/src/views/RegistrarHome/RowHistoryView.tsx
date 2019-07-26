@@ -26,7 +26,6 @@ import {
   REJECT_COMMENTS,
   LOCAL_DATE_FORMAT,
   CERTIFICATE_DATE_FORMAT,
-  DECLARED,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
 } from '@register/utils/constants'
 import { constantsMessages, errorMessages } from '@register/i18n/messages'

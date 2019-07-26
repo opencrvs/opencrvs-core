@@ -130,7 +130,7 @@ const messages: {
     description: 'Results label at the top of the data table component'
   },
   dataTableNoResults: {
-    id: 'register.registrationHome.noResults',
+    id: 'constants.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
@@ -151,7 +151,7 @@ const messages: {
     description: 'The title of sent for updates tab'
   },
   listItemType: {
-    id: 'register.registrationHome.table.label.type',
+    id: 'constants.type',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },
@@ -171,12 +171,12 @@ const messages: {
     description: 'Label for application date in work queue list item'
   },
   listItemUpdateDate: {
-    id: 'register.registrationHome.table.label.updateDate',
+    id: 'constants.sentOn',
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item'
   },
   listItemModificationDate: {
-    id: 'register.registrationHome.table.label.modificationDate',
+    id: 'constants.lastEdited',
     defaultMessage: 'Last edited',
     description: 'Label for rejection date in work queue list item'
   },

@@ -18,7 +18,7 @@ import {
   StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import {
@@ -42,7 +42,12 @@ import {
 import { Query } from 'react-apollo'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
 import * as Sentry from '@sentry/browser'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import {
+  userMessages,
+  constantsMessages as messages,
+  buttonMessages,
+  errorMessages
+} from '@register/i18n/messages'
 import {
   REJECTED,
   REJECT_REASON,
@@ -132,96 +137,6 @@ interface IHistoryData {
   action?: React.ReactElement
 }
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  workflowStatusDateDraftStarted: {
-    id: 'register.details.status.dateLabel.draft.started',
-    defaultMessage: 'Started on',
-    description:
-      'Label for the workflow timestamp when the status is draft created'
-  },
-  workflowStatusDateDraftUpdated: {
-    id: 'register.details.status.dateLabel.draft.updated',
-    defaultMessage: 'Updated on',
-    description:
-      'Label for the workflow timestamp when the status is draft updated'
-  },
-  workflowStatusDateFailed: {
-    id: 'register.details.status.dateLabel.draft.failed',
-    defaultMessage: 'Failed to send on',
-    description: 'Label for the workflow timestamp when the status is failed'
-  },
-  applicationRegisteredOn: {
-    id: 'constants.applicationRegisteredOn',
-    defaultMessage: 'Registrated on',
-    description:
-      'Label for the workflow timestamp when the status is registered'
-  },
-  applicationRejectedOn: {
-    id: 'constants.applicationRejectedOn',
-    defaultMessage: 'Rejected on',
-    description: 'Label for the workflow timestamp when the status is rejected'
-  },
-  applicationCollectedOn: {
-    id: 'constants.applicationCollectedOn',
-    defaultMessage: 'Printed on',
-    description: 'Label for the workflow timestamp when the status is collected'
-  },
-  by: {
-    id: 'constants.by',
-    defaultMessage: 'By',
-    description: 'Label for the practitioner name in workflow'
-  },
-  applicationSubmittedOn: {
-    id: 'constants.applicationSubmittedOn',
-    defaultMessage: 'Application submitted on',
-    description:
-      'Label for the workflow timestamp when the status is application'
-  },
-  update: {
-    id: 'buttons.update',
-    defaultMessage: 'Update',
-    description: 'The title of update button for draft application'
-  },
-  retry: {
-    id: 'buttons.retry',
-    defaultMessage: 'Retry',
-    description: 'The title of retry button for failed application'
-  },
-  workflowApplicantNumber: {
-    id: 'register.detail.status.applicant.number',
-    defaultMessage: 'Applicant contact number',
-    description: 'The title of contact number label'
-  },
-  workflowApplicantTrackingID: {
-    id: 'constants.trackingId',
-    defaultMessage: 'Tracking ID',
-    description: 'Tracking ID label'
-  },
-  workflowApplicationRejectReason: {
-    id: 'constants.reason',
-    defaultMessage: 'Reason',
-    description: 'Label for rejection reason'
-  },
-  workflowApplicationRejectComment: {
-    id: 'constants.comment',
-    defaultMessage: 'Comment',
-    description: 'Label for rejection comment'
-  },
-  emptyTitle: {
-    id: 'register.detail.subpage.emptyTitle',
-    defaultMessage: 'No name provided',
-    description: 'Label for empty title'
-  },
-  failureMessage: {
-    id: 'register.detail.status.failedMessage',
-    defaultMessage:
-      'This is some messaging on advicing the user on what to do... in the event of a failed applicaton.',
-    description: 'Tips for failed applications'
-  }
-})
-
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -280,11 +195,11 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DRAFT_STARTED':
-        return messages.workflowStatusDateDraftStarted
+        return messages.applicationStartedOn
       case 'DRAFT_MODIFIED':
-        return messages.workflowStatusDateDraftUpdated
+        return messages.applicationUpdatedOn
       case 'FAILED':
-        return messages.workflowStatusDateFailed
+        return messages.applicationFailedOn
       case 'DECLARED':
         return messages.applicationSubmittedOn
       case 'REGISTERED':
@@ -358,7 +273,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             new Date(draft.modifiedOn).toString(),
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
-                  roleMessages[userDetails.role as string]
+                  userMessages[userDetails.role as string]
                 )
               : '',
             (userDetails &&
@@ -377,7 +292,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             (draft.savedOn && new Date(draft.savedOn).toString()) || '',
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
-                  roleMessages[userDetails.role as string]
+                  userMessages[userDetails.role as string]
                 )
               : '',
             (userDetails &&
@@ -411,7 +326,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
       history.push(generateHistoryEntry(DraftStatus.FAILED, null, '', '', ''))
       action = (
         <ActionButton id="failed_retry" disabled>
-          {this.props.intl.formatMessage(messages.retry)}
+          {this.props.intl.formatMessage(buttonMessages.retry)}
         </ActionButton>
       )
     }
@@ -443,7 +358,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             (status && status.timestamp) || '',
             status && status.user && status.user.role
               ? this.props.intl.formatMessage(
-                  roleMessages[status.user.role as string]
+                  userMessages[status.user.role as string]
                 )
               : '',
             this.props.language === 'en'
@@ -524,7 +439,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                 />
                 {(status.type === DraftStatus.FAILED && (
                   <StyledLabel>
-                    {this.props.intl.formatMessage(messages.failureMessage)}
+                    {this.props.intl.formatMessage(errorMessages.draftFailed)}
                   </StyledLabel>
                 )) || (
                   <ValueContainer>
@@ -543,32 +458,26 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
                 {status.contactNumber && (
                   <LabelValue
                     label={this.props.intl.formatMessage(
-                      messages.workflowApplicantNumber
+                      messages.applicantContactNumber
                     )}
                     value={status.contactNumber}
                   />
                 )}
                 {status.trackingId && (
                   <LabelValue
-                    label={this.props.intl.formatMessage(
-                      messages.workflowApplicantTrackingID
-                    )}
+                    label={this.props.intl.formatMessage(messages.trackingId)}
                     value={status.trackingId}
                   />
                 )}
                 {status.rejectReason && (
                   <LabelValue
-                    label={this.props.intl.formatMessage(
-                      messages.workflowApplicationRejectReason
-                    )}
+                    label={this.props.intl.formatMessage(messages.reason)}
                     value={status.rejectReason}
                   />
                 )}
                 {status.rejectComment && (
                   <LabelValue
-                    label={this.props.intl.formatMessage(
-                      messages.workflowApplicationRejectComment
-                    )}
+                    label={this.props.intl.formatMessage(messages.comment)}
                     value={status.rejectComment}
                   />
                 )}
@@ -584,7 +493,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     return (
       <SubPage
         title={historyData.title}
-        emptyTitle={this.props.intl.formatMessage(messages.emptyTitle)}
+        emptyTitle={this.props.intl.formatMessage(messages.noNameProvided)}
         goBack={this.props.goToHome}
       >
         {this.renderHistory(historyData.history)}

@@ -1,13 +1,7 @@
 import * as React from 'react'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { ActionPage, Box, Spinner } from '@opencrvs/components/lib/interface'
-
-import {
-  InjectedIntlProps,
-  injectIntl,
-  defineMessages,
-  InjectedIntl
-} from 'react-intl'
+import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
 import { FormFieldGenerator } from '@register/components/form'
 import {
   IFormSection,
@@ -77,7 +71,6 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@register/utils/userUtils'
 import { RouteComponentProps } from 'react-router'
 import { goToHome } from '@register/navigation'
-
 import { CONFIRMATION_SCREEN } from '@register/navigation/routes'
 import {
   IOfflineDataState,
@@ -88,7 +81,15 @@ import {
 import { getOfflineState } from '@register/offline/selectors'
 import { renderSelectDynamicLabel } from '@register/views/RegisterForm/review/ReviewSection'
 import * as Sentry from '@sentry/browser'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import {
+  userMessages,
+  buttonMessages,
+  errorMessages
+} from '@register/i18n/messages'
+import {
+  messages,
+  dynamicMessages
+} from '@register/i18n/messages/views/certificate'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -215,101 +216,6 @@ const B = styled.div`
   display: block;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  queryError: {
-    id: 'print.certificate.queryError',
-    defaultMessage:
-      'An error occurred while quering for birth registration data',
-    description: 'The error message shown when a query fails'
-  },
-  confirm: {
-    id: 'buttons.confirm',
-    defaultMessage: 'Confirm',
-    description:
-      'The label for confirm button when all information of the collector is provided'
-  },
-  printReceipt: {
-    id: 'print.certificate.printReceipt',
-    defaultMessage: 'Print receipt',
-    description: 'The label for print receipt button'
-  },
-  next: {
-    id: 'print.certificate.next',
-    defaultMessage: 'Next',
-    description: 'The label for next button'
-  },
-  serviceYear: {
-    id: 'print.certificate.serviceYear',
-    defaultMessage:
-      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph'
-  },
-  serviceMonth: {
-    id: 'print.certificate.serviceMonth',
-    defaultMessage:
-      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph'
-  },
-  birthService: {
-    id: 'print.certificate.birthService'
-  },
-  deathService: {
-    id: 'print.certificate.deathService'
-  },
-  certificateHeader: {
-    id: 'print.certificate.header'
-  },
-  certificateSubHeader: {
-    id: 'print.certificate.subheader'
-  },
-  certificateIssuer: {
-    id: 'print.certificate.issuer'
-  },
-  certificatePaidAmount: {
-    id: 'print.certificate.amount'
-  },
-  certificateService: {
-    id: 'print.certificate.service'
-  },
-  printCertificate: {
-    id: 'print.certificate.printCertificate',
-    defaultMessage: 'Print certificate',
-    description: 'The label for print certificate button'
-  },
-  finish: {
-    id: 'print.certificate.finish',
-    defaultMessage: 'Finish',
-    description: 'The label for finish printing certificate button'
-  },
-  editRegistration: {
-    id: 'buttons.editRegistration',
-    defaultMessage: 'Edit Registration'
-  },
-  certificateIsCorrect: {
-    id: 'certificate.isCertificateCorrect'
-  },
-  state: {
-    id: 'form.field.label.state',
-    defaultMessage: 'Division',
-    description: 'The label for state of event location'
-  },
-  district: {
-    id: 'form.field.label.district',
-    defaultMessage: 'District',
-    description: 'The label for district of event location'
-  },
-  certificateConfirmationTxt: {
-    id: 'certificate.confirmCorrect'
-  },
-  back: {
-    id: 'buttons.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  }
-})
 
 const locationText = {
   district: {
@@ -529,7 +435,7 @@ class PrintCertificateActionComponent extends React.Component<
                 this.onConfirmForm()
               }}
             >
-              {intl.formatMessage(messages.confirm)}
+              {intl.formatMessage(buttonMessages.confirm)}
             </PrimaryButton>
           </ButtonContainer>
         )
@@ -599,7 +505,9 @@ class PrintCertificateActionComponent extends React.Component<
                       {!loading && (
                         <>
                           <TickLarge />
-                          <span>{intl.formatMessage(messages.confirm)}</span>
+                          <span>
+                            {intl.formatMessage(buttonMessages.confirm)}
+                          </span>
                         </>
                       )}
                       {loading && (
@@ -617,7 +525,7 @@ class PrintCertificateActionComponent extends React.Component<
               </MutationProvider>
               <EditRegistration id="edit" disabled={true}>
                 <Edit />
-                {this.props.intl.formatMessage(messages.editRegistration)}
+                {this.props.intl.formatMessage(buttonMessages.editRegistration)}
               </EditRegistration>
             </Box>
             <ButtonContainer>
@@ -638,7 +546,7 @@ class PrintCertificateActionComponent extends React.Component<
                 disabled={!enableConfirmButton}
                 onClick={() => this.finishSubmission(certificateDetails)}
               >
-                {intl.formatMessage(messages.finish)}
+                {intl.formatMessage(buttonMessages.finish)}
               </PrimaryButton>
             </ButtonContainer>
           </>
@@ -921,7 +829,7 @@ class PrintCertificateActionComponent extends React.Component<
       name: fullName,
       role:
         userDetails && userDetails.role
-          ? intl.formatMessage(roleMessages[userDetails.role])
+          ? intl.formatMessage(userMessages[userDetails.role])
           : '',
       issuedAt:
         userDetails &&
@@ -960,7 +868,7 @@ class PrintCertificateActionComponent extends React.Component<
       <ActionPageWrapper>
         <ActionPage
           title={intl.formatMessage(form.title)}
-          backLabel={intl.formatMessage(messages.back)}
+          backLabel={intl.formatMessage(buttonMessages.back)}
           goBack={() => {
             dispatch(goToHome())
           }}
@@ -1019,7 +927,7 @@ class PrintCertificateActionComponent extends React.Component<
                         field.name === 'service'
                       ) {
                         field.initialValue = eventDateDiff.toString()
-                        field.label = messages[`${event}Service`]
+                        field.label = dynamicMessages[`${event}Service`]
                       }
                       return field
                     })
@@ -1091,7 +999,7 @@ class PrintCertificateActionComponent extends React.Component<
 
                     return (
                       <ErrorText id="print-certificate-queue-error-text">
-                        {intl.formatMessage(messages.queryError)}
+                        {intl.formatMessage(errorMessages.printQueryError)}
                       </ErrorText>
                     )
                   }

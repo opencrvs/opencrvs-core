@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { sentenceCase } from '@register/utils/data-formatting'
 import moment from 'moment'
 import { goToApplicationDetails } from '@register/navigation'
+import { constantsMessages as messages } from '@register/i18n/messages'
 
 interface IInProgressProps {
   draftApplications: IApplication[]
@@ -17,30 +18,6 @@ type IFullProps = IInProgressProps & InjectedIntlProps
 
 interface IState {
   inProgressPageNo: number
-}
-
-const messages = {
-  listItemType: {
-    id: 'register.registrationHome.table.label.type',
-    defaultMessage: 'Type',
-    description: 'Label for type of event in work queue list item'
-  },
-  name: {
-    id: 'constants.name',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  listItemModificationDate: {
-    id: 'register.registrationHome.table.label.modificationDate',
-    defaultMessage: 'Last edited',
-    description: 'Label for rejection date in work queue list item'
-  },
-  dataTableNoResults: {
-    id: 'register.registrationHome.noResults',
-    defaultMessage: 'No result to display',
-    description:
-      'Text to display if the search return no results for the current filters'
-  }
 }
 
 class InProgressComponent extends React.Component<IFullProps, IState> {
@@ -130,7 +107,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           content={this.transformDraftContent()}
           columns={[
             {
-              label: this.props.intl.formatMessage(messages.listItemType),
+              label: this.props.intl.formatMessage(messages.type),
               width: 20,
               key: 'event'
             },
@@ -141,14 +118,12 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
               errorValue: 'No name provided'
             },
             {
-              label: this.props.intl.formatMessage(
-                messages.listItemModificationDate
-              ),
+              label: this.props.intl.formatMessage(messages.lastEdited),
               width: 40,
               key: 'dateOfModification'
             }
           ]}
-          noResultText={intl.formatMessage(messages.dataTableNoResults)}
+          noResultText={intl.formatMessage(messages.noResults)}
           onPageChange={(currentPage: number) => {
             this.onPageChange(currentPage)
           }}

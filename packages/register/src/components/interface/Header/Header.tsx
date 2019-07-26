@@ -52,9 +52,12 @@ import {
   SYS_ADMIN_ROLES
 } from '@register/utils/constants'
 import styled from 'styled-components'
-import { roleMessages } from '@register/utils/roleTypeMessages'
 import { messages } from '@register/i18n/messages/views/header'
-import { constantsMessages, buttonMessages } from '@register/i18n/messages'
+import {
+  constantsMessages,
+  buttonMessages,
+  userMessages
+} from '@register/i18n/messages'
 
 type IProps = InjectedIntlProps & {
   userDetails: IUserDetails | null
@@ -113,7 +116,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     const role =
       userDetails && userDetails.role
-        ? intl.formatMessage(roleMessages[userDetails.role])
+        ? intl.formatMessage(userMessages[userDetails.role])
         : ''
 
     let menuItems = [

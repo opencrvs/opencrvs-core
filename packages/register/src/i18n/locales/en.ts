@@ -676,7 +676,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Please collect the payment, print the receipt and hand it over to the payee.',
     'print.certificate.deathService':
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
-    'print.certificate.finish': 'Finish',
+    'buttons.finish': 'Finish',
     'print.certificate.form.name': 'Print',
     'print.certificate.form.title': 'Print certificate',
     'print.certificate.manualPaymentMethod': 'Manual',
@@ -716,42 +716,37 @@ export const ENGLISH_STATE: ILanguage = {
     'register.confirmationScreen.buttons.newDeclaration': 'New application',
     'register.confirmationScreen.trackingSectionDesc': `{event, select, certificate {Certificates have been collected from your jurisdiction.} declaration {The informant will receive this number via SMS, but make sure they write it down and keep it safe. They should use the number as a reference if enquiring about their registration.} registration {The informant will receive this number via SMS with instructions on how and where to collect the certificate.} duplication{The informant will receive this number via SMS with instructions on how and where to collect the certificate.} rejection{The application agent will be informed about the reasons for rejection and instructed to follow up.} offline {The informant will receive the tracking ID number via SMS when the application has been sent for review.}} `,
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {Tracking number:} registration {{eventType, select, birth {Birth} death {Death}} Registration Number:} duplication {{eventType, select, birth {Birth} death {Death}} Registration Number:} rejection {Tracking number:} certificate {} offline {Tracking number:}} `,
-    'register.detail.status.applicant.number': 'Applicant contact number',
-    'register.detail.status.failedMessage':
+    'constants.applicantContactNumber': 'Applicant contact number',
+    'error.draftFailed':
       'This is some messaging on advicing the user on what to do... in the event of a failed applicaton.',
-    'register.detail.subpage.emptyTitle': 'No name provided',
-    'register.details.status.dateLabel.draft.failed': 'Failed to send on',
-    'register.details.status.dateLabel.draft.started': 'Started on',
-    'register.details.status.dateLabel.draft.updated': 'Updated on',
+    'constants.noNameProvided': 'No name provided',
+    'constants.applicationFailedOn': 'Failed to send on',
+    'constants.applicationStartedOn': 'Started on',
+    'constants.applicationUpdatedOn': 'Updated on',
     'buttons.reject': 'Reject',
-    'duplicates.description':
+    'duplicates.duplicateFoundDescription':
       'The following application has been flagged as a possible duplicate of an existing registered record.',
     'duplicates.modal.reject':
       'Are you sure you want to reject this application for being a duplicate ?',
     'duplicates.notDuplicate.modal.confirmationText':
       'Are you sure this is not a duplicate application?',
-    'duplicates.pageTitle': 'Possible duplicate',
+    'duplicates.possibleDuplicateFound': 'Possible duplicate',
     'duplicates.queryError': 'An error occurred while fetching data',
-    'duplicates.title': 'Possible duplicates found',
-    'register.fieldAgentHome.allUpdatesText':
+    'duplicates.duplicateFoundTitle': 'Possible duplicates found',
+    'fieldAgentHome.allUpdatesText':
       'Great job! You have updated all applications',
-    'register.fieldAgentHome.inProgress': 'In progress ({total})',
-    'register.fieldAgentHome.queryError':
-      'An error occured while loading applications',
-    'register.fieldAgentHome.rejectedDays': 'Rejected {text}',
-    'register.fieldAgentHome.requireUpdates': 'Require updates ({total})',
-    'register.fieldAgentHome.requireUpdatesLoading':
-      'Checking your applications',
-    'register.fieldAgentHome.sentForReview': 'Sent for review ({total})',
-    'register.fieldAgentHome.table.label.statusFailed': 'Failed to send',
-    'register.fieldAgentHome.table.label.statusPendingConnection':
-      'Pending connection',
-    'register.fieldAgentHome.table.label.statusReadyToSubmit':
-      'Waiting to send',
-    'register.fieldAgentHome.table.label.statusSubmitting': 'Sending...',
-    'register.fieldAgentHome.table.label.submissionStatus': 'Submission status',
-    'register.fieldAgentHome.zeroUpdatesText':
-      'No applications require updates',
+    'fieldAgentHome.inProgressCount': 'In progress ({total})',
+    'fieldAgentHome.queryError': 'An error occured while loading applications',
+    'constants.rejectedDays': 'Rejected {text}',
+    'fieldAgentHome.requireUpdatesCount': 'Require updates ({total})',
+    'fieldAgentHome.requireUpdatesCountLoading': 'Checking your applications',
+    'fieldAgentHome.sentForReviewCount': 'Sent for review ({total})',
+    'constants.failedToSend': 'Failed to send',
+    'constants.pendingConnection': 'Pending connection',
+    'constants.waitingToSend': 'Waiting to send',
+    'constants.sending': 'Sending...',
+    'constants.submissionStatus': 'Submission status',
+    'fieldAgentHome.zeroUpdatesText': 'No applications require updates',
     'register.form.informationMissing': 'Information missing',
     'register.form.missingFieldsDescription':
       'The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:',
@@ -840,7 +835,7 @@ export const ENGLISH_STATE: ILanguage = {
       'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
     'register.registrationHome.inProgress': 'In progress',
     'constants.dod': 'D.o.D.',
-    'register.registrationHome.noResults': 'No result to display',
+    'constants.noResults': 'No result to display',
     'register.registrationHome.outbox.statusRegistering': 'Registering...',
     'register.registrationHome.outbox.statusRejecting': 'Rejecting...',
     'register.registrationHome.outbox.statusSubmitting': 'Submitting...',
@@ -864,11 +859,11 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrationHome.table.label.applicantNumber': 'Applicant No.',
     'register.registrationHome.table.label.applicationDate': 'Application sent',
     'register.registrationHome.table.label.eventDate': 'Date of event',
-    'register.registrationHome.table.label.modificationDate': 'Last edited',
+    'constants.lastEdited': 'Last edited',
     'register.registrationHome.table.label.registeredDate':
       'Application registered',
-    'register.registrationHome.table.label.type': 'Type',
-    'register.registrationHome.table.label.updateDate': 'Sent on',
+    'constants.type': 'Type',
+    'constants.sentOn': 'Sent on',
     'constants.collectedBy': 'Collected by',
     'search.informantContact': 'Informant contact number',
     'constants.issuedBy': 'Issued by',
@@ -930,22 +925,17 @@ export const ENGLISH_STATE: ILanguage = {
     'register.sysAdminHome.offices': 'Offices',
     'register.sysAdminHome.overview': 'Overview',
     'register.sysAdminHome.users': 'Users',
-    'register.userSetup.securityQuestions.birthTown':
-      'What city were you born in?',
-    'register.userSetup.securityQuestions.favoriteFood':
-      'What is your favorite food?',
-    'register.userSetup.securityQuestions.favoriteMovie':
-      'What is your favorite movie?',
-    'register.userSetup.securityQuestions.favoriteSong':
-      'What is your favorite song?',
-    'register.userSetup.securityQuestions.favoriteTeacher':
+    'userSetup.securityQuestions.birthTown': 'What city were you born in?',
+    'userSetup.securityQuestions.favoriteFood': 'What is your favorite food?',
+    'userSetup.securityQuestions.favoriteMovie': 'What is your favorite movie?',
+    'userSetup.securityQuestions.favoriteSong': 'What is your favorite song?',
+    'userSetup.securityQuestions.favoriteTeacher':
       'What is the name of your favorite school teacher?',
-    'register.userSetup.securityQuestions.firstChildName':
+    'userSetup.securityQuestions.firstChildName':
       "What is your first child's name?",
-    'register.userSetup.securityQuestions.hightSchool':
+    'userSetup.securityQuestions.hightSchool':
       'What is the name of your high school?',
-    'register.userSetup.securityQuestions.motherName':
-      "What is your mother's name?",
+    'userSetup.securityQuestions.motherName': "What is your mother's name?",
     'register.workQueue.applications.banner':
       'Applications to register in your area',
     'review.actions.description.confirmComplete':

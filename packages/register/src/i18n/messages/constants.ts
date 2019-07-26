@@ -28,14 +28,107 @@ interface IConstantsMessages {
   search: ReactIntl.FormattedMessage.MessageDescriptor
   dod: ReactIntl.FormattedMessage.MessageDescriptor
   comment: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationStartedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationUpdatedOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationSubmittedOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationRegisteredOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationRejectedOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationCollectedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationFailedOn: ReactIntl.FormattedMessage.MessageDescriptor
   collectedBy: ReactIntl.FormattedMessage.MessageDescriptor
   issuedBy: ReactIntl.FormattedMessage.MessageDescriptor
+  rejectedDays: ReactIntl.FormattedMessage.MessageDescriptor
+  type: ReactIntl.FormattedMessage.MessageDescriptor
+  sentOn: ReactIntl.FormattedMessage.MessageDescriptor
+  lastEdited: ReactIntl.FormattedMessage.MessageDescriptor
+  noResults: ReactIntl.FormattedMessage.MessageDescriptor
+  submissionStatus: ReactIntl.FormattedMessage.MessageDescriptor
+  waitingToSend: ReactIntl.FormattedMessage.MessageDescriptor
+  sending: ReactIntl.FormattedMessage.MessageDescriptor
+  failedToSend: ReactIntl.FormattedMessage.MessageDescriptor
+  pendingConnection: ReactIntl.FormattedMessage.MessageDescriptor
+  noNameProvided: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantContactNumber: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  applicantContactNumber: {
+    id: 'constants.applicantContactNumber',
+    defaultMessage: 'Applicant contact number',
+    description: 'The title of contact number label'
+  },
+  applicationStartedOn: {
+    id: 'constants.applicationStartedOn',
+    defaultMessage: 'Started on',
+    description:
+      'Label for the workflow timestamp when the status is draft created'
+  },
+  applicationUpdatedOn: {
+    id: 'constants.applicationUpdatedOn',
+    defaultMessage: 'Updated on',
+    description:
+      'Label for the workflow timestamp when the status is draft updated'
+  },
+  applicationFailedOn: {
+    id: 'constants.applicationFailedOn',
+    defaultMessage: 'Failed to send on',
+    description: 'Label for the workflow timestamp when the status is failed'
+  },
+  noNameProvided: {
+    id: 'constants.noNameProvided',
+    defaultMessage: 'No name provided',
+    description: 'Label for empty title'
+  },
+  submissionStatus: {
+    id: 'constants.submissionStatus',
+    defaultMessage: 'Submission status',
+    description: 'Label for table header of column Submission status'
+  },
+  waitingToSend: {
+    id: 'constants.waitingToSend',
+    defaultMessage: 'Waiting to send',
+    description: 'Label for application status Ready to Submit'
+  },
+  sending: {
+    id: 'constants.sending',
+    defaultMessage: 'Sending...',
+    description: 'Label for application status Submitting'
+  },
+  failedToSend: {
+    id: 'constants.failedToSend',
+    defaultMessage: 'Failed to send',
+    description: 'Label for application status Failed'
+  },
+  pendingConnection: {
+    id: 'constants.pendingConnection',
+    defaultMessage: 'Pending connection',
+    description: 'Label for application status Pending Connection'
+  },
+  lastEdited: {
+    id: 'constants.lastEdited',
+    defaultMessage: 'Last edited',
+    description: 'Label for rejection date in work queue list item'
+  },
+  noResults: {
+    id: 'constants.noResults',
+    defaultMessage: 'No result to display',
+    description:
+      'Text to display if the search return no results for the current filters'
+  },
+  rejectedDays: {
+    id: 'constants.rejectedDays',
+    defaultMessage: 'Rejected {text}',
+    description: 'The title of rejected days of application'
+  },
+  type: {
+    id: 'constants.type',
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item'
+  },
+  sentOn: {
+    id: 'constants.sentOn',
+    defaultMessage: 'Sent on',
+    description: 'Label for rejection date in work queue list item'
+  },
   dod: {
     id: 'constants.dod',
     defaultMessage: 'D.o.D',
@@ -233,6 +326,16 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     id: 'constants.certified',
     defaultMessage: 'certified',
     description: 'A label for certified'
+  },
+  male: {
+    id: 'constants.male',
+    defaultMessage: 'Male',
+    description: 'The duplicates text for male'
+  },
+  female: {
+    id: 'constants.female',
+    defaultMessage: 'Female',
+    description: 'The duplicates text for female'
   }
 }
 

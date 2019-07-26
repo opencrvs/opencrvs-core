@@ -674,7 +674,7 @@ export const BENGALI_STATE: ILanguage = {
       'পেমেন্ট সংগ্রহ করুন, প্রাপ্তি প্রিন্ট এবং এটি প্রাপকের কাছে হস্তান্তর করুন।',
     'print.certificate.deathService':
       'সেবা: <strong>মৃত্যুদিবসের {service} পরে মৃত্যু নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
-    'print.certificate.finish': 'সমাপ্ত',
+    'buttons.finish': 'সমাপ্ত',
     'print.certificate.form.name': 'মুদ্রণ',
     'print.certificate.form.title': 'সার্টিফিকেট মুদ্রণ',
     'print.certificate.manualPaymentMethod': 'হস্তকৃত',
@@ -714,42 +714,36 @@ export const BENGALI_STATE: ILanguage = {
     'register.confirmationScreen.buttons.newDeclaration': 'নতুন আবেদন',
     'register.confirmationScreen.trackingSectionDesc': `{event, select, certificate {টি সার্টিফিকেট আপনার তত্ত্বাবধানে সংগ্রহ করা হয়েছে।} declaration {একটি এসএমএসের মাধ্যমে সংবাদদাতা এই নম্বরটি পাবেন, নিশ্চিত করুন যে নম্বরটি আপনি পরবর্তী রেজিস্ট্রেশনের ধাপের জন্য সংরক্ষন করেছেন।} registration {সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।} duplication{সনদপত্রটি কীভাবে এবং কোথায় সংগ্রহ করতে হবে তার নির্দেশাবলীর সাথে সংবাদদাতা এসএমএসের মাধ্যমে পাবেন।} rejection{আবেদন সংবাদদাতাকে প্রত্যাখ্যানের  কারণ এবং  অনুসরণ নির্দেশ সম্পর্কে জানানো হবে।} offline {আবেদনটি পর্যালোচনার জন্য পাঠানো হলে  সংবাদদাতাকে ট্র্যাকিং আইডি নাম্বারটি  জানানো হবে।}} `,
     'register.confirmationScreen.trackingSectionTitle': `{event, select, declaration {ট্র্যাকিং নম্বর : } registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নম্বর :} rejection {ট্র্যাকিং নম্বর : } certificate {} offline {ট্র্যাকিং নম্বর :}} `,
-    'register.detail.status.applicant.number': 'আবেদনকারীর মোবাইল নম্বর',
-    'register.detail.status.failedMessage':
+    'constants.applicantContactNumber': 'আবেদনকারীর মোবাইল নম্বর',
+    'error.draftFailed':
       'এটি কোনও ব্যর্থতার আবেদনকারীর ক্ষেত্রে ব্যবহারকারীর পরামর্শ দেওয়ার বিষয়ে কিছু বার্তা।',
-    'register.detail.subpage.emptyTitle': 'নাম দেয়া হয়নি',
-    'register.details.status.dateLabel.draft.failed':
-      'পাঠাতে ব্যর্থ হওয়ার তারিখ',
-    'register.details.status.dateLabel.draft.started': 'শুরু করা হয়েছে',
-    'register.details.status.dateLabel.draft.updated': 'আপডেট করা হয়েছে',
+    'constants.noNameProvided': 'নাম দেয়া হয়নি',
+    'constants.applicationFailedOn': 'পাঠাতে ব্যর্থ হওয়ার তারিখ',
+    'constants.applicationStartedOn': 'শুরু করা হয়েছে',
+    'constants.applicationUpdatedOn': 'আপডেট করা হয়েছে',
     'buttons.reject': 'প্রত্যাখ্যান',
-    'duplicates.description':
+    'duplicates.duplicateFoundDescription':
       'নিম্নলিখিত নিবন্ধটি একটি বিদ্যমান নিবন্ধিত রেকর্ডের সম্ভাব্য সদৃশ হিসাবে পতাকাঙ্কিত করা হয়েছে',
     'duplicates.modal.reject':
       'আপনি কি এই অ্যাপ্লিকেশনটি অনুলিপি করার জন্য প্রত্যাখ্যান করতে চান?',
     'duplicates.notDuplicate.modal.confirmationText':
       'আপনি কি নিশ্চিত এই আবেদন নকল না?',
-    'duplicates.pageTitle': 'সম্ভাব্য সদৃশ',
+    'duplicates.possibleDuplicateFound': 'সম্ভাব্য সদৃশ',
     'duplicates.queryError': 'তথ্য আনয়ন করার সময় একটি ত্রুটি ঘটেছে',
-    'duplicates.title': 'সম্ভাব্য সদৃশ তালিকা',
-    'register.fieldAgentHome.allUpdatesText':
-      'অভিনন্দন! আপনি সব আবেদন হালনাগাদ করেছেন',
-    'register.fieldAgentHome.inProgress': 'চলমান ({total})',
-    'register.fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
-    'register.fieldAgentHome.rejectedDays': '{text} প্রত্যাখ্যাত',
-    'register.fieldAgentHome.requireUpdates': 'হালনাগাদ প্রয়োজন ({total})',
-    'register.fieldAgentHome.requireUpdatesLoading':
-      'আপনার  আবেদন চেক করা হচ্ছে ',
-    'register.fieldAgentHome.sentForReview':
-      'পর্যালোচনার জন্য পাঠানো ({total})',
-    'register.fieldAgentHome.table.label.statusFailed': 'পাঠাতে ব্যর্থ',
-    'register.fieldAgentHome.table.label.statusPendingConnection':
-      'সংযোগের জন্য অপেক্ষা করছে',
-    'register.fieldAgentHome.table.label.statusReadyToSubmit':
-      'পাঠানোর জন্য অপেক্ষা করছে',
-    'register.fieldAgentHome.table.label.statusSubmitting': 'পাঠানো হচ্ছে...',
-    'register.fieldAgentHome.table.label.submissionStatus': 'জমা অবস্থা',
-    'register.fieldAgentHome.zeroUpdatesText': 'হালনাগাদের জন্য কোন আবেদন নেই',
+    'duplicates.duplicateFoundTitle': 'সম্ভাব্য সদৃশ তালিকা',
+    'fieldAgentHome.allUpdatesText': 'অভিনন্দন! আপনি সব আবেদন হালনাগাদ করেছেন',
+    'fieldAgentHome.inProgressCount': 'চলমান ({total})',
+    'fieldAgentHome.queryError': 'আবেদন লোড  করার সময়  ত্রুটি হয়েছে ',
+    'constants.rejectedDays': '{text} প্রত্যাখ্যাত',
+    'fieldAgentHome.requireUpdatesCount': 'হালনাগাদ প্রয়োজন ({total})',
+    'fieldAgentHome.requireUpdatesCountLoading': 'আপনার  আবেদন চেক করা হচ্ছে ',
+    'fieldAgentHome.sentForReviewCount': 'পর্যালোচনার জন্য পাঠানো ({total})',
+    'constants.failedToSend': 'পাঠাতে ব্যর্থ',
+    'constants.pendingConnection': 'সংযোগের জন্য অপেক্ষা করছে',
+    'constants.waitingToSend': 'পাঠানোর জন্য অপেক্ষা করছে',
+    'constants.sending': 'পাঠানো হচ্ছে...',
+    'constants.submissionStatus': 'জমা অবস্থা',
+    'fieldAgentHome.zeroUpdatesText': 'হালনাগাদের জন্য কোন আবেদন নেই',
     'register.form.informationMissing': 'অনুপস্থিত তথ্য',
     'register.form.missingFieldsDescription':
       'যাচাইয়ের জন্য নিম্নলিখিত তথ্য  বিবরনী জমা দেওয়া হবে।\n দয়া করে নিশ্চিত করুন যে সমস্ত প্রয়োজনীয় তথ্য সঠিকভাবে পূরণ করা হয়েছে।\n আপনার ফর্মে বাধ্যতামূলক তথ্যগুলো অনুপস্থিত ({numberOfErrors}):',
@@ -838,7 +832,7 @@ export const BENGALI_STATE: ILanguage = {
       'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি  এই মুহূর্তে  লোড করা সম্ভব হচ্ছে  না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ  করুন, অথবা পুনরায়  চেষ্টা করুন।',
     'register.registrationHome.inProgress': 'চলমান',
     'constants.dod': 'মৃত্যুর তারিখ',
-    'register.registrationHome.noResults': 'প্রদর্শনযোগ্য ফলাফল নেই',
+    'constants.noResults': 'প্রদর্শনযোগ্য ফলাফল নেই',
     'register.registrationHome.outbox.statusRegistering': 'নিবন্ধিত হচ্ছে...',
     'register.registrationHome.outbox.statusRejecting': 'প্রত্যাক্ষিত হচ্ছে...',
     'register.registrationHome.outbox.statusSubmitting': 'পাঠানো হচ্ছে...',
@@ -865,10 +859,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrationHome.table.label.applicantNumber': 'ফোন নম্বর',
     'register.registrationHome.table.label.applicationDate': 'আবেদন পাঠানো',
     'register.registrationHome.table.label.eventDate': 'ঘটনা তারিখ',
-    'register.registrationHome.table.label.modificationDate': 'শেষ সম্পাদনা',
+    'constants.lastEdited': 'শেষ সম্পাদনা',
     'register.registrationHome.table.label.registeredDate': 'নিবন্ধনের তারিখ',
-    'register.registrationHome.table.label.type': 'ধরণ',
-    'register.registrationHome.table.label.updateDate': 'পাঠানো',
+    'constants.type': 'ধরণ',
+    'constants.sentOn': 'পাঠানো',
     'constants.collectedBy': 'সংগৃহীত',
     'search.informantContact': 'তথ্যদাতার যোগাযোগ নম্বর',
     'constants.issuedBy': 'প্রদান',
@@ -930,20 +924,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.sysAdminHome.offices': 'অফিস',
     'register.sysAdminHome.overview': 'ওভারভিউ',
     'register.sysAdminHome.users': 'ইউজারস',
-    'register.userSetup.securityQuestions.birthTown':
-      'কোন শহরে আপনার জন্ম হয়?',
-    'register.userSetup.securityQuestions.favoriteFood':
-      'আপনার প্রিয় খাদ্য কি?',
-    'register.userSetup.securityQuestions.favoriteMovie':
-      'আপনার প্রিয় সিনেমা কি?',
-    'register.userSetup.securityQuestions.favoriteSong': 'আপনার প্রিয় গান কি?',
-    'register.userSetup.securityQuestions.favoriteTeacher':
+    'userSetup.securityQuestions.birthTown': 'কোন শহরে আপনার জন্ম হয়?',
+    'userSetup.securityQuestions.favoriteFood': 'আপনার প্রিয় খাদ্য কি?',
+    'userSetup.securityQuestions.favoriteMovie': 'আপনার প্রিয় সিনেমা কি?',
+    'userSetup.securityQuestions.favoriteSong': 'আপনার প্রিয় গান কি?',
+    'userSetup.securityQuestions.favoriteTeacher':
       'আপনার প্রিয় স্কুল শিক্ষকের নাম কি?',
-    'register.userSetup.securityQuestions.firstChildName':
+    'userSetup.securityQuestions.firstChildName':
       'আপনার প্রথম সন্তানের নাম কি?',
-    'register.userSetup.securityQuestions.hightSchool':
-      'আপনার উচ্চ বিদ্যালয় নাম কি?',
-    'register.userSetup.securityQuestions.motherName': 'আপনার মা এর নাম কি?',
+    'userSetup.securityQuestions.hightSchool': 'আপনার উচ্চ বিদ্যালয় নাম কি?',
+    'userSetup.securityQuestions.motherName': 'আপনার মা এর নাম কি?',
     'register.workQueue.applications.banner':
       'আপনার এলাকায় নিবন্ধন অ্যাপ্লিকেশন',
     'review.actions.description.confirmComplete':

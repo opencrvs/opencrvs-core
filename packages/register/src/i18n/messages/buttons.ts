@@ -20,9 +20,52 @@ interface IButtonsMessages {
   review: ReactIntl.FormattedMessage.MessageDescriptor
   print: ReactIntl.FormattedMessage.MessageDescriptor
   edit: ReactIntl.FormattedMessage.MessageDescriptor
+  yes: ReactIntl.FormattedMessage.MessageDescriptor
+  update: ReactIntl.FormattedMessage.MessageDescriptor
+  retry: ReactIntl.FormattedMessage.MessageDescriptor
+  next: ReactIntl.FormattedMessage.MessageDescriptor
+  finish: ReactIntl.FormattedMessage.MessageDescriptor
+  editRegistration: ReactIntl.FormattedMessage.MessageDescriptor
+  confirm: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  next: {
+    id: 'buttons.next',
+    defaultMessage: 'Next',
+    description: 'The label for next button'
+  },
+  finish: {
+    id: 'buttons.finish',
+    defaultMessage: 'Finish',
+    description: 'The label for finish printing certificate button'
+  },
+
+  editRegistration: {
+    id: 'buttons.editRegistration',
+    defaultMessage: 'Edit Registration',
+    description: 'Edit registration button text'
+  },
+  confirm: {
+    id: 'buttons.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Confirm button text'
+  },
+  update: {
+    id: 'buttons.update',
+    defaultMessage: 'Update',
+    description: 'The title of update button for draft application'
+  },
+  retry: {
+    id: 'buttons.retry',
+    defaultMessage: 'Retry',
+    description: 'The title of retry button for failed application'
+  },
+  yes: {
+    id: 'buttons.yes',
+    defaultMessage: 'Yes',
+    description: 'Yes button text'
+  },
   review: {
     id: 'buttons.review',
     defaultMessage: 'Review',

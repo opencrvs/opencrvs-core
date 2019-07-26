@@ -1,54 +1,10 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { countries } from '@register/forms/countries'
 import { identityNameMapper } from '@register/forms/identity'
 import { formatLongDate } from '@register/utils/date-formatting'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  firstName: {
-    id: 'certificate.parent.details.label.firstName',
-    defaultMessage: 'First Name(s)',
-    description: 'Parent first names'
-  },
-  familyName: {
-    id: 'certificate.parent.details.label.familyName',
-    defaultMessage: 'Family Name',
-    description: 'Parent family name'
-  },
-  firstNameInEng: {
-    id: 'certificate.parent.details.label.firstNameInEng',
-    defaultMessage: 'First Name(s)(in english)',
-    description: 'Parent first names'
-  },
-  familyNameInEng: {
-    id: 'certificate.parent.details.label.familyNameInEng',
-    defaultMessage: 'Family Name(in english)',
-    description: 'Parent family name'
-  },
-  dateOfBirth: {
-    id: 'certificate.parent.details.label.dateOfBirth',
-    defaultMessage: 'Date of Birth',
-    description: 'Parent Date of Birth'
-  },
-  nationality: {
-    id: 'certificate.parent.details.label.nationality',
-    defaultMessage: 'Nationality',
-    description: 'Parent Nationality'
-  },
-  typeOfID: {
-    id: 'certificate.parent.details.label.typeOfID',
-    defaultMessage: 'Type of ID',
-    description: 'Parent Type of ID'
-  },
-  number: {
-    id: 'certificate.parent.details.label.number',
-    defaultMessage: 'Number',
-    description: 'Parent number'
-  }
-})
+import { messages } from '@register/i18n/messages/views/certificate'
 
 const Wrapper = styled.div`
   width: 100%;

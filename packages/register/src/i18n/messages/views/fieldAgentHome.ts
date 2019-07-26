@@ -1,0 +1,48 @@
+import { defineMessages } from 'react-intl'
+
+interface IFieldAgentHomeMessages {
+  inProgressCount: ReactIntl.FormattedMessage.MessageDescriptor
+  sentForReviewCount: ReactIntl.FormattedMessage.MessageDescriptor
+  requireUpdates: ReactIntl.FormattedMessage.MessageDescriptor
+  zeroUpdatesText: ReactIntl.FormattedMessage.MessageDescriptor
+  allUpdatesText: ReactIntl.FormattedMessage.MessageDescriptor
+  requireUpdatesLoading: ReactIntl.FormattedMessage.MessageDescriptor
+}
+
+const messagesToDefine: IFieldAgentHomeMessages = {
+  inProgressCount: {
+    id: 'fieldAgentHome.inProgressCount',
+    defaultMessage: 'In progress ({total})',
+    description: 'The title of in progress tab'
+  },
+  sentForReviewCount: {
+    id: 'fieldAgentHome.sentForReviewCount',
+    defaultMessage: 'Sent for review ({total})',
+    description: 'The title of sent for review tab'
+  },
+  requireUpdates: {
+    id: 'fieldAgentHome.requireUpdatesCount',
+    defaultMessage: 'Require updates ({total})',
+    description: 'The title of require updates tab'
+  },
+
+  zeroUpdatesText: {
+    id: 'fieldAgentHome.zeroUpdatesText',
+    defaultMessage: 'No applications require updates',
+    description: 'The text when no rejected applications'
+  },
+  allUpdatesText: {
+    id: 'fieldAgentHome.allUpdatesText',
+    defaultMessage: 'Great job! You have updated all applications',
+    description: 'The text when all rejected applications updated'
+  },
+  requireUpdatesLoading: {
+    id: 'fieldAgentHome.requireUpdatesCountLoading',
+    defaultMessage: 'Checking your applications',
+    description: 'The text when all rejected applications are loading'
+  }
+}
+
+export const messages: IFieldAgentHomeMessages = defineMessages(
+  messagesToDefine
+)

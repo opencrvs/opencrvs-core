@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { messages } from '@register/i18n/messages/views/duplicates'
+import { buttonMessages } from '@register/i18n/messages'
 
 const ConfirmButton = styled.a`
   text-decoration: underline;
@@ -12,25 +14,6 @@ const ConfirmButton = styled.a`
 const StyledModal = styled(Modal)`
   z-index: 4;
 `
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  noButton: {
-    id: 'buttons.back',
-    defaultMessage: 'Back',
-    description: 'Back button text on not a duplicate confirmation modal'
-  },
-  yesButton: {
-    id: 'buttons.yes',
-    defaultMessage: 'Yes',
-    description: 'Yes button on not a duplicate confirmation modal'
-  },
-  notDuplicateConfirmationTxt: {
-    id: 'duplicates.notDuplicate.modal.confirmationText',
-    defaultMessage: 'Are you sure this is not a duplicate application?',
-    description: 'Not a duplicate modal confirmation text'
-  }
-})
 
 interface IProps {
   show: boolean
@@ -53,14 +36,14 @@ const NotDuplicateConfirmationComponent = ({
           id="not_duplicate_confirm"
           onClick={handleYes}
         >
-          {intl.formatMessage(messages.yesButton)}
+          {intl.formatMessage(buttonMessages.yes)}
         </PrimaryButton>,
         <ConfirmButton
           key="close"
           id="not_duplicate_close"
           onClick={handleClose}
         >
-          {intl.formatMessage(messages.noButton)}
+          {intl.formatMessage(buttonMessages.back)}
         </ConfirmButton>
       ]}
       show={show}

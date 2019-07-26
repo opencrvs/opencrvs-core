@@ -13,10 +13,9 @@ import { IUserDetails } from '@register/utils/userUtils'
 import { getLanguage } from '@register/i18n/selectors'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { roleMessages } from '@register/utils/roleTypeMessages'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { goToSettings } from '@register/navigation'
-import { buttonMessages } from '@register/i18n/messages'
+import { buttonMessages, userMessages } from '@register/i18n/messages'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -81,7 +80,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
 
       userRole =
         userDetails.role &&
-        intl.formatMessage(roleMessages[userDetails.role as string])
+        intl.formatMessage(userMessages[userDetails.role as string])
     } else {
       userName = ''
       userRole = ''

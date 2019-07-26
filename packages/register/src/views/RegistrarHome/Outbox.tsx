@@ -50,13 +50,13 @@ const messages = {
 
   // end of status type
   dataTableNoResults: {
-    id: 'register.registrationHome.noResults',
+    id: 'constants.noResults',
     defaultMessage: 'No result to display',
     description:
       'Text to display if the search return no results for the current filters'
   },
   listItemType: {
-    id: 'register.registrationHome.table.label.type',
+    id: 'constants.type',
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item'
   },

@@ -1,6 +1,16 @@
 import { defineMessages } from 'react-intl'
 
-export default defineMessages({
+interface IPinMessages {
+  createTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  createDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  pinSameDigitsError: ReactIntl.FormattedMessage.MessageDescriptor
+  pinSequentialDigitsError: ReactIntl.FormattedMessage.MessageDescriptor
+  pinMatchError: ReactIntl.FormattedMessage.MessageDescriptor
+  reEnterTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  reEnterDescription: ReactIntl.FormattedMessage.MessageDescriptor
+}
+
+const messagesToDefine: IPinMessages = {
   createTitle: {
     id: 'createPIN.createTitle',
     defaultMessage: 'Create a PIN',
@@ -37,4 +47,6 @@ export default defineMessages({
     defaultMessage: "Let's make sure we collected your PIN correctly.",
     description: ''
   }
-})
+}
+
+export const messages: IPinMessages = defineMessages(messagesToDefine)

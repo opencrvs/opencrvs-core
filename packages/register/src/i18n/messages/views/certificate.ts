@@ -22,9 +22,132 @@ interface ICertificateMessages {
   person1: ReactIntl.FormattedMessage.MessageDescriptor
   person2: ReactIntl.FormattedMessage.MessageDescriptor
   informantHasReviewedInformaiton: ReactIntl.FormattedMessage.MessageDescriptor
+  firstName: ReactIntl.FormattedMessage.MessageDescriptor
+  familyName: ReactIntl.FormattedMessage.MessageDescriptor
+  firstNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
+  familyNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
+  dateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  nationality: ReactIntl.FormattedMessage.MessageDescriptor
+  typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
+  number: ReactIntl.FormattedMessage.MessageDescriptor
+  printReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  next: ReactIntl.FormattedMessage.MessageDescriptor
+  serviceYear: ReactIntl.FormattedMessage.MessageDescriptor
+  serviceMonth: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateReceiptHeader: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateReceiptSubHeader: ReactIntl.FormattedMessage.MessageDescriptor
+  receiptIssuedAt: ReactIntl.FormattedMessage.MessageDescriptor
+  receiptIssuer: ReactIntl.FormattedMessage.MessageDescriptor
+  receiptPaidAmount: ReactIntl.FormattedMessage.MessageDescriptor
+  receiptService: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateIsCorrect: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateConfirmationTxt: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
+  certificateIsCorrect: {
+    id: 'certificate.isCertificateCorrect',
+    defaultMessage: 'Is the {event} certificate correct?',
+    description:
+      'Question asking the user if the information on the  certificate is correct'
+  },
+  certificateConfirmationTxt: {
+    id: 'certificate.confirmCorrect',
+    defaultMessage: 'Edit',
+    description: 'Edit'
+  },
+  certificateReceiptHeader: {
+    id: 'certificate.receipt.header',
+    defaultMessage: 'Receipt for {event} Certificate of',
+    description: 'Receipt header for payment on certificate'
+  },
+  certificateReceiptSubHeader: {
+    id: 'certificate.receipt.subheader',
+    defaultMessage: '{event} Registration after {DOBDiff} of {DOE}',
+    description: 'Subheader for receipt on payment on certificate'
+  },
+  receiptIssuedAt: {
+    id: 'certificate.receipt.issuedAt',
+    defaultMessage: 'Issued at:',
+    description: 'Receipt on payment on certificate issued at label'
+  },
+  receiptIssuer: {
+    id: 'certificate.receipt.issuer',
+    defaultMessage: 'By: {role}, {name}\n Date of payment: {dateOfPayment}',
+    description: 'Issuer information for receipt of certificate payment label'
+  },
+  receiptPaidAmount: {
+    id: 'certificate.receipt.amount',
+    defaultMessage: 'Amount paid:\n\n',
+    description: 'Amount paid for certificate label'
+  },
+  receiptService: {
+    id: 'certificate.receipt.service',
+    defaultMessage: 'Service:',
+    description: 'Service received for receipt label'
+  },
+  printReceipt: {
+    id: 'print.certificate.printReceipt',
+    defaultMessage: 'Print receipt',
+    description: 'The label for print receipt button'
+  },
+  next: {
+    id: 'buttons.next',
+    defaultMessage: 'Next',
+    description: 'The label for next button'
+  },
+  serviceYear: {
+    id: 'print.certificate.serviceYear',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
+    description: 'The label for service paragraph'
+  },
+  serviceMonth: {
+    id: 'print.certificate.serviceMonth',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
+    description: 'The label for service paragraph'
+  },
+  firstName: {
+    id: 'certificate.parent.details.label.firstName',
+    defaultMessage: 'First Name(s)',
+    description: 'Parent first names'
+  },
+  familyName: {
+    id: 'certificate.parent.details.label.familyName',
+    defaultMessage: 'Family Name',
+    description: 'Parent family name'
+  },
+  firstNameInEng: {
+    id: 'certificate.parent.details.label.firstNameInEng',
+    defaultMessage: 'First Name(s)(in english)',
+    description: 'Parent first names'
+  },
+  familyNameInEng: {
+    id: 'certificate.parent.details.label.familyNameInEng',
+    defaultMessage: 'Family Name(in english)',
+    description: 'Parent family name'
+  },
+  dateOfBirth: {
+    id: 'certificate.parent.details.label.dateOfBirth',
+    defaultMessage: 'Date of Birth',
+    description: 'Parent Date of Birth'
+  },
+  nationality: {
+    id: 'certificate.parent.details.label.nationality',
+    defaultMessage: 'Nationality',
+    description: 'Parent Nationality'
+  },
+  typeOfID: {
+    id: 'certificate.parent.details.label.typeOfID',
+    defaultMessage: 'Type of ID',
+    description: 'Parent Type of ID'
+  },
+  number: {
+    id: 'certificate.parent.details.label.number',
+    defaultMessage: 'Number',
+    description: 'Parent number'
+  },
   preview: {
     id: 'print.certificate.certificatePreview',
     defaultMessage: 'Certificate Preview',
@@ -134,4 +257,26 @@ const messagesToDefine: ICertificateMessages = {
   }
 }
 
+interface IDynamicCertificateMessages {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+}
+
+const dynamicMessagesToDefine = {
+  birthService: {
+    id: 'print.certificate.birthService',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
+    description: 'Amount due on certificate for birth label'
+  },
+  deathService: {
+    id: 'print.certificate.deathService',
+    defaultMessage:
+      'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
+    description: 'Amount due on certificate for death label'
+  }
+}
+
 export const messages: ICertificateMessages = defineMessages(messagesToDefine)
+export const dynamicMessages: IDynamicCertificateMessages = defineMessages(
+  dynamicMessagesToDefine
+)
