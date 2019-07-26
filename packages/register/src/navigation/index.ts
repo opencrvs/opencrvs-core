@@ -126,14 +126,10 @@ export function goToHome() {
 }
 
 export function goToInProgressTab() {
-  const scope = getCurrentUserScope()
-  if (scope.includes('sysadmin')) {
-    return push(SYS_ADMIN_HOME)
-  } else if (scope.includes('register')) {
-    return push(formatUrl(REGISTRAR_HOME_TAB, { tabId: 'progress' }))
-  } else {
-    return push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: 'progress' }))
-  }
+  const path = getCurrentUserScope().includes('declare')
+    ? FIELD_AGENT_HOME_TAB
+    : REGISTRAR_HOME_TAB
+  return push(formatUrl(path, { tabId: 'progress', selectorId: 'you' }))
 }
 
 export function goToPerformance() {

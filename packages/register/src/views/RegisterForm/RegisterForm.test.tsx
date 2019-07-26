@@ -270,17 +270,6 @@ describe('when user is in the register form for birth event', async () => {
         history.location.pathname.includes('/registration-home/progress')
       ).toBeTruthy()
     })
-    it('takes system admin to declaration submitted page when save button is clicked', () => {
-      localStorage.getItem = jest.fn(
-        (key: string) =>
-          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNTYzOTczMDU2LCJleHAiOjE1NjQ1Nzc4NTYsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMzcifQ.OnnI4h0Uko8O8ZDvrvhsIkTlLMFL8_iIi6DAY6Zuorqhu4FEELJJyDslniqIgfmR8q06Ot8a1ojxGtZFE-6DIm-RwCtP9juGe7cw78qD8dzLbPH7WTj2gBKVxL9IWh39GpvQbAV7TD_GaS-4DD9IEYsxxsbJH_GcRhUPEoH3LwkdeYggCFJ33jXs7wf7cxiQ6Z-2XK_u22uooQvtQbMpxUk7lRdxP0aQ1uPo02MFj7dDldTk04ttLl7UPqRC-nGeafW4Gcz5scpv3jgVm51-pdkesUuAJHBkjJMepxYR5i1-PdmZM7NKup78onlM-24IEYmaQYaA1Io3WgjKYrLekA'
-      )
-      component
-        .find('#save_draft')
-        .hostNodes()
-        .simulate('click')
-      expect(history.location.pathname).toEqual('/sys-admin-home')
-    })
   })
 })
 
