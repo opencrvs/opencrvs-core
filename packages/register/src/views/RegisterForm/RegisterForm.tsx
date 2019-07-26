@@ -366,8 +366,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
     groupId: string,
     event: string
   ) => {
+    this.updateVisitedGroups()
     this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+  }
+
+  updateVisitedGroups = () => {
+    const visitedGroups = this.props.application.visitedGroupIds || []
+    if (
+      visitedGroups.findIndex(
+        visitedGroup =>
+          visitedGroup.sectionId === this.props.activeSection.id &&
+          visitedGroup.groupId === this.props.activeSectionGroup.id
+      ) === -1
+    ) {
+      visitedGroups.push({
+        sectionId: this.props.activeSection.id,
+        groupId: this.props.activeSectionGroup.id
+      })
+    }
+    this.props.application.visitedGroupIds = visitedGroups
   }
 
   render() {
@@ -671,19 +689,15 @@ function mapStateToProps(
   if (!application) {
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
-  const visitedSections = registerForm.sections.filter(
-    ({ id }) =>
-      id !== registrationSection.id &&
-      id !== applicantsSection.id &&
-      Boolean(application.data[id])
-  )
-
-  const rightMostVisited = visitedSections[visitedSections.length - 1]
 
   const setAllFieldsDirty =
-    rightMostVisited &&
-    registerForm.sections.indexOf(activeSection) <
-      registerForm.sections.indexOf(rightMostVisited)
+    (application.visitedGroupIds &&
+      application.visitedGroupIds.findIndex(
+        visitedGroup =>
+          visitedGroup.sectionId === activeSection.id &&
+          visitedGroup.groupId === activeSectionGroup.id
+      ) > -1) ||
+    false
 
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
