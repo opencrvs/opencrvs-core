@@ -227,9 +227,11 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.BIRTH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
+      forwardToOpenHim(Events.BIRTH_MARK_VALID, request)
       break
     case Events.DEATH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
+      forwardToOpenHim(Events.DEATH_MARK_VALID, request)
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
