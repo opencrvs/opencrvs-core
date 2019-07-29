@@ -10,7 +10,7 @@ export const Content = styled.section`
 
 export const BodyContent = styled.div`
   max-width: 940px;
-  margin: auto;
+  margin: 64px auto 0;
   padding: 16px 32px;
   position: relative;
 `
@@ -26,5 +26,5 @@ export const FullBodyContent = styled.div`
   width: 100%;
   height: 100%;
   padding: 24px;
-  margin-top: 4px;
+  margin-top: 68px;
 `

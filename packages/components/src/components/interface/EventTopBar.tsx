@@ -11,6 +11,10 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  top: 0;
+  width: 100%;
+  position: fixed;
+  z-index: 1;
 `
 const TopBarTitle = styled.h4`
   ${({ theme }) => theme.fonts.bigBodyStyle};
@@ -42,7 +46,7 @@ interface IToggleMenuItem {
 export const EventTopBar = (props: IProps) => {
   const { goHome, title, saveAction, exitAction, menuItems, iconColor } = props
   return (
-    <TopBar>
+    <TopBar id="eventtopbar">
       <Item>
         <ApplicationIcon color={iconColor} /> <TopBarTitle>{title}</TopBarTitle>
       </Item>

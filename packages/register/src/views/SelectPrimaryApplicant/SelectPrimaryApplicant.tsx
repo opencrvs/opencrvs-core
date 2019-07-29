@@ -11,7 +11,7 @@ import {
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
-import { Container } from '@opencrvs/components/lib/layout'
+import { Container, BodyContent } from '@opencrvs/components/lib/layout'
 import { IApplication, modifyApplication } from '@register/applications'
 import {
   goBack,
@@ -67,13 +67,6 @@ export const messages: {
     description: 'Back button in the menu'
   }
 })
-
-const BodyContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  padding: 16px 32px;
-  position: relative;
-`
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
