@@ -494,12 +494,6 @@ describe('validate', () => {
   })
 
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
-    it('should error when an English punctuation is given', () => {
-      const badValue = 'John.'
-      expect(englishOnlyNameFormat(badValue)).toEqual({
-        message: messages.englishOnlyNameFormat
-      })
-    })
     it('should error when an English number is given', () => {
       const badValue = 'John1'
       expect(englishOnlyNameFormat(badValue)).toEqual({
