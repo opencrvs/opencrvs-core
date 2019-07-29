@@ -56,6 +56,15 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/events/birth/mark-validated',
+      handler: birthEventHandler,
+      config: {
+        tags: ['api'],
+        description: 'Handles updating an existing declaration'
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/new-registration',
       handler: birthEventHandler,
       config: {
@@ -110,6 +119,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Handles indexing a new validation'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-validated',
+      handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        description: 'Handles updating an existing declaration'
       }
     },
     {
