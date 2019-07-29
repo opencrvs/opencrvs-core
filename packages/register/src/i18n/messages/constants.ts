@@ -443,6 +443,47 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     id: 'form.field.label.applicantRelation.father',
     defaultMessage: 'Father',
     description: 'Label for option Father'
+  },
+  BOTH_PARENTS: {
+    id: 'register.selectInformant.parents',
+    defaultMessage: 'Mother & Father',
+    description:
+      'The description that appears when selecting the parent as informant'
+  },
+  SELF: {
+    defaultMessage: 'Self',
+    description: 'The title that appears when selecting self as informant',
+    id: 'form.field.label.self'
+  },
+  OTHER: {
+    defaultMessage: 'Someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElse'
+  },
+  SPOUSE: {
+    id: 'form.field.label.applicantRelation.spouse',
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse'
+  },
+  SON: {
+    id: 'form.field.label.applicantRelation.son',
+    defaultMessage: 'Son',
+    description: 'Label for option Son'
+  },
+  DAUGHTER: {
+    id: 'form.field.label.applicantRelation.daughter',
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter'
+  },
+  EXTENDED_FAMILY: {
+    defaultMessage: 'Extended Family',
+    description: 'Label for option Extended Family',
+    id: 'form.field.label.applicantRelation.extendedFamily'
+  },
+  SOMEONE_ELSE: {
+    defaultMessage: 'Someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElse'
   }
 }
 
