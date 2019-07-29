@@ -165,6 +165,12 @@ export class RegistrationHomeView extends React.Component<
     }
   }
 
+  componentWillReceiveProps() {
+    this.setState({
+      lastModifiedOn: this.props.lastModifiedOn
+    })
+  }
+
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
