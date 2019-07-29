@@ -19,7 +19,11 @@ import {
   goToDeathInformant,
   goToHome
 } from '@register/navigation'
-import { PAGE_TRANSITIONS_CLASSNAME } from '@register/utils/constants'
+import {
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_ENTER_TIME,
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+} from '@register/utils/constants'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -78,7 +82,8 @@ const StyledContainer = styled.div`
   min-height: calc(100vh - 40px);
   width: 100%;
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
-    animation: ${fadeFromBottom} 300ms ease-in-out both;
+    animation: ${fadeFromBottom} ${PAGE_TRANSITIONS_ENTER_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
     z-index: 999;
   }
 
@@ -86,7 +91,7 @@ const StyledContainer = styled.div`
     position: fixed;
   }
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {
-    z-index: 999999999;
+    z-index: 999;
     position: fixed;
   }
 `

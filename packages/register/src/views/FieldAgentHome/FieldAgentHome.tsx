@@ -31,7 +31,9 @@ import {
   FIELD_AGENT_ROLES,
   SYS_ADMIN_ROLES,
   REGISTRAR_ROLES,
-  PAGE_TRANSITIONS_CLASSNAME
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_ENTER_TIME,
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@register/utils/constants'
 import styled, { withTheme, keyframes } from '@register/styledComponents'
 import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@register/navigation/routes'
@@ -136,7 +138,8 @@ const StyledContainer = styled.div`
   background: ${({ theme }) => theme.colors.background};
 
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
-    animation: ${fadeFromTop} 300ms ease-in-out both;
+    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_ENTER_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
   }
 
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {

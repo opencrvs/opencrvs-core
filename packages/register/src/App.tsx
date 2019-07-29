@@ -37,7 +37,10 @@ import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
-import { PAGE_TRANSITIONS_CLASSNAME } from './utils/constants'
+import {
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_ENTER_TIME
+} from './utils/constants'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -98,9 +101,11 @@ export class App extends React.Component<IAppProps> {
                                     <>
                                       <TransitionGroup component={null}>
                                         <CSSTransition
+                                          unmountOnExit
                                           timeout={{
-                                            enter: 300,
-                                            exit: 300
+                                            enter: PAGE_TRANSITIONS_ENTER_TIME,
+                                            exit:
+                                              PAGE_TRANSITIONS_ENTER_TIME - 25
                                           }}
                                           classNames={
                                             PAGE_TRANSITIONS_CLASSNAME

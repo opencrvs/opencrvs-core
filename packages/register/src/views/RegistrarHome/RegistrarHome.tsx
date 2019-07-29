@@ -52,7 +52,11 @@ import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
-import { PAGE_TRANSITIONS_CLASSNAME } from '@register/utils/constants'
+import {
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_ENTER_TIME,
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+} from '@register/utils/constants'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -112,7 +116,8 @@ const StyledContainer = styled.div`
   background: ${({ theme }) => theme.colors.background};
 
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
-    animation: ${fadeFromTop} 300ms ease-in-out both;
+    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_ENTER_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
   }
 
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {

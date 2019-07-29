@@ -438,7 +438,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           id="phone_number_input"
           type="tel"
           key={`${id}_phoneNumberInputField`}
-          name={PHONE_NO_FIELD_STRING}
+          name="mobile"
           isSmallSized={true}
           value={this.state.phoneNumber}
           onChange={e => this.handlePhoneNoChange(e.target.value)}
