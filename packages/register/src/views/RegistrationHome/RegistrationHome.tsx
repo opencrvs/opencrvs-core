@@ -50,6 +50,7 @@ import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
 import { ApprovalTab } from './tabs/approvals/approvalTab'
+import { QUERY_POLLING_INTERVAL } from '@register/utils/constants'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -110,13 +111,11 @@ interface IBaseRegistrationHomeProps {
   selectorId: string
   drafts: IApplication[]
   goToEvents: typeof goToEventsAction
-  lastModifiedOn: number
 }
 
 interface IRegistrationHomeState {
   reviewCurrentPage: number
   updatesCurrentPage: number
-  lastModifiedOn: number
 }
 
 type IRegistrationHomeProps = InjectedIntlProps &
@@ -140,17 +139,6 @@ export const EVENT_STATUS = {
   REJECTED: 'REJECTED'
 }
 
-export const stopPollingAsync = (
-  isApplicationsModified: boolean,
-  stopPolling: () => void
-) => {
-  if (isApplicationsModified) {
-    setTimeout(() => {
-      stopPolling()
-    }, 2000)
-  }
-}
-
 export class RegistrationHomeView extends React.Component<
   IRegistrationHomeProps,
   IRegistrationHomeState
@@ -160,15 +148,8 @@ export class RegistrationHomeView extends React.Component<
     super(props)
     this.state = {
       reviewCurrentPage: 1,
-      updatesCurrentPage: 1,
-      lastModifiedOn: this.props.lastModifiedOn
+      updatesCurrentPage: 1
     }
-  }
-
-  componentWillReceiveProps() {
-    this.setState({
-      lastModifiedOn: this.props.lastModifiedOn
-    })
   }
 
   userHasRegisterScope() {
@@ -257,8 +238,6 @@ export class RegistrationHomeView extends React.Component<
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
     let parentQueryLoading = false
-    const isApplicationsModified =
-      this.props.lastModifiedOn !== this.state.lastModifiedOn
 
     return (
       <>
@@ -268,20 +247,16 @@ export class RegistrationHomeView extends React.Component<
           variables={{
             locationIds: [registrarUnion]
           }}
-          pollInterval={isApplicationsModified ? 200 : 0}
+          pollInterval={QUERY_POLLING_INTERVAL}
         >
           {({
             loading,
             error,
-            data,
-            startPolling,
-            stopPolling
+            data
           }: {
             loading: any
             error?: any
             data: any
-            startPolling: any
-            stopPolling: () => void
           }) => {
             if (loading) {
               parentQueryLoading = true
@@ -301,8 +276,6 @@ export class RegistrationHomeView extends React.Component<
                 </ErrorText>
               )
             }
-
-            stopPollingAsync(isApplicationsModified, stopPolling)
 
             return (
               <>
@@ -386,14 +359,12 @@ export class RegistrationHomeView extends React.Component<
           <ReviewTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
-            isApplicationsModified={isApplicationsModified}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
           <RejectTab
             registrarUnion={registrarUnion}
             parentQueryLoading={parentQueryLoading}
-            isApplicationsModified={isApplicationsModified}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
@@ -421,17 +392,6 @@ export class RegistrationHomeView extends React.Component<
   }
 }
 
-function getLastModifiedOn(applications: IApplication[]) {
-  let lastModifiedon = 0
-  applications &&
-    applications.forEach((application: IApplication) => {
-      if (application.modifiedOn && application.modifiedOn > lastModifiedon) {
-        lastModifiedon = application.modifiedOn
-      }
-    })
-  return lastModifiedon
-}
-
 function mapStateToProps(
   state: IStoreState,
   props: RouteComponentProps<{ tabId: string; selectorId?: string }>
@@ -450,8 +410,7 @@ function mapStateToProps(
             application.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
-      [],
-    lastModifiedOn: getLastModifiedOn(state.applicationsState.applications)
+      []
   }
 }
 

@@ -22,6 +22,7 @@ import {
   StyledSpinner
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
+import { QUERY_POLLING_INTERVAL } from '@register/utils/constants'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -104,6 +105,7 @@ class PrintTabComponent extends React.Component<
           count: this.pageSize,
           skip: (this.state.printCurrentPage - 1) * this.pageSize
         }}
+        pollInterval={QUERY_POLLING_INTERVAL}
       >
         {({
           loading,

@@ -26,6 +26,7 @@ import {
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
+import { QUERY_POLLING_INTERVAL } from '@register/utils/constants'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -108,6 +109,7 @@ class ApprovalTabComponent extends React.Component<
           count: this.pageSize,
           skip: (this.state.approvalCurrentPage - 1) * this.pageSize
         }}
+        pollInterval={QUERY_POLLING_INTERVAL}
       >
         {({
           loading,
