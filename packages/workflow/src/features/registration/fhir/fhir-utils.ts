@@ -3,7 +3,8 @@ import {
   CHILD_SECTION_CODE,
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
-  EVENT_TYPE
+  EVENT_TYPE,
+  REG_STATUS_VALIDATED
 } from '@workflow/features/registration/fhir/constants'
 import { HEARTH_URL } from '@workflow/constants'
 import {
@@ -180,6 +181,8 @@ export function getRegStatusCode(tokenPayload: ITokenPayload) {
     return REG_STATUS_REGISTERED
   } else if (tokenPayload.scope.indexOf(USER_SCOPE.DECLARE.toString()) > -1) {
     return REG_STATUS_DECLARED
+  } else if (tokenPayload.scope.indexOf(USER_SCOPE.VALIDATE.toString()) > -1) {
+    return REG_STATUS_VALIDATED
   } else {
     throw new Error('No valid scope found on token')
   }

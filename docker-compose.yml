@@ -113,6 +113,7 @@ services:
       - AUTH_URL=http://auth:4040
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
+      - HOST=0.0.0.0
 
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
@@ -121,7 +122,7 @@ services:
       dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
-      - LANGUAGE=bn
+      - LANGUAGES=bn,en
       - AUTH_URL=http://auth:4040
 
   resources:

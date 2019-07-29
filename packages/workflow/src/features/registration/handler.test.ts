@@ -188,6 +188,188 @@ describe('Verify handler', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    it('returns OK for a correctly authenticated user birth validation', async () => {
+      fetch.mockResponses(
+        [userMock, { status: 200 }],
+        [fieldAgentPractitionerMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'birth-registration'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/paper-form-id',
+                      value: '12345678'
+                    },
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'B5WGYJE'
+                    }
+                  ],
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    }
+                  ],
+                  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Patient/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+
+      const token = jwt.sign(
+        { scope: ['validate'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('returns OK for a correctly authenticated user death validation', async () => {
+      fetch.mockResponses(
+        [userMock, { status: 200 }],
+        [fieldAgentPractitionerMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [fieldAgentPractitionerRoleMock, { status: 200 }],
+        [districtMock, { status: 200 }],
+        [upazilaMock, { status: 200 }],
+        [unionMock, { status: 200 }],
+        [officeMock, { status: 200 }],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'death-registration'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'B5WGYJE'
+                    }
+                  ],
+                  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Patient/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+
+      const token = jwt.sign(
+        { scope: ['validate'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:workflow-user'
+        }
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/fhir',
+        payload: testFhirBundleForDeath,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
     it('returns OK for a registrar user', async () => {
       fetch.mockResponses(
         [userMock, { status: 200 }],

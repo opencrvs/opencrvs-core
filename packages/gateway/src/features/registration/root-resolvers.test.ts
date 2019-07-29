@@ -788,16 +788,24 @@ describe('Registration root resolvers', () => {
           }
         }
       }
-      fetch.mockResponses([
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Task/12423/_history/1' }
-            }
-          ]
-        })
-      ])
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: []
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
       const result = await resolvers.Mutation.markBirthAsValidated(
         {},
         { id: compositionID, details: compositionDetails },
@@ -1090,16 +1098,70 @@ describe('Registration root resolvers', () => {
         },
         _fhirIDMap: { composition: 'd7e273e7-e4d3-4342-905e-f3514fa2c10a' }
       }
-      fetch.mockResponses([
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Task/12423/_history/1' }
-            }
-          ]
-        })
-      ])
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                resource: {
+                  identifier: [{ type: 'PASSPORT', id: '111111111' }],
+                  name: [
+                    { use: 'bn', familyName: 'টম' },
+                    { use: 'en', familyName: 'Tom' }
+                  ],
+                  nationality: ['BGD'],
+                  gender: 'male',
+                  maritalStatus: 'MARRIED',
+                  birthDate: '1940-01-01',
+                  address: [
+                    {
+                      type: 'PERMANENT',
+                      line: [
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                      ],
+                      country: 'BGD',
+                      state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                      district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+                    },
+                    {
+                      type: 'CURRENT',
+                      line: [
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                      ],
+                      country: 'BGD',
+                      state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                      district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+                    }
+                  ],
+                  id: 'f4dd0315-9b89-46aa-a52e-68e1cd1f352f',
+                  deceased: { deceased: true, deathDate: '2010-01-01' }
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
       const result = await resolvers.Mutation.markDeathAsValidated(
         {},
         { id: compositionID, details: compositionDetails },

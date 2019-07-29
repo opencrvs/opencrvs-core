@@ -151,7 +151,7 @@ export const resolvers: GQLResolver = {
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
+        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
@@ -280,7 +280,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event)
+  const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
@@ -313,7 +313,7 @@ async function markEventAsValidated(
       entry: taskBundle.entry
     }
   } else {
-    doc = await buildFHIRBundle(details, event)
+    doc = await buildFHIRBundle(details, event, authHeader)
   }
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
