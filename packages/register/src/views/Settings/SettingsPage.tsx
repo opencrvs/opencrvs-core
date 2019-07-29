@@ -117,7 +117,7 @@ const Container = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   padding: 40px 80px;
-  margin: 36px auto 0;
+  margin: 36px auto;
   width: 1156px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 0;
