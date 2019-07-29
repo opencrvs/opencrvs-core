@@ -54,6 +54,7 @@ import {
 } from '@register/forms/utils'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+import { PAGE_TRANSITIONS_ENTER_TIME } from '@register/utils/constants'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -359,7 +360,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.userHasRegisterScope()
       ? this.props.goToRegistrarHomeTab('progress')
       : this.props.goToHome()
-    //  this.props.toggleDraftSavedNotification()
+    this.props.toggleDraftSavedNotification()
+  }
+
+  onDeleteApplication = (application: IApplication) => {
+    this.userHasRegisterScope()
+      ? this.props.goToRegistrarHomeTab('progress')
+      : this.props.goToHome()
+
+    setTimeout(
+      () => this.props.deleteApplication(application),
+      PAGE_TRANSITIONS_ENTER_TIME + 100
+    )
+  }
+
+  goToUserHome = () => {
+    this.userHasRegisterScope()
+      ? this.props.goToRegistrarHomeTab('progress')
+      : this.props.goToHome()
   }
 
   continueButtonHandler = (
@@ -430,12 +448,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   menuItems={[
                     {
                       label: 'Delete Application',
-                      handler: () => {
-                        this.props.deleteApplication(application)
-                        this.userHasRegisterScope()
-                          ? this.props.goToRegistrarHomeTab('progress')
-                          : this.props.goToHome()
-                      }
+                      handler: () => this.onDeleteApplication(application)
                     }
                   ]}
                 />
@@ -458,7 +471,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       : 'violet'
                   }
                   saveAction={{
-                    handler: this.props.goToHome,
+                    handler: this.goToUserHome,
                     label: intl.formatMessage(messages.exitButton)
                   }}
                 />
@@ -489,10 +502,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   menuItems={[
                     {
                       label: 'Delete Application',
-                      handler: () => {
-                        this.props.deleteApplication(application)
-                        this.props.goToHome()
-                      }
+                      handler: () => this.onDeleteApplication(application)
                     }
                   ]}
                 />
