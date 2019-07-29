@@ -322,16 +322,16 @@ export const applicantsSection: IFormSection = {
           placeholder: messages.select,
           hidden: true,
           options: [
-            { value: 'FATHER', label: messages.relationFather },
-            { value: 'MOTHER', label: messages.relationMother },
-            { value: 'SPOUSE', label: messages.relationSpouse },
+            { value: 'FATHER', label: messages.father },
+            { value: 'MOTHER', label: messages.mother },
+            { value: 'SPOUSE', label: messages.spouse },
             {
               value: 'SON',
-              label: messages.relationSon
+              label: messages.son
             },
             {
               value: 'DAUGHTER',
-              label: messages.relationDaughter
+              label: messages.daughter
             },
             {
               value: 'EXTENDED_FAMILY',

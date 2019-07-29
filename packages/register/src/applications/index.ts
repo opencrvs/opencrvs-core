@@ -31,6 +31,11 @@ export enum SUBMISSION_STATUS {
 export interface IPayload {
   [key: string]: IFormFieldValue
 }
+
+export interface IVisitedGroupId {
+  sectionId: string
+  groupId: string
+}
 export interface IApplication {
   id: string
   data: IFormData
@@ -46,6 +51,7 @@ export interface IApplication {
   compositionId?: string
   registrationNumber?: string
   payload?: IPayload
+  visitedGroupIds?: IVisitedGroupId[]
 }
 
 interface IStoreApplicationAction {
@@ -99,6 +105,7 @@ export type Action =
 
 export interface IUserData {
   userID: string
+  userPIN?: string
   applications: IApplication[]
 }
 
@@ -189,7 +196,7 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
-    return '{}'
+    return JSON.stringify({ applications: [] })
   }
 
   const currentUserID = await getCurrentUserID()

@@ -22,9 +22,42 @@ interface IReviewMessages {
   additionalComments: ReactIntl.FormattedMessage.MessageDescriptor
   zeroDocumentsText: ReactIntl.FormattedMessage.MessageDescriptor
   editDocuments: ReactIntl.FormattedMessage.MessageDescriptor
+  formDataHeader: ReactIntl.FormattedMessage.MessageDescriptor
+  validateConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  validateActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  valueApprove: ReactIntl.FormattedMessage.MessageDescriptor
+  validateConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
+  validateConfirmationDesc: {
+    id: 'register.form.modal.desc.validateConfirmation',
+    defaultMessage:
+      'This application will be sent to the registrar from them to approve.',
+    description: 'Description for validate confirmation modal'
+  },
+  validateConfirmationTitle: {
+    id: 'register.form.modal.title.validateConfirmation',
+    defaultMessage: 'Send for approval?',
+    description: 'Title for validate confirmation modal'
+  },
+  validateActionDescription: {
+    id: 'review.validate.action.description',
+    defaultMessage:
+      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
+    description: 'Description is shown when validation'
+  },
+  valueApprove: {
+    id: 'review.button.approve',
+    defaultMessage: 'Send for approval',
+    description: 'Label for Send For Approval button'
+  },
+  formDataHeader: {
+    id: 'review.formData.header',
+    defaultMessage:
+      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
+    description: 'Label for form data header text'
+  },
   headerSubjectWithoutName: {
     id: 'review.header.subject.subjectWithoutName',
     defaultMessage:

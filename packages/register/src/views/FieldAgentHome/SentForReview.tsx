@@ -23,6 +23,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
 import { goToApplicationDetails } from '@register/navigation'
 import { constantsMessages as messages } from '@register/i18n/messages'
+import { getDefaultLanguage } from '@register/i18n/utils'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -216,7 +217,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               label: this.props.intl.formatMessage(messages.submissionStatus),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(window.config.COUNTRY, window.config.LANGUAGE)
+              color: getTheme(window.config.COUNTRY, getDefaultLanguage())
                 .colors.secondaryLabel
             },
             {

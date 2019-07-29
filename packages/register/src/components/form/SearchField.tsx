@@ -161,17 +161,17 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     )
     const locations: ILocation[] = [
       {
-        id: '454b4008-7ffd-4808-9ed4-4613d4047021',
+        id: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
         name: 'Moktarpur Union Parishad',
         detailedLocation: 'Moktarpur, Kaliganj, Gazipur, Dhaka'
       },
       {
-        id: '759a0452-ef5b-4853-95d0-2f231c22e230',
+        id: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
         name: 'Amdia Union Parishad',
         detailedLocation: 'Amdia, Narsingdi Sadar, Narsingdi, Dhaka'
       },
       {
-        id: '4140ccc2-a5ed-4008-bf13-96ddbc15eb6c',
+        id: 'd757aee6-0691-42d5-92dd-ab731cb640d6',
         name: 'Bhurungamari Union Parishad',
         detailedLocation: 'Bhurungamari, Bhurungamari, Kurigram, Rangpur'
       }

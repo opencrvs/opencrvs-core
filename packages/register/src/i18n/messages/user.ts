@@ -2,7 +2,7 @@ import { defineMessages } from 'react-intl'
 
 interface IUserMessages {
   FIELD_AGENT: ReactIntl.FormattedMessage.MessageDescriptor
-  REGISTRATION_CLERK: ReactIntl.FormattedMessage.MessageDescriptor
+  REGISTRATION_AGENT: ReactIntl.FormattedMessage.MessageDescriptor
   LOCAL_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
   DISTRICT_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
   STATE_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
@@ -30,6 +30,13 @@ interface IUserMessages {
   FAVORITE_SONG: ReactIntl.FormattedMessage.MessageDescriptor
   FAVORITE_FOOD: ReactIntl.FormattedMessage.MessageDescriptor
   FIRST_CHILD_NAME: ReactIntl.FormattedMessage.MessageDescriptor
+  settingsTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  profileTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  securityTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  accountTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  systemTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  labelEnglishName: ReactIntl.FormattedMessage.MessageDescriptor
+  changeLanguageTitle: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 interface IDynamicUserMessages {
@@ -37,6 +44,51 @@ interface IDynamicUserMessages {
 }
 
 const messagesToDefine: IUserMessages = {
+  settingsTitle: {
+    id: 'settings.title',
+    defaultMessage: 'Settings',
+    description: 'Title of the settings page'
+  },
+  profileTitle: {
+    id: 'settings.profile.tile',
+    defaultMessage: 'Profile',
+    description: 'Profile header'
+  },
+  securityTitle: {
+    id: 'settings.security.tile',
+    defaultMessage: 'Security',
+    description: 'Security header'
+  },
+  accountTitle: {
+    id: 'settings.account.tile',
+    defaultMessage: 'Account',
+    description: 'Account header'
+  },
+  systemTitle: {
+    id: 'settings.system.tile',
+    defaultMessage: 'System',
+    description: 'System header'
+  },
+  labelEnglishName: {
+    id: 'settings.user.label.nameEN',
+    defaultMessage: 'English name',
+    description: 'English name label'
+  },
+  changeLanguageTitle: {
+    id: 'settings.changeLanguage',
+    defaultMessage: 'Change language',
+    description: 'Change language title'
+  },
+  changeLanguageMessege: {
+    id: 'settings.message.changeLanguage',
+    defaultMessage: 'Your prefered language that you want to use on OpenCRVS',
+    description: 'Change language message'
+  },
+  changeLanguageSuccessMessage: {
+    id: 'settings.changeLanguage.success',
+    defaultMessage: 'Language updted to English',
+    description: 'Change language success'
+  },
   BIRTH_TOWN: {
     id: 'userSetup.securityQuestions.birthTown',
     defaultMessage: 'What city were you born in?',
@@ -82,10 +134,10 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
-  REGISTRATION_CLERK: {
-    id: 'constants.registrationClerk',
-    defaultMessage: 'Registration Clerk',
-    description: 'The description for REGISTRATION_CLERK role'
+  REGISTRATION_AGENT: {
+    id: 'constants.registrationAgent',
+    defaultMessage: 'Registration Agent',
+    description: 'The description for REGISTRATION_AGENT role'
   },
   LOCAL_REGISTRAR: {
     id: 'constants.localRegistrar',

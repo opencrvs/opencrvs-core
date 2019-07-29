@@ -72,6 +72,7 @@ import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import { sectionMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 const RequiredFieldLink = styled(Link)`
   color: ${({ theme }) => theme.colors.error};
@@ -125,6 +126,9 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+`
+const FormDataHeader = styled.div`
+  ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
   margin-top: 16px;
@@ -374,26 +378,38 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
     const selectOptions: SelectComponentOptions[] = []
-    let uploadedDocuments =
-      draft.data[draftItemName] &&
-      isArray(draft.data[draftItemName].imageUploader)
-        ? (draft.data[draftItemName].imageUploader as FullIFileValue[])
-        : []
+
+    let uploadedDocuments: IFileValue[] = []
+
+    for (let index in draft.data[draftItemName]) {
+      if (isArray(draft.data[draftItemName][index]))
+        uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
+          index
+        ] as IFileValue[])
+    }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
-      return document.title.toUpperCase() === activeSection.toUpperCase()
-    })
+      const index = activeSection.toUpperCase()
+      // @ts-ignore
+      const allowedDocumentType = sectionMapping[index] || []
 
-    uploadedDocuments.forEach(document => {
-      const label = document.title + ' ' + document.description
-      documentOptions.push({
-        value: document.data,
-        label
-      })
-      selectOptions.push({
-        value: label,
-        label
-      })
+      if (
+        allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
+      ) {
+        // const label = document.title + ' ' + document.description
+        const label = document.optionValues[0] + ' ' + document.optionValues[1]
+
+        documentOptions.push({
+          value: document.data,
+          label
+        })
+        selectOptions.push({
+          value: label,
+          label
+        })
+        return true
+      }
+      return false
     })
 
     return {
@@ -424,6 +440,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   userHasRegisterScope() {
     if (this.props.scope) {
       return this.props.scope && this.props.scope.includes('register')
+    } else {
+      return false
+    }
+  }
+
+  userHasValidateScope() {
+    if (this.props.scope) {
+      return this.props.scope && this.props.scope.includes('validate')
     } else {
       return false
     }
@@ -555,6 +579,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
+    const isDraft =
+      this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
 
     return (
       <FullBodyContent>
@@ -578,6 +604,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
+              <FormDataHeader>
+                {intl.formatMessage(messages.formDataHeader, { isDraft })}
+              </FormDataHeader>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
                   <DataSection key={index} {...sec} id={'Section_' + sec.id} />
@@ -595,18 +624,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
+              <ReviewAction
+                isComplete={isComplete}
+                isRegister={this.userHasRegisterScope()}
+                isRegistrationAgent={this.userHasValidateScope()}
+                isRejected={this.props.draft.registrationStatus === REJECTED}
+                isDraft={isDraft}
+                application={draft}
+                submitAction={submitClickEvent}
+                rejectAction={rejectApplicationClickEvent}
+              />
             </FormData>
-            <ReviewAction
-              isComplete={isComplete}
-              isRegister={this.userHasRegisterScope()}
-              isRejected={this.props.draft.registrationStatus === REJECTED}
-              isDraft={
-                this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
-              }
-              application={draft}
-              submitAction={submitClickEvent}
-              rejectAction={rejectApplicationClickEvent}
-            />
           </StyledColumn>
           <Column>
             <ResponsiveDocumentViewer

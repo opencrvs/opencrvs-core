@@ -89,7 +89,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.MOTHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationMother),
+          label: intl.formatMessage(formMessages.mother),
           value: ContactPoint.MOTHER
         },
         disabled: false
@@ -97,7 +97,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.FATHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationFather),
+          label: intl.formatMessage(formMessages.father),
           value: ContactPoint.FATHER
         },
         disabled: false
@@ -116,7 +116,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.MOTHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationMother),
+          label: intl.formatMessage(formMessages.mother),
           value: ContactPoint.MOTHER
         },
         disabled: false
@@ -124,7 +124,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.FATHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationFather),
+          label: intl.formatMessage(formMessages.father),
           value: ContactPoint.FATHER
         },
         disabled: false
@@ -132,7 +132,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.SPOUSE}`,
         option: {
-          label: intl.formatMessage(formMessages.relationSpouse),
+          label: intl.formatMessage(formMessages.spouse),
           value: ContactPoint.SPOUSE
         },
         disabled: false
@@ -140,7 +140,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.SON}`,
         option: {
-          label: intl.formatMessage(formMessages.relationSon),
+          label: intl.formatMessage(formMessages.son),
           value: ContactPoint.SON
         },
         disabled: false
@@ -148,7 +148,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.DAUGHTER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationDaughter),
+          label: intl.formatMessage(formMessages.daughter),
           value: ContactPoint.DAUGHTER
         },
         disabled: false

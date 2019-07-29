@@ -13,6 +13,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import styled from '@register/styledComponents'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import { sentenceCase } from '@register/utils/data-formatting'
+import { getDefaultLanguage } from '@register/i18n/utils'
 
 const Container = styled(BodyContent)`
   padding-top: 32px;
@@ -173,7 +174,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               ),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(window.config.COUNTRY, window.config.LANGUAGE)
+              color: getTheme(window.config.COUNTRY, getDefaultLanguage())
                 .colors.secondaryLabel
             },
             {

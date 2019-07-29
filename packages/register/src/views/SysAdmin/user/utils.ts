@@ -110,7 +110,7 @@ export const mockFetchRoleGraphqlOperation = {
         },
         {
           title: 'Registration Agent',
-          value: 'REGISTRATION_CLERK',
+          value: 'REGISTRATION_AGENT',
           types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK']
         },
         {

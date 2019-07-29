@@ -20,20 +20,22 @@ import {
   CREATE_USER_SECTION,
   SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT
+  SELECT_DEATH_MAIN_CONTACT_POINT,
+  SYS_ADMIN_HOME
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken } from '@register/utils/authUtils'
+import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
 
 export interface IDynamicValues {
   [key: string]: any
 }
 
-function formatUrl(url: string, props: { [key: string]: string }) {
-  return Object.keys(props).reduce(
+export function formatUrl(url: string, props: { [key: string]: string }) {
+  const formattedUrl = Object.keys(props).reduce(
     (str, key) => str.replace(`:${key}`, props[key]),
     url
   )
+  return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
 }
 
 export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
@@ -123,6 +125,13 @@ export function goToHome() {
   return push(HOME)
 }
 
+export function goToInProgressTab() {
+  const path = getCurrentUserScope().includes('declare')
+    ? FIELD_AGENT_HOME_TAB
+    : REGISTRAR_HOME_TAB
+  return push(formatUrl(path, { tabId: 'progress', selectorId: 'you' }))
+}
+
 export function goToPerformance() {
   window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
 }
@@ -197,10 +206,10 @@ export function goToDeathRegistration(applicationId: string) {
   )
 }
 
-export function goToRegistrarHomeTab(tabId: string) {
+export function goToRegistrarHomeTab(tabId: string, selectorId?: string) {
   return {
     type: GO_TO_REGISTRAR_HOME,
-    payload: { tabId }
+    payload: { tabId, selectorId }
   }
 }
 
@@ -324,11 +333,19 @@ export function navigationReducer(state: INavigationState, action: any) {
         )
       )
     case GO_TO_REGISTRAR_HOME:
-      const { tabId: RegistrarHomeTabId } = action.payload
+      const {
+        tabId: RegistrarHomeTabId,
+        selectorId: RegistrarHomeSelectorId = ''
+      } = action.payload
       return loop(
         state,
         Cmd.action(
-          push(formatUrl(REGISTRAR_HOME_TAB, { tabId: RegistrarHomeTabId }))
+          push(
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: RegistrarHomeTabId,
+              selectorId: RegistrarHomeSelectorId
+            })
+          )
         )
       )
     case GO_TO_FIELD_AGENT_HOME:

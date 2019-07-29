@@ -184,11 +184,11 @@ interface IFormMessages {
   phoneNumber: ReactIntl.FormattedMessage.MessageDescriptor
   fetchInformantDetails: ReactIntl.FormattedMessage.MessageDescriptor
   applicantsRelationWithDeceased: ReactIntl.FormattedMessage.MessageDescriptor
-  relationFather: ReactIntl.FormattedMessage.MessageDescriptor
-  relationMother: ReactIntl.FormattedMessage.MessageDescriptor
-  relationSpouse: ReactIntl.FormattedMessage.MessageDescriptor
-  relationSon: ReactIntl.FormattedMessage.MessageDescriptor
-  relationDaughter: ReactIntl.FormattedMessage.MessageDescriptor
+  father: ReactIntl.FormattedMessage.MessageDescriptor
+  mother: ReactIntl.FormattedMessage.MessageDescriptor
+  spouse: ReactIntl.FormattedMessage.MessageDescriptor
+  son: ReactIntl.FormattedMessage.MessageDescriptor
+  daughter: ReactIntl.FormattedMessage.MessageDescriptor
   relationExtendedFamily: ReactIntl.FormattedMessage.MessageDescriptor
   relationOther: ReactIntl.FormattedMessage.MessageDescriptor
   applicantOtherRelationship: ReactIntl.FormattedMessage.MessageDescriptor
@@ -251,6 +251,14 @@ interface IFormMessages {
   relationshipPlaceHolder: ReactIntl.FormattedMessage.MessageDescriptor
   someoneElse: ReactIntl.FormattedMessage.MessageDescriptor
   self: ReactIntl.FormattedMessage.MessageDescriptor
+  paragraph45daysTo5Years: ReactIntl.FormattedMessage.MessageDescriptor
+  paragraphAbove5Years: ReactIntl.FormattedMessage.MessageDescriptor
+  docTaxReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  dischargeCertificate: ReactIntl.FormattedMessage.MessageDescriptor
+  birthMedicalInstitution: ReactIntl.FormattedMessage.MessageDescriptor
+  birthAttendant: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeChildAgeProof: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeEPIStaffCertificate: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IFormMessages = {
   self: {
@@ -459,6 +467,16 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeFuneralReceipt',
     defaultMessage: 'Certified Copy of Funeral Receipt',
     description: 'Label for select option Certified Copy of Funeral Receipt'
+  },
+  docTypeChildAgeProof: {
+    id: 'formFields.docTypeChildAgeProof',
+    defaultMessage: 'Proof of Child Age',
+    description: 'Label for select option Child Age Proof'
+  },
+  docTypeEPIStaffCertificate: {
+    id: 'formFields.docTypeEPIStaffCertificate',
+    defaultMessage: 'EPI Staff Certificate',
+    description: 'Label for select option EPI Card'
   },
   deceasedName: {
     id: 'form.section.deceased.name',
@@ -695,27 +713,27 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Relationship to Deceased',
     description: 'Label for Relationship to Deceased select'
   },
-  relationFather: {
+  father: {
     id: 'form.field.label.applicantRelation.father',
     defaultMessage: 'Father',
     description: 'Label for option Father'
   },
-  relationMother: {
+  mother: {
     id: 'form.field.label.applicantRelation.mother',
     defaultMessage: 'Mother',
     description: 'Label for option Mother'
   },
-  relationSpouse: {
+  spouse: {
     id: 'form.field.label.applicantRelation.spouse',
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse'
   },
-  relationSon: {
+  son: {
     id: 'form.field.label.applicantRelation.son',
     defaultMessage: 'Son',
     description: 'Label for option Son'
   },
-  relationDaughter: {
+  daughter: {
     id: 'form.field.label.applicantRelation.daughter',
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter'
@@ -931,6 +949,42 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.documents.title',
     defaultMessage: 'Supporting documents',
     description: 'Form section title for Documents'
+  },
+
+  docTaxReceipt: {
+    id: 'formFields.docTypeTaxReceipt',
+    defaultMessage: 'Receipt of tax payment',
+    description: 'Document type label for tax receipt'
+  },
+
+  dischargeCertificate: {
+    id: 'formFields.docTypeHospitalDischargeCertificate',
+    defaultMessage: 'Discharge Certificate',
+    description: 'Document type label for Discharge Certificate'
+  },
+  birthMedicalInstitution: {
+    id: 'formFields.docTypeMedicalInstitution',
+    defaultMessage: 'Proof of birth from medical institution',
+    description:
+      'Document type label for Proof of birth from medical institution'
+  },
+  birthAttendant: {
+    id: 'formFields.docTypebirthAttendant',
+    defaultMessage: 'Proof of birth from birth attendant',
+    description: 'Document type label for Proof of birth from birth attendant'
+  },
+
+  paragraph45daysTo5Years: {
+    id: 'form.section.documents.paragraph45daysTo5Years',
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text'
+  },
+  paragraphAbove5Years: {
+    id: 'form.section.documents.paragraphAbove5Years',
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text'
   },
   uploadImage: {
     id: 'form.section.documents.uploadImage',

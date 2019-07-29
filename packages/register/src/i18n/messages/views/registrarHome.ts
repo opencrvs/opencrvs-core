@@ -10,9 +10,39 @@ interface IRegistrarHomeMessages {
   readyToPrint: ReactIntl.FormattedMessage.MessageDescriptor
   registrationNumber: ReactIntl.FormattedMessage.MessageDescriptor
   listItemRegisteredDate: ReactIntl.FormattedMessage.MessageDescriptor
+  sentForApprovals: ReactIntl.FormattedMessage.MessageDescriptor
+  validatedApplicationTooltipForRegistrationAgent: ReactIntl.FormattedMessage.MessageDescriptor
+  validatedApplicationTooltipForRegistrar: ReactIntl.FormattedMessage.MessageDescriptor
+  inProgressOwnDrafts: ReactIntl.FormattedMessage.MessageDescriptor
+  inProgressFieldAgents: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IRegistrarHomeMessages = {
+  validatedApplicationTooltipForRegistrar: {
+    id: 'register.registrarHome.validated.registrar.tooltip',
+    defaultMessage: 'Application has been validated by a registration agent',
+    description: 'Text to display for validated application as tooltip'
+  },
+  inProgressFieldAgents: {
+    id: 'tab.inProgress.selector.field.agents',
+    defaultMessage: 'Field agents',
+    description: 'The title of In progress field agents'
+  },
+  inProgressOwnDrafts: {
+    id: 'tab.inProgress.selector.own.drafts',
+    defaultMessage: 'Yours',
+    description: 'The title of In progress own drafts'
+  },
+  validatedApplicationTooltipForRegistrationAgent: {
+    id: 'register.registrarHome.validated.registrationAgent.tooltip',
+    defaultMessage: 'Application has been validated and waiting for approval',
+    description: 'Text to display for validated application as tooltip'
+  },
+  sentForApprovals: {
+    id: 'register.registrarHome.sentForApprovals',
+    defaultMessage: 'Sent for approval',
+    description: 'The title of sent for approvals tab'
+  },
   dataTableResults: {
     id: 'register.registrationHome.table.label',
     defaultMessage: 'Results',

@@ -11,7 +11,7 @@ import {
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
-import { Container } from '@opencrvs/components/lib/layout'
+import { Container, BodyContent } from '@opencrvs/components/lib/layout'
 import { IApplication, modifyApplication } from '@register/applications'
 import {
   goBack,
@@ -23,13 +23,6 @@ import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { messages } from '@register/i18n/messages/views/selectPrimaryApplicant'
 import { formMessages, buttonMessages } from '@register/i18n/messages'
-
-const BodyContent = styled.div`
-  max-width: 940px;
-  margin: auto;
-  padding: 16px 32px;
-  position: relative;
-`
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -133,7 +126,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
               size="large"
               key="motherevent"
               name="motherevent"
-              label={intl.formatMessage(formMessages.relationMother)}
+              label={intl.formatMessage(formMessages.mother)}
               value={APPLICANT.MOTHER}
               id="select_mother_event"
               selected={this.state.applicant}
@@ -143,7 +136,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
               size="large"
               key="fatherevent"
               name="fatherevent"
-              label={intl.formatMessage(formMessages.relationFather)}
+              label={intl.formatMessage(formMessages.father)}
               value={APPLICANT.FATHER}
               id="select_father_event"
               selected={this.state.applicant}

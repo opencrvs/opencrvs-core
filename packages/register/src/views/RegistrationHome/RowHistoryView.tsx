@@ -36,6 +36,7 @@ import {
 import { messages } from '@register/i18n/messages/views/search'
 import moment from 'moment'
 import {
+  StatusGray,
   StatusGreen,
   StatusOrange,
   StatusRejected
@@ -244,6 +245,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             <StatusOrange />
           </StatusIcon>
         )
+      case 'VALIDATED':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
       case 'REGISTERED':
         return (
           <StatusIcon>
@@ -269,6 +276,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     switch (status) {
       case 'DECLARED':
         return constantsMessages.applicationSubmittedOn
+      case 'VALIDATED':
+        return constantsMessages.applicationValidatedOn
       case 'REGISTERED':
         return constantsMessages.applicationRegisteredOn
       case 'REJECTED':

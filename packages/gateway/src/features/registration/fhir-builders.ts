@@ -51,7 +51,8 @@ import {
   selectOrCreateEncounterLocationRef,
   selectOrCreateInformantSection,
   selectOrCreateInformantResource,
-  setInformantReference
+  setInformantReference,
+  fetchFHIR
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -110,7 +111,11 @@ function createNameBuilder(sectionCode: string, sectionTitle: string) {
 }
 function createIDBuilder(sectionCode: string, sectionTitle: string) {
   return {
-    id: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
+    id: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
       const person = selectOrCreatePersonResource(
         sectionCode,
         sectionTitle,
@@ -123,6 +128,21 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
+      if (!person.id) {
+        const personSearchSet = await fetchFHIR(
+          `/Patient?identifier=${fieldValue}`,
+          context.authHeader
+        )
+        if (
+          person &&
+          personSearchSet &&
+          personSearchSet.entry &&
+          personSearchSet.entry[0] &&
+          personSearchSet.entry[0].resource
+        ) {
+          person.id = personSearchSet.entry[0].resource.id
+        }
+      }
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(

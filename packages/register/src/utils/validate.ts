@@ -428,11 +428,12 @@ export const validIDNumber: ValidationInitializer = (
     min: 17,
     max: 18
   }
+  value = (value && value.toString()) || ''
   const validDeathRegistrationNumberLength = 18
   const validPassportLength = 9
   switch (typeOfID) {
     case NATIONAL_ID:
-      return hasValidLength(value.toString(), validNationalIDLength) &&
+      return hasValidLength(value, validNationalIDLength) &&
         isNumber(value.toString())
         ? undefined
         : {
@@ -445,7 +446,7 @@ export const validIDNumber: ValidationInitializer = (
         value.toString(),
         validBirthRegistrationNumberLength.min,
         validBirthRegistrationNumberLength.max
-      ) && isRegexpMatched(value.toString(), REGEXP_BLOCK_ALPHA_NUMERIC)
+      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
@@ -456,7 +457,7 @@ export const validIDNumber: ValidationInitializer = (
       return hasValidLength(
         value.toString(),
         validDeathRegistrationNumberLength
-      ) && isRegexpMatched(value.toString(), REGEXP_BLOCK_ALPHA_NUMERIC)
+      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
         ? undefined
         : {
             message: messages.validDeathRegistrationNumber,
@@ -465,7 +466,7 @@ export const validIDNumber: ValidationInitializer = (
 
     case PASSPORT:
       return hasValidLength(value.toString(), validPassportLength) &&
-        isRegexpMatched(value.toString(), REGEXP_ALPHA_NUMERIC)
+        isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
         ? undefined
         : {
             message: messages.validPassportNumber,

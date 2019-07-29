@@ -2,6 +2,7 @@ import { ILanguage } from '@register/i18n/reducer'
 
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
+  displayName: 'বাংলা',
   messages: {
     'buttons.apply': 'প্রয়োগ করুন',
     'buttons.back': 'পিছনে',
@@ -107,7 +108,7 @@ export const BENGALI_STATE: ILanguage = {
     'constants.performanceManagement': 'কর্মক্ষমতা ব্যবস্থাপনা',
     'constants.performanceOversight': 'কর্মক্ষমতা তত্ত্বাবধান',
     'constants.phoneNumber': 'ফোন নম্বর',
-    'constants.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'constants.registrationAgent': 'নিবন্ধন ক্লার্ক',
     'constants.relationship': 'Relationship',
     'constants.role': 'দায়িত্ব',
     'constants.secretary': 'সচিব',
@@ -843,7 +844,6 @@ export const BENGALI_STATE: ILanguage = {
       'নিবন্ধনের অপেক্ষায়',
     'register.registrationHome.outbox.waitingToRetry':
       'পুনরায় চেষ্টা করার জন্য অপেক্ষা হচ্ছে',
-    'buttons.print': 'মুদ্রণ',
     'register.registrationHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
     'register.registrationHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
@@ -855,12 +855,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrationHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
     'register.registrationHome.table.label': 'ফলাফল',
     'register.registrationHome.table.label.action': 'সম্ভাব্য কর্ম',
-    'constants.applicantContactNumber': 'ফোন নম্বর',
     'register.registrationHome.table.label.applicationDate': 'আবেদন পাঠানো',
     'constants.eventDate': 'ঘটনা তারিখ',
     'constants.lastEdited': 'শেষ সম্পাদনা',
     'register.registrationHome.table.label.registeredDate': 'নিবন্ধনের তারিখ',
-    'constants.type': 'ধরণ',
     'constants.sentOn': 'পাঠানো',
     'constants.collectedBy': 'সংগৃহীত',
     'search.informantContact': 'তথ্যদাতার যোগাযোগ নম্বর',
@@ -900,13 +898,10 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectInformant.deathInformantTitle':
       'What relationship does the applicant have to the deceased?',
     'register.selectInformant.extendedFamily': 'যৌথ পরিবার',
-    'form.field.label.applicantRelation.father': 'পিতা',
-    'form.field.label.applicantRelation.mother': 'মাতা',
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
     'register.selectInformant.parents': 'পিতা ও মাতা ',
     'register.selectInformant.relationshipLabel': 'মৃত ব্যক্তি সঙ্গে সম্পর্ক',
     'form.field.label.self': 'নিজের',
-    'form.field.label.someoneElse': 'অন্য কেউ',
     'register.selectInformant.son': 'পুত্র',
     'register.selectInformant.spouse': 'স্বামী বা স্ত্রী',
     'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান',
@@ -980,11 +975,11 @@ export const BENGALI_STATE: ILanguage = {
     'settings.security.tile': 'নিরাপত্তা',
     'settings.system.tile': 'সিস্টেম',
     'settings.title': 'সেটিংস',
-    'settings.user.label.language': 'ভাষা',
+    'constants.language': 'ভাষা',
     'settings.user.label.nameBN': 'বাংলার নাম',
     'settings.user.label.nameEN': 'ইংরেজি নাম',
-    'settings.user.label.password': 'পাসওয়ার্ড',
-    'settings.user.label.pin': 'পিন',
+    'constants.password': 'পাসওয়ার্ড',
+    'constants.PIN': 'পিন',
     'system.user.queryError':
       'সংযোগ বা নেটওয়ার্ক ত্রুটির কারণে পেজটি এই মুহূর্তে লোড করা সম্ভব হচ্ছে না। অনুগ্রহপূর্বক আবার চেষ্টা করার জন্য রিফ্রেশ করুন, অথবা পুনরায় চেষ্টা করুন।',
     'system.users.table.label.name': 'নাম',

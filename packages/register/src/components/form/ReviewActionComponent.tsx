@@ -23,6 +23,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
   isComplete: boolean
   isRegister?: boolean
+  isRegistrationAgent?: boolean
   isDraft?: boolean
   isRejected: boolean
   application: IApplication
@@ -37,7 +38,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Container = styled.div`
   position: relative;
-  margin: 0 32px 32px;
+  margin-top: 32px;
 `
 const Content = styled.div`
   z-index: 1;
@@ -97,6 +98,7 @@ class ReviewActionComponent extends React.Component<
     const {
       id,
       isRegister,
+      isRegistrationAgent,
       isRejected,
       isComplete,
       application,
@@ -118,6 +120,7 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {!isRegister &&
+              !isRegistrationAgent &&
               intl.formatMessage(
                 isComplete
                   ? messages.reviewActionDescriptionComplete
@@ -131,9 +134,13 @@ class ReviewActionComponent extends React.Component<
                     : messages.registerActionDescriptionComplete
                   : messages.registerActionDescriptionIncomplete
               )}
+            {isRegistrationAgent &&
+              intl.formatMessage(messages.validateActionDescription, {
+                isComplete
+              })}
           </Description>
           <ActionContainer>
-            {!isRegister && (
+            {!isRegister && !isRegistrationAgent && (
               <PrimaryButton
                 id="submit_form"
                 icon={() => <Upload />}
@@ -161,6 +168,18 @@ class ReviewActionComponent extends React.Component<
               </SuccessButton>
             )}
 
+            {isRegistrationAgent && (
+              <PrimaryButton
+                id="validateApplicationBtn"
+                icon={() => <Upload />}
+                onClick={this.toggleSubmitModalOpen}
+                disabled={!isComplete}
+                align={ICON_ALIGNMENT.LEFT}
+              >
+                {intl.formatMessage(messages.valueApprove)}
+              </PrimaryButton>
+            )}
+
             {rejectAction && !isRejected && (
               <DangerButton
                 id="rejectApplicationBtn"
@@ -177,6 +196,8 @@ class ReviewActionComponent extends React.Component<
           title={
             isRegister
               ? intl.formatMessage(messages.registerConfirmationTitle)
+              : isRegistrationAgent
+              ? intl.formatMessage(messages.validateConfirmationTitle)
               : intl.formatMessage(messages.submitConfirmationTitle, {
                   isComplete
                 })
@@ -222,6 +243,8 @@ class ReviewActionComponent extends React.Component<
         >
           {isRegister
             ? intl.formatMessage(constantsMessages.areYouSure)
+            : isRegistrationAgent
+            ? intl.formatMessage(messages.validateConfirmationDesc)
             : intl.formatMessage(messages.submitConfirmationDesc, {
                 isComplete
               })}

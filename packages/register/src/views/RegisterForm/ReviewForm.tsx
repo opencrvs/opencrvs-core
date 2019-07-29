@@ -65,9 +65,14 @@ export class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
+
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
+  }
+
   render() {
     const { intl, theme, application, applicationId, dispatch } = this.props
-    if (!this.userHasRegisterScope()) {
+    if (!this.userHasRegisterScope() && !this.userHasValidateScope()) {
       return (
         <ErrorText id="review-unauthorized-error-text">
           {intl.formatMessage(errorMessages.unauthorized)}

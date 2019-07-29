@@ -33,9 +33,15 @@ interface IButtonsMessages {
   saveExitButton: ReactIntl.FormattedMessage.MessageDescriptor
   exitButton: ReactIntl.FormattedMessage.MessageDescriptor
   search: ReactIntl.FormattedMessage.MessageDescriptor
+  apply: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  apply: {
+    id: 'buttons.apply',
+    defaultMessage: 'Apply',
+    description: 'Apply button label'
+  },
   search: {
     id: 'buttons.search',
     defaultMessage: 'Search',

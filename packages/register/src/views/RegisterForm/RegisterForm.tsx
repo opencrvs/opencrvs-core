@@ -29,6 +29,7 @@ import {
 import {
   goBack as goBackAction,
   goToHome,
+  goToInProgressTab,
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
@@ -100,17 +101,11 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
-function getNextSection(sections: IFormSection[], fromSection: IFormSection) {
-  const currentIndex = sections.findIndex(
-    (section: IFormSection) => section.id === fromSection.id
-  )
-
-  if (currentIndex === sections.length - 1) {
-    return null
-  }
-
-  return sections[currentIndex + 1]
+const VIEW_TYPE = {
+  FORM: 'form',
+  REVIEW: 'review',
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
 }
 
 function getNextSectionIds(
@@ -128,15 +123,18 @@ function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const currentIndex = sections.findIndex(
+    const visibleSections = sections.filter(
+      section => section.viewType !== VIEW_TYPE.HIDDEN
+    )
+    const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
     )
-    if (currentIndex === sections.length - 1) {
+    if (currentIndex === visibleSections.length - 1) {
       return null
     }
     return {
-      sectionId: sections[currentIndex + 1].id,
-      groupId: sections[currentIndex + 1].groups[0].id
+      sectionId: visibleSections[currentIndex + 1].id,
+      groupId: visibleSections[currentIndex + 1].groups[0].id
     }
   }
   return {
@@ -156,6 +154,7 @@ type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
+  goToInProgressTab: typeof goToInProgressTab
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -183,12 +182,6 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
-}
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
 }
 
 class RegisterFormView extends React.Component<FullProps, State> {
@@ -252,6 +245,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           section
         )
       )
+      return
     })
     return result
   }
@@ -276,7 +270,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToHome()
+    this.props.goToInProgressTab()
     this.props.toggleDraftSavedNotification()
   }
 
@@ -287,8 +281,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
     groupId: string,
     event: string
   ) => {
+    this.updateVisitedGroups()
     this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+  }
+
+  updateVisitedGroups = () => {
+    const visitedGroups = this.props.application.visitedGroupIds || []
+    if (
+      visitedGroups.findIndex(
+        visitedGroup =>
+          visitedGroup.sectionId === this.props.activeSection.id &&
+          visitedGroup.groupId === this.props.activeSectionGroup.id
+      ) === -1
+    ) {
+      visitedGroups.push({
+        sectionId: this.props.activeSection.id,
+        groupId: this.props.activeSectionGroup.id
+      })
+    }
+    this.props.application.visitedGroupIds = visitedGroups
   }
 
   render() {
@@ -299,19 +311,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm,
       offlineResources,
       handleSubmit,
-      duplicate
+      duplicate,
+      activeSection,
+      activeSectionGroup
     } = this.props
 
-    let activeSection: IFormSection = this.props.activeSection
-    let activeSectionGroup: IFormSectionGroup = this.props.activeSectionGroup
-
-    if (activeSection.viewType === VIEW_TYPE.HIDDEN) {
-      const nextSection = getNextSection(registerForm.sections, activeSection)
-      if (nextSection) {
-        activeSection = nextSection
-        activeSectionGroup = nextSection.groups[0]
-      }
-    }
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
       activeSection,
@@ -367,6 +371,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   pageRoute={this.props.pageRoute}
                   draft={application}
                   submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyApplication}
                 />
               </>
             )}
@@ -391,6 +396,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft={application}
                   rejectApplicationClickEvent={this.toggleRejectForm}
                   submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyApplication}
                 />
               </>
             )}
@@ -600,19 +606,15 @@ function mapStateToProps(
   if (!application) {
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
-  const visitedSections = registerForm.sections.filter(
-    ({ id }) =>
-      id !== registrationSection.id &&
-      id !== applicantsSection.id &&
-      Boolean(application.data[id])
-  )
-
-  const rightMostVisited = visitedSections[visitedSections.length - 1]
 
   const setAllFieldsDirty =
-    rightMostVisited &&
-    registerForm.sections.indexOf(activeSection) <
-      registerForm.sections.indexOf(rightMostVisited)
+    (application.visitedGroupIds &&
+      application.visitedGroupIds.findIndex(
+        visitedGroup =>
+          visitedGroup.sectionId === activeSection.id &&
+          visitedGroup.groupId === activeSectionGroup.id
+      ) > -1) ||
+    false
 
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
@@ -649,6 +651,7 @@ export const RegisterForm = connect<
     goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
+    goToInProgressTab,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {
       console.log(values)

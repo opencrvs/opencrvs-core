@@ -43,7 +43,8 @@ import { getScope, getUserDetails } from '@register/profile/profileSelectors'
 import {
   buttonMessages,
   constantsMessages,
-  errorMessages
+  errorMessages,
+  userMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/search'
 import { messages as rejectMessages } from '@register/i18n/messages/views/reject'
@@ -77,7 +78,6 @@ import {
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
-import { userMessages } from '@register/i18n/messages'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;

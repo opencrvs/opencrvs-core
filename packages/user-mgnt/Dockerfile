@@ -15,7 +15,7 @@ RUN yarn install --production
 COPY --from=opencrvs-build packages/user-mgnt/build packages/user-mgnt/build
 
 # Copy dependant package(s) source
-COPY packages/commons packages/commons
+COPY --from=opencrvs-build packages/commons packages/commons
 
 EXPOSE 3030
 WORKDIR /usr/src/app/packages/user-mgnt

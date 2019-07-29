@@ -202,6 +202,21 @@ describe('Search root resolvers', () => {
         [
           JSON.stringify({
             hits: {
+              total: 5,
+              hits: [
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} },
+                { _type: 'composition', _source: {} }
+              ]
+            }
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            hits: {
               total: 3,
               hits: [
                 { _type: 'composition', _source: {} },
@@ -228,12 +243,19 @@ describe('Search root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result.declared).toBe(2)
+      expect(result.validated).toBe(5)
       expect(result.registered).toBe(3)
       expect(result.rejected).toBe(1)
     })
   })
   it('in case of invalid respose from elastic, returns 0 as count for different statuses of events', async () => {
     fetch.mockResponses(
+      [
+        JSON.stringify({
+          hits: {}
+        }),
+        { status: 200 }
+      ],
       [
         JSON.stringify({
           hits: {}
@@ -262,6 +284,7 @@ describe('Search root resolvers', () => {
 
     expect(result).toBeDefined()
     expect(result.declared).toBe(0)
+    expect(result.validated).toBe(0)
     expect(result.registered).toBe(0)
     expect(result.rejected).toBe(0)
   })

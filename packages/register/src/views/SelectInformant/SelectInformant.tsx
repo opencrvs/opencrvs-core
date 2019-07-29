@@ -93,7 +93,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.MOTHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationMother),
+          label: intl.formatMessage(formMessages.mother),
           value: INFORMANT.MOTHER
         },
         disabled: false
@@ -101,7 +101,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.FATHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationFather),
+          label: intl.formatMessage(formMessages.father),
           value: INFORMANT.FATHER
         },
         disabled: false
@@ -136,7 +136,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.MOTHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationMother),
+          label: intl.formatMessage(formMessages.mother),
           value: INFORMANT.MOTHER
         },
         disabled: false
@@ -144,7 +144,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.FATHER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationFather),
+          label: intl.formatMessage(formMessages.father),
           value: INFORMANT.FATHER
         },
         disabled: false
@@ -152,7 +152,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SPOUSE}`,
         option: {
-          label: intl.formatMessage(formMessages.relationSpouse),
+          label: intl.formatMessage(formMessages.spouse),
           value: INFORMANT.SPOUSE
         },
         disabled: false
@@ -160,7 +160,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SON}`,
         option: {
-          label: intl.formatMessage(formMessages.relationSon),
+          label: intl.formatMessage(formMessages.son),
           value: INFORMANT.SON
         },
         disabled: false
@@ -168,7 +168,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.DAUGHTER}`,
         option: {
-          label: intl.formatMessage(formMessages.relationDaughter),
+          label: intl.formatMessage(formMessages.daughter),
           value: INFORMANT.DAUGHTER
         },
         disabled: false

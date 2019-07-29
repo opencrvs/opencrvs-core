@@ -32,6 +32,7 @@ interface IConstantsMessages {
   applicationRegisteredOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationRejectedOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationCollectedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationValidatedOn: ReactIntl.FormattedMessage.MessageDescriptor
   applicationFailedOn: ReactIntl.FormattedMessage.MessageDescriptor
   collectedBy: ReactIntl.FormattedMessage.MessageDescriptor
   issuedBy: ReactIntl.FormattedMessage.MessageDescriptor
@@ -49,8 +50,14 @@ interface IConstantsMessages {
   applicantContactNumber: ReactIntl.FormattedMessage.MessageDescriptor
   eventDate: ReactIntl.FormattedMessage.MessageDescriptor
   relationship: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationInformantLabel: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  applicationInformantLabel: {
+    id: 'constants.informant',
+    defaultMessage: 'Informant',
+    description: 'Informant Label'
+  },
   relationship: {
     id: 'constants.relationship',
     defaultMessage: 'Relationship',
@@ -165,6 +172,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.applicationRejectedOn',
     defaultMessage: 'Application rejected on',
     description: 'Label for the workflow timestamp when the status is rejected'
+  },
+  applicationValidatedOn: {
+    id: 'constants.applicationValidatedOn',
+    defaultMessage: 'Application reviewed on',
+    description: 'Label for the workflow timestamp when the status is validated'
   },
   applicationCollectedOn: {
     id: 'constants.applicationCollectedOn',
@@ -336,6 +348,41 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     id: 'constants.female',
     defaultMessage: 'Female',
     description: 'The duplicates text for female'
+  },
+  birth: {
+    id: 'constants.birth',
+    defaultMessage: 'Birth',
+    description: 'A label from the birth event'
+  },
+  death: {
+    id: 'constants.death',
+    defaultMessage: 'Death',
+    description: 'A label from the death event'
+  },
+  father: {
+    id: 'form.field.label.applicantRelation.father',
+    defaultMessage: 'Father',
+    description: 'Label for option Father'
+  },
+  mother: {
+    id: 'form.field.label.applicantRelation.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother'
+  },
+  spouse: {
+    id: 'form.field.label.applicantRelation.spouse',
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse'
+  },
+  son: {
+    id: 'form.field.label.applicantRelation.son',
+    defaultMessage: 'Son',
+    description: 'Label for option Son'
+  },
+  daughter: {
+    id: 'form.field.label.applicantRelation.daughter',
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter'
   }
 }
 

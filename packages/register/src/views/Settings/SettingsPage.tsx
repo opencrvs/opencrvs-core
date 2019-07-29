@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { IStoreState } from '@register/store'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -16,103 +16,13 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { userMessages as messages } from '@register/i18n/messages'
+import {
+  userMessages as messages,
+  buttonMessages
+} from '@register/i18n/messages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  settingsTitle: {
-    id: 'settings.title',
-    defaultMessage: 'Settings',
-    description: 'Title of the settings page'
-  },
-  profileTitle: {
-    id: 'settings.profile.tile',
-    defaultMessage: 'Profile',
-    description: 'Profile header'
-  },
-  securityTitle: {
-    id: 'settings.security.tile',
-    defaultMessage: 'Security',
-    description: 'Security header'
-  },
-  accountTitle: {
-    id: 'settings.account.tile',
-    defaultMessage: 'Account',
-    description: 'Account header'
-  },
-  systemTitle: {
-    id: 'settings.system.tile',
-    defaultMessage: 'System',
-    description: 'System header'
-  },
-  labelEnglishName: {
-    id: 'settings.user.label.nameEN',
-    defaultMessage: 'English name',
-    description: 'English name label'
-  },
-  labelBanglaName: {
-    id: 'settings.user.label.nameBN',
-    defaultMessage: 'Bengali name',
-    description: 'Bengali name label'
-  },
-  labelPhone: {
-    id: 'constants.phoneNumber',
-    defaultMessage: 'Phone number',
-    description: 'Phone label'
-  },
-  labelRole: {
-    id: 'constants.role',
-    defaultMessage: 'Role',
-    description: 'Role label'
-  },
-  labelPassword: {
-    id: 'settings.user.label.password',
-    defaultMessage: 'Password',
-    description: 'Password label'
-  },
-  labelPin: {
-    id: 'settings.user.label.pin',
-    defaultMessage: 'PIN',
-    description: 'PIN label'
-  },
-  labelLanguage: {
-    id: 'settings.user.label.language',
-    defaultMessage: 'Language',
-    description: 'language label'
-  },
-  actionChange: {
-    id: 'buttons.change',
-    defaultMessage: 'Change',
-    description: 'Change action'
-  },
-  changeLanguageMessege: {
-    id: 'settings.message.changeLanguage',
-    defaultMessage: 'Your prefered language that you want to use on OpenCRVS',
-    description: 'Change language message'
-  },
-  changeLanguageTitle: {
-    id: 'settings.changeLanguage',
-    defaultMessage: 'Change language',
-    description: 'Change language title'
-  },
-  changeLanguageSuccessMessage: {
-    id: 'settings.changeLanguage.success',
-    defaultMessage: 'Language updted to English',
-    description: 'Change language success'
-  },
-  buttonApply: {
-    id: 'buttons.apply',
-    defaultMessage: 'Apply',
-    description: 'Apply button label'
-  },
-  buttonCancel: {
-    id: 'buttons.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Cancel button label'
-  }
-})
+import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
+import { IntlState } from '@register/i18n/reducer'
 
 const Container = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
@@ -120,7 +30,7 @@ const Container = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   padding: 40px 80px;
-  margin: 36px auto 0;
+  margin: 36px auto;
   width: 1156px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 0;
@@ -192,6 +102,7 @@ const CancelButton = styled(TertiaryButton)`
 `
 type IProps = InjectedIntlProps & {
   language: string
+  languages: IntlState['languages']
   userDetails: IUserDetails | null
   modifyUserDetails: typeof modifyUserDetailsAction
 }
@@ -214,7 +125,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
       showSuccessNotification: false,
       selectedLanguage: this.props.userDetails
         ? this.props.userDetails.language
-        : window.config.LANGUAGE
+        : getDefaultLanguage()
     }
   }
 
@@ -234,7 +145,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
     this.setState(state => ({
       selectedLanguage: this.props.userDetails
         ? this.props.userDetails.language
-        : window.config.LANGUAGE,
+        : getDefaultLanguage(),
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
@@ -250,28 +161,22 @@ class SettingsView extends React.Component<IProps & IState, IState> {
   }
 
   render() {
-    const { userDetails, intl } = this.props
-    let bengaliName = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName | null) => {
-          const name = storedName as GQLHumanName
-          return name.use === 'bn'
-        }
-      ) as GQLHumanName
-      if (nameObj) {
-        bengaliName = `${String(nameObj.firstNames)} ${String(
-          nameObj.familyName
-        )}`
-      }
-    }
+    const { userDetails, intl, languages } = this.props
+    const langChoice = [] as ILanguageOptions[]
+    const availableLangs = getAvailableLanguages()
+    availableLangs.map((lang: string) => {
+      langChoice.push({
+        value: lang,
+        label: languages[lang].displayName
+      })
+    })
 
     let englishName = ''
     if (userDetails && userDetails.name) {
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName | null) => {
           const name = storedName as GQLHumanName
-          return name.use === 'en'
+          return name.use === getDefaultLanguage()
         }
       ) as GQLHumanName
 
@@ -286,29 +191,15 @@ class SettingsView extends React.Component<IProps & IState, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
-
-    const language: ILanguageOptions = {
-      bn: 'বাংলা',
-      en: 'English'
-    }
-
     const sections = [
       {
         title: intl.formatMessage(messages.profileTitle),
         items: [
           {
-            label: intl.formatMessage(messages.labelBanglaName),
-            value: bengaliName,
-            action: {
-              label: intl.formatMessage(messages.actionChange),
-              disabled: true
-            }
-          },
-          {
             label: intl.formatMessage(messages.labelEnglishName),
             value: englishName,
             action: {
-              label: intl.formatMessage(messages.actionChange),
+              label: intl.formatMessage(buttonMessages.change),
               disabled: true
             }
           },
@@ -316,7 +207,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelPhone),
             value: mobile,
             action: {
-              label: intl.formatMessage(messages.actionChange),
+              label: intl.formatMessage(buttonMessages.change),
               disabled: true
             }
           }
@@ -329,7 +220,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelRole),
             value: role,
             action: {
-              label: intl.formatMessage(messages.actionChange),
+              label: intl.formatMessage(buttonMessages.change),
               disabled: true
             }
           }
@@ -342,7 +233,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelPassword),
             placeHolder: 'Last change 4 days ago',
             action: {
-              label: intl.formatMessage(messages.actionChange),
+              label: intl.formatMessage(buttonMessages.change),
               disabled: true
             }
           },
@@ -350,7 +241,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             label: intl.formatMessage(messages.labelPin),
             placeHolder: 'Last change 4 days ago',
             action: {
-              label: intl.formatMessage(messages.actionChange),
+              label: intl.formatMessage(buttonMessages.change),
               disabled: true
             }
           }
@@ -361,10 +252,10 @@ class SettingsView extends React.Component<IProps & IState, IState> {
         items: [
           {
             label: intl.formatMessage(messages.labelLanguage),
-            value: language[this.state.selectedLanguage],
+            value: languages[this.state.selectedLanguage].displayName,
             action: {
               id: 'BtnChangeLanguage',
-              label: intl.formatMessage(messages.actionChange),
+              label: intl.formatMessage(buttonMessages.change),
               handler: this.toggleLanguageSettingsModal
             }
           }
@@ -400,14 +291,14 @@ class SettingsView extends React.Component<IProps & IState, IState> {
               id="modal_cancel"
               onClick={this.cancelLanguageSettings}
             >
-              {intl.formatMessage(messages.buttonCancel)}
+              {intl.formatMessage(buttonMessages.cancel)}
             </CancelButton>,
             <ApplyButton
               key="apply"
               id="apply_change"
               onClick={this.changeLanguage}
             >
-              {intl.formatMessage(messages.buttonApply)}
+              {intl.formatMessage(messages.apply)}
             </ApplyButton>
           ]}
           handleClose={this.cancelLanguageSettings}
@@ -424,10 +315,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
               })
             }}
             value={this.state.selectedLanguage}
-            options={[
-              { value: 'bn', label: 'বাংলা' },
-              { value: 'en', label: 'English' }
-            ]}
+            options={langChoice}
             placeholder=""
           />
         </ResponsiveModal>
@@ -446,6 +334,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
 export const SettingsPage = connect(
   (store: IStoreState) => ({
     language: store.i18n.language,
+    languages: store.i18n.languages,
     userDetails: getUserDetails(store)
   }),
   {

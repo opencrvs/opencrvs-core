@@ -19,6 +19,16 @@ const registerCertifyToken = jwt.sign(
   }
 )
 
+const validateToken = jwt.sign(
+  { scope: ['validate'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const declareToken = jwt.sign(
   { scope: ['declare'] },
   readFileSync('../auth/test/cert.key'),
@@ -31,6 +41,10 @@ const declareToken = jwt.sign(
 
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
+}
+
+const authHeaderValidate = {
+  Authorization: `Bearer ${validateToken}`
 }
 
 const authHeaderNotRegCert = {
@@ -151,6 +165,40 @@ describe('Registration root resolvers', () => {
           {
             locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
             status: 'DECLARED'
+          },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register scope')
+    })
+  })
+  describe('countEventRegistrationsByStatus()', () => {
+    it('returns total number of compositions by status', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
+        })
+      )
+
+      // @ts-ignore
+      const result = await resolvers.Query.countEventRegistrationsByStatus(
+        {},
+        {
+          status: 'IN_PROGRESS',
+          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
+        },
+        authHeaderRegCert
+      )
+
+      expect(result).toBeDefined()
+      expect(result.count).toBe(2)
+    })
+    it('throws error if user does not have register scope', async () => {
+      await expect(
+        resolvers.Query.countEventRegistrationsByStatus(
+          {},
+          {
+            status: 'IN_PROGRES',
+            locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
           },
           authHeaderNotRegCert
         )
@@ -668,6 +716,626 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a register scope')
     })
   })
+
+  describe('markBirthAsValidated()', () => {
+    it('updates status successfully when composition id and details both are sent', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      const compositionDetails = {
+        createdAt: '2019-07-23T07:51:31.883Z',
+        child: {
+          name: [
+            { use: 'bn', familyName: 'স্যাম' },
+            { use: 'en', familyName: 'Sam' }
+          ],
+          gender: 'male',
+          birthDate: '2010-01-01',
+          _fhirID: '672b825e-7a32-423c-9da3-070d704e8e23'
+        },
+        mother: {
+          multipleBirth: 1,
+          identifier: [{ type: 'NATIONAL_ID', id: '1212121212121' }],
+          nationality: ['BGD'],
+          name: [
+            { use: 'bn', familyName: 'জুল' },
+            { use: 'en', familyName: 'Jul' }
+          ],
+          maritalStatus: 'MARRIED',
+          address: [
+            {
+              type: 'PERMANENT',
+              line: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+              ],
+              country: 'BGD',
+              state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+              district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+            },
+            {
+              type: 'CURRENT',
+              line: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+              ],
+              country: 'BGD',
+              state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+              district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+            }
+          ],
+          _fhirID: '276cbe01-c95a-4c07-9e97-cad2ecc07a25'
+        },
+        registration: {
+          contact: 'MOTHER',
+          contactPhoneNumber: '01712121212',
+          _fhirID: '75e734d8-47cf-47b4-9416-fa4c747e1b71',
+          trackingId: 'BZ1D4FY',
+          status: [{ timestamp: '2019-07-23T07:51:31.906Z' }]
+        },
+        presentAtBirthRegistration: 'MOTHER',
+        _fhirIDMap: {
+          composition: '20703e32-0e2f-4685-8371-e7448d18de82',
+          encounter: '04cd7da2-89b6-4d68-b3c6-b158ce83b0e8',
+          observation: {
+            presentAtBirthRegistration: 'c7879d8e-d094-42ed-804a-aeea8aaa7ef8'
+          }
+        }
+      }
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: []
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+      const result = await resolvers.Mutation.markBirthAsValidated(
+        {},
+        { id: compositionID, details: compositionDetails },
+        authHeaderValidate
+      )
+
+      expect(result).toBeUndefined()
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it('updates status successfully when only composition id is sent', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: '0a84365d-1925-40cf-a48b-17fcf3425040',
+            meta: {
+              lastUpdated: '2018-12-13T03:55:12.629+00:00'
+            },
+            type: 'searchset',
+            total: 1,
+            link: [
+              {
+                relation: 'self',
+                url:
+                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'BIRTH'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/paper-form-id',
+                      value: '23423'
+                    },
+                    {
+                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                      value: 'BlAqHa7'
+                    }
+                  ],
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/contact-person',
+                      valueString: 'MOTHER'
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: {
+                        reference:
+                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      }
+                    },
+                    {
+                      url:
+                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    }
+                  ],
+                  lastModified: '2018-12-11T11:55:46.775Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-12-11T11:55:46.775Z',
+                      authorString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                  },
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'DECLARED'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
+                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+                  },
+                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+      const result = await resolvers.Mutation.markBirthAsValidated(
+        {},
+        { id: compositionID },
+        authHeaderValidate
+      )
+
+      expect(result).toBeUndefined()
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it('throws error if no task entry found by given id', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
+          meta: {
+            lastUpdated: '2018-12-13T04:02:42.003+00:00'
+          },
+          type: 'searchset',
+          total: 0,
+          link: [
+            {
+              relation: 'self',
+              url:
+                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+            }
+          ],
+          entry: []
+        })
+      )
+      expect(
+        resolvers.Mutation.markBirthAsValidated(
+          {},
+          { id: compositionID },
+          authHeaderValidate
+        )
+      ).rejects.toThrowError('Task does not exist')
+    })
+
+    it("throws an error when the user doesn't have validate scope", async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      await expect(
+        resolvers.Mutation.markBirthAsValidated(
+          {},
+          { id: compositionID },
+          authHeaderRegCert
+        )
+      ).rejects.toThrowError('User does not have a validate scope')
+    })
+  })
+
+  describe('markDeathAsValidated()', () => {
+    it('updates status successfully when only composition id and details both are sent', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      const compositionDetails = {
+        createdAt: '2019-07-23T08:51:50.626Z',
+        deceased: {
+          identifier: [{ type: 'PASSPORT', id: '111111111' }],
+          name: [
+            { use: 'bn', familyName: 'টম' },
+            { use: 'en', familyName: 'Tom' }
+          ],
+          nationality: ['BGD'],
+          gender: 'male',
+          maritalStatus: 'MARRIED',
+          birthDate: '1940-01-01',
+          address: [
+            {
+              type: 'PERMANENT',
+              line: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+              ],
+              country: 'BGD',
+              state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+              district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+            },
+            {
+              type: 'CURRENT',
+              line: [
+                '',
+                '',
+                '',
+                '',
+                '',
+                'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+              ],
+              country: 'BGD',
+              state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+              district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+            }
+          ],
+          _fhirID: 'f4dd0315-9b89-46aa-a52e-68e1cd1f352f',
+          deceased: { deceased: true, deathDate: '2010-01-01' }
+        },
+        informant: {
+          individual: {
+            identifier: [{ type: 'PASSPORT', id: '222222222' }],
+            name: [
+              { use: 'bn', familyName: 'জুল' },
+              { use: 'en', familyName: 'Jul' }
+            ],
+            nationality: ['BGD'],
+            telecom: [{ system: 'phone', value: '01711111111' }],
+            address: [
+              {
+                type: 'CURRENT',
+                line: [
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                ],
+                country: 'BGD',
+                state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+              },
+              {
+                type: 'PERMANENT',
+                line: [
+                  '',
+                  '',
+                  '',
+                  '',
+                  '',
+                  'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                ],
+                country: 'BGD',
+                state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+              }
+            ],
+            _fhirID: '33960f24-7be1-4db3-beb1-dae5d30a9e53'
+          },
+          relationship: 'DAUGHTER',
+          _fhirID: 'd51db81b-85b8-4670-9004-d7768177b65b'
+        },
+        mannerOfDeath: 'NATURAL_CAUSES',
+        eventLocation: {
+          address: {
+            type: 'PERMANENT',
+            line: ['', '', '', '', '', 'f8816522-0a1a-49ca-aa4e-a886a9b056ec'],
+            country: 'BGD',
+            state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+            district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+          },
+          type: 'PERMANENT',
+          partOf: 'Location/f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+        },
+        registration: {
+          _fhirID: 'a8c62d2c-9d04-4b0c-b239-5950aa3839ec',
+          trackingId: 'DIH14HS'
+        },
+        _fhirIDMap: { composition: 'd7e273e7-e4d3-4342-905e-f3514fa2c10a' }
+      }
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                resource: {
+                  identifier: [{ type: 'PASSPORT', id: '111111111' }],
+                  name: [
+                    { use: 'bn', familyName: 'টম' },
+                    { use: 'en', familyName: 'Tom' }
+                  ],
+                  nationality: ['BGD'],
+                  gender: 'male',
+                  maritalStatus: 'MARRIED',
+                  birthDate: '1940-01-01',
+                  address: [
+                    {
+                      type: 'PERMANENT',
+                      line: [
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                      ],
+                      country: 'BGD',
+                      state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                      district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+                    },
+                    {
+                      type: 'CURRENT',
+                      line: [
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                      ],
+                      country: 'BGD',
+                      state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                      district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
+                    }
+                  ],
+                  id: 'f4dd0315-9b89-46aa-a52e-68e1cd1f352f',
+                  deceased: { deceased: true, deathDate: '2010-01-01' }
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+      const result = await resolvers.Mutation.markDeathAsValidated(
+        {},
+        { id: compositionID, details: compositionDetails },
+        authHeaderValidate
+      )
+
+      expect(result).toBeUndefined()
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it('updates status successfully when only composition id is sent', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            id: '0a84365d-1925-40cf-a48b-17fcf3425040',
+            meta: {
+              lastUpdated: '2018-12-13T03:55:12.629+00:00'
+            },
+            type: 'searchset',
+            total: 1,
+            link: [
+              {
+                relation: 'self',
+                url:
+                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+              }
+            ],
+            entry: [
+              {
+                fullUrl:
+                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
+                resource: {
+                  resourceType: 'Task',
+                  status: 'requested',
+                  code: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/types',
+                        code: 'DEATH'
+                      }
+                    ]
+                  },
+                  identifier: [
+                    {
+                      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+                      value: 'DlAqHa7'
+                    }
+                  ],
+                  extension: [
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastUser',
+                      valueReference: {
+                        reference:
+                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                      }
+                    },
+                    {
+                      url:
+                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    },
+                    {
+                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                      valueReference: {
+                        reference:
+                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
+                      }
+                    }
+                  ],
+                  lastModified: '2018-12-11T11:55:46.775Z',
+                  note: [
+                    {
+                      text: '',
+                      time: '2018-12-11T11:55:46.775Z',
+                      authorString:
+                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
+                    }
+                  ],
+                  focus: {
+                    reference:
+                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                  },
+                  businessStatus: {
+                    coding: [
+                      {
+                        system: 'http://opencrvs.org/specs/reg-status',
+                        code: 'DECLARED'
+                      }
+                    ]
+                  },
+                  meta: {
+                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
+                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
+                  },
+                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ]
+      )
+      const result = await resolvers.Mutation.markDeathAsValidated(
+        {},
+        { id: compositionID },
+        authHeaderValidate
+      )
+
+      expect(result).toBeUndefined()
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    it('throws error if no task entry found by given id', async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          id: 'd2ca298f-662f-4086-a8c5-697517a2b5a3',
+          meta: {
+            lastUpdated: '2018-12-13T04:02:42.003+00:00'
+          },
+          type: 'searchset',
+          total: 0,
+          link: [
+            {
+              relation: 'self',
+              url:
+                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+            }
+          ],
+          entry: []
+        })
+      )
+      expect(
+        resolvers.Mutation.markDeathAsValidated(
+          {},
+          { id: compositionID },
+          authHeaderValidate
+        )
+      ).rejects.toThrowError('Task does not exist')
+    })
+
+    it("throws an error when the user doesn't have validate scope", async () => {
+      const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
+      await expect(
+        resolvers.Mutation.markDeathAsValidated(
+          {},
+          { id: compositionID },
+          authHeaderRegCert
+        )
+      ).rejects.toThrowError('User does not have a validate scope')
+    })
+  })
+
   describe('markBirthAsRegistered()', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'

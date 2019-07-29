@@ -15,7 +15,7 @@ RUN yarn install --production
 COPY --from=opencrvs-build /packages/gateway/build packages/gateway/build
 
 # Copy dependant package(s) source
-COPY packages/commons packages/commons
+COPY --from=opencrvs-build packages/commons packages/commons
 
 EXPOSE 7070
 WORKDIR /usr/src/app/packages/gateway

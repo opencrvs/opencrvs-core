@@ -21,7 +21,8 @@ import {
   REG_STATUS_IN_PROGRESS,
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
-  REG_STATUS_CERTIFIED
+  REG_STATUS_CERTIFIED,
+  REG_STATUS_VALIDATED
 } from '@workflow/features/registration/fhir/constants'
 import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
 import { generateRegistrationNumber } from '@workflow/features/registration/brnGenerator'
@@ -68,6 +69,27 @@ export async function modifyRegistrationBundle(
   setupAuthorOnNotes(taskResource, practitioner)
 
   return fhirBundle
+}
+
+export async function markBundleAsValidated(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_VALIDATED
+  )
+
+  await setupLastRegLocation(taskResource, practitioner)
+
+  setupLastRegUser(taskResource, practitioner)
+
+  return bundle
 }
 
 export async function markBundleAsRegistered(

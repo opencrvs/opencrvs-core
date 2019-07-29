@@ -48,3 +48,9 @@ export const getTokenPayload = (token: string) => {
 
   return decoded
 }
+
+export function getCurrentUserScope() {
+  const token = getToken()
+  const payload = token && getTokenPayload(token)
+  return (payload && payload.scope) || []
+}
