@@ -268,12 +268,14 @@ describe('RegistrationHome In Progress tab related tests', () => {
     store.dispatch(modifyApplication(draft))
 
     await new Promise(resolve => {
-      setTimeout(resolve, 500)
+      setTimeout(resolve, 100)
     })
 
     testComponent.component.update()
 
-    expect(testComponent.component).toBeDefined()
+    const app = testComponent.component
+
+    expect(app.find('#tab_progress').hostNodes().length).toBe(1)
 
     testComponent.component.unmount()
   })
