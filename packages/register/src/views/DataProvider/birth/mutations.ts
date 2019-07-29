@@ -55,7 +55,10 @@ export function getBirthMutationMappings(
         mutation: APPROVE_BIRTH_APPLICATION,
         variables:
           form && draft
-            ? { details: draftToGqlTransformer(form, draft.data) }
+            ? {
+                id: draft.id,
+                details: draftToGqlTransformer(form, draft.data)
+              }
             : {},
         dataKey: 'markBirthAsValidated'
       }
