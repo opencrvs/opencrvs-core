@@ -1,5 +1,15 @@
 import { defineMessages } from 'react-intl'
 
+export enum QUESTION_KEYS {
+  BIRTH_TOWN,
+  HIGH_SCHOOL,
+  MOTHER_NAME,
+  FAVORITE_TEACHER,
+  FAVORITE_MOVIE,
+  FAVORITE_SONG,
+  FAVORITE_FOOD,
+  FIRST_CHILD_NAME
+}
 interface IUserMessages {
   FIELD_AGENT: ReactIntl.FormattedMessage.MessageDescriptor
   REGISTRATION_AGENT: ReactIntl.FormattedMessage.MessageDescriptor

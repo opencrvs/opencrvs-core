@@ -1,59 +1,21 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
-
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  formMessages as messages,
+  buttonMessages,
+  userMessages,
+  QUESTION_KEYS
+} from '@register/i18n/messages'
 import styled from 'styled-components'
 import { TextInput, Select } from '@opencrvs/components/lib/forms'
 import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  QUESTION_KEYS,
-  questionMessages
-} from '@register/utils/userSecurityQuestions'
-import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer
 } from '@register/components/ProtectedAccount'
-
-const messages = defineMessages({
-  title: {
-    id: 'user.form.securityquestion.title',
-    defaultMessage: 'Security questions'
-  },
-  heading: {
-    id: 'user.form.securityquestion.heading',
-    defaultMessage: 'Set your security questions'
-  },
-  description: {
-    id: 'user.form.securityquestion.description',
-    defaultMessage: `From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.`
-  },
-  select: {
-    id: 'form.field.select.placeholder',
-    defaultMessage: 'Select'
-  },
-  selectSecurityQuestion: {
-    id: 'user.form.securityquestion.selectSecurityQuestion',
-    defaultMessage: 'Select a security question'
-  },
-  answer: {
-    id: 'user.form.securityquestion.answer',
-    defaultMessage: 'Answer'
-  },
-  enterResponse: {
-    id: 'user.form.securityquestion.enterResponse',
-    defaultMessage: 'Enter a response to your chosen security question'
-  },
-  continue: {
-    id: 'buttons.continue',
-    defaultMessage: 'Continue'
-  },
-  securityQuestionLabel: {
-    id: 'user.form.securityquestion.securityQuestionLabel',
-    defaultMessage: 'Security question {count}'
-  }
-})
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
@@ -139,7 +101,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     questionKeys.forEach((value: string) => {
       result.push({
         value,
-        label: this.props.intl.formatHTMLMessage(questionMessages[value])
+        label: this.props.intl.formatHTMLMessage(userMessages[value])
       })
     })
 
@@ -324,7 +286,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         )}
 
         <PrimaryButton id="submit-security-question" onClick={this.onsubmit}>
-          {intl.formatMessage(messages.continue)}
+          {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       </form>
     )
@@ -340,10 +302,12 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
             this.props.setupData
           )
         }}
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
       >
-        <H3>{intl.formatMessage(messages.heading)}</H3>
-        <P>{intl.formatMessage(messages.description)}</P>
+        <H3>{intl.formatMessage(messages.userFormSecurityQuestionsHeading)}</H3>
+        <P>
+          {intl.formatMessage(messages.userFormSecurityQuestionsDescription)}
+        </P>
         {this.showQuestionnaire()}
       </ActionPageLight>
     )

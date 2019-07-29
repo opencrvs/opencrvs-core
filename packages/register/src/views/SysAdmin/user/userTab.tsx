@@ -14,15 +14,19 @@ import {
 import { SEARCH_USERS } from '@register/sysadmin/user/queries'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap } from '@register/utils/data-formatting'
-import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
-import { messages, UserStatus } from './utils'
+import { UserStatus } from './utils'
 import { goToCreateNewUser } from '@register/navigation'
 import { connect } from 'react-redux'
+import {
+  userMessages,
+  constantsMessages,
+  errorMessages
+} from '@register/i18n/messages'
 
 const UserTabBodyContent = styled(BodyContent)`
   max-width: 1050px;
@@ -123,8 +127,8 @@ class UserTabComponent extends React.Component<IProps, IState> {
           photo: <AvatarSmall />,
           name,
           username: user.username,
-          role: user.role && intl.formatMessage(roleMessages[user.role]),
-          type: user.type && intl.formatMessage(typeMessages[user.type]),
+          role: user.role && intl.formatMessage(userMessages[user.role]),
+          type: user.type && intl.formatMessage(userMessages[user.type]),
           status: <Status status={status} />,
           menu: <VerticalThreeDots />
         }
@@ -150,27 +154,27 @@ class UserTabComponent extends React.Component<IProps, IState> {
         key: 'photo'
       },
       {
-        label: intl.formatMessage(messages.name),
+        label: intl.formatMessage(constantsMessages.name),
         width: 25,
         key: 'name'
       },
       {
-        label: intl.formatMessage(messages.username),
+        label: intl.formatMessage(constantsMessages.username),
         width: 20,
         key: 'username'
       },
       {
-        label: intl.formatMessage(messages.role),
+        label: intl.formatMessage(constantsMessages.labelRole),
         width: 18,
         key: 'role'
       },
       {
-        label: intl.formatMessage(messages.type),
+        label: intl.formatMessage(constantsMessages.type),
         width: 17,
         key: 'type'
       },
       {
-        label: intl.formatMessage(messages.status),
+        label: intl.formatMessage(constantsMessages.status),
         width: 8,
         key: 'status'
       },
@@ -193,7 +197,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
             Sentry.captureException(error)
             return (
               <ErrorText id="user_loading_error">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.userQueryError)}
               </ErrorText>
             )
           }

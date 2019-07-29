@@ -13,9 +13,22 @@ interface IErrorMessages {
   printQueryError: ReactIntl.FormattedMessage.MessageDescriptor
   registrationQueryError: ReactIntl.FormattedMessage.MessageDescriptor
   unauthorized: ReactIntl.FormattedMessage.MessageDescriptor
+  userQueryError: ReactIntl.FormattedMessage.MessageDescriptor
+  pleaseTryAgainError: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
+  pleaseTryAgainError: {
+    id: 'error.occured',
+    defaultMessage: 'An error occured. Please try again.',
+    description:
+      'The error message that displays if we wnat the user to try the action again'
+  },
+  userQueryError: {
+    id: 'system.user.queryError',
+    defaultMessage: 'An error occured while loading system users',
+    description: 'The text when error ocurred loading system users'
+  },
   registrationQueryError: {
     id: 'review.birthRegistration.queryError',
     defaultMessage: 'An error occurred while fetching birth registration',

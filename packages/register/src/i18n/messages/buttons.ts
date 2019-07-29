@@ -34,9 +34,21 @@ interface IButtonsMessages {
   exitButton: ReactIntl.FormattedMessage.MessageDescriptor
   search: ReactIntl.FormattedMessage.MessageDescriptor
   apply: ReactIntl.FormattedMessage.MessageDescriptor
+  createUser: ReactIntl.FormattedMessage.MessageDescriptor
+  start: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  start: {
+    id: 'buttons.start',
+    defaultMessage: 'Start',
+    description: 'Label of start button'
+  },
+  createUser: {
+    id: 'user.form.buttons.submit',
+    defaultMessage: 'Create user',
+    description: 'Label for submit button of user creation form'
+  },
   apply: {
     id: 'buttons.apply',
     defaultMessage: 'Apply',

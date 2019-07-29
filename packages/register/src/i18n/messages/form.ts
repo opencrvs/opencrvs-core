@@ -259,8 +259,122 @@ interface IFormMessages {
   birthAttendant: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeChildAgeProof: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeEPIStaffCertificate: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  accountDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  assignedRegisterOffice: ReactIntl.FormattedMessage.MessageDescriptor
+  firstNameBn: ReactIntl.FormattedMessage.MessageDescriptor
+  lastNameBn: ReactIntl.FormattedMessage.MessageDescriptor
+  firstNameEn: ReactIntl.FormattedMessage.MessageDescriptor
+  lastNameEn: ReactIntl.FormattedMessage.MessageDescriptor
+  NID: ReactIntl.FormattedMessage.MessageDescriptor
+  userDevice: ReactIntl.FormattedMessage.MessageDescriptor
+  registrationOffice: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormReviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormSecurityQuestionsTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormSecurityQuestionsHeading: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormSecurityQuestionsDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  selectSecurityQuestion: ReactIntl.FormattedMessage.MessageDescriptor
+  answer: ReactIntl.FormattedMessage.MessageDescriptor
+  enterResponse: ReactIntl.FormattedMessage.MessageDescriptor
+  securityQuestionLabel: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IFormMessages = {
+  userFormSecurityQuestionsTitle: {
+    id: 'user.form.securityquestion.title',
+    defaultMessage: 'Security questions',
+    description: 'Title for the security questions form'
+  },
+  userFormSecurityQuestionsHeading: {
+    id: 'user.form.securityquestion.heading',
+    defaultMessage: 'Set your security questions',
+    description: 'Subtitle for the security questions form'
+  },
+  userFormSecurityQuestionsDescription: {
+    id: 'user.form.securityquestion.description',
+    defaultMessage: `From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.`,
+    description: 'Description for the security questions form'
+  },
+  selectSecurityQuestion: {
+    id: 'user.form.securityquestion.selectSecurityQuestion',
+    defaultMessage: 'Select a security question',
+    description: 'Label to select a security question'
+  },
+  answer: {
+    id: 'user.form.securityquestion.answer',
+    defaultMessage: 'Answer',
+    description: 'Label to show answer to a security question'
+  },
+  enterResponse: {
+    id: 'user.form.securityquestion.enterResponse',
+    defaultMessage: 'Enter a response to your chosen security question',
+    description: 'Label to input an answer to a security question'
+  },
+  securityQuestionLabel: {
+    id: 'user.form.securityquestion.securityQuestionLabel',
+    defaultMessage: 'Security question {count}',
+    description: 'Label to describe number of security questions entered'
+  },
+  userFormReviewTitle: {
+    id: 'form.section.user.preview.title',
+    defaultMessage: 'Please review the new users details',
+    description: 'The title of the review page of the user form'
+  },
+  userFormTitle: {
+    id: 'form.section.user.title',
+    defaultMessage: 'Create new user',
+    description: 'The title of user form'
+  },
+  userDetails: {
+    id: 'form.section.userDetails',
+    defaultMessage: 'User details',
+    description: 'User details section'
+  },
+  accountDetails: {
+    id: 'form.section.accountDetails',
+    defaultMessage: 'Account details',
+    description: 'Account details section'
+  },
+  assignedRegisterOffice: {
+    id: 'form.section.assignedRegisterOffice',
+    defaultMessage: 'Assigned Register Office',
+    description: 'Assigned Register Office section'
+  },
+  firstNameBn: {
+    id: 'form.field.label.firstNameBN',
+    defaultMessage: 'Bengali first name',
+    description: 'Bengali first name'
+  },
+  lastNameBn: {
+    id: 'form.field.label.lastNameBN',
+    defaultMessage: 'Bengali last name',
+    description: 'Bengali last name'
+  },
+  firstNameEn: {
+    id: 'form.field.label.firstNameEN',
+    defaultMessage: 'English first name',
+    description: 'English first name'
+  },
+  lastNameEn: {
+    id: 'form.field.label.lastNameEN',
+    defaultMessage: 'English last name',
+    description: 'English last name'
+  },
+  NID: {
+    id: 'form.field.label.NID',
+    defaultMessage: 'NID',
+    description: 'National ID'
+  },
+  userDevice: {
+    id: 'form.field.label.userDevice',
+    defaultMessage: 'Device',
+    description: 'User device'
+  },
+  registrationOffice: {
+    id: 'form.field.label.registrationOffice',
+    defaultMessage: 'Registration Office',
+    description: 'Registration office'
+  },
   self: {
     id: 'form.field.label.self',
     defaultMessage: 'Self',

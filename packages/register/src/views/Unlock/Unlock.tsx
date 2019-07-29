@@ -8,35 +8,16 @@ import { IStoreState } from '@register/store'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { storage } from '@register/storage'
-import {
-  SECURITY_PIN_INDEX,
-  SECURITY_PIN_EXPIRED_AT
-} from '@register/utils/constants'
+import { SECURITY_PIN_EXPIRED_AT } from '@register/utils/constants'
 import moment from 'moment'
 import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { pinOps } from '@register/views/Unlock/ComparePINs'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@register/applications'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  incorrect: {
-    id: 'unlockApp.incorrectPin',
-    defaultMessage: 'Incorrect pin. Please try again'
-  },
-  lastTry: {
-    id: 'unlockApp.lastTry',
-    defaultMessage: 'Last Try'
-  },
-  locked: {
-    id: 'unlockApp.locked',
-    defaultMessage: 'Locked'
-  }
-})
+import { messages } from '@register/i18n/messages/views/pin'
 
 const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};

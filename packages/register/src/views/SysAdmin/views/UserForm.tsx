@@ -3,7 +3,6 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@register/components/form'
 import { IFormSection, IFormSectionData } from '@register/forms'
 import { getSectionFields, hasFormError } from '@register/forms/utils'
-
 import { goToCreateUserSection, goToHome } from '@register/navigation'
 import styled from '@register/styledComponents'
 import {
@@ -12,16 +11,9 @@ import {
 } from '@register/views/SysAdmin/forms/userReducer'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-
-const messages = defineMessages({
-  continue: {
-    id: 'buttons.continue',
-    defaultMessage: 'Continue',
-    description: 'Continue button label'
-  }
-})
+import { buttonMessages } from '@register/i18n/messages'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -90,7 +82,7 @@ class UserFormComponent extends React.Component<IFullProps> {
           />
           <Action>
             <PrimaryButton id="confirm_form" onClick={this.handleFormAction}>
-              {intl.formatMessage(messages.continue)}
+              {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>
         </ActionPageLight>

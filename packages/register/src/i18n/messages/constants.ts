@@ -56,8 +56,26 @@ interface IConstantsMessages {
   labelPassword: ReactIntl.FormattedMessage.MessageDescriptor
   labelPin: ReactIntl.FormattedMessage.MessageDescriptor
   labelLanguage: ReactIntl.FormattedMessage.MessageDescriptor
+  user: ReactIntl.FormattedMessage.MessageDescriptor
+  username: ReactIntl.FormattedMessage.MessageDescriptor
+  status: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  status: {
+    id: 'constants.status',
+    defaultMessage: 'Status',
+    description: 'Title for column'
+  },
+  username: {
+    id: 'constants.username',
+    defaultMessage: 'Username',
+    description: 'Username'
+  },
+  user: {
+    id: 'constants.user',
+    defaultMessage: 'User',
+    description: 'The name of the user form'
+  },
   labelPhone: {
     id: 'constants.phoneNumber',
     defaultMessage: 'Phone number',
