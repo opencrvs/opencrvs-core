@@ -1,7 +1,10 @@
 import * as Good from 'good'
 import * as JWT from 'hapi-auth-jwt2'
 import * as HapiI18n from 'hapi-i18n'
-import { LANGUAGE } from '@notification/constants'
+import {
+  getAvailableLanguages,
+  getDefaultLanguage
+} from '@notification/i18n/utils'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -37,9 +40,9 @@ export default function getPlugins() {
     {
       plugin: HapiI18n,
       options: {
-        locales: ['bn', 'en'],
+        locales: getAvailableLanguages(),
         directory: __dirname + '/../i18n/locales',
-        defaultLocale: LANGUAGE,
+        defaultLocale: getDefaultLanguage(),
         languageHeaderField: 'language'
       }
     }
