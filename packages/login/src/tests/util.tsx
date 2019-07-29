@@ -11,6 +11,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { App, store } from '@login/App'
 import { IStoreState, createStore } from '@login/store'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
+import { getDefaultLanguage } from '@login/i18n/utils'
 
 configure({ adapter: new Adapter() })
 addLocaleData([...en])
@@ -29,8 +30,7 @@ export function createTestComponent(node: React.ReactElement<object>) {
           theme={getTheme(
             (window as Window & { config: { [key: string]: string } }).config
               .COUNTRY,
-            (window as Window & { config: { [key: string]: string } }).config
-              .LANGUAGE
+            getDefaultLanguage()
           )}
         >
           {node}

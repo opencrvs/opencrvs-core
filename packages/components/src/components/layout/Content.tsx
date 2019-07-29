@@ -16,8 +16,8 @@ export const BodyContent = styled.div`
 `
 export const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  position: relative;
-  min-height: calc(100vh - 40px);
+  position: absolute;
+  min-height: 100vh;
   width: 100%;
 `
 export const FullBodyContent = styled.div`
