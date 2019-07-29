@@ -68,14 +68,14 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
 
-    it('throws error if user does not have register scope', async () => {
+    it('throws error if user does not have register or validate scope', async () => {
       await expect(
         resolvers.Query.fetchBirthRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
   describe('fetchDeathRegistration()', () => {
@@ -95,14 +95,14 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
 
-    it('throws error if user does not have register scope', async () => {
+    it('throws error if user does not have register or validate scope', async () => {
       await expect(
         resolvers.Query.fetchDeathRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
   describe('fetchRegistration()', () => {
@@ -158,7 +158,7 @@ describe('Registration root resolvers', () => {
       expect(result.totalItems).toBe(2)
     })
 
-    it('throws error if user does not have register scope', async () => {
+    it('throws error if user does not have register or validate scope', async () => {
       await expect(
         resolvers.Query.listEventRegistrations(
           {},
@@ -168,7 +168,7 @@ describe('Registration root resolvers', () => {
           },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
   describe('countEventRegistrationsByStatus()', () => {
@@ -192,7 +192,7 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result.count).toBe(2)
     })
-    it('throws error if user does not have register scope', async () => {
+    it('throws error if user does not have register or validate scope', async () => {
       await expect(
         resolvers.Query.countEventRegistrationsByStatus(
           {},
@@ -202,7 +202,7 @@ describe('Registration root resolvers', () => {
           },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
   describe('countEventRegistrations()', () => {
@@ -703,7 +703,7 @@ describe('Registration root resolvers', () => {
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
     })
 
-    it('throws error if user does not have register scope', async () => {
+    it('throws error if user does not have register or validate scope', async () => {
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
@@ -713,7 +713,7 @@ describe('Registration root resolvers', () => {
           { id, reason, comment },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
 
@@ -1948,7 +1948,7 @@ describe('Registration root resolvers', () => {
           { details },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
 
     it("throws an error when the response isn't what we expect", async () => {
@@ -2224,14 +2224,14 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('Composition reference not found')
     })
 
-    it("throws an error when the user doesn't have register scope", async () => {
+    it("throws an error when the user doesn't have register or validate scope", async () => {
       await expect(
         resolvers.Query.queryRegistrationByIdentifier(
           {},
           { identifier: '2019333494BAQFYEG6' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
 
@@ -2292,14 +2292,14 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it("throws an error when the user doesn't have register scope", async () => {
+    it("throws an error when the user doesn't have register or validate scope", async () => {
       await expect(
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have a register or validate scope')
     })
   })
 })
