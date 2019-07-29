@@ -304,6 +304,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.maritalStatusMarried': 'বিবাহিত',
     'formFields.maritalStatusWidowed': 'বিধবা',
     'formFields.maritalStatusDivorced': 'তালাকপ্রাপ্ত',
+    'formFields.maritalStatusSeparated': 'পৃথকীকৃত',
     'formFields.maritalStatusNotStated': 'অবিবৃত',
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',

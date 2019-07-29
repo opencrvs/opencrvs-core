@@ -304,6 +304,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.maritalStatusMarried': 'Married',
     'formFields.maritalStatusWidowed': 'Widowed',
     'formFields.maritalStatusDivorced': 'Divorced',
+    'formFields.maritalStatusSeparated': 'Separated',
     'formFields.maritalStatusNotStated': 'Not stated',
     'formFields.dateOfMarriage': 'Date of marriage',
     'register.form.tabs.childTab': 'Child',
