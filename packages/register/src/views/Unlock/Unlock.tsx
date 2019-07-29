@@ -129,8 +129,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     ) as IUserData[]
     const currentUserData = allUserData.find(
       user => user.userID === currentUserID
-    ) || { userPIN: '' }
-    const userPin = currentUserData.userPIN || ''
+    ) as IUserData
+    const userPin = currentUserData.userPIN as string
     this.setState(() => ({
       userPin
     }))
