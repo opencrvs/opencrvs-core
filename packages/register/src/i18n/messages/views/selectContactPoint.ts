@@ -5,6 +5,7 @@ interface ISelectContactPointMessages {
   heading: ReactIntl.FormattedMessage.MessageDescriptor
   birthRelationshipLabel: ReactIntl.FormattedMessage.MessageDescriptor
   error: ReactIntl.FormattedMessage.MessageDescriptor
+  phoneNumberNotValid: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: ISelectContactPointMessages = {
@@ -27,6 +28,11 @@ const messagesToDefine: ISelectContactPointMessages = {
     id: 'register.SelectContactPoint.error',
     defaultMessage: 'Please select a main point of contact',
     description: 'Error text'
+  },
+  phoneNumberNotValid: {
+    id: 'register.SelectContactPoint.phoneNoError',
+    defaultMessage: 'Not a valid mobile number',
+    description: 'Phone no error text'
   }
 }
 

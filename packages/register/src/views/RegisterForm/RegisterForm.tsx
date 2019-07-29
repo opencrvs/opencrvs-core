@@ -52,8 +52,6 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   getVisibleGroupFields
 } from '@register/forms/utils'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 import { messages } from '@register/i18n/messages/views/register'
 import { buttonMessages, formMessages } from '@register/i18n/messages'
 

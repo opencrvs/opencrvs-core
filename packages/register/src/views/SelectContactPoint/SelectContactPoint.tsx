@@ -40,7 +40,6 @@ import { IInformantField } from '@register/views/SelectInformant/SelectInformant
 import { Event } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/selectContactPoint'
 import {
-  validationMessages,
   formMessages,
   constantsMessages,
   buttonMessages
@@ -339,9 +338,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         touched={this.state.touched}
         error={
           this.state.isPhoneNoError
-            ? this.props.intl.formatMessage(
-                validationMessages.phoneNumberFormat
-              )
+            ? this.props.intl.formatMessage(messages.phoneNumberNotValid)
             : ''
         }
         hideAsterisk={true}

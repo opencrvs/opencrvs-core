@@ -42,7 +42,7 @@ import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
 import { getToken } from '@register/utils/authUtils'
 
-import { messages } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
+import { formMessages as messages } from '@register/i18n/messages'
 
 describe('when user logs in', async () => {
   // Some mock data

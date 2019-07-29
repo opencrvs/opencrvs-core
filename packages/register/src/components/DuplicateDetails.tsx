@@ -18,6 +18,7 @@ import Moment from 'react-moment'
 import { getRejectionReasonDisplayValue } from '@register/views/SearchResult/SearchResult'
 import {
   buttonMessages,
+  formMessages,
   constantsMessages,
   dynamicConstantsMessages
 } from '@register/i18n/messages'
@@ -217,7 +218,7 @@ class DuplicateDetailsClass extends React.Component<
         <DetailTextSplitContainer>
           {data.mother && (
             <DetailText>
-              <b>{intl.formatMessage(constantsMessages.mother)}</b>
+              <b>{intl.formatMessage(formMessages.mother)}</b>
               <br />
               <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
               {data.mother.name}
@@ -232,7 +233,7 @@ class DuplicateDetailsClass extends React.Component<
           )}
           {data.father && (
             <DetailText>
-              <b>{intl.formatMessage(constantsMessages.father)}</b>
+              <b>{intl.formatMessage(formMessages.father)}</b>
               <br />
               <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
               {data.father.name}

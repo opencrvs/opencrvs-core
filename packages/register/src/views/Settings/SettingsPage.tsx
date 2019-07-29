@@ -18,7 +18,8 @@ import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import {
   userMessages as messages,
-  buttonMessages
+  buttonMessages,
+  constantsMessages
 } from '@register/i18n/messages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
 import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
@@ -204,7 +205,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             }
           },
           {
-            label: intl.formatMessage(messages.labelPhone),
+            label: intl.formatMessage(constantsMessages.labelPhone),
             value: mobile,
             action: {
               label: intl.formatMessage(buttonMessages.change),
@@ -217,7 +218,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
         title: intl.formatMessage(messages.accountTitle),
         items: [
           {
-            label: intl.formatMessage(messages.labelRole),
+            label: intl.formatMessage(constantsMessages.labelRole),
             value: role,
             action: {
               label: intl.formatMessage(buttonMessages.change),
@@ -230,7 +231,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
         title: intl.formatMessage(messages.securityTitle),
         items: [
           {
-            label: intl.formatMessage(messages.labelPassword),
+            label: intl.formatMessage(constantsMessages.labelPassword),
             placeHolder: 'Last change 4 days ago',
             action: {
               label: intl.formatMessage(buttonMessages.change),
@@ -238,7 +239,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
             }
           },
           {
-            label: intl.formatMessage(messages.labelPin),
+            label: intl.formatMessage(constantsMessages.labelPin),
             placeHolder: 'Last change 4 days ago',
             action: {
               label: intl.formatMessage(buttonMessages.change),
@@ -251,7 +252,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
         title: intl.formatMessage(messages.systemTitle),
         items: [
           {
-            label: intl.formatMessage(messages.labelLanguage),
+            label: intl.formatMessage(constantsMessages.labelLanguage),
             value: languages[this.state.selectedLanguage].displayName,
             action: {
               id: 'BtnChangeLanguage',
@@ -298,7 +299,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
               id="apply_change"
               onClick={this.changeLanguage}
             >
-              {intl.formatMessage(messages.apply)}
+              {intl.formatMessage(buttonMessages.apply)}
             </ApplyButton>
           ]}
           handleClose={this.cancelLanguageSettings}
@@ -306,7 +307,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
           <Message>
             {intl.formatMessage(messages.changeLanguageMessege)}
           </Message>
-          <Label>{intl.formatMessage(messages.labelLanguage)}</Label>
+          <Label>{intl.formatMessage(constantsMessages.labelLanguage)}</Label>
           <Select
             id="SelectLanguage"
             onChange={(val: string) => {

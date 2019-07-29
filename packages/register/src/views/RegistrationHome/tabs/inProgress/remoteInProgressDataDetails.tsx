@@ -9,7 +9,12 @@ import {
 } from '@register/utils/constants'
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import {
+  userMessages,
+  errorMessages,
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@register/i18n/messages'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/RegistrationHome/queries'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
@@ -17,11 +22,6 @@ import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
-import {
-  errorMessages,
-  constantsMessages,
-  dynamicConstantsMessages
-} from '@register/i18n/messages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -127,7 +127,9 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
     const { locale } = this.props.intl
     const registration =
       data && data.fetchRegistration && data.fetchRegistration.registration
-
+    if (registration && registration.contact) {
+      console.log(registration.contact)
+    }
     return {
       informantRelation:
         registration &&
@@ -156,7 +158,7 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
-                      roleMessages[status.user.role as string]
+                      userMessages[status.user.role as string]
                     )
                   : '',
               officeName:

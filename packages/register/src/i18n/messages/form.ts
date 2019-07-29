@@ -1,62 +1,27 @@
 import { defineMessages } from 'react-intl'
 
 interface IFormMessages {
-  uploadedList: ReactIntl.FormattedMessage.MessageDescriptor
-  optionalLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  searchFieldModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  officeLocationId: ReactIntl.FormattedMessage.MessageDescriptor
-  changeAssignedOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  country: ReactIntl.FormattedMessage.MessageDescriptor
-  state: ReactIntl.FormattedMessage.MessageDescriptor
-  district: ReactIntl.FormattedMessage.MessageDescriptor
+  accountDetails: ReactIntl.FormattedMessage.MessageDescriptor
   addressLine1: ReactIntl.FormattedMessage.MessageDescriptor
   addressLine2: ReactIntl.FormattedMessage.MessageDescriptor
   addressLine3: ReactIntl.FormattedMessage.MessageDescriptor
   addressLine3CityOption: ReactIntl.FormattedMessage.MessageDescriptor
   addressLine4: ReactIntl.FormattedMessage.MessageDescriptor
-  postCode: ReactIntl.FormattedMessage.MessageDescriptor
-  permanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  confirm: ReactIntl.FormattedMessage.MessageDescriptor
-  deny: ReactIntl.FormattedMessage.MessageDescriptor
   addressSameAsMother: ReactIntl.FormattedMessage.MessageDescriptor
-  permanentAddressSameAsMother: ReactIntl.FormattedMessage.MessageDescriptor
-  currentAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentNone: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED1: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED2: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED3: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED4: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED5: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED6: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentNotStated: ReactIntl.FormattedMessage.MessageDescriptor
-  iDType: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypePassport: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeNationalID: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeDrivingLicense: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeBRN: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeDRN: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeRefugeeNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeAlienNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeOther: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeNoId: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeOtherLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  iD: ReactIntl.FormattedMessage.MessageDescriptor
-  searchFieldPlaceHolderText: ReactIntl.FormattedMessage.MessageDescriptor
-  otherOption: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatus: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusSingle: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusMarried: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusDivorced: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusNotStated: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusWidowed: ReactIntl.FormattedMessage.MessageDescriptor
-  dateOfMarriage: ReactIntl.FormattedMessage.MessageDescriptor
-  confirmMotherDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  givenNames: ReactIntl.FormattedMessage.MessageDescriptor
-  familyName: ReactIntl.FormattedMessage.MessageDescriptor
-  signedAffidavitConfirmation: ReactIntl.FormattedMessage.MessageDescriptor
-  documentNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  warningNotVerified: ReactIntl.FormattedMessage.MessageDescriptor
-  prompt: ReactIntl.FormattedMessage.MessageDescriptor
+  answer: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantIDProof: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantName: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantOtherRelationship: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsGivenNames: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsIdType: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsNationality: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsRelationWithDeceased: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  assignedRegisterOffice: ReactIntl.FormattedMessage.MessageDescriptor
   attendantAtBirth: ReactIntl.FormattedMessage.MessageDescriptor
   attendantAtBirthLayperson: ReactIntl.FormattedMessage.MessageDescriptor
   attendantAtBirthMidwife: ReactIntl.FormattedMessage.MessageDescriptor
@@ -65,13 +30,24 @@ interface IFormMessages {
   attendantAtBirthOther: ReactIntl.FormattedMessage.MessageDescriptor
   attendantAtBirthOtherParamedicalPersonnel: ReactIntl.FormattedMessage.MessageDescriptor
   attendantAtBirthPhysician: ReactIntl.FormattedMessage.MessageDescriptor
+  attestedBirthRecord: ReactIntl.FormattedMessage.MessageDescriptor
+  attestedVaccination: ReactIntl.FormattedMessage.MessageDescriptor
+  birthAttendant: ReactIntl.FormattedMessage.MessageDescriptor
   birthLocation: ReactIntl.FormattedMessage.MessageDescriptor
+  birthMedicalInstitution: ReactIntl.FormattedMessage.MessageDescriptor
   birthType: ReactIntl.FormattedMessage.MessageDescriptor
   birthTypeHigherMultipleDelivery: ReactIntl.FormattedMessage.MessageDescriptor
   birthTypeQuadruplet: ReactIntl.FormattedMessage.MessageDescriptor
   birthTypeSingle: ReactIntl.FormattedMessage.MessageDescriptor
   birthTypeTriplet: ReactIntl.FormattedMessage.MessageDescriptor
   birthTypeTwin: ReactIntl.FormattedMessage.MessageDescriptor
+  causeOfDeathCode: ReactIntl.FormattedMessage.MessageDescriptor
+  causeOfDeathEstablished: ReactIntl.FormattedMessage.MessageDescriptor
+  causeOfDeathName: ReactIntl.FormattedMessage.MessageDescriptor
+  causeOfDeathNotice: ReactIntl.FormattedMessage.MessageDescriptor
+  causeOfDeathTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  certification: ReactIntl.FormattedMessage.MessageDescriptor
+  changeAssignedOffice: ReactIntl.FormattedMessage.MessageDescriptor
   childDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
   childFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
   childFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
@@ -84,1161 +60,332 @@ interface IFormMessages {
   childSexUnknown: ReactIntl.FormattedMessage.MessageDescriptor
   childTab: ReactIntl.FormattedMessage.MessageDescriptor
   childTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  deliveryAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  deliveryInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  hospital: ReactIntl.FormattedMessage.MessageDescriptor
-  multipleBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  otherInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  placeOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  privateHome: ReactIntl.FormattedMessage.MessageDescriptor
-  select: ReactIntl.FormattedMessage.MessageDescriptor
-  otherHealthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  weightAtBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsName: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadImage: ReactIntl.FormattedMessage.MessageDescriptor
-  paragraph: ReactIntl.FormattedMessage.MessageDescriptor
-  informantAttestation: ReactIntl.FormattedMessage.MessageDescriptor
-  attestedVaccination: ReactIntl.FormattedMessage.MessageDescriptor
-  attestedBirthRecord: ReactIntl.FormattedMessage.MessageDescriptor
-  certification: ReactIntl.FormattedMessage.MessageDescriptor
-  otherDocuments: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsUploadName: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsUploadTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForWhom: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForChild: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForMother: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForFather: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForOther: ReactIntl.FormattedMessage.MessageDescriptor
-  whatDocToUpload: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeBR: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeNIDFront: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeNIDBack: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypePassport: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeSC: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeOther: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeChildBirthProof: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeEPICard: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeDoctorCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfMothersID: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfFathersID: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfBirthPlaceAndDate: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfEPICardOfChild: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfDocCertificateOfChild: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherName: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fathersDetailsExist: ReactIntl.FormattedMessage.MessageDescriptor
-  nationality: ReactIntl.FormattedMessage.MessageDescriptor
-  nationalityBangladesh: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  defaultLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherEducationAttainment: ReactIntl.FormattedMessage.MessageDescriptor
-  currentAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchFatherDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfParentPermanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchIdentifierModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchIdentifierModalSuccessTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchIdentifierModalErrorTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchRegistrationModalErrorText: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchPersonByNIDModalErrorText: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchRegistrationModalInfo: ReactIntl.FormattedMessage.MessageDescriptor
-  motherName: ReactIntl.FormattedMessage.MessageDescriptor
-  motherTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchPersonByNIDModalInfo: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  motherDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  motherEducationAttainment: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchMotherDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationName: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  whoIsPresentLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  presentBoth: ReactIntl.FormattedMessage.MessageDescriptor
-  presentMother: ReactIntl.FormattedMessage.MessageDescriptor
-  presentFather: ReactIntl.FormattedMessage.MessageDescriptor
-  presentOther: ReactIntl.FormattedMessage.MessageDescriptor
-  whoseContactDetailsLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  commentsOrNotesDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  commentsOrNotesLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  confirm: ReactIntl.FormattedMessage.MessageDescriptor
+  confirmMotherDetails: ReactIntl.FormattedMessage.MessageDescriptor
   contactDetailsBoth: ReactIntl.FormattedMessage.MessageDescriptor
   contactDetailsFather: ReactIntl.FormattedMessage.MessageDescriptor
   contactDetailsMother: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationPhoneLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneVerificationWarning: ReactIntl.FormattedMessage.MessageDescriptor
-  commentsOrNotesLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  commentsOrNotesDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantName: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsIdType: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsGivenNames: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsNationality: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  permanentAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchInformantDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsRelationWithDeceased: ReactIntl.FormattedMessage.MessageDescriptor
-  father: ReactIntl.FormattedMessage.MessageDescriptor
-  mother: ReactIntl.FormattedMessage.MessageDescriptor
-  spouse: ReactIntl.FormattedMessage.MessageDescriptor
-  son: ReactIntl.FormattedMessage.MessageDescriptor
+  country: ReactIntl.FormattedMessage.MessageDescriptor
+  currentAddress: ReactIntl.FormattedMessage.MessageDescriptor
+  currentAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
+  dateOfMarriage: ReactIntl.FormattedMessage.MessageDescriptor
   daughter: ReactIntl.FormattedMessage.MessageDescriptor
-  relationExtendedFamily: ReactIntl.FormattedMessage.MessageDescriptor
-  relationOther: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantOtherRelationship: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathName: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathNotice: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathEstablished: ReactIntl.FormattedMessage.MessageDescriptor
-  methodOfCauseOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathCode: ReactIntl.FormattedMessage.MessageDescriptor
-  verbalAutopsy: ReactIntl.FormattedMessage.MessageDescriptor
-  medicallyCertified: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedName: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedIdType: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchDeceasedDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedGivenNames: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSex: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexMale: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexFemale: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexOther: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexUnknown: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedCurrentAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedIDProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedPermanentAddressProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedDeathProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedDoBProof: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantIDProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedParagraph: ReactIntl.FormattedMessage.MessageDescriptor
-  typeOfDocument: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypePostMortemReport: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeHospitalDischargeCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeLetterOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeDeathCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeCopyOfBurialReceipt: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeFuneralReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  deathAtFacility: ReactIntl.FormattedMessage.MessageDescriptor
+  deathAtOtherLocation: ReactIntl.FormattedMessage.MessageDescriptor
+  deathAtPrivateHome: ReactIntl.FormattedMessage.MessageDescriptor
+  deathDate: ReactIntl.FormattedMessage.MessageDescriptor
   deathEventName: ReactIntl.FormattedMessage.MessageDescriptor
   deathEventTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  deathDate: ReactIntl.FormattedMessage.MessageDescriptor
-  manner: ReactIntl.FormattedMessage.MessageDescriptor
-  selectOne: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerNatural: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerAccident: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerSuicide: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerHomicide: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerUndetermined: ReactIntl.FormattedMessage.MessageDescriptor
   deathPlace: ReactIntl.FormattedMessage.MessageDescriptor
-  deathAtFacility: ReactIntl.FormattedMessage.MessageDescriptor
-  deathAtPrivateHome: ReactIntl.FormattedMessage.MessageDescriptor
-  deathAtOtherLocation: ReactIntl.FormattedMessage.MessageDescriptor
   deathPlaceAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
   deathPlaceAddressOther: ReactIntl.FormattedMessage.MessageDescriptor
+  deathPlaceAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
+  deathPlaceAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
   deathPlaceAddressType: ReactIntl.FormattedMessage.MessageDescriptor
-  healthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  relationshipPlaceHolder: ReactIntl.FormattedMessage.MessageDescriptor
-  someoneElse: ReactIntl.FormattedMessage.MessageDescriptor
-  self: ReactIntl.FormattedMessage.MessageDescriptor
-  paragraph45daysTo5Years: ReactIntl.FormattedMessage.MessageDescriptor
-  paragraphAbove5Years: ReactIntl.FormattedMessage.MessageDescriptor
-  docTaxReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedCurrentAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedDeathProof: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedDoBProof: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedGivenNames: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedIDProof: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedIdType: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedName: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedParagraph: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedPermanentAddressProof: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedSex: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedSexFemale: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedSexMale: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedSexOther: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedSexUnknown: ReactIntl.FormattedMessage.MessageDescriptor
+  deceasedTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  defaultLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  deliveryAddress: ReactIntl.FormattedMessage.MessageDescriptor
+  deliveryInstitution: ReactIntl.FormattedMessage.MessageDescriptor
+  deny: ReactIntl.FormattedMessage.MessageDescriptor
   dischargeCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  birthMedicalInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  birthAttendant: ReactIntl.FormattedMessage.MessageDescriptor
+  district: ReactIntl.FormattedMessage.MessageDescriptor
+  docTaxReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeBR: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeChildAgeProof: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeChildBirthProof: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeCopyOfBurialReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeDeathCertificate: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeDoctorCertificate: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeEPICard: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeEPIStaffCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  accountDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  assignedRegisterOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  firstNameBn: ReactIntl.FormattedMessage.MessageDescriptor
-  lastNameBn: ReactIntl.FormattedMessage.MessageDescriptor
-  firstNameEn: ReactIntl.FormattedMessage.MessageDescriptor
-  lastNameEn: ReactIntl.FormattedMessage.MessageDescriptor
-  NID: ReactIntl.FormattedMessage.MessageDescriptor
-  userDevice: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormReviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSecurityQuestionsTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSecurityQuestionsHeading: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSecurityQuestionsDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  selectSecurityQuestion: ReactIntl.FormattedMessage.MessageDescriptor
-  answer: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeFuneralReceipt: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeHospitalDischargeCertificate: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeLetterOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeNIDBack: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeNIDFront: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeOther: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypePassport: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypePostMortemReport: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeSC: ReactIntl.FormattedMessage.MessageDescriptor
+  documentNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  documentsName: ReactIntl.FormattedMessage.MessageDescriptor
+  documentsTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  documentsUploadName: ReactIntl.FormattedMessage.MessageDescriptor
+  documentsUploadTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentISCED1: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentISCED2: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentISCED3: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentISCED4: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentISCED5: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentISCED6: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentNone: ReactIntl.FormattedMessage.MessageDescriptor
+  educationAttainmentNotStated: ReactIntl.FormattedMessage.MessageDescriptor
   enterResponse: ReactIntl.FormattedMessage.MessageDescriptor
+  familyName: ReactIntl.FormattedMessage.MessageDescriptor
+  father: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherEducationAttainment: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherName: ReactIntl.FormattedMessage.MessageDescriptor
+  fathersDetailsExist: ReactIntl.FormattedMessage.MessageDescriptor
+  fatherTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchDeceasedDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchFatherDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchIdentifierModalErrorTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchIdentifierModalSuccessTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchIdentifierModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchInformantDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchMotherDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchPersonByNIDModalErrorText: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchPersonByNIDModalInfo: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchRegistrationModalErrorText: ReactIntl.FormattedMessage.MessageDescriptor
+  fetchRegistrationModalInfo: ReactIntl.FormattedMessage.MessageDescriptor
+  firstNameBn: ReactIntl.FormattedMessage.MessageDescriptor
+  firstNameEn: ReactIntl.FormattedMessage.MessageDescriptor
+  givenNames: ReactIntl.FormattedMessage.MessageDescriptor
+  healthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
+  hospital: ReactIntl.FormattedMessage.MessageDescriptor
+  iD: ReactIntl.FormattedMessage.MessageDescriptor
+  iDType: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeAlienNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeBRN: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeDrivingLicense: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeDRN: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeNationalID: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeNoId: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeOther: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeOtherLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypePassport: ReactIntl.FormattedMessage.MessageDescriptor
+  iDTypeRefugeeNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  informantAttestation: ReactIntl.FormattedMessage.MessageDescriptor
+  lastNameBn: ReactIntl.FormattedMessage.MessageDescriptor
+  lastNameEn: ReactIntl.FormattedMessage.MessageDescriptor
+  manner: ReactIntl.FormattedMessage.MessageDescriptor
+  mannerAccident: ReactIntl.FormattedMessage.MessageDescriptor
+  mannerHomicide: ReactIntl.FormattedMessage.MessageDescriptor
+  mannerNatural: ReactIntl.FormattedMessage.MessageDescriptor
+  mannerSuicide: ReactIntl.FormattedMessage.MessageDescriptor
+  mannerUndetermined: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatus: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatusDivorced: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatusMarried: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatusNotStated: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatusSingle: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatusWidowed: ReactIntl.FormattedMessage.MessageDescriptor
+  medicallyCertified: ReactIntl.FormattedMessage.MessageDescriptor
+  methodOfCauseOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
+  mother: ReactIntl.FormattedMessage.MessageDescriptor
+  motherDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  motherEducationAttainment: ReactIntl.FormattedMessage.MessageDescriptor
+  motherFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
+  motherFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
+  motherFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
+  motherFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
+  motherName: ReactIntl.FormattedMessage.MessageDescriptor
+  motherTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  multipleBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  nationality: ReactIntl.FormattedMessage.MessageDescriptor
+  nationalityBangladesh: ReactIntl.FormattedMessage.MessageDescriptor
+  NID: ReactIntl.FormattedMessage.MessageDescriptor
+  officeLocationId: ReactIntl.FormattedMessage.MessageDescriptor
+  optionalLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  otherDocuments: ReactIntl.FormattedMessage.MessageDescriptor
+  otherHealthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
+  otherInstitution: ReactIntl.FormattedMessage.MessageDescriptor
+  otherOption: ReactIntl.FormattedMessage.MessageDescriptor
+  paragraph45daysTo5Years: ReactIntl.FormattedMessage.MessageDescriptor
+  paragraph: ReactIntl.FormattedMessage.MessageDescriptor
+  paragraphAbove5Years: ReactIntl.FormattedMessage.MessageDescriptor
+  permanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
+  permanentAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
+  permanentAddressSameAsMother: ReactIntl.FormattedMessage.MessageDescriptor
+  phoneNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  phoneVerificationWarning: ReactIntl.FormattedMessage.MessageDescriptor
+  placeOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  postCode: ReactIntl.FormattedMessage.MessageDescriptor
+  presentBoth: ReactIntl.FormattedMessage.MessageDescriptor
+  presentFather: ReactIntl.FormattedMessage.MessageDescriptor
+  presentMother: ReactIntl.FormattedMessage.MessageDescriptor
+  presentOther: ReactIntl.FormattedMessage.MessageDescriptor
+  privateHome: ReactIntl.FormattedMessage.MessageDescriptor
+  prompt: ReactIntl.FormattedMessage.MessageDescriptor
+  proofOfBirthPlaceAndDate: ReactIntl.FormattedMessage.MessageDescriptor
+  proofOfDocCertificateOfChild: ReactIntl.FormattedMessage.MessageDescriptor
+  proofOfEPICardOfChild: ReactIntl.FormattedMessage.MessageDescriptor
+  proofOfFathersID: ReactIntl.FormattedMessage.MessageDescriptor
+  proofOfMothersID: ReactIntl.FormattedMessage.MessageDescriptor
+  proofOfParentPermanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
+  registrationName: ReactIntl.FormattedMessage.MessageDescriptor
+  registrationOffice: ReactIntl.FormattedMessage.MessageDescriptor
+  registrationPhoneLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  registrationTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  relationExtendedFamily: ReactIntl.FormattedMessage.MessageDescriptor
+  relationOther: ReactIntl.FormattedMessage.MessageDescriptor
+  relationshipPlaceHolder: ReactIntl.FormattedMessage.MessageDescriptor
+  searchFieldModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  searchFieldPlaceHolderText: ReactIntl.FormattedMessage.MessageDescriptor
   securityQuestionLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  select: ReactIntl.FormattedMessage.MessageDescriptor
+  selectOne: ReactIntl.FormattedMessage.MessageDescriptor
+  selectSecurityQuestion: ReactIntl.FormattedMessage.MessageDescriptor
+  self: ReactIntl.FormattedMessage.MessageDescriptor
+  signedAffidavitConfirmation: ReactIntl.FormattedMessage.MessageDescriptor
+  someoneElse: ReactIntl.FormattedMessage.MessageDescriptor
+  son: ReactIntl.FormattedMessage.MessageDescriptor
+  spouse: ReactIntl.FormattedMessage.MessageDescriptor
+  state: ReactIntl.FormattedMessage.MessageDescriptor
+  typeOfDocument: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadDocForChild: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadDocForFather: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadDocForMother: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadDocForOther: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadDocForWhom: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadImage: ReactIntl.FormattedMessage.MessageDescriptor
+  userDetails: ReactIntl.FormattedMessage.MessageDescriptor
+  userDevice: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormReviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormSecurityQuestionsDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormSecurityQuestionsHeading: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormSecurityQuestionsTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  verbalAutopsy: ReactIntl.FormattedMessage.MessageDescriptor
+  warningNotVerified: ReactIntl.FormattedMessage.MessageDescriptor
+  weightAtBirth: ReactIntl.FormattedMessage.MessageDescriptor
+  whatDocToUpload: ReactIntl.FormattedMessage.MessageDescriptor
+  whoIsPresentLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  whoseContactDetailsLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadedList: ReactIntl.FormattedMessage.MessageDescriptor
 }
+
 const messagesToDefine: IFormMessages = {
-  userFormSecurityQuestionsTitle: {
-    id: 'user.form.securityquestion.title',
-    defaultMessage: 'Security questions',
-    description: 'Title for the security questions form'
+  accountDetails: {
+    defaultMessage: 'Account details',
+    description: 'Account details section',
+    id: 'form.section.accountDetails'
   },
-  userFormSecurityQuestionsHeading: {
-    id: 'user.form.securityquestion.heading',
-    defaultMessage: 'Set your security questions',
-    description: 'Subtitle for the security questions form'
+  addressLine1: {
+    defaultMessage: 'Street and house number',
+    description: 'Title for the address line 1',
+    id: 'form.field.label.addressLine1'
   },
-  userFormSecurityQuestionsDescription: {
-    id: 'user.form.securityquestion.description',
-    defaultMessage: `From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.`,
-    description: 'Description for the security questions form'
+  addressLine2: {
+    defaultMessage: 'Area / Ward / Mouja / Village',
+    description: 'Title for the address line 2',
+    id: 'form.field.label.addressLine2'
   },
-  selectSecurityQuestion: {
-    id: 'user.form.securityquestion.selectSecurityQuestion',
-    defaultMessage: 'Select a security question',
-    description: 'Label to select a security question'
+  addressLine3: {
+    defaultMessage: 'Union / Municipality / Cantonement',
+    description: 'Title for the address line 3 option 1',
+    id: 'form.field.label.addressLine3'
+  },
+  addressLine3CityOption: {
+    defaultMessage: 'Ward',
+    description: 'Title for the address line 3 option 2',
+    id: 'form.field.label.addressLine3CityOption'
+  },
+  addressLine4: {
+    defaultMessage: 'Upazila (Thana) / City',
+    description: 'Title for the address line 4',
+    id: 'form.field.label.addressLine4'
+  },
+  addressSameAsMother: {
+    defaultMessage: "Is his current address the same as the mother's?",
+    description:
+      "Title for the radio button to select that the father's current address is the same as the mother's address",
+    id: 'form.field.label.addressSameAsMother'
   },
   answer: {
-    id: 'user.form.securityquestion.answer',
     defaultMessage: 'Answer',
-    description: 'Label to show answer to a security question'
-  },
-  enterResponse: {
-    id: 'user.form.securityquestion.enterResponse',
-    defaultMessage: 'Enter a response to your chosen security question',
-    description: 'Label to input an answer to a security question'
-  },
-  securityQuestionLabel: {
-    id: 'user.form.securityquestion.securityQuestionLabel',
-    defaultMessage: 'Security question {count}',
-    description: 'Label to describe number of security questions entered'
-  },
-  userFormReviewTitle: {
-    id: 'form.section.user.preview.title',
-    defaultMessage: 'Please review the new users details',
-    description: 'The title of the review page of the user form'
-  },
-  userFormTitle: {
-    id: 'form.section.user.title',
-    defaultMessage: 'Create new user',
-    description: 'The title of user form'
-  },
-  userDetails: {
-    id: 'form.section.userDetails',
-    defaultMessage: 'User details',
-    description: 'User details section'
-  },
-  accountDetails: {
-    id: 'form.section.accountDetails',
-    defaultMessage: 'Account details',
-    description: 'Account details section'
-  },
-  assignedRegisterOffice: {
-    id: 'form.section.assignedRegisterOffice',
-    defaultMessage: 'Assigned Register Office',
-    description: 'Assigned Register Office section'
-  },
-  firstNameBn: {
-    id: 'form.field.label.firstNameBN',
-    defaultMessage: 'Bengali first name',
-    description: 'Bengali first name'
-  },
-  lastNameBn: {
-    id: 'form.field.label.lastNameBN',
-    defaultMessage: 'Bengali last name',
-    description: 'Bengali last name'
-  },
-  firstNameEn: {
-    id: 'form.field.label.firstNameEN',
-    defaultMessage: 'English first name',
-    description: 'English first name'
-  },
-  lastNameEn: {
-    id: 'form.field.label.lastNameEN',
-    defaultMessage: 'English last name',
-    description: 'English last name'
-  },
-  NID: {
-    id: 'form.field.label.NID',
-    defaultMessage: 'NID',
-    description: 'National ID'
-  },
-  userDevice: {
-    id: 'form.field.label.userDevice',
-    defaultMessage: 'Device',
-    description: 'User device'
-  },
-  registrationOffice: {
-    id: 'form.field.label.registrationOffice',
-    defaultMessage: 'Registration Office',
-    description: 'Registration office'
-  },
-  self: {
-    id: 'form.field.label.self',
-    defaultMessage: 'Self',
-    description: 'The title that appears when selecting self as informant'
-  },
-  relationshipPlaceHolder: {
-    id: 'form.field.label.relationshipPlaceHolder',
-    defaultMessage: 'eg. Grandmother',
-    description: 'Relationship place holder'
-  },
-  someoneElse: {
-    id: 'form.field.label.someoneElse',
-    defaultMessage: 'Someone else',
-    description: 'Other Label'
-  },
-  deathEventName: {
-    id: 'form.section.deathEvent.name',
-    defaultMessage: 'When did the death occur?',
-    description: 'Form section name for Death Event'
-  },
-  deathEventTitle: {
-    id: 'form.section.deathEvent.title',
-    defaultMessage: 'When did the death occur?',
-    description: 'Form section title for Death Event'
-  },
-  deathDate: {
-    id: 'form.field.label.deathDate',
-    defaultMessage:
-      'Enter the date in the format day, month and year. For example 24 10 2020.',
-    description: 'Label for form field: Date of occurrence'
-  },
-  manner: {
-    id: 'form.field.label.mannerOfDeath',
-    defaultMessage: 'What was the manner of death?',
-    description: 'Label for form field: Manner of death'
-  },
-  selectOne: {
-    id: 'form.field.label.selectOne',
-    defaultMessage: 'Please select an option',
-    description: 'Generic label for select on option'
-  },
-  mannerNatural: {
-    id: 'form.field.label.mannerOfDeathNatural',
-    defaultMessage: 'Natural causes',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerAccident: {
-    id: 'form.field.label.mannerOfDeathAccident',
-    defaultMessage: 'Accident',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerSuicide: {
-    id: 'form.field.label.mannerOfDeathSuicide',
-    defaultMessage: 'Suicide',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerHomicide: {
-    id: 'form.field.label.mannerOfDeathHomicide',
-    defaultMessage: 'Homicide',
-    description: 'Option for form field: Manner of death'
-  },
-  mannerUndetermined: {
-    id: 'form.field.label.mannerOfDeathUndetermined',
-    defaultMessage: 'Manner undetermined',
-    description: 'Option for form field: Manner of death'
-  },
-  deathPlace: {
-    id: 'form.field.label.deathPlace',
-    defaultMessage: 'Place of Occurrence of Death',
-    description: 'Title for place of occurrence of death'
-  },
-  deathAtFacility: {
-    id: 'form.field.label.deathAtFacility',
-    defaultMessage: 'What hospital did the death occur at?',
-    description: 'Label for form field: Hospital or Health Institution'
-  },
-  deathAtPrivateHome: {
-    id: 'form.field.label.deathAtPrivateHome',
-    defaultMessage: 'What is the address of the private home?',
-    description: 'Label for form field: Private Home Address'
-  },
-  deathAtOtherLocation: {
-    id: 'form.field.label.deathAtOtherLocation',
-    defaultMessage: 'What is the other address did the death occur at?',
-    description: 'Label for form field: Other Location Address'
-  },
-  deathPlaceAddress: {
-    id: 'form.field.label.deathPlaceAddress',
-    defaultMessage: 'Where did the death occur?',
-    description: 'Label for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressSameAsPermanent: {
-    id: 'form.field.label.deathPlaceAddressSameAsPermanent',
-    defaultMessage: 'Permanent address of the deceased',
-    description: 'Option for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressSameAsCurrent: {
-    id: 'form.field.label.deathPlaceAddressSameAsCurrent',
-    defaultMessage: 'Current address of the deceased',
-    description: 'Option for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressOther: {
-    id: 'form.field.label.deathPlaceAddressOther',
-    defaultMessage: 'Different Address',
-    description: 'Option for form field: Place of occurrence of death'
-  },
-  deathPlaceAddressType: {
-    id: 'form.field.label.deathPlaceAddressType',
-    defaultMessage: 'Type of Place',
-    description: 'Label for form field: Type of place of death occurrence'
-  },
-  otherHealthInstitution: {
-    id: 'form.field.label.otherHealthInstitution',
-    defaultMessage: 'Other Health Institution',
-    description: 'Select item for Other Health Institution'
-  },
-  healthInstitution: {
-    id: 'form.field.label.healthInstitution',
-    defaultMessage: 'Health Institution',
-    description: 'Select item for Health Institution'
-  },
-  privateHome: {
-    id: 'form.field.label.privateHome',
-    defaultMessage: 'Private Home',
-    description: 'Select item for Private Home'
-  },
-  deceasedIDProof: {
-    id: 'form.field.label.deceasedIDProof',
-    defaultMessage: "Proof of Deceased's ID",
-    description: 'Option for radio group field: Type of Document To Upload'
-  },
-  deceasedPermanentAddressProof: {
-    id: 'form.field.label.deceasedPermanentAddressProof',
-    defaultMessage: 'Proof of Permanent Address of Deceased',
-    description: 'Option for radio group field: Type of Document To Upload'
-  },
-  deceasedDeathProof: {
-    id: 'form.field.label.deceasedDeathProof',
-    defaultMessage: 'Proof of Death of Deceased',
-    description: 'Option for radio group field: Type of Document To Upload'
-  },
-  deceasedDoBProof: {
-    id: 'form.field.label.deceasedDoBProof',
-    defaultMessage: 'Proof of Date of Birth of Deceased',
-    description: 'Option for radio group field: Type of Document To Upload'
+    description: 'Label to show answer to a security question',
+    id: 'user.form.securityquestion.answer'
   },
   applicantIDProof: {
-    id: 'form.field.label.applicantIDProof',
     defaultMessage: "Proof of Applicant's ID",
-    description: 'Option for radio group field: Type of Document To Upload'
-  },
-  deceasedParagraph: {
-    id: 'form.field.label.deceasedDocumentParagraph',
-    defaultMessage:
-      'For this death registration, the following documents are required:',
-    description: 'Documents Paragraph text'
-  },
-  typeOfDocument: {
-    id: 'form.field.label.typeOfDocument',
-    defaultMessage: 'Choose type of document',
-    description: 'Label for Select Form Field: Type of Document'
-  },
-  docTypeBR: {
-    id: 'form.field.label.docTypeBR',
-    defaultMessage: 'Birth Registration',
-    description: 'Label for select option Birth Registration'
-  },
-  docTypeNIDFront: {
-    id: 'form.field.label.docTypeNIDFront',
-    defaultMessage: 'National ID (front)',
-    description: 'Label for select option radio option NID front'
-  },
-  docTypeNIDBack: {
-    id: 'form.field.label.docTypeNIDBack',
-    defaultMessage: 'National ID (back)',
-    description: 'Label for select option radio option NID back'
-  },
-  docTypePostMortemReport: {
-    id: 'form.field.label.docTypePostMortemReport',
-    defaultMessage: 'Certified Post Mortem Report',
-    description: 'Label for select option Post Mortem Report'
-  },
-  docTypeHospitalDischargeCertificate: {
-    id: 'form.field.label.docTypeHospitalDischargeCertificate',
-    defaultMessage: 'Hospital Discharge Certificate',
-    description: 'Label for select option Hospital Discharge Certificate'
-  },
-  docTypeLetterOfDeath: {
-    id: 'form.field.label.docTypeLetterOfDeath',
-    defaultMessage: 'Attested Letter of Death',
-    description: 'Label for select option Attested Letter of Death'
-  },
-  docTypeDeathCertificate: {
-    id: 'form.field.label.docTypeDeathCertificate',
-    defaultMessage: 'Attested Certificate of Death',
-    description: 'Label for select option Attested Certificate of Death'
-  },
-  docTypeCopyOfBurialReceipt: {
-    id: 'form.field.label.docTypeCopyOfBurialReceipt',
-    defaultMessage: 'Certified Copy of Burial Receipt',
-    description: 'Label for select option Certified Copy of Burial Receipt'
-  },
-  docTypeFuneralReceipt: {
-    id: 'form.field.label.docTypeFuneralReceipt',
-    defaultMessage: 'Certified Copy of Funeral Receipt',
-    description: 'Label for select option Certified Copy of Funeral Receipt'
-  },
-  docTypeChildAgeProof: {
-    id: 'form.field.label.docTypeChildAgeProof',
-    defaultMessage: 'Proof of Child Age',
-    description: 'Label for select option Child Age Proof'
-  },
-  docTypeEPIStaffCertificate: {
-    id: 'form.field.label.docTypeEPIStaffCertificate',
-    defaultMessage: 'EPI Staff Certificate',
-    description: 'Label for select option EPI Card'
-  },
-  deceasedName: {
-    id: 'form.section.deceased.name',
-    defaultMessage: 'Deceased',
-    description: 'Form section name for Deceased'
-  },
-  deceasedTitle: {
-    id: 'form.section.deceased.title',
-    defaultMessage: 'What are the deceased details?',
-    description: 'Form section title for Deceased'
-  },
-  deceasedIdType: {
-    id: 'form.field.label.deceasedIdType',
-    defaultMessage: 'Type of ID',
-    description: 'Label for form field: Existing ID'
-  },
-  fetchDeceasedDetails: {
-    id: 'form.field.label.fetchDeceasedDetails',
-    defaultMessage: "Retrieve Deceased's Details",
-    description: 'Label for loader button'
-  },
-  fetchIdentifierModalTitle: {
-    id: 'form.field.label.fetchIdentifierModalTitle',
-    defaultMessage: 'Checking',
-    description: 'Label for fetch modal title'
-  },
-  fetchIdentifierModalSuccessTitle: {
-    id: 'form.field.label.fetchIdentifierModalSuccessTitle',
-    defaultMessage: 'ID valid',
-    description: 'Label for fetch modal success title'
-  },
-  fetchIdentifierModalErrorTitle: {
-    id: 'form.field.label.fetchIdentifierModalErrorTitle',
-    defaultMessage: 'Invalid Id',
-    description: 'Label for fetch modal error title'
-  },
-  fetchRegistrationModalErrorText: {
-    id: 'form.field.label.fetchRegistrationModalErrorText',
-    defaultMessage: 'No registration found for provided BRN',
-    description: 'Label for fetch modal error title'
-  },
-  fetchPersonByNIDModalErrorText: {
-    id: 'form.field.label.fetchPersonByNIDModalErrorText',
-    defaultMessage: 'No person found for provided NID',
-    description: 'Label for fetch modal error title'
-  },
-  fetchRegistrationModalInfo: {
-    id: 'form.field.label.fetchRegistrationModalInfo',
-    defaultMessage: 'Birth Registration Number',
-    description: 'Label for loader button'
-  },
-  fetchInformantDetails: {
-    id: 'form.field.label.fetchInformantDetails',
-    defaultMessage: "Retrieve Informant's Details",
-    description: 'Label for loader button'
-  },
-  fetchPersonByNIDModalInfo: {
-    id: 'form.field.label.fetchPersonByNIDModalInfo',
-    defaultMessage: 'National ID',
-    description: 'Label for loader button'
-  },
-  deceasedGivenNames: {
-    id: 'form.field.label.deceasedGivenNames',
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: Given names'
-  },
-  deceasedFamilyName: {
-    id: 'form.field.label.deceasedFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
-  },
-  deceasedGivenNamesEng: {
-    id: 'form.field.label.deceasedGivenNamesEng',
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: Given names in english'
-  },
-  deceasedFamilyNameEng: {
-    id: 'form.field.label.deceasedFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
-  },
-  nationality: {
-    id: 'form.field.label.deceased.nationality',
-    defaultMessage: 'Nationality',
-    description: 'Label for form field: Nationality'
-  },
-  deceasedSex: {
-    id: 'form.field.label.deceasedSex',
-    defaultMessage: 'Sex',
-    description: 'Label for form field: Sex name'
-  },
-  deceasedSexMale: {
-    id: 'form.field.label.deceasedSexMale',
-    defaultMessage: 'Male',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexFemale: {
-    id: 'form.field.label.deceasedSexFemale',
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexOther: {
-    id: 'form.field.label.deceasedSexOther',
-    defaultMessage: 'Other',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedSexUnknown: {
-    id: 'form.field.label.deceasedSexUnknown',
-    defaultMessage: 'Unknown',
-    description: 'Option for form field: Sex name'
-  },
-  deceasedDateOfBirth: {
-    id: 'form.field.label.deceasedDateOfBirth',
-    defaultMessage: 'Date of Birth',
-    description: 'Label for form field: Date of birth'
-  },
-  deceasedCurrentAddressSameAsPermanent: {
-    id: 'form.field.label.deceasedCurrentAddressSameAsPermanent',
-    defaultMessage:
-      'Is deceased’s current address the same as their permanent address?',
-    description:
-      'Title for the radio button to select that the deceased current address is the same as their permanent address'
-  },
-  currentAddress: {
-    id: 'form.field.label.currentAddress',
-    defaultMessage: 'Current Address',
-    description: 'Title for the current address fields'
-  },
-  permanentAddress: {
-    id: 'form.field.label.permanentAddress',
-    defaultMessage: 'What was their permanent address?',
-    description: 'Title for the permanent address fields'
-  },
-  causeOfDeathName: {
-    id: 'form.section.causeOfDeath.name',
-    defaultMessage: 'What is the official cause of death?',
-    description: 'Form section name for Cause of Death'
-  },
-  causeOfDeathTitle: {
-    id: 'form.section.causeOfDeath.title',
-    defaultMessage: 'What is the official cause of death?',
-    description: 'Form section title for Cause of Death'
-  },
-  causeOfDeathNotice: {
-    id: 'form.section.causeOfDeathNotice',
-    defaultMessage:
-      'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
-    description: 'Form section notice for Cause of Death'
-  },
-  causeOfDeathEstablished: {
-    id: 'form.field.label.causeOfDeathEstablished',
-    defaultMessage: 'Has an official cause of death been established ?',
-    description: 'Label for form field: Cause of Death Established'
-  },
-  methodOfCauseOfDeath: {
-    id: 'form.field.label.methodOfCauseOfDeath',
-    defaultMessage: 'Method of Cause of Death',
-    description: 'Label for form field: Method of Cause of Death'
-  },
-  causeOfDeathCode: {
-    id: 'form.field.label.causeOfDeathCode',
-    defaultMessage: 'Cause of Death Code',
-    description: 'Label for form field: Cause of Death Code'
-  },
-  verbalAutopsy: {
-    id: 'form.field.label.verbalAutopsy',
-    defaultMessage: 'Verbal autopsy',
-    description: 'Option for form field: Method of Cause of Death'
-  },
-  medicallyCertified: {
-    id: 'form.field.label.medicallyCertified',
-    defaultMessage: 'Medically Certified Cause of Death',
-    description: 'Option for form field: Method of Cause of Death'
+    description: 'Option for radio group field: Type of Document To Upload',
+    id: 'form.field.label.applicantIDProof'
   },
   applicantName: {
-    id: 'form.section.applicant.name',
     defaultMessage: 'Applicant',
-    description: 'Form section name for Applicant'
-  },
-  applicantTitle: {
-    id: 'form.section.applicant.title',
-    defaultMessage: "What are the applicant's details?",
-    description: 'Form section title for applicants'
-  },
-  applicantsIdType: {
-    id: 'form.field.label.applicantsIdType',
-    defaultMessage: 'Type of ID',
-    description: 'Label for form field: Existing ID'
-  },
-  applicantsGivenNames: {
-    id: 'form.field.label.applicantsGivenNames',
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: Given names'
-  },
-  applicantsFamilyName: {
-    id: 'form.field.label.applicantsFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
-  },
-  applicantsGivenNamesEng: {
-    id: 'form.field.label.applicantsGivenNamesEng',
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: Given names in english'
-  },
-  applicantsFamilyNameEng: {
-    id: 'form.field.label.applicantsFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
-  },
-  applicantsNationality: {
-    id: 'form.field.label.applicants.nationality',
-    defaultMessage: 'Nationality',
-    description: 'Label for form field: Nationality'
-  },
-  applicantsDateOfBirth: {
-    id: 'form.field.label.applicantsDateOfBirth',
-    defaultMessage: 'Date of Birth',
-    description: 'Label for form field: Date of birth'
-  },
-  permanentAddressSameAsCurrent: {
-    id: 'form.field.label.applicantsCurrentAddressSameAsPermanent',
-    defaultMessage:
-      'Is applicant’s permanent address the same as their current address?',
-    description:
-      'Title for the radio button to select that the applicants current address is the same as their permanent address'
-  },
-  phoneNumber: {
-    defaultMessage: 'Phone number',
-    id: 'form.field.label.phoneNumber',
-    description: 'Input label for phone input'
-  },
-  applicantsRelationWithDeceased: {
-    id: 'form.field.label.applicantsRelationWithDeceased',
-    defaultMessage: 'Relationship to Deceased',
-    description: 'Label for Relationship to Deceased select'
-  },
-  father: {
-    id: 'form.field.label.applicantRelation.father',
-    defaultMessage: 'Father',
-    description: 'Label for option Father'
-  },
-  mother: {
-    id: 'form.field.label.applicantRelation.mother',
-    defaultMessage: 'Mother',
-    description: 'Label for option Mother'
-  },
-  spouse: {
-    id: 'form.field.label.applicantRelation.spouse',
-    defaultMessage: 'Spouse',
-    description: 'Label for option Spouse'
-  },
-  son: {
-    id: 'form.field.label.applicantRelation.son',
-    defaultMessage: 'Son',
-    description: 'Label for option Son'
-  },
-  daughter: {
-    id: 'form.field.label.applicantRelation.daughter',
-    defaultMessage: 'Daughter',
-    description: 'Label for option Daughter'
-  },
-  relationExtendedFamily: {
-    id: 'form.field.label.applicantRelation.extendedFamily',
-    defaultMessage: 'Extended Family',
-    description: 'Label for option Extended Family'
-  },
-  relationOther: {
-    id: 'form.field.label.applicantRelation.other',
-    defaultMessage: 'Other (Specify)',
-    description: 'Label for option Other'
+    description: 'Form section name for Applicant',
+    id: 'form.section.applicant.name'
   },
   applicantOtherRelationship: {
-    id: 'form.field.label.applicantOtherRelationship',
     defaultMessage: 'Other relation',
-    description: 'Label for form field: Other relation'
+    description: 'Label for form field: Other relation',
+    id: 'form.field.label.applicantOtherRelationship'
   },
-  registrationName: {
-    id: 'form.section.application.name',
-    defaultMessage: 'Registration',
-    description: 'Form section name for Registration'
+  applicantsDateOfBirth: {
+    defaultMessage: 'Date of Birth',
+    description: 'Label for form field: Date of birth',
+    id: 'form.field.label.applicantsDateOfBirth'
   },
-  registrationTitle: {
-    id: 'form.section.application.title',
-    defaultMessage: 'Registration',
-    description: 'Form section title for Registration'
-  },
-  whoIsPresentLabel: {
-    defaultMessage: 'Who is present for the registration',
-    id: 'form.field.label.application.whoIsPresent',
-    description: 'Input label for who is present input'
-  },
-  presentBoth: {
-    id: 'form.field.label.application.whoIsPresent.both',
-    defaultMessage: 'Both Parents',
-    description: 'Label for "Both Parents" select option'
-  },
-  presentMother: {
-    id: 'form.field.label.application.whoIsPresent.mother',
-    defaultMessage: 'Mother',
-    description: 'Label for "Mother" select option'
-  },
-  presentFather: {
-    id: 'form.field.label.application.whoIsPresent.father',
-    defaultMessage: 'Father',
-    description: 'Label for "Father" select option'
-  },
-  presentOther: {
-    id: 'form.field.label.application.whoIsPresent.other',
-    defaultMessage: 'Other',
-    description: 'Label for "Other" select option'
-  },
-  whoseContactDetailsLabel: {
-    defaultMessage: 'Who is the contact person for this application?',
-    id: 'form.field.label.application.whoseContactDetails',
-    description: 'Input label for contact details person'
-  },
-  contactDetailsBoth: {
-    id: 'form.field.label.application.whoseContactDetails.both',
-    defaultMessage: 'Both Parents',
-    description: 'Label for "Both Parents" select option'
-  },
-  contactDetailsMother: {
-    id: 'form.field.label.application.whoseContactDetails.mother',
-    defaultMessage: 'Mother',
-    description: 'Label for "Mother" select option'
-  },
-  contactDetailsFather: {
-    id: 'form.field.label.application.whoseContactDetails.father',
-    defaultMessage: 'Father',
-    description: 'Label for "Father" select option'
-  },
-  registrationPhoneLabel: {
-    defaultMessage: 'Phone number',
-    id: 'form.field.label.application.phone',
-    description: 'Input label for phone input'
-  },
-  phoneVerificationWarning: {
-    id: 'form.field.label.application.phoneVerificationWarning',
-    defaultMessage:
-      'Check with the applicant that the mobile phone number you have entered is correct',
-    description: 'Warning message to verify applicant phone number '
-  },
-  commentsOrNotesLabel: {
-    defaultMessage: 'Comments or notes',
-    id: 'form.field.label.application.commentsOrNotes',
-    description: 'Input label for comments or notes textarea'
-  },
-  commentsOrNotesDescription: {
-    id: 'form.field.label.application.commentsOrNotes.description',
-    description: 'Help text for the notes field',
-    defaultMessage:
-      'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.'
-  },
-  motherName: {
-    id: 'form.section.mother.name',
-    defaultMessage: 'Mother',
-    description: 'Form section name for Mother'
-  },
-  motherTitle: {
-    id: 'form.section.mother.title',
-    defaultMessage: "Mother's details",
-    description: 'Form section title for Mother'
-  },
-  motherFirstNames: {
-    id: 'form.field.label.motherFirstNames',
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: First names'
-  },
-  motherFamilyName: {
-    id: 'form.field.label.motherFamilyName',
+  applicantsFamilyName: {
     defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.applicantsFamilyName'
   },
-  motherFirstNamesEng: {
-    id: 'form.field.label.motherFirstNamesEng',
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english'
-  },
-  motherFamilyNameEng: {
-    id: 'form.field.label.motherFamilyNameEng',
+  applicantsFamilyNameEng: {
     defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.applicantsFamilyNameEng'
   },
-  motherDateOfBirth: {
-    id: 'form.field.label.motherDateOfBirth',
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth'
-  },
-  motherEducationAttainment: {
-    id: 'form.field.label.motherEducationAttainment',
-    defaultMessage: "Mother's level of formal education attained",
-    description: 'Label for form field: Mother education'
-  },
-  fetchMotherDetails: {
-    id: 'form.field.label.fetchMotherDetails',
-    defaultMessage: "Retrieve Mother's Details",
-    description: 'Label for loader button'
-  },
-  select: {
-    id: 'form.field.select.placeholder',
-    defaultMessage: 'Select',
-    description: 'Placeholder text for a select'
-  },
-  fatherName: {
-    id: 'form.section.father.name',
-    defaultMessage: 'Father',
-    description: 'Form section name for Father'
-  },
-  fatherTitle: {
-    id: 'form.section.father.title',
-    defaultMessage: "Father's details",
-    description: 'Form section title for Father'
-  },
-  fathersDetailsExist: {
-    id: 'form.field.label.fathersDetailsExist',
-    defaultMessage: "Do you have the father's details?",
-    description: "Question to ask the user if they have the father's details"
-  },
-  nationalityBangladesh: {
-    id: 'form.field.label.father.nationalityBangladesh',
-    defaultMessage: 'Bangladesh',
-    description: 'Option for form field: Nationality'
-  },
-  fatherFirstNames: {
-    id: 'form.field.label.fatherFirstNames',
+  applicantsGivenNames: {
     defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: First name'
+    description: 'Label for form field: Given names',
+    id: 'form.field.label.applicantsGivenNames'
   },
-  fatherFamilyName: {
-    id: 'form.field.label.fatherFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
-  },
-  fatherFirstNamesEng: {
-    id: 'form.field.label.fatherFirstNamesEng',
+  applicantsGivenNamesEng: {
     defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english'
+    description: 'Label for form field: Given names in english',
+    id: 'form.field.label.applicantsGivenNamesEng'
   },
-  fatherFamilyNameEng: {
-    id: 'form.field.label.fatherFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
+  applicantsIdType: {
+    defaultMessage: 'Type of ID',
+    description: 'Label for form field: Existing ID',
+    id: 'form.field.label.applicantsIdType'
   },
-  defaultLabel: {
-    id: 'form.field.label.defaultLabel',
-    defaultMessage: 'Label goes here',
-    description: 'default label'
+  applicantsNationality: {
+    defaultMessage: 'Nationality',
+    description: 'Label for form field: Nationality',
+    id: 'form.field.label.applicants.nationality'
   },
-  fatherDateOfBirth: {
-    id: 'form.field.label.fatherDateOfBirth',
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth'
+  applicantsRelationWithDeceased: {
+    defaultMessage: 'Relationship to Deceased',
+    description: 'Label for Relationship to Deceased select',
+    id: 'form.field.label.applicantsRelationWithDeceased'
   },
-  fatherEducationAttainment: {
-    id: 'form.field.label.fatherEducationAttainment',
-    defaultMessage: "Father's level of formal education attained",
-    description: 'Label for form field: Father education'
+  applicantTitle: {
+    defaultMessage: "What are the applicant's details?",
+    description: 'Form section title for applicants',
+    id: 'form.section.applicant.title'
   },
-  fetchFatherDetails: {
-    id: 'form.field.label.fetchFatherDetails',
-    defaultMessage: "Retrieve Father's Details",
-    description: 'Label for loader button'
-  },
-  documentsName: {
-    id: 'form.section.documents.name',
-    defaultMessage: 'Documents',
-    description: 'Form section name for Documents'
-  },
-  documentsTitle: {
-    id: 'form.section.documents.title',
-    defaultMessage: 'Supporting documents',
-    description: 'Form section title for Documents'
-  },
-
-  docTaxReceipt: {
-    id: 'form.field.label.docTypeTaxReceipt',
-    defaultMessage: 'Receipt of tax payment',
-    description: 'Document type label for tax receipt'
-  },
-
-  dischargeCertificate: {
-    id: 'form.field.label.docTypeHospitalDischargeCertificate',
-    defaultMessage: 'Discharge Certificate',
-    description: 'Document type label for Discharge Certificate'
-  },
-  birthMedicalInstitution: {
-    id: 'form.field.label.docTypeMedicalInstitution',
-    defaultMessage: 'Proof of birth from medical institution',
-    description:
-      'Document type label for Proof of birth from medical institution'
-  },
-  birthAttendant: {
-    id: 'form.field.label.docTypebirthAttendant',
-    defaultMessage: 'Proof of birth from birth attendant',
-    description: 'Document type label for Proof of birth from birth attendant'
-  },
-
-  paragraph45daysTo5Years: {
-    id: 'form.section.documents.paragraph45daysTo5Years',
-    defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
-    description: 'Documents Paragraph text'
-  },
-  paragraphAbove5Years: {
-    id: 'form.section.documents.paragraphAbove5Years',
-    defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
-    description: 'Documents Paragraph text'
-  },
-  uploadImage: {
-    id: 'form.section.documents.uploadImage',
-    defaultMessage: 'Upload a photo of the supporting document',
-    description: 'Title for the upload image button'
-  },
-  paragraph: {
-    id: 'form.section.documents.birth.requirements',
-    defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
-    description: 'Documents Paragraph text'
-  },
-  informantAttestation: {
-    id: 'form.section.documents.list.informantAttestation',
-    defaultMessage: 'Attestation of the informant, or',
-    description: 'Attested document of the informant'
-  },
-  attestedVaccination: {
-    id: 'form.section.documents.list.attestedVaccination',
-    defaultMessage: 'Attested copy of the vaccination (EPI) card, or',
-    description: 'Attested copy of the vaccination card'
-  },
-  attestedBirthRecord: {
-    id: 'form.section.documents.list.attestedBirthRecord',
-    defaultMessage: 'Attested copy of hospital document or birth record, or',
-    description: 'Attested copy of hospital document'
-  },
-  certification: {
-    id: 'form.section.documents.list.certification',
-    defaultMessage:
-      'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
-    description: 'Certification regarding NGO worker'
-  },
-  otherDocuments: {
-    id: 'form.section.documents.list.otherDocuments',
-    defaultMessage:
-      'Attested copy(s) of the document as prescribed by the Registrar',
-    description: 'Attested copy(s) of the document'
-  },
-  documentsUploadName: {
-    id: 'form.section.upload.documentsName',
-    defaultMessage: 'Documents Upload',
-    description: 'Form section name for Documents Upload'
-  },
-  documentsUploadTitle: {
-    id: 'form.section.upload.documentsTitle',
-    defaultMessage: 'Supporting documents',
-    description: 'Form section title for Documents'
-  },
-  uploadDocForWhom: {
-    id: 'form.field.label.uploadDocForWhom',
-    defaultMessage: 'Whose suppoting document are you uploading?',
-    description: 'Question to ask user, for whom, documents are being uploaded'
-  },
-  uploadDocForChild: {
-    id: 'form.field.label.uploadDocForChild',
-    defaultMessage: 'Child',
-    description: 'Label for radio option Child'
-  },
-  uploadDocForMother: {
-    id: 'form.field.label.uploadDocForMother',
-    defaultMessage: 'Mother',
-    description: 'Label for radio option Mother'
-  },
-  uploadDocForFather: {
-    id: 'form.field.label.uploadDocForFather',
-    defaultMessage: 'Father',
-    description: 'Label for radio option Father'
-  },
-  uploadDocForOther: {
-    id: 'form.field.label.uploadDocForOther',
-    defaultMessage: 'Other',
-    description: 'Label for radio option Other'
-  },
-  whatDocToUpload: {
-    id: 'form.field.label.whatDocToUpload',
-    defaultMessage: 'Which document type are you uploading?',
-    description:
-      'Question to ask user, what type of documents are being uploaded'
-  },
-  docTypePassport: {
-    id: 'form.field.label.docTypePassport',
-    defaultMessage: 'Passport',
-    description: 'Label for radio option Passport'
-  },
-  docTypeSC: {
-    id: 'form.field.label.docTypeSC',
-    defaultMessage: 'School Certificate',
-    description: 'Label for radio option School Certificate'
-  },
-  docTypeOther: {
-    id: 'form.field.label.docTypeOther',
-    defaultMessage: 'Other',
-    description: 'Label for radio option Other'
-  },
-  docTypeChildBirthProof: {
-    id: 'form.field.label.docTypeChildBirthProof',
-    defaultMessage: 'Proof of Place and Date of Birth',
-    description: 'Label for select option Child Birth Proof'
-  },
-  docTypeEPICard: {
-    id: 'form.field.label.docTypeEPICard',
-    defaultMessage: 'EPI Card',
-    description: 'Label for select option EPI Card'
-  },
-  docTypeDoctorCertificate: {
-    id: 'form.field.label.docTypeDoctorCertificate',
-    defaultMessage: 'Doctor Certificate',
-    description: 'Label for select option Doctor Certificate'
-  },
-  proofOfMothersID: {
-    id: 'form.field.label.proofOfMothersID',
-    defaultMessage: "Proof of Mother's ID",
-    description: 'Label for list item Mother ID Proof'
-  },
-  proofOfFathersID: {
-    id: 'form.field.label.proofOfFathersID',
-    defaultMessage: "Proof of Father's ID",
-    description: 'Label for list item Father ID Proof'
-  },
-  proofOfBirthPlaceAndDate: {
-    id: 'form.field.label.proofOfBirthPlaceAndDate',
-    defaultMessage: 'Proof of Place and Date of Birth of Child',
-    description: 'Label for list item Child Birth Proof'
-  },
-  proofOfParentPermanentAddress: {
-    id: 'form.field.label.proofOfParentPermanentAddress',
-    defaultMessage: 'Proof of Permanent Address of Parent',
-    description: 'Label for list item Parent Permanent Address Proof'
-  },
-  proofOfEPICardOfChild: {
-    id: 'form.field.label.proofOfEPICardOfChild',
-    defaultMessage: 'EPI Card of Child',
-    description: 'Label for list item EPI Card of Child'
-  },
-  proofOfDocCertificateOfChild: {
-    id: 'form.field.label.proofOfDocCertificateOfChild',
-    defaultMessage:
-      "Certificate from doctor to prove child's age OR School certificate",
-    description: 'Label for list item Doctor Certificate'
+  assignedRegisterOffice: {
+    defaultMessage: 'Assigned Register Office',
+    description: 'Assigned Register Office section',
+    id: 'form.section.assignedRegisterOffice'
   },
   attendantAtBirth: {
     defaultMessage: 'Attendant at birth',
@@ -1280,10 +427,31 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for form field: Attendant at birth',
     id: 'form.field.label.attendantAtBirthPhysician'
   },
+  attestedBirthRecord: {
+    defaultMessage: 'Attested copy of hospital document or birth record, or',
+    description: 'Attested copy of hospital document',
+    id: 'form.section.documents.list.attestedBirthRecord'
+  },
+  attestedVaccination: {
+    defaultMessage: 'Attested copy of the vaccination (EPI) card, or',
+    description: 'Attested copy of the vaccination card',
+    id: 'form.section.documents.list.attestedVaccination'
+  },
+  birthAttendant: {
+    defaultMessage: 'Proof of birth from birth attendant',
+    description: 'Document type label for Proof of birth from birth attendant',
+    id: 'form.field.label.docTypebirthAttendant'
+  },
   birthLocation: {
     defaultMessage: 'Hospital / Clinic',
     description: 'Label for form field: Hospital or Health Institution',
     id: 'form.field.label.birthLocation'
+  },
+  birthMedicalInstitution: {
+    defaultMessage: 'Proof of birth from medical institution',
+    description:
+      'Document type label for Proof of birth from medical institution',
+    id: 'form.field.label.docTypeMedicalInstitution'
   },
   birthType: {
     defaultMessage: 'Type of birth',
@@ -1314,6 +482,43 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Twin',
     description: 'Label for form field: Type of birth',
     id: 'form.field.label.birthTypeTwin'
+  },
+  causeOfDeathCode: {
+    defaultMessage: 'Cause of Death Code',
+    description: 'Label for form field: Cause of Death Code',
+    id: 'form.field.label.causeOfDeathCode'
+  },
+  causeOfDeathEstablished: {
+    defaultMessage: 'Has an official cause of death been established ?',
+    description: 'Label for form field: Cause of Death Established',
+    id: 'form.field.label.causeOfDeathEstablished'
+  },
+  causeOfDeathName: {
+    defaultMessage: 'What is the official cause of death?',
+    description: 'Form section name for Cause of Death',
+    id: 'form.section.causeOfDeath.name'
+  },
+  causeOfDeathNotice: {
+    defaultMessage:
+      'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
+    description: 'Form section notice for Cause of Death',
+    id: 'form.section.causeOfDeathNotice'
+  },
+  causeOfDeathTitle: {
+    defaultMessage: 'What is the official cause of death?',
+    description: 'Form section title for Cause of Death',
+    id: 'form.section.causeOfDeath.title'
+  },
+  certification: {
+    defaultMessage:
+      'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
+    description: 'Certification regarding NGO worker',
+    id: 'form.section.documents.list.certification'
+  },
+  changeAssignedOffice: {
+    defaultMessage: 'Change assigned office',
+    description: 'Edit button text',
+    id: 'form.field.SearchField.changeAssignedOffice'
   },
   childDateOfBirth: {
     defaultMessage: 'Date of birth',
@@ -1375,6 +580,233 @@ const messagesToDefine: IFormMessages = {
     description: 'Form section title for Child',
     id: 'birth.form.section.child.title'
   },
+  commentsOrNotesDescription: {
+    defaultMessage:
+      'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.',
+    description: 'Help text for the notes field',
+    id: 'form.field.label.application.commentsOrNotes.description'
+  },
+  commentsOrNotesLabel: {
+    defaultMessage: 'Comments or notes',
+    description: 'Input label for comments or notes textarea',
+    id: 'form.field.label.application.commentsOrNotes'
+  },
+  confirm: {
+    defaultMessage: 'Yes',
+    description: 'confirmation label for yes / no radio button',
+    id: 'form.field.label.confirm'
+  },
+  confirmMotherDetails: {
+    defaultMessage:
+      'Does their proof of ID document match the following details?',
+    description: 'The label for mother details paragraph',
+    id: 'form.field.label.print.confirmMotherInformation'
+  },
+  contactDetailsBoth: {
+    defaultMessage: 'Both Parents',
+    description: 'Label for "Both Parents" select option',
+    id: 'form.field.label.application.whoseContactDetails.both'
+  },
+  contactDetailsFather: {
+    defaultMessage: 'Father',
+    description: 'Label for "Father" select option',
+    id: 'form.field.label.application.whoseContactDetails.father'
+  },
+  contactDetailsMother: {
+    defaultMessage: 'Mother',
+    description: 'Label for "Mother" select option',
+    id: 'form.field.label.application.whoseContactDetails.mother'
+  },
+  country: {
+    defaultMessage: 'Country',
+    description: 'Title for the country select',
+    id: 'form.field.label.country'
+  },
+  currentAddress: {
+    defaultMessage: 'Current Address',
+    description: 'Title for the current address fields',
+    id: 'form.field.label.currentAddress'
+  },
+  currentAddressSameAsPermanent: {
+    defaultMessage: 'Is her current address the same as her permanent address?',
+    description:
+      'Title for the radio button to select that the mothers current address is the same as her permanent address',
+    id: 'form.field.label.currentAddressSameAsPermanent'
+  },
+  dateOfMarriage: {
+    defaultMessage: 'Date of marriage',
+    description: 'Option for form field: Date of marriage',
+    id: 'form.field.label.dateOfMarriage'
+  },
+  daughter: {
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter',
+    id: 'form.field.label.applicantRelation.daughter'
+  },
+  deathAtFacility: {
+    defaultMessage: 'What hospital did the death occur at?',
+    description: 'Label for form field: Hospital or Health Institution',
+    id: 'form.field.label.deathAtFacility'
+  },
+  deathAtOtherLocation: {
+    defaultMessage: 'What is the other address did the death occur at?',
+    description: 'Label for form field: Other Location Address',
+    id: 'form.field.label.deathAtOtherLocation'
+  },
+  deathAtPrivateHome: {
+    defaultMessage: 'What is the address of the private home?',
+    description: 'Label for form field: Private Home Address',
+    id: 'form.field.label.deathAtPrivateHome'
+  },
+  deathDate: {
+    defaultMessage:
+      'Enter the date in the format day, month and year. For example 24 10 2020.',
+    description: 'Label for form field: Date of occurrence',
+    id: 'form.field.label.deathDate'
+  },
+  deathEventName: {
+    defaultMessage: 'When did the death occur?',
+    description: 'Form section name for Death Event',
+    id: 'form.section.deathEvent.name'
+  },
+  deathEventTitle: {
+    defaultMessage: 'When did the death occur?',
+    description: 'Form section title for Death Event',
+    id: 'form.section.deathEvent.title'
+  },
+  deathPlace: {
+    defaultMessage: 'Place of Occurrence of Death',
+    description: 'Title for place of occurrence of death',
+    id: 'form.field.label.deathPlace'
+  },
+  deathPlaceAddress: {
+    defaultMessage: 'Where did the death occur?',
+    description: 'Label for form field: Place of occurrence of death',
+    id: 'form.field.label.deathPlaceAddress'
+  },
+  deathPlaceAddressOther: {
+    defaultMessage: 'Different Address',
+    description: 'Option for form field: Place of occurrence of death',
+    id: 'form.field.label.deathPlaceAddressOther'
+  },
+  deathPlaceAddressSameAsCurrent: {
+    defaultMessage: 'Current address of the deceased',
+    description: 'Option for form field: Place of occurrence of death',
+    id: 'form.field.label.deathPlaceAddressSameAsCurrent'
+  },
+  deathPlaceAddressSameAsPermanent: {
+    defaultMessage: 'Permanent address of the deceased',
+    description: 'Option for form field: Place of occurrence of death',
+    id: 'form.field.label.deathPlaceAddressSameAsPermanent'
+  },
+  deathPlaceAddressType: {
+    defaultMessage: 'Type of Place',
+    description: 'Label for form field: Type of place of death occurrence',
+    id: 'form.field.label.deathPlaceAddressType'
+  },
+  deceasedCurrentAddressSameAsPermanent: {
+    defaultMessage:
+      'Is deceased’s current address the same as their permanent address?',
+    description:
+      'Title for the radio button to select that the deceased current address is the same as their permanent address',
+    id: 'form.field.label.deceasedCurrentAddressSameAsPermanent'
+  },
+  deceasedDateOfBirth: {
+    defaultMessage: 'Date of Birth',
+    description: 'Label for form field: Date of birth',
+    id: 'form.field.label.deceasedDateOfBirth'
+  },
+  deceasedDeathProof: {
+    defaultMessage: 'Proof of Death of Deceased',
+    description: 'Option for radio group field: Type of Document To Upload',
+    id: 'form.field.label.deceasedDeathProof'
+  },
+  deceasedDoBProof: {
+    defaultMessage: 'Proof of Date of Birth of Deceased',
+    description: 'Option for radio group field: Type of Document To Upload',
+    id: 'form.field.label.deceasedDoBProof'
+  },
+  deceasedFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.deceasedFamilyName'
+  },
+  deceasedFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.deceasedFamilyNameEng'
+  },
+  deceasedGivenNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: Given names',
+    id: 'form.field.label.deceasedGivenNames'
+  },
+  deceasedGivenNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: Given names in english',
+    id: 'form.field.label.deceasedGivenNamesEng'
+  },
+  deceasedIDProof: {
+    defaultMessage: "Proof of Deceased's ID",
+    description: 'Option for radio group field: Type of Document To Upload',
+    id: 'form.field.label.deceasedIDProof'
+  },
+  deceasedIdType: {
+    defaultMessage: 'Type of ID',
+    description: 'Label for form field: Existing ID',
+    id: 'form.field.label.deceasedIdType'
+  },
+  deceasedName: {
+    defaultMessage: 'Deceased',
+    description: 'Form section name for Deceased',
+    id: 'form.section.deceased.name'
+  },
+  deceasedParagraph: {
+    defaultMessage:
+      'For this death registration, the following documents are required:',
+    description: 'Documents Paragraph text',
+    id: 'form.field.label.deceasedDocumentParagraph'
+  },
+  deceasedPermanentAddressProof: {
+    defaultMessage: 'Proof of Permanent Address of Deceased',
+    description: 'Option for radio group field: Type of Document To Upload',
+    id: 'form.field.label.deceasedPermanentAddressProof'
+  },
+  deceasedSex: {
+    defaultMessage: 'Sex',
+    description: 'Label for form field: Sex name',
+    id: 'form.field.label.deceasedSex'
+  },
+  deceasedSexFemale: {
+    defaultMessage: 'Female',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.deceasedSexFemale'
+  },
+  deceasedSexMale: {
+    defaultMessage: 'Male',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.deceasedSexMale'
+  },
+  deceasedSexOther: {
+    defaultMessage: 'Other',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.deceasedSexOther'
+  },
+  deceasedSexUnknown: {
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.deceasedSexUnknown'
+  },
+  deceasedTitle: {
+    defaultMessage: 'What are the deceased details?',
+    description: 'Form section title for Deceased',
+    id: 'form.section.deceased.title'
+  },
+  defaultLabel: {
+    defaultMessage: 'Label goes here',
+    description: 'default label',
+    id: 'form.field.label.defaultLabel'
+  },
   deliveryAddress: {
     defaultMessage: 'Address of place of delivery',
     description: 'Label for form field: Address of place of delivery',
@@ -1385,311 +817,879 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for form field: Type or select institution',
     id: 'form.field.label.deliveryInstitution'
   },
+  deny: {
+    defaultMessage: 'No',
+    description: 'deny label for yes / no radio button',
+    id: 'form.field.label.deny'
+  },
+  dischargeCertificate: {
+    defaultMessage: 'Discharge Certificate',
+    description: 'Document type label for Discharge Certificate',
+    id: 'form.field.label.docTypeHospitalDischargeCertificate'
+  },
+  district: {
+    defaultMessage: 'District',
+    description: 'Title for the district select',
+    id: 'form.field.label.district'
+  },
+  docTaxReceipt: {
+    defaultMessage: 'Receipt of tax payment',
+    description: 'Document type label for tax receipt',
+    id: 'form.field.label.docTypeTaxReceipt'
+  },
+  docTypeBR: {
+    defaultMessage: 'Birth Registration',
+    description: 'Label for select option Birth Registration',
+    id: 'form.field.label.docTypeBR'
+  },
+  docTypeChildAgeProof: {
+    defaultMessage: 'Proof of Child Age',
+    description: 'Label for select option Child Age Proof',
+    id: 'form.field.label.docTypeChildAgeProof'
+  },
+  docTypeChildBirthProof: {
+    defaultMessage: 'Proof of Place and Date of Birth',
+    description: 'Label for select option Child Birth Proof',
+    id: 'form.field.label.docTypeChildBirthProof'
+  },
+  docTypeCopyOfBurialReceipt: {
+    defaultMessage: 'Certified Copy of Burial Receipt',
+    description: 'Label for select option Certified Copy of Burial Receipt',
+    id: 'form.field.label.docTypeCopyOfBurialReceipt'
+  },
+  docTypeDeathCertificate: {
+    defaultMessage: 'Attested Certificate of Death',
+    description: 'Label for select option Attested Certificate of Death',
+    id: 'form.field.label.docTypeDeathCertificate'
+  },
+  docTypeDoctorCertificate: {
+    defaultMessage: 'Doctor Certificate',
+    description: 'Label for select option Doctor Certificate',
+    id: 'form.field.label.docTypeDoctorCertificate'
+  },
+  docTypeEPICard: {
+    defaultMessage: 'EPI Card',
+    description: 'Label for select option EPI Card',
+    id: 'form.field.label.docTypeEPICard'
+  },
+  docTypeEPIStaffCertificate: {
+    defaultMessage: 'EPI Staff Certificate',
+    description: 'Label for select option EPI Card',
+    id: 'form.field.label.docTypeEPIStaffCertificate'
+  },
+  docTypeFuneralReceipt: {
+    defaultMessage: 'Certified Copy of Funeral Receipt',
+    description: 'Label for select option Certified Copy of Funeral Receipt',
+    id: 'form.field.label.docTypeFuneralReceipt'
+  },
+  docTypeHospitalDischargeCertificate: {
+    defaultMessage: 'Hospital Discharge Certificate',
+    description: 'Label for select option Hospital Discharge Certificate',
+    id: 'form.field.label.docTypeHospitalDischargeCertificate'
+  },
+  docTypeLetterOfDeath: {
+    defaultMessage: 'Attested Letter of Death',
+    description: 'Label for select option Attested Letter of Death',
+    id: 'form.field.label.docTypeLetterOfDeath'
+  },
+  docTypeNIDBack: {
+    defaultMessage: 'National ID (back)',
+    description: 'Label for select option radio option NID back',
+    id: 'form.field.label.docTypeNIDBack'
+  },
+  docTypeNIDFront: {
+    defaultMessage: 'National ID (front)',
+    description: 'Label for select option radio option NID front',
+    id: 'form.field.label.docTypeNIDFront'
+  },
+  docTypeOther: {
+    defaultMessage: 'Other',
+    description: 'Label for radio option Other',
+    id: 'form.field.label.docTypeOther'
+  },
+  docTypePassport: {
+    defaultMessage: 'Passport',
+    description: 'Label for radio option Passport',
+    id: 'form.field.label.docTypePassport'
+  },
+  docTypePostMortemReport: {
+    defaultMessage: 'Certified Post Mortem Report',
+    description: 'Label for select option Post Mortem Report',
+    id: 'form.field.label.docTypePostMortemReport'
+  },
+  docTypeSC: {
+    defaultMessage: 'School Certificate',
+    description: 'Label for radio option School Certificate',
+    id: 'form.field.label.docTypeSC'
+  },
+  documentNumber: {
+    defaultMessage: 'Document number',
+    description: 'Label for document number input field',
+    id: 'form.field.label.print.documentNumber'
+  },
+  documentsName: {
+    defaultMessage: 'Documents',
+    description: 'Form section name for Documents',
+    id: 'form.section.documents.name'
+  },
+  documentsTitle: {
+    defaultMessage: 'Supporting documents',
+    description: 'Form section title for Documents',
+    id: 'form.section.documents.title'
+  },
+  documentsUploadName: {
+    defaultMessage: 'Documents Upload',
+    description: 'Form section name for Documents Upload',
+    id: 'form.section.upload.documentsName'
+  },
+  documentsUploadTitle: {
+    defaultMessage: 'Supporting documents',
+    description: 'Form section title for Documents',
+    id: 'form.section.upload.documentsTitle'
+  },
+  educationAttainmentISCED1: {
+    defaultMessage: 'Primary',
+    description: 'Option for form field: ISCED1 education',
+    id: 'form.field.label.educationAttainmentISCED1'
+  },
+  educationAttainmentISCED2: {
+    defaultMessage: 'Lower secondary',
+    description: 'Option for form field: ISCED2 education',
+    id: 'form.field.label.educationAttainmentISCED2'
+  },
+  educationAttainmentISCED3: {
+    defaultMessage: 'Upper secondary',
+    description: 'Option for form field: ISCED3 education',
+    id: 'form.field.label.educationAttainmentISCED3'
+  },
+  educationAttainmentISCED4: {
+    defaultMessage: 'Post secondary',
+    description: 'Option for form field: ISCED4 education',
+    id: 'form.field.label.educationAttainmentISCED4'
+  },
+  educationAttainmentISCED5: {
+    defaultMessage: 'First stage tertiary',
+    description: 'Option for form field: ISCED5 education',
+    id: 'form.field.label.educationAttainmentISCED5'
+  },
+  educationAttainmentISCED6: {
+    defaultMessage: 'Second stage tertiary',
+    description: 'Option for form field: ISCED6 education',
+    id: 'form.field.label.educationAttainmentISCED6'
+  },
+  educationAttainmentNone: {
+    defaultMessage: 'No schooling',
+    description: 'Option for form field: no education',
+    id: 'form.field.label.educationAttainmentNone'
+  },
+  educationAttainmentNotStated: {
+    defaultMessage: 'Not stated',
+    description: 'Option for form field: not stated education',
+    id: 'form.field.label.educationAttainmentNotStated'
+  },
+  enterResponse: {
+    defaultMessage: 'Enter a response to your chosen security question',
+    description: 'Label to input an answer to a security question',
+    id: 'user.form.securityquestion.enterResponse'
+  },
+  familyName: {
+    defaultMessage: 'Family name',
+    description: 'Label for family name text input',
+    id: 'form.field.label.print.otherPersonFamilyName'
+  },
+  father: {
+    defaultMessage: 'Father',
+    description: 'Label for option Father',
+    id: 'form.field.label.applicantRelation.father'
+  },
+  fatherDateOfBirth: {
+    defaultMessage: 'Date of birth',
+    description: 'Label for form field: Date of birth',
+    id: 'form.field.label.fatherDateOfBirth'
+  },
+  fatherEducationAttainment: {
+    defaultMessage: "Father's level of formal education attained",
+    description: 'Label for form field: Father education',
+    id: 'form.field.label.fatherEducationAttainment'
+  },
+  fatherFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.fatherFamilyName'
+  },
+  fatherFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.fatherFamilyNameEng'
+  },
+  fatherFirstNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: First name',
+    id: 'form.field.label.fatherFirstNames'
+  },
+  fatherFirstNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: First names in english',
+    id: 'form.field.label.fatherFirstNamesEng'
+  },
+  fatherName: {
+    defaultMessage: 'Father',
+    description: 'Form section name for Father',
+    id: 'form.section.father.name'
+  },
+  fathersDetailsExist: {
+    defaultMessage: "Do you have the father's details?",
+    description: "Question to ask the user if they have the father's details",
+    id: 'form.field.label.fathersDetailsExist'
+  },
+  fatherTitle: {
+    defaultMessage: "Father's details",
+    description: 'Form section title for Father',
+    id: 'form.section.father.title'
+  },
+  fetchDeceasedDetails: {
+    defaultMessage: "Retrieve Deceased's Details",
+    description: 'Label for loader button',
+    id: 'form.field.label.fetchDeceasedDetails'
+  },
+  fetchFatherDetails: {
+    defaultMessage: "Retrieve Father's Details",
+    description: 'Label for loader button',
+    id: 'form.field.label.fetchFatherDetails'
+  },
+  fetchIdentifierModalErrorTitle: {
+    defaultMessage: 'Invalid Id',
+    description: 'Label for fetch modal error title',
+    id: 'form.field.label.fetchIdentifierModalErrorTitle'
+  },
+  fetchIdentifierModalSuccessTitle: {
+    defaultMessage: 'ID valid',
+    description: 'Label for fetch modal success title',
+    id: 'form.field.label.fetchIdentifierModalSuccessTitle'
+  },
+  fetchIdentifierModalTitle: {
+    defaultMessage: 'Checking',
+    description: 'Label for fetch modal title',
+    id: 'form.field.label.fetchIdentifierModalTitle'
+  },
+  fetchInformantDetails: {
+    defaultMessage: "Retrieve Informant's Details",
+    description: 'Label for loader button',
+    id: 'form.field.label.fetchInformantDetails'
+  },
+  fetchMotherDetails: {
+    defaultMessage: "Retrieve Mother's Details",
+    description: 'Label for loader button',
+    id: 'form.field.label.fetchMotherDetails'
+  },
+  fetchPersonByNIDModalErrorText: {
+    defaultMessage: 'No person found for provided NID',
+    description: 'Label for fetch modal error title',
+    id: 'form.field.label.fetchPersonByNIDModalErrorText'
+  },
+  fetchPersonByNIDModalInfo: {
+    defaultMessage: 'National ID',
+    description: 'Label for loader button',
+    id: 'form.field.label.fetchPersonByNIDModalInfo'
+  },
+  fetchRegistrationModalErrorText: {
+    defaultMessage: 'No registration found for provided BRN',
+    description: 'Label for fetch modal error title',
+    id: 'form.field.label.fetchRegistrationModalErrorText'
+  },
+  fetchRegistrationModalInfo: {
+    defaultMessage: 'Birth Registration Number',
+    description: 'Label for loader button',
+    id: 'form.field.label.fetchRegistrationModalInfo'
+  },
+  firstNameBn: {
+    defaultMessage: 'Bengali first name',
+    description: 'Bengali first name',
+    id: 'form.field.label.firstNameBN'
+  },
+  firstNameEn: {
+    defaultMessage: 'English first name',
+    description: 'English first name',
+    id: 'form.field.label.firstNameEN'
+  },
+  givenNames: {
+    defaultMessage: 'Given name',
+    description: 'Label for given name text input',
+    id: 'form.field.label.print.otherPersonGivenNames'
+  },
+  healthInstitution: {
+    defaultMessage: 'Health Institution',
+    description: 'Select item for Health Institution',
+    id: 'form.field.label.healthInstitution'
+  },
   hospital: {
     defaultMessage: 'Hospital',
     description: 'Select item for hospital',
     id: 'form.field.label.hospital'
+  },
+  iD: {
+    defaultMessage: 'ID Number',
+    description: 'Label for form field: ID Number',
+    id: 'form.field.label.iD'
+  },
+  iDType: {
+    defaultMessage: 'Type of ID',
+    description: 'Label for form field: Type of ID',
+    id: 'form.field.label.iDType'
+  },
+  iDTypeAlienNumber: {
+    defaultMessage: 'Alien Number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeAlienNumber'
+  },
+  iDTypeBRN: {
+    defaultMessage: 'Birth Registration Number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeBRN'
+  },
+  iDTypeDrivingLicense: {
+    defaultMessage: 'Drivers License',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeDrivingLicense'
+  },
+  iDTypeDRN: {
+    defaultMessage: 'Death Registration Number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeDRN'
+  },
+  iDTypeNationalID: {
+    defaultMessage: 'National ID',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeNationalID'
+  },
+  iDTypeNoId: {
+    defaultMessage: 'No ID available',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeNoID'
+  },
+  iDTypeOther: {
+    defaultMessage: 'Other',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeOther'
+  },
+  iDTypeOtherLabel: {
+    defaultMessage: 'Other type of ID',
+    description: 'Label for form field: Other type of ID',
+    id: 'form.field.label.iDTypeOtherLabel'
+  },
+  iDTypePassport: {
+    defaultMessage: 'Passport',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypePassport'
+  },
+  iDTypeRefugeeNumber: {
+    defaultMessage: 'Refugee Number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.label.iDTypeRefugeeNumber'
+  },
+  informantAttestation: {
+    defaultMessage: 'Attestation of the informant, or',
+    description: 'Attested document of the informant',
+    id: 'form.section.documents.list.informantAttestation'
+  },
+  lastNameBn: {
+    defaultMessage: 'Bengali last name',
+    description: 'Bengali last name',
+    id: 'form.field.label.lastNameBN'
+  },
+  lastNameEn: {
+    defaultMessage: 'English last name',
+    description: 'English last name',
+    id: 'form.field.label.lastNameEN'
+  },
+  manner: {
+    defaultMessage: 'What was the manner of death?',
+    description: 'Label for form field: Manner of death',
+    id: 'form.field.label.mannerOfDeath'
+  },
+  mannerAccident: {
+    defaultMessage: 'Accident',
+    description: 'Option for form field: Manner of death',
+    id: 'form.field.label.mannerOfDeathAccident'
+  },
+  mannerHomicide: {
+    defaultMessage: 'Homicide',
+    description: 'Option for form field: Manner of death',
+    id: 'form.field.label.mannerOfDeathHomicide'
+  },
+  mannerNatural: {
+    defaultMessage: 'Natural causes',
+    description: 'Option for form field: Manner of death',
+    id: 'form.field.label.mannerOfDeathNatural'
+  },
+  mannerSuicide: {
+    defaultMessage: 'Suicide',
+    description: 'Option for form field: Manner of death',
+    id: 'form.field.label.mannerOfDeathSuicide'
+  },
+  mannerUndetermined: {
+    defaultMessage: 'Manner undetermined',
+    description: 'Option for form field: Manner of death',
+    id: 'form.field.label.mannerOfDeathUndetermined'
+  },
+  maritalStatus: {
+    defaultMessage: 'Marital status',
+    description: 'Label for form field: Marital status',
+    id: 'form.field.label.maritalStatus'
+  },
+  maritalStatusDivorced: {
+    defaultMessage: 'Divorced',
+    description: 'Option for form field: Marital status',
+    id: 'form.field.label.maritalStatusDivorced'
+  },
+  maritalStatusMarried: {
+    defaultMessage: 'Married',
+    description: 'Option for form field: Marital status',
+    id: 'form.field.label.maritalStatusMarried'
+  },
+  maritalStatusNotStated: {
+    defaultMessage: 'Not stated',
+    description: 'Option for form field: Marital status',
+    id: 'form.field.label.maritalStatusNotStated'
+  },
+  maritalStatusSingle: {
+    defaultMessage: 'Unmarried',
+    description: 'Option for form field: Marital status',
+    id: 'form.field.label.maritalStatusSingle'
+  },
+  maritalStatusWidowed: {
+    defaultMessage: 'Widowed',
+    description: 'Option for form field: Marital status',
+    id: 'form.field.label.maritalStatusWidowed'
+  },
+  medicallyCertified: {
+    defaultMessage: 'Medically Certified Cause of Death',
+    description: 'Option for form field: Method of Cause of Death',
+    id: 'form.field.label.medicallyCertified'
+  },
+  methodOfCauseOfDeath: {
+    defaultMessage: 'Method of Cause of Death',
+    description: 'Label for form field: Method of Cause of Death',
+    id: 'form.field.label.methodOfCauseOfDeath'
+  },
+  mother: {
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother',
+    id: 'form.field.label.applicantRelation.mother'
+  },
+  motherDateOfBirth: {
+    defaultMessage: 'Date of birth',
+    description: 'Label for form field: Date of birth',
+    id: 'form.field.label.motherDateOfBirth'
+  },
+  motherEducationAttainment: {
+    defaultMessage: "Mother's level of formal education attained",
+    description: 'Label for form field: Mother education',
+    id: 'form.field.label.motherEducationAttainment'
+  },
+  motherFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.motherFamilyName'
+  },
+  motherFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.motherFamilyNameEng'
+  },
+  motherFirstNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: First names',
+    id: 'form.field.label.motherFirstNames'
+  },
+  motherFirstNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: First names in english',
+    id: 'form.field.label.motherFirstNamesEng'
+  },
+  motherName: {
+    defaultMessage: 'Mother',
+    description: 'Form section name for Mother',
+    id: 'form.section.mother.name'
+  },
+  motherTitle: {
+    defaultMessage: "Mother's details",
+    description: 'Form section title for Mother',
+    id: 'form.section.mother.title'
   },
   multipleBirth: {
     defaultMessage: 'Order of birth (number)',
     description: 'Label for form field: Order of birth',
     id: 'form.field.label.multipleBirth'
   },
+  nationality: {
+    defaultMessage: 'Nationality',
+    description: 'Label for form field: Nationality',
+    id: 'form.field.label.deceased.nationality'
+  },
+  nationalityBangladesh: {
+    defaultMessage: 'Bangladesh',
+    description: 'Option for form field: Nationality',
+    id: 'form.field.label.father.nationalityBangladesh'
+  },
+  NID: {
+    defaultMessage: 'NID',
+    description: 'National ID',
+    id: 'form.field.label.NID'
+  },
+  officeLocationId: {
+    defaultMessage: 'Id: {locationId}',
+    description: 'The location Id column',
+    id: 'form.field.SearchField.officeLocationId'
+  },
+  optionalLabel: {
+    defaultMessage: 'Optional',
+    description: 'Optional label',
+    id: 'form.field.label.optionalLabel'
+  },
+  otherDocuments: {
+    defaultMessage:
+      'Attested copy(s) of the document as prescribed by the Registrar',
+    description: 'Attested copy(s) of the document',
+    id: 'form.section.documents.list.otherDocuments'
+  },
+  otherHealthInstitution: {
+    defaultMessage: 'Other Health Institution',
+    description: 'Select item for Other Health Institution',
+    id: 'form.field.label.otherHealthInstitution'
+  },
   otherInstitution: {
     defaultMessage: 'Other Institution',
     description: 'Select item for Other Institution',
     id: 'form.field.label.otherInstitution'
+  },
+  otherOption: {
+    defaultMessage: 'Other',
+    description: 'Other option for select',
+    id: 'form.field.label.otherOption'
+  },
+  paragraph: {
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text',
+    id: 'form.section.documents.birth.requirements'
+  },
+  paragraph45daysTo5Years: {
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text',
+    id: 'form.section.documents.paragraph45daysTo5Years'
+  },
+  paragraphAbove5Years: {
+    defaultMessage:
+      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+    description: 'Documents Paragraph text',
+    id: 'form.section.documents.paragraphAbove5Years'
+  },
+  permanentAddress: {
+    defaultMessage: 'What was their permanent address?',
+    description: 'Title for the permanent address fields',
+    id: 'form.field.label.permanentAddress'
+  },
+  permanentAddressSameAsCurrent: {
+    defaultMessage:
+      'Is applicant’s permanent address the same as their current address?',
+    description:
+      'Title for the radio button to select that the applicants current address is the same as their permanent address',
+    id: 'form.field.label.applicantsCurrentAddressSameAsPermanent'
+  },
+  permanentAddressSameAsMother: {
+    defaultMessage: "Is his permanent address the same as the mother's?",
+    description:
+      "Title for the radio button to select that the father's permanent address is the same as the mother's address",
+    id: 'form.field.label.permanentAddressSameAsMother'
+  },
+  phoneNumber: {
+    defaultMessage: 'Phone number',
+    description: 'Input label for phone input',
+    id: 'form.field.label.phoneNumber'
+  },
+  phoneVerificationWarning: {
+    defaultMessage:
+      'Check with the applicant that the mobile phone number you have entered is correct',
+    description: 'Warning message to verify applicant phone number ',
+    id: 'form.field.label.application.phoneVerificationWarning'
   },
   placeOfBirth: {
     defaultMessage: 'Place of delivery',
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
   },
-  weightAtBirth: {
-    defaultMessage: 'Weight at birth',
-    description: 'Label for form field: Weight at birth',
-    id: 'form.field.label.weightAtBirth'
+  postCode: {
+    defaultMessage: 'Postcode',
+    description: 'Title for the postcode field',
+    id: 'form.field.label.postCode'
   },
-  confirmMotherDetails: {
-    id: 'form.field.label.print.confirmMotherInformation',
-    defaultMessage:
-      'Does their proof of ID document match the following details?',
-    description: 'The label for mother details paragraph'
+  presentBoth: {
+    defaultMessage: 'Both Parents',
+    description: 'Label for "Both Parents" select option',
+    id: 'form.field.label.application.whoIsPresent.both'
   },
-  givenNames: {
-    id: 'form.field.label.print.otherPersonGivenNames',
-    defaultMessage: 'Given name',
-    description: 'Label for given name text input'
+  presentFather: {
+    defaultMessage: 'Father',
+    description: 'Label for "Father" select option',
+    id: 'form.field.label.application.whoIsPresent.father'
   },
-  familyName: {
-    id: 'form.field.label.print.otherPersonFamilyName',
-    defaultMessage: 'Family name',
-    description: 'Label for family name text input'
+  presentMother: {
+    defaultMessage: 'Mother',
+    description: 'Label for "Mother" select option',
+    id: 'form.field.label.application.whoIsPresent.mother'
   },
-  signedAffidavitConfirmation: {
-    id: 'form.field.label.print.signedAffidavit',
-    defaultMessage: 'Do they have a signed affidavit?',
-    description: 'Label for signed affidavit confirmation radio group'
+  presentOther: {
+    defaultMessage: 'Other',
+    description: 'Label for "Other" select option',
+    id: 'form.field.label.application.whoIsPresent.other'
   },
-  documentNumber: {
-    id: 'form.field.label.print.documentNumber',
-    defaultMessage: 'Document number',
-    description: 'Label for document number input field'
-  },
-  warningNotVerified: {
-    id: 'form.field.label.print.warningNotVerified',
-    defaultMessage:
-      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
-    description: 'Label for warning message when the collector is not verified'
+  privateHome: {
+    defaultMessage: 'Private Home',
+    description: 'Select item for Private Home',
+    id: 'form.field.label.privateHome'
   },
   prompt: {
-    id: 'form.field.label.print.otherPersonPrompt',
     defaultMessage:
       'Because there are no details of this person on record, we need to capture their details:',
-    description: 'Labal for prompt in case of other person collects certificate'
+    description:
+      'Labal for prompt in case of other person collects certificate',
+    id: 'form.field.label.print.otherPersonPrompt'
   },
-  maritalStatus: {
-    id: 'form.field.label.maritalStatus',
-    defaultMessage: 'Marital status',
-    description: 'Label for form field: Marital status'
+  proofOfBirthPlaceAndDate: {
+    defaultMessage: 'Proof of Place and Date of Birth of Child',
+    description: 'Label for list item Child Birth Proof',
+    id: 'form.field.label.proofOfBirthPlaceAndDate'
   },
-  maritalStatusSingle: {
-    id: 'form.field.label.maritalStatusSingle',
-    defaultMessage: 'Unmarried',
-    description: 'Option for form field: Marital status'
+  proofOfDocCertificateOfChild: {
+    defaultMessage:
+      "Certificate from doctor to prove child's age OR School certificate",
+    description: 'Label for list item Doctor Certificate',
+    id: 'form.field.label.proofOfDocCertificateOfChild'
   },
-  maritalStatusMarried: {
-    id: 'form.field.label.maritalStatusMarried',
-    defaultMessage: 'Married',
-    description: 'Option for form field: Marital status'
+  proofOfEPICardOfChild: {
+    defaultMessage: 'EPI Card of Child',
+    description: 'Label for list item EPI Card of Child',
+    id: 'form.field.label.proofOfEPICardOfChild'
   },
-  maritalStatusWidowed: {
-    id: 'form.field.label.maritalStatusWidowed',
-    defaultMessage: 'Widowed',
-    description: 'Option for form field: Marital status'
+  proofOfFathersID: {
+    defaultMessage: "Proof of Father's ID",
+    description: 'Label for list item Father ID Proof',
+    id: 'form.field.label.proofOfFathersID'
   },
-  maritalStatusDivorced: {
-    id: 'form.field.label.maritalStatusDivorced',
-    defaultMessage: 'Divorced',
-    description: 'Option for form field: Marital status'
+  proofOfMothersID: {
+    defaultMessage: "Proof of Mother's ID",
+    description: 'Label for list item Mother ID Proof',
+    id: 'form.field.label.proofOfMothersID'
   },
-  maritalStatusNotStated: {
-    id: 'form.field.label.maritalStatusNotStated',
-    defaultMessage: 'Not stated',
-    description: 'Option for form field: Marital status'
+  proofOfParentPermanentAddress: {
+    defaultMessage: 'Proof of Permanent Address of Parent',
+    description: 'Label for list item Parent Permanent Address Proof',
+    id: 'form.field.label.proofOfParentPermanentAddress'
   },
-  dateOfMarriage: {
-    id: 'form.field.label.dateOfMarriage',
-    defaultMessage: 'Date of marriage',
-    description: 'Option for form field: Date of marriage'
+  registrationName: {
+    defaultMessage: 'Registration',
+    description: 'Form section name for Registration',
+    id: 'form.section.application.name'
   },
-  otherOption: {
-    id: 'form.field.label.otherOption',
-    defaultMessage: 'Other',
-    description: 'Other option for select'
+  registrationOffice: {
+    defaultMessage: 'Registration Office',
+    description: 'Registration office',
+    id: 'form.field.label.registrationOffice'
   },
-  iDType: {
-    id: 'form.field.label.iDType',
-    defaultMessage: 'Type of ID',
-    description: 'Label for form field: Type of ID'
+  registrationPhoneLabel: {
+    defaultMessage: 'Phone number',
+    description: 'Input label for phone input',
+    id: 'form.field.label.application.phone'
   },
-  iDTypePassport: {
-    id: 'form.field.label.iDTypePassport',
-    defaultMessage: 'Passport',
-    description: 'Option for form field: Type of ID'
+  registrationTitle: {
+    defaultMessage: 'Registration',
+    description: 'Form section title for Registration',
+    id: 'form.section.application.title'
   },
-  iDTypeNationalID: {
-    id: 'form.field.label.iDTypeNationalID',
-    defaultMessage: 'National ID',
-    description: 'Option for form field: Type of ID'
+  relationExtendedFamily: {
+    defaultMessage: 'Extended Family',
+    description: 'Label for option Extended Family',
+    id: 'form.field.label.applicantRelation.extendedFamily'
   },
-  iDTypeDrivingLicense: {
-    id: 'form.field.label.iDTypeDrivingLicense',
-    defaultMessage: 'Drivers License',
-    description: 'Option for form field: Type of ID'
+  relationOther: {
+    defaultMessage: 'Other (Specify)',
+    description: 'Label for option Other',
+    id: 'form.field.label.applicantRelation.other'
   },
-  iDTypeBRN: {
-    id: 'form.field.label.iDTypeBRN',
-    defaultMessage: 'Birth Registration Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeDRN: {
-    id: 'form.field.label.iDTypeDRN',
-    defaultMessage: 'Death Registration Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeRefugeeNumber: {
-    id: 'form.field.label.iDTypeRefugeeNumber',
-    defaultMessage: 'Refugee Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeAlienNumber: {
-    id: 'form.field.label.iDTypeAlienNumber',
-    defaultMessage: 'Alien Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeOther: {
-    id: 'form.field.label.iDTypeOther',
-    defaultMessage: 'Other',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeNoId: {
-    id: 'form.field.label.iDTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeOtherLabel: {
-    id: 'form.field.label.iDTypeOtherLabel',
-    defaultMessage: 'Other type of ID',
-    description: 'Label for form field: Other type of ID'
-  },
-  iD: {
-    id: 'form.field.label.iD',
-    defaultMessage: 'ID Number',
-    description: 'Label for form field: ID Number'
-  },
-  educationAttainmentNone: {
-    id: 'form.field.label.educationAttainmentNone',
-    defaultMessage: 'No schooling',
-    description: 'Option for form field: no education'
-  },
-  educationAttainmentISCED1: {
-    id: 'form.field.label.educationAttainmentISCED1',
-    defaultMessage: 'Primary',
-    description: 'Option for form field: ISCED1 education'
-  },
-  educationAttainmentISCED2: {
-    id: 'form.field.label.educationAttainmentISCED2',
-    defaultMessage: 'Lower secondary',
-    description: 'Option for form field: ISCED2 education'
-  },
-  educationAttainmentISCED3: {
-    id: 'form.field.label.educationAttainmentISCED3',
-    defaultMessage: 'Upper secondary',
-    description: 'Option for form field: ISCED3 education'
-  },
-  educationAttainmentISCED4: {
-    id: 'form.field.label.educationAttainmentISCED4',
-    defaultMessage: 'Post secondary',
-    description: 'Option for form field: ISCED4 education'
-  },
-  educationAttainmentISCED5: {
-    id: 'form.field.label.educationAttainmentISCED5',
-    defaultMessage: 'First stage tertiary',
-    description: 'Option for form field: ISCED5 education'
-  },
-  educationAttainmentISCED6: {
-    id: 'form.field.label.educationAttainmentISCED6',
-    defaultMessage: 'Second stage tertiary',
-    description: 'Option for form field: ISCED6 education'
-  },
-  educationAttainmentNotStated: {
-    id: 'form.field.label.educationAttainmentNotStated',
-    defaultMessage: 'Not stated',
-    description: 'Option for form field: not stated education'
-  },
-  uploadedList: {
-    id: 'form.field.label.imageUpload.uploadedList',
-    defaultMessage: 'Uploaded:',
-    description: 'label for uploaded list'
-  },
-  optionalLabel: {
-    id: 'form.field.label.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
+  relationshipPlaceHolder: {
+    defaultMessage: 'eg. Grandmother',
+    description: 'Relationship place holder',
+    id: 'form.field.label.relationshipPlaceHolder'
   },
   searchFieldModalTitle: {
     id: 'form.field.SearchField.modalTitle',
     defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     description: 'Modal title'
   },
-  officeLocationId: {
-    id: 'form.field.SearchField.officeLocationId',
-    defaultMessage: 'Id: {locationId}',
-    description: 'The location Id column'
-  },
-  changeAssignedOffice: {
-    id: 'form.field.SearchField.changeAssignedOffice',
-    defaultMessage: 'Change assigned office',
-    description: 'Edit button text'
-  },
   searchFieldPlaceHolderText: {
-    id: 'form.field.SearchField.placeHolderText',
     defaultMessage: 'Search',
-    description: 'Place holder text '
+    description: 'Place holder text ',
+    id: 'form.field.SearchField.placeHolderText'
   },
-  country: {
-    id: 'form.field.label.country',
-    defaultMessage: 'Country',
-    description: 'Title for the country select'
+  securityQuestionLabel: {
+    defaultMessage: 'Security question {count}',
+    description: 'Label to describe number of security questions entered',
+    id: 'user.form.securityquestion.securityQuestionLabel'
+  },
+  select: {
+    defaultMessage: 'Select',
+    description: 'Placeholder text for a select',
+    id: 'form.field.select.placeholder'
+  },
+  selectOne: {
+    defaultMessage: 'Please select an option',
+    description: 'Generic label for select on option',
+    id: 'form.field.label.selectOne'
+  },
+  selectSecurityQuestion: {
+    defaultMessage: 'Select a security question',
+    description: 'Label to select a security question',
+    id: 'user.form.securityquestion.selectSecurityQuestion'
+  },
+  self: {
+    defaultMessage: 'Self',
+    description: 'The title that appears when selecting self as informant',
+    id: 'form.field.label.self'
+  },
+  signedAffidavitConfirmation: {
+    defaultMessage: 'Do they have a signed affidavit?',
+    description: 'Label for signed affidavit confirmation radio group',
+    id: 'form.field.label.print.signedAffidavit'
+  },
+  someoneElse: {
+    defaultMessage: 'Someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElse'
+  },
+  son: {
+    defaultMessage: 'Son',
+    description: 'Label for option Son',
+    id: 'form.field.label.applicantRelation.son'
+  },
+  spouse: {
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse',
+    id: 'form.field.label.applicantRelation.spouse'
   },
   state: {
-    id: 'form.field.label.state',
     defaultMessage: 'Division',
-    description: 'Title for the state select'
+    description: 'Title for the state select',
+    id: 'form.field.label.state'
   },
-  district: {
-    id: 'form.field.label.district',
-    defaultMessage: 'District',
-    description: 'Title for the district select'
+  typeOfDocument: {
+    defaultMessage: 'Choose type of document',
+    description: 'Label for Select Form Field: Type of Document',
+    id: 'form.field.label.typeOfDocument'
   },
-  addressLine1: {
-    id: 'form.field.label.addressLine1',
-    defaultMessage: 'Street and house number',
-    description: 'Title for the address line 1'
+  uploadDocForChild: {
+    defaultMessage: 'Child',
+    description: 'Label for radio option Child',
+    id: 'form.field.label.uploadDocForChild'
   },
-  addressLine2: {
-    id: 'form.field.label.addressLine2',
-    defaultMessage: 'Area / Ward / Mouja / Village',
-    description: 'Title for the address line 2'
+  uploadDocForFather: {
+    defaultMessage: 'Father',
+    description: 'Label for radio option Father',
+    id: 'form.field.label.uploadDocForFather'
   },
-  addressLine3: {
-    id: 'form.field.label.addressLine3',
-    defaultMessage: 'Union / Municipality / Cantonement',
-    description: 'Title for the address line 3 option 1'
+  uploadDocForMother: {
+    defaultMessage: 'Mother',
+    description: 'Label for radio option Mother',
+    id: 'form.field.label.uploadDocForMother'
   },
-  addressLine3CityOption: {
-    id: 'form.field.label.addressLine3CityOption',
-    defaultMessage: 'Ward',
-    description: 'Title for the address line 3 option 2'
+  uploadDocForOther: {
+    defaultMessage: 'Other',
+    description: 'Label for radio option Other',
+    id: 'form.field.label.uploadDocForOther'
   },
-  addressLine4: {
-    id: 'form.field.label.addressLine4',
-    defaultMessage: 'Upazila (Thana) / City',
-    description: 'Title for the address line 4'
+  uploadDocForWhom: {
+    defaultMessage: 'Whose suppoting document are you uploading?',
+    description: 'Question to ask user, for whom, documents are being uploaded',
+    id: 'form.field.label.uploadDocForWhom'
   },
-  postCode: {
-    id: 'form.field.label.postCode',
-    defaultMessage: 'Postcode',
-    description: 'Title for the postcode field'
+  uploadedList: {
+    defaultMessage: 'Uploaded:',
+    description: 'label for uploaded list',
+    id: 'form.field.label.imageUpload.uploadedList'
   },
-  confirm: {
-    id: 'form.field.label.confirm',
-    defaultMessage: 'Yes',
-    description: 'confirmation label for yes / no radio button'
+  uploadImage: {
+    defaultMessage: 'Upload a photo of the supporting document',
+    description: 'Title for the upload image button',
+    id: 'form.section.documents.uploadImage'
   },
-  deny: {
-    id: 'form.field.label.deny',
-    defaultMessage: 'No',
-    description: 'deny label for yes / no radio button'
+  userDetails: {
+    defaultMessage: 'User details',
+    description: 'User details section',
+    id: 'form.section.userDetails'
   },
-  addressSameAsMother: {
-    id: 'form.field.label.addressSameAsMother',
-    defaultMessage: "Is his current address the same as the mother's?",
+  userDevice: {
+    defaultMessage: 'Device',
+    description: 'User device',
+    id: 'form.field.label.userDevice'
+  },
+  userFormReviewTitle: {
+    defaultMessage: 'Please review the new users details',
+    description: 'The title of the review page of the user form',
+    id: 'form.section.user.preview.title'
+  },
+  userFormSecurityQuestionsDescription: {
+    defaultMessage:
+      'From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.',
+    description: 'Description for the security questions form',
+    id: 'user.form.securityquestion.description'
+  },
+  userFormSecurityQuestionsHeading: {
+    defaultMessage: 'Set your security questions',
+    description: 'Subtitle for the security questions form',
+    id: 'user.form.securityquestion.heading'
+  },
+  userFormSecurityQuestionsTitle: {
+    defaultMessage: 'Security questions',
+    description: 'Title for the security questions form',
+    id: 'user.form.securityquestion.title'
+  },
+  userFormTitle: {
+    defaultMessage: 'Create new user',
+    description: 'The title of user form',
+    id: 'form.section.user.title'
+  },
+  verbalAutopsy: {
+    defaultMessage: 'Verbal autopsy',
+    description: 'Option for form field: Method of Cause of Death',
+    id: 'form.field.label.verbalAutopsy'
+  },
+  warningNotVerified: {
+    defaultMessage:
+      'Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.',
+    description: 'Label for warning message when the collector is not verified',
+    id: 'form.field.label.print.warningNotVerified'
+  },
+  weightAtBirth: {
+    defaultMessage: 'Weight at birth',
+    description: 'Label for form field: Weight at birth',
+    id: 'form.field.label.weightAtBirth'
+  },
+  whatDocToUpload: {
+    defaultMessage: 'Which document type are you uploading?',
     description:
-      "Title for the radio button to select that the father's current address is the same as the mother's address"
+      'Question to ask user, what type of documents are being uploaded',
+    id: 'form.field.label.whatDocToUpload'
   },
-  permanentAddressSameAsMother: {
-    id: 'form.field.label.permanentAddressSameAsMother',
-    defaultMessage: "Is his permanent address the same as the mother's?",
-    description:
-      "Title for the radio button to select that the father's permanent address is the same as the mother's address"
+  whoIsPresentLabel: {
+    defaultMessage: 'Who is present for the registration',
+    description: 'Input label for who is present input',
+    id: 'form.field.label.application.whoIsPresent'
   },
-  currentAddressSameAsPermanent: {
-    id: 'form.field.label.currentAddressSameAsPermanent',
-    defaultMessage: 'Is her current address the same as her permanent address?',
-    description:
-      'Title for the radio button to select that the mothers current address is the same as her permanent address'
+  whoseContactDetailsLabel: {
+    defaultMessage: 'Who is the contact person for this application?',
+    description: 'Input label for contact details person',
+    id: 'form.field.label.application.whoseContactDetails'
   }
 }
 

@@ -383,7 +383,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         error={
           this.state.isPhoneNoError
             ? this.props.intl.formatMessage(
-                validationMessages.phoneNumberFormat
+                validationMessages.phoneNumberNotValid
               )
             : ''
         }
