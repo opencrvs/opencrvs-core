@@ -48,7 +48,10 @@ context('Death Integration Test', () => {
     cy.get('#deathDate-yyyy').type('2019')
     cy.wait(500)
     cy.get('#next_section').click()
+    // MANNER OF DEATH
+    cy.get('#manner_NATURAL_CAUSES').click()
     cy.get('#next_section').click()
+    // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
@@ -292,7 +295,10 @@ context('Death Integration Test', () => {
     cy.get('#deathDate-yyyy').type('2019')
     cy.wait(500)
     cy.get('#next_section').click()
+    // MANNER OF DEATH
+    cy.get('#manner_NATURAL_CAUSES').click()
     cy.get('#next_section').click()
+    // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
