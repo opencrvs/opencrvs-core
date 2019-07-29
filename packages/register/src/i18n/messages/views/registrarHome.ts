@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 
-interface IRegistrarHomeMessages {
+interface IregistrationHomeMessages {
   dataTableResults: ReactIntl.FormattedMessage.MessageDescriptor
   inProgress: ReactIntl.FormattedMessage.MessageDescriptor
   readyForReview: ReactIntl.FormattedMessage.MessageDescriptor
@@ -17,9 +17,9 @@ interface IRegistrarHomeMessages {
   inProgressFieldAgents: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
-const messagesToDefine: IRegistrarHomeMessages = {
+const messagesToDefine: IregistrationHomeMessages = {
   validatedApplicationTooltipForRegistrar: {
-    id: 'register.registrarHome.validated.registrar.tooltip',
+    id: 'register.registrationHome.validated.registrar.tooltip',
     defaultMessage: 'Application has been validated by a registration agent',
     description: 'Text to display for validated application as tooltip'
   },
@@ -34,12 +34,12 @@ const messagesToDefine: IRegistrarHomeMessages = {
     description: 'The title of In progress own drafts'
   },
   validatedApplicationTooltipForRegistrationAgent: {
-    id: 'register.registrarHome.validated.registrationAgent.tooltip',
+    id: 'register.registrationHome.validated.registrationAgent.tooltip',
     defaultMessage: 'Application has been validated and waiting for approval',
     description: 'Text to display for validated application as tooltip'
   },
   sentForApprovals: {
-    id: 'register.registrarHome.sentForApprovals',
+    id: 'register.registrationHome.sentForApprovals',
     defaultMessage: 'Sent for approval',
     description: 'The title of sent for approvals tab'
   },
@@ -90,4 +90,6 @@ const messagesToDefine: IRegistrarHomeMessages = {
   }
 }
 
-export const messages: IRegistrarHomeMessages = defineMessages(messagesToDefine)
+export const messages: IregistrationHomeMessages = defineMessages(
+  messagesToDefine
+)

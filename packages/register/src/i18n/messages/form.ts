@@ -469,12 +469,12 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for select option Certified Copy of Funeral Receipt'
   },
   docTypeChildAgeProof: {
-    id: 'formFields.docTypeChildAgeProof',
+    id: 'form.field.label.docTypeChildAgeProof',
     defaultMessage: 'Proof of Child Age',
     description: 'Label for select option Child Age Proof'
   },
   docTypeEPIStaffCertificate: {
-    id: 'formFields.docTypeEPIStaffCertificate',
+    id: 'form.field.label.docTypeEPIStaffCertificate',
     defaultMessage: 'EPI Staff Certificate',
     description: 'Label for select option EPI Card'
   },
@@ -952,24 +952,24 @@ const messagesToDefine: IFormMessages = {
   },
 
   docTaxReceipt: {
-    id: 'formFields.docTypeTaxReceipt',
+    id: 'form.field.label.docTypeTaxReceipt',
     defaultMessage: 'Receipt of tax payment',
     description: 'Document type label for tax receipt'
   },
 
   dischargeCertificate: {
-    id: 'formFields.docTypeHospitalDischargeCertificate',
+    id: 'form.field.label.docTypeHospitalDischargeCertificate',
     defaultMessage: 'Discharge Certificate',
     description: 'Document type label for Discharge Certificate'
   },
   birthMedicalInstitution: {
-    id: 'formFields.docTypeMedicalInstitution',
+    id: 'form.field.label.docTypeMedicalInstitution',
     defaultMessage: 'Proof of birth from medical institution',
     description:
       'Document type label for Proof of birth from medical institution'
   },
   birthAttendant: {
-    id: 'formFields.docTypebirthAttendant',
+    id: 'form.field.label.docTypebirthAttendant',
     defaultMessage: 'Proof of birth from birth attendant',
     description: 'Document type label for Proof of birth from birth attendant'
   },

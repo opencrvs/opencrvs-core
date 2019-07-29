@@ -51,8 +51,38 @@ interface IConstantsMessages {
   eventDate: ReactIntl.FormattedMessage.MessageDescriptor
   relationship: ReactIntl.FormattedMessage.MessageDescriptor
   applicationInformantLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  labelPhone: ReactIntl.FormattedMessage.MessageDescriptor
+  labelRole: ReactIntl.FormattedMessage.MessageDescriptor
+  labelPassword: ReactIntl.FormattedMessage.MessageDescriptor
+  labelPin: ReactIntl.FormattedMessage.MessageDescriptor
+  labelLanguage: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  labelPhone: {
+    id: 'constants.phoneNumber',
+    defaultMessage: 'Phone number',
+    description: 'Phone label'
+  },
+  labelRole: {
+    id: 'constants.role',
+    defaultMessage: 'Role',
+    description: 'Role label'
+  },
+  labelPassword: {
+    id: 'constants.password',
+    defaultMessage: 'Password',
+    description: 'Password label'
+  },
+  labelPin: {
+    id: 'constants.PIN',
+    defaultMessage: 'PIN',
+    description: 'PIN label'
+  },
+  labelLanguage: {
+    id: 'constants.language',
+    defaultMessage: 'Language',
+    description: 'language label'
+  },
   applicationInformantLabel: {
     id: 'constants.informant',
     defaultMessage: 'Informant',

@@ -37,6 +37,8 @@ interface IUserMessages {
   systemTitle: ReactIntl.FormattedMessage.MessageDescriptor
   labelEnglishName: ReactIntl.FormattedMessage.MessageDescriptor
   changeLanguageTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  changeLanguageMessege: ReactIntl.FormattedMessage.MessageDescriptor
+  changeLanguageSuccessMessage: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 interface IDynamicUserMessages {

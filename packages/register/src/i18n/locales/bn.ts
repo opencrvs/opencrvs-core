@@ -68,6 +68,7 @@ export const BENGALI_STATE: ILanguage = {
     'constants.performance': 'কর্মদক্ষতা',
     'constants.applications': 'আবেদন',
     'constants.application': 'আবেদন',
+    'constants.applicationValidatedOn': 'আবেদন পর্যালোচনা',
     'constants.applicationState': 'Application {action} on',
     'constants.by': 'দ্বারা',
     'constants.certified': 'প্রত্যয়িত',
@@ -75,6 +76,7 @@ export const BENGALI_STATE: ILanguage = {
     'constants.dob': 'জন্ম তারিখ',
     'constants.gender': 'লিঙ্গ',
     'constants.id': 'আইডি',
+    'constants.informant': 'তথ্যদাতা',
     'constants.name': 'নাম',
     'duplicates.details.notDuplicate': 'এটি নকল না?',
     'constants.reason': 'কারণ',
@@ -524,6 +526,12 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.docTypePassport': 'পাসপোর্ট',
     'form.field.label.docTypePostMortemReport': 'প্রত্যয়িত ময়না তদন্ত রিপোর্ট',
     'form.field.label.docTypeSC': 'স্কুল সার্টিফিকেট',
+    'form.field.label.docTypeChildAgeProof': 'জন্ম তারিখ প্রমাণ',
+    'form.field.label.docTypeEPIStaffCertificate': 'ইপিআই সার্টিফিকেট',
+    'form.field.label.docTypeTaxReceipt': 'কর প্রদান রসিদ',
+    'form.field.label.docTypeMedicalInstitution':
+      'মেডিকেল প্রতিষ্ঠান থেকে জন্ম প্রমাণ',
+    'form.field.label.docTypebirthAttendant': 'জন্ম পরিচর্যা থেকে জন্ম প্রমাণ',
     'form.field.label.educationAttainmentISCED1': 'প্রাথমিক',
     'form.field.label.educationAttainmentISCED2': 'নিম্ন মাধ্যমিক',
     'form.field.label.educationAttainmentISCED3': 'উচ্চ মাধ্যমিক',
@@ -647,7 +655,16 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.verbalAutopsy': 'মৌখিক ময়না তদন্ত',
     'form.field.label.weightAtBirth': 'জন্মের সময় ওজন',
     'form.field.label.whatDocToUpload': 'আপনি কোন ধরনের ডকুমেন্ট আপলোড করছেন?',
+    'form.section.documents.paragraph45daysTo5Years':
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৪৫ দিনের অধিক ৫ বছরের কম বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
+    'form.section.documents.paragraphAbove5Years':
+      'নিম্নে উল্লেখিত কাগজ পত্রাদি ৫ বছরের অধিক বয়সের শিশুদের জন্ম নিবন্ধনের জন্য বাধ্যতামূলক',
     'imageUpload.upload.error': 'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে',
+    'imageUploadOption.upload.error':
+      'অবশ্যই JPEG/JPG/PNG ফরম্যাট হতে হবে (সর্বোচ্চ ৫ মে:বা:)',
+    'imageUploadOption.upload.documentType': 'প্রথমে নথি ধরন নির্বাচন করুন',
+    'imageUploadOption.upload.overSized':
+      'ফাইল খুব বড়। দয়া করে ৫ মে:বা: এর ছোট ছবি প্রদান করুন',
     'label.assignedOffice': 'দায়িত্বপ্রাপ্ত অফিস',
     'languages.bengali': 'বাংলা',
     'languages.english': 'ইংরেজি',
@@ -856,6 +873,11 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrationHome.table.label': 'ফলাফল',
     'register.registrationHome.table.label.action': 'সম্ভাব্য কর্ম',
     'register.registrationHome.table.label.applicationDate': 'আবেদন পাঠানো',
+    'register.registrationHome.validated.registrar.tooltip':
+      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে',
+    'register.registrationHome.validated.registrationAgent.tooltip':
+      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে',
+    'register.registrationHome.sentForApprovals': 'অনুমোদনের জন্য প্রস্তুত',
     'constants.eventDate': 'ঘটনা তারিখ',
     'constants.lastEdited': 'শেষ সম্পাদনা',
     'register.registrationHome.table.label.registeredDate': 'নিবন্ধনের তারিখ',
@@ -881,6 +903,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
     'constants.extendedFamily': 'যৌথ পরিবার',
+    'register.form.modal.desc.validateConfirmation':
+      'এই আবেদন অনুমোদন করার জন্য নিবন্ধকের কাছে পাঠানো হবে।',
+    'register.form.modal.title.validateConfirmation': 'অনুমোদনের জন্য পাঠাবেন?',
     'register.SelectContactPoint.heading':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম  কে ?',
     'form.field.label.someoneElse': 'অন্য কেউ',
@@ -940,6 +965,9 @@ export const BENGALI_STATE: ILanguage = {
       'জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে',
     'review.documents.zeroDocumentsText':
       '{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }',
+    'review.button.approve': 'অনুমোদনের জন্য পাঠান',
+    'review.formData.header':
+      '{isDraft, select, true {পর্যালোচনার জন্য পাঠানোর আগে আবেদনকারী সঙ্গে যাচাই করুন} false {সমর্থনকারী নথির সাথে উত্তর পর্যালোচনা করুন}}',
     'review.documents.editDocuments': 'সংযুক্তি যোগ করুন।',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
@@ -966,6 +994,8 @@ export const BENGALI_STATE: ILanguage = {
     'review.rejection.form.reasons.other': 'অন্যান্য',
     'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.rejection.form.title': 'প্রত্যাখ্যানের কারণ',
+    'review.validate.action.description':
+      '{isComplete, select, true {অনুমোদনের জন্য পাঠানোর মাধ্যমে আপনি নিশ্চিত করেছেন যে তথ্যটি আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে এবং এটি অনুমোদনের জন্য প্রস্তুত।} false {বাধ্যতামূলক তথ্য অনুপস্থিত। দয়া করে এই তথ্যটি যোগ করুন যাতে আপনি অনুমোদনের জন্য পাঠাতে পারেন।}}',
     'settings.account.tile': 'অ্যাকাউন্ট',
     'settings.changeLanguage': 'ভাষা পরিবর্তন',
     'settings.changeLanguage.success': 'ভাষা পরিবর্তিত হয়ে বাংলা হয়েছে',
@@ -978,6 +1008,8 @@ export const BENGALI_STATE: ILanguage = {
     'constants.language': 'ভাষা',
     'settings.user.label.nameBN': 'বাংলার নাম',
     'settings.user.label.nameEN': 'ইংরেজি নাম',
+    'tab.inProgress.selector.field.agents': 'মাঠ কর্মী',
+    'tab.inProgress.selector.own.drafts': 'আপনার',
     'constants.password': 'পাসওয়ার্ড',
     'constants.PIN': 'পিন',
     'system.user.queryError':

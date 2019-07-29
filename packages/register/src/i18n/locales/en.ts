@@ -69,12 +69,14 @@ export const ENGLISH_STATE: ILanguage = {
     'constants.performance': 'Performance',
     'constants.application': 'application',
     'constants.applicationState': 'Application {action} on',
+    'constants.applicationValidatedOn': 'Application reviewed on',
     'constants.by': 'By',
     'constants.certified': 'certified',
     'constants.dateOfApplication': 'Date of application',
     'constants.dob': 'D.o.B.',
     'constants.gender': 'Gender',
     'constants.id': 'ID',
+    'constants.informant': 'Informant',
     'constants.name': 'Name',
     'duplicates.details.notDuplicate': 'Not a duplicate?',
     'constants.reason': 'Reason',
@@ -530,6 +532,13 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.docTypePassport': 'Passport',
     'form.field.label.docTypePostMortemReport': 'Certified Post Mortem Report',
     'form.field.label.docTypeSC': 'School Certificate',
+    'form.field.label.docTypeChildAgeProof': 'Proof of Child Age',
+    'form.field.label.docTypeEPIStaffCertificate': 'EPI Staff Certificate',
+    'form.field.label.docTypeTaxReceipt': 'Receipt of tax payment',
+    'form.field.label.docTypeMedicalInstitution':
+      'Proof of birth from medical institution',
+    'form.field.label.docTypebirthAttendant':
+      'Proof of birth from birth attendant',
     'form.field.label.educationAttainmentISCED1': 'Primary',
     'form.field.label.educationAttainmentISCED2': 'Lower secondary',
     'form.field.label.educationAttainmentISCED3': 'Upper secondary',
@@ -649,7 +658,16 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.weightAtBirth': 'Weight at birth',
     'form.field.label.whatDocToUpload':
       'Which document type are you uploading?',
-    'imageUpload.upload.error': 'Must be in JPEG/JPG/PNG format',
+    'form.section.documents.paragraph45daysTo5Years':
+      'For birth registration of births occurring within 45 days and and 5 years old the following documents are required:',
+    'form.section.documents.paragraphAbove5Years':
+      'For birth registration of births occurring after 5 years the following documents are required:',
+    'imageUploadOption.upload.error':
+      'File format not supported. Please attach a png, jpg or pdf (max 5mb)',
+    'imageUploadOption.upload.documentType':
+      'Please select the type of document first',
+    'imageUploadOption.upload.overSized':
+      'File is too large. Please attach file less than 5mb',
     'label.assignedOffice': 'Assigned office',
     'languages.bengali': 'Bengali',
     'languages.english': 'English',
@@ -836,6 +854,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrationHome.inProgress': 'In progress',
     'constants.dod': 'D.o.D.',
     'constants.noResults': 'No result to display',
+    'register.form.modal.desc.validateConfirmation':
+      'This application will be sent to the registrar from them to approve.',
+    'register.form.modal.title.validateConfirmation': 'Send for approval?',
     'register.registrationHome.outbox.statusRegistering': 'Registering...',
     'register.registrationHome.outbox.statusRejecting': 'Rejecting...',
     'register.registrationHome.outbox.statusSubmitting': 'Submitting...',
@@ -856,10 +877,17 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrationHome.table.label': 'Results',
     'register.registrationHome.table.label.action': 'Action',
     'register.registrationHome.table.label.applicationDate': 'Application sent',
+    'register.registrationHome.validated.registrar.tooltip':
+      'Application has been validated by a registration agent',
+    'register.registrationHome.validated.registrationAgent.tooltip':
+      'Application has been validated and waiting for approval',
+    'register.registrationHome.sentForApprovals': 'Sent for approval',
     'constants.eventDate': 'Date of event',
     'constants.lastEdited': 'Last edited',
     'register.registrationHome.table.label.registeredDate':
       'Application registered',
+    'review.validate.action.description':
+      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
     'constants.sentOn': 'Sent on',
     'constants.collectedBy': 'Collected by',
     'search.informantContact': 'Informant contact number',
@@ -971,6 +999,9 @@ export const ENGLISH_STATE: ILanguage = {
     'review.rejection.form.reasons.other': 'Other',
     'review.rejection.form.submitButton': 'Submit rejection',
     'review.rejection.form.title': 'Reasons for rejection',
+    'review.button.approve': 'Send for approval',
+    'review.formData.header':
+      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
     'settings.account.tile': 'Account',
     'settings.changeLanguage': 'Change language',
     'settings.changeLanguage.success': 'Language updted to English',
@@ -983,6 +1014,8 @@ export const ENGLISH_STATE: ILanguage = {
     'constants.language': 'Language',
     'settings.user.label.nameBN': 'Bengali name',
     'settings.user.label.nameEN': 'English name',
+    'tab.inProgress.selector.field.agents': 'Field agents',
+    'tab.inProgress.selector.own.drafts': 'Yours',
     'constants.password': 'Password',
     'constants.PIN': 'PIN',
     'system.user.queryError': 'An error occured while loading system users',
