@@ -3,11 +3,22 @@ import { ExpandableNotification } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import Outbox from './Outbox'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
-import { messages } from '@register/i18n/messages/views/notification'
 
+const messages = defineMessages({
+  processingText: {
+    id: 'notification.processingText',
+    defaultMessage: '{num} application processing...',
+    description: 'Application processing text'
+  },
+  outboxText: {
+    id: 'notification.outboxText',
+    defaultMessage: 'Outbox({num})',
+    description: 'Application outbox text'
+  }
+})
 const ExpandableNotificationContainer = styled.div`
   display: flex;
   bottom: 0;

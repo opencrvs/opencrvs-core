@@ -392,7 +392,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.addressLine4': 'Upazila (Thana) / City',
     'form.field.label.addressSameAsMother':
       "Is his current address the same as the mother's?",
-    'form.field.label.applicant.phone': 'Phone number',
+    'form.field.label.phoneNumber': 'Phone number',
     'form.field.label.applicantIDProof': "Proof of Applicant's ID",
     'form.field.label.applicantOtherRelationship': 'Other relation',
     'form.field.label.applicantRelation.daughter': 'Daughter',
@@ -759,7 +759,6 @@ export const ENGLISH_STATE: ILanguage = {
     'review.modal.title.registerConfirmation': 'Register this application?',
     'review.modal.title.submitConfirmation':
       '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
-    'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
       'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
     'register.form.previewEventRegistration':
@@ -846,19 +845,19 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrationHome.outbox.statusWaitingToSubmit':
       'Waiting to submit',
     'register.registrationHome.outbox.waitingToRetry': 'Waiting to retry',
-    'register.registrationHome.printButton': 'Print',
+    'buttons.print': 'Print',
     'register.registrationHome.queryError': 'An error occurred while searching',
     'register.registrationHome.readyForReview': 'Ready for review',
     'register.registrationHome.readyToPrint': 'Ready to print',
     'register.registrationHome.registrationNumber': 'Registration no.',
-    'register.registrationHome.searchButton': 'Search',
+    'buttons.search': 'Search',
     'register.registrationHome.searchInput.placeholder': 'Look for a record',
     'register.registrationHome.sentForUpdates': 'Sent for updates',
     'register.registrationHome.table.label': 'Results',
     'register.registrationHome.table.label.action': 'Action',
-    'register.registrationHome.table.label.applicantNumber': 'Applicant No.',
+    'constants.applicantContactNumber': 'Applicant No.',
     'register.registrationHome.table.label.applicationDate': 'Application sent',
-    'register.registrationHome.table.label.eventDate': 'Date of event',
+    'constants.eventDate': 'Date of event',
     'constants.lastEdited': 'Last edited',
     'register.registrationHome.table.label.registeredDate':
       'Application registered',
@@ -885,13 +884,13 @@ export const ENGLISH_STATE: ILanguage = {
       'RelationShip to child',
     'register.SelectContactPoint.error':
       'Please select a main point of contact',
-    'register.SelectContactPoint.extendedFamily': 'Extended family',
+    'constants.extendedFamily': 'Extended family',
     'register.SelectContactPoint.heading':
       'Who is the main point of contact for this application?',
-    'register.SelectContactPoint.otherLabel': 'Someone else',
+    'form.field.label.someoneElse': 'Someone else',
     'register.SelectContactPoint.phoneNoError': 'Not a valid mobile number',
     'register.SelectContactPoint.phoneNoLabel': 'Phone number',
-    'register.SelectContactPoint.relationshipPlaceHolder': 'eg. Grandmother',
+    'form.field.label.relationshipPlaceHolder': 'eg. Grandmother',
     'register.SelectContactPoint.title': 'Birth application',
     'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying',
@@ -903,13 +902,13 @@ export const ENGLISH_STATE: ILanguage = {
     'register.selectInformant.deathInformantTitle':
       'What relationship does the applicant have to the deceased?',
     'register.selectInformant.extendedFamily': 'Extended family',
-    'register.selectInformant.father': 'Father',
-    'register.selectInformant.mother': 'Mother',
+    'form.field.label.applicantRelation.father': 'Father',
+    'form.field.label.applicantRelation.mother': 'Mother',
     'register.selectInformant.newBirthRegistration': 'New birth application',
     'register.selectInformant.parents': 'Mother & Father',
     'register.selectInformant.relationshipLabel': 'Relationship to deceased',
-    'register.selectInformant.self': 'Self',
-    'register.selectInformant.someoneElse': 'Someone Else',
+    'form.field.label.self': 'Self',
+    'form.field.label.someoneElse': 'Someone Else',
     'register.selectInformant.son': 'Son',
     'register.selectInformant.spouse': 'Spouse',
     'register.selectVitalEvent.backToReviewButton': 'Back to review',
@@ -953,7 +952,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.documentViewer.title': 'Supporting Documents',
     'review.edit.modal.confirmationText':
       'Are you sure you want to edit the application?',
-    'review.edit.modal.preview': 'Back to Preview',
+    'review.edit.modal.backToPreview': 'Back to Preview',
     'review.error.unauthorized': 'We are unable to display this page to you',
     'review.form.section.review.title': 'Review',
     'review.form.section.review.name': 'Review',

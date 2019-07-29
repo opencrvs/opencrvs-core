@@ -1,34 +1,16 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { messages } from '@register/i18n/messages/views/review'
+import { buttonMessages } from '@register/i18n/messages'
 
 const PreviewButton = styled.a`
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
 `
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  preview: {
-    id: 'review.edit.modal.preview',
-    defaultMessage: 'Back to Preview',
-    description: 'Preview button on edit modal'
-  },
-  submitButton: {
-    id: 'buttons.edit',
-    defaultMessage: 'Edit',
-    description: 'Edit button on edit modal'
-  },
-  editApplicationConfirmationTxt: {
-    id: 'review.edit.modal.confirmationText',
-    defaultMessage: 'Are you sure you want to edit the application?',
-    description: 'Edit modal confirmation text'
-  }
-})
 
 interface IProps {
   show: boolean
@@ -44,13 +26,13 @@ const EditConfirmationComponent = ({
 }: IProps & InjectedIntlProps) => {
   return (
     <Modal
-      title={intl.formatMessage(messages.editApplicationConfirmationTxt)}
+      title={intl.formatMessage(messages.editApplicationConfirmation)}
       actions={[
         <PrimaryButton key="edit" id="edit_confirm" onClick={handleEdit}>
-          {intl.formatMessage(messages.submitButton)}
+          {intl.formatMessage(buttonMessages.edit)}
         </PrimaryButton>,
         <PreviewButton key="preview" id="preview_back" onClick={handleClose}>
-          {intl.formatMessage(messages.preview)}
+          {intl.formatMessage(messages.backToPreview)}
         </PreviewButton>
       ]}
       show={show}

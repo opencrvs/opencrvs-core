@@ -11,9 +11,21 @@ interface IErrorMessages {
   fieldAgentQueryError: ReactIntl.FormattedMessage.MessageDescriptor
   draftFailed: ReactIntl.FormattedMessage.MessageDescriptor
   printQueryError: ReactIntl.FormattedMessage.MessageDescriptor
+  registrationQueryError: ReactIntl.FormattedMessage.MessageDescriptor
+  unauthorized: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
+  registrationQueryError: {
+    id: 'review.birthRegistration.queryError',
+    defaultMessage: 'An error occurred while fetching birth registration',
+    description: 'The error message shown when a query fails'
+  },
+  unauthorized: {
+    id: 'review.error.unauthorized',
+    defaultMessage: 'We are unable to display this page to you',
+    description: 'The error message shown when a query fails'
+  },
   printQueryError: {
     id: 'print.certificate.queryError',
     defaultMessage:

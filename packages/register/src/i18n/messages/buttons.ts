@@ -27,9 +27,45 @@ interface IButtonsMessages {
   finish: ReactIntl.FormattedMessage.MessageDescriptor
   editRegistration: ReactIntl.FormattedMessage.MessageDescriptor
   confirm: ReactIntl.FormattedMessage.MessageDescriptor
+  no: ReactIntl.FormattedMessage.MessageDescriptor
+  change: ReactIntl.FormattedMessage.MessageDescriptor
+  continueButton: ReactIntl.FormattedMessage.MessageDescriptor
+  saveExitButton: ReactIntl.FormattedMessage.MessageDescriptor
+  exitButton: ReactIntl.FormattedMessage.MessageDescriptor
+  search: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  search: {
+    id: 'buttons.search',
+    defaultMessage: 'Search',
+    description: 'The title of search input submit button'
+  },
+  continueButton: {
+    id: 'buttons.continue',
+    defaultMessage: 'Continue',
+    description: 'Continue Button Text'
+  },
+  saveExitButton: {
+    id: 'buttons.saveAndExit',
+    defaultMessage: 'SAVE & EXIT',
+    description: 'SAVE & EXIT Button Text'
+  },
+  exitButton: {
+    id: 'buttons.exit',
+    defaultMessage: 'EXIT',
+    description: 'Label for Exit button on EventTopBar'
+  },
+  no: {
+    id: 'buttons.no',
+    defaultMessage: 'No',
+    description: 'No button text'
+  },
+  change: {
+    id: 'buttons.change',
+    defaultMessage: 'Change',
+    description: 'Change action'
+  },
   next: {
     id: 'buttons.next',
     defaultMessage: 'Next',

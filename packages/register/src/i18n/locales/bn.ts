@@ -390,7 +390,7 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.addressLine4': 'উপজেলা (থানা) / পৌরসভা / সিটি করপোরেশন',
     'form.field.label.addressSameAsMother':
       'তার বর্তমান ঠিকানা কি মায়ের বর্তমান ঠিকানা?',
-    'form.field.label.applicant.phone': 'ফোন নম্বর',
+    'form.field.label.phoneNumber': 'ফোন নম্বর',
     'form.field.label.applicantIDProof': "আবেদনকারীর আইডি'র প্রমাণ",
     'form.field.label.applicantOtherRelationship': 'অন্যান্য সম্পর্ক',
     'form.field.label.applicantRelation.daughter': 'কন্যা',
@@ -756,7 +756,6 @@ export const BENGALI_STATE: ILanguage = {
     'review.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
     'review.modal.title.submitConfirmation':
       '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
-    'register.form.newBirthRegistration': 'নতুন জন্ম ঘোষণা',
     'register.form.newVitalEventRegistration':
       'নতুন {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewEventRegistration':
@@ -844,21 +843,21 @@ export const BENGALI_STATE: ILanguage = {
       'নিবন্ধনের অপেক্ষায়',
     'register.registrationHome.outbox.waitingToRetry':
       'পুনরায় চেষ্টা করার জন্য অপেক্ষা হচ্ছে',
-    'register.registrationHome.printButton': 'মুদ্রণ',
+    'buttons.print': 'মুদ্রণ',
     'register.registrationHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
     'register.registrationHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
     'register.registrationHome.readyToPrint': 'মুদ্রণের জন্য প্রস্তুত',
     'register.registrationHome.registrationNumber': 'নিবন্ধন নম্বর',
-    'register.registrationHome.searchButton': 'অনুসন্ধান',
+    'buttons.search': 'অনুসন্ধান',
     'register.registrationHome.searchInput.placeholder':
       'একটি রেকর্ডের অনুসন্ধান করুন',
     'register.registrationHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
     'register.registrationHome.table.label': 'ফলাফল',
     'register.registrationHome.table.label.action': 'সম্ভাব্য কর্ম',
-    'register.registrationHome.table.label.applicantNumber': 'ফোন নম্বর',
+    'constants.applicantContactNumber': 'ফোন নম্বর',
     'register.registrationHome.table.label.applicationDate': 'আবেদন পাঠানো',
-    'register.registrationHome.table.label.eventDate': 'ঘটনা তারিখ',
+    'constants.eventDate': 'ঘটনা তারিখ',
     'constants.lastEdited': 'শেষ সম্পাদনা',
     'register.registrationHome.table.label.registeredDate': 'নিবন্ধনের তারিখ',
     'constants.type': 'ধরণ',
@@ -883,13 +882,13 @@ export const BENGALI_STATE: ILanguage = {
     'register.SelectContactPoint.birthRelationshipLabel': 'শিশুর সাথে সম্পর্ক',
     'register.SelectContactPoint.error':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম নির্বাচন করুন',
-    'register.SelectContactPoint.extendedFamily': 'যৌথ পরিবার',
+    'constants.extendedFamily': 'যৌথ পরিবার',
     'register.SelectContactPoint.heading':
       'আবেদনটির জন্য যোগাযোগের প্রধান মাধ্যম  কে ?',
-    'register.SelectContactPoint.otherLabel': 'অন্য কেউ',
+    'form.field.label.someoneElse': 'অন্য কেউ',
     'register.SelectContactPoint.phoneNoError': 'বৈধ মোবাইল নম্বর নয়',
     'register.SelectContactPoint.phoneNoLabel': 'ফোন নম্বর',
-    'register.SelectContactPoint.relationshipPlaceHolder': 'যেমন. দাদী',
+    'form.field.label.relationshipPlaceHolder': 'যেমন. দাদী',
     'register.SelectContactPoint.title': 'জন্ম আবেদন',
     'register.selectInformant.birthErrorMessage':
       'Please select who is present and applying.',
@@ -901,13 +900,13 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectInformant.deathInformantTitle':
       'What relationship does the applicant have to the deceased?',
     'register.selectInformant.extendedFamily': 'যৌথ পরিবার',
-    'register.selectInformant.father': 'পিতা',
-    'register.selectInformant.mother': 'মাতা',
+    'form.field.label.applicantRelation.father': 'পিতা',
+    'form.field.label.applicantRelation.mother': 'মাতা',
     'register.selectInformant.newBirthRegistration': 'জন্মের আবেদন',
     'register.selectInformant.parents': 'পিতা ও মাতা ',
     'register.selectInformant.relationshipLabel': 'মৃত ব্যক্তি সঙ্গে সম্পর্ক',
-    'register.selectInformant.self': 'নিজের',
-    'register.selectInformant.someoneElse': 'অন্য কেউ',
+    'form.field.label.self': 'নিজের',
+    'form.field.label.someoneElse': 'অন্য কেউ',
     'register.selectInformant.son': 'পুত্র',
     'register.selectInformant.spouse': 'স্বামী বা স্ত্রী',
     'register.selectVitalEvent.backToReviewButton': 'পর্যালোচনায় ফিরে যান',
@@ -950,7 +949,7 @@ export const BENGALI_STATE: ILanguage = {
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.edit.modal.confirmationText': 'আপনি কি আবেদন সম্পাদনা করতে ইচ্ছুক?',
-    'review.edit.modal.preview': 'প্রিভিউতে ফেরত যান',
+    'review.edit.modal.backToPreview': 'প্রিভিউতে ফেরত যান',
     'review.error.unauthorized': 'আমরা আপনাকে এই পৃষ্ঠা প্রদর্শন করতে অক্ষম',
     'review.form.section.review.title': 'পর্যালোচনা',
     'review.form.section.review.name': 'পর্যালোচনা',

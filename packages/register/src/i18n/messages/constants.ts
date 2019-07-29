@@ -8,8 +8,6 @@ interface IConstantsMessages {
   dob: ReactIntl.FormattedMessage.MessageDescriptor
   gender: ReactIntl.FormattedMessage.MessageDescriptor
   dateOfApplication: ReactIntl.FormattedMessage.MessageDescriptor
-  mother: ReactIntl.FormattedMessage.MessageDescriptor
-  father: ReactIntl.FormattedMessage.MessageDescriptor
   id: ReactIntl.FormattedMessage.MessageDescriptor
   applicationState: ReactIntl.FormattedMessage.MessageDescriptor
   by: ReactIntl.FormattedMessage.MessageDescriptor
@@ -49,8 +47,20 @@ interface IConstantsMessages {
   pendingConnection: ReactIntl.FormattedMessage.MessageDescriptor
   noNameProvided: ReactIntl.FormattedMessage.MessageDescriptor
   applicantContactNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  eventDate: ReactIntl.FormattedMessage.MessageDescriptor
+  relationship: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  relationship: {
+    id: 'constants.relationship',
+    defaultMessage: 'Relationship',
+    description: 'Relationship Label for death'
+  },
+  eventDate: {
+    id: 'constants.eventDate',
+    defaultMessage: 'Date of event',
+    description: 'Label for event date in list item'
+  },
   applicantContactNumber: {
     id: 'constants.applicantContactNumber',
     defaultMessage: 'Applicant contact number',
@@ -147,7 +157,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   applicationRegisteredOn: {
     id: 'constants.applicationRegisteredOn',
-    defaultMessage: 'Registrated on',
+    defaultMessage: 'Application registered on',
     description:
       'Label for the workflow timestamp when the status is registered'
   },
@@ -225,16 +235,6 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.dateOfApplication',
     defaultMessage: 'Date of application',
     description: 'Date of application label'
-  },
-  mother: {
-    id: 'constants.mother',
-    defaultMessage: 'Mother',
-    description: 'Mother section label'
-  },
-  father: {
-    id: 'constants.father',
-    defaultMessage: 'Father',
-    description: 'Father section label'
   },
   id: {
     id: 'constants.id',

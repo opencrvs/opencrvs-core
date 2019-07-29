@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import { userMessages as messages } from '@register/i18n/messages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
 
 export const messages: {
@@ -284,7 +284,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
 
     const role =
       userDetails && userDetails.role
-        ? intl.formatMessage(roleMessages[userDetails.role])
+        ? intl.formatMessage(messages[userDetails.role])
         : ''
 
     const language: ILanguageOptions = {

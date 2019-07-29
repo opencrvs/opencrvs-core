@@ -372,7 +372,7 @@ export const applicantsSection: IFormSection = {
         {
           name: 'applicantPhone',
           type: TEL,
-          label: messages.applicantsPhone,
+          label: messages.phoneNumber,
           required: true,
           initialValue: '',
           validate: [phoneNumberFormat],

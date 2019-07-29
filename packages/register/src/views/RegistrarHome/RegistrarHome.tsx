@@ -29,7 +29,7 @@ import moment from 'moment'
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
 import { Query } from 'react-apollo'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Header } from '@register/components/interface/Header/Header'
@@ -56,9 +56,15 @@ import {
   COUNT_REGISTRATION_QUERY,
   SEARCH_EVENTS
 } from '@register/views/RegistrarHome/queries'
-import NotificationToast from '@register/views/RegistrarHome/NotificatoinToast'
+import NotificationToast from '@register/views/RegistrarHome/NotificationToast'
 import { transformData } from '@register/search/transformer'
 import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+import {
+  buttonMessages,
+  errorMessages,
+  constantsMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -106,126 +112,6 @@ const FABContainer = styled.div`
     display: none;
   }
 `
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  searchInputPlaceholder: {
-    id: 'register.registrationHome.searchInput.placeholder',
-    defaultMessage: 'Look for a record',
-    description: 'The placeholder of search input'
-  },
-  searchInputButtonTitle: {
-    id: 'register.registrationHome.searchButton',
-    defaultMessage: 'Search',
-    description: 'The title of search input submit button'
-  },
-  queryError: {
-    id: 'register.registrationHome.queryError',
-    defaultMessage: 'An error occurred while searching',
-    description: 'The error message shown when a search query fails'
-  },
-  dataTableResults: {
-    id: 'register.registrationHome.table.label',
-    defaultMessage: 'Results',
-    description: 'Results label at the top of the data table component'
-  },
-  dataTableNoResults: {
-    id: 'constants.noResults',
-    defaultMessage: 'No result to display',
-    description:
-      'Text to display if the search return no results for the current filters'
-  },
-  inProgress: {
-    id: 'register.registrationHome.inProgress',
-    defaultMessage: 'In progress',
-    description: 'The title of In progress'
-  },
-  readyForReview: {
-    id: 'register.registrationHome.readyForReview',
-    defaultMessage: 'Ready for review',
-    description: 'The title of ready for review'
-  },
-  sentForUpdates: {
-    id: 'register.registrationHome.sentForUpdates',
-    defaultMessage: 'Sent for updates',
-    description: 'The title of sent for updates tab'
-  },
-  listItemType: {
-    id: 'constants.type',
-    defaultMessage: 'Type',
-    description: 'Label for type of event in work queue list item'
-  },
-  trackingId: {
-    id: 'constants.trackingId',
-    defaultMessage: 'Tracking ID',
-    description: 'Label for tracking ID in work queue list item'
-  },
-  listItemApplicantNumber: {
-    id: 'register.registrationHome.table.label.applicantNumber',
-    defaultMessage: 'Applicant No.',
-    description: 'Label for applicant number in work queue list item'
-  },
-  listItemApplicationDate: {
-    id: 'register.registrationHome.table.label.applicationDate',
-    defaultMessage: 'Application sent',
-    description: 'Label for application date in work queue list item'
-  },
-  listItemUpdateDate: {
-    id: 'constants.sentOn',
-    defaultMessage: 'Sent on',
-    description: 'Label for rejection date in work queue list item'
-  },
-  listItemModificationDate: {
-    id: 'constants.lastEdited',
-    defaultMessage: 'Last edited',
-    description: 'Label for rejection date in work queue list item'
-  },
-  listItemEventDate: {
-    id: 'register.registrationHome.table.label.eventDate',
-    defaultMessage: 'Date of event',
-    description: 'Label for event date in work queue list item'
-  },
-  review: {
-    id: 'buttons.review',
-    defaultMessage: 'Review',
-    description: 'The title of review button in list item actions'
-  },
-  update: {
-    id: 'buttons.update',
-    defaultMessage: 'Update',
-    description: 'The title of update button in list item actions'
-  },
-  name: {
-    id: 'constants.name',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  listItemAction: {
-    id: 'register.registrationHome.table.label.action',
-    defaultMessage: 'Action',
-    description: 'Label for action in work queue list item'
-  },
-  readyToPrint: {
-    id: 'register.registrationHome.readyToPrint',
-    defaultMessage: 'Ready to print',
-    description: 'The title of ready to print tab'
-  },
-  registrationNumber: {
-    id: 'register.registrationHome.registrationNumber',
-    defaultMessage: 'Registration no.',
-    description: 'The heading of registration no. column'
-  },
-  listItemRegisteredDate: {
-    id: 'register.registrationHome.table.label.registeredDate',
-    defaultMessage: 'Application registered',
-    description: 'Label for date of registration in work queue list item'
-  },
-  print: {
-    id: 'register.registrationHome.printButton',
-    defaultMessage: 'Print',
-    description: 'The title of print button in list item actions'
-  }
-})
 
 interface IBaseRegistrarHomeProps {
   theme: ITheme
@@ -295,13 +181,13 @@ export class RegistrarHomeView extends React.Component<
       if (this.userHasRegisterScope()) {
         if (reg.duplicates && reg.duplicates.length > 0) {
           actions.push({
-            label: this.props.intl.formatMessage(messages.review),
+            label: this.props.intl.formatMessage(buttonMessages.review),
             handler: () => this.props.goToReviewDuplicate(reg.id)
           })
           icon = <Duplicate />
         } else {
           actions.push({
-            label: this.props.intl.formatMessage(messages.review),
+            label: this.props.intl.formatMessage(buttonMessages.review),
             handler: () =>
               this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -342,12 +228,12 @@ export class RegistrarHomeView extends React.Component<
       if (this.userHasRegisterScope()) {
         if (reg.duplicates && reg.duplicates.length > 0) {
           actions.push({
-            label: this.props.intl.formatMessage(messages.review),
+            label: this.props.intl.formatMessage(buttonMessages.review),
             handler: () => this.props.goToReviewDuplicate(reg.id)
           })
         } else {
           actions.push({
-            label: this.props.intl.formatMessage(messages.update),
+            label: this.props.intl.formatMessage(buttonMessages.update),
             handler: () =>
               this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -424,7 +310,7 @@ export class RegistrarHomeView extends React.Component<
         const lastModificationDate = draft.modifiedOn || draft.savedOn
         const actions = [
           {
-            label: this.props.intl.formatMessage(messages.update),
+            label: this.props.intl.formatMessage(buttonMessages.update),
             handler: () =>
               this.props.goToPage(
                 pageRoute,
@@ -455,7 +341,7 @@ export class RegistrarHomeView extends React.Component<
     return transformedData.map(reg => {
       const actions = [
         {
-          label: this.props.intl.formatMessage(messages.print),
+          label: this.props.intl.formatMessage(buttonMessages.print),
           handler: () =>
             this.props.goToPrintCertificate(
               reg.id,
@@ -538,7 +424,7 @@ export class RegistrarHomeView extends React.Component<
               Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-count">
-                  {intl.formatMessage(messages.queryError)}
+                  {intl.formatMessage(errorMessages.queryError)}
                 </ErrorText>
               )
             }
@@ -616,18 +502,18 @@ export class RegistrarHomeView extends React.Component<
               content={this.transformDraftContent()}
               columns={[
                 {
-                  label: this.props.intl.formatMessage(messages.listItemType),
+                  label: this.props.intl.formatMessage(constantsMessages.type),
                   width: 15,
                   key: 'event'
                 },
                 {
-                  label: this.props.intl.formatMessage(messages.name),
+                  label: this.props.intl.formatMessage(constantsMessages.name),
                   width: 35,
                   key: 'name'
                 },
                 {
                   label: this.props.intl.formatMessage(
-                    messages.listItemModificationDate
+                    constantsMessages.lastEdited
                   ),
                   width: 35,
                   key: 'dateOfModification'
@@ -640,7 +526,7 @@ export class RegistrarHomeView extends React.Component<
                   alignment: ColumnContentAlignment.CENTER
                 }
               ]}
-              noResultText={intl.formatMessage(messages.dataTableNoResults)}
+              noResultText={intl.formatMessage(constantsMessages.noResults)}
               onPageChange={(currentPage: number) => {
                 this.onPageChange(currentPage)
               }}
@@ -684,7 +570,7 @@ export class RegistrarHomeView extends React.Component<
                 Sentry.captureException(error)
                 return (
                   <ErrorText id="search-result-error-text-review">
-                    {intl.formatMessage(messages.queryError)}
+                    {intl.formatMessage(errorMessages.queryError)}
                   </ErrorText>
                 )
               }
@@ -695,14 +581,14 @@ export class RegistrarHomeView extends React.Component<
                     columns={[
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemType
+                          constantsMessages.type
                         ),
                         width: 14,
                         key: 'event'
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.trackingId
+                          constantsMessages.trackingId
                         ),
                         width: 20,
                         key: 'trackingId'
@@ -716,7 +602,7 @@ export class RegistrarHomeView extends React.Component<
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemEventDate
+                          constantsMessages.eventDate
                         ),
                         width: 20,
                         key: 'eventTimeElapsed'
@@ -735,7 +621,7 @@ export class RegistrarHomeView extends React.Component<
                     ]}
                     renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
-                      messages.dataTableNoResults
+                      constantsMessages.noResults
                     )}
                     onPageChange={(currentPage: number) => {
                       this.onPageChange(currentPage)
@@ -786,7 +672,7 @@ export class RegistrarHomeView extends React.Component<
                 Sentry.captureException(error)
                 return (
                   <ErrorText id="search-result-error-text-reject">
-                    {intl.formatMessage(messages.queryError)}
+                    {intl.formatMessage(errorMessages.queryError)}
                   </ErrorText>
                 )
               }
@@ -797,26 +683,28 @@ export class RegistrarHomeView extends React.Component<
                     columns={[
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemType
+                          constantsMessages.type
                         ),
                         width: 14,
                         key: 'event'
                       },
                       {
-                        label: this.props.intl.formatMessage(messages.name),
+                        label: this.props.intl.formatMessage(
+                          constantsMessages.name
+                        ),
                         width: 23,
                         key: 'name'
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemApplicantNumber
+                          constantsMessages.applicantContactNumber
                         ),
                         width: 21,
                         key: 'contactNumber'
                       },
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemUpdateDate
+                          constantsMessages.sentOn
                         ),
                         width: 22,
                         key: 'dateOfRejection'
@@ -833,7 +721,7 @@ export class RegistrarHomeView extends React.Component<
                     ]}
                     renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
-                      messages.dataTableNoResults
+                      constantsMessages.noResults
                     )}
                     onPageChange={(currentPage: number) => {
                       this.onPageChange(currentPage)
@@ -884,7 +772,7 @@ export class RegistrarHomeView extends React.Component<
                 Sentry.captureException(error)
                 return (
                   <ErrorText id="search-result-error-text-print">
-                    {intl.formatMessage(messages.queryError)}
+                    {intl.formatMessage(errorMessages.queryError)}
                   </ErrorText>
                 )
               }
@@ -895,13 +783,15 @@ export class RegistrarHomeView extends React.Component<
                     columns={[
                       {
                         label: this.props.intl.formatMessage(
-                          messages.listItemType
+                          constantsMessages.type
                         ),
                         width: 14,
                         key: 'event'
                       },
                       {
-                        label: this.props.intl.formatMessage(messages.name),
+                        label: this.props.intl.formatMessage(
+                          constantsMessages.name
+                        ),
                         width: 25,
                         key: 'name'
                       },
@@ -931,7 +821,7 @@ export class RegistrarHomeView extends React.Component<
                     ]}
                     renderExpandedComponent={this.renderExpandedComponent}
                     noResultText={intl.formatMessage(
-                      messages.dataTableNoResults
+                      constantsMessages.noResults
                     )}
                     onPageChange={(currentPage: number) => {
                       this.onPageChange(currentPage)

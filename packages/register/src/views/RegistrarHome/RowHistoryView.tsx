@@ -28,7 +28,11 @@ import {
   CERTIFICATE_DATE_FORMAT,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
 } from '@register/utils/constants'
-import { constantsMessages, errorMessages } from '@register/i18n/messages'
+import {
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/search'
 import moment from 'moment'
 import {
@@ -36,7 +40,6 @@ import {
   StatusOrange,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
-import { roleMessages } from '@register/utils/roleTypeMessages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -204,7 +207,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
-                      roleMessages[status.user.role as string]
+                      userMessages[status.user.role as string]
                     )
                   : '',
               officeName:

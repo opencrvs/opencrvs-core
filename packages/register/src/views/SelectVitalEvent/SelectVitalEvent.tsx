@@ -19,41 +19,8 @@ import {
   goToDeathInformant,
   goToHome
 } from '@register/navigation'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  registerNewEventTitle: {
-    id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New application',
-    description: 'The title that appears on the select vital event page'
-  },
-  registerNewEventHeading: {
-    id: 'register.selectVitalEvent.registerNewEventHeading',
-    defaultMessage: 'What type of event do you want to declare?',
-    description: 'The section heading on the page'
-  },
-  birth: {
-    id: 'constants.birth',
-    defaultMessage: 'Birth',
-    description: 'Birth Text'
-  },
-  death: {
-    id: 'constants.death',
-    defaultMessage: 'Death',
-    description: 'Death text'
-  },
-  continueButton: {
-    id: 'buttons.continue',
-    defaultMessage: 'Continue',
-    description: 'Continue Button Text'
-  },
-  errorMessage: {
-    id: 'register.selectVitalEvent.errorMessage',
-    defaultMessage: 'Please select the type of event',
-    description: 'Error Message to show when no event is being selected'
-  }
-})
+import { messages } from '@register/i18n/messages/views/selectVitalEvent'
+import { constantsMessages, buttonMessages } from '@register/i18n/messages'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -116,7 +83,7 @@ class SelectVitalEventView extends React.Component<
               size="large"
               key="birthevent"
               name="birthevent"
-              label={intl.formatMessage(messages.birth)}
+              label={intl.formatMessage(constantsMessages.birth)}
               value="birth"
               id="select_birth_event"
               selected={this.state.goTo === 'birth' ? 'birth' : ''}
@@ -126,7 +93,7 @@ class SelectVitalEventView extends React.Component<
               size="large"
               key="deathevent"
               name="deathevent"
-              label={intl.formatMessage(messages.death)}
+              label={intl.formatMessage(constantsMessages.death)}
               value="death"
               id="select_death_event"
               selected={this.state.goTo === 'death' ? 'death' : ''}
@@ -134,7 +101,7 @@ class SelectVitalEventView extends React.Component<
             />
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButton)}
+            {intl.formatMessage(buttonMessages.continueButton)}
           </PrimaryButton>
         </BodyContent>
       </Container>

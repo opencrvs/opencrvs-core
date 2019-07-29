@@ -77,7 +77,7 @@ import {
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import { userMessages } from '@register/i18n/messages'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -368,7 +368,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         practitionerRole:
           status && status.user && status.user.role
             ? this.props.intl.formatMessage(
-                roleMessages[status.user.role as string]
+                userMessages[status.user.role as string]
               )
             : '',
         officeName:

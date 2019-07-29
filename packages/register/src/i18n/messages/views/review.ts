@@ -15,9 +15,55 @@ interface IReviewMessages {
   previewTitle: ReactIntl.FormattedMessage.MessageDescriptor
   reviewName: ReactIntl.FormattedMessage.MessageDescriptor
   reviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  backToPreview: ReactIntl.FormattedMessage.MessageDescriptor
+  editApplicationConfirmation: ReactIntl.FormattedMessage.MessageDescriptor
+  headerSubjectWithoutName: ReactIntl.FormattedMessage.MessageDescriptor
+  headerSubjectWithName: ReactIntl.FormattedMessage.MessageDescriptor
+  additionalComments: ReactIntl.FormattedMessage.MessageDescriptor
+  zeroDocumentsText: ReactIntl.FormattedMessage.MessageDescriptor
+  editDocuments: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
+  headerSubjectWithoutName: {
+    id: 'review.header.subject.subjectWithoutName',
+    defaultMessage:
+      '{eventType, select, birth {Birth} death {Death}} Application',
+    description: 'Header subject that shows which application type to review'
+  },
+  headerSubjectWithName: {
+    id: 'review.header.subject.subjectWitName',
+    defaultMessage:
+      '{eventType, select, birth {Birth} death {Death}} Application for {name}',
+    description:
+      'Header subject that shows which application type to review with applicant name'
+  },
+  additionalComments: {
+    id: 'review.inputs.additionalComments',
+    defaultMessage: 'Any additional comments?',
+    description: 'Label for input Additional comments'
+  },
+  zeroDocumentsText: {
+    id: 'review.documents.zeroDocumentsText',
+    defaultMessage:
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
+    description: 'Zero documents text'
+  },
+  editDocuments: {
+    id: 'review.documents.editDocuments',
+    defaultMessage: 'Add attachement',
+    description: 'Edit documents text'
+  },
+  backToPreview: {
+    id: 'review.edit.modal.backToPreview',
+    defaultMessage: 'Back to Preview',
+    description: 'Preview button on edit modal'
+  },
+  editApplicationConfirmation: {
+    id: 'review.edit.modal.confirmationText',
+    defaultMessage: 'Are you sure you want to edit the application?',
+    description: 'Edit modal confirmation text'
+  },
   reviewName: {
     id: 'review.form.section.review.name',
     defaultMessage: 'Review',
@@ -97,3 +143,19 @@ const messagesToDefine: IReviewMessages = {
 }
 
 export const messages: IReviewMessages = defineMessages(messagesToDefine)
+
+interface IDynamicReviewMessages {
+  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+}
+
+const dynamicMessagesToDefine = {
+  bgdGovtName: {
+    id: 'review.header.title.govtName.bgd',
+    defaultMessage: 'Government of the peoples republic of Bangladesh',
+    description: 'Header title that shows bgd govt name'
+  }
+}
+
+export const dynamicMessages: IDynamicReviewMessages = defineMessages(
+  dynamicMessagesToDefine
+)

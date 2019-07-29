@@ -44,7 +44,7 @@ import { isNull, isUndefined, merge } from 'lodash'
 // @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -53,6 +53,8 @@ import {
 } from '@register/forms/utils'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+import { messages } from '@register/i18n/messages/views/register'
+import { buttonMessages, formMessages } from '@register/i18n/messages'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -82,95 +84,6 @@ const Required = styled.span.attrs<
     disabled ? theme.colors.disabled : theme.colors.error};
   flex-grow: 0;
 `
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  newBirthRegistration: {
-    id: 'register.form.newBirthRegistration',
-    defaultMessage: 'New birth application',
-    description: 'The message that appears for new birth registrations'
-  },
-  newVitalEventRegistration: {
-    id: 'register.form.newVitalEventRegistration',
-    defaultMessage:
-      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
-    description: 'The message that appears for new vital event registration'
-  },
-  previewEventRegistration: {
-    id: 'register.form.previewEventRegistration',
-    defaultMessage:
-      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
-    description: 'The message that appears for new birth registrations'
-  },
-  reviewEventRegistration: {
-    id: 'register.form.reviewEventRegistration',
-    defaultMessage:
-      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Review',
-    description: 'The message that appears for new birth registrations'
-  },
-  saveDraft: {
-    id: 'buttons.saveDraft',
-    defaultMessage: 'Save draft',
-    description: 'Save draft button'
-  },
-  next: {
-    id: 'buttons.next',
-    defaultMessage: 'Next',
-    description: 'Next button'
-  },
-  submitDescription: {
-    id: 'register.form.modal.submitDescription',
-    defaultMessage:
-      'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
-    description: 'Submit description text on submit modal'
-  },
-  back: {
-    id: 'buttons.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-  valueSaveAsDraft: {
-    id: 'buttons.saveDraft',
-    defaultMessage: 'Save as draft',
-    description: 'Save as draft Button Text'
-  },
-  optionalLabel: {
-    id: 'form.field.label.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
-  },
-  submitConfirmation: {
-    id: 'register.form.modal.areYouReadyToSubmit',
-    defaultMessage: 'Are you ready to submit?',
-    description: 'Title for submit confirmation modal'
-  },
-  queryError: {
-    id: 'register.registerForm.queryError',
-    defaultMessage:
-      'The page cannot be loaded at this time due to low connectivity or a network error. Please click refresh to try again, or try again later.',
-    description: 'The error message shown when a search query fails'
-  },
-  continueButton: {
-    id: 'buttons.continue',
-    defaultMessage: 'Continue',
-    description: 'Continue Button Text'
-  },
-  saveExitButton: {
-    id: 'buttons.saveAndExit',
-    defaultMessage: 'SAVE & EXIT',
-    description: 'SAVE & EXIT Button Text'
-  },
-  exitButton: {
-    id: 'buttons.exit',
-    defaultMessage: 'EXIT',
-    description: 'Label for Exit button on EventTopBar'
-  },
-  backToReviewButton: {
-    id: 'register.selectVitalEvent.backToReviewButton',
-    defaultMessage: 'Back to review'
-  }
-})
 
 const Optional = styled.span.attrs<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
@@ -420,7 +333,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       <Container id="informant_parent_view">
         {isErrorOccured && (
           <ErrorText id="error_message_section">
-            {intl.formatMessage(messages.queryError)}
+            {intl.formatMessage(messages.registerFormQueryError)}
           </ErrorText>
         )}
         {!isErrorOccured && (
@@ -438,7 +351,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   }
                   saveAction={{
                     handler: this.onSaveAsDraftClicked,
-                    label: intl.formatMessage(messages.saveExitButton)
+                    label: intl.formatMessage(buttonMessages.saveExitButton)
                   }}
                   menuItems={[
                     {
@@ -470,7 +383,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   }
                   saveAction={{
                     handler: this.props.goToHome,
-                    label: intl.formatMessage(messages.exitButton)
+                    label: intl.formatMessage(buttonMessages.exitButton)
                   }}
                 />
                 <ReviewSection
@@ -495,7 +408,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   }
                   saveAction={{
                     handler: this.onSaveAsDraftClicked,
-                    label: intl.formatMessage(messages.saveExitButton)
+                    label: intl.formatMessage(buttonMessages.saveExitButton)
                   }}
                   menuItems={[
                     {
@@ -513,7 +426,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     icon={() => <BackArrow />}
                     onClick={this.props.goBack}
                   >
-                    {intl.formatMessage(messages.back)}
+                    {intl.formatMessage(buttonMessages.back)}
                   </TertiaryButton>
                   <FormSectionTitle
                     id={`form_section_title_${activeSectionGroup.id}`}
@@ -551,7 +464,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             }
                           >
                             &nbsp;&nbsp;•&nbsp;
-                            {intl.formatMessage(messages.optionalLabel)}
+                            {intl.formatMessage(formMessages.optionalLabel)}
                           </Optional>
                         )}
                       </>
@@ -595,7 +508,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           )
                         }}
                       >
-                        {intl.formatMessage(messages.continueButton)}
+                        {intl.formatMessage(buttonMessages.continueButton)}
                       </PrimaryButton>
                       {application.review && (
                         <StyledLinkButton

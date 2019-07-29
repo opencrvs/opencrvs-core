@@ -181,7 +181,7 @@ interface IFormMessages {
   applicantsNationality: ReactIntl.FormattedMessage.MessageDescriptor
   applicantsDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
   permanentAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsPhone: ReactIntl.FormattedMessage.MessageDescriptor
+  phoneNumber: ReactIntl.FormattedMessage.MessageDescriptor
   fetchInformantDetails: ReactIntl.FormattedMessage.MessageDescriptor
   applicantsRelationWithDeceased: ReactIntl.FormattedMessage.MessageDescriptor
   relationFather: ReactIntl.FormattedMessage.MessageDescriptor
@@ -248,8 +248,26 @@ interface IFormMessages {
   deathPlaceAddressOther: ReactIntl.FormattedMessage.MessageDescriptor
   deathPlaceAddressType: ReactIntl.FormattedMessage.MessageDescriptor
   healthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
+  relationshipPlaceHolder: ReactIntl.FormattedMessage.MessageDescriptor
+  someoneElse: ReactIntl.FormattedMessage.MessageDescriptor
+  self: ReactIntl.FormattedMessage.MessageDescriptor
 }
 const messagesToDefine: IFormMessages = {
+  self: {
+    id: 'form.field.label.self',
+    defaultMessage: 'Self',
+    description: 'The title that appears when selecting self as informant'
+  },
+  relationshipPlaceHolder: {
+    id: 'form.field.label.relationshipPlaceHolder',
+    defaultMessage: 'eg. Grandmother',
+    description: 'Relationship place holder'
+  },
+  someoneElse: {
+    id: 'form.field.label.someoneElse',
+    defaultMessage: 'Someone else',
+    description: 'Other Label'
+  },
   deathEventName: {
     id: 'form.section.deathEvent.name',
     defaultMessage: 'When did the death occur?',
@@ -667,9 +685,9 @@ const messagesToDefine: IFormMessages = {
     description:
       'Title for the radio button to select that the applicants current address is the same as their permanent address'
   },
-  applicantsPhone: {
+  phoneNumber: {
     defaultMessage: 'Phone number',
-    id: 'form.field.label.applicant.phone',
+    id: 'form.field.label.phoneNumber',
     description: 'Input label for phone input'
   },
   applicantsRelationWithDeceased: {
@@ -709,7 +727,7 @@ const messagesToDefine: IFormMessages = {
   },
   relationOther: {
     id: 'form.field.label.applicantRelation.other',
-    defaultMessage: 'Other(Specify)',
+    defaultMessage: 'Other (Specify)',
     description: 'Label for option Other'
   },
   applicantOtherRelationship: {
