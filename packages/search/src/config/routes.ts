@@ -4,6 +4,7 @@ import { searchDeclaration } from '@search/features/search/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
+  VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify'
 }
@@ -28,7 +29,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.REGISTER, RouteScope.DECLARE]
+          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
         },
         description:
           'Handles indexing a new declaration and searching for duplicates'
