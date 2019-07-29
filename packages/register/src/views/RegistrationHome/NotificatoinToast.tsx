@@ -25,7 +25,6 @@ const ExpandableNotificationContainer = styled.div`
   position: fixed;
   width: 100%;
   flex-direction: column;
-  z-index: 7;
 `
 
 interface IProps {
