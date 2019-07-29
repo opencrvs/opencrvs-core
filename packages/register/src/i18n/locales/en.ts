@@ -503,6 +503,8 @@ export const ENGLISH_STATE: ILanguage = {
       'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validPassportNumber':
       'The Passport Number can only be alpha numeric and must be {validLength} characters long',
+    'validations.validDrivingLicenseNumber':
+      'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
     'validations.blockAlphaNumericDot':
       'Can contain only block character, number and dot (e.g. C91.5)',
     'validations.phoneNumberFormat':
