@@ -252,10 +252,10 @@ describe('when user is in the review page to validate birth application', () => 
   })
 
   it('Should click the Validate Application Button', async () => {
-    const rejectButton = reviewSectionComponent
+    const validateButton = reviewSectionComponent
       .find('#validateApplicationBtn')
       .hostNodes().length
-    expect(rejectButton).toEqual(1)
+    expect(validateButton).toEqual(1)
   })
 
   it('Should click the Reject Application Button', async () => {
