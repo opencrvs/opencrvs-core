@@ -7,6 +7,17 @@ import {
 
 export const REGISTRATION_SECTION = 'registration'
 
+const fieldNameMapping = {
+  [documentForWhomFhirMapping["Proof of Deceased's ID"]]:
+    'uploadDocForDeceased',
+  [documentForWhomFhirMapping["Proof of Applicant's ID"]]:
+    'uploadDocForApplicant',
+  [documentForWhomFhirMapping['Proof Deceased Permanent Address']]:
+    'uploadDocForDeceasedPermanentAddress',
+  [documentForWhomFhirMapping['Proof of Date of Birth of Deceased']]:
+    'uploadDocForDeceasedDOB'
+}
+
 export function deathAttachmentToFieldTransformer(
   transformedData: IFormData,
   queryData: any,
@@ -20,6 +31,7 @@ export function deathAttachmentToFieldTransformer(
     field,
     REGISTRATION_SECTION,
     documentForWhomFhirMapping,
-    documentTypeFhirMapping
+    documentTypeFhirMapping,
+    fieldNameMapping
   )
 }

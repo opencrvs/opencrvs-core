@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { IPage } from '@login/common/Page'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { getDefaultLanguage } from '@login/i18n/utils'
 
 const languageFromProps = ({ language }: IPage) => language
 
@@ -72,7 +73,7 @@ export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
             <Spinner
               id="login-submitting-spinner"
               baseColor={
-                getTheme(window.config.COUNTRY, window.config.LANGUAGE).colors
+                getTheme(window.config.COUNTRY, getDefaultLanguage()).colors
                   .white
               }
             />

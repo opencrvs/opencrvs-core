@@ -24,7 +24,7 @@ const Container = styled.div`
     background: ${({ theme }) => theme.colors.lightGreyBackground};
     top: 16px;
     left: 16px;
-    width: 200px;
+    width: 250px;
     padding-top: 0px;
     padding-left: 0px;
   }
@@ -69,7 +69,7 @@ export class DocumentViewer extends React.Component<IProps, IState> {
     const { options, children, id } = this.props
 
     return (
-      <Sticky enabled={true} top="#form_tabs_container">
+      <Sticky enabled={true} top="#eventtopbar">
         <Container id={id}>
           {options.documentOptions.length > 0 && (
             <>

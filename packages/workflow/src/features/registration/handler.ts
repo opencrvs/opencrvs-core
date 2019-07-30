@@ -1,20 +1,21 @@
-import * as Hapi from 'hapi'
-import fetch from 'node-fetch'
 import { HEARTH_URL } from '@workflow/constants'
+import { Events } from '@workflow/features/events/handler'
 import {
-  modifyRegistrationBundle,
-  markBundleAsRegistered,
   markBundleAsCertified,
+  markBundleAsRegistered,
+  markBundleAsValidated,
+  modifyRegistrationBundle,
   setTrackingId
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { getToken } from '@workflow/utils/authUtils'
-import { sendEventNotification } from '@workflow/features/registration/utils'
 import {
-  postToHearth,
-  getSharedContactMsisdn
+  getSharedContactMsisdn,
+  postToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
+import { sendEventNotification } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
-import { Events } from '@workflow/features/events/handler'
+import { getToken } from '@workflow/utils/authUtils'
+import * as Hapi from 'hapi'
+import fetch from 'node-fetch'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -77,6 +78,14 @@ export async function createRegistrationHandler(
         payload as fhir.Bundle,
         getToken(request)
       )
+    } else if (
+      event === Events.BIRTH_NEW_VALIDATE ||
+      event === Events.DEATH_NEW_VALIDATE
+    ) {
+      payload = await markBundleAsValidated(
+        payload as fhir.Bundle,
+        getToken(request)
+      )
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
@@ -86,7 +95,9 @@ export async function createRegistrationHandler(
     if (
       msisdn &&
       (event !== Events.BIRTH_IN_PROGRESS_DEC &&
-        event !== Events.DEATH_IN_PROGRESS_DEC)
+        event !== Events.DEATH_IN_PROGRESS_DEC &&
+        event !== Events.BIRTH_NEW_VALIDATE &&
+        event !== Events.DEATH_NEW_VALIDATE)
     ) {
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
@@ -98,6 +109,24 @@ export async function createRegistrationHandler(
     logger.error(
       `Workflow/createRegistrationHandler[${event}]: error: ${error}`
     )
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsValidatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit,
+  event: Events
+) {
+  try {
+    const payload = await markBundleAsValidated(
+      request.payload as fhir.Bundle & fhir.BundleEntry,
+      getToken(request)
+    )
+
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(`Workflow/markAsValidatedHandler[${event}]: error: ${error}`)
     throw new Error(error)
   }
 }

@@ -19,6 +19,7 @@ import { IntlProvider, intlShape } from 'react-intl'
 import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
 import { App } from '@performance/App'
 import { MockedProvider } from 'react-apollo/test-utils'
+import { getDefaultLanguage } from '@performance/i18n/utils'
 
 configure({ adapter: new Adapter() })
 
@@ -60,7 +61,7 @@ export function createTestComponent(
       <Provider store={store}>
         <I18nContainer>
           <ThemeProvider
-            theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
           >
             {nodeWithIntlProp(node)}
           </ThemeProvider>

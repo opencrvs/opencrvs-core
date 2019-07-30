@@ -63,7 +63,8 @@ import {
   IFormSectionData,
   WARNING,
   DATE,
-  TEXTAREA
+  TEXTAREA,
+  Event
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 
@@ -76,7 +77,14 @@ import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
-import { sectionMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  sectionMapping as birthSectionMapping,
+  sectionTitle as birthSectionTitle
+} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  sectionMapping as deathSectionMapping,
+  sectionTitle as deathSectionTitle
+} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -146,6 +154,12 @@ const messages: {
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments'
   },
+  formDataHeader: {
+    id: 'review.formData.header',
+    defaultMessage:
+      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
+    description: 'Label for form data header text'
+  },
   zeroDocumentsText: {
     id: 'review.documents.zeroDocumentsText',
     defaultMessage:
@@ -211,6 +225,9 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+`
+const FormDataHeader = styled.div`
+  ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
   margin-top: 16px;
@@ -387,11 +404,14 @@ const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-type ImageMeta = {
-  title: string
-  description: string
+const SECTION_MAPPING = {
+  [Event.BIRTH]: birthSectionMapping,
+  [Event.DEATH]: deathSectionMapping
 }
-type FullIFileValue = IFileValue & ImageMeta
+const SECTION_TITLE = {
+  [Event.BIRTH]: birthSectionTitle,
+  [Event.DEATH]: deathSectionTitle
+}
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
@@ -471,15 +491,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
-      const index = activeSection.toUpperCase()
+      const sectionMapping = SECTION_MAPPING[draft.event]
+      const sectionTitle = SECTION_TITLE[draft.event]
       // @ts-ignore
-      const allowedDocumentType = sectionMapping[index] || []
+      const allowedDocumentType = sectionMapping[activeSection] || []
 
       if (
         allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
       ) {
-        // const label = document.title + ' ' + document.description
-        const label = document.optionValues[0] + ' ' + document.optionValues[1]
+        const title = sectionTitle[activeSection]
+        const label = title + ' ' + document.optionValues[1]
 
         documentOptions.push({
           value: document.data,
@@ -522,6 +543,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   userHasRegisterScope() {
     if (this.props.scope) {
       return this.props.scope && this.props.scope.includes('register')
+    } else {
+      return false
+    }
+  }
+
+  userHasValidateScope() {
+    if (this.props.scope) {
+      return this.props.scope && this.props.scope.includes('validate')
     } else {
       return false
     }
@@ -653,6 +682,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
+    const isDraft =
+      this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
 
     return (
       <FullBodyContent>
@@ -676,6 +707,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
+              <FormDataHeader>
+                {intl.formatMessage(messages.formDataHeader, { isDraft })}
+              </FormDataHeader>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
                   <DataSection key={index} {...sec} id={'Section_' + sec.id} />
@@ -693,18 +727,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
+              <ReviewAction
+                completeApplication={isComplete}
+                applicationToBeValidated={this.userHasValidateScope()}
+                applicationToBeRegistered={this.userHasRegisterScope()}
+                alreadyRejectedApplication={
+                  this.props.draft.registrationStatus === REJECTED
+                }
+                draftApplication={isDraft}
+                application={draft}
+                submitApplicationAction={submitClickEvent}
+                rejectApplicationAction={rejectApplicationClickEvent}
+              />
             </FormData>
-            <ReviewAction
-              isComplete={isComplete}
-              isRegister={this.userHasRegisterScope()}
-              isRejected={this.props.draft.registrationStatus === REJECTED}
-              isDraft={
-                this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
-              }
-              application={draft}
-              submitAction={submitClickEvent}
-              rejectAction={rejectApplicationClickEvent}
-            />
           </StyledColumn>
           <Column>
             <ResponsiveDocumentViewer

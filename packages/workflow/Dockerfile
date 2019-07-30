@@ -15,7 +15,7 @@ RUN yarn install --production
 COPY --from=opencrvs-build packages/workflow/build packages/workflow/build
 
 # Copy dependant package(s) source
-COPY packages/commons packages/commons
+COPY --from=opencrvs-build packages/commons packages/commons
 
 EXPOSE 5050
 WORKDIR /usr/src/app/packages/workflow

@@ -27,7 +27,9 @@ export const draftToGqlTransformer = (
       groupDef.fields.forEach(fieldDef => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
-          draftData[section.id]
+          draftData[section.id],
+          undefined,
+          draftData
         )
         if (
           fieldDef.required &&

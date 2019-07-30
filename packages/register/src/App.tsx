@@ -28,7 +28,7 @@ import { PrintCertificateAction } from '@register/views/PrintCertificate/PrintCe
 import { ErrorBoundary } from '@register/components/ErrorBoundary'
 import { Details } from '@register/views/Home/Details'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
-import { RegistrarHome } from '@register/views/RegistrarHome/RegistrarHome'
+import { RegistrationHome } from '@register/views/RegistrationHome/RegistrationHome'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { ConnectedRouter } from 'react-router-redux'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
@@ -37,6 +37,7 @@ import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
 import TransitionWrapper from './components/TransitionWrapper'
+import { getDefaultLanguage } from '@register/i18n/utils'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -59,7 +60,7 @@ export class App extends React.Component<IAppProps> {
           <Provider store={this.props.store}>
             <I18nContainer>
               <ThemeProvider
-                theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+                theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
               >
                 <StyledErrorBoundary>
                   <ConnectedRouter history={this.props.history}>
@@ -87,18 +88,25 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.REGISTRAR_HOME}
-                                            component={RegistrarHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.REGISTRAR_HOME_TAB}
-                                            component={RegistrarHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
                                             path={routes.SELECT_VITAL_EVENT}
                                             component={SelectVitalEvent}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.SELECT_BIRTH_PRIMARY_APPLICANT
+                                            }
+                                            component={SelectPrimaryApplicant}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.SELECT_BIRTH_INFORMANT}
+                                            component={SelectInformant}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.SELECT_DEATH_INFORMANT}
+                                            component={SelectInformant}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -141,26 +149,19 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.SELECT_BIRTH_PRIMARY_APPLICANT
-                                            }
-                                            component={SelectPrimaryApplicant}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.SELECT_BIRTH_INFORMANT}
-                                            component={SelectInformant}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.SELECT_DEATH_INFORMANT}
-                                            component={SelectInformant}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
                                               routes.REVIEW_EVENT_PARENT_FORM_PAGE
                                             }
                                             component={ReviewForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.REGISTRAR_HOME}
+                                            component={RegistrationHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.REGISTRAR_HOME_TAB}
+                                            component={RegistrationHome}
                                           />
                                           <ProtectedRoute
                                             path={routes.CONFIRMATION_SCREEN}

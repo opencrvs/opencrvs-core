@@ -15,7 +15,7 @@ RUN yarn install --prodction
 COPY --from=opencrvs-build packages/resources/build packages/resources/build
 
 # Copy dependant package(s) source
-COPY packages/commons packages/commons
+COPY --from=opencrvs-build packages/commons packages/commons
 
 EXPOSE 3040
 WORKDIR /usr/src/app/packages/resources

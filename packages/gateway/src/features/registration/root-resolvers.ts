@@ -1,41 +1,50 @@
+import { IAuthHeader } from '@gateway/common-types'
+import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import {
+  fetchFHIR,
+  getDeclarationIdsFromResponse,
+  getIDFromResponse,
+  getRegistrationIdsFromResponse,
+  removeDuplicatesFromComposition
+} from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
-import { GQLResolver } from '@gateway/graphql/schema'
-import {
-  fetchFHIR,
-  getIDFromResponse,
-  getDeclarationIdsFromResponse,
-  getRegistrationIdsFromResponse,
-  removeDuplicatesFromComposition
-} from '@gateway/features/fhir/utils'
-import { IAuthHeader } from '@gateway/common-types'
 import { hasScope } from '@gateway/features/user/utils'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
   Query: {
     async fetchBirthRegistration(_, { id }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         return await fetchFHIR(`/Composition/${id}`, authHeader)
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
     async fetchDeathRegistration(_, { id }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         return await fetchFHIR(`/Composition/${id}`, authHeader)
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
     async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         const taskBundle = await fetchFHIR(
           `/Task?identifier=${identifier}`,
           authHeader
@@ -53,7 +62,7 @@ export const resolvers: GQLResolver = {
         return await fetchFHIR(`/${task.focus.reference}`, authHeader)
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
@@ -61,7 +70,10 @@ export const resolvers: GQLResolver = {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
     async queryPersonByIdentifier(_, { identifier }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         const personBundle = await fetchFHIR(
           `/Patient?identifier=${identifier}`,
           authHeader
@@ -74,7 +86,7 @@ export const resolvers: GQLResolver = {
         return person
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
@@ -83,11 +95,14 @@ export const resolvers: GQLResolver = {
       { status = null, locationIds = null, count = 0, skip = 0 },
       authHeader
     ) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         return getCompositions(status, locationIds, authHeader, count, skip)
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
@@ -96,7 +111,10 @@ export const resolvers: GQLResolver = {
       { status = null, locationIds = null },
       authHeader
     ) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         const registrations = await getCompositions(
           status,
           locationIds,
@@ -107,7 +125,7 @@ export const resolvers: GQLResolver = {
         return { count: registrations.totalItems }
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
@@ -150,16 +168,33 @@ export const resolvers: GQLResolver = {
       )
     },
     async updateBirthRegistration(_, { details }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH)
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
         return getIDFromResponse(res)
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
+      }
+    },
+    async markBirthAsValidated(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'validate')) {
+        await markEventAsValidated(id, authHeader, EVENT_TYPE.BIRTH, details)
+      } else {
+        await Promise.reject(new Error('User does not have a validate scope'))
+      }
+    },
+    async markDeathAsValidated(_, { id, details }, authHeader) {
+      if (hasScope(authHeader, 'validate')) {
+        await markEventAsValidated(id, authHeader, EVENT_TYPE.DEATH, details)
+      } else {
+        await Promise.reject(new Error('User does not have a validate scope'))
       }
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
@@ -191,7 +226,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsVoided(_, { id, reason, comment }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         const taskBundle = await fetchFHIR(
           `/Task?focus=Composition/${id}`,
           authHeader
@@ -217,7 +255,7 @@ export const resolvers: GQLResolver = {
         return taskEntry.resource.id
       } else {
         return await Promise.reject(
-          new Error('User does not have a register scope')
+          new Error('User does not have a register or validate scope')
         )
       }
     },
@@ -238,7 +276,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async notADuplicate(_, { id, duplicateId }, authHeader) {
-      if (hasScope(authHeader, 'register')) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
         const composition = await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
@@ -266,7 +307,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event)
+  const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
@@ -276,6 +317,33 @@ async function createEventRegistration(
     // return tracking-id
     return await getDeclarationIdsFromResponse(res, authHeader)
   }
+}
+
+async function markEventAsValidated(
+  id: string,
+  authHeader: IAuthHeader,
+  event: EVENT_TYPE,
+  details?: any
+) {
+  let doc
+  if (!details) {
+    const taskBundle = await fetchFHIR(
+      `/Task?focus=Composition/${id}`,
+      authHeader
+    )
+    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+      throw new Error('Task does not exist')
+    }
+    doc = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: taskBundle.entry
+    }
+  } else {
+    doc = await buildFHIRBundle(details, event, authHeader)
+  }
+
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 }
 
 async function markEventAsRegistered(

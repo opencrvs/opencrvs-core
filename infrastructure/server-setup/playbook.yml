@@ -1,121 +1,120 @@
 ---
-
 - hosts: all
   become: yes
   become_method: sudo
   tasks:
-  - name: "Add docker repository key"
-    apt_key:
-      url: https://download.docker.com/linux/ubuntu/gpg
-      state: present
+    - name: 'Add docker repository key'
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
 
-  - name: "Add docker repository"
-    apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present
-    when: ansible_distribution == "Ubuntu"
+    - name: 'Add docker repository'
+      apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present
+      when: ansible_distribution == "Ubuntu"
 
-  - name: "Install docker"
-    apt: name=docker-ce state=present update_cache=yes install_recommends=yes allow_unauthenticated=yes
-    when: ansible_distribution == "Ubuntu"
-    retries: 3
-    delay: 20
+    - name: 'Install docker'
+      apt: name=docker-ce state=present update_cache=yes install_recommends=yes allow_unauthenticated=yes
+      when: ansible_distribution == "Ubuntu"
+      retries: 3
+      delay: 20
 
-  - name: "Ensure Docker service started"
-    service: name=docker state=started
+    - name: 'Ensure Docker service started'
+      service: name=docker state=started
 
-  - name: "Get docker info"
-    shell: docker info
-    register: docker_info
-    changed_when: False
+    - name: 'Get docker info'
+      shell: docker info
+      register: docker_info
+      changed_when: False
 
-  - name: "Install pip3"
-    apt:
-      name: python3-pip
-      state: present
+    - name: 'Install pip3'
+      apt:
+        name: python3-pip
+        state: present
 
-  - name: "Install docker python module for ansible docker commands"
-    pip:
-      name: docker
+    - name: 'Install docker python module for ansible docker commands'
+      pip:
+        name: docker
 
-  - name: "Log into DockerHub"
-    docker_login:
-      username: "{{dockerhub_username}}"
-      password: "{{dockerhub_password}}"
+    - name: 'Log into DockerHub'
+      docker_login:
+        username: '{{dockerhub_username}}'
+        password: '{{dockerhub_password}}'
 
-  - name: "Setup crontab to clean up docker images"
-    cron:
-      name: "cleanup docker images"
-      minute: "0"
-      hour: "0"
-      job: "/usr/bin/docker system prune -f >> /var/log/docker-prune.log"
+    - name: 'Setup crontab to clean up docker images'
+      cron:
+        name: 'cleanup docker images'
+        minute: '0'
+        hour: '0'
+        job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
-  - name: "Create mongo data directory"
-    file:
-      path: /data/mongo
-      state: directory
+    - name: 'Create mongo data directory'
+      file:
+        path: /data/mongo
+        state: directory
 
-  - name: "Create traefik data directory"
-    file:
-      path: /data/traefik
-      state: directory
+    - name: 'Create traefik data directory'
+      file:
+        path: /data/traefik
+        state: directory
 
-  - name: "Create elasticsearch data directory"
-    file:
-      path: /data/elasticsearch
-      state: directory
-      group: 1000
-      owner: 1000
-      mode: g+rwx
+    - name: 'Create elasticsearch data directory'
+      file:
+        path: /data/elasticsearch
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
 
 - hosts: docker-manager-first
   become: yes
   become_method: sudo
   tasks:
-  - name: "Create primary swarm manager"
-    shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
-    when: "docker_info.stdout.find('Swarm: inactive') != -1"
+    - name: 'Create primary swarm manager'
+      shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
+      when: "docker_info.stdout.find('Swarm: inactive') != -1"
 
-  - name: "Get docker swarm manager token"
-    shell: docker swarm join-token -q manager
-    register: manager_token
+    - name: 'Get docker swarm manager token'
+      shell: docker swarm join-token -q manager
+      register: manager_token
 
-  - name: "Get docker swarm worker token"
-    shell: docker swarm join-token -q worker
-    register: worker_token
+    - name: 'Get docker swarm worker token'
+      shell: docker swarm join-token -q worker
+      register: worker_token
 
-  - name: "Set higher max map count for elastic search"
-    sysctl:
-      name: vm.max_map_count
-      value: 262144
-      state: present
+    - name: 'Set higher max map count for elastic search'
+      sysctl:
+        name: vm.max_map_count
+        value: 262144
+        state: present
 
-  - name: "Create influxdb data directory"
-    file:
-      path: /data/influxdb
-      state: directory
+    - name: 'Create influxdb data directory'
+      file:
+        path: /data/influxdb
+        state: directory
 
-  - name: "Create acme file for traefik"
-    file:
-      path: /data/traefik/acme.json
-      state: touch
-      mode: '600'
+    - name: 'Create acme file for traefik'
+      file:
+        path: /data/traefik/acme.json
+        state: touch
+        mode: '600'
 
 - hosts: docker-workers
   become: yes
   become_method: sudo
   tasks:
-  - name: "Join as a worker"
-    shell: "docker swarm join --token {{ hostvars['manager1']['worker_token']['stdout'] }} {{ hostvars['manager1']['ansible_default_ipv4']['address'] }}:2377"
-    when: "docker_info.stdout.find('Swarm: inactive') != -1"
-    retries: 3
-    delay: 20
+    - name: 'Join as a worker'
+      shell: "docker swarm join --token {{ hostvars['manager1']['worker_token']['stdout'] }} {{ hostvars['manager1']['ansible_default_ipv4']['address'] }}:2377"
+      when: "docker_info.stdout.find('Swarm: inactive') != -1"
+      retries: 3
+      delay: 20
 
 - hosts: docker-manager-first
   become: yes
   become_method: sudo
   tasks:
-  - name: "Label node as data1"
-    shell: docker node update --label-add data1=true {{ data1_hostname }}
-  - name: "Label node as data2"
-    shell: docker node update --label-add data2=true {{ data2_hostname }}
-  - name: "Label node as data3"
-    shell: docker node update --label-add data3=true {{ data3_hostname }}
+    - name: 'Label node as data1'
+      shell: docker node update --label-add data1=true {{ data1_hostname }}
+    - name: 'Label node as data2'
+      shell: docker node update --label-add data2=true {{ data2_hostname }}
+    - name: 'Label node as data3'
+      shell: docker node update --label-add data3=true {{ data3_hostname }}

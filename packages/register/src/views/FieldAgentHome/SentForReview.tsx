@@ -21,8 +21,8 @@ import {
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
-import styled from '@register/styledComponents'
 import { goToApplicationDetails } from '@register/navigation'
+import { getDefaultLanguage } from '@register/i18n/utils'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -265,7 +265,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               label: this.props.intl.formatMessage(messages.submissionStatus),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(window.config.COUNTRY, window.config.LANGUAGE)
+              color: getTheme(window.config.COUNTRY, getDefaultLanguage())
                 .colors.secondaryLabel
             },
             {

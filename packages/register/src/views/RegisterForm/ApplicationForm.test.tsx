@@ -93,6 +93,7 @@ describe('when user has starts a new application', () => {
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
       )
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')
@@ -343,7 +344,7 @@ describe('when user has starts a new application', () => {
         app.update()
       })
       it('image upload field is rendered', () => {
-        expect(app.find('#upload_document').hostNodes()).toHaveLength(6)
+        expect(app.find('#upload_document').hostNodes()).toHaveLength(4)
       })
     })
   })

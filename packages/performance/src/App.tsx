@@ -18,6 +18,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import { client } from '@performance/utils/apolloClient'
 import { ApolloProvider } from 'react-apollo'
 import { ErrorBoundary } from '@performance/components/ErrorBoundary'
+import { getDefaultLanguage } from './i18n/utils'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -42,7 +43,7 @@ export class App extends React.Component<IAppProps, {}> {
           <Provider store={this.props.store}>
             <I18nContainer>
               <ThemeProvider
-                theme={getTheme(window.config.COUNTRY, window.config.LANGUAGE)}
+                theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
               >
                 <ConnectedRouter history={this.props.history}>
                   <Page>

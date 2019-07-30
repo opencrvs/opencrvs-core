@@ -658,6 +658,8 @@ export function getMaritalStatusCode(fieldValue: string) {
       return 'UNK'
     case 'MARRIED':
       return 'M'
+    case 'SEPARATED':
+      return 'L'
     default:
       return 'UNK'
   }
@@ -751,9 +753,10 @@ export const getMetrics = (
 
 export async function getDeclarationIdsFromResponse(
   resBody: fhir.Bundle,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  compId?: string
 ) {
-  const compositionId = getIDFromResponse(resBody)
+  const compositionId = compId || getIDFromResponse(resBody)
   const compositionBundle = await fetchFHIR(
     `/Composition/${compositionId}`,
     authHeader
