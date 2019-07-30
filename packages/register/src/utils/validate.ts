@@ -13,7 +13,8 @@ import {
   NATIONAL_ID,
   BIRTH_REGISTRATION_NUMBER,
   DEATH_REGISTRATION_NUMBER,
-  PASSPORT
+  PASSPORT,
+  DRIVING_LICENSE
 } from '@register/forms/identity'
 
 export interface IValidationResult {
@@ -167,6 +168,13 @@ export const messages: {
     defaultMessage:
       'Can contain only block character, number and dot (e.g. C91.5)',
     description: 'The error message that appears when an invalid value is used'
+  },
+  validDrivingLicenseNumber: {
+    id: 'validations.validDrivingLicenseNumber',
+    defaultMessage:
+      'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
+    description:
+      'The error message that appeards when an invalid value is used as driving license number'
   }
 })
 
@@ -478,8 +486,8 @@ export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
 // Each character has to be a part of the Unicode Bengali script or the hyphen.
 //
 export const isValidBengaliWord = (value: string): boolean => {
-  const bengaliRe = XRegExp.cache('^[\\p{Bengali}-]+$')
-  const lettersRe = XRegExp.cache('^[\\pL\\pM-]+$')
+  const bengaliRe = XRegExp.cache('^[\\p{Bengali}-.]+$')
+  const lettersRe = XRegExp.cache('^[\\pL\\pM-.]+$')
 
   return bengaliRe.test(value) && lettersRe.test(value)
 }
@@ -489,7 +497,7 @@ export const isValidBengaliWord = (value: string): boolean => {
 //
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
-  const englishRe = XRegExp.cache('^[\\p{Latin}-]+$')
+  const englishRe = XRegExp.cache('^[\\p{Latin}-.]+$')
 
   return englishRe.test(value)
 }
@@ -562,9 +570,9 @@ export const validIDNumber: ValidationInitializer = (
     min: 17,
     max: 18
   }
-  value = (value && value.toString()) || ''
   const validDeathRegistrationNumberLength = 18
   const validPassportLength = 9
+  const validDrivingLicenseLength = 15
   switch (typeOfID) {
     case NATIONAL_ID:
       return hasValidLength(value, validNationalIDLength) &&
@@ -606,7 +614,14 @@ export const validIDNumber: ValidationInitializer = (
             message: messages.validPassportNumber,
             props: { validLength: validPassportLength }
           }
-
+    case DRIVING_LICENSE:
+      return hasValidLength(value, validDrivingLicenseLength) &&
+        isRegexpMatched(value, REGEXP_ALPHA_NUMERIC)
+        ? undefined
+        : {
+            message: messages.validDrivingLicenseNumber,
+            props: { validLength: validDrivingLicenseLength }
+          }
     default:
       return undefined
   }

@@ -278,6 +278,31 @@ describe('validate', () => {
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
+
+    it('Should pass when supplied a good value as Driving License Number', () => {
+      const goodValue = 'BK1234567890123'
+      const typeOfID = 'DRIVING_LICENSE'
+      const response = undefined
+      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
+    })
+
+    it('Should error when supplied a bad value as Driving License Number', () => {
+      const badValue = '1234567890'
+      const typeOfID = 'DRIVING_LICENSE'
+      const response = {
+        message: {
+          id: 'validations.validDrivingLicenseNumber',
+          defaultMessage:
+            'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
+          description:
+            'The error message that appeards when an invalid value is used as driving license number'
+        },
+        props: {
+          validLength: 15
+        }
+      }
+      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
+    })
   })
 
   describe('numeric. Checks a value is numeric', () => {
@@ -494,12 +519,6 @@ describe('validate', () => {
   })
 
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
-    it('should error when an English punctuation is given', () => {
-      const badValue = 'John.'
-      expect(englishOnlyNameFormat(badValue)).toEqual({
-        message: messages.englishOnlyNameFormat
-      })
-    })
     it('should error when an English number is given', () => {
       const badValue = 'John1'
       expect(englishOnlyNameFormat(badValue)).toEqual({

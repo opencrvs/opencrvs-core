@@ -304,6 +304,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.maritalStatusMarried': 'বিবাহিত',
     'formFields.maritalStatusWidowed': 'বিধবা',
     'formFields.maritalStatusDivorced': 'তালাকপ্রাপ্ত',
+    'formFields.maritalStatusSeparated': 'পৃথকীকৃত',
     'formFields.maritalStatusNotStated': 'অবিবৃত',
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',
@@ -498,6 +499,8 @@ export const BENGALI_STATE: ILanguage = {
       'মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
       'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'validations.validDrivingLicenseNumber':
+      'ড্রাইভিং লাইসেন্স নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.blockAlphaNumericDot':
       'শুধুমাত্র ইংরেজি বড় অক্ষর, সংখ্যা এবং ডট হতে পারে (উদাঃ, C91.5)',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',

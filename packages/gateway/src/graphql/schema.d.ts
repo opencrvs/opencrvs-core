@@ -99,7 +99,8 @@ export enum GQLMaritalStatusType {
   MARRIED = 'MARRIED',
   WIDOWED = 'WIDOWED',
   DIVORCED = 'DIVORCED',
-  NOT_STATED = 'NOT_STATED'
+  NOT_STATED = 'NOT_STATED',
+  SEPARATED = 'SEPARATED'
 }
 
 export interface GQLAddress {
