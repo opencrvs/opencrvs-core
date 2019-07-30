@@ -53,6 +53,7 @@ context('Death Integration Test', () => {
     cy.get('#next_section').click()
     // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
@@ -300,6 +301,7 @@ context('Death Integration Test', () => {
     cy.get('#next_section').click()
     // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
