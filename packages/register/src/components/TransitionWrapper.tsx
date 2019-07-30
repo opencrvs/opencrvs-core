@@ -5,96 +5,80 @@ import {
   PAGE_TRANSITIONS_CLASSNAME
 } from '@register/utils/constants'
 import * as routes from '@register/navigation/routes'
+import { matchPath } from 'react-router'
+import { Location } from 'history'
 
-interface IPros {
-  location: any
-}
-
-interface IState {
-  locations: any
-}
-
-let locationKey = 'key'
-
-const getAnimationKey = (currLocation: any, prevLocation: any): string => {
-  const prevLocParts = prevLocation.pathname.split('/')
-  const currLocParts = currLocation.pathname.split('/')
-
-  if (
-    [
-      routes.HOME,
-      routes.FIELD_AGENT_HOME_TAB.replace(':tabId', prevLocParts[2]),
-      routes.REGISTRAR_HOME,
-      routes.REGISTRAR_HOME_TAB.replace(':tabId', prevLocParts[2]).replace(
-        ':selectorId?',
-        prevLocParts[3]
-      )
-    ].includes(prevLocation.pathname.toString()) &&
-    currLocation.pathname.toString() === routes.SELECT_VITAL_EVENT
-  ) {
-    locationKey = currLocation.key
-  } else if (
-    [
-      routes.DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', prevLocParts[2]),
-      routes.DRAFT_BIRTH_PARENT_FORM_PAGE.replace(
-        ':applicationId',
-        prevLocParts[2]
-      )
-        .replace(':pageId', prevLocParts[5])
-        .toString(),
-      routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP.replace(
-        ':applicationId',
-        prevLocParts[2]
-      )
-        .replace(':pageId', prevLocParts[5])
-        .replace(':groupId', prevLocParts[7])
-        .toString(),
-      routes.REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-        ':applicationId',
-        prevLocParts[2]
-      )
-        .replace(':event', prevLocParts[4])
-        .replace(':pageId', prevLocParts[6])
-        .toString(),
-      routes.DRAFT_DEATH_FORM.replace(':applicationId', prevLocParts[2]),
-      routes.DRAFT_DEATH_FORM_PAGE.replace(':applicationId', prevLocParts[2])
-        .replace(':pageId', prevLocParts[5])
-        .toString(),
-      routes.DRAFT_DEATH_FORM_PAGE_GROUP.replace(
-        ':applicationId',
-        prevLocParts[2]
-      )
-        .replace(':pageId', prevLocParts[5])
-        .replace(':groupId', prevLocParts[7])
-        .toString()
-    ].includes(prevLocation.pathname.toString()) &&
-    [
-      routes.HOME,
-      routes.FIELD_AGENT_HOME_TAB.replace(':tabId', currLocParts[2]),
-      routes.REGISTRAR_HOME,
-      routes.REGISTRAR_HOME_TAB.replace(':tabId', currLocParts[2]).replace(
-        ':selectorId?',
-        currLocParts[3]
-      )
-    ].includes(currLocation.pathname.toString())
-  ) {
-    locationKey = currLocation.key
+function isPathExactmatch(pathname: string, routesPath: string): boolean {
+  const match = matchPath(pathname, routesPath)
+  if (match) {
+    return match.isExact
   }
 
-  return locationKey
+  return false
 }
 
-export default class TransitionWrapper extends React.Component<IPros, IState> {
-  constructor(props: IPros) {
+function isUserHome(pathname: string): boolean {
+  if (
+    isPathExactmatch(pathname, routes.HOME) ||
+    isPathExactmatch(pathname, routes.FIELD_AGENT_HOME_TAB) ||
+    isPathExactmatch(pathname, routes.REGISTRAR_HOME) ||
+    isPathExactmatch(pathname, routes.REGISTRAR_HOME_TAB)
+  ) {
+    return true
+  }
+
+  return false
+}
+
+function isFormPage(pathname: string): boolean {
+  if (
+    isPathExactmatch(pathname, routes.DRAFT_BIRTH_PARENT_FORM) ||
+    isPathExactmatch(pathname, routes.DRAFT_BIRTH_PARENT_FORM_PAGE) ||
+    isPathExactmatch(pathname, routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP) ||
+    isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM) ||
+    isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE) ||
+    isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE_GROUP) ||
+    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE)
+  ) {
+    return true
+  }
+
+  return false
+}
+
+let locationKey = 'locationkey'
+
+function setLocationKey(currLocation: Location, prevLocation: Location) {
+  const prevLocPathname = prevLocation.pathname
+  const currLocPathname = currLocation.pathname
+
+  if (currLocPathname === routes.SELECT_VITAL_EVENT) {
+    if (isUserHome(prevLocPathname)) {
+      locationKey = currLocation.key as string
+    }
+  } else if (isUserHome(currLocPathname)) {
+    if (isFormPage(prevLocPathname)) {
+      locationKey = currLocation.key as string
+    }
+  }
+}
+interface IProps {
+  location: Location
+}
+interface IState {
+  locations: Location[]
+}
+export default class TransitionWrapper extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
     super(props)
 
     this.state = {
-      locations: [{ pathname: '' }, { pathname: '' }]
+      locations: [this.props.location, this.props.location]
     }
   }
 
   static getDerivedStateFromProps(
-    { location: currLocation }: IPros,
+    { location: currLocation }: IProps,
     { locations: [prevLocation] }: IState
   ) {
     return { locations: [currLocation, prevLocation] }
@@ -106,16 +90,18 @@ export default class TransitionWrapper extends React.Component<IPros, IState> {
       locations: [currLocation, prevLocation]
     } = this.state
 
+    setLocationKey(currLocation, prevLocation)
+
     return (
       <TransitionGroup component={null}>
         <CSSTransition
           unmountOnExit
           timeout={{
             enter: PAGE_TRANSITIONS_ENTER_TIME,
-            exit: PAGE_TRANSITIONS_ENTER_TIME - 25
+            exit: PAGE_TRANSITIONS_ENTER_TIME - 50
           }}
           classNames={PAGE_TRANSITIONS_CLASSNAME}
-          key={getAnimationKey(currLocation, prevLocation)}
+          key={locationKey}
         >
           {children}
         </CSSTransition>

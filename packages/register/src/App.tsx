@@ -1,7 +1,7 @@
 import { Footer } from '@opencrvs/components/lib/interface/'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
-import { History } from 'history'
+import { History, Location } from 'history'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
@@ -71,7 +71,11 @@ export class App extends React.Component<IAppProps> {
                           <MainSection>
                             <ProtectedPage>
                               <ProtectedRoute
-                                render={({ location }: { location: any }) => {
+                                render={({
+                                  location
+                                }: {
+                                  location: Location
+                                }) => {
                                   return (
                                     <>
                                       <TransitionWrapper location={location}>
