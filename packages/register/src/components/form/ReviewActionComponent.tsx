@@ -1,43 +1,42 @@
-import * as React from 'react'
-import styled from '@register/styledComponents'
 import {
-  PrimaryButton,
-  ICON_ALIGNMENT,
-  SuccessButton,
   DangerButton,
+  ICON_ALIGNMENT,
+  PrimaryButton,
+  SuccessButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
-import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
-import {
-  SUBMISSION_STATUS,
-  IApplication,
-  IPayload
-} from '@register/applications'
-
+import { Check, Cross, Upload } from '@opencrvs/components/lib/icons'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import {
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS
+} from '@register/applications'
 import { Action } from '@register/forms'
+import styled from '@register/styledComponents'
+import * as React from 'react'
+import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
-  isComplete: boolean
-  isRegister?: boolean
-  isRegistrationAgent?: boolean
-  isDraft?: boolean
-  isRejected: boolean
+  draftApplication?: boolean
+  completeApplication: boolean
+  applicationToBeValidated?: boolean
+  applicationToBeRegistered?: boolean
+  alreadyRejectedApplication: boolean
   application: IApplication
-  submitAction: (
+  submitApplicationAction: (
     application: IApplication,
     submissionStatus: string,
     action: string,
     payload?: IPayload
   ) => void
-  rejectAction?: () => void
+  rejectApplicationAction?: () => void
 }
 
 const Container = styled.div`
   position: relative;
-  margin-top: 32px;
+  margin: 0 32px 32px;
 `
 const Content = styled.div`
   z-index: 1;
@@ -83,7 +82,7 @@ const messages = defineMessages({
   reviewActionTitle: {
     id: 'review.actions.title.applicationStatus',
     defaultMessage:
-      'Application is {isComplete, select, true {complete} false {incomplete}}',
+      'Application is {completeApplication, select, true {complete} false {incomplete}}',
     description: 'Title for review action component'
   },
   reviewActionDescriptionIncomplete: {
@@ -119,6 +118,29 @@ const messages = defineMessages({
     defaultMessage:
       'By registering this birth, a birth certificate will be generated with your signature for issuance.'
   },
+  createAndValidateApplicationActionDescription: {
+    id: 'create.validate.application.action.decription',
+    defaultMessage:
+      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}'
+  },
+  validateCompleteApplicationActionTitle: {
+    id: 'validate.complete.application.action.title',
+    defaultMessage: 'Ready to approve?'
+  },
+  validateCompleteApplicationActionDescription: {
+    id: 'validate.complete.application.action.description',
+    defaultMessage:
+      'By approving you confirm that the applicatiohn is ready to register'
+  },
+  validateApplicationActionModalTitle: {
+    id: 'validate.application.action.modal.title',
+    defaultMessage: 'Send for approval?'
+  },
+  validateApplicationActionModalDescription: {
+    id: 'validate.application.action.modal.description',
+    defaultMessage:
+      'This application will be sent to the registrar from them to register'
+  },
   valueSendForReview: {
     id: 'register.form.submit',
     defaultMessage: 'SEND FOR REVIEW',
@@ -134,11 +156,6 @@ const messages = defineMessages({
     defaultMessage: 'REGISTER',
     description: 'Register button text'
   },
-  valueApprove: {
-    id: 'review.button.approve',
-    defaultMessage: 'Send for approval',
-    description: 'Label for Send For Approval button'
-  },
   valueReject: {
     id: 'review.button.reject',
     defaultMessage: 'Reject Application',
@@ -147,13 +164,13 @@ const messages = defineMessages({
   submitConfirmationTitle: {
     id: 'register.form.modal.title.submitConfirmation',
     defaultMessage:
-      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
     description: 'Submit title text on modal'
   },
   submitConfirmationDesc: {
     id: 'register.form.modal.desc.submitConfirmation',
     defaultMessage:
-      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     description: 'Submit description text on modal'
   },
   registerConfirmationTitle: {
@@ -171,6 +188,10 @@ const messages = defineMessages({
     defaultMessage: 'Register',
     description: 'Label for button on register confirmation modal'
   },
+  approveButton: {
+    id: 'button.approve',
+    defaultMessage: 'Approve'
+  },
   submitButton: {
     id: 'register.form.modal.submitButton',
     defaultMessage: 'Send',
@@ -180,25 +201,193 @@ const messages = defineMessages({
     id: 'register.form.modal.cancel',
     defaultMessage: 'Cancel',
     description: 'Cancel button on submit modal'
-  },
-  validateActionDescription: {
-    id: 'review.validate.action.description',
-    defaultMessage:
-      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
-    description: 'Description is shown when validation'
-  },
-  validateConfirmationTitle: {
-    id: 'register.form.modal.title.validateConfirmation',
-    defaultMessage: 'Send for approval?',
-    description: 'Title for validate confirmation modal'
-  },
-  validateConfirmationDesc: {
-    id: 'register.form.modal.desc.validateConfirmation',
-    defaultMessage:
-      'This application will be sent to the registrar from them to approve.',
-    description: 'Description for validate confirmation modal'
   }
 })
+
+enum ACTION {
+  APPLICATION_TO_BE_DECLARED = 'APPLICATION_TO_BE_DECLARED',
+  APPLICATION_TO_BE_VALIDATED = 'APPLICATION_TO_BE_VALIDATED',
+  APPLICATION_TO_BE_REGISTERED = 'APPLICATION_TO_BE_REGISTERED'
+}
+
+const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
+  [String(ACTION.APPLICATION_TO_BE_DECLARED)]: {
+    draftStatus: {
+      true: {
+        completionStatus: {
+          true: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: true }
+            },
+            description: {
+              message: messages.reviewActionDescriptionComplete
+            },
+            modal: {
+              title: {
+                message: messages.submitConfirmationTitle,
+                payload: { completeApplication: true }
+              },
+              description: {
+                message: messages.submitConfirmationDesc,
+                payload: { completeApplication: true }
+              }
+            }
+          },
+          false: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: false }
+            },
+            description: {
+              message: messages.reviewActionDescriptionIncomplete
+            },
+            modal: {
+              title: {
+                message: messages.submitConfirmationTitle,
+                payload: { completeApplication: false }
+              },
+              description: {
+                message: messages.submitConfirmationDesc,
+                payload: { completeApplication: false }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  [String(ACTION.APPLICATION_TO_BE_VALIDATED)]: {
+    draftStatus: {
+      true: {
+        completionStatus: {
+          true: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: true }
+            },
+            description: {
+              message: messages.reviewActionDescriptionComplete
+            },
+            modal: {
+              title: {
+                message: messages.submitConfirmationTitle,
+                payload: { completeApplication: true }
+              },
+              description: {
+                message: messages.submitConfirmationDesc,
+                payload: { completeApplication: true }
+              }
+            }
+          },
+          false: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: false }
+            },
+            description: {
+              message: messages.reviewActionDescriptionIncomplete
+            }
+          }
+        }
+      },
+      false: {
+        completionStatus: {
+          true: {
+            title: {
+              message: messages.validateCompleteApplicationActionTitle
+            },
+            description: {
+              message: messages.validateCompleteApplicationActionDescription
+            },
+            modal: {
+              title: {
+                message: messages.submitConfirmationTitle,
+                payload: { completeApplication: true }
+              },
+              description: {
+                message: messages.submitConfirmationDesc,
+                payload: { completeApplication: true }
+              }
+            }
+          },
+          false: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: false }
+            },
+            description: {
+              message: messages.registerActionDescriptionIncomplete
+            }
+          }
+        }
+      }
+    }
+  },
+  [String(ACTION.APPLICATION_TO_BE_REGISTERED)]: {
+    draftStatus: {
+      true: {
+        completionStatus: {
+          true: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: true }
+            },
+            description: {
+              message: messages.registerActionDescriptionComplete
+            },
+            modal: {
+              title: {
+                message: messages.registerConfirmationTitle
+              },
+              description: {
+                message: messages.registerConfirmationDesc
+              }
+            }
+          },
+          false: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: false }
+            },
+            description: {
+              message: messages.registerActionDescriptionIncomplete
+            }
+          }
+        }
+      },
+      false: {
+        completionStatus: {
+          true: {
+            title: {
+              message: messages.registerActionTitle
+            },
+            description: {
+              message: messages.registerActionDescription
+            },
+            modal: {
+              title: {
+                message: messages.registerConfirmationTitle
+              },
+              description: {
+                message: messages.registerConfirmationDesc
+              }
+            }
+          },
+          false: {
+            title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: false }
+            },
+            description: {
+              message: messages.registerActionDescriptionIncomplete
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 interface IReviewActionState {
   showSubmitModal: boolean
@@ -216,50 +405,72 @@ class ReviewActionComponent extends React.Component<
   render() {
     const {
       id,
-      isRegister,
-      isRegistrationAgent,
-      isRejected,
-      isComplete,
+      applicationToBeValidated,
+      applicationToBeRegistered,
+      alreadyRejectedApplication,
+      completeApplication,
       application,
-      submitAction,
-      isDraft,
-      rejectAction,
+      submitApplicationAction,
+      draftApplication,
+      rejectApplicationAction,
       intl
     } = this.props
 
-    const background = !isComplete ? 'error' : isDraft ? 'success' : ''
+    const background = !completeApplication
+      ? 'error'
+      : draftApplication
+      ? 'success'
+      : ''
+    const action = applicationToBeRegistered
+      ? ACTION.APPLICATION_TO_BE_REGISTERED
+      : applicationToBeValidated
+      ? ACTION.APPLICATION_TO_BE_VALIDATED
+      : ACTION.APPLICATION_TO_BE_DECLARED
+    const actionContent =
+      ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftApplication)]
+        .completionStatus[String(completeApplication)]
     return (
       <Container id={id}>
         <UnderLayBackground background={background} />
         <Content>
           <Title>
-            {isRegister && isComplete && !isDraft
-              ? intl.formatMessage(messages.registerActionTitle)
-              : intl.formatMessage(messages.reviewActionTitle, { isComplete })}
+            {intl.formatMessage(
+              actionContent.title.message,
+              actionContent.title.payload
+            )}
           </Title>
           <Description>
-            {!isRegister &&
-              !isRegistrationAgent &&
-              intl.formatMessage(
-                isComplete
-                  ? messages.reviewActionDescriptionComplete
-                  : messages.reviewActionDescriptionIncomplete
-              )}
-            {isRegister &&
-              intl.formatMessage(
-                isComplete
-                  ? !isDraft
-                    ? messages.registerActionDescription
-                    : messages.registerActionDescriptionComplete
-                  : messages.registerActionDescriptionIncomplete
-              )}
-            {isRegistrationAgent &&
-              intl.formatMessage(messages.validateActionDescription, {
-                isComplete
-              })}
+            {intl.formatMessage(
+              actionContent.description.message,
+              actionContent.description.payload
+            )}
           </Description>
           <ActionContainer>
-            {!isRegister && !isRegistrationAgent && (
+            {applicationToBeRegistered ? (
+              <SuccessButton
+                id="registerApplicationBtn"
+                icon={() => <Check />}
+                onClick={this.toggleSubmitModalOpen}
+                disabled={!completeApplication}
+                align={ICON_ALIGNMENT.LEFT}
+              >
+                {intl.formatMessage(messages.valueRegister)}
+              </SuccessButton>
+            ) : applicationToBeValidated ? (
+              <PrimaryButton
+                id="validateApplicationBtn"
+                icon={() => <Upload />}
+                onClick={this.toggleSubmitModalOpen}
+                disabled={!completeApplication}
+                align={ICON_ALIGNMENT.LEFT}
+              >
+                {intl.formatMessage(
+                  draftApplication
+                    ? messages.valueSendForReview
+                    : messages.approveButton
+                )}
+              </PrimaryButton>
+            ) : (
               <PrimaryButton
                 id="submit_form"
                 icon={() => <Upload />}
@@ -268,106 +479,84 @@ class ReviewActionComponent extends React.Component<
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(
-                  isComplete
+                  completeApplication
                     ? messages.valueSendForReview
                     : messages.valueSendForReviewIncomplete
                 )}
               </PrimaryButton>
             )}
 
-            {isRegister && (
-              <SuccessButton
-                id="registerApplicationBtn"
-                icon={() => <Check />}
-                onClick={this.toggleSubmitModalOpen}
-                disabled={!isComplete}
-                align={ICON_ALIGNMENT.LEFT}
-              >
-                {intl.formatMessage(messages.valueRegister)}
-              </SuccessButton>
-            )}
-
-            {isRegistrationAgent && (
-              <PrimaryButton
-                id="validateApplicationBtn"
-                icon={() => <Upload />}
-                onClick={this.toggleSubmitModalOpen}
-                disabled={!isComplete}
-                align={ICON_ALIGNMENT.LEFT}
-              >
-                {intl.formatMessage(messages.valueApprove)}
-              </PrimaryButton>
-            )}
-
-            {rejectAction && !isRejected && (
+            {rejectApplicationAction && !alreadyRejectedApplication && (
               <DangerButton
                 id="rejectApplicationBtn"
                 align={ICON_ALIGNMENT.LEFT}
                 icon={() => <Cross color="white" />}
-                onClick={rejectAction}
+                onClick={rejectApplicationAction}
               >
                 {intl.formatMessage(messages.valueReject)}
               </DangerButton>
             )}
           </ActionContainer>
         </Content>
-        <ResponsiveModal
-          title={
-            isRegister
-              ? intl.formatMessage(messages.registerConfirmationTitle)
-              : isRegistrationAgent
-              ? intl.formatMessage(messages.validateConfirmationTitle)
-              : intl.formatMessage(messages.submitConfirmationTitle, {
-                  isComplete
-                })
-          }
-          contentHeight={96}
-          actions={[
-            <TertiaryButton
-              id="cancel-btn"
-              key="cancel"
-              onClick={() => {
-                this.toggleSubmitModalOpen()
-                if (document.documentElement) {
-                  document.documentElement.scrollTop = 0
+        {actionContent.modal && (
+          <ResponsiveModal
+            title={intl.formatMessage(
+              actionContent.modal.title.message,
+              actionContent.modal.title.payload
+            )}
+            contentHeight={96}
+            actions={[
+              <TertiaryButton
+                id="cancel-btn"
+                key="cancel"
+                onClick={() => {
+                  this.toggleSubmitModalOpen()
+                  if (document.documentElement) {
+                    document.documentElement.scrollTop = 0
+                  }
+                }}
+              >
+                {intl.formatMessage(messages.cancel)}
+              </TertiaryButton>,
+              <PrimaryButton
+                key="submit"
+                id="submit_confirm"
+                onClick={() =>
+                  draftApplication
+                    ? submitApplicationAction(
+                        application,
+                        SUBMISSION_STATUS.READY_TO_SUBMIT,
+                        Action.SUBMIT_FOR_REVIEW
+                      )
+                    : applicationToBeRegistered
+                    ? submitApplicationAction(
+                        application,
+                        SUBMISSION_STATUS.READY_TO_REGISTER,
+                        Action.REGISTER_APPLICATION
+                      )
+                    : submitApplicationAction(
+                        application,
+                        SUBMISSION_STATUS.READY_TO_APPROVE,
+                        Action.APPROVE_APPLICATION
+                      )
                 }
-              }}
-            >
-              {intl.formatMessage(messages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              key="submit"
-              id="submit_confirm"
-              onClick={() =>
-                isDraft
-                  ? submitAction(
-                      application,
-                      SUBMISSION_STATUS.READY_TO_SUBMIT,
-                      Action.SUBMIT_FOR_REVIEW
-                    )
-                  : submitAction(
-                      application,
-                      SUBMISSION_STATUS.READY_TO_REGISTER,
-                      Action.REGISTER_APPLICATION
-                    )
-              }
-            >
-              {isRegister
-                ? intl.formatMessage(messages.registerButtonTitle)
-                : intl.formatMessage(messages.submitButton)}
-            </PrimaryButton>
-          ]}
-          show={this.state.showSubmitModal}
-          handleClose={this.toggleSubmitModalOpen}
-        >
-          {isRegister
-            ? intl.formatMessage(messages.registerConfirmationDesc)
-            : isRegistrationAgent
-            ? intl.formatMessage(messages.validateConfirmationDesc)
-            : intl.formatMessage(messages.submitConfirmationDesc, {
-                isComplete
-              })}
-        </ResponsiveModal>
+              >
+                {applicationToBeRegistered
+                  ? intl.formatMessage(messages.registerButtonTitle)
+                  : applicationToBeValidated
+                  ? intl.formatMessage(messages.approveButton)
+                  : intl.formatMessage(messages.submitButton)}
+              </PrimaryButton>
+            ]}
+            show={this.state.showSubmitModal}
+            handleClose={this.toggleSubmitModalOpen}
+          >
+            {intl.formatMessage(
+              actionContent.modal.description.message,
+              actionContent.modal.description.payload
+            )}
+          </ResponsiveModal>
+        )}
       </Container>
     )
   }

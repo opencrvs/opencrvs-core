@@ -1,6 +1,7 @@
 import { createStore } from '@register/store'
 import { SubmissionController } from '@register/SubmissionController'
 import { SUBMISSION_STATUS } from '@register/applications'
+import { Action } from './forms'
 
 describe('Submission Controller', () => {
   it('starts the interval', () => {
@@ -118,6 +119,42 @@ describe('Submission Controller', () => {
     expect(
       store.dispatch.mock.calls[1][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
+  })
+
+  it('sync all ready to approve application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              submissionStatus: SUBMISSION_STATUS.READY_TO_APPROVE,
+              action: Action.APPROVE_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = {
+      mutate: jest
+        .fn()
+        .mockResolvedValueOnce({ data: { markBirthAsValidated: {} } })
+    }
+
+    await subCon.sync()
+
+    expect(subCon.client.mutate).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.APPROVED)
   })
 
   it('fails a application that has a network error', async () => {

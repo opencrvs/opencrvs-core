@@ -532,9 +532,9 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.title.submitConfirmation':
-      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+      '{completeApplication, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+      '{completeApplication, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
     'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
     'register.form.modal.desc.registerConfirmation':
       'আপনি কি এ ব্যাপারে নিশ্চিত?',
@@ -850,7 +850,7 @@ export const BENGALI_STATE: ILanguage = {
       '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
     'review.inputs.additionalComments': 'কোন মন্তব্য?',
     'review.actions.title.applicationStatus':
-      'আবেদন {isComplete, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
+      'আবেদন {completeApplication, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
     'review.actions.description.confirmInComplete':
       'এই অসম্পূর্ণ আবেদনটি পাঠিয়ে, একটি ডিজিটাল রেকর্ড তৈরি করা হবে।\n\nআবেদনকারীকে বলুন যে তারা ট্র্যাকিং আইডি সহ একটি এসএমএস পাবেন। 30 দিনের মধ্যে রেজিস্ট্রেশন অফিসে আবেদনটি সম্পূর্ণ করার জন্য তাদের এটি প্রয়োজন হবে। জন্ম নিবন্ধিত হতে পারে আগে আবেদনকারী সব বাধ্যতামূলক তথ্য প্রদান করতে হবে',
     'review.actions.description.confirmComplete':
@@ -1275,6 +1275,15 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.validated.registrar.tooltip':
       'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে',
     'register.registrarHome.validated.registrationAgent.tooltip':
-      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে'
+      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে',
+    'create.validate.application.action.decription':
+      '{completeApplication, select, true {অনুমোদন পাঠানোর মাধ্যমে আপনি নিশ্চিত হন যে তথ্যটি আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে এবং এটি নিবন্ধন করার জন্য প্রস্তুত।} false {বাধ্যতামূলক তথ্য অনুপস্থিত। নিবন্ধটি পাঠাতে তথ্যগুলো যোগ করুন}}',
+    'validate.complete.application.action.title': 'অনুমোদন করার জন্য প্রস্তুত?',
+    'validate.complete.application.action.description':
+      'অনুমোদন দ্বারা আপনি নিশ্চিত যে আবেদন নিবন্ধন করতে প্রস্তুত',
+    'validate.application.action.modal.title': 'অনুমোদনের জন্য পাঠান',
+    'validate.application.action.modal.description':
+      'এই আবেদন নিবন্ধন করতে রেজিস্ট্রারের কাছে পাঠানো হবে',
+    'button.approve': 'অনুমোদন করুন'
   }
 }
