@@ -241,11 +241,7 @@ export function attachmentToFieldTransformer(
   if (queryData[selectedSectionId].attachments) {
     ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
       attachment => {
-        let subject = attachment.subject as string
-        if (subjectMapper) {
-          // @ts-ignore
-          subject = attachment.subject
-        }
+        const subject = attachment.subject as string
         let type = attachment.type
         if (typeMapper) {
           // @ts-ignore
