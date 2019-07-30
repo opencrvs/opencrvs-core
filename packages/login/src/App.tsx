@@ -13,6 +13,7 @@ import * as routes from '@login/navigation/routes'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
+import { getDefaultLanguage } from './i18n/utils'
 
 export const store = createStore()
 export class App extends React.Component {
@@ -25,8 +26,7 @@ export class App extends React.Component {
               theme={getTheme(
                 (window as Window & { config: { [key: string]: string } })
                   .config.COUNTRY,
-                (window as Window & { config: { [key: string]: string } })
-                  .config.LANGUAGE
+                getDefaultLanguage()
               )}
             >
               <ConnectedRouter history={history}>

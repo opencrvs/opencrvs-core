@@ -2,6 +2,7 @@ import { ILanguage } from '@register/i18n/reducer'
 
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
+  displayName: 'English',
   messages: {
     'session.expire.text': 'Your session has expired. Please login again.',
     'login.stepOneTitle': 'Login',
@@ -303,6 +304,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.maritalStatusMarried': 'Married',
     'formFields.maritalStatusWidowed': 'Widowed',
     'formFields.maritalStatusDivorced': 'Divorced',
+    'formFields.maritalStatusSeparated': 'Separated',
     'formFields.maritalStatusNotStated': 'Not stated',
     'formFields.dateOfMarriage': 'Date of marriage',
     'register.form.tabs.childTab': 'Child',
@@ -502,6 +504,8 @@ export const ENGLISH_STATE: ILanguage = {
       'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validPassportNumber':
       'The Passport Number can only be alpha numeric and must be {validLength} characters long',
+    'validations.validDrivingLicenseNumber':
+      'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
     'validations.blockAlphaNumericDot':
       'Can contain only block character, number and dot (e.g. C91.5)',
     'validations.phoneNumberFormat':
@@ -555,16 +559,16 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.title.submitConfirmation':
-      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     'register.form.modal.title.registerConfirmation':
       'Register this application?',
     'register.form.modal.desc.registerConfirmation': 'Are you sure?',
     'register.form.modal.button.title.registerConfirmation': 'Register',
     'register.form.modal.submitButton': 'Send',
     'register.home.header.fieldAgent': 'Field Agent',
-    'register.home.header.registrationClerk': 'Registration Clerk',
+    'register.home.header.registrationAgent': 'Registration Agent',
     'register.home.header.localRegistrar': 'Registrar',
     'register.home.header.districtRegistrar': 'District Registrar',
     'register.home.header.stateRegistrar': 'State Registrar',
@@ -844,6 +848,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
     'review.rejection.form.submitButton': 'Submit rejection',
     'review.button.register': 'Register',
+    'review.button.approve': 'Send for approval',
     'review.button.reject': 'Reject',
     'review.documentViewer.title': 'Supporting Documents',
     'review.documentViewer.tagline': 'Select to Preview',
@@ -856,7 +861,7 @@ export const ENGLISH_STATE: ILanguage = {
       '{eventType, select, birth {Birth} death {Death}} Application for {name}',
     'review.inputs.additionalComments': 'Any additional comments?',
     'review.actions.title.applicationStatus':
-      'Application is {isComplete, select, true {complete} false {incomplete}}',
+      'Application is {completeApplication, select, true {complete} false {incomplete}}',
     'review.actions.description.confirmInComplete':
       'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
     'review.actions.description.confirmComplete':
@@ -867,6 +872,13 @@ export const ENGLISH_STATE: ILanguage = {
       'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
     'register.actions.description':
       'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+    'review.validate.action.description':
+      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
+    'register.form.modal.title.validateConfirmation': 'Send for approval?',
+    'register.form.modal.desc.validateConfirmation':
+      'This application will be sent to the registrar from them to approve.',
+    'review.formData.header':
+      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
     'register.actions.title.applicationStatus': 'Register or reject?',
     'app.logout.modal.no': 'No',
     'app.logout.modal.yes': 'Yes',
@@ -1077,6 +1089,7 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'In progress',
     'register.registrarHome.readyForReview': 'Ready for review',
     'register.registrarHome.sentForUpdates': 'Sent for updates',
+    'register.registrarHome.sentForApprovals': 'Sent for approval',
     'register.registrarHome.action': 'Action',
     'register.fieldAgentHome.tableHeader.submissionStatus': 'Submission status',
     'register.fieldAgentHome.table.statusReadyToSubmit': 'Waiting to send',
@@ -1272,7 +1285,18 @@ export const ENGLISH_STATE: ILanguage = {
     'application.informant.value.father': 'Father',
     'application.initiator.label': 'By',
     'expansion.info.queryError': 'An error occurred while fetching details',
-    'register.registrarHome.validated.tooltip':
-      'Application has been validated by a registration agent'
+    'register.registrarHome.validated.registrar.tooltip':
+      'Application has been validated by a registration agent',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'Application has been validated and waiting for approval',
+    'create.validate.application.action.decription':
+      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}',
+    'validate.complete.application.action.title': 'Ready to approve?',
+    'validate.complete.application.action.description':
+      'By approving you confirm that the applicatiohn is ready to register',
+    'validate.application.action.modal.title': 'Send for approval?',
+    'validate.application.action.modal.description':
+      'This application will be sent to the registrar from them to register',
+    'button.approve': 'Approve'
   }
 }

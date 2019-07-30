@@ -18,6 +18,9 @@ export enum SUBMISSION_STATUS {
   READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTING = 'SUBMITTING',
   SUBMITTED = 'SUBMITTED',
+  READY_TO_APPROVE = 'READY_TO_APPROVE',
+  APPROVING = 'APPROVING',
+  APPROVED = 'APPROVED',
   READY_TO_REGISTER = 'READY_TO_REGISTER',
   REGISTERING = 'REGISTERING',
   REGISTERED = 'REGISTERED',
@@ -30,6 +33,11 @@ export enum SUBMISSION_STATUS {
 
 export interface IPayload {
   [key: string]: IFormFieldValue
+}
+
+export interface IVisitedGroupId {
+  sectionId: string
+  groupId: string
 }
 export interface IApplication {
   id: string
@@ -46,6 +54,7 @@ export interface IApplication {
   compositionId?: string
   registrationNumber?: string
   payload?: IPayload
+  visitedGroupIds?: IVisitedGroupId[]
 }
 
 interface IStoreApplicationAction {
@@ -99,6 +108,7 @@ export type Action =
 
 export interface IUserData {
   userID: string
+  userPIN?: string
   applications: IApplication[]
 }
 

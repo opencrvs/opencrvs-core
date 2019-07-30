@@ -206,7 +206,7 @@ services:
       - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - LANGUAGE=bn
+      - LANGUAGES=bn,en
       - COUNTRY_ALPHA3=BGD
     deploy:
       replicas: 2

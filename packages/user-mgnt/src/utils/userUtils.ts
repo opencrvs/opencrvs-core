@@ -8,7 +8,7 @@ export const statuses = {
 
 export const roleScopeMapping = {
   FIELD_AGENT: ['declare', 'demo'],
-  REGISTRATION_CLERK: ['register', 'performance', 'certify', 'demo'],
+  REGISTRATION_AGENT: ['validate', 'demo'],
   LOCAL_REGISTRAR: ['register', 'performance', 'certify', 'demo'],
   LOCAL_SYSTEM_ADMIN: ['sysadmin', 'demo'],
   NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'demo'],

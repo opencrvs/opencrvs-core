@@ -20,16 +20,15 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrarHome/messages'
-import { SEARCH_EVENTS } from '@register/views/RegistrarHome/queries'
+import { messages } from '@register/views/RegistrationHome/messages'
+import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
   EVENT_STATUS,
   StyledSpinner
-} from '@register/views/RegistrarHome/RegistrarHome'
-import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+} from '@register/views/RegistrationHome/RegistrationHome'
+import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
-import { findDOMNode } from 'react-dom'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -127,12 +126,14 @@ class ReviewTabComponent extends React.Component<
 
   render() {
     const { theme, intl, registrarUnion, parentQueryLoading } = this.props
-
+    const queryStatuses = this.userHasRegisterScope()
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
     return (
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+          status: queryStatuses,
           locationIds: [registrarUnion],
           count: this.pageSize,
           skip: (this.state.reviewCurrentPage - 1) * this.pageSize
@@ -171,7 +172,7 @@ class ReviewTabComponent extends React.Component<
               <ReactTooltip id="validateTooltip">
                 <ToolTipContainer>
                   {this.props.intl.formatMessage(
-                    messages.validatedApplicationTooltip
+                    messages.validatedApplicationTooltipForRegistrar
                   )}
                 </ToolTipContainer>
               </ReactTooltip>

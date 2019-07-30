@@ -23,6 +23,7 @@ describe('Settings page tests', () => {
     store.dispatch(
       getStorageUserDetailsSuccess(
         JSON.stringify({
+          language: 'en',
           catchmentArea: []
         })
       )
@@ -33,12 +34,6 @@ describe('Settings page tests', () => {
       store
     ).component
 
-    expect(
-      comp
-        .find('#Bengali-name')
-        .first()
-        .text()
-    ).toBe('Bengali nameChange')
     expect(
       comp
         .find('#English-name')

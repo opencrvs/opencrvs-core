@@ -241,14 +241,7 @@ export function attachmentToFieldTransformer(
   if (queryData[selectedSectionId].attachments) {
     ;(queryData[selectedSectionId].attachments as GQLAttachment[]).forEach(
       attachment => {
-        let subject = attachment.subject as string
-        if (subjectMapper) {
-          // @ts-ignore
-          subject =
-            Object.keys(subjectMapper).find(
-              key => subjectMapper[key].toUpperCase() === subject.toUpperCase()
-            ) || attachment.subject
-        }
+        const subject = attachment.subject as string
         let type = attachment.type
         if (typeMapper) {
           // @ts-ignore
@@ -257,8 +250,6 @@ export function attachmentToFieldTransformer(
               key => typeMapper[key] === attachment.type
             ) || attachment.type
         }
-
-        console.log(field)
         if (fieldNameMapping && field.name === fieldNameMapping[subject]) {
           attachments.push({
             data: attachment.data,
@@ -271,8 +262,6 @@ export function attachmentToFieldTransformer(
       }
     )
   }
-
-  console.log(attachments)
   if (attachments) {
     transformedData[sectionId][field.name] = attachments
   }
