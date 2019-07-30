@@ -33,6 +33,11 @@ export const messages: {
     defaultMessage: 'Not stated',
     description: 'Option for form field: Marital status'
   },
+  maritalStatusSeparated: {
+    id: 'formFields.maritalStatusSeparated',
+    defaultMessage: 'Separated',
+    description: 'Option for form field: Marital status'
+  },
   dateOfMarriage: {
     id: 'formFields.dateOfMarriage',
     defaultMessage: 'Date of marriage',

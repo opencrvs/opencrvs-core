@@ -63,7 +63,8 @@ import {
   IFormSectionData,
   WARNING,
   DATE,
-  TEXTAREA
+  TEXTAREA,
+  Event
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 
@@ -76,7 +77,14 @@ import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
-import { sectionMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  sectionMapping as birthSectionMapping,
+  sectionTitle as birthSectionTitle
+} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import {
+  sectionMapping as deathSectionMapping,
+  sectionTitle as deathSectionTitle
+} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -396,11 +404,14 @@ const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-type ImageMeta = {
-  title: string
-  description: string
+const SECTION_MAPPING = {
+  [Event.BIRTH]: birthSectionMapping,
+  [Event.DEATH]: deathSectionMapping
 }
-type FullIFileValue = IFileValue & ImageMeta
+const SECTION_TITLE = {
+  [Event.BIRTH]: birthSectionTitle,
+  [Event.DEATH]: deathSectionTitle
+}
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
@@ -480,15 +491,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
-      const index = activeSection.toUpperCase()
+      const sectionMapping = SECTION_MAPPING[draft.event]
+      const sectionTitle = SECTION_TITLE[draft.event]
       // @ts-ignore
-      const allowedDocumentType = sectionMapping[index] || []
+      const allowedDocumentType = sectionMapping[activeSection] || []
 
       if (
         allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
       ) {
-        // const label = document.title + ' ' + document.description
-        const label = document.optionValues[0] + ' ' + document.optionValues[1]
+        const title = sectionTitle[activeSection]
+        const label = title + ' ' + document.optionValues[1]
 
         documentOptions.push({
           value: document.data,
@@ -716,14 +728,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
               <ReviewAction
-                isComplete={isComplete}
-                isRegister={this.userHasRegisterScope()}
-                isRegistrationAgent={this.userHasValidateScope()}
-                isRejected={this.props.draft.registrationStatus === REJECTED}
-                isDraft={isDraft}
+                completeApplication={isComplete}
+                applicationToBeValidated={this.userHasValidateScope()}
+                applicationToBeRegistered={this.userHasRegisterScope()}
+                alreadyRejectedApplication={
+                  this.props.draft.registrationStatus === REJECTED
+                }
+                draftApplication={isDraft}
                 application={draft}
-                submitAction={submitClickEvent}
-                rejectAction={rejectApplicationClickEvent}
+                submitApplicationAction={submitClickEvent}
+                rejectApplicationAction={rejectApplicationClickEvent}
               />
             </FormData>
           </StyledColumn>

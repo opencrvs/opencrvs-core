@@ -2,6 +2,7 @@ import { ILanguage } from '@register/i18n/reducer'
 
 export const ENGLISH_STATE: ILanguage = {
   lang: 'en',
+  displayName: 'English',
   messages: {
     'session.expire.text': 'Your session has expired. Please login again.',
     'login.stepOneTitle': 'Login',
@@ -303,6 +304,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.maritalStatusMarried': 'Married',
     'formFields.maritalStatusWidowed': 'Widowed',
     'formFields.maritalStatusDivorced': 'Divorced',
+    'formFields.maritalStatusSeparated': 'Separated',
     'formFields.maritalStatusNotStated': 'Not stated',
     'formFields.dateOfMarriage': 'Date of marriage',
     'register.form.tabs.childTab': 'Child',
@@ -502,6 +504,8 @@ export const ENGLISH_STATE: ILanguage = {
       'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validPassportNumber':
       'The Passport Number can only be alpha numeric and must be {validLength} characters long',
+    'validations.validDrivingLicenseNumber':
+      'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
     'validations.blockAlphaNumericDot':
       'Can contain only block character, number and dot (e.g. C91.5)',
     'validations.phoneNumberFormat':
@@ -555,9 +559,9 @@ export const ENGLISH_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
     'register.form.modal.title.submitConfirmation':
-      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     'register.form.modal.title.registerConfirmation':
       'Register this application?',
     'register.form.modal.desc.registerConfirmation': 'Are you sure?',
@@ -857,7 +861,7 @@ export const ENGLISH_STATE: ILanguage = {
       '{eventType, select, birth {Birth} death {Death}} Application for {name}',
     'review.inputs.additionalComments': 'Any additional comments?',
     'review.actions.title.applicationStatus':
-      'Application is {isComplete, select, true {complete} false {incomplete}}',
+      'Application is {completeApplication, select, true {complete} false {incomplete}}',
     'review.actions.description.confirmInComplete':
       'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
     'review.actions.description.confirmComplete':
@@ -1284,6 +1288,15 @@ export const ENGLISH_STATE: ILanguage = {
     'register.registrarHome.validated.registrar.tooltip':
       'Application has been validated by a registration agent',
     'register.registrarHome.validated.registrationAgent.tooltip':
-      'Application has been validated and waiting for approval'
+      'Application has been validated and waiting for approval',
+    'create.validate.application.action.decription':
+      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}',
+    'validate.complete.application.action.title': 'Ready to approve?',
+    'validate.complete.application.action.description':
+      'By approving you confirm that the applicatiohn is ready to register',
+    'validate.application.action.modal.title': 'Send for approval?',
+    'validate.application.action.modal.description':
+      'This application will be sent to the registrar from them to register',
+    'button.approve': 'Approve'
   }
 }

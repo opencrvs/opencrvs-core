@@ -53,6 +53,7 @@ enum MaritalStatusType {
   WIDOWED
   DIVORCED
   NOT_STATED
+  SEPARATED
 }
 
 enum AddressType {

@@ -3,24 +3,34 @@ import styled, { css } from 'styled-components'
 import { Avatar } from '../../icons'
 
 const MenuMainWrapper = styled.div`
-  @keyframes fadeIn {
-    0% {
-      background: '#35495d00';
-    }
-    100% {
-      background: ${({ theme }) => theme.colors.menuBackground};
-    }
-  }
-  background: ${({ theme }) => theme.colors.menuBackground};
   width: 100%;
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   height: 100vh;
   z-index: 99999;
-  animation: 300ms ease-out 0s 1 fadeIn;
   position: fixed;
   top: 0px;
   left: 0px;
+`
+
+const Backdrop = styled.div`
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0.8;
+    }
+  }
+  background: ${({ theme }) => theme.colors.menuBackground};
+  opacity: 0.8;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: -1;
+  animation: 300ms ease-out 0s 1 fadeIn;
 `
 const MenuContainer = styled.div`
   @keyframes slideInFromLeft {
@@ -116,6 +126,7 @@ export class ExpandingMenu extends React.Component<IProps> {
     return (
       this.props.showMenu && (
         <MenuMainWrapper onClick={() => this.props.menuCollapse()}>
+          <Backdrop />
           <MenuContainer onClick={e => e.stopPropagation()}>
             <UserInfo>
               <Avatar />

@@ -658,6 +658,8 @@ export function getMaritalStatusCode(fieldValue: string) {
       return 'UNK'
     case 'MARRIED':
       return 'M'
+    case 'SEPARATED':
+      return 'L'
     default:
       return 'UNK'
   }
