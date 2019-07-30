@@ -1,25 +1,37 @@
 import { IFormField, IFormData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
+import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
+import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
+import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
 
 export const documentForWhomFhirMapping = {
-  Child: 'Child',
-  Father: 'Father',
-  Mother: 'Mother',
-  Parent: 'Parent',
-  Other: 'Other',
-  ChildAge: 'ChildAge'
+  Child: 'CHILD',
+  Father: 'FATHER',
+  Mother: 'MOTHER',
+  Parent: 'PARENT',
+  Other: 'OTHER',
+  ChildAge: 'CHILD_AGE'
 }
 
 export const sectionMapping = {
-  CHILD: [
+  [childSection.id]: [
     documentForWhomFhirMapping.Child,
     documentForWhomFhirMapping.ChildAge
   ],
-  MOTHER: [
+  [motherSection.id]: [
     documentForWhomFhirMapping.Mother,
     documentForWhomFhirMapping.Parent
   ],
-  FATHER: [documentForWhomFhirMapping.Father, documentForWhomFhirMapping]
+  [fatherSection.id]: [
+    documentForWhomFhirMapping.Father,
+    documentForWhomFhirMapping
+  ]
+}
+
+export const sectionTitle = {
+  [childSection.id]: 'Child',
+  [motherSection.id]: 'Mother',
+  [fatherSection.id]: 'Father'
 }
 
 export const documentTypeFhirMapping = {
