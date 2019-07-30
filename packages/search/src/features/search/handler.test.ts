@@ -13,7 +13,7 @@ describe('Verify handlers', () => {
     beforeEach(async () => {
       server = await createServer()
     })
-    it('should return status code 403 if not Registrar or Declare', async () => {
+    it('should return status code 403 if the token does not hold any of the Register, Validate or Declare scope', async () => {
       const token = jwt.sign(
         {
           scope: ['anonymous']
@@ -37,10 +37,10 @@ describe('Verify handlers', () => {
 
       expect(res.statusCode).toBe(403)
     })
-    it('should return status code 200 for Registrar or Declare scope', async () => {
+    it('should return status code 200 when the token hold any or some of Register, Validate or Declare', async () => {
       const token = jwt.sign(
         {
-          scope: ['register', 'declare']
+          scope: ['register', 'validate', 'declare']
         },
         readFileSync('../auth/test/cert.key'),
         {
