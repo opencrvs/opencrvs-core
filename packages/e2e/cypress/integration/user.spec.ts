@@ -5,7 +5,8 @@ context('User Integration Test', () => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
 
-  it('Create user as SYSTEM ADMIN', () => {
+  it('create user as SYSTEM ADMIN and to activate account login for the first time as FIELD AGENT', () => {
+    // LOG IN AS SYSTEM ADMIN
     cy.login('sysAdmin')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
@@ -28,16 +29,13 @@ context('User Integration Test', () => {
     cy.get('#location-0').click()
     cy.get('#modal_select').click()
     cy.get('#confirm_form').click()
+    // PREVIEW
     cy.get('#submit_user_form').click()
-    cy.log('Waiting for application to sync...')
     cy.wait(5000) // Wait for application to be sync'd
     // LOG OUT
     cy.get('#mobile_header_left').click()
     cy.get('#mobile_menu_item_3').click()
-  })
-
-  it('To activate account login for the first time as FIELD AGENT', () => {
-    cy.visit(Cypress.env('LOGIN_URL'))
+    // LOG IN AS FIELD AGENT
     cy.get('#username').type('n.ahmed')
     cy.get('#password').type('test')
     cy.get('#login-mobile-submit').click()
@@ -45,6 +43,7 @@ context('User Integration Test', () => {
     cy.get('#NewPassword').type('Test0000')
     cy.get('#ConfirmPassword').type('Test0000')
     cy.get('#Continue').click()
+    // SECURITY QUESTIONS
     cy.get('#question-0').should('exist')
     cy.selectOption(
       '#question-0',
@@ -67,7 +66,9 @@ context('User Integration Test', () => {
     )
     cy.get('#answer-2').type('Burger')
     cy.get('#submit-security-question').click()
+    // PREVIEW
     cy.get('#Confirm').click()
+    // WELCOME MESSAGE
     cy.get('#setup-login-button').click()
   })
 })
