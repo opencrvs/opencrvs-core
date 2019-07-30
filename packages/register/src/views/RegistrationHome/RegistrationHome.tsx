@@ -65,9 +65,13 @@ export const IconTab = styled(Button).attrs<IProps>({})`
   border-radius: 0;
   flex-shrink: 0;
   outline: none;
+  margin-left: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: 8px;
+  }
   ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
   & > div {
-    padding: 0 16px;
+    padding: 0 8px;
   }
   :first-child > div {
     position: relative;

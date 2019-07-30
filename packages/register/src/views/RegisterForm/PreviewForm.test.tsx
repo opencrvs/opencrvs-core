@@ -16,7 +16,8 @@ import {
 import {
   storeApplication,
   IApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  createReviewApplication
 } from '@register/applications'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -704,12 +705,8 @@ describe('when user is previewing the form data', () => {
         ...mockApplicationData
       }
 
-      const customDraft = {
-        id: uuid(),
-        data,
-        review: true,
-        event: Event.BIRTH
-      }
+      const customDraft = createReviewApplication(uuid(), data, Event.BIRTH)
+      customDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
 
       store.dispatch(storeApplication(customDraft))
       history.replace(
@@ -723,13 +720,13 @@ describe('when user is previewing the form data', () => {
       app.update()
     })
 
-    it('shows send for approval button', () => {
+    it('shows send for review button', () => {
       expect(
         app
           .find('#validateApplicationBtn')
           .hostNodes()
           .text()
-      ).toBe('Send for approval')
+      ).toBe('SEND FOR REVIEW')
     })
   })
 })
