@@ -33,8 +33,13 @@ Cypress.Commands.add('login', (userType, options = {}) => {
     registrar: {
       username: 'mohammad.ashraful',
       password: 'test'
+    },
+    sysAdmin: {
+      username: 'shahriar.nafis',
+      password: 'test'
     }
   }
+
   const user = users[userType]
   cy.request({
     url: `${Cypress.env('AUTH_URL')}authenticate`,
