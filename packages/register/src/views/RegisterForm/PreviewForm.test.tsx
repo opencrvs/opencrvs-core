@@ -272,31 +272,6 @@ describe('when user is previewing the form data', () => {
         })
       })
     })
-
-    describe('when user clicks save as draft button', () => {
-      beforeEach(async () => {
-        app
-          .find('#save_draft')
-          .hostNodes()
-          .simulate('click')
-
-        await flushPromises()
-        app.update()
-      })
-      it('should display draft saved notification', () => {
-        expect(app.find('#draftsSavedNotification').hostNodes()).toHaveLength(1)
-      })
-      it('should hide draft saved notification when clicked', async () => {
-        app
-          .find('#draftsSavedNotification')
-          .hostNodes()
-          .simulate('click')
-
-        await flushPromises()
-        app.update()
-        expect(app.find('#draftsSavedNotification').hostNodes()).toHaveLength(0)
-      })
-    })
   })
   describe('when user is in the birth review section', () => {
     let customDraft: IApplication
