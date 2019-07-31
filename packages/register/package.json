@@ -51,6 +51,7 @@
     "react-router-redux": "next",
     "react-scripts": "^3.0.1",
     "react-stickynode": "^2.0.1",
+    "react-transition-group": "^4.2.1",
     "react-tooltip": "^3.10.0",
     "redux": "^4.0.1",
     "redux-loop": "^5.0.0",
