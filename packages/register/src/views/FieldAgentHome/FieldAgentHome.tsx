@@ -56,7 +56,7 @@ import {
 import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import * as Sentry from '@sentry/browser'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyWrapper } from '@opencrvs/components/lib/layout'
 import {
   GQLQuery,
   GQLEventSearchSet,
@@ -457,7 +457,7 @@ class FieldAgentHomeView extends React.Component<
                   return (
                     <>
                       {data && data.searchEvents.totalItems > 0 && (
-                        <BodyContent id="require_updates_list">
+                        <BodyWrapper id="require_updates_list">
                           <GridTable
                             content={this.transformRejectedContent(data)}
                             columns={[
@@ -495,7 +495,7 @@ class FieldAgentHomeView extends React.Component<
                             currentPage={this.state.requireUpdatesPage}
                             clickable={true}
                           />
-                        </BodyContent>
+                        </BodyWrapper>
                       )}
                       {data && data.searchEvents.totalItems === 0 && (
                         <ZeroUpdatesContainer>

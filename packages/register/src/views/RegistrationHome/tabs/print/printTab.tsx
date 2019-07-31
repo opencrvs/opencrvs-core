@@ -2,7 +2,7 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyWrapper } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPrintCertificate } from '@register/navigation'
 import { transformData } from '@register/search/transformer'
@@ -134,7 +134,7 @@ class PrintTabComponent extends React.Component<
             )
           }
           return (
-            <BodyContent>
+            <BodyWrapper>
               <GridTable
                 content={this.transformRegisterdContent(data)}
                 columns={[
@@ -182,7 +182,7 @@ class PrintTabComponent extends React.Component<
                 currentPage={this.state.printCurrentPage}
                 expandable={true}
               />
-            </BodyContent>
+            </BodyWrapper>
           )
         }}
       </Query>

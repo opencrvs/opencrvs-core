@@ -3,7 +3,7 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyWrapper } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPage } from '@register/navigation'
 import { getScope } from '@register/profile/profileSelectors'
@@ -138,7 +138,7 @@ class ApprovalTabComponent extends React.Component<
             )
           }
           return (
-            <BodyContent>
+            <BodyWrapper>
               <ReactTooltip id="validatedTooltip">
                 <ToolTipContainer>
                   {this.props.intl.formatMessage(
@@ -197,7 +197,7 @@ class ApprovalTabComponent extends React.Component<
                 currentPage={this.state.approvalCurrentPage}
                 expandable={true}
               />
-            </BodyContent>
+            </BodyWrapper>
           )
         }}
       </Query>

@@ -14,6 +14,12 @@ export const BodyContent = styled.div`
   padding: 16px 32px;
   position: relative;
 `
+export const BodyWrapper = styled.div`
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  position: relative;
+`
 export const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   position: absolute;

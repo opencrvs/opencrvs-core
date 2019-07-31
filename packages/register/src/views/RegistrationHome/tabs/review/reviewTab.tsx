@@ -4,7 +4,7 @@ import {
   GridTable,
   IAction
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { BodyWrapper } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPage, goToReviewDuplicate } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
@@ -168,7 +168,7 @@ class ReviewTabComponent extends React.Component<
             )
           }
           return (
-            <BodyContent>
+            <BodyWrapper>
               <ReactTooltip id="validateTooltip">
                 <ToolTipContainer>
                   {this.props.intl.formatMessage(
@@ -227,7 +227,7 @@ class ReviewTabComponent extends React.Component<
                 currentPage={this.state.reviewCurrentPage}
                 expandable={true}
               />
-            </BodyContent>
+            </BodyWrapper>
           )
         }}
       </Query>
