@@ -23,7 +23,7 @@ RUN apk del build-dependencies
 COPY --from=opencrvs-build packages/notification/build packages/notification/build
 
 # Copy dependant package(s) source
-COPY packages/commons packages/commons
+COPY --from=opencrvs-build packages/commons packages/commons
 
 EXPOSE 2020
 WORKDIR /usr/src/app/packages/notification

@@ -1,7 +1,7 @@
 import { StatusProgress } from '@opencrvs/components/lib/icons'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import {
   CERTIFICATE_DATE_FORMAT,
   LANG_EN,
@@ -10,7 +10,7 @@ import {
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { roleMessages } from '@register/utils/roleTypeMessages'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/RegistrarHome/queries'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/RegistrationHome/queries'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'

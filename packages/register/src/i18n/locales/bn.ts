@@ -2,6 +2,7 @@ import { ILanguage } from '@register/i18n/reducer'
 
 export const BENGALI_STATE: ILanguage = {
   lang: 'bn',
+  displayName: 'বাংলা',
   messages: {
     'session.expire.text': 'আপনার সেশনের মেয়াদ শেষ হয়ে গেছে',
     'login.stepOneTitle': 'লগইন',
@@ -303,6 +304,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.maritalStatusMarried': 'বিবাহিত',
     'formFields.maritalStatusWidowed': 'বিধবা',
     'formFields.maritalStatusDivorced': 'তালাকপ্রাপ্ত',
+    'formFields.maritalStatusSeparated': 'পৃথকীকৃত',
     'formFields.maritalStatusNotStated': 'অবিবৃত',
     'formFields.dateOfMarriage': 'বিয়ের তারিখ',
     'register.form.tabs.childTab': 'শিশু',
@@ -497,6 +499,8 @@ export const BENGALI_STATE: ILanguage = {
       'মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
       'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'validations.validDrivingLicenseNumber':
+      'ড্রাইভিং লাইসেন্স নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.blockAlphaNumericDot':
       'শুধুমাত্র ইংরেজি বড় অক্ষর, সংখ্যা এবং ডট হতে পারে (উদাঃ, C91.5)',
     'validations.range': '{min} থেকে {max} এর মধ্যে হতে হবে',
@@ -531,16 +535,16 @@ export const BENGALI_STATE: ILanguage = {
     'register.form.modal.submitDescription':
       '“সাবমিট” ট্যাব-এ ক্লিক করে আপনি নিশ্চিত করছেন যে উপরোক্ত তথ্য বিবরনী গুলো সঠিক এবং পর্যালোচিত যা সিভিল রেজিস্ট্রেশন কর্তৃপক্ষের সাথে শেয়ার করা যেতে পারে।',
     'register.form.modal.title.submitConfirmation':
-      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+      '{completeApplication, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
     'register.form.modal.desc.submitConfirmation':
-      '{isComplete, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
+      '{completeApplication, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
     'register.form.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
     'register.form.modal.desc.registerConfirmation':
       'আপনি কি এ ব্যাপারে নিশ্চিত?',
     'register.form.modal.button.title.registerConfirmation': 'নিবন্ধন',
     'register.form.modal.submitButton': 'জমা দিন',
     'register.home.header.fieldAgent': 'মাঠকর্মী',
-    'register.home.header.registrationClerk': 'নিবন্ধন ক্লার্ক',
+    'register.home.header.registrationAgent': 'নিবন্ধন এজেন্ট',
     'register.home.header.localRegistrar': 'নিবন্ধক',
     'register.home.header.districtRegistrar': 'জেলা নিবন্ধক',
     'register.home.header.stateRegistrar': 'অঞ্চল নিবন্ধক',
@@ -730,6 +734,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.registrarHome.inProgress': 'চলমান',
     'register.registrarHome.readyForReview': 'পর্যালোচনার জন্য প্রস্তুত',
     'register.registrarHome.sentForUpdates': 'আপডেটের জন্য প্রস্তুত',
+    'register.registrarHome.sentForApprovals': 'অনুমোদনের জন্য প্রস্তুত',
     'register.registrarHome.results.eventDate': 'ঘটনা তারিখ',
     'register.registrarHome.queryError':
       'অনুসন্ধান করার সময় একটি ত্রুটি ঘটেছে',
@@ -759,6 +764,8 @@ export const BENGALI_STATE: ILanguage = {
     'register.workQueue.listItem.status.dateLabel.collected':
       'সার্টিফিকেট মুদ্রণ',
     'register.searchResult.listItem.status.dateLabel.application': 'আবেদন জমা',
+    'register.searchResult.listItem.status.dateLabel.validated':
+      'আবেদন পর্যালোচনা',
     'register.searchResult.listItem.status.dateLabel.registered': 'নিবন্ধিত',
     'register.searchResult.listItem.status.dateLabel.rejected':
       'আবেদন প্রত্যাখ্যাত',
@@ -834,6 +841,7 @@ export const BENGALI_STATE: ILanguage = {
       'স্বাস্থ্য কর্মী সঠিকভাবে আবেদন আপডেট করার জন্য তার কি নির্দেশাবলী প্রয়োজন প্রদান করুন',
     'review.rejection.form.submitButton': 'প্রত্যাখ্যান জমা দিন',
     'review.button.register': 'নিবন্ধন',
+    'review.button.approve': 'অনুমোদনের জন্য পাঠান',
     'review.button.reject': 'বাতিল',
     'review.documentViewer.title': 'প্রমাণক ডকুমেন্ট',
     'review.documentViewer.tagline': 'প্রিভিউ বাছাই করুন',
@@ -845,7 +853,7 @@ export const BENGALI_STATE: ILanguage = {
       '{name} এর জন্য {eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন',
     'review.inputs.additionalComments': 'কোন মন্তব্য?',
     'review.actions.title.applicationStatus':
-      'আবেদন {isComplete, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
+      'আবেদন {completeApplication, select, true {সম্পূর্ণ} false {অসম্পূর্ণ}}',
     'review.actions.description.confirmInComplete':
       'এই অসম্পূর্ণ আবেদনটি পাঠিয়ে, একটি ডিজিটাল রেকর্ড তৈরি করা হবে।\n\nআবেদনকারীকে বলুন যে তারা ট্র্যাকিং আইডি সহ একটি এসএমএস পাবেন। 30 দিনের মধ্যে রেজিস্ট্রেশন অফিসে আবেদনটি সম্পূর্ণ করার জন্য তাদের এটি প্রয়োজন হবে। জন্ম নিবন্ধিত হতে পারে আগে আবেদনকারী সব বাধ্যতামূলক তথ্য প্রদান করতে হবে',
     'review.actions.description.confirmComplete':
@@ -856,6 +864,13 @@ export const BENGALI_STATE: ILanguage = {
       'নিবন্ধন ক্লিক করে, আপনি নিশ্চিত করেন যে তথ্যটি সঠিক এবং আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে। আবেদনকারী বুঝেছেন যে এটি জন্ম নিবন্ধনের জন্য এবং পরিকল্পনার উদ্দেশ্যে ব্যবহার করা হবে।\n\nএই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের মাধ্যমে একটি জন্ম শংসাপত্র তৈরি করা হবে।',
     'register.actions.description':
       'এই জন্ম নিবন্ধনের মাধ্যমে, আপনার স্বাক্ষরের জন্য একটি জন্ম শংসাপত্র তৈরি করা হবে।',
+    'review.validate.action.description':
+      '{isComplete, select, true {অনুমোদনের জন্য পাঠানোর মাধ্যমে আপনি নিশ্চিত করেছেন যে তথ্যটি আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে এবং এটি অনুমোদনের জন্য প্রস্তুত।} false {বাধ্যতামূলক তথ্য অনুপস্থিত। দয়া করে এই তথ্যটি যোগ করুন যাতে আপনি অনুমোদনের জন্য পাঠাতে পারেন।}}',
+    'register.form.modal.title.validateConfirmation': 'অনুমোদনের জন্য পাঠাবেন?',
+    'register.form.modal.desc.validateConfirmation':
+      'এই আবেদন অনুমোদন করার জন্য নিবন্ধকের কাছে পাঠানো হবে।',
+    'review.formData.header':
+      '{isDraft, select, true {পর্যালোচনার জন্য পাঠানোর আগে আবেদনকারী সঙ্গে যাচাই করুন} false {সমর্থনকারী নথির সাথে উত্তর পর্যালোচনা করুন}}',
     'register.actions.title.applicationStatus': 'নিবন্ধন বা বাতিল?',
     'app.logout.modal.no': 'না',
     'app.logout.modal.yes': 'হ্যাঁ',
@@ -1259,6 +1274,19 @@ export const BENGALI_STATE: ILanguage = {
     'application.informant.value.mother.only': 'মা',
     'application.informant.value.father': 'বাবা',
     'application.initiator.label': 'কর্মী',
-    'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে'
+    'expansion.info.queryError': 'তথ্য বের করার সময় একটি ত্রুটি ঘটেছে',
+    'register.registrarHome.validated.registrar.tooltip':
+      'আবেদন নিবন্ধন এজেন্ট দ্বারা যাচাই করা হয়েছে',
+    'register.registrarHome.validated.registrationAgent.tooltip':
+      'অ্যাপ্লিকেশন যাচাই করা হয়েছে এবং অনুমোদনের জন্য অপেক্ষা করা হয়েছে',
+    'create.validate.application.action.decription':
+      '{completeApplication, select, true {অনুমোদন পাঠানোর মাধ্যমে আপনি নিশ্চিত হন যে তথ্যটি আবেদনকারীর দ্বারা পর্যালোচনা করা হয়েছে এবং এটি নিবন্ধন করার জন্য প্রস্তুত।} false {বাধ্যতামূলক তথ্য অনুপস্থিত। নিবন্ধটি পাঠাতে তথ্যগুলো যোগ করুন}}',
+    'validate.complete.application.action.title': 'অনুমোদন করার জন্য প্রস্তুত?',
+    'validate.complete.application.action.description':
+      'অনুমোদন দ্বারা আপনি নিশ্চিত যে আবেদন নিবন্ধন করতে প্রস্তুত',
+    'validate.application.action.modal.title': 'অনুমোদনের জন্য পাঠান',
+    'validate.application.action.modal.description':
+      'এই আবেদন নিবন্ধন করতে রেজিস্ট্রারের কাছে পাঠানো হবে',
+    'button.approve': 'অনুমোদন করুন'
   }
 }

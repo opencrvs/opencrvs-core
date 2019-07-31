@@ -93,6 +93,7 @@ describe('when user has starts a new application', () => {
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
       )
+      await flushPromises()
       app.update()
       app
         .find('#createPinBtn')

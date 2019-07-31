@@ -29,6 +29,7 @@ import {
 import {
   goBack as goBackAction,
   goToHome,
+  goToHomeTab,
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
@@ -240,6 +241,7 @@ type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
+  goToHomeTab: typeof goToHomeTab
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -330,6 +332,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           section
         )
       )
+      return
     })
     return result
   }
@@ -354,7 +357,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToHome()
+    this.props.goToHomeTab('progress')
     this.props.toggleDraftSavedNotification()
   }
 
@@ -365,8 +368,26 @@ class RegisterFormView extends React.Component<FullProps, State> {
     groupId: string,
     event: string
   ) => {
+    this.updateVisitedGroups()
     this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+  }
+
+  updateVisitedGroups = () => {
+    const visitedGroups = this.props.application.visitedGroupIds || []
+    if (
+      visitedGroups.findIndex(
+        visitedGroup =>
+          visitedGroup.sectionId === this.props.activeSection.id &&
+          visitedGroup.groupId === this.props.activeSectionGroup.id
+      ) === -1
+    ) {
+      visitedGroups.push({
+        sectionId: this.props.activeSection.id,
+        groupId: this.props.activeSectionGroup.id
+      })
+    }
+    this.props.application.visitedGroupIds = visitedGroups
   }
 
   render() {
@@ -437,6 +458,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   pageRoute={this.props.pageRoute}
                   draft={application}
                   submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyApplication}
                 />
               </>
             )}
@@ -461,6 +483,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   draft={application}
                   rejectApplicationClickEvent={this.toggleRejectForm}
                   submitClickEvent={this.confirmSubmission}
+                  onChangeReviewForm={this.modifyApplication}
                 />
               </>
             )}
@@ -670,19 +693,15 @@ function mapStateToProps(
   if (!application) {
     throw new Error(`Draft "${match.params.applicationId}" missing!`)
   }
-  const visitedSections = registerForm.sections.filter(
-    ({ id }) =>
-      id !== registrationSection.id &&
-      id !== applicantsSection.id &&
-      Boolean(application.data[id])
-  )
-
-  const rightMostVisited = visitedSections[visitedSections.length - 1]
 
   const setAllFieldsDirty =
-    rightMostVisited &&
-    registerForm.sections.indexOf(activeSection) <
-      registerForm.sections.indexOf(rightMostVisited)
+    (application.visitedGroupIds &&
+      application.visitedGroupIds.findIndex(
+        visitedGroup =>
+          visitedGroup.sectionId === activeSection.id &&
+          visitedGroup.groupId === activeSectionGroup.id
+      ) > -1) ||
+    false
 
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
@@ -719,6 +738,7 @@ export const RegisterForm = connect<
     goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
+    goToHomeTab,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {
       console.log(values)

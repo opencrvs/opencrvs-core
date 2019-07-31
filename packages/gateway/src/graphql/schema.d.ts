@@ -99,7 +99,8 @@ export enum GQLMaritalStatusType {
   MARRIED = 'MARRIED',
   WIDOWED = 'WIDOWED',
   DIVORCED = 'DIVORCED',
-  NOT_STATED = 'NOT_STATED'
+  NOT_STATED = 'NOT_STATED',
+  SEPARATED = 'SEPARATED'
 }
 
 export interface GQLAddress {
@@ -315,6 +316,7 @@ export interface GQLRegWorkflow {
 export enum GQLRegStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
+  VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED'
@@ -517,6 +519,7 @@ export interface GQLBirthRegistrationWithIn45D {
 
 export interface GQLEventCount {
   declared?: number
+  validated?: number
   registered?: number
   rejected?: number
 }
@@ -572,6 +575,7 @@ export interface GQLMutation {
   createBirthRegistration: GQLCreatedIds
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
+  markBirthAsValidated?: string
   markBirthAsRegistered: string
   markBirthAsCertified: string
   markEventAsVoided: string
@@ -579,6 +583,7 @@ export interface GQLMutation {
   createDeathRegistration: string
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
+  markDeathAsValidated?: string
   markDeathAsRegistered: string
   markDeathAsCertified: string
   createUser: GQLUser
@@ -1202,9 +1207,9 @@ export interface QueryToCountEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToSearchEventsArgs {
-  status?: string
   userId?: string
   locationIds?: Array<string | null>
+  status?: Array<string | null>
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
@@ -2464,11 +2469,16 @@ export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
 
 export interface GQLEventCountTypeResolver<TParent = any> {
   declared?: EventCountToDeclaredResolver<TParent>
+  validated?: EventCountToValidatedResolver<TParent>
   registered?: EventCountToRegisteredResolver<TParent>
   rejected?: EventCountToRejectedResolver<TParent>
 }
 
 export interface EventCountToDeclaredResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventCountToValidatedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2641,6 +2651,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createBirthRegistration?: MutationToCreateBirthRegistrationResolver<TParent>
   updateBirthRegistration?: MutationToUpdateBirthRegistrationResolver<TParent>
   markBirthAsVerified?: MutationToMarkBirthAsVerifiedResolver<TParent>
+  markBirthAsValidated?: MutationToMarkBirthAsValidatedResolver<TParent>
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
   markBirthAsCertified?: MutationToMarkBirthAsCertifiedResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
@@ -2648,6 +2659,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
+  markDeathAsValidated?: MutationToMarkDeathAsValidatedResolver<TParent>
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   createUser?: MutationToCreateUserResolver<TParent>
@@ -2726,6 +2738,22 @@ export interface MutationToMarkBirthAsVerifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkBirthAsVerifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkBirthAsValidatedArgs {
+  id: string
+  details?: GQLBirthRegistrationInput
+}
+export interface MutationToMarkBirthAsValidatedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkBirthAsValidatedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2835,6 +2863,22 @@ export interface MutationToMarkDeathAsVerifiedResolver<
   (
     parent: TParent,
     args: MutationToMarkDeathAsVerifiedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkDeathAsValidatedArgs {
+  id: string
+  details?: GQLDeathRegistrationInput
+}
+export interface MutationToMarkDeathAsValidatedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkDeathAsValidatedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

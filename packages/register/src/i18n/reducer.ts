@@ -2,6 +2,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@register/i18n/actions'
 import { ENGLISH_STATE } from '@register/i18n/locales/en'
 import { BENGALI_STATE } from '@register/i18n/locales/bn'
+import { getDefaultLanguage } from '@register/i18n/utils'
 
 export interface IntlMessages {
   [key: string]: string
@@ -9,6 +10,7 @@ export interface IntlMessages {
 
 export interface ILanguage {
   lang: string
+  displayName: string
   messages: IntlMessages
 }
 
@@ -28,8 +30,8 @@ export type IntlState = {
 }
 
 export const initialState: IntlState = {
-  language: window.config.LANGUAGE,
-  messages: languages[window.config.LANGUAGE].messages,
+  language: getDefaultLanguage(),
+  messages: languages[getDefaultLanguage()].messages,
   languages
 }
 

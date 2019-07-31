@@ -113,7 +113,10 @@ export class ResponsiveModal extends React.Component<IProps> {
       body.style.removeProperty('overflow')
     }
   }
-
+  componentWillUnmount = () => {
+    const body = document.querySelector('body') as HTMLBodyElement
+    body.style.removeProperty('overflow')
+  }
   render() {
     const {
       title,

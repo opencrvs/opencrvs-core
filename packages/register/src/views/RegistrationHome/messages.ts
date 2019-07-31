@@ -69,6 +69,11 @@ export const messages: {
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab'
   },
+  sentForApprovals: {
+    id: 'register.registrarHome.sentForApprovals',
+    defaultMessage: 'Sent for approval',
+    description: 'The title of sent for approvals tab'
+  },
   listItemType: {
     id: 'register.registrarHome.resultsType',
     defaultMessage: 'Type',
@@ -154,5 +159,15 @@ export const messages: {
     id: 'column.name.error.value',
     defaultMessage: 'No name provided',
     description: 'Text to display if the name column has no value provided'
+  },
+  validatedApplicationTooltipForRegistrar: {
+    id: 'register.registrarHome.validated.registrar.tooltip',
+    defaultMessage: 'Application has been validated by a registration agent',
+    description: 'Text to display for validated application as tooltip'
+  },
+  validatedApplicationTooltipForRegistrationAgent: {
+    id: 'register.registrarHome.validated.registrationAgent.tooltip',
+    defaultMessage: 'Application has been validated and waiting for approval',
+    description: 'Text to display for validated application as tooltip'
   }
 })

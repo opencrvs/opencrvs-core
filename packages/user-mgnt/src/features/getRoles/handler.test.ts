@@ -28,7 +28,7 @@ const dummyRoleList = [
   },
   {
     title: 'Registration Agent',
-    value: 'REGISTRATION_CLERK',
+    value: 'REGISTRATION_AGENT',
     types: ['Entrepeneur', 'Data entry clerk'],
     active: true,
     creationDate: 1559054406444

@@ -11,6 +11,11 @@ const SUBMIT_BIRTH_APPLICATION = gql`
     }
   }
 `
+const APPROVE_BIRTH_APPLICATION = gql`
+  mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
+    markBirthAsValidated(id: $id, details: $details)
+  }
+`
 const REGISTER_BIRTH_APPLICATION = gql`
   mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
     markBirthAsRegistered(id: $id, details: $details)
@@ -44,6 +49,18 @@ export function getBirthMutationMappings(
               }
             : {},
         dataKey: 'createBirthRegistration'
+      }
+    case Action.APPROVE_APPLICATION:
+      return {
+        mutation: APPROVE_BIRTH_APPLICATION,
+        variables:
+          form && draft
+            ? {
+                id: draft.id,
+                details: draftToGqlTransformer(form, draft.data)
+              }
+            : {},
+        dataKey: 'markBirthAsValidated'
       }
     case Action.REGISTER_APPLICATION:
       return {

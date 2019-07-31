@@ -14,14 +14,14 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrarHome/messages'
-import { SEARCH_EVENTS } from '@register/views/RegistrarHome/queries'
+import { messages } from '@register/views/RegistrationHome/messages'
+import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
   EVENT_STATUS,
   StyledSpinner
-} from '@register/views/RegistrarHome/RegistrarHome'
-import { RowHistoryView } from '@register/views/RegistrarHome/RowHistoryView'
+} from '@register/views/RegistrationHome/RegistrationHome'
+import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -99,7 +99,7 @@ class PrintTabComponent extends React.Component<
       <Query
         query={SEARCH_EVENTS}
         variables={{
-          status: EVENT_STATUS.REGISTERED,
+          status: [EVENT_STATUS.REGISTERED],
           locationIds: [registrarUnion],
           count: this.pageSize,
           skip: (this.state.printCurrentPage - 1) * this.pageSize
