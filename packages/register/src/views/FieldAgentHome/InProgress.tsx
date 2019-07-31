@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { IApplication } from '@register/applications'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
@@ -7,8 +7,10 @@ import { connect } from 'react-redux'
 import { sentenceCase } from '@register/utils/data-formatting'
 import moment from 'moment'
 import { goToApplicationDetails } from '@register/navigation'
+import { withTheme, ITheme } from '@register/styledComponents'
 
 interface IInProgressProps {
+  theme: ITheme
   draftApplications: IApplication[]
   goToApplicationDetails: typeof goToApplicationDetails
 }
@@ -17,6 +19,7 @@ type IFullProps = IInProgressProps & InjectedIntlProps
 
 interface IState {
   inProgressPageNo: number
+  width: number
 }
 
 const messages = {
@@ -50,7 +53,10 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     super(props)
 
     this.pageSize = 10
-    this.state = { inProgressPageNo: 1 }
+    this.state = {
+      width: window.innerWidth,
+      inProgressPageNo: 1
+    }
   }
 
   transformDraftContent = () => {
@@ -117,37 +123,69 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     })
   }
 
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
   onPageChange = (newPageNumber: number) => {
     this.setState({ inProgressPageNo: newPageNumber })
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.md) {
+      return [
+        {
+          label: this.props.intl.formatMessage(messages.listItemType),
+          width: 20,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemName),
+          width: 40,
+          key: 'name',
+          errorValue: 'No name provided'
+        },
+        {
+          label: this.props.intl.formatMessage(
+            messages.listItemModificationDate
+          ),
+          width: 40,
+          key: 'dateOfModification'
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(messages.listItemType),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemName),
+          width: 70,
+          key: 'name',
+          errorValue: 'No name provided'
+        }
+      ]
+    }
   }
 
   render() {
     const { draftApplications, intl } = this.props
 
     return (
-      <BodyContent>
+      <HomeContent>
         <GridTable
           content={this.transformDraftContent()}
-          columns={[
-            {
-              label: this.props.intl.formatMessage(messages.listItemType),
-              width: 20,
-              key: 'event'
-            },
-            {
-              label: this.props.intl.formatMessage(messages.listItemName),
-              width: 40,
-              key: 'name',
-              errorValue: 'No name provided'
-            },
-            {
-              label: this.props.intl.formatMessage(
-                messages.listItemModificationDate
-              ),
-              width: 40,
-              key: 'dateOfModification'
-            }
-          ]}
+          columns={this.getColumns()}
           noResultText={intl.formatMessage(messages.dataTableNoResults)}
           onPageChange={(currentPage: number) => {
             this.onPageChange(currentPage)
@@ -158,7 +196,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           expandable={false}
           clickable={true}
         />
-      </BodyContent>
+      </HomeContent>
     )
   }
 }
@@ -166,4 +204,4 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
 export const InProgress = connect(
   null,
   { goToApplicationDetails }
-)(injectIntl(InProgressComponent))
+)(injectIntl(withTheme(InProgressComponent)))
