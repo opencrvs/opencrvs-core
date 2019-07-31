@@ -5,7 +5,6 @@ import { IFileValue } from '@register/forms'
 
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
-  background: ${({ theme }) => theme.colors.background};
 `
 const PreviewLink = styled.p`
   color: ${({ theme }) => theme.colors.primary};
@@ -13,7 +12,7 @@ const PreviewLink = styled.p`
   margin: 10px 0px;
   display: flex;
   cursor: pointer;
-
+  background: ${({ theme }) => theme.colors.background};
   span {
     margin-left: 8px;
   }
