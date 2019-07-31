@@ -36,7 +36,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Container = styled.div`
   position: relative;
-  margin: 0 32px 32px;
+  margin-top: 32px;
 `
 const Content = styled.div`
   z-index: 1;
