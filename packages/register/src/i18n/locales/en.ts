@@ -491,7 +491,7 @@ export const ENGLISH_STATE: ILanguage = {
     'formFields.deathAtPrivateHome': 'What is the address of the private home?',
     'formFields.deathAtOtherLocation':
       'What is the other address did the death occur at?',
-    'validations.required': 'This field must be completed.',
+    'validations.required': 'Required for registration',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': 'Must not be more than {max} characters',
     'validations.numberRequired': 'Must be a number',
@@ -547,7 +547,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Please select who is the primary applicant',
     'register.form.newBirthRegistration': 'New birth application',
     'register.form.newVitalEventRegistration':
-      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} application',
     'register.form.previewEventRegistration':
       '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
     'register.form.reviewEventRegistration':

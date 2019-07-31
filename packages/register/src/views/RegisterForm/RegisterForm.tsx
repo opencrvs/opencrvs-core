@@ -95,7 +95,7 @@ export const messages: {
   newVitalEventRegistration: {
     id: 'register.form.newVitalEventRegistration',
     defaultMessage:
-      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} application',
     description: 'The message that appears for new vital event registration'
   },
   previewEventRegistration: {
@@ -410,13 +410,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       application
     )
 
-    const title =
-      activeSection.viewType === VIEW_TYPE.REVIEW
-        ? messages.reviewEventRegistration
-        : activeSection.viewType === VIEW_TYPE.PREVIEW
-        ? messages.previewEventRegistration
-        : messages.newVitalEventRegistration
-
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
@@ -432,13 +425,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
             {activeSection.viewType === VIEW_TYPE.PREVIEW && (
               <>
                 <EventTopBar
-                  title={intl.formatMessage(title, {
-                    event: application.event
-                  })}
+                  title={intl.formatMessage(
+                    messages.newVitalEventRegistration,
+                    {
+                      event: application.event
+                    }
+                  )}
                   iconColor={
                     application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                      ? 'orange'
-                      : 'violet'
+                      ? 'violet'
+                      : 'orange'
                   }
                   saveAction={{
                     handler: this.onSaveAsDraftClicked,
@@ -465,13 +461,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
             {activeSection.viewType === VIEW_TYPE.REVIEW && (
               <>
                 <EventTopBar
-                  title={intl.formatMessage(title, {
-                    event: application.event
-                  })}
+                  title={intl.formatMessage(
+                    messages.newVitalEventRegistration,
+                    {
+                      event: application.event
+                    }
+                  )}
                   iconColor={
                     application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                      ? 'orange'
-                      : 'violet'
+                      ? 'violet'
+                      : 'orange'
                   }
                   saveAction={{
                     handler: this.props.goToHome,
@@ -491,13 +490,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
             {activeSection.viewType === VIEW_TYPE.FORM && (
               <>
                 <EventTopBar
-                  title={intl.formatMessage(title, {
-                    event: application.event
-                  })}
+                  title={intl.formatMessage(
+                    messages.newVitalEventRegistration,
+                    {
+                      event: application.event
+                    }
+                  )}
                   iconColor={
                     application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                      ? 'orange'
-                      : 'violet'
+                      ? 'violet'
+                      : 'orange'
                   }
                   saveAction={{
                     handler: this.onSaveAsDraftClicked,

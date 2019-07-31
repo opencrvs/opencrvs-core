@@ -487,7 +487,7 @@ export const BENGALI_STATE: ILanguage = {
     'formFields.docTypeFuneralReceipt':
       'অন্ত্যেষ্টিক্রিয়া রশিদের প্রত্যয়িত কপি',
     'formFields.selectOne': 'অনুগ্রহ করে নির্বাচন করুন',
-    'validations.required': 'ক্ষেত্রটি সম্পূর্ণ করতে হবে।',
+    'validations.required': 'নিবন্ধনের জন্য প্রয়োজনীয়',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.maxLength': '{max} অক্ষরের বেশি হতে হবে না',
     'validations.numberRequired': 'Must be a number',
@@ -523,7 +523,7 @@ export const BENGALI_STATE: ILanguage = {
     'register.selectVitalEvent.saveExitButton': 'সংরক্ষণ করে বেরিয়ে যান ',
     'register.review.eventTopBar.exitButton': 'বাহির',
     'register.form.newVitalEventRegistration':
-      'নতুন {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
+      '{event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} ঘোষণা',
     'register.form.previewEventRegistration':
       ' {event, select, birth {জন্ম} death {মৃত্যু} marriage {বিবাহ} divorce {বিবাহবিচ্ছেদ} adoption {দত্তক গ্রহণ}} আবেদনপত্র প্রিভিউ',
     'register.form.reviewEventRegistration':
