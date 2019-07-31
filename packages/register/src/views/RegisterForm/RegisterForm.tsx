@@ -387,7 +387,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     setTimeout(
       () => this.props.deleteApplication(application),
-      PAGE_TRANSITIONS_ENTER_TIME + 100
+      PAGE_TRANSITIONS_ENTER_TIME + 200
     )
   }
 
