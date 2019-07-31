@@ -5,7 +5,7 @@ context('Menu', () => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
 
-  it('Opens menu and selects Bengali', () => {
+  it.skip('Opens menu and selects Bengali', () => {
     cy.login('fieldWorker')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
