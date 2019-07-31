@@ -4,7 +4,7 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
-import { BodyWrapper } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   GQLBirthRegistration,
   GQLDeathRegistration,
@@ -385,7 +385,7 @@ export class InProgressTabComponent extends React.Component<
     } = this.props
 
     return (
-      <BodyWrapper>
+      <BodyContent>
         {this.renderInProgressSelectorsWithCounts(
           selectorId,
           drafts,
@@ -525,7 +525,7 @@ export class InProgressTabComponent extends React.Component<
             }}
           </Query>
         )}
-      </BodyWrapper>
+      </BodyContent>
     )
   }
 }

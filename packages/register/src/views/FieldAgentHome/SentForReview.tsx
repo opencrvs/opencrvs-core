@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BodyWrapper } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
   GridTable,
   ColumnContentAlignment,
@@ -247,7 +247,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     const { intl, applicationsReadyToSend } = this.props
 
     return (
-      <BodyWrapper>
+      <BodyContent>
         <GridTable
           content={this.transformApplicationsReadyToSend()}
           columns={[
@@ -282,7 +282,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           clickable={true}
           currentPage={this.state.sentForReviewPageNo}
         />
-      </BodyWrapper>
+      </BodyContent>
     )
   }
 }

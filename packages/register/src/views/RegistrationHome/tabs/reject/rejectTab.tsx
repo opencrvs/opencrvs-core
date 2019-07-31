@@ -3,7 +3,7 @@ import {
   GridTable,
   IAction
 } from '@opencrvs/components/lib/interface'
-import { BodyWrapper } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPage, goToReviewDuplicate } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
@@ -149,7 +149,7 @@ class RejectTabComponent extends React.Component<
             )
           }
           return (
-            <BodyWrapper>
+            <BodyContent>
               <GridTable
                 content={this.transformRejectedContent(data)}
                 columns={[
@@ -197,7 +197,7 @@ class RejectTabComponent extends React.Component<
                 currentPage={this.state.updatesCurrentPage}
                 expandable={true}
               />
-            </BodyWrapper>
+            </BodyContent>
           )
         }}
       </Query>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BodyWrapper } from '@opencrvs/components/lib/layout'
+import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { IApplication } from '@register/applications'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
@@ -125,7 +125,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     const { draftApplications, intl } = this.props
 
     return (
-      <BodyWrapper>
+      <BodyContent>
         <GridTable
           content={this.transformDraftContent()}
           columns={[
@@ -158,7 +158,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           expandable={false}
           clickable={true}
         />
-      </BodyWrapper>
+      </BodyContent>
     )
   }
 }
