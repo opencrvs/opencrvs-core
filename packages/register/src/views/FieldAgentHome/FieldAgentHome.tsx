@@ -30,12 +30,9 @@ import {
   UNION_LOCATION_CODE,
   FIELD_AGENT_ROLES,
   SYS_ADMIN_ROLES,
-  REGISTRAR_ROLES,
-  PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_ENTER_TIME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+  REGISTRAR_ROLES
 } from '@register/utils/constants'
-import styled, { withTheme, keyframes } from '@register/styledComponents'
+import styled, { withTheme } from '@register/styledComponents'
 import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@register/navigation/routes'
 import { SentForReview } from '@register/views/FieldAgentHome/SentForReview'
 import { InProgress } from '@register/views/FieldAgentHome/InProgress'
@@ -134,28 +131,6 @@ const AllUpdatesText = styled.span`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
-
-const fadeFromTop = keyframes`
-from {
-   -webkit-transform: translateY(-100%);
-   transform: translateY(-100%); }
-`
-const StyledContainer = styled.div`
-  min-height: calc(100vh - 40px);
-  width: 100%;
-  background: ${({ theme }) => theme.colors.background};
-
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
-    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_ENTER_TIME}ms
-      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
-  }
-
-  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {
-    position: fixed;
-    z-index: 999;
-  }
-`
-
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
@@ -332,7 +307,7 @@ class FieldAgentHomeView extends React.Component<
     let parentQueryLoading = false
     const role = userDetails && userDetails.role
     return (
-      <StyledContainer className={PAGE_TRANSITIONS_CLASSNAME}>
+      <>
         {role && FIELD_AGENT_ROLES.includes(role) && (
           <>
             <Query
@@ -550,7 +525,7 @@ class FieldAgentHomeView extends React.Component<
         {role && REGISTRAR_ROLES.includes(role) && (
           <Redirect to={REGISTRAR_HOME} />
         )}
-      </StyledContainer>
+      </>
     )
   }
 }

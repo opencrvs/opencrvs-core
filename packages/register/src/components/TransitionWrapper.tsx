@@ -98,7 +98,7 @@ export default class TransitionWrapper extends React.Component<IProps, IState> {
           unmountOnExit
           timeout={{
             enter: PAGE_TRANSITIONS_ENTER_TIME,
-            exit: PAGE_TRANSITIONS_ENTER_TIME - 50
+            exit: PAGE_TRANSITIONS_ENTER_TIME - 20
           }}
           classNames={PAGE_TRANSITIONS_CLASSNAME}
           key={locationKey}
