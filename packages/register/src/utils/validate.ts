@@ -573,6 +573,7 @@ export const validIDNumber: ValidationInitializer = (
   const validDeathRegistrationNumberLength = 18
   const validPassportLength = 9
   const validDrivingLicenseLength = 15
+  value = (value && value.toString()) || ''
   switch (typeOfID) {
     case NATIONAL_ID:
       return hasValidLength(value, validNationalIDLength) &&
