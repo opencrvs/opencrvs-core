@@ -5,7 +5,7 @@ context('Login', () => {
     cy.visit(Cypress.env('LOGIN_URL'))
   })
 
-  it.skip('takes user to the registration app once correct credentials are given', () => {
+  it('takes user to the registration app once correct credentials are given', () => {
     cy.get('#username').type('sakibal.hasan')
     cy.get('#password').type('test')
     cy.get('#login-mobile-submit').click()
