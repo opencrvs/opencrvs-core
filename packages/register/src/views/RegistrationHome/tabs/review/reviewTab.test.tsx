@@ -18,6 +18,7 @@ import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { Validate } from '@opencrvs/components/lib/icons'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -42,7 +43,7 @@ const nameObj = {
   }
 }
 
-const mockUserData = {
+const mockSearchData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
   type: 'Birth',
   registration: {
@@ -112,9 +113,9 @@ const mockUserData = {
   deceasedName: null,
   createdAt: '2018-05-23T14:44:58+02:00'
 }
-const userData: any = []
+const searchData: any = []
 for (let i = 0; i < 14; i++) {
-  userData.push(mockUserData)
+  searchData.push(mockSearchData)
 }
 merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
@@ -124,7 +125,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('RegistrationHome sent for review tab related tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
@@ -583,7 +584,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
           data: {
             searchEvents: {
               totalItems: 14,
-              results: userData
+              results: searchData
             }
           }
         }
@@ -1134,6 +1135,233 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(window.location.href).toContain(
       '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
+    testComponent.component.unmount()
+  })
+
+  it('redirects user to duplicate page on review action click', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'DECLARED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 500)
+    })
+    testComponent.component.update()
+
+    expect(
+      testComponent.component.find('#ListItemAction-1-Review').hostNodes()
+    ).toHaveLength(1)
+    testComponent.component
+      .find('#ListItemAction-1-Review')
+      .hostNodes()
+      .simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    expect(history.location.pathname).toContain(
+      '/duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e95'
+    )
+    testComponent.component.unmount()
+  })
+
+  it('check the validate icon', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'DECLARED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 500)
+    })
+    testComponent.component.update()
+
+    expect(testComponent.component.find(Validate)).toHaveLength(1)
     testComponent.component.unmount()
   })
 })

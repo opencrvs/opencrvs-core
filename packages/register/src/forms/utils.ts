@@ -574,6 +574,6 @@ export const conditionals: IConditionals = {
   deceasedNationIdSelected: {
     action: 'hide',
     expression:
-      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1] > -1)))'
+      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
   }
 }

@@ -4,6 +4,7 @@ import { searchDeclaration } from '@search/features/search/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
+  VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify'
 }
@@ -28,7 +29,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.REGISTER, RouteScope.DECLARE]
+          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
         },
         description:
           'Handles indexing a new declaration and searching for duplicates'
@@ -52,6 +53,15 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Handles indexing a new validation and searching for duplicates'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-validated',
+      handler: birthEventHandler,
+      config: {
+        tags: ['api'],
+        description: 'Handles updating an existing declaration'
       }
     },
     {
@@ -110,6 +120,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Handles indexing a new validation'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-validated',
+      handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        description: 'Handles updating an existing declaration'
       }
     },
     {

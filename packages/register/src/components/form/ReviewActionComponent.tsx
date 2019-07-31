@@ -79,11 +79,15 @@ const Description = styled.div`
 
 const ActionContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-flow: row wrap;
   align-items: center;
 
   button:first-child {
     margin-right: 16px;
+  }
+
+  & > button {
+    margin-bottom: 8px;
   }
 `
 const messages = defineMessages({
