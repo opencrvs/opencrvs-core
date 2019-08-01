@@ -1,5 +1,6 @@
-import { defineMessages, FormattedMessage } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
+import { formMessages as messages } from '@register/i18n/messages'
 
 export const NATIONAL_ID = 'NATIONAL_ID'
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
@@ -10,71 +11,6 @@ export const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
 export const ALIEN_NUMBER = 'ALIEN_NUMBER'
 export const OTHER = 'OTHER'
 export const NO_ID = 'NO_ID'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  iDType: {
-    id: 'formFields.iDType',
-    defaultMessage: 'Type of ID',
-    description: 'Label for form field: Type of ID'
-  },
-  iDTypePassport: {
-    id: 'formFields.iDTypePassport',
-    defaultMessage: 'Passport',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeNationalID: {
-    id: 'formFields.iDTypeNationalID',
-    defaultMessage: 'National ID',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeDrivingLicense: {
-    id: 'formFields.iDTypeDrivingLicense',
-    defaultMessage: 'Drivers License',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeBRN: {
-    id: 'formFields.iDTypeBRN',
-    defaultMessage: 'Birth Registration Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeDRN: {
-    id: 'formFields.iDTypeDRN',
-    defaultMessage: 'Death Registration Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeRefugeeNumber: {
-    id: 'formFields.iDTypeRefugeeNumber',
-    defaultMessage: 'Refugee Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeAlienNumber: {
-    id: 'formFields.iDTypeAlienNumber',
-    defaultMessage: 'Alien Number',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeOther: {
-    id: 'formFields.iDTypeOther',
-    defaultMessage: 'Other',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeNoId: {
-    id: 'formFields.iDTypeNoID',
-    defaultMessage: 'No ID available',
-    description: 'Option for form field: Type of ID'
-  },
-  iDTypeOtherLabel: {
-    id: 'formFields.iDTypeOtherLabel',
-    defaultMessage: 'Other type of ID',
-    description: 'Label for form field: Other type of ID'
-  },
-  iD: {
-    id: 'formFields.iD',
-    defaultMessage: 'ID Number',
-    description: 'Label for form field: ID Number'
-  }
-})
 
 export const birthIdentityOptions = [
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },

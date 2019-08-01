@@ -1,7 +1,7 @@
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import {
@@ -65,6 +65,8 @@ import {
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@register/utils/data-formatting'
+import { messages } from '@register/i18n/messages/views/fieldAgentHome'
+import { constantsMessages, errorMessages } from '@register/i18n/messages'
 import moment from 'moment'
 
 const IconTab = styled(Button).attrs<{ active: boolean }>({})`
@@ -131,65 +133,6 @@ const AllUpdatesText = styled.span`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  inProgress: {
-    id: 'register.fieldAgentHome.inProgress',
-    defaultMessage: 'In progress ({total})',
-    description: 'The title of in progress tab'
-  },
-  sentForReview: {
-    id: 'register.fieldAgentHome.sentForReview',
-    defaultMessage: 'Sent for review ({total})',
-    description: 'The title of sent for review tab'
-  },
-  requireUpdates: {
-    id: 'register.fieldAgentHome.requireUpdates',
-    defaultMessage: 'Require updates ({total})',
-    description: 'The title of require updates tab'
-  },
-  rejectedDays: {
-    id: 'register.fieldAgentHome.rejectedDays',
-    defaultMessage: 'Rejected {text}',
-    description: 'The title of rejected days of application'
-  },
-  listItemName: {
-    id: 'register.registrarHome.listItemName',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  listItemType: {
-    id: 'register.registrarHome.resultsType',
-    defaultMessage: 'Type',
-    description: 'Label for type of event in work queue list item'
-  },
-  listItemUpdateDate: {
-    id: 'register.registrarHome.results.updateDate',
-    defaultMessage: 'Sent on',
-    description: 'Label for rejection date in work queue list item'
-  },
-  zeroUpdatesText: {
-    id: 'register.fieldAgentHome.zeroUpdatesText',
-    defaultMessage: 'No applications require updates',
-    description: 'The text when no rejected applications'
-  },
-  allUpdatesText: {
-    id: 'register.fieldAgentHome.allUpdatesText',
-    defaultMessage: 'Great job! You have updated all applications',
-    description: 'The text when all rejected applications updated'
-  },
-  requireUpdatesLoading: {
-    id: 'register.fieldAgentHome.requireUpdatesLoading',
-    defaultMessage: 'Checking your applications',
-    description: 'The text when all rejected applications are loading'
-  },
-  queryError: {
-    id: 'register.fieldAgentHome.queryError',
-    defaultMessage: 'An error occured while loading applications',
-    description: 'The text when error ocurred loading rejected applications'
-  }
-})
 interface IBaseFieldAgentHomeProps {
   theme: ITheme
   language: string
@@ -278,9 +221,12 @@ class FieldAgentHomeView extends React.Component<
         name:
           (createNamesMap(names)[this.props.intl.locale] as string) ||
           (createNamesMap(names)[LANG_EN] as string),
-        daysOfRejection: this.props.intl.formatMessage(messages.rejectedDays, {
-          text: daysOfRejection
-        }),
+        daysOfRejection: this.props.intl.formatMessage(
+          constantsMessages.rejectedDays,
+          {
+            text: daysOfRejection
+          }
+        ),
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -340,7 +286,7 @@ class FieldAgentHomeView extends React.Component<
                   Sentry.captureException(error)
                   return (
                     <ErrorText id="field-agent-home_error">
-                      {intl.formatMessage(messages.queryError)}
+                      {intl.formatMessage(errorMessages.fieldAgentQueryError)}
                     </ErrorText>
                   )
                 }
@@ -358,7 +304,7 @@ class FieldAgentHomeView extends React.Component<
                           this.props.goToFieldAgentHomeTab(TAB_ID.inProgress)
                         }
                       >
-                        {intl.formatMessage(messages.inProgress, {
+                        {intl.formatMessage(messages.inProgressCount, {
                           total: draftApplications.length
                         })}
                       </IconTab>
@@ -372,7 +318,7 @@ class FieldAgentHomeView extends React.Component<
                           this.props.goToFieldAgentHomeTab(TAB_ID.sentForReview)
                         }
                       >
-                        {intl.formatMessage(messages.sentForReview, {
+                        {intl.formatMessage(messages.sentForReviewCount, {
                           total: applicationsReadyToSend.length
                         })}
                       </IconTab>
@@ -447,7 +393,7 @@ class FieldAgentHomeView extends React.Component<
                     Sentry.captureException(error)
                     return (
                       <ErrorText id="require_updates_loading_error">
-                        {intl.formatMessage(messages.queryError)}
+                        {intl.formatMessage(errorMessages.fieldAgentQueryError)}
                       </ErrorText>
                     )
                   }
@@ -460,14 +406,14 @@ class FieldAgentHomeView extends React.Component<
                             columns={[
                               {
                                 label: this.props.intl.formatMessage(
-                                  messages.listItemType
+                                  constantsMessages.type
                                 ),
                                 width: 30,
                                 key: 'event'
                               },
                               {
                                 label: this.props.intl.formatMessage(
-                                  messages.listItemName
+                                  constantsMessages.name
                                 ),
                                 width: 40,
                                 key: 'name',
@@ -475,7 +421,7 @@ class FieldAgentHomeView extends React.Component<
                               },
                               {
                                 label: this.props.intl.formatMessage(
-                                  messages.listItemUpdateDate
+                                  constantsMessages.sentOn
                                 ),
                                 width: 30,
                                 key: 'daysOfRejection'

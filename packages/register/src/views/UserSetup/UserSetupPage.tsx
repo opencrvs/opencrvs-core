@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
@@ -8,12 +8,13 @@ import { IUserDetails } from '@register/utils/userUtils'
 import { createNamesMap } from '@register/utils/data-formatting'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { LightLogo } from '@opencrvs/components/lib/icons'
-import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
+import { userMessages, buttonMessages } from '@register/i18n/messages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData
 } from '@register/components/ProtectedAccount'
+import { messages } from '@register/i18n/messages/views/userSetup'
 
 export const Page = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
@@ -65,27 +66,6 @@ const NextButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  welcomeTitle: {
-    id: 'userSetup.landing.title',
-    defaultMessage: 'Welcome to OpenCRVS',
-    description: 'Title for the landing page'
-  },
-  instruction: {
-    id: 'userSetup.landing.instruction',
-    defaultMessage:
-      'You just a few steps away from completing your account set up.',
-    description: 'Instruction for the account setup'
-  },
-  startButtonLabel: {
-    id: 'userSetup.landing.button.start',
-    defaultMessage: 'Start',
-    description: 'Label of start button'
-  }
-})
-
 interface IUserSetupPageProp {
   userDetails: IUserDetails | null
   setupData: IProtectedAccountSetupData
@@ -105,7 +85,9 @@ export class UserSetupView extends React.Component<
           <LogoContainer>
             <LightLogo />
           </LogoContainer>
-          <TitleHolder>{intl.formatMessage(messages.welcomeTitle)}</TitleHolder>
+          <TitleHolder>
+            {intl.formatMessage(messages.userSetupWelcomeTitle)}
+          </TitleHolder>
           <InfoHolder>
             <NameHolder id="user-setup-name-holder">
               {(userDetails &&
@@ -119,18 +101,18 @@ export class UserSetupView extends React.Component<
               {(userDetails &&
                 (userDetails.type
                   ? `${intl.formatMessage(
-                      typeMessages[userDetails.type as string]
+                      userMessages[userDetails.type as string]
                     )} - ${intl.formatMessage(
-                      roleMessages[userDetails.role as string]
+                      userMessages[userDetails.role as string]
                     )}`
                   : `${intl.formatMessage(
-                      roleMessages[userDetails.role as string]
+                      userMessages[userDetails.role as string]
                     )}`)) ||
                 ''}
             </RoleHolder>
           </InfoHolder>
           <InstructionHolder>
-            {intl.formatMessage(messages.instruction)}
+            {intl.formatMessage(messages.userSetupIntroduction)}
           </InstructionHolder>
           <NextButton
             id="user-setup-start-button"
@@ -141,7 +123,7 @@ export class UserSetupView extends React.Component<
               })
             }
           >
-            {intl.formatMessage(messages.startButtonLabel)}
+            {intl.formatMessage(buttonMessages.start)}
           </NextButton>
         </Container>
       </Page>

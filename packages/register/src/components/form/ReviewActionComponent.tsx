@@ -5,17 +5,19 @@ import {
   SuccessButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { Check, Cross, Upload } from '@opencrvs/components/lib/icons'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   IApplication,
   IPayload,
   SUBMISSION_STATUS
 } from '@register/applications'
+import { messages } from '@register/i18n/messages/views/review'
+import { buttonMessages, constantsMessages } from '@register/i18n/messages'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { Action } from '@register/forms'
 import styled from '@register/styledComponents'
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
@@ -90,131 +92,6 @@ const ActionContainer = styled.div`
     margin-bottom: 8px;
   }
 `
-const messages = defineMessages({
-  reviewActionTitle: {
-    id: 'review.actions.title.applicationStatus',
-    defaultMessage:
-      'Application is {completeApplication, select, true {complete} false {incomplete}}',
-    description: 'Title for review action component'
-  },
-  reviewActionDescriptionIncomplete: {
-    id: 'review.actions.description.confirmInComplete',
-    defaultMessage:
-      'By sending this incomplete application, there will be a digital record made.\n\nTell the applicant that they will receive an SMS with a tracking ID. They will need this to complete the application at a registration office within 30 days. The applicant will need to provide all mandatory information before the birth can be registered.',
-    description:
-      'Description for review action component when incomplete application'
-  },
-  reviewActionDescriptionComplete: {
-    id: 'review.actions.description.confirmComplete',
-    defaultMessage:
-      'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
-    description:
-      'Description for review action component when complete application'
-  },
-  registerActionDescriptionIncomplete: {
-    id: 'register.actions.description.confirmInComplete',
-    defaultMessage:
-      'Mandatory information is missing. Please add this information so that you can complete the registration process.'
-  },
-  registerActionDescriptionComplete: {
-    id: 'register.actions.description.confirmComplete',
-    defaultMessage:
-      'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.'
-  },
-  registerActionTitle: {
-    id: 'register.actions.title.applicationStatus',
-    defaultMessage: 'Register or reject?'
-  },
-  registerActionDescription: {
-    id: 'register.actions.description',
-    defaultMessage:
-      'By registering this birth, a birth certificate will be generated with your signature for issuance.'
-  },
-  createAndValidateApplicationActionDescription: {
-    id: 'create.validate.application.action.decription',
-    defaultMessage:
-      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}'
-  },
-  validateCompleteApplicationActionTitle: {
-    id: 'validate.complete.application.action.title',
-    defaultMessage: 'Ready to approve?'
-  },
-  validateCompleteApplicationActionDescription: {
-    id: 'validate.complete.application.action.description',
-    defaultMessage:
-      'By approving you confirm that the applicatiohn is ready to register'
-  },
-  validateApplicationActionModalTitle: {
-    id: 'validate.application.action.modal.title',
-    defaultMessage: 'Send for approval?'
-  },
-  validateApplicationActionModalDescription: {
-    id: 'validate.application.action.modal.description',
-    defaultMessage:
-      'This application will be sent to the registrar from them to register'
-  },
-  valueSendForReview: {
-    id: 'register.form.submit',
-    defaultMessage: 'SEND FOR REVIEW',
-    description: 'Submit Button Text'
-  },
-  valueSendForReviewIncomplete: {
-    id: 'register.form.submitIncomplete',
-    defaultMessage: 'Send incomplete application',
-    description: 'Title for Incomplete submit button'
-  },
-  valueRegister: {
-    id: 'review.button.register',
-    defaultMessage: 'REGISTER',
-    description: 'Register button text'
-  },
-  valueReject: {
-    id: 'review.button.reject',
-    defaultMessage: 'Reject Application',
-    description: 'Reject application button text'
-  },
-  submitConfirmationTitle: {
-    id: 'register.form.modal.title.submitConfirmation',
-    defaultMessage:
-      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
-    description: 'Submit title text on modal'
-  },
-  submitConfirmationDesc: {
-    id: 'register.form.modal.desc.submitConfirmation',
-    defaultMessage:
-      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
-    description: 'Submit description text on modal'
-  },
-  registerConfirmationTitle: {
-    id: 'register.form.modal.title.registerConfirmation',
-    defaultMessage: 'Register this application?',
-    description: 'Title for register confirmation modal'
-  },
-  registerConfirmationDesc: {
-    id: 'register.form.modal.desc.registerConfirmation',
-    defaultMessage: 'Are you sure?',
-    description: 'Description for register confirmation modal'
-  },
-  registerButtonTitle: {
-    id: 'register.form.modal.button.title.registerConfirmation',
-    defaultMessage: 'Register',
-    description: 'Label for button on register confirmation modal'
-  },
-  approveButton: {
-    id: 'button.approve',
-    defaultMessage: 'Approve'
-  },
-  submitButton: {
-    id: 'register.form.modal.submitButton',
-    defaultMessage: 'Send',
-    description: 'Submit button on submit modal'
-  },
-  cancel: {
-    id: 'register.form.modal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Cancel button on submit modal'
-  }
-})
 
 enum ACTION {
   APPLICATION_TO_BE_DECLARED = 'APPLICATION_TO_BE_DECLARED',
@@ -353,7 +230,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
                 message: messages.registerConfirmationTitle
               },
               description: {
-                message: messages.registerConfirmationDesc
+                message: constantsMessages.areYouSure
               }
             }
           },
@@ -382,7 +259,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
                 message: messages.registerConfirmationTitle
               },
               description: {
-                message: messages.registerConfirmationDesc
+                message: constantsMessages.areYouSure
               }
             }
           },
@@ -466,7 +343,7 @@ class ReviewActionComponent extends React.Component<
                 disabled={!completeApplication}
                 align={ICON_ALIGNMENT.LEFT}
               >
-                {intl.formatMessage(messages.valueRegister)}
+                {intl.formatMessage(buttonMessages.register)}
               </SuccessButton>
             ) : applicationToBeValidated ? (
               <PrimaryButton
@@ -478,8 +355,8 @@ class ReviewActionComponent extends React.Component<
               >
                 {intl.formatMessage(
                   draftApplication
-                    ? messages.valueSendForReview
-                    : messages.approveButton
+                    ? buttonMessages.sendForReview
+                    : buttonMessages.approve
                 )}
               </PrimaryButton>
             ) : (
@@ -492,8 +369,8 @@ class ReviewActionComponent extends React.Component<
               >
                 {intl.formatMessage(
                   completeApplication
-                    ? messages.valueSendForReview
-                    : messages.valueSendForReviewIncomplete
+                    ? buttonMessages.sendForReview
+                    : buttonMessages.sendIncomplete
                 )}
               </PrimaryButton>
             )}
@@ -505,7 +382,7 @@ class ReviewActionComponent extends React.Component<
                 icon={() => <Cross color="white" />}
                 onClick={rejectApplicationAction}
               >
-                {intl.formatMessage(messages.valueReject)}
+                {intl.formatMessage(buttonMessages.reject)}
               </DangerButton>
             )}
           </ActionContainer>
@@ -528,7 +405,7 @@ class ReviewActionComponent extends React.Component<
                   }
                 }}
               >
-                {intl.formatMessage(messages.cancel)}
+                {intl.formatMessage(buttonMessages.cancel)}
               </TertiaryButton>,
               <PrimaryButton
                 key="submit"
@@ -554,10 +431,10 @@ class ReviewActionComponent extends React.Component<
                 }
               >
                 {applicationToBeRegistered
-                  ? intl.formatMessage(messages.registerButtonTitle)
+                  ? intl.formatMessage(buttonMessages.register)
                   : applicationToBeValidated
-                  ? intl.formatMessage(messages.approveButton)
-                  : intl.formatMessage(messages.submitButton)}
+                  ? intl.formatMessage(buttonMessages.approve)
+                  : intl.formatMessage(buttonMessages.send)}
               </PrimaryButton>
             ]}
             show={this.state.showSubmitModal}

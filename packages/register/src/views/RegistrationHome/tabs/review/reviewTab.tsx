@@ -20,7 +20,6 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrationHome/messages'
 import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
@@ -29,6 +28,8 @@ import {
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
+import { errorMessages, constantsMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -75,7 +76,7 @@ class ReviewTabComponent extends React.Component<
       let icon: JSX.Element = <div />
       if (reg.duplicates && reg.duplicates.length > 0) {
         actions.push({
-          label: this.props.intl.formatMessage(messages.reviewDuplicates),
+          label: this.props.intl.formatMessage(constantsMessages.review),
           handler: () => this.props.goToReviewDuplicate(reg.id)
         })
         icon = <Duplicate />
@@ -84,7 +85,7 @@ class ReviewTabComponent extends React.Component<
           icon = <Validate data-tip data-for="validateTooltip" />
         }
         actions.push({
-          label: this.props.intl.formatMessage(messages.review),
+          label: this.props.intl.formatMessage(constantsMessages.review),
           handler: () =>
             this.props.goToPage(
               REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -161,7 +162,7 @@ class ReviewTabComponent extends React.Component<
             Sentry.captureException(error)
             return (
               <ErrorText id="search-result-error-text-review">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.queryError)}
               </ErrorText>
             )
           }
@@ -178,13 +179,15 @@ class ReviewTabComponent extends React.Component<
                 content={this.transformDeclaredContent(data)}
                 columns={[
                   {
-                    label: this.props.intl.formatMessage(messages.listItemType),
+                    label: this.props.intl.formatMessage(
+                      constantsMessages.type
+                    ),
                     width: 14,
                     key: 'event'
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.listItemTrackingNumber
+                      constantsMessages.trackingId
                     ),
                     width: 20,
                     key: 'trackingId'
@@ -198,7 +201,7 @@ class ReviewTabComponent extends React.Component<
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.listItemEventDate
+                      constantsMessages.eventDate
                     ),
                     width: 20,
                     key: 'eventTimeElapsed'
@@ -216,7 +219,7 @@ class ReviewTabComponent extends React.Component<
                   }
                 ]}
                 renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
                   this.onPageChange(currentPage)
                 }}

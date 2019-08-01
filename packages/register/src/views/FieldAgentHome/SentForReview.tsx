@@ -22,53 +22,10 @@ import { sentenceCase } from '@register/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
 import { goToApplicationDetails } from '@register/navigation'
+import { constantsMessages as messages } from '@register/i18n/messages'
 import { getDefaultLanguage } from '@register/i18n/utils'
 
 const APPLICATIONS_DAY_LIMIT = 7
-
-const messages = {
-  submissionStatus: {
-    id: 'register.fieldAgentHome.tableHeader.submissionStatus',
-    defaultMessage: 'Submission status',
-    description: 'Label for table header of column Submission status'
-  },
-  statusReadyToSubmit: {
-    id: 'register.fieldAgentHome.table.statusReadyToSubmit',
-    defaultMessage: 'Waiting to send',
-    description: 'Label for application status Ready to Submit'
-  },
-  statusSubmitting: {
-    id: 'register.fieldAgentHome.table.statusSubmitting',
-    defaultMessage: 'Sending...',
-    description: 'Label for application status Submitting'
-  },
-  statusFailed: {
-    id: 'register.fieldAgentHome.table.statusFailed',
-    defaultMessage: 'Failed to send',
-    description: 'Label for application status Failed'
-  },
-  statusPendingConnection: {
-    id: 'register.fieldAgentHome.table.statusPendingConnection',
-    defaultMessage: 'Pending connection',
-    description: 'Label for application status Pending Connection'
-  },
-  dataTableNoResults: {
-    id: 'register.registrarHome.noResults',
-    defaultMessage: 'No result to display',
-    description:
-      'Text to display if the search return no results for the current filters'
-  },
-  listItemType: {
-    id: 'register.registrarHome.resultsType',
-    defaultMessage: 'Type',
-    description: 'Label for type of event in work queue list item'
-  },
-  name: {
-    id: 'register.registrarHome.listItemName',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  }
-}
 
 interface ISentForReviewProps {
   applicationsReadyToSend: IApplication[]
@@ -99,12 +56,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     id?: string
   ) => {
     const { formatMessage } = this.props.intl
-    const {
-      statusReadyToSubmit,
-      statusSubmitting,
-      statusFailed,
-      statusPendingConnection
-    } = messages
+    const { waitingToSend, sending, failedToSend, pendingConnection } = messages
 
     let icon: () => React.ReactNode
     let statusText: string
@@ -114,7 +66,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
         iconId = `submitting${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusSubmitting)
+        statusText = formatMessage(sending)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
         overwriteStatusIfOffline = false
@@ -126,20 +78,20 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         overwriteStatusIfOffline = false
         iconId = `failed${index}`
         icon = () => <StatusFailed id={iconId} key={iconId} />
-        statusText = formatMessage(statusFailed)
+        statusText = formatMessage(failedToSend)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
       default:
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusReadyToSubmit)
+        statusText = formatMessage(waitingToSend)
         break
     }
 
     if (!online && overwriteStatusIfOffline) {
       iconId = `offline${index}`
       icon = () => <StatusPendingOffline id={iconId} key={iconId} />
-      statusText = formatMessage(statusPendingConnection)
+      statusText = formatMessage(pendingConnection)
     }
 
     return {
@@ -252,7 +204,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           content={this.transformApplicationsReadyToSend()}
           columns={[
             {
-              label: this.props.intl.formatMessage(messages.listItemType),
+              label: this.props.intl.formatMessage(messages.type),
               width: 15,
               key: 'event'
             },
@@ -275,7 +227,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               key: 'statusIndicator'
             }
           ]}
-          noResultText={intl.formatMessage(messages.dataTableNoResults)}
+          noResultText={intl.formatMessage(messages.noResults)}
           totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}

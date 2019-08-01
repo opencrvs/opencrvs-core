@@ -29,17 +29,22 @@ import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   LIST_EVENT_REGISTRATIONS_BY_STATUS
 } from '@register/views/RegistrationHome/queries'
-import { messages as eventMessages } from '@register/views/SelectVitalEvent/SelectVitalEvent'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { messages } from '@register/views/RegistrationHome/messages'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
 import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
+import {
+  buttonMessages,
+  errorMessages,
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -158,7 +163,7 @@ export class InProgressTabComponent extends React.Component<
         }
         const actions = [
           {
-            label: intl.formatMessage(messages.update),
+            label: intl.formatMessage(buttonMessages.update),
             handler: () =>
               this.props.goToPage(
                 pageRoute,
@@ -172,7 +177,10 @@ export class InProgressTabComponent extends React.Component<
         return {
           id: regId,
           event:
-            (event && intl.formatMessage(eventMessages[event.toLowerCase()])) ||
+            (event &&
+              intl.formatMessage(
+                dynamicConstantsMessages[event.toLowerCase()]
+              )) ||
             '',
           name,
           trackingId,
@@ -232,7 +240,7 @@ export class InProgressTabComponent extends React.Component<
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
         {
-          label: this.props.intl.formatMessage(messages.update),
+          label: this.props.intl.formatMessage(buttonMessages.update),
           handler: () =>
             this.props.goToPage(
               pageRoute,
@@ -282,7 +290,7 @@ export class InProgressTabComponent extends React.Component<
             Sentry.captureException(error)
             return (
               <ErrorText id="search-result-error-text-count">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.queryError)}
               </ErrorText>
             )
           }
@@ -396,18 +404,18 @@ export class InProgressTabComponent extends React.Component<
             content={this.transformDraftContent()}
             columns={[
               {
-                label: intl.formatMessage(messages.listItemType),
+                label: intl.formatMessage(constantsMessages.type),
                 width: 15,
                 key: 'event'
               },
               {
-                label: intl.formatMessage(messages.listItemName),
+                label: intl.formatMessage(constantsMessages.name),
                 width: 35,
                 key: 'name',
-                errorValue: intl.formatMessage(messages.nameColumnErrorValue)
+                errorValue: intl.formatMessage(constantsMessages.noNameProvided)
               },
               {
-                label: intl.formatMessage(messages.listItemModificationDate),
+                label: intl.formatMessage(constantsMessages.lastEdited),
                 width: 35,
                 key: 'dateOfModification'
               },
@@ -420,7 +428,7 @@ export class InProgressTabComponent extends React.Component<
               }
             ]}
             renderExpandedComponent={this.renderDraftDataExpandedComponent}
-            noResultText={intl.formatMessage(messages.dataTableNoResults)}
+            noResultText={intl.formatMessage(constantsMessages.noResults)}
             onPageChange={(currentPage: number) => {
               this.onPageChange(currentPage)
             }}
@@ -464,7 +472,7 @@ export class InProgressTabComponent extends React.Component<
                 Sentry.captureException(error)
                 return (
                   <ErrorText id="remote-drafts-error-text">
-                    {intl.formatMessage(messages.queryError)}
+                    {intl.formatMessage(errorMessages.queryError)}
                   </ErrorText>
                 )
               }
@@ -473,29 +481,25 @@ export class InProgressTabComponent extends React.Component<
                   content={this.transformRemoteDraftsContent(data)}
                   columns={[
                     {
-                      label: intl.formatMessage(messages.listItemType),
+                      label: intl.formatMessage(constantsMessages.type),
                       width: 15,
                       key: 'event'
                     },
                     {
-                      label: intl.formatMessage(messages.listItemName),
+                      label: intl.formatMessage(constantsMessages.name),
                       width: 30,
                       key: 'name',
                       errorValue: intl.formatMessage(
-                        messages.nameColumnErrorValue
+                        constantsMessages.noNameProvided
                       )
                     },
                     {
-                      label: intl.formatMessage(
-                        messages.listItemModificationDate
-                      ),
+                      label: intl.formatMessage(constantsMessages.eventDate),
                       width: 20,
                       key: 'dateOfModification'
                     },
                     {
-                      label: intl.formatMessage(
-                        messages.listItemTrackingNumber
-                      ),
+                      label: intl.formatMessage(constantsMessages.trackingId),
                       width: 15,
                       key: 'trackingId'
                     },
@@ -509,7 +513,7 @@ export class InProgressTabComponent extends React.Component<
                   renderExpandedComponent={
                     this.renderInProgressDataExpandedComponent
                   }
-                  noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                  noResultText={intl.formatMessage(constantsMessages.noResults)}
                   onPageChange={(currentPage: number) => {
                     this.onPageChange(currentPage)
                   }}

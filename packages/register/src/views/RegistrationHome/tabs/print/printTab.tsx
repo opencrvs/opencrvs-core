@@ -14,7 +14,6 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrationHome/messages'
 import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
@@ -22,6 +21,12 @@ import {
   StyledSpinner
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
+import {
+  buttonMessages,
+  errorMessages,
+  constantsMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -57,7 +62,7 @@ class PrintTabComponent extends React.Component<
     return transformedData.map(reg => {
       const actions = [
         {
-          label: this.props.intl.formatMessage(messages.print),
+          label: this.props.intl.formatMessage(buttonMessages.print),
           handler: () =>
             this.props.goToPrintCertificate(
               reg.id,
@@ -129,7 +134,7 @@ class PrintTabComponent extends React.Component<
             Sentry.captureException(error)
             return (
               <ErrorText id="search-result-error-text-print">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.queryError)}
               </ErrorText>
             )
           }
@@ -139,12 +144,16 @@ class PrintTabComponent extends React.Component<
                 content={this.transformRegisterdContent(data)}
                 columns={[
                   {
-                    label: this.props.intl.formatMessage(messages.listItemType),
+                    label: this.props.intl.formatMessage(
+                      constantsMessages.type
+                    ),
                     width: 14,
                     key: 'event'
                   },
                   {
-                    label: this.props.intl.formatMessage(messages.listItemName),
+                    label: this.props.intl.formatMessage(
+                      constantsMessages.name
+                    ),
                     width: 25,
                     key: 'name'
                   },
@@ -173,7 +182,7 @@ class PrintTabComponent extends React.Component<
                   }
                 ]}
                 renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
                   this.onPageChange(currentPage)
                 }}

@@ -17,7 +17,6 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrationHome/messages'
 import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
@@ -26,6 +25,8 @@ import {
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
+import { errorMessages, constantsMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -133,7 +134,7 @@ class ApprovalTabComponent extends React.Component<
             Sentry.captureException(error)
             return (
               <ErrorText id="search-result-error-text-approvals">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.queryError)}
               </ErrorText>
             )
           }
@@ -150,20 +151,22 @@ class ApprovalTabComponent extends React.Component<
                 content={this.transformValidatedContent(data)}
                 columns={[
                   {
-                    label: this.props.intl.formatMessage(messages.listItemType),
+                    label: this.props.intl.formatMessage(
+                      constantsMessages.type
+                    ),
                     width: 14,
                     key: 'event'
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.listItemTrackingNumber
+                      constantsMessages.trackingId
                     ),
                     width: 20,
                     key: 'trackingId'
                   },
                   {
                     label: this.props.intl.formatMessage(
-                      messages.listItemEventDate
+                      constantsMessages.eventDate
                     ),
                     width: 28,
                     key: 'eventTimeElapsed'
@@ -188,7 +191,7 @@ class ApprovalTabComponent extends React.Component<
                   }
                 ]}
                 renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
                   this.onPageChange(currentPage)
                 }}

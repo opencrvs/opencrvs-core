@@ -1,16 +1,16 @@
 export const ENGLISH_STATE = {
   lang: 'en',
   messages: {
-    'menu.back': 'Back',
-    'menu.menu': 'Menu',
-    'menu.items.homepage': 'Homepage',
-    'menu.items.register': 'Register',
-    'menu.items.drafts': 'Drafts',
-    'menu.items.settings': 'Settings',
-    'menu.items.logout': 'Log out',
-    'menu.items.changeLanguage': 'Change Language',
-    'menu.items.changeLanguage.english': 'English',
-    'menu.items.changeLanguage.bengali': 'Bengali',
+    'buttons.back': 'Back',
+    'buttons.menu': 'Menu',
+    'buttons.homepage': 'Homepage',
+    'buttons.register': 'Register',
+    'buttons.drafts': 'Drafts',
+    'buttons.settings': 'Settings',
+    'buttons.logout': 'Log out',
+    'buttons.changeLanguage': 'Change Language',
+    'languages.english': 'English',
+    'languages.bengali': 'Bengali',
     'performance.hello': 'Hello',
     'performance.graph.birthRegistrationBoxTitle':
       'Birth Registration Key Figures',
@@ -43,11 +43,11 @@ export const ENGLISH_STATE = {
     'performance.graph.category.gender.male': 'Male',
     'performance.header.hello': 'Hello {fullName}',
     'performance.graph.queryError': 'An error occurred while searching',
-    'register.home.header.FIELD_AGENT': 'Field Agent',
-    'register.home.header.REGISTRATION_AGENT': 'Registration Agent',
-    'register.home.header.LOCAL_REGISTRAR': 'Registrar',
-    'register.home.header.DISTRICT_REGISTRAR': 'District Registrar',
-    'register.home.header.STATE_REGISTRAR': 'State Registrar',
-    'register.home.header.NATIONAL_REGISTRAR': 'National Registrar'
+    'home.header.FIELD_AGENT': 'Field Agent',
+    'home.header.REGISTRATION_AGENT': 'Registration Agent',
+    'home.header.LOCAL_REGISTRAR': 'Registrar',
+    'home.header.DISTRICT_REGISTRAR': 'District Registrar',
+    'home.header.STATE_REGISTRAR': 'State Registrar',
+    'home.header.NATIONAL_REGISTRAR': 'National Registrar'
   }
 }

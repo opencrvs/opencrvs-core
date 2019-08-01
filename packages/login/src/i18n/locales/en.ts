@@ -1,7 +1,7 @@
 export const ENGLISH_STATE = {
   lang: 'en',
   messages: {
-    'login.stepOneTitle': 'Login',
+    'buttons.login': 'Login',
     'login.stepOneInstruction': 'Please enter your User name and password.',
     'login.username': 'User Name',
     'login.mobileLabel': 'Mobile number',

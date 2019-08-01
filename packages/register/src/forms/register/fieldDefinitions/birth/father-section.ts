@@ -1,14 +1,10 @@
-import { defineMessages } from 'react-intl'
-import { messages as addressMessages } from '@register/forms/address'
+import { formMessages as messages } from '@register/i18n/messages'
 import { countries } from '@register/forms/countries'
 import {
-  messages as identityMessages,
   birthIdentityOptions,
   identityTypeMapper,
   identityNameMapper
 } from '@register/forms/identity'
-import { messages as maritalStatusMessages } from '@register/forms/maritalStatus'
-import { messages as educationMessages } from '@register/forms/education'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import {
   ViewType,
@@ -76,144 +72,10 @@ export interface IFatherSectionFormData {
   baz: string
 }
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  fatherTab: {
-    id: 'register.form.tabs.fatherTab',
-    defaultMessage: 'Father',
-    description: 'Tab title for Father'
-  },
-  fatherTitle: {
-    id: 'register.form.section.fatherTitle',
-    defaultMessage: "Father's details",
-    description: 'Form section title for Father'
-  },
-  fathersDetailsExist: {
-    id: 'formFields.fathersDetailsExist',
-    defaultMessage: "Do you have the father's details?",
-    description: "Question to ask the user if they have the father's details"
-  },
-  confirm: {
-    id: 'formFields.confirm',
-    defaultMessage: 'Yes',
-    description: 'confirmation label for yes / no radio button'
-  },
-  deny: {
-    id: 'formFields.deny',
-    defaultMessage: 'No',
-    description: 'deny label for yes / no radio button'
-  },
-  nationality: {
-    id: 'formFields.father.nationality',
-    defaultMessage: 'Nationality',
-    description: 'Label for form field: Nationality'
-  },
-  nationalityBangladesh: {
-    id: 'formFields.father.nationalityBangladesh',
-    defaultMessage: 'Bangladesh',
-    description: 'Option for form field: Nationality'
-  },
-  fatherFirstNames: {
-    id: 'formFields.fatherFirstNames',
-    defaultMessage: 'First Name(s) in Bengali',
-    description: 'Label for form field: First name'
-  },
-  fatherFamilyName: {
-    id: 'formFields.fatherFamilyName',
-    defaultMessage: 'Last Name(s) in Bengali',
-    description: 'Label for form field: Family name'
-  },
-  fatherFirstNamesEng: {
-    id: 'formFields.fatherFirstNamesEng',
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english'
-  },
-  fatherFamilyNameEng: {
-    id: 'formFields.fatherFamilyNameEng',
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english'
-  },
-  defaultLabel: {
-    id: 'formFields.defaultLabel',
-    defaultMessage: 'Label goes here',
-    description: 'default label'
-  },
-  fatherDateOfBirth: {
-    id: 'formFields.fatherDateOfBirth',
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth'
-  },
-  fatherEducationAttainment: {
-    id: 'formFields.fatherEducationAttainment',
-    defaultMessage: "Father's level of formal education attained",
-    description: 'Label for form field: Father education'
-  },
-  currentAddress: {
-    id: 'formFields.currentAddress',
-    defaultMessage: 'Current Address',
-    description: 'Title for the current address fields'
-  },
-  permanentAddress: {
-    id: 'formFields.permanentAddress',
-    defaultMessage: 'Permanent Address',
-    description: 'Title for the permanent address fields'
-  },
-  optionalLabel: {
-    id: 'formFields.optionalLabel',
-    defaultMessage: 'Optional',
-    description: 'Optional label'
-  },
-  fetchFatherDetails: {
-    id: 'formFields.fetchFatherDetails',
-    defaultMessage: "Retrieve Father's Details",
-    description: 'Label for loader button'
-  },
-  fetchIdentifierModalTitle: {
-    id: 'formFields.fetchIdentifierModalTitle',
-    defaultMessage: 'Checking',
-    description: 'Label for fetch modal title'
-  },
-  fetchIdentifierModalSuccessTitle: {
-    id: 'formFields.fetchIdentifierModalSuccessTitle',
-    defaultMessage: 'ID valid',
-    description: 'Label for fetch modal success title'
-  },
-  fetchIdentifierModalErrorTitle: {
-    id: 'formFields.fetchIdentifierModalErrorTitle',
-    defaultMessage: 'Invalid Id',
-    description: 'Label for fetch modal error title'
-  },
-  fetchRegistrationModalErrorText: {
-    id: 'formFields.fetchRegistrationModalErrorText',
-    defaultMessage: 'No registration found for provided BRN',
-    description: 'Label for fetch modal error title'
-  },
-  fetchPersonByNIDModalErrorText: {
-    id: 'formFields.fetchPersonByNIDModalErrorText',
-    defaultMessage: 'No person found for provided NID',
-    description: 'Label for fetch modal error title'
-  },
-  fetchRegistrationModalInfo: {
-    id: 'formFields.fetchRegistrationModalInfo',
-    defaultMessage: 'Birth Registration Number',
-    description: 'Label for loader button'
-  },
-  fetchPersonByNIDModalInfo: {
-    id: 'formFields.fetchPersonByNIDModalInfo',
-    defaultMessage: 'National ID',
-    description: 'Label for loader button'
-  },
-  select: {
-    id: 'register.select.placeholder',
-    defaultMessage: 'Select'
-  }
-})
-
 export const fatherSection: IFormSection = {
   id: 'father',
   viewType: 'form' as ViewType,
-  name: messages.fatherTab,
+  name: messages.fatherName,
   title: messages.fatherTitle,
   hasDocumentSection: true,
   groups: [
@@ -239,7 +101,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,
-          label: identityMessages.iDType,
+          label: messages.iDType,
           required: true,
           initialValue: '',
           validate: [],
@@ -254,7 +116,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'iDTypeOther',
           type: TEXT,
-          label: identityMessages.iDTypeOtherLabel,
+          label: messages.iDTypeOtherLabel,
           required: true,
           initialValue: '',
           validate: [],
@@ -284,7 +146,7 @@ export const fatherSection: IFormSection = {
               }
             ]
           },
-          label: identityMessages.iD,
+          label: messages.iD,
           required: true,
           initialValue: '',
           validate: [],
@@ -443,7 +305,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'maritalStatus',
           type: SELECT_WITH_OPTIONS,
-          label: maritalStatusMessages.maritalStatus,
+          label: messages.maritalStatus,
           required: false,
           initialValue: 'MARRIED',
           validate: [],
@@ -451,27 +313,27 @@ export const fatherSection: IFormSection = {
           options: [
             {
               value: 'SINGLE',
-              label: maritalStatusMessages.maritalStatusSingle
+              label: messages.maritalStatusSingle
             },
             {
               value: 'MARRIED',
-              label: maritalStatusMessages.maritalStatusMarried
+              label: messages.maritalStatusMarried
             },
             {
               value: 'WIDOWED',
-              label: maritalStatusMessages.maritalStatusWidowed
+              label: messages.maritalStatusWidowed
             },
             {
               value: 'DIVORCED',
-              label: maritalStatusMessages.maritalStatusDivorced
+              label: messages.maritalStatusDivorced
             },
             {
               value: 'SEPARATED',
-              label: maritalStatusMessages.maritalStatusSeparated
+              label: messages.maritalStatusSeparated
             },
             {
               value: 'NOT_STATED',
-              label: maritalStatusMessages.maritalStatusNotStated
+              label: messages.maritalStatusNotStated
             }
           ],
           conditionals: [conditionals.fathersDetailsExist]
@@ -503,7 +365,7 @@ export const fatherSection: IFormSection = {
               }
             ]
           },
-          label: maritalStatusMessages.dateOfMarriage,
+          label: messages.dateOfMarriage,
           required: false,
           initialValue: '',
           validate: [],
@@ -523,35 +385,35 @@ export const fatherSection: IFormSection = {
           options: [
             {
               value: 'NO_SCHOOLING',
-              label: educationMessages.educationAttainmentNone
+              label: messages.educationAttainmentNone
             },
             {
               value: 'PRIMARY_ISCED_1',
-              label: educationMessages.educationAttainmentISCED1
+              label: messages.educationAttainmentISCED1
             },
             {
               value: 'LOWER_SECONDARY_ISCED_2',
-              label: educationMessages.educationAttainmentISCED2
+              label: messages.educationAttainmentISCED2
             },
             {
               value: 'UPPER_SECONDARY_ISCED_3',
-              label: educationMessages.educationAttainmentISCED3
+              label: messages.educationAttainmentISCED3
             },
             {
               value: 'POST_SECONDARY_ISCED_4',
-              label: educationMessages.educationAttainmentISCED4
+              label: messages.educationAttainmentISCED4
             },
             {
               value: 'FIRST_STAGE_TERTIARY_ISCED_5',
-              label: educationMessages.educationAttainmentISCED5
+              label: messages.educationAttainmentISCED5
             },
             {
               value: 'SECOND_STAGE_TERTIARY_ISCED_6',
-              label: educationMessages.educationAttainmentISCED6
+              label: messages.educationAttainmentISCED6
             },
             {
               value: 'NOT_STATED',
-              label: educationMessages.educationAttainmentNotStated
+              label: messages.educationAttainmentNotStated
             }
           ],
           conditionals: [conditionals.fathersDetailsExist]
@@ -559,13 +421,13 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressSameAsMother',
           type: RADIO_GROUP,
-          label: addressMessages.addressSameAsMother,
+          label: messages.addressSameAsMother,
           required: true,
           initialValue: true,
           validate: [],
           options: [
-            { value: true, label: addressMessages.confirm },
-            { value: false, label: addressMessages.deny }
+            { value: true, label: messages.confirm },
+            { value: false, label: messages.deny }
           ],
           conditionals: [conditionals.fathersDetailsExist],
           mapping: {
@@ -597,7 +459,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'country',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: messages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -612,7 +474,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'state',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: messages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -633,7 +495,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'district',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: messages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -655,7 +517,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine4',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: messages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -678,7 +540,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine3',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: messages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -703,7 +565,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine3CityOption',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: messages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -723,7 +585,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine2',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: messages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -743,7 +605,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine1CityOption',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -763,7 +625,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'postCodeCityOption',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],
@@ -783,7 +645,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine1',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -803,7 +665,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'postCode',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],
@@ -823,7 +685,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'permanentAddressSameAsMother',
           type: RADIO_GROUP,
-          label: addressMessages.permanentAddressSameAsMother,
+          label: messages.permanentAddressSameAsMother,
           required: true,
           initialValue: true,
           validate: [],
@@ -861,7 +723,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'countryPermanent',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: messages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -879,7 +741,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'statePermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: messages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -900,7 +762,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'districtPermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: messages.district,
           required: true,
           initialValue: '',
           validate: [],
@@ -922,7 +784,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine4Permanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine4,
+          label: messages.addressLine4,
           required: true,
           initialValue: '',
           validate: [],
@@ -945,7 +807,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine3Permanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.addressLine3,
+          label: messages.addressLine3,
           required: false,
           initialValue: '',
           validate: [],
@@ -970,7 +832,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine3CityOptionPermanent',
           type: TEXT,
-          label: addressMessages.addressLine3CityOption,
+          label: messages.addressLine3CityOption,
           required: false,
           initialValue: '',
           validate: [],
@@ -990,7 +852,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine2Permanent',
           type: TEXT,
-          label: addressMessages.addressLine2,
+          label: messages.addressLine2,
           required: false,
           initialValue: '',
           validate: [],
@@ -1010,7 +872,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine1CityOptionPermanent',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -1030,7 +892,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'postCodeCityOptionPermanent',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],
@@ -1050,7 +912,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'addressLine1Permanent',
           type: TEXT,
-          label: addressMessages.addressLine1,
+          label: messages.addressLine1,
           required: false,
           initialValue: '',
           validate: [],
@@ -1070,7 +932,7 @@ export const fatherSection: IFormSection = {
         {
           name: 'postCodePermanent',
           type: TEL,
-          label: addressMessages.postCode,
+          label: messages.postCode,
           required: false,
           initialValue: '',
           validate: [numeric, maxLength(4)],

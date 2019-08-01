@@ -7,7 +7,10 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { messages } from './messages'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@register/i18n/messages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -109,18 +112,25 @@ class LocalInProgressDataDetailsComponent extends React.Component<IProps> {
             </StatusIcon>
             <ExpansionContentContainer>
               <LabelValue
-                label={intl.formatMessage(messages.applicationCreationLabel)}
+                label={intl.formatMessage(
+                  constantsMessages.applicationStartedOn
+                )}
                 value={timestamp}
               />
               <ValueContainer>
                 <StyledLabel>
-                  {intl.formatMessage(messages.applicationInformantLabel)}:
+                  {intl.formatMessage(
+                    constantsMessages.applicationInformantLabel
+                  )}
+                  :
                 </StyledLabel>
                 <ValuesWithSeparator
                   strings={[
                     (transformedData.informantRelation &&
                       intl.formatMessage(
-                        messages[transformedData.informantRelation]
+                        dynamicConstantsMessages[
+                          transformedData.informantRelation
+                        ]
                       )) ||
                       '',
                     transformedData.informantContactNumber || ''

@@ -55,11 +55,10 @@ async function extractMessages() {
       let res: Message[]
       files.forEach(f => {
         const contents = fs.readFileSync(f).toString()
-        res = main(contents)
+        var res = main(contents)
         results = results.concat(res)
       })
       const reactIntlSource: IReactIntlSource = {}
-
       results.forEach(r => {
         reactIntlSource[r.id] = {
           defaultMessage: r.defaultMessage,

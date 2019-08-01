@@ -11,24 +11,24 @@ describe('when user is in the document upload page', () => {
 
   const listItems = [
     {
-      id: 'register.form.section.documents.list.informantAttestation',
+      id: 'form.section.documents.list.informantAttestation',
       defaultMessage: 'Attestation of the informant, or'
     },
     {
-      id: 'register.form.section.documents.list.attestedVaccination',
+      id: 'form.section.documents.list.attestedVaccination',
       defaultMessage: 'Attested copy of the vaccination (EPI) card, or'
     },
     {
-      id: 'register.form.section.documents.list.attestedBirthRecord',
+      id: 'form.section.documents.list.attestedBirthRecord',
       defaultMessage: 'Attested copy of hospital document or birth record, or'
     },
     {
-      id: 'register.form.section.documents.list.certification',
+      id: 'form.section.documents.list.certification',
       defaultMessage:
         'Certification regarding NGO worker authorized by registrar in favour of date of birth, or'
     },
     {
-      id: 'register.form.section.documents.list.otherDocuments',
+      id: 'form.section.documents.list.otherDocuments',
       defaultMessage:
         'Attested copy(s) of the document as prescribed by the Registrar'
     }

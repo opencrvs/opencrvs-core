@@ -1,8 +1,497 @@
 import { defineMessages } from 'react-intl'
 
-export const messages: {
+interface IConstantsMessages {
+  areYouSure: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantContactNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  application: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationCollectedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationFailedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationInformantLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationRegisteredOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationRejectedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationStartedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationState: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationSubmittedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationUpdatedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  applicationValidatedOn: ReactIntl.FormattedMessage.MessageDescriptor
+  birth: ReactIntl.FormattedMessage.MessageDescriptor
+  by: ReactIntl.FormattedMessage.MessageDescriptor
+  certified: ReactIntl.FormattedMessage.MessageDescriptor
+  collected: ReactIntl.FormattedMessage.MessageDescriptor
+  collectedBy: ReactIntl.FormattedMessage.MessageDescriptor
+  comment: ReactIntl.FormattedMessage.MessageDescriptor
+  dateOfApplication: ReactIntl.FormattedMessage.MessageDescriptor
+  death: ReactIntl.FormattedMessage.MessageDescriptor
+  declared: ReactIntl.FormattedMessage.MessageDescriptor
+  dob: ReactIntl.FormattedMessage.MessageDescriptor
+  dod: ReactIntl.FormattedMessage.MessageDescriptor
+  eventDate: ReactIntl.FormattedMessage.MessageDescriptor
+  failedToSend: ReactIntl.FormattedMessage.MessageDescriptor
+  gender: ReactIntl.FormattedMessage.MessageDescriptor
+  id: ReactIntl.FormattedMessage.MessageDescriptor
+  issuedBy: ReactIntl.FormattedMessage.MessageDescriptor
+  labelLanguage: ReactIntl.FormattedMessage.MessageDescriptor
+  labelPassword: ReactIntl.FormattedMessage.MessageDescriptor
+  labelPhone: ReactIntl.FormattedMessage.MessageDescriptor
+  labelPin: ReactIntl.FormattedMessage.MessageDescriptor
+  labelRole: ReactIntl.FormattedMessage.MessageDescriptor
+  lastEdited: ReactIntl.FormattedMessage.MessageDescriptor
+  name: ReactIntl.FormattedMessage.MessageDescriptor
+  noNameProvided: ReactIntl.FormattedMessage.MessageDescriptor
+  noResults: ReactIntl.FormattedMessage.MessageDescriptor
+  pendingConnection: ReactIntl.FormattedMessage.MessageDescriptor
+  performanceTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  reason: ReactIntl.FormattedMessage.MessageDescriptor
+  registered: ReactIntl.FormattedMessage.MessageDescriptor
+  rejected: ReactIntl.FormattedMessage.MessageDescriptor
+  rejectedDays: ReactIntl.FormattedMessage.MessageDescriptor
+  relationship: ReactIntl.FormattedMessage.MessageDescriptor
+  review: ReactIntl.FormattedMessage.MessageDescriptor
+  search: ReactIntl.FormattedMessage.MessageDescriptor
+  sending: ReactIntl.FormattedMessage.MessageDescriptor
+  sentOn: ReactIntl.FormattedMessage.MessageDescriptor
+  status: ReactIntl.FormattedMessage.MessageDescriptor
+  submissionStatus: ReactIntl.FormattedMessage.MessageDescriptor
+  trackingId: ReactIntl.FormattedMessage.MessageDescriptor
+  type: ReactIntl.FormattedMessage.MessageDescriptor
+  update: ReactIntl.FormattedMessage.MessageDescriptor
+  user: ReactIntl.FormattedMessage.MessageDescriptor
+  username: ReactIntl.FormattedMessage.MessageDescriptor
+  waitingToSend: ReactIntl.FormattedMessage.MessageDescriptor
+}
+const messagesToDefine: IConstantsMessages = {
+  applicantContactNumber: {
+    defaultMessage: 'Applicant contact number',
+    description: 'The title of contact number label',
+    id: 'constants.applicantContactNumber'
+  },
+  application: {
+    defaultMessage: 'application',
+    description: 'A label for application',
+    id: 'constants.application'
+  },
+  applicationCollectedOn: {
+    defaultMessage: 'Certificate collected on',
+    description:
+      'Label for the workflow timestamp when the status is collected',
+    id: 'constants.applicationCollectedOn'
+  },
+  applicationFailedOn: {
+    defaultMessage: 'Failed to send on',
+    description: 'Label for the workflow timestamp when the status is failed',
+    id: 'constants.applicationFailedOn'
+  },
+  applicationInformantLabel: {
+    defaultMessage: 'Informant',
+    description: 'Informant Label',
+    id: 'constants.informant'
+  },
+  applicationRegisteredOn: {
+    defaultMessage: 'Application registered on',
+    description:
+      'Label for the workflow timestamp when the status is registered',
+    id: 'constants.applicationRegisteredOn'
+  },
+  applicationRejectedOn: {
+    defaultMessage: 'Application rejected on',
+    description: 'Label for the workflow timestamp when the status is rejected',
+    id: 'constants.applicationRejectedOn'
+  },
+  applicationStartedOn: {
+    defaultMessage: 'Started on',
+    description:
+      'Label for the workflow timestamp when the status is draft created',
+    id: 'constants.applicationStartedOn'
+  },
+  applicationState: {
+    defaultMessage: 'Application {action} on',
+    description: 'A label to describe when the application was actioned on',
+    id: 'constants.applicationState'
+  },
+  applicationSubmittedOn: {
+    defaultMessage: 'Application submitted on',
+    description:
+      'Label for the workflow timestamp when the status is application',
+    id: 'constants.applicationSubmittedOn'
+  },
+  applicationTitle: {
+    defaultMessage: 'Applications',
+    description: 'Application title',
+    id: 'constants.applications'
+  },
+  applicationUpdatedOn: {
+    defaultMessage: 'Updated on',
+    description:
+      'Label for the workflow timestamp when the status is draft updated',
+    id: 'constants.applicationUpdatedOn'
+  },
+  applicationValidatedOn: {
+    defaultMessage: 'Application reviewed on',
+    description:
+      'Label for the workflow timestamp when the status is validated',
+    id: 'constants.applicationValidatedOn'
+  },
+  areYouSure: {
+    defaultMessage: 'Are you sure?',
+    description: 'Description for are you sure label in modals',
+    id: 'constants.areYouSure'
+  },
+  birth: {
+    defaultMessage: 'Birth',
+    description: 'A label from the birth event',
+    id: 'constants.birth'
+  },
+  by: {
+    defaultMessage: 'By',
+    description: 'Label for By (the person who performed the action)',
+    id: 'constants.by'
+  },
+  certified: {
+    defaultMessage: 'certified',
+    description: 'A label for certified',
+    id: 'constants.certified'
+  },
+  collected: {
+    defaultMessage: 'collected',
+    description: 'The status label for collected',
+    id: 'constants.collected'
+  },
+  collectedBy: {
+    defaultMessage: 'Collected by',
+    description: 'The collected by sec text',
+    id: 'constants.collectedBy'
+  },
+  comment: {
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment',
+    id: 'constants.comment'
+  },
+  dateOfApplication: {
+    defaultMessage: 'Date of application',
+    description: 'Date of application label',
+    id: 'constants.dateOfApplication'
+  },
+  death: {
+    defaultMessage: 'Death',
+    description: 'A label from the death event',
+    id: 'constants.death'
+  },
+  declared: {
+    defaultMessage: 'submitted',
+    description: 'A label for submitted',
+    id: 'constants.submitted'
+  },
+  dob: {
+    defaultMessage: 'D.o.B.',
+    description: 'Date of birth label',
+    id: 'constants.dob'
+  },
+  dod: {
+    defaultMessage: 'D.o.D',
+    description: 'Label for DoD in work queue list item',
+    id: 'constants.dod'
+  },
+  eventDate: {
+    defaultMessage: 'Date of event',
+    description: 'Label for event date in list item',
+    id: 'constants.eventDate'
+  },
+  failedToSend: {
+    defaultMessage: 'Failed to send',
+    description: 'Label for application status Failed',
+    id: 'constants.failedToSend'
+  },
+  gender: {
+    defaultMessage: 'Gender',
+    description: 'Gender label',
+    id: 'constants.gender'
+  },
+  id: {
+    defaultMessage: 'ID',
+    description: 'ID Label',
+    id: 'constants.id'
+  },
+  issuedBy: {
+    defaultMessage: 'Issued by',
+    description: 'The issued by sec text',
+    id: 'constants.issuedBy'
+  },
+  labelLanguage: {
+    defaultMessage: 'Language',
+    description: 'language label',
+    id: 'constants.language'
+  },
+  labelPassword: {
+    defaultMessage: 'Password',
+    description: 'Password label',
+    id: 'constants.password'
+  },
+  labelPhone: {
+    defaultMessage: 'Phone number',
+    description: 'Phone label',
+    id: 'constants.phoneNumber'
+  },
+  labelPin: {
+    defaultMessage: 'PIN',
+    description: 'PIN label',
+    id: 'constants.PIN'
+  },
+  labelRole: {
+    defaultMessage: 'Role',
+    description: 'Role label',
+    id: 'constants.role'
+  },
+  lastEdited: {
+    defaultMessage: 'Last edited',
+    description: 'Label for rejection date in work queue list item',
+    id: 'constants.lastEdited'
+  },
+  name: {
+    defaultMessage: 'Name',
+    description: 'Name label',
+    id: 'constants.name'
+  },
+  noNameProvided: {
+    defaultMessage: 'No name provided',
+    description: 'Label for empty title',
+    id: 'constants.noNameProvided'
+  },
+  noResults: {
+    defaultMessage: 'No result to display',
+    description:
+      'Text to display if the search return no results for the current filters',
+    id: 'constants.noResults'
+  },
+  pendingConnection: {
+    defaultMessage: 'Pending connection',
+    description: 'Label for application status Pending Connection',
+    id: 'constants.pendingConnection'
+  },
+  performanceTitle: {
+    defaultMessage: 'Performance',
+    description: 'Performance title',
+    id: 'constants.performance'
+  },
+  reason: {
+    defaultMessage: 'Reason',
+    description: 'Label for Reason the application was rejected',
+    id: 'constants.reason'
+  },
+  registered: {
+    defaultMessage: 'registered',
+    description: 'A label for registered',
+    id: 'constants.registered'
+  },
+  rejected: {
+    defaultMessage: 'rejected',
+    description: 'A label for rejected',
+    id: 'constants.rejected'
+  },
+  rejectedDays: {
+    defaultMessage: 'Rejected {text}',
+    description: 'The title of rejected days of application',
+    id: 'constants.rejectedDays'
+  },
+  relationship: {
+    defaultMessage: 'Relationship',
+    description: 'Relationship Label for death',
+    id: 'constants.relationship'
+  },
+  review: {
+    defaultMessage: 'Review',
+    description: 'A label from the review button',
+    id: 'constants.review'
+  },
+  search: {
+    defaultMessage: 'Search',
+    description: 'The title of the page',
+    id: 'constants.search'
+  },
+  sending: {
+    defaultMessage: 'Sending...',
+    description: 'Label for application status Submitting',
+    id: 'constants.sending'
+  },
+  sentOn: {
+    defaultMessage: 'Sent on',
+    description: 'Label for rejection date in work queue list item',
+    id: 'constants.sentOn'
+  },
+  status: {
+    defaultMessage: 'Status',
+    description: 'Title for column',
+    id: 'constants.status'
+  },
+  submissionStatus: {
+    defaultMessage: 'Submission status',
+    description: 'Label for table header of column Submission status',
+    id: 'constants.submissionStatus'
+  },
+  trackingId: {
+    defaultMessage: 'Tracking ID',
+    description: 'Search menu tracking id type',
+    id: 'constants.trackingId'
+  },
+  type: {
+    defaultMessage: 'Type',
+    description: 'Label for type of event in work queue list item',
+    id: 'constants.type'
+  },
+  update: {
+    defaultMessage: 'Update',
+    description: 'The title of reject button in list item actions',
+    id: 'constants.update'
+  },
+  user: {
+    defaultMessage: 'User',
+    description: 'The name of the user form',
+    id: 'constants.user'
+  },
+  username: {
+    defaultMessage: 'Username',
+    description: 'Username',
+    id: 'constants.username'
+  },
+  waitingToSend: {
+    defaultMessage: 'Waiting to send',
+    description: 'Label for application status Ready to Submit',
+    id: 'constants.waitingToSend'
+  }
+}
+
+export const constantsMessages: IConstantsMessages = defineMessages(
+  messagesToDefine
+)
+
+interface IDynamicConstants {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
+}
+
+const dynamicMessagesToDefine: IDynamicConstants = {
+  declared: {
+    id: 'constants.submitted',
+    defaultMessage: 'submitted',
+    description: 'A label for submitted'
+  },
+  rejected: {
+    id: 'constants.rejected',
+    defaultMessage: 'rejected',
+    description: 'A label for rejected'
+  },
+  registered: {
+    id: 'constants.registered',
+    defaultMessage: 'registered',
+    description: 'A label for registered'
+  },
+  certified: {
+    id: 'constants.certified',
+    defaultMessage: 'certified',
+    description: 'A label for certified'
+  },
+  male: {
+    id: 'constants.male',
+    defaultMessage: 'Male',
+    description: 'The duplicates text for male'
+  },
+  female: {
+    id: 'constants.female',
+    defaultMessage: 'Female',
+    description: 'The duplicates text for female'
+  },
+  birth: {
+    id: 'constants.birth',
+    defaultMessage: 'Birth',
+    description: 'A label from the birth event'
+  },
+  death: {
+    id: 'constants.death',
+    defaultMessage: 'Death',
+    description: 'A label from the death event'
+  },
+  father: {
+    id: 'form.field.label.applicantRelation.father',
+    defaultMessage: 'Father',
+    description: 'Label for option Father'
+  },
+  mother: {
+    id: 'form.field.label.applicantRelation.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother'
+  },
+  spouse: {
+    id: 'form.field.label.applicantRelation.spouse',
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse'
+  },
+  son: {
+    id: 'form.field.label.applicantRelation.son',
+    defaultMessage: 'Son',
+    description: 'Label for option Son'
+  },
+  daughter: {
+    id: 'form.field.label.applicantRelation.daughter',
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter'
+  },
+  MOTHER: {
+    id: 'form.field.label.applicantRelation.father',
+    defaultMessage: 'Father',
+    description: 'Label for option Father'
+  },
+  FATHER: {
+    id: 'form.field.label.applicantRelation.father',
+    defaultMessage: 'Father',
+    description: 'Label for option Father'
+  },
+  BOTH_PARENTS: {
+    id: 'register.selectInformant.parents',
+    defaultMessage: 'Mother & Father',
+    description:
+      'The description that appears when selecting the parent as informant'
+  },
+  SELF: {
+    defaultMessage: 'Self',
+    description: 'The title that appears when selecting self as informant',
+    id: 'form.field.label.self'
+  },
+  OTHER: {
+    defaultMessage: 'Someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElse'
+  },
+  SPOUSE: {
+    id: 'form.field.label.applicantRelation.spouse',
+    defaultMessage: 'Spouse',
+    description: 'Label for option Spouse'
+  },
+  SON: {
+    id: 'form.field.label.applicantRelation.son',
+    defaultMessage: 'Son',
+    description: 'Label for option Son'
+  },
+  DAUGHTER: {
+    id: 'form.field.label.applicantRelation.daughter',
+    defaultMessage: 'Daughter',
+    description: 'Label for option Daughter'
+  },
+  EXTENDED_FAMILY: {
+    defaultMessage: 'Extended Family',
+    description: 'Label for option Extended Family',
+    id: 'form.field.label.applicantRelation.extendedFamily'
+  },
+  SOMEONE_ELSE: {
+    defaultMessage: 'Someone else',
+    description: 'Other Label',
+    id: 'form.field.label.someoneElse'
+  }
+}
+
+export const dynamicConstantsMessages: IDynamicConstants = defineMessages(
+  dynamicMessagesToDefine
+)
+
+const countryMessagesToDefine: IDynamicConstants = {
   AFG: {
     id: 'countries.AFG',
     defaultMessage: 'Afghanistan',
@@ -1244,4 +1733,8 @@ export const messages: {
     defaultMessage: 'Zimbabwe',
     description: 'ISO Country ZWE'
   }
-})
+}
+
+export const countryMessages: IDynamicConstants = defineMessages(
+  countryMessagesToDefine
+)

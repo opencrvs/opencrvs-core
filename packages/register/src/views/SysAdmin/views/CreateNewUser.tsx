@@ -4,7 +4,7 @@ import { replaceInitialValues } from '@register/views/RegisterForm/RegisterForm'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { UserReviewForm } from '@register/views/SysAdmin/views/UserReviewForm'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ApolloClient from 'apollo-client'
@@ -15,6 +15,7 @@ import { goBack } from '@register/navigation'
 import { getRolesQuery } from '@register/views/SysAdmin/user/queries'
 import { updateUserFormFieldDefinitions } from '@register/views/SysAdmin/forms/userReducer'
 import * as Sentry from '@sentry/browser'
+import { formMessages } from '@register/i18n/messages'
 
 interface IMatchParams {
   sectionId: string
@@ -44,20 +45,12 @@ const Container = styled.div`
   justify-content: center;
 `
 
-const messages = defineMessages({
-  userTitle: {
-    id: 'user.title.create',
-    defaultMessage: 'Create new user',
-    description: 'The title of user form'
-  }
-})
-
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   renderLoadingPage = () => {
     const { intl } = this.props
     return (
       <ActionPageLight
-        title={intl.formatMessage(messages.userTitle)}
+        title={intl.formatMessage(formMessages.userFormTitle)}
         goBack={this.props.goBack}
       >
         <Container>

@@ -6,70 +6,14 @@ import {
   Spinner
 } from '@opencrvs/components/lib/interface'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
-
+import { constantsMessages } from '@register/i18n/messages'
 import { StatusWaiting } from '@opencrvs/components/lib/icons'
-
+import { messages } from '@register/i18n/messages/views/notifications'
 import { getTheme } from '@opencrvs/components/lib/theme'
-
 import styled from '@register/styledComponents'
-
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getDefaultLanguage } from '@register/i18n/utils'
-
-const messages = {
-  statusWaitingToRegister: {
-    id: 'register.registrarHome.outbox.statusWaitingToRegister',
-    defaultMessage: 'Waiting to register',
-    description: 'Label for application status waiting for register'
-  },
-  statusWaitingToReject: {
-    id: 'register.registrarHome.outbox.statusWaitingToReject',
-    defaultMessage: 'Waiting to reject',
-    description: 'Label for application status waiting for reject'
-  },
-  statusWaitingToSubmit: {
-    id: 'register.registrarHome.outbox.statusWaitingToSubmit',
-    defaultMessage: 'Waiting to submit',
-    description: 'Label for application status waiting for reject'
-  },
-  statusRegistering: {
-    id: 'register.registrarHome.outbox.statusRegistering',
-    defaultMessage: 'Registering...',
-    description: 'Label for application status Registering'
-  },
-  statusRejecting: {
-    id: 'register.registrarHome.outbox.statusRejecting',
-    defaultMessage: 'Rejecting...',
-    description: 'Label for application status Rejecting'
-  },
-  statusSubmitting: {
-    id: 'register.registrarHome.outbox.statusSubmitting',
-    defaultMessage: 'Submitting...',
-    description: 'Label for application status submitting'
-  },
-
-  // end of status type
-  dataTableNoResults: {
-    id: 'register.registrarHome.noResults',
-    defaultMessage: 'No result to display',
-    description:
-      'Text to display if the search return no results for the current filters'
-  },
-  listItemType: {
-    id: 'register.registrarHome.resultsType',
-    defaultMessage: 'Type',
-    description: 'Label for type of event in work queue list item'
-  },
-  name: {
-    id: 'register.registrarHome.listItemName',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  waitingToRetry: {
-    id: 'register.registrarHome.outbox.waitingToRetry'
-  }
-}
 
 const Container = styled(BodyContent)`
   padding-top: 32px;
@@ -215,13 +159,13 @@ class Outbox extends React.Component<IFullProps, IState> {
           content={this.transformApplicationsReadyToSend()}
           columns={[
             {
-              label: this.props.intl.formatMessage(messages.listItemType),
+              label: this.props.intl.formatMessage(constantsMessages.type),
               width: 15,
               key: 'event'
             },
             {
               width: 45,
-              label: this.props.intl.formatMessage(messages.name),
+              label: this.props.intl.formatMessage(constantsMessages.name),
               key: 'name'
             },
             {
@@ -240,7 +184,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               key: 'statusIndicator'
             }
           ]}
-          noResultText={intl.formatMessage(messages.dataTableNoResults)}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
           totalItems={application.length}
           onPageChange={this.onPageChange}
           pageSize={10}

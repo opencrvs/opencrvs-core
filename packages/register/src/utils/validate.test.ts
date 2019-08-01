@@ -1,5 +1,4 @@
 import {
-  messages,
   isAValidPhoneNumberFormat,
   requiredSymbol,
   required,
@@ -24,6 +23,7 @@ import {
   dateFormatIsCorrect,
   dateInPast
 } from '@register/utils/validate'
+import { validationMessages as messages } from '@register/i18n/messages'
 
 describe('validate', () => {
   describe('isAValidPhoneNumberFormat. Checks a local phone number format complies with regex', () => {

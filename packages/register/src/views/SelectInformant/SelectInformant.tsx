@@ -1,11 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import {
-  defineMessages,
-  InjectedIntlProps,
-  injectIntl,
-  InjectedIntl
-} from 'react-intl'
+import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -42,116 +37,12 @@ import {
   RADIO_BUTTON_LARGE_STRING,
   INFORMANT_FIELD_STRING
 } from '@register/utils/constants'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  newBirthRegistration: {
-    id: 'register.selectInformant.newBirthRegistration',
-    defaultMessage: 'New birth application',
-    description: 'The message that appears for new birth registrations'
-  },
-  birthInformantTitle: {
-    id: 'register.selectInformant.birthInformantTitle',
-    defaultMessage: 'Who is applying for birth registration?',
-    description: 'The title that appears when asking for the birth informant'
-  },
-  deathInformantTitle: {
-    id: 'register.selectInformant.deathInformantTitle',
-    defaultMessage:
-      'What relationship does the applicant have to the deceased?',
-    description: 'The title that appears when asking for the death informant'
-  },
-  mother: {
-    id: 'register.selectInformant.mother',
-    defaultMessage: 'Mother',
-    description: 'The description that appears when asking for the informant'
-  },
-  father: {
-    id: 'register.selectInformant.father',
-    defaultMessage: 'Father',
-    description: 'The title that appears when selecting the parent as informant'
-  },
-  parents: {
-    id: 'register.selectInformant.parents',
-    defaultMessage: 'Mother & Father',
-    description:
-      'The description that appears when selecting the parent as informant'
-  },
-  someoneElse: {
-    id: 'register.selectInformant.someoneElse',
-    defaultMessage: 'Someone Else',
-    description:
-      'The description that appears when selecting someone else as informant'
-  },
-  self: {
-    id: 'register.selectInformant.self',
-    defaultMessage: 'Self',
-    description: 'The title that appears when selecting self as informant'
-  },
-  spouse: {
-    id: 'register.selectInformant.spouse',
-    defaultMessage: 'Spouse',
-    description: 'The title that appears when selecting spouse as informant'
-  },
-  son: {
-    id: 'register.selectInformant.son',
-    defaultMessage: 'Son',
-    description: 'The title that appears when selecting son as informant'
-  },
-  daughter: {
-    id: 'register.selectInformant.daughter',
-    defaultMessage: 'Daughter',
-    description: 'The title that appears when selecting daughter as informant'
-  },
-  extendedFamily: {
-    id: 'register.selectInformant.extendedFamily',
-    defaultMessage: 'Extended family',
-    description:
-      'The title that appears when selecting extended family as informant'
-  },
-  back: {
-    id: 'menu.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-  birthErrorMessage: {
-    id: 'register.selectInformant.birthErrorMessage',
-    defaultMessage: 'Please select who is present and applying',
-    description: 'Error Message to show when no informant is selected for birth'
-  },
-  deathErrorMessage: {
-    id: 'register.selectInformant.deathErrorMessage',
-    defaultMessage:
-      'Please select the relationship to the deceased and any relevant contact details.',
-    description: 'Error Message to show when no informant is selected for death'
-  },
-  continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
-    defaultMessage: 'Continue',
-    description: 'Continue Button Text'
-  },
-  phoneNoLabel: {
-    id: 'register.SelectContactPoint.phoneNoLabel',
-    defaultMessage: 'Phone number',
-    description: 'Phone No Label'
-  },
-  relationshipLabel: {
-    id: 'register.selectInformant.relationshipLabel',
-    defaultMessage: 'Relationship to deceased',
-    description: 'Relationship Label used for death informant'
-  },
-  phoneNoError: {
-    id: 'register.SelectContactPoint.phoneNoError',
-    defaultMessage: 'Not a valid mobile number',
-    description: 'Phone no error text'
-  },
-  error: {
-    id: 'register.SelectContactPoint.error',
-    defaultMessage: 'Please select a main point of contact',
-    description: 'Error text'
-  }
-})
+import { messages } from '@register/i18n/messages/views/selectInformant'
+import {
+  validationMessages,
+  formMessages,
+  buttonMessages
+} from '@register/i18n/messages'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -202,7 +93,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.MOTHER}`,
         option: {
-          label: intl.formatMessage(messages.mother),
+          label: intl.formatMessage(formMessages.mother),
           value: INFORMANT.MOTHER
         },
         disabled: false
@@ -210,7 +101,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.FATHER}`,
         option: {
-          label: intl.formatMessage(messages.father),
+          label: intl.formatMessage(formMessages.father),
           value: INFORMANT.FATHER
         },
         disabled: false
@@ -226,7 +117,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SELF}`,
         option: {
-          label: intl.formatMessage(messages.self),
+          label: intl.formatMessage(formMessages.self),
           value: INFORMANT.SELF
         },
         disabled: true
@@ -234,7 +125,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
         option: {
-          label: intl.formatMessage(messages.someoneElse),
+          label: intl.formatMessage(formMessages.someoneElse),
           value: INFORMANT.SOMEONE_ELSE
         },
         disabled: true
@@ -245,7 +136,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.MOTHER}`,
         option: {
-          label: intl.formatMessage(messages.mother),
+          label: intl.formatMessage(formMessages.mother),
           value: INFORMANT.MOTHER
         },
         disabled: false
@@ -253,7 +144,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.FATHER}`,
         option: {
-          label: intl.formatMessage(messages.father),
+          label: intl.formatMessage(formMessages.father),
           value: INFORMANT.FATHER
         },
         disabled: false
@@ -261,7 +152,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SPOUSE}`,
         option: {
-          label: intl.formatMessage(messages.spouse),
+          label: intl.formatMessage(formMessages.spouse),
           value: INFORMANT.SPOUSE
         },
         disabled: false
@@ -269,7 +160,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SON}`,
         option: {
-          label: intl.formatMessage(messages.son),
+          label: intl.formatMessage(formMessages.son),
           value: INFORMANT.SON
         },
         disabled: false
@@ -277,7 +168,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.DAUGHTER}`,
         option: {
-          label: intl.formatMessage(messages.daughter),
+          label: intl.formatMessage(formMessages.daughter),
           value: INFORMANT.DAUGHTER
         },
         disabled: false
@@ -285,7 +176,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.EXTENDED_FAMILY}`,
         option: {
-          label: intl.formatMessage(messages.extendedFamily),
+          label: intl.formatMessage(formMessages.relationExtendedFamily),
           value: INFORMANT.EXTENDED_FAMILY
         },
         disabled: false
@@ -293,7 +184,7 @@ const setInformantFields = (
       {
         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
         option: {
-          label: intl.formatMessage(messages.someoneElse),
+          label: intl.formatMessage(formMessages.someoneElse),
           value: INFORMANT.SOMEONE_ELSE
         },
         disabled: false
@@ -487,11 +378,13 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     return (
       <InputField
         id="phone_number"
-        label={this.props.intl.formatMessage(messages.phoneNoLabel)}
+        label={this.props.intl.formatMessage(formMessages.phoneNumber)}
         touched={this.state.touched}
         error={
           this.state.isPhoneNoError
-            ? this.props.intl.formatMessage(messages.phoneNoError)
+            ? this.props.intl.formatMessage(
+                validationMessages.phoneNumberNotValid
+              )
             : ''
         }
         hideAsterisk={true}
@@ -528,7 +421,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             icon={() => <BackArrow />}
             onClick={this.props.goBack}
           >
-            {intl.formatMessage(messages.back)}
+            {intl.formatMessage(buttonMessages.back)}
           </TertiaryButton>
 
           <Title>
@@ -572,7 +465,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                 <ChildContainer>
                   <InputField
                     id="relationship"
-                    label={intl.formatMessage(messages.relationshipLabel)}
+                    label={intl.formatMessage(
+                      formMessages.applicantsRelationWithDeceased
+                    )}
                     touched={this.state.touched}
                     hideAsterisk={true}
                   >
@@ -592,7 +487,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
               )}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButton)}
+            {intl.formatMessage(buttonMessages.continueButton)}
           </PrimaryButton>
         </BodyContent>
       </Container>

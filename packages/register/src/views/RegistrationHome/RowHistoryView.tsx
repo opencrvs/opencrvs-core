@@ -28,7 +28,12 @@ import {
   CERTIFICATE_DATE_FORMAT,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
 } from '@register/utils/constants'
-import { messages } from '@register/search/messages'
+import {
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/search'
 import moment from 'moment'
 import {
   StatusGray,
@@ -36,7 +41,6 @@ import {
   StatusOrange,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
-import { roleMessages } from '@register/utils/roleTypeMessages'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -206,7 +210,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
-                      roleMessages[status.user.role as string]
+                      userMessages[status.user.role as string]
                     )
                   : '',
               officeName:
@@ -221,7 +225,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     REJECT_REASON
                   )) ||
                 '',
-              rejectComments:
+              comment:
                 (status &&
                   status.type === REJECTED &&
                   extractCommentFragmentValue(
@@ -273,15 +277,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DECLARED':
-        return messages.workflowStatusDateApplication
+        return constantsMessages.applicationSubmittedOn
       case 'VALIDATED':
-        return messages.workflowStatusDateValidated
+        return constantsMessages.applicationValidatedOn
       case 'REGISTERED':
-        return messages.workflowStatusDateRegistered
+        return constantsMessages.applicationRegisteredOn
       case 'REJECTED':
-        return messages.workflowStatusDateRejected
+        return constantsMessages.applicationRejectedOn
       default:
-        return messages.workflowStatusDateApplication
+        return constantsMessages.applicationSubmittedOn
     }
   }
 
@@ -308,7 +312,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-expanded">
-                  {intl.formatMessage(messages.queryError)}
+                  {intl.formatMessage(errorMessages.queryError)}
                 </ErrorText>
               )
             } else if (loading) {
@@ -323,15 +327,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
               <>
                 <BorderedPaddedContent>
                   <ExpansionContainer>
-                    <label>{intl.formatMessage(messages.name)}:</label>
+                    <label>{intl.formatMessage(constantsMessages.name)}:</label>
                     <BoldSpan>{transformedData.name}</BoldSpan>
                   </ExpansionContainer>
                   <ExpansionContainer>
                     <label>
                       {intl.formatMessage(
                         transformedData.type.toLowerCase() === 'birth'
-                          ? messages.dob
-                          : messages.dod
+                          ? constantsMessages.dob
+                          : constantsMessages.dod
                       )}
                       :
                     </label>
@@ -351,7 +355,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         practitionerName,
                         practitionerRole,
                         rejectReasons,
-                        rejectComments
+                        comment
                       } = status
                       const type = status.type as string
                       const officeName = status.officeName as string
@@ -376,7 +380,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                               <ValueContainer>
                                 <StyledLabel>
                                   {this.props.intl.formatMessage(
-                                    messages.workflowPractitionerLabel
+                                    constantsMessages.by
                                   )}
                                   :
                                 </StyledLabel>
@@ -392,15 +396,15 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                                 <>
                                   <LabelValue
                                     label={intl.formatMessage(
-                                      messages.rejectReason
+                                      constantsMessages.update
                                     )}
                                     value={rejectReasons}
                                   />
                                   <LabelValue
                                     label={intl.formatMessage(
-                                      messages.rejectComments
+                                      constantsMessages.comment
                                     )}
-                                    value={rejectComments}
+                                    value={comment}
                                   />
                                 </>
                               )}
