@@ -74,28 +74,26 @@ class ReviewTabComponent extends React.Component<
     return transformedData.map(reg => {
       const actions = [] as IAction[]
       let icon: JSX.Element = <div />
-      if (this.userHasRegisterScope()) {
-        if (reg.duplicates && reg.duplicates.length > 0) {
-          actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
-          })
-          icon = <Duplicate />
-        } else {
-          if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
-            icon = <Validate data-tip data-for="validateTooltip" />
-          }
-          actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () =>
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
-              )
-          })
+      if (reg.duplicates && reg.duplicates.length > 0) {
+        actions.push({
+          label: this.props.intl.formatMessage(constantsMessages.review),
+          handler: () => this.props.goToReviewDuplicate(reg.id)
+        })
+        icon = <Duplicate />
+      } else {
+        if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
+          icon = <Validate data-tip data-for="validateTooltip" />
         }
+        actions.push({
+          label: this.props.intl.formatMessage(constantsMessages.review),
+          handler: () =>
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
+              reg.id,
+              'review',
+              reg.event ? reg.event.toLowerCase() : ''
+            )
+        })
       }
 
       return {

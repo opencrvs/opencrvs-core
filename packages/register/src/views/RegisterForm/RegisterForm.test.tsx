@@ -19,7 +19,8 @@ import {
   getApplicationsOfCurrentUser,
   writeApplicationByUser,
   deleteApplicationByUser,
-  IApplication
+  IApplication,
+  SUBMISSION_STATUS
 } from '@register/applications'
 import { v4 as uuid } from 'uuid'
 import { createStore } from '@register/store'
@@ -43,6 +44,7 @@ import { IUserDetails } from '@register/utils/userUtils'
 import { getToken } from '@register/utils/authUtils'
 
 import { formMessages as messages } from '@register/i18n/messages'
+import * as profileSelectors from '@register/profile/profileSelectors'
 
 describe('when user logs in', async () => {
   // Some mock data
@@ -929,6 +931,7 @@ describe('when user is in the register form preview section', () => {
         mockApplicationData,
         Event.BIRTH
       )
+      nApplication.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       store.dispatch(setInitialApplications())
       store.dispatch(storeApplication(nApplication))
 
@@ -1001,6 +1004,7 @@ describe('when user is in the register form review section', () => {
     store.dispatch(setInitialApplications())
     store.dispatch(storeApplication(application))
     const mock: any = jest.fn()
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
     const form = getReviewForm(store.getState()).birth
     const testComponent = createTestComponent(
       // @ts-ignore
@@ -1058,8 +1062,11 @@ describe('When user is in Preview section death event', async () => {
       mockDeathApplicationData,
       Event.DEATH
     )
+    deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialApplications())
     store.dispatch(storeApplication(deathDraft))
+
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
     deathForm = getRegisterForm(store.getState())[Event.DEATH]
     const nTestComponent = createTestComponent(
@@ -1202,6 +1209,7 @@ describe('When user is in Preview section death event in offline mode', async ()
       mockDeathApplicationDataWithoutFirstNames,
       Event.DEATH
     )
+    deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialApplications())
     store.dispatch(storeApplication(deathDraft))
 

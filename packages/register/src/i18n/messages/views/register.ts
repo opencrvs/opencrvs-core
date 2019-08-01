@@ -13,7 +13,7 @@ const messagesToDefine: IRegisterMessages = {
   newVitalEventRegistration: {
     id: 'register.form.newVitalEventRegistration',
     defaultMessage:
-      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} application',
     description: 'The message that appears for new vital event registration'
   },
   previewEventRegistration: {

@@ -9,7 +9,6 @@ import {
   NUMBER
 } from '@register/forms'
 import { RadioSize } from '@opencrvs/components/lib/forms'
-import { defineMessages } from 'react-intl'
 import { isValidDeathOccurrenceDate } from '@register/utils/validate'
 import { formMessages as messages } from '@register/i18n/messages'
 import { countries } from '@register/forms/countries'

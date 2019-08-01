@@ -298,6 +298,10 @@ export const motherSection: IFormSection = {
               label: messages.maritalStatusDivorced
             },
             {
+              value: 'SEPARATED',
+              label: messages.maritalStatusSeparated
+            },
+            {
               value: 'NOT_STATED',
               label: messages.maritalStatusNotStated
             }

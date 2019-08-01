@@ -513,9 +513,9 @@ describe('ReviewForm tests', async () => {
 
     expect(data.data.documents.uploadDocForMother).toEqual([
       {
-        optionValues: ['Mother', 'Birth Registration'],
+        optionValues: ['MOTHER', 'Birth Registration'],
         type: 'image/jpeg',
-        title: 'Mother',
+        title: 'MOTHER',
         description: 'Birth Registration',
         data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQECWAJYAAD'
       }

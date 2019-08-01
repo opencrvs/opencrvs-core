@@ -36,9 +36,15 @@ interface IButtonsMessages {
   update: ReactIntl.FormattedMessage.MessageDescriptor
   upload: ReactIntl.FormattedMessage.MessageDescriptor
   yes: ReactIntl.FormattedMessage.MessageDescriptor
+  approve: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  approve: {
+    id: 'buttons.approve',
+    defaultMessage: 'Approve',
+    description: 'Approve button text'
+  },
   apply: {
     defaultMessage: 'Apply',
     description: 'Apply button label',

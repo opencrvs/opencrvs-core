@@ -23,6 +23,7 @@ interface IValidationMessages {
   validNationalId: ReactIntl.FormattedMessage.MessageDescriptor
   validPassportNumber: ReactIntl.FormattedMessage.MessageDescriptor
   phoneNumberNotValid: ReactIntl.FormattedMessage.MessageDescriptor
+  validDrivingLicenseNumber: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IValidationMessages = {
@@ -159,6 +160,13 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears when an invalid value is used as passport number',
     id: 'validations.validPassportNumber'
+  },
+  validDrivingLicenseNumber: {
+    id: 'validations.validDrivingLicenseNumber',
+    defaultMessage:
+      'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
+    description:
+      'The error message that appeards when an invalid value is used as driving license number'
   }
 }
 

@@ -29,7 +29,7 @@ import {
 import {
   goBack as goBackAction,
   goToHome,
-  goToInProgressTab,
+  goToHomeTab,
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
@@ -38,7 +38,7 @@ import { HOME } from '@register/navigation/routes'
 import { getOfflineState } from '@register/offline/selectors'
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
-import styled from '@register/styledComponents'
+import styled, { keyframes } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { isNull, isUndefined, merge } from 'lodash'
@@ -54,6 +54,11 @@ import {
 } from '@register/forms/utils'
 import { messages } from '@register/i18n/messages/views/register'
 import { buttonMessages, formMessages } from '@register/i18n/messages'
+import {
+  PAGE_TRANSITIONS_ENTER_TIME,
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+} from '@register/utils/constants'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -152,7 +157,7 @@ type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
   goToHome: typeof goToHome
-  goToInProgressTab: typeof goToInProgressTab
+  goToHomeTab: typeof goToHomeTab
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
@@ -182,6 +187,25 @@ type State = {
   hasError: boolean
 }
 
+const fadeFromTop = keyframes`
+from {
+   -webkit-transform: translateY(-100%);
+   transform: translateY(-100%); 
+  }
+`
+const StyledContainer = styled(Container)`
+  &.${PAGE_TRANSITIONS_CLASSNAME}-exit {
+    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_ENTER_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
+    position: fixed;
+    z-index: 999;
+  }
+
+  &.${PAGE_TRANSITIONS_CLASSNAME}-exit-active {
+    position: fixed;
+    z-index: 999;
+  }
+`
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -268,8 +292,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToInProgressTab()
-    this.props.toggleDraftSavedNotification()
+    this.props.goToHomeTab('progress')
+  }
+
+  onDeleteApplication = (application: IApplication) => {
+    this.props.goToHomeTab('progress')
+
+    setTimeout(
+      () => this.props.deleteApplication(application),
+      PAGE_TRANSITIONS_ENTER_TIME + 200
+    )
   }
 
   continueButtonHandler = (
@@ -332,7 +364,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <Container id="informant_parent_view">
+      <StyledContainer
+        className={PAGE_TRANSITIONS_CLASSNAME}
+        id="informant_parent_view"
+      >
         {isErrorOccured && (
           <ErrorText id="error_message_section">
             {intl.formatMessage(messages.registerFormQueryError)}
@@ -358,10 +393,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   menuItems={[
                     {
                       label: 'Delete Application',
-                      handler: () => {
-                        this.props.deleteApplication(application)
-                        this.props.goToHome()
-                      }
+                      handler: () => this.onDeleteApplication(application)
                     }
                   ]}
                 />
@@ -385,7 +417,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       : 'violet'
                   }
                   saveAction={{
-                    handler: this.props.goToHome,
+                    handler: () => this.props.goToHomeTab('progress'),
                     label: intl.formatMessage(buttonMessages.exitButton)
                   }}
                 />
@@ -417,10 +449,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   menuItems={[
                     {
                       label: 'Delete Application',
-                      handler: () => {
-                        this.props.deleteApplication(application)
-                        this.props.goToHome()
-                      }
+                      handler: () => this.onDeleteApplication(application)
                     }
                   ]}
                 />
@@ -556,7 +585,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             application={application}
           />
         )}
-      </Container>
+      </StyledContainer>
     )
   }
 }
@@ -649,7 +678,7 @@ export const RegisterForm = connect<
     goToPageGroup: goToPageGroupAction,
     goBack: goBackAction,
     goToHome,
-    goToInProgressTab,
+    goToHomeTab,
     toggleDraftSavedNotification,
     handleSubmit: (values: any) => {
       console.log(values)

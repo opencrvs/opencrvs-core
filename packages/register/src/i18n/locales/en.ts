@@ -7,6 +7,7 @@ export const ENGLISH_STATE: ILanguage = {
     'birth.form.section.child.name': 'Child',
     'birth.form.section.child.title': "Child's details",
     'buttons.apply': 'Apply',
+    'buttons.approve': 'Approve',
     'buttons.back': 'Back',
     'buttons.cancel': 'Cancel',
     'buttons.change': 'Change',
@@ -406,6 +407,8 @@ export const ENGLISH_STATE: ILanguage = {
     'countries.ZAF': 'South Africa',
     'countries.ZMB': 'Zambia',
     'countries.ZWE': 'Zimbabwe',
+    'create.validate.application.action.decription':
+      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}',
     'createPIN.createDescription':
       "Choose a PIN that doesn't have 4 repeating digits or sequential numbers.",
     'createPIN.createTitle': 'Create a PIN',
@@ -530,7 +533,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.dateOfMarriage': 'Date of marriage',
     'form.field.label.deathAtFacility': 'What hospital did the death occur at?',
     'form.field.label.deathAtOtherLocation':
-      'What is the other address did the death occur at?',
+      'What is the other address that the death occurred at?',
     'form.field.label.deathAtPrivateHome':
       'What is the address of the private home?',
     'form.field.label.deathDate': 'Date of Occurrence',
@@ -583,7 +586,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.docTypeFuneralReceipt':
       'Certified Copy of Funeral Receipt',
     'form.field.label.docTypeHospitalDischargeCertificate':
-      'Hospital Discharge Certificate',
+      'Discharge Certificate',
     'form.field.label.docTypeLetterOfDeath': 'Attested Letter of Death',
     'form.field.label.docTypeMedicalInstitution':
       'Proof of birth from medical institution',
@@ -653,6 +656,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.label.maritalStatus': 'Marital status',
     'form.field.label.maritalStatusDivorced': 'Divorced',
     'form.field.label.maritalStatusMarried': 'Married',
+    'form.field.label.maritalStatusSeparated': 'Separated',
     'form.field.label.maritalStatusNotStated': 'Not stated',
     'form.field.label.maritalStatusSingle': 'Unmarried',
     'form.field.label.maritalStatusWidowed': 'Widowed',
@@ -855,9 +859,11 @@ export const ENGLISH_STATE: ILanguage = {
       'This application will be sent to the registrar from them to approve.',
     'register.form.modal.submitDescription':
       'By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.',
+    'register.form.modal.title.submitConfirmation':
+      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
     'register.form.modal.title.validateConfirmation': 'Send for approval?',
     'register.form.newVitalEventRegistration':
-      'New {event, select, birth {birth} death {death} marriage {marriage} divorce {divorce} adoption {adoption}} application',
+      '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} application',
     'register.form.previewEventRegistration':
       '{event, select, birth {Birth} death {Death} marriage {Marriage} divorce {Divorce} adoption {Adoption}} Application Preview',
     'register.form.required': 'This field is required',
@@ -951,7 +957,7 @@ export const ENGLISH_STATE: ILanguage = {
     'review.actions.description.registerConfirmInComplete':
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
     'review.actions.title.applicationStatus':
-      'Application is {isComplete, select, true {complete} false {incomplete}}',
+      'Application is {completeApplication, select, true {complete} false {incomplete}}',
     'review.actions.title.registerActionTitle': 'Register or reject?',
     'review.birthRegistration.queryError':
       'An error occurred while fetching birth registration',
@@ -977,7 +983,7 @@ export const ENGLISH_STATE: ILanguage = {
       'Government of the peoples republic of Bangladesh',
     'review.inputs.additionalComments': 'Any additional comments?',
     'review.modal.desc.submitConfirmation':
-      '{isComplete, select, true {This application will be sent to the registrar for them to review} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     'review.modal.title.registerConfirmation': 'Register this application?',
     'review.modal.title.submitConfirmation':
       '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
@@ -994,8 +1000,6 @@ export const ENGLISH_STATE: ILanguage = {
     'review.rejection.form.reasons.other': 'Other',
     'review.rejection.form.submitButton': 'Submit rejection',
     'review.rejection.form.title': 'Reasons for rejection',
-    'review.validate.action.description':
-      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
     'search.informantContact': 'Informant contact number',
     'search.labels.results.eventRegistrationNumber':
       '{event, select, birth {B} death {D} marriage {M} divorce {Divorce } adoption {A}}RN',
@@ -1059,6 +1063,12 @@ export const ENGLISH_STATE: ILanguage = {
     'userSetup.type.hospital': 'Hospital',
     'userSetupReview.instruction':
       'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
+    'validate.application.action.modal.description':
+      'This application will be sent to the registrar from them to register',
+    'validate.application.action.modal.title': 'Send for approval?',
+    'validate.complete.application.action.description':
+      'By approving you confirm that the applicatiohn is ready to register',
+    'validate.complete.application.action.title': 'Ready to approve?',
     'validations.bengaliOnlyNameFormat': 'Must contain only Bengali characters',
     'validations.blockAlphaNumericDot':
       'Can contain only block character, number and dot (e.g. C91.5)',
@@ -1076,12 +1086,14 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.phoneNumberFormat':
       'Must be a valid {num} digit number that starts with {start}',
     'validations.range': 'Must be within {min} and {max}',
-    'validations.required': 'This field must be completed.',
+    'validations.required': 'Required for registration',
     'validations.requiredSymbol': '',
     'validations.validBirthRegistrationNumber':
       'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
     'validations.validDeathRegistrationNumber':
       'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+    'validations.validDrivingLicenseNumber':
+      'The Driving License Number can only be alpha numeric and must be {validLength} characters long',
     'validations.validNationalId':
       'The National ID can only be numeric and must be {validLength} digits long',
     'validations.validPassportNumber':

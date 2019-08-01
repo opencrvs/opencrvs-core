@@ -22,14 +22,41 @@ interface IReviewMessages {
   reviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
   submitConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
   submitConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
   validateConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
   validateConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
   valueApprove: ReactIntl.FormattedMessage.MessageDescriptor
   zeroDocumentsText: ReactIntl.FormattedMessage.MessageDescriptor
+  createAndValidateApplicationActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  validateCompleteApplicationActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  validateCompleteApplicationActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  validateApplicationActionModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  validateApplicationActionModalDescription: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
+  validateCompleteApplicationActionTitle: {
+    id: 'validate.complete.application.action.title',
+    defaultMessage: 'Ready to approve?'
+  },
+  validateCompleteApplicationActionDescription: {
+    id: 'validate.complete.application.action.description',
+    defaultMessage:
+      'By approving you confirm that the applicatiohn is ready to register'
+  },
+  validateApplicationActionModalTitle: {
+    id: 'validate.application.action.modal.title',
+    defaultMessage: 'Send for approval?'
+  },
+  validateApplicationActionModalDescription: {
+    id: 'validate.application.action.modal.description',
+    defaultMessage:
+      'This application will be sent to the registrar from them to register'
+  },
+  createAndValidateApplicationActionDescription: {
+    id: 'create.validate.application.action.decription',
+    defaultMessage:
+      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}'
+  },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments',
@@ -119,7 +146,7 @@ const messagesToDefine: IReviewMessages = {
   },
   reviewActionTitle: {
     defaultMessage:
-      'Application is {isComplete, select, true {complete} false {incomplete}}',
+      'Application is {completeApplication, select, true {complete} false {incomplete}}',
     description: 'Title for review action component',
     id: 'review.actions.title.applicationStatus'
   },
@@ -135,21 +162,15 @@ const messagesToDefine: IReviewMessages = {
   },
   submitConfirmationDesc: {
     defaultMessage:
-      '{isComplete, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     description: 'Submit description text on modal',
     id: 'review.modal.desc.submitConfirmation'
   },
   submitConfirmationTitle: {
     defaultMessage:
-      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
     description: 'Submit title text on modal',
     id: 'review.modal.title.submitConfirmation'
-  },
-  validateActionDescription: {
-    defaultMessage:
-      '{isComplete, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.} false {Mandatory information is missing. Please add this information so that you can send for approval.}}',
-    description: 'Description is shown when validation',
-    id: 'review.validate.action.description'
   },
   validateConfirmationDesc: {
     defaultMessage:

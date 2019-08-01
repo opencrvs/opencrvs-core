@@ -20,8 +20,7 @@ import {
   CREATE_USER_SECTION,
   SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
-  SYS_ADMIN_HOME
+  SELECT_DEATH_MAIN_CONTACT_POINT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
@@ -125,11 +124,11 @@ export function goToHome() {
   return push(HOME)
 }
 
-export function goToInProgressTab() {
+export function goToHomeTab(tabId: string) {
   const path = getCurrentUserScope().includes('declare')
     ? FIELD_AGENT_HOME_TAB
     : REGISTRAR_HOME_TAB
-  return push(formatUrl(path, { tabId: 'progress', selectorId: 'you' }))
+  return push(formatUrl(path, { tabId, selectorId: 'you' }))
 }
 
 export function goToPerformance() {

@@ -68,10 +68,13 @@ const ExpansionContainer = styled.div`
   &:last-child {
     margin-bottom: 0;
   }
+  &.history {
+    margin-left: 8px;
+  }
 `
 const ExpansionContentContainer = styled.div`
   flex: 1;
-  margin-left: 10px;
+  margin-left: 16px;
 `
 const StatusIcon = styled.div`
   margin-top: 3px;
@@ -94,11 +97,10 @@ const ValueContainer = styled.div`
   }
 `
 const HistoryWrapper = styled.div`
-  padding: 10px 25px;
-  margin: 20px 0px;
+  margin: 24px;
 `
 const PaddedContent = styled.div`
-  padding: 25px;
+  padding: 24px;
 `
 const BorderedPaddedContent = styled(PaddedContent)`
   border-bottom: ${({ theme }) => `2px solid ${theme.colors.background}`};
@@ -111,7 +113,7 @@ const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
-  margin: 25px;
+  margin: 24px;
 `
 
 function LabelValue({ label, value }: { label: string; value: string }) {
@@ -316,10 +318,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             } else if (loading) {
               return (
                 <SpinnerContainer>
-                  <QuerySpinner
-                    id="query-spinner"
-                    baseColor={this.props.theme.colors.background}
-                  />
+                  <QuerySpinner id="query-spinner" />
                 </SpinnerContainer>
               )
             }
@@ -366,7 +365,10 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                       ).format(CERTIFICATE_DATE_FORMAT)
                       return (
                         <HistoryWrapper key={index}>
-                          <ExpansionContainer id={type + '-' + index}>
+                          <ExpansionContainer
+                            id={type + '-' + index}
+                            className="history"
+                          >
                             {this.getDeclarationStatusIcon(type)}
                             <ExpansionContentContainer>
                               <LabelValue

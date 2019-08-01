@@ -193,6 +193,7 @@ interface IFormMessages {
   maritalStatusDivorced: ReactIntl.FormattedMessage.MessageDescriptor
   maritalStatusMarried: ReactIntl.FormattedMessage.MessageDescriptor
   maritalStatusNotStated: ReactIntl.FormattedMessage.MessageDescriptor
+  maritalStatusSeparated: ReactIntl.FormattedMessage.MessageDescriptor
   maritalStatusSingle: ReactIntl.FormattedMessage.MessageDescriptor
   maritalStatusWidowed: ReactIntl.FormattedMessage.MessageDescriptor
   medicallyCertified: ReactIntl.FormattedMessage.MessageDescriptor
@@ -1236,6 +1237,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Marital status',
     description: 'Label for form field: Marital status',
     id: 'form.field.label.maritalStatus'
+  },
+  maritalStatusSeparated: {
+    id: 'form.field.label.maritalStatusSeparated',
+    defaultMessage: 'Separated',
+    description: 'Option for form field: Marital status'
   },
   maritalStatusDivorced: {
     defaultMessage: 'Divorced',

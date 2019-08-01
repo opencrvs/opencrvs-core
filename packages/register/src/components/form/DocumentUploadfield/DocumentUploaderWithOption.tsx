@@ -217,6 +217,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     const dropDownOptions = this.state.dropDownOptions.concat(addableOption)
     this.setState(() => ({ dropDownOptions }))
     remove(this.state.uploadedDocuments, (item: IFileValue) => item === image)
+    this.props.onComplete(this.state.uploadedDocuments)
     this.closePreviewSection()
   }
 

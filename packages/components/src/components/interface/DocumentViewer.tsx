@@ -24,7 +24,7 @@ const Container = styled.div`
     background: ${({ theme }) => theme.colors.lightGreyBackground};
     top: 16px;
     left: 16px;
-    width: 200px;
+    width: 250px;
     padding-top: 0px;
     padding-left: 0px;
   }

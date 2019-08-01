@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
   goToPage as goToPageAction,
-  goToHome as goToHomeAction
+  goBack as goBackAction
 } from '@register/navigation'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
@@ -116,7 +116,7 @@ interface IDetailProps {
   draft: IApplication | null
   userDetails: IUserDetails | null
   goToPage: typeof goToPageAction
-  goToHome: typeof goToHomeAction
+  goBack: typeof goBackAction
 }
 
 interface IStatus {
@@ -494,7 +494,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
       <SubPage
         title={historyData.title}
         emptyTitle={this.props.intl.formatMessage(messages.noNameProvided)}
-        goBack={this.props.goToHome}
+        goBack={this.props.goBack}
       >
         {this.renderHistory(historyData.history)}
         {historyData.action}
@@ -576,6 +576,6 @@ export const Details = connect(
   mapStateToProps,
   {
     goToPage: goToPageAction,
-    goToHome: goToHomeAction
+    goBack: goBackAction
   }
 )(injectIntl(withTheme(DetailView)))

@@ -295,9 +295,7 @@ export function fieldToAttachmentTransformer(
     attachment => {
       return {
         data: attachment.data,
-        subject: subjectMapper
-          ? subjectMapper[attachment.optionValues[0]].toUpperCase()
-          : attachment.optionValues[0].toUpperCase(),
+        subject: attachment.optionValues[0],
         type: typeMapper
           ? typeMapper[attachment.optionValues[1]]
           : attachment.optionValues[1],

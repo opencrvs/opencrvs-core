@@ -43,6 +43,7 @@ export enum Event {
 
 export enum Action {
   SUBMIT_FOR_REVIEW = 'submit for review',
+  APPROVE_APPLICATION = 'approve',
   REGISTER_APPLICATION = 'register',
   COLLECT_CERTIFICATE = 'collect certificate',
   REJECT_APPLICATION = 'reject',
@@ -364,6 +365,7 @@ export interface IConditionals {
   withIn45Days: IConditional
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
+  deceasedNationIdSelected: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
