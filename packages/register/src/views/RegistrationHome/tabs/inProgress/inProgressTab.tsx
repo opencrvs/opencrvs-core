@@ -1,7 +1,4 @@
-import {
-  PrimaryButton,
-  SecondaryButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/buttons'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   ColumnContentAlignment,
@@ -53,7 +50,33 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
+const BlueButton = styled(Button)`
+  background-color: ${({ theme }) => theme.colors.secondary};
+  height: 32px;
+  color: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  border-radius: 4px;
+  ${({ theme }) => theme.shadows.mistyShadow};
+`
+const WhiteButton = styled(Button)`
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.copy};
+  height: 32px;
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.shadows.mistyShadow};
+  &:hover {
+    background: ${({ theme }) => theme.colors.dropdownHover};
+  }
+`
+const TabGroup = styled.div`
+  > :first-child {
+    border-radius: 4px 0 0 4px;
+  }
+  > :last-child {
+    border-radius: 0 4px 4px 0;
+  }
+  padding-top: 16px;
+`
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
@@ -264,9 +287,9 @@ export class InProgressTabComponent extends React.Component<
             )
           }
           return (
-            <>
+            <TabGroup>
               {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-                <PrimaryButton
+                <BlueButton
                   id={`selector_${SELECTOR_ID.ownDrafts}`}
                   key={SELECTOR_ID.ownDrafts}
                   onClick={() =>
@@ -278,9 +301,9 @@ export class InProgressTabComponent extends React.Component<
                 >
                   {intl.formatMessage(messages.inProgressOwnDrafts)} (
                   {drafts && drafts.length})
-                </PrimaryButton>
+                </BlueButton>
               )) || (
-                <SecondaryButton
+                <WhiteButton
                   id={`selector_${SELECTOR_ID.ownDrafts}`}
                   key={SELECTOR_ID.ownDrafts}
                   onClick={() =>
@@ -292,11 +315,11 @@ export class InProgressTabComponent extends React.Component<
                 >
                   {intl.formatMessage(messages.inProgressOwnDrafts)} (
                   {drafts && drafts.length})
-                </SecondaryButton>
+                </WhiteButton>
               )}
 
               {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
-                <PrimaryButton
+                <BlueButton
                   id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
                   key={SELECTOR_ID.fieldAgentDrafts}
                   onClick={() =>
@@ -312,9 +335,9 @@ export class InProgressTabComponent extends React.Component<
                     data.countEventRegistrationsByStatus.count) ||
                     0}
                   )
-                </PrimaryButton>
+                </BlueButton>
               )) || (
-                <SecondaryButton
+                <WhiteButton
                   id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
                   key={SELECTOR_ID.fieldAgentDrafts}
                   onClick={() =>
@@ -330,9 +353,9 @@ export class InProgressTabComponent extends React.Component<
                     data.countEventRegistrationsByStatus.count) ||
                     0}
                   )
-                </SecondaryButton>
+                </WhiteButton>
               )}
-            </>
+            </TabGroup>
           )
         }}
       </Query>
