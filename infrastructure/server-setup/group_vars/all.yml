@@ -1,2 +1,3 @@
 ansible_python_interpreter: /usr/bin/python3
 ansible_user: root
+encrypt_data: False
