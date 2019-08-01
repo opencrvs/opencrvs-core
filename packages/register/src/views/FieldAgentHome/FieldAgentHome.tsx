@@ -115,7 +115,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
 const ZeroUpdatesContainer = styled.div`
   padding-top: 200px;
   display: flex;
@@ -128,12 +127,10 @@ const ZeroUpdatesText = styled.span`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h4Style};
 `
-
 const AllUpdatesText = styled.span`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bigBodyStyle};
 `
-
 const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({

@@ -150,7 +150,7 @@ const Actions = styled.div`
 `
 
 const ChildContainer = styled.div`
-  margin-left: 18px;
+  margin: 15px 0px 0px 18px;
   padding-left: 33px;
   border-left: 4px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;

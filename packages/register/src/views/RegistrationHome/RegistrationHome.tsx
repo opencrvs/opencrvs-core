@@ -101,6 +101,7 @@ const FABContainer = styled.div`
     display: none;
   }
 `
+
 interface IBaseRegistrationHomeProps {
   theme: ITheme
   language: string

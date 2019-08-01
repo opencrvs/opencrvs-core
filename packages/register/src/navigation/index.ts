@@ -125,11 +125,11 @@ export function goToHome() {
   return push(HOME)
 }
 
-export function goToInProgressTab() {
+export function goToHomeTab(tabId: string) {
   const path = getCurrentUserScope().includes('declare')
     ? FIELD_AGENT_HOME_TAB
     : REGISTRAR_HOME_TAB
-  return push(formatUrl(path, { tabId: 'progress', selectorId: 'you' }))
+  return push(formatUrl(path, { tabId, selectorId: 'you' }))
 }
 
 export function goToPerformance() {
