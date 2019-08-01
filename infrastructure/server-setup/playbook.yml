@@ -55,11 +55,11 @@
       register: st
 
     - name: 'Bootstrap encrypted data folder'
-      script: ../cryptfs/bootstrap.sh -s 100g -p {{encrypt_passphrase}} -m /data_test
+      script: ../cryptfs/bootstrap.sh -s 100g -p {{encrypt_passphrase}}
       when: (not st.stat.exists) and encrypt_data
 
     - name: 'Mount encrypted data folder'
-      script: ../cryptfs/mount.sh -p {{encrypt_passphrase}} -m /data_test
+      script: ../cryptfs/mount.sh -p {{encrypt_passphrase}}
       when: st.stat.exists and encrypt_data
 
     - name: 'Create mongo data directory'
