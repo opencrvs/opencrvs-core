@@ -155,11 +155,11 @@ export const registrationSection: IFormSection = {
               label: messages.presentBoth
             },
             {
-              value: 'MOTHER_ONLY',
+              value: 'MOTHER',
               label: messages.presentMother
             },
             {
-              value: 'FATHER_ONLY',
+              value: 'FATHER',
               label: messages.presentFather
             },
             {

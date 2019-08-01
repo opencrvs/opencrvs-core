@@ -40,7 +40,6 @@ const PlaceHolder = styled.div`
 `
 const Action = styled.div`
   width: auto;
-  margin-left: auto;
 `
 interface IAction {
   id?: string

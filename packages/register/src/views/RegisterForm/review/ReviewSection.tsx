@@ -20,7 +20,6 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   getSectionFields
 } from '@register/forms/utils'
-import { Link } from '@opencrvs/components/lib/typography'
 import { flatten, isArray } from 'lodash'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { goToPageGroup } from '@register/navigation'
@@ -173,7 +172,7 @@ const messages: {
   }
 })
 
-const RequiredFieldLink = styled(Link)`
+const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
 `
 const Row = styled.div`
@@ -230,7 +229,7 @@ const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
-  margin-top: 16px;
+  margin-top: 48px;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
@@ -596,24 +595,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 label: intl.formatMessage(field.label),
                 value:
                   errorsOnField.length > 0 ? (
-                    <RequiredFieldLink
-                      id={`required_link_${section.id}_${field.name}`}
-                      onClick={() => {
-                        this.props.goToPageGroup(
-                          pageRoute,
-                          draft.id,
-                          section.id,
-                          group.id,
-                          draft.event.toLowerCase(),
-                          field.name
-                        )
-                      }}
+                    <RequiredField
+                      id={`required_label_${section.id}_${field.name}`}
                     >
                       {intl.formatMessage(
                         errorsOnField[0].message,
                         errorsOnField[0].props
                       )}
-                    </RequiredFieldLink>
+                    </RequiredField>
                   ) : (
                     renderValue(
                       draft,

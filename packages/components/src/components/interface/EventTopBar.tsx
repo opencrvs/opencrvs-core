@@ -17,8 +17,9 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const TopBarTitle = styled.h4`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   padding-left: 16px;
+  color: ${({ theme }) => theme.colors.copy};
 `
 const Item = styled.span`
   display: flex;
