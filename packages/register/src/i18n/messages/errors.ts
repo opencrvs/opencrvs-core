@@ -4,8 +4,8 @@ interface IErrorMessages {
   draftFailed: ReactIntl.FormattedMessage.MessageDescriptor
   duplicateQueryError: ReactIntl.FormattedMessage.MessageDescriptor
   errorCodeUnauthorized: ReactIntl.FormattedMessage.MessageDescriptor
-  errorDescription1: ReactIntl.FormattedMessage.MessageDescriptor
-  errorDescription2: ReactIntl.FormattedMessage.MessageDescriptor
+  unknownErrorTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  unknownErrorDescription: ReactIntl.FormattedMessage.MessageDescriptor
   errorTitle: ReactIntl.FormattedMessage.MessageDescriptor
   errorTitleUnauthorized: ReactIntl.FormattedMessage.MessageDescriptor
   fieldAgentQueryError: ReactIntl.FormattedMessage.MessageDescriptor
@@ -34,12 +34,12 @@ const messagesToDefine: IErrorMessages = {
     description: 'Error code',
     id: 'error.code'
   },
-  errorDescription1: {
+  unknownErrorTitle: {
     defaultMessage: 'Something went wrong.',
     description: 'Error description',
     id: 'error.somethingWentWrong'
   },
-  errorDescription2: {
+  unknownErrorDescription: {
     defaultMessage: "It's not you, it us. This is our fault.",
     description: 'Error description',
     id: 'error.weAreTryingToFixThisError'

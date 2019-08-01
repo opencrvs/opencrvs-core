@@ -76,10 +76,10 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
               : intl.formatMessage(errorMessages.errorTitle)}
           </ErrorTitle>
           <ErrorMessage>
-            {intl.formatMessage(errorMessages.errorDescription1)}
+            {intl.formatMessage(errorMessages.unknownErrorTitle)}
           </ErrorMessage>
           <ErrorMessage>
-            {intl.formatMessage(errorMessages.errorDescription2)}
+            {intl.formatMessage(errorMessages.unknownErrorDescription)}
           </ErrorMessage>
           <GoToHomepage
             id="GoToHomepage"
