@@ -12,11 +12,7 @@ export const options = {
 export function setup() {
   return {
     // users are assigned to locations so these rates affect which location is used
-    tokens: [
-      { rate: 0.25, token: fetchToken('+8801733333333', 'test') },
-      { rate: 0.4, token: fetchToken('+8801722038795', 'test') },
-      { rate: 0.35, token: fetchToken('+8801712142796', 'test') }
-    ]
+    tokens: [{ rate: 1, token: fetchToken('mohammad.ashraful', 'test') }]
   }
 }
 
