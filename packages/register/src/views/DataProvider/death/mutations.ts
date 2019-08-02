@@ -5,7 +5,10 @@ import { draftToGqlTransformer } from '@register/transformer'
 
 const SUBMIT_DEATH_APPLICATION = gql`
   mutation submitMutation($details: DeathRegistrationInput!) {
-    createDeathRegistration(details: $details)
+    createDeathRegistration(details: $details) {
+      trackingId
+      compositionId
+    }
   }
 `
 const APPROVE_DEATH_APPLICATION = gql`
