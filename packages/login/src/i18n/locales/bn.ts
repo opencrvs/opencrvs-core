@@ -1,7 +1,7 @@
 export const BENGALI_STATE = {
   lang: 'bn',
   messages: {
-    'login.stepOneTitle': 'লগইন',
+    'buttons.login': 'লগইন',
     'login.stepOneInstruction':
       'অনুগ্রহপূর্বক আপনার ব্যবহারকারীর নাম  এবং পাসওয়ার্ড টাইপ করুন',
     'login.username': 'ব্যবহারকারীর নাম',

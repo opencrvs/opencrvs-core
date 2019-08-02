@@ -9,41 +9,12 @@ import { IFileValue, IFormFieldValue } from '@register/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as Jimp from 'jimp'
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  uploadError: {
-    id: 'imageUploadOption.upload.error',
-    defaultMessage:
-      'File format not supported. Please attach a png, jpg or pdf (max 5mb)',
-    description: 'Show error messages while uploading'
-  },
-  documentTypeRequired: {
-    id: 'imageUploadOption.upload.documentType',
-    defaultMessage: 'Please select the type of document first',
-    description: 'Show error message if the document type is not selected'
-  },
-  preview: {
-    id: 'formFields.imageUpload.preview',
-    defaultMessage: 'Preview',
-    description: 'label for preview a uploaded item'
-  },
-  back: {
-    id: 'menu.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  },
-  overSized: {
-    id: 'imageUploadOption.upload.overSized',
-    defaultMessage: 'File is too large. Please attach file less than 5mb',
-    description: 'Error message for Attachment size greater than 5MD.'
-  }
-})
+import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/imageUpload'
 
 const UploaderWrapper = styled.div`
   margin-bottom: 20px;
@@ -292,7 +263,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}
-            title={intl.formatMessage(messages.preview)}
+            title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
           />

@@ -32,7 +32,7 @@ import { IStoreState } from '@register/store'
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
-import NotificationToast from '@register/views/RegistrationHome/NotificatoinToast'
+import NotificationToast from '@register/views/RegistrationHome/NotificationToast'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   COUNT_REGISTRATION_QUERY
@@ -44,12 +44,13 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { messages } from './messages'
 import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
 import { ApprovalTab } from './tabs/approvals/approvalTab'
+import { errorMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -190,7 +191,7 @@ export class RegistrationHomeView extends React.Component<
             Sentry.captureException(error)
             return (
               <ErrorText id="search-result-error-text-count">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.queryError)}
               </ErrorText>
             )
           }
@@ -274,7 +275,7 @@ export class RegistrationHomeView extends React.Component<
               Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-count">
-                  {intl.formatMessage(messages.queryError)}
+                  {intl.formatMessage(errorMessages.queryError)}
                 </ErrorText>
               )
             }

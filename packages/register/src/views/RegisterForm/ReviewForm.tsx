@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
@@ -27,22 +27,8 @@ import {
 } from '@register/views/DataProvider/QueryProvider'
 import * as Sentry from '@sentry/browser'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+import { errorMessages } from '@register/i18n/messages'
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  queryError: {
-    id: 'review.birthRegistration.queryError',
-    defaultMessage: 'An error occurred while fetching birth registration',
-    description: 'The error message shown when a query fails'
-  },
-
-  unauthorized: {
-    id: 'review.error.unauthorized',
-    defaultMessage: 'We are unable to display this page to you',
-    description: 'The error message shown when a query fails'
-  }
-})
 interface IReviewProps {
   theme: ITheme
   dispatch: Dispatch
@@ -89,7 +75,7 @@ export class ReviewFormView extends React.Component<IProps> {
     if (!this.userHasRegisterScope() && !this.userHasValidateScope()) {
       return (
         <ErrorText id="review-unauthorized-error-text">
-          {intl.formatMessage(messages.unauthorized)}
+          {intl.formatMessage(errorMessages.unauthorized)}
         </ErrorText>
       )
     }
@@ -115,7 +101,7 @@ export class ReviewFormView extends React.Component<IProps> {
 
                 return (
                   <ErrorText id="review-error-text">
-                    {intl.formatMessage(messages.queryError)}
+                    {intl.formatMessage(errorMessages.registrationQueryError)}
                   </ErrorText>
                 )
               }

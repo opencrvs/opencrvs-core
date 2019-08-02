@@ -1,16 +1,16 @@
 export const BENGALI_STATE = {
   lang: 'bn',
   messages: {
-    'menu.back': 'পিছনে',
-    'menu.menu': 'তালিকা',
-    'menu.items.homepage': 'হোমপেজে',
-    'menu.items.register': 'নিবন্ধন',
-    'menu.items.drafts': 'খসড়া',
-    'menu.items.settings': 'সেটিংস',
-    'menu.items.logout': 'প্রস্থান',
-    'menu.items.changeLanguage': 'ভাষা পরিবর্তন',
-    'menu.items.changeLanguage.english': 'ইংরেজি',
-    'menu.items.changeLanguage.bengali': 'বাংলা',
+    'buttons.back': 'পিছনে',
+    'buttons.menu': 'তালিকা',
+    'buttons.homepage': 'হোমপেজে',
+    'buttons.register': 'নিবন্ধন',
+    'buttons.drafts': 'খসড়া',
+    'buttons.settings': 'সেটিংস',
+    'buttons.logout': 'প্রস্থান',
+    'buttons.changeLanguage': 'ভাষা পরিবর্তন',
+    'languages.english': 'ইংরেজি',
+    'languages.bengali': 'বাংলা',
     'performance.hello': 'হ্যালো',
     'performance.graph.birthRegistrationBoxTitle':
       'জন্ম নিবন্ধন মূল পরিসংখ্যান',
@@ -43,11 +43,11 @@ export const BENGALI_STATE = {
     'performance.graph.category.gender.male': 'পুরুষ',
     'performance.header.hello': 'হ্যালো {fullName}',
     'performance.graph.queryError': 'অনুসন্ধান করার সময় ত্রুটি ঘটেছে',
-    'register.home.header.FIELD_AGENT': 'মাঠকর্মী',
-    'register.home.header.REGISTRATION_AGENT': 'নিবন্ধন এজেন্ট',
-    'register.home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
-    'register.home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
-    'register.home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
-    'register.home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক'
+    'home.header.FIELD_AGENT': 'মাঠকর্মী',
+    'home.header.REGISTRATION_AGENT': 'নিবন্ধন এজেন্ট',
+    'home.header.LOCAL_REGISTRAR': 'নিবন্ধক',
+    'home.header.DISTRICT_REGISTRAR': 'জেলা নিবন্ধক',
+    'home.header.STATE_REGISTRAR': 'অঞ্চল নিবন্ধক',
+    'home.header.NATIONAL_REGISTRAR': 'জাতীয় নিবন্ধক'
   }
 }

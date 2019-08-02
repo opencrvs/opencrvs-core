@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   ActionPageLight,
@@ -19,67 +19,16 @@ import { IStoreState } from '@register/store'
 import { createNamesMap } from '@register/utils/data-formatting'
 import { IUserDetails } from '@register/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
 import { Mutation } from 'react-apollo'
-import { questionMessages } from '@register/utils/userSecurityQuestions'
+import {
+  userMessages,
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@register/i18n/messages'
 import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@register/views/UserSetup/queries'
-
-const messages = defineMessages({
-  title: {
-    id: 'userSetup.review.title',
-    defaultMessage: 'Your details'
-  },
-  header: {
-    id: 'userSetup.review.header',
-    defaultMessage: 'Confirm your details'
-  },
-  instruction: {
-    id: 'userSetupReview.instruction',
-    defaultMessage:
-      'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.'
-  },
-  labelEnglishName: {
-    id: 'label.nameEN',
-    defaultMessage: 'English name'
-  },
-  labelBanglaName: {
-    id: 'label.nameBN',
-    defaultMessage: 'Bengali name'
-  },
-  labelPhone: {
-    id: 'label.phone',
-    defaultMessage: 'Phone number'
-  },
-  labelAssignedOffice: {
-    id: 'label.assignedOffice',
-    defaultMessage: 'Assigned office'
-  },
-  labelRole: {
-    id: 'table.column.header.role',
-    defaultMessage: 'Role'
-  },
-  labelType: {
-    id: 'table.column.header.type',
-    defaultMessage: 'Type'
-  },
-  actionChange: {
-    id: 'action.change',
-    defaultMessage: 'Change'
-  },
-  confirm: {
-    id: 'button.confirm',
-    defaultMessage: 'Confirm'
-  },
-  wiating: {
-    id: 'user.setup.waiting',
-    defaultMessage: 'Setting up your account'
-  },
-  submitError: {
-    id: 'error.occured',
-    defaultMessage: 'An error occured. Please try again.'
-  }
-})
+import { messages } from '@register/i18n/messages/views/userSetup'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -161,12 +110,12 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         userDetails.role &&
         (userDetails.type
           ? `${intl.formatMessage(
-              roleMessages[userDetails.role as string]
+              userMessages[userDetails.role as string]
             )} / ${intl.formatMessage(
-              typeMessages[userDetails.type as string]
+              userMessages[userDetails.type as string]
             )}`
           : `${intl.formatMessage(
-              roleMessages[userDetails.role as string]
+              userMessages[userDetails.role as string]
             )}`)) ||
       ''
 
@@ -181,11 +130,11 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       this.props.setupData.securityQuestionAnswers.forEach(e => {
         answeredQuestions.push({
           id: `Question_${e.questionKey}`,
-          label: intl.formatMessage(questionMessages[e.questionKey]),
+          label: intl.formatMessage(userMessages[e.questionKey]),
           value: e.answer,
           action: {
             id: `Question_Action_${e.questionKey}`,
-            label: intl.formatMessage(messages.actionChange),
+            label: intl.formatMessage(buttonMessages.change),
             handler: () =>
               this.props.goToStep(
                 ProtectedAccoutStep.SECURITY_QUESTION,
@@ -200,7 +149,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.labelBanglaName),
         value: bengaliName,
         action: {
-          label: intl.formatMessage(messages.actionChange),
+          label: intl.formatMessage(buttonMessages.change),
           disabled: true
         }
       },
@@ -209,16 +158,16 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.labelEnglishName),
         value: englishName,
         action: {
-          label: intl.formatMessage(messages.actionChange),
+          label: intl.formatMessage(buttonMessages.change),
           disabled: true
         }
       },
       {
         id: 'UserPhone',
-        label: intl.formatMessage(messages.labelPhone),
+        label: intl.formatMessage(constantsMessages.labelPhone),
         value: mobile,
         action: {
-          label: intl.formatMessage(messages.actionChange),
+          label: intl.formatMessage(buttonMessages.change),
           disabled: true
         }
       },
@@ -230,8 +179,8 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
       {
         id: 'RoleType',
         label: `${intl.formatMessage(
-          messages.labelRole
-        )} / ${intl.formatMessage(messages.labelType)}`,
+          constantsMessages.labelRole
+        )} / ${intl.formatMessage(constantsMessages.type)}`,
         value: typeRole
       },
       ...answeredQuestions
@@ -250,7 +199,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
     }
     return (
       <ActionPageLight
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(messages.userSetupRevieTitle)}
         goBack={() => {
           this.props.goToStep(
             ProtectedAccoutStep.SECURITY_QUESTION,
@@ -263,7 +212,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         <GlobalError id="GlobalError">
           {this.state.submitError && (
             <WarningMessage>
-              {intl.formatMessage(messages.submitError)}
+              {intl.formatMessage(errorMessages.pleaseTryAgainError)}
             </WarningMessage>
           )}
         </GlobalError>
@@ -284,7 +233,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
                 <LoaderOverlay>
                   <Loader
                     id="setup_submit_waiting"
-                    loadingText={intl.formatMessage(messages.wiating)}
+                    loadingText={intl.formatMessage(messages.waiting)}
                   />
                 </LoaderOverlay>
               )
@@ -296,7 +245,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
                   onClick={() => submitActivateUser()}
                 >
                   <Check />
-                  {intl.formatMessage(messages.confirm)}
+                  {intl.formatMessage(buttonMessages.confirm)}
                 </ConfirmButton>
               </Action>
             )

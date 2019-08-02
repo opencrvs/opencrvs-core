@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { keyframes } from '@register/styledComponents'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
@@ -19,47 +19,13 @@ import {
   goToDeathInformant,
   goToHome
 } from '@register/navigation'
+import { messages } from '@register/i18n/messages/views/selectVitalEvent'
+import { constantsMessages, buttonMessages } from '@register/i18n/messages'
 import {
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@register/utils/constants'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  registerNewEventTitle: {
-    id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New application',
-    description: 'The title that appears on the select vital event page'
-  },
-  registerNewEventHeading: {
-    id: 'register.selectVitalEvent.registerNewEventHeading',
-    defaultMessage: 'What type of event do you want to declare?',
-    description: 'The section heading on the page'
-  },
-  birth: {
-    id: 'register.selectVitalEvent.birth',
-    defaultMessage: 'Birth',
-    description: 'Birth Text'
-  },
-  death: {
-    id: 'register.selectVitalEvent.death',
-    defaultMessage: 'Death',
-    description: 'Death text'
-  },
-  continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
-    defaultMessage: 'Continue',
-    description: 'Continue Button Text'
-  },
-  errorMessage: {
-    id: 'register.selectVitalEvent.errorMessage',
-    defaultMessage: 'Please select the type of event',
-    description: 'Error Message to show when no event is being selected'
-  }
-})
-
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
@@ -135,7 +101,6 @@ class SelectVitalEventView extends React.Component<
             title={intl.formatMessage(messages.registerNewEventTitle)}
             goHome={this.props.goToHome}
           />
-
           <BodyContent>
             <Title>
               {intl.formatMessage(messages.registerNewEventHeading)}
@@ -148,7 +113,7 @@ class SelectVitalEventView extends React.Component<
                 size="large"
                 key="birthevent"
                 name="birthevent"
-                label={intl.formatMessage(messages.birth)}
+                label={intl.formatMessage(constantsMessages.birth)}
                 value="birth"
                 id="select_birth_event"
                 selected={this.state.goTo === 'birth' ? 'birth' : ''}
@@ -158,7 +123,7 @@ class SelectVitalEventView extends React.Component<
                 size="large"
                 key="deathevent"
                 name="deathevent"
-                label={intl.formatMessage(messages.death)}
+                label={intl.formatMessage(constantsMessages.death)}
                 value="death"
                 id="select_death_event"
                 selected={this.state.goTo === 'death' ? 'death' : ''}
@@ -166,7 +131,7 @@ class SelectVitalEventView extends React.Component<
               />
             </Actions>
             <PrimaryButton id="continue" onClick={this.handleContinue}>
-              {intl.formatMessage(messages.continueButton)}
+              {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </BodyContent>
         </Container>

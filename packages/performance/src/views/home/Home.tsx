@@ -32,7 +32,7 @@ const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   logoutActionTitle: {
-    id: 'register.home.logout',
+    id: 'buttons.logout',
     defaultMessage: 'Log out',
     description: 'The title for log out on an action'
   },
@@ -42,32 +42,32 @@ const messages: {
     description: 'Title for the user'
   },
   FIELD_AGENT: {
-    id: 'register.home.header.FIELD_AGENT',
+    id: 'home.header.FIELD_AGENT',
     defaultMessage: 'Field Agent',
     description: 'The description for FIELD_AGENT role'
   },
   REGISTRATION_AGENT: {
-    id: 'register.home.header.REGISTRATION_AGENT',
+    id: 'home.header.REGISTRATION_AGENT',
     defaultMessage: 'Registration Agent',
     description: 'The description for REGISTRATION_AGENT role'
   },
   LOCAL_REGISTRAR: {
-    id: 'register.home.header.LOCAL_REGISTRAR',
+    id: 'home.header.LOCAL_REGISTRAR',
     defaultMessage: 'Registrar',
     description: 'The description for LOCAL_REGISTRAR role'
   },
   DISTRICT_REGISTRAR: {
-    id: 'register.home.header.DISTRICT_REGISTRAR',
+    id: 'home.header.DISTRICT_REGISTRAR',
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role'
   },
   STATE_REGISTRAR: {
-    id: 'register.home.header.STATE_REGISTRAR',
+    id: 'home.header.STATE_REGISTRAR',
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role'
   },
   NATIONAL_REGISTRAR: {
-    id: 'register.home.header.NATIONAL_REGISTRAR',
+    id: 'home.header.NATIONAL_REGISTRAR',
     defaultMessage: 'National Registrar',
     description: 'The description for NATIONAL_REGISTRAR role'
   },

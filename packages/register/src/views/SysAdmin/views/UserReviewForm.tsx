@@ -11,7 +11,7 @@ import {
 } from '@register/forms'
 import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { FormTitle, Action } from '@register/views/SysAdmin/views/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -22,7 +22,10 @@ import { createUserMutation } from '@register/views/SysAdmin/user/mutations'
 import { draftToGqlTransformer } from '@register/transformer'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { roleMessages, typeMessages } from '@register/utils/roleTypeMessages'
+import {
+  userMessages,
+  buttonMessages as messages
+} from '@register/i18n/messages'
 import { getSectionFields } from '@register/forms/utils'
 
 export interface IUserReviewFormProps {
@@ -44,19 +47,6 @@ interface ISectionData {
 
 type IFullProps = IUserReviewFormProps & InjectedIntlProps
 
-const messages = defineMessages({
-  actionChange: {
-    id: 'action.change',
-    defaultMessage: 'Change',
-    description: 'Change action'
-  },
-  submit: {
-    id: 'createUser.buttons.submit',
-    defaultMessage: 'Create user',
-    description: 'Label for submit button of user creation form'
-  }
-})
-
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -72,7 +62,7 @@ class UserReviewFormComponent extends React.Component<
           value: this.getValue(field),
           action: {
             id: `btn_change_${field.name}`,
-            label: intl.formatMessage(messages.actionChange),
+            label: intl.formatMessage(messages.change),
             handler: () => this.props.goToCreateUserSection('user', field.name)
           }
         })
@@ -87,9 +77,9 @@ class UserReviewFormComponent extends React.Component<
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
         ? field.name === 'role'
-          ? intl.formatMessage(roleMessages[formData.role as string])
+          ? intl.formatMessage(userMessages[formData.role as string])
           : field.name === 'type'
-          ? intl.formatMessage(typeMessages[formData.type as string])
+          ? intl.formatMessage(userMessages[formData.type as string])
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''
@@ -111,7 +101,7 @@ class UserReviewFormComponent extends React.Component<
         ))}
         <Action>
           <PrimaryButton id="submit_user_form" onClick={this.props.submitForm}>
-            {intl.formatMessage(messages.submit)}
+            {intl.formatMessage(messages.createUser)}
           </PrimaryButton>
         </Action>
       </ActionPageLight>

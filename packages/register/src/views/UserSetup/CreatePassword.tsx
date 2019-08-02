@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -13,70 +13,8 @@ import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData
 } from '@register/components/ProtectedAccount'
-
-const messages = defineMessages({
-  header: {
-    id: 'newPassword.header',
-    defaultMessage: 'Choose a new password',
-    description: 'New Password header'
-  },
-  instruction: {
-    id: 'newPassword.instruction',
-    defaultMessage:
-      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
-    description: 'New Password instruction'
-  },
-  newPassword: {
-    id: 'password.label.new',
-    defaultMessage: 'New password:',
-    description: 'New password label'
-  },
-  confirmPassword: {
-    id: 'password.label.confirm',
-    defaultMessage: 'Confirm new password',
-    description: 'Confirm password label'
-  },
-  validationMsg: {
-    id: 'password.validation.msg',
-    defaultMessage: 'Password must have:',
-    description: 'Password validation message'
-  },
-  minLength: {
-    id: 'password.minLength',
-    defaultMessage: '{min} characters minimum',
-    description: 'Password validation'
-  },
-  hasCases: {
-    id: 'password.cases',
-    defaultMessage: 'Contain upper and lower cases',
-    description: 'Password validation'
-  },
-  hasNumber: {
-    id: 'password.number',
-    defaultMessage: 'At least one number',
-    description: 'Password validation'
-  },
-  match: {
-    id: 'password.match',
-    defaultMessage: 'Passwords match',
-    description: 'Password validation'
-  },
-  mismatch: {
-    id: 'password.mismatch',
-    defaultMessage: 'Passwords do not match',
-    description: 'Password validation'
-  },
-  continue: {
-    id: 'button.continue',
-    defaultMessage: 'Continue',
-    description: 'Continue button label'
-  },
-  passwordRequired: {
-    id: 'error.required.password',
-    defaultMessage: 'New password is not valid',
-    description: 'New password required'
-  }
-})
+import { messages } from '@register/i18n/messages/views/userSetup'
+import { buttonMessages } from '@register/i18n/messages'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -315,7 +253,7 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
           </PasswordContents>
           <Action>
             <PrimaryButton id="Continue" onClick={this.whatNext}>
-              {intl.formatMessage(messages.continue)}
+              {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>
         </ActionPageLight>

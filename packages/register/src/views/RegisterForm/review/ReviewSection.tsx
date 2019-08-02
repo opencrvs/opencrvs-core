@@ -40,12 +40,7 @@ import {
   ILocation
 } from '@register/offline/reducer'
 import { getLanguage } from '@register/i18n/selectors'
-import {
-  defineMessages,
-  InjectedIntlProps,
-  injectIntl,
-  InjectedIntl
-} from 'react-intl'
+import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
@@ -66,7 +61,8 @@ import {
   Event
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
-
+import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
+import { buttonMessages } from '@register/i18n/messages'
 import { REJECTED, BIRTH } from '@register/utils/constants'
 import { ReviewHeader } from './ReviewHeader'
 import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
@@ -84,93 +80,6 @@ import {
   sectionMapping as deathSectionMapping,
   sectionTitle as deathSectionTitle
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  valueYes: {
-    id: 'register.form.valueYes',
-    defaultMessage: 'Yes',
-    description: 'Label for "Yes" answer'
-  },
-  valueNo: {
-    id: 'register.form.valueNo',
-    defaultMessage: 'No',
-    description: 'Label for "No" answer'
-  },
-  editLink: {
-    id: 'review.edit.modal.editButton',
-    defaultMessage: 'Edit',
-    description: 'Edit link text'
-  },
-  valueNext: {
-    id: 'register.form.next',
-    defaultMessage: 'Next',
-    description: 'Next button text'
-  },
-
-  requiredField: {
-    id: 'register.form.required',
-    defaultMessage: 'This field is required',
-    description: 'Message when a field doesnt have a value'
-  },
-
-  valueSaveAsDraft: {
-    id: 'register.form.saveDraft',
-    defaultMessage: 'Save as draft',
-    description: 'Save as draft Button Text'
-  },
-  deleteApplicationBtnTxt: {
-    id: 'review.form.deleteApplication',
-    defaultMessage: 'Delete Application',
-    description: 'Delete application Button Text'
-  },
-  actionChange: {
-    id: 'action.change',
-    defaultMessage: 'Change',
-    description: 'Change action'
-  },
-  bgdGovtName: {
-    id: 'review.header.title.govtName.bgd',
-    defaultMessage: 'Government of the peoples republic of Bangladesh',
-    description: 'Header title that shows bgd govt name'
-  },
-  headerSubjectWithoutName: {
-    id: 'review.header.subject.subjectWithoutName',
-    defaultMessage:
-      '{eventType, select, birth {Birth} death {Death}} Application',
-    description: 'Header subject that shows which application type to review'
-  },
-  headerSubjectWithName: {
-    id: 'review.header.subject.subjectWitName',
-    defaultMessage:
-      '{eventType, select, birth {Birth} death {Death}} Application for {name}',
-    description:
-      'Header subject that shows which application type to review with applicant name'
-  },
-  additionalComments: {
-    id: 'review.inputs.additionalComments',
-    defaultMessage: 'Any additional comments?',
-    description: 'Label for input Additional comments'
-  },
-  formDataHeader: {
-    id: 'review.formData.header',
-    defaultMessage:
-      '{isDraft, select, true {Check responses with the applicant before sending for review} false {Review the answers with the supporting documents}}',
-    description: 'Label for form data header text'
-  },
-  zeroDocumentsText: {
-    id: 'review.documents.zeroDocumentsText',
-    defaultMessage:
-      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
-    description: 'Zero documents text'
-  },
-  editDocuments: {
-    id: 'review.documents.editDocuments',
-    defaultMessage: 'Add attachement',
-    description: 'Edit documents text'
-  }
-})
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -364,8 +273,8 @@ const renderValue = (
   }
   if (typeof value === 'boolean') {
     return value
-      ? intl.formatMessage(messages.valueYes)
-      : intl.formatMessage(messages.valueNo)
+      ? intl.formatMessage(buttonMessages.yes)
+      : intl.formatMessage(buttonMessages.no)
   }
   return value
 }
@@ -615,7 +524,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   ),
                 action: {
                   id: `btn_change_${section.id}_${field.name}`,
-                  label: intl.formatMessage(messages.actionChange),
+                  label: intl.formatMessage(buttonMessages.change),
                   handler: () => {
                     this.editLinkClickHandler(section.id, group.id, field.name)
                   }
@@ -682,7 +591,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               id="review_header"
               logoSource={SEAL_BD_GOVT}
               title={intl.formatMessage(
-                messages[`${window.config.COUNTRY}GovtName`]
+                dynamicMessages[`${window.config.COUNTRY}GovtName`]
               )}
               subject={
                 applicantName

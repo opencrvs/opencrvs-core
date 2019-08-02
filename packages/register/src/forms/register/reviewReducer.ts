@@ -1,6 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import { IForm } from '@register/forms'
-import { defineMessages } from 'react-intl'
 import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
 import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
 import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
@@ -11,21 +10,7 @@ import { applicantsSection } from '@register/forms/register/fieldDefinitions/dea
 import { eventSection } from '@register/forms/register/fieldDefinitions/death/event-section'
 import { causeOfDeathSection } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 import { documentsSection as deathDocumentsSection } from '@register/forms/register/fieldDefinitions/death/documents-section'
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  reviewTab: {
-    id: 'review.form.tabs.reviewTab',
-    defaultMessage: 'Review',
-    description: 'Tab title for Review'
-  },
-  reviewTitle: {
-    id: 'review.form.section.reviewTitle',
-    defaultMessage: 'Review',
-    description: 'Form section title for Review'
-  }
-})
+import { messages } from '@register/i18n/messages/views/review'
 
 export interface IReviewFormState {
   reviewForm: {
@@ -46,7 +31,7 @@ export const initialState: IReviewFormState = {
         {
           id: 'review',
           viewType: 'review',
-          name: messages.reviewTab,
+          name: messages.reviewName,
           title: messages.reviewTitle,
           groups: [
             {
@@ -67,7 +52,7 @@ export const initialState: IReviewFormState = {
         {
           id: 'review',
           viewType: 'review',
-          name: messages.reviewTab,
+          name: messages.reviewName,
           title: messages.reviewTitle,
           groups: [
             {

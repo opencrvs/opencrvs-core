@@ -17,7 +17,7 @@ import {
 import { countries } from '@register/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 
-import { messages as addressMessages } from '@register/forms/address'
+import { formMessages as addressMessages } from '@register/i18n/messages'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -149,7 +149,7 @@ describe('form component registration section', () => {
           type: TEL,
           label: {
             defaultMessage: 'Phone number',
-            id: 'formFields.registration.phone',
+            id: 'form.field.label.application.phone',
             description: 'Input label for phone input'
           },
           required: true,

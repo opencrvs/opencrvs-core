@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -21,52 +21,8 @@ import {
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  registerNewEventTitle: {
-    id: 'register.selectVitalEvent.registerNewEventTitle',
-    defaultMessage: 'New application',
-    description: 'The title that appears on the select vital event page'
-  },
-  registerNewEventHeading: {
-    id: 'register.primaryApplicant.registerNewEventHeading',
-    defaultMessage: 'Who is the primary applicant for this application?',
-    description: 'The section heading on the page'
-  },
-  primaryApplicantDescription: {
-    id: 'register.primaryApplicant.description',
-    defaultMessage:
-      'This person is responsible for providing accurate information in this application. ',
-    description: 'The section heading on the page'
-  },
-  mother: {
-    id: 'register.selectInformant.mother',
-    defaultMessage: 'Mother',
-    description: 'The description that appears when asking for the informant'
-  },
-  father: {
-    id: 'register.selectInformant.father',
-    defaultMessage: 'Father',
-    description: 'The title that appears when selecting the parent as informant'
-  },
-  continueButton: {
-    id: 'register.selectVitalEvent.continueButton',
-    defaultMessage: 'Continue',
-    description: 'Continue Button Text'
-  },
-  errorMessage: {
-    id: 'register.primaryApplicant.errorMessage',
-    defaultMessage: 'Please select who is the primary applicant',
-    description: 'Error Message to show when no event is being selected'
-  },
-  back: {
-    id: 'menu.back',
-    defaultMessage: 'Back',
-    description: 'Back button in the menu'
-  }
-})
+import { messages } from '@register/i18n/messages/views/selectPrimaryApplicant'
+import { formMessages, buttonMessages } from '@register/i18n/messages'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -154,7 +110,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
             icon={() => <BackArrow />}
             onClick={this.props.goBack}
           >
-            {intl.formatMessage(messages.back)}
+            {intl.formatMessage(buttonMessages.back)}
           </TertiaryButton>
           <Title>{intl.formatMessage(messages.registerNewEventHeading)}</Title>
           <Description>
@@ -170,7 +126,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
               size="large"
               key="motherevent"
               name="motherevent"
-              label={intl.formatMessage(messages.mother)}
+              label={intl.formatMessage(formMessages.mother)}
               value={APPLICANT.MOTHER}
               id="select_mother_event"
               selected={this.state.applicant}
@@ -180,7 +136,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
               size="large"
               key="fatherevent"
               name="fatherevent"
-              label={intl.formatMessage(messages.father)}
+              label={intl.formatMessage(formMessages.father)}
               value={APPLICANT.FATHER}
               id="select_father_event"
               selected={this.state.applicant}
@@ -188,7 +144,7 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
             />
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButton)}
+            {intl.formatMessage(buttonMessages.continueButton)}
           </PrimaryButton>
         </BodyContent>
       </Container>

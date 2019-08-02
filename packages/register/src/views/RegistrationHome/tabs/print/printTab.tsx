@@ -2,9 +2,12 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPrintCertificate } from '@register/navigation'
+import {
+  goToPrintCertificate,
+  goToApplicationDetails
+} from '@register/navigation'
 import { transformData } from '@register/search/transformer'
 import { ITheme } from '@register/styledComponents'
 import * as Sentry from '@sentry/browser'
@@ -14,7 +17,6 @@ import { Query } from 'react-apollo'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { messages } from '@register/views/RegistrationHome/messages'
 import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
@@ -22,16 +24,24 @@ import {
   StyledSpinner
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
+import {
+  buttonMessages,
+  errorMessages,
+  constantsMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/registrarHome'
 
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
+  goToApplicationDetails: typeof goToApplicationDetails
   registrarUnion: string | null
   parentQueryLoading?: boolean
 }
 
 interface IPrintTabState {
   printCurrentPage: number
+  width: number
 }
 
 type IPrintTabProps = InjectedIntlProps & IBasePrintTabProps
@@ -44,7 +54,73 @@ class PrintTabComponent extends React.Component<
   constructor(props: IPrintTabProps) {
     super(props)
     this.state = {
+      width: window.innerWidth,
       printCurrentPage: 1
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getExpandable = () => {
+    return this.state.width > this.props.theme.grid.breakpoints.lg
+      ? true
+      : false
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 14,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 25,
+          key: 'name'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemRegisteredDate),
+          width: 24,
+          key: 'dateOfRegistration'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.registrationNumber),
+          width: 25,
+          key: 'registrationNumber'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemAction),
+          width: 12,
+          key: 'actions',
+          alignment: ColumnContentAlignment.CENTER,
+          isActionColumn: true
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'name'
+        }
+      ]
     }
   }
 
@@ -57,7 +133,7 @@ class PrintTabComponent extends React.Component<
     return transformedData.map(reg => {
       const actions = [
         {
-          label: this.props.intl.formatMessage(messages.print),
+          label: this.props.intl.formatMessage(buttonMessages.print),
           handler: () =>
             this.props.goToPrintCertificate(
               reg.id,
@@ -79,7 +155,13 @@ class PrintTabComponent extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
             ''),
-        actions
+        actions,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(reg.id)
+          }
+        ]
       }
     })
   }
@@ -129,60 +211,27 @@ class PrintTabComponent extends React.Component<
             Sentry.captureException(error)
             return (
               <ErrorText id="search-result-error-text-print">
-                {intl.formatMessage(messages.queryError)}
+                {intl.formatMessage(errorMessages.queryError)}
               </ErrorText>
             )
           }
           return (
-            <BodyContent>
+            <HomeContent>
               <GridTable
                 content={this.transformRegisterdContent(data)}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemType),
-                    width: 14,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(messages.listItemName),
-                    width: 25,
-                    key: 'name'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemRegisteredDate
-                    ),
-                    width: 24,
-                    key: 'dateOfRegistration'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.registrationNumber
-                    ),
-                    width: 25,
-                    key: 'registrationNumber'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemAction
-                    ),
-                    width: 12,
-                    key: 'actions',
-                    alignment: ColumnContentAlignment.CENTER,
-                    isActionColumn: true
-                  }
-                ]}
+                columns={this.getColumns()}
                 renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(messages.dataTableNoResults)}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
                   this.onPageChange(currentPage)
                 }}
                 pageSize={this.pageSize}
                 totalItems={data.searchEvents && data.searchEvents.totalItems}
                 currentPage={this.state.printCurrentPage}
-                expandable={true}
+                expandable={this.getExpandable()}
+                clickable={!this.getExpandable()}
               />
-            </BodyContent>
+            </HomeContent>
           )
         }}
       </Query>
@@ -193,6 +242,7 @@ class PrintTabComponent extends React.Component<
 export const PrintTab = connect(
   null,
   {
-    goToPrintCertificate: goToPrintCertificate
+    goToPrintCertificate,
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(PrintTabComponent)))

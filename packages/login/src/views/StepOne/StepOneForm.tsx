@@ -26,7 +26,7 @@ export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
 } = defineMessages({
   stepOneTitle: {
-    id: 'login.stepOneTitle',
+    id: 'buttons.login',
     defaultMessage: 'Login',
     description: 'The title that appears in step one of the form'
   },

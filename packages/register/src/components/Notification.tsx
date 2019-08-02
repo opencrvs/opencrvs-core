@@ -1,9 +1,8 @@
 import * as React from 'react'
-
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
-
-import { InjectedIntlProps, injectIntl, defineMessages } from 'react-intl'
+import { messages } from '@register/i18n/messages/views/notifications'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
@@ -40,42 +39,6 @@ type DispatchProps = {
   hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
-
-export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  newContentAvailable: {
-    id: 'register.notification.newContentAvailable',
-    defaultMessage: "We've made some updates, click here to refresh.",
-    description:
-      'The message that appears in notification when new content available.'
-  },
-  declarationsSynced: {
-    id: 'register.notification.declarationsSynced',
-    defaultMessage:
-      'As you have connectivity, we have synced {syncCount} new birth declarations.',
-    description:
-      'The message that appears in notification when background sync takes place'
-  },
-  draftsSaved: {
-    id: 'register.notification.draftsSaved',
-    defaultMessage: 'Your draft has been saved',
-    description:
-      'The message that appears in notification when save drafts button is clicked'
-  },
-  userFormSuccess: {
-    id: 'register.notification.userFormSuccess',
-    defaultMessage: 'New user created',
-    description:
-      'The message that appears in notification when a new user is created'
-  },
-  userFormFail: {
-    id: 'register.notification.userFormFail',
-    defaultMessage: 'Sorry! Something went wrong',
-    description:
-      'The message that appears in notification when a new user creation fails'
-  }
-})
 
 class Component extends React.Component<
   NotificationProps &
@@ -175,7 +138,7 @@ class Component extends React.Component<
             type={NOTIFICATION_TYPE.SUCCESS}
             callback={this.hideSubmitFormSuccessToast}
           >
-            {intl.formatMessage(messages[submitFormSuccessToast])}
+            {intl.formatMessage(messages.userFormSuccess)}
           </FloatingNotification>
         )}
 
@@ -186,7 +149,7 @@ class Component extends React.Component<
             type={NOTIFICATION_TYPE.ERROR}
             callback={this.hideSubmitFormErrorToast}
           >
-            {intl.formatMessage(messages[submitFormErrorToast])}
+            {intl.formatMessage(messages.userFormFail)}
           </FloatingNotification>
         )}
 

@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/browser'
 import {
   IApplication,
   modifyApplication,
+  writeApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
 import { Action, IForm } from '@register/forms'
@@ -122,6 +123,7 @@ export class SubmissionController {
       SUBMISSION_STATUS.SUBMITTING
     application.submissionStatus = requestInProgressStatus
     this.store.dispatch(modifyApplication(application))
+    this.store.dispatch(writeApplication(application))
 
     try {
       const mutationResult = await this.client.mutate({ mutation, variables })
@@ -136,8 +138,12 @@ export class SubmissionController {
       SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED
     application.submissionStatus = submissionStatus
-    if (result && result.data && result.data.createBirthRegistration) {
-      const { compositionId, trackingId } = result.data.createBirthRegistration
+    let response =
+      (result && result.data && result.data.createBirthRegistration) ||
+      (result && result.data && result.data.createDeathRegistration) ||
+      null
+    if (response) {
+      const { compositionId, trackingId } = response
       if (compositionId) {
         application.compositionId = compositionId
       }
@@ -146,6 +152,7 @@ export class SubmissionController {
       }
     }
     this.store.dispatch(modifyApplication(application))
+    this.store.dispatch(writeApplication(application))
   }
 
   private onError = (application: IApplication, error: ApolloError) => {
@@ -159,5 +166,6 @@ export class SubmissionController {
 
     application.submissionStatus = status
     this.store.dispatch(modifyApplication(application))
+    this.store.dispatch(writeApplication(application))
   }
 }

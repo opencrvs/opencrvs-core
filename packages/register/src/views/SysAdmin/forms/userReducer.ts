@@ -2,7 +2,7 @@ import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 import { IFormSectionData, IForm } from '@register/forms'
 import { Action } from 'redux'
-import { defineMessages } from 'react-intl'
+import { formMessages as messages } from '@register/i18n/messages'
 import ApolloClient from 'apollo-client'
 import { goToHome } from '@register/navigation'
 import { transformRoleDataToDefinitions } from '@register/views/SysAdmin/user/utils'
@@ -24,21 +24,6 @@ enum TOAST_MESSAGES {
   FAIL = 'userFormFail'
 }
 
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  previewTab: {
-    id: 'createUser.preview.title',
-    defaultMessage: 'Please review the new users details',
-    description: 'The title of user preview form'
-  },
-  previewTitle: {
-    id: 'user.title.create',
-    defaultMessage: 'Create new user',
-    description: 'The title of user form'
-  }
-})
-
 const initialState: IUserFormState = {
   userForm: {
     sections: [
@@ -46,8 +31,8 @@ const initialState: IUserFormState = {
       {
         id: 'preview',
         viewType: 'preview',
-        name: messages.previewTab,
-        title: messages.previewTitle,
+        name: messages.userFormReviewTitle,
+        title: messages.userFormTitle,
         groups: [
           {
             id: 'preview-view-group',

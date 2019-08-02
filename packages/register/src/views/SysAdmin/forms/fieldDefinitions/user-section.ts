@@ -6,7 +6,6 @@ import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS
 } from '@register/forms'
-import { defineMessages } from 'react-intl'
 import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
@@ -20,94 +19,15 @@ import {
   fieldNameValueTransformer
 } from '@register/forms/mappings/mutation/field-mappings'
 import { NATIONAL_ID } from '@register/forms/identity'
-
-const messages = defineMessages({
-  userForm: {
-    id: 'user.form.name',
-    defaultMessage: 'User',
-    description: 'The name of the user form'
-  },
-  userFormTitle: {
-    id: 'user.title.create',
-    defaultMessage: 'Create new user',
-    description: 'The title of user form'
-  },
-  userDetails: {
-    id: 'user.section.userDetails',
-    defaultMessage: 'User details',
-    description: 'User details section'
-  },
-  accountDetails: {
-    id: 'user.section.accountDetails',
-    defaultMessage: 'Account details',
-    description: 'Account details section'
-  },
-  assignedRegisterOffice: {
-    id: 'user.section.assignedRegisterOffice',
-    defaultMessage: 'Assigned Register Office',
-    description: 'Assigned Register Office section'
-  },
-  firstNameBn: {
-    id: 'label.firstNameBN',
-    defaultMessage: 'Bengali first name',
-    description: 'Bengali first name'
-  },
-  lastNameBn: {
-    id: 'label.lastNameBN',
-    defaultMessage: 'Bengali last name',
-    description: 'Bengali last name'
-  },
-  firstNameEn: {
-    id: 'label.firstNameEN',
-    defaultMessage: 'English first name',
-    description: 'English first name'
-  },
-  lastNameEn: {
-    id: 'label.lastNameEN',
-    defaultMessage: 'English last name',
-    description: 'English last name'
-  },
-  phoneNumber: {
-    id: 'label.phone',
-    defaultMessage: 'Phone number',
-    description: 'Phone number'
-  },
-  NID: {
-    id: 'label.NID',
-    defaultMessage: 'NID',
-    description: 'National ID'
-  },
-  username: {
-    id: 'label.username',
-    defaultMessage: 'Username',
-    description: 'Username'
-  },
-  userRole: {
-    id: 'label.role',
-    defaultMessage: 'Role',
-    description: 'User role'
-  },
-  userType: {
-    id: 'label.type',
-    defaultMessage: 'Type',
-    description: 'User type'
-  },
-  userDevice: {
-    id: 'label.userDevice',
-    defaultMessage: 'Device',
-    description: 'User device'
-  },
-  registrationOffice: {
-    id: 'label.registrationOffice',
-    defaultMessage: 'Registration Office',
-    description: 'Registration office'
-  }
-})
+import {
+  constantsMessages,
+  formMessages as messages
+} from '@register/i18n/messages'
 
 export const userSection: IFormSection = {
   id: 'user',
   viewType: 'form',
-  name: messages.userForm,
+  name: constantsMessages.user,
   title: messages.userFormTitle,
   groups: [
     {
@@ -198,7 +118,7 @@ export const userSection: IFormSection = {
         {
           name: 'role',
           type: SELECT_WITH_OPTIONS,
-          label: messages.userRole,
+          label: constantsMessages.labelRole,
           required: true,
           initialValue: '',
           validate: [],
@@ -207,7 +127,7 @@ export const userSection: IFormSection = {
         {
           name: 'type',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: messages.userType,
+          label: constantsMessages.type,
           required: true,
           initialValue: '',
           validate: [],

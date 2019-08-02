@@ -9,7 +9,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { Mutation, Query } from 'react-apollo'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps, defineMessages } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { SEARCH_RESULT } from '@register/navigation/routes'
 import { DuplicateDetails, Action } from '@register/components/DuplicateDetails'
 import { Event } from '@register/forms'
@@ -35,63 +35,17 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from '@register/utils/date-formatting'
 import * as Sentry from '@sentry/browser'
-import { roleMessages } from '@register/utils/roleTypeMessages'
+import {
+  userMessages,
+  buttonMessages,
+  errorMessages,
+  dynamicConstantsMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/duplicates'
 
 interface IMatchParams {
   applicationId: string
 }
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  title: {
-    id: 'register.duplicates.title',
-    defaultMessage: 'Possible duplicates found',
-    description: 'The title of the text box in the duplicates page'
-  },
-  description: {
-    id: 'register.duplicates.description',
-    defaultMessage:
-      'The following application has been flagged as a possible duplicate of an existing registered record.',
-    description: 'The description at the top of the duplicates page'
-  },
-  pageTitle: {
-    id: 'register.duplicates.pageTitle',
-    defaultMessage: 'Possible duplicate',
-    description: 'The duplicates page title'
-  },
-  back: {
-    id: 'menu.back',
-    defaultMessage: 'Back',
-    description: 'Title of the back link'
-  },
-  rejectButton: {
-    id: 'register.duplicates.button.reject',
-    defaultMessage: 'Reject',
-    description: 'Title of the reject button'
-  },
-  rejectDescription: {
-    id: 'register.duplicates.modal.reject',
-    defaultMessage:
-      'Are you sure you want to reject this application for being a duplicate ?',
-    description: 'Description of the reject modal'
-  },
-  male: {
-    id: 'register.duplicates.male',
-    defaultMessage: 'Male',
-    description: 'The duplicates text for male'
-  },
-  female: {
-    id: 'register.duplicates.female',
-    defaultMessage: 'Female',
-    description: 'The duplicates text for female'
-  },
-  queryError: {
-    id: 'register.duplicates.queryError',
-    defaultMessage: 'An error occurred while fetching data',
-    description: 'The error message shown when a query fails'
-  }
-})
 
 const StyledSpinner = styled(Spinner)`
   margin: 50% auto;
@@ -309,7 +263,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
           gender:
             (rec.child &&
               rec.child.gender &&
-              intl.formatMessage(messages[rec.child.gender])) ||
+              intl.formatMessage(dynamicConstantsMessages[rec.child.gender])) ||
             ''
         },
         mother: {
@@ -363,7 +317,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                     (status.user &&
                       (status.user as GQLUser).role &&
                       intl.formatMessage(
-                        roleMessages[(status.user as GQLUser).role as string]
+                        userMessages[(status.user as GQLUser).role as string]
                       )) ||
                     '',
                   office:
@@ -413,8 +367,8 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
         goBack={() => {
           window.location.assign(SEARCH_RESULT)
         }}
-        backLabel={intl.formatMessage(messages.back)}
-        title={intl.formatMessage(messages.pageTitle)}
+        backLabel={intl.formatMessage(buttonMessages.back)}
+        title={intl.formatMessage(messages.possibleDuplicateFound)}
       >
         <Query
           query={FETCH_DUPLICATES}
@@ -445,7 +399,9 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
               return (
                 <ErrorText id="duplicates-error-text">
-                  {this.props.intl.formatMessage(messages.queryError)}
+                  {this.props.intl.formatMessage(
+                    errorMessages.duplicateQueryError
+                  )}
                 </ErrorText>
               )
             }
@@ -495,7 +451,9 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
                     return (
                       <ErrorText id="duplicates-error-text">
-                        {this.props.intl.formatMessage(messages.queryError)}
+                        {this.props.intl.formatMessage(
+                          errorMessages.duplicateQueryError
+                        )}
                       </ErrorText>
                     )
                   }
@@ -506,11 +464,15 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                         <Header id="review-duplicates-header">
                           <Duplicate />
                           <HeaderText>
-                            {this.props.intl.formatMessage(messages.title)}
+                            {this.props.intl.formatMessage(
+                              messages.duplicateFoundTitle
+                            )}
                           </HeaderText>
                         </Header>
                         <p>
-                          {this.props.intl.formatMessage(messages.description)}
+                          {this.props.intl.formatMessage(
+                            messages.duplicateFoundDescription
+                          )}
                         </p>
                       </TitleBox>
                       <Grid id="review-duplicates-grid">
@@ -560,7 +522,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                     id="reject_confirm"
                     onClick={() => submitEventAsRejected()}
                   >
-                    {intl.formatMessage(messages.rejectButton)}
+                    {intl.formatMessage(buttonMessages.reject)}
                   </PrimaryButton>,
                   <BackButton
                     key="back"
@@ -572,7 +534,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                       }
                     }}
                   >
-                    {intl.formatMessage(messages.back)}
+                    {intl.formatMessage(buttonMessages.back)}
                   </BackButton>
                 ]}
                 show={this.state.showRejectModal}

@@ -5,7 +5,7 @@ import styled from '@register/styledComponents'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
 import { injectIntl, InjectedIntlProps } from 'react-intl'
-import messages from '@register/views/PIN/messages'
+import { messages } from '@register/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@register/applications'
 

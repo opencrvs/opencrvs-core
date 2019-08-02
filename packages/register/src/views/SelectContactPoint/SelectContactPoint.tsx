@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-  defineMessages,
-  InjectedIntlProps,
-  injectIntl,
-  InjectedIntl
-} from 'react-intl'
+import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -43,98 +38,12 @@ import { registrationSection } from '@register/forms/register/fieldDefinitions/b
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 import { IInformantField } from '@register/views/SelectInformant/SelectInformant'
 import { Event } from '@register/forms'
-
-const messages = defineMessages({
-  title: {
-    id: 'register.SelectContactPoint.title',
-    defaultMessage: 'Birth application',
-    description: 'The title that appears on the select vital event page'
-  },
-  heading: {
-    id: 'register.SelectContactPoint.heading',
-    defaultMessage: 'Who is the main point of contact for this application?',
-    description: 'The section heading on the page'
-  },
-  continueButton: {
-    id: 'register.SelectContactPoint.continueButton',
-    defaultMessage: 'Continue',
-    description: 'Continue Button Text'
-  },
-  motherLabel: {
-    id: 'register.SelectContactPoint.motherLabel',
-    defaultMessage: 'Mother',
-    description: 'Mother Label'
-  },
-  fatherLabel: {
-    id: 'register.SelectContactPoint.fatherLabel',
-    defaultMessage: 'Father',
-    description: 'Father Label'
-  },
-  otherLabel: {
-    id: 'register.SelectContactPoint.otherLabel',
-    defaultMessage: 'Someone else',
-    description: 'Other Label'
-  },
-  phoneNoLabel: {
-    id: 'register.SelectContactPoint.phoneNoLabel',
-    defaultMessage: 'Phone number',
-    description: 'Phone No Label'
-  },
-  birthRelationshipLabel: {
-    id: 'register.SelectContactPoint.birthRelationshipLabel',
-    defaultMessage: 'Relationship to child',
-    description: 'Relationship Label for birth'
-  },
-  deathRelationshipLabel: {
-    id: 'register.SelectContactPoint.deathRelationshipLabel',
-    defaultMessage: 'Relationship',
-    description: 'Relationship Label for death'
-  },
-  goBack: {
-    id: 'register.SelectContactPoint.goBack',
-    defaultMessage: 'Back',
-    description: 'Back button text'
-  },
-  phoneNoError: {
-    id: 'register.SelectContactPoint.phoneNoError',
-    defaultMessage: 'Not a valid mobile number',
-    description: 'Phone no error text'
-  },
-  error: {
-    id: 'register.SelectContactPoint.error',
-    defaultMessage: 'Please select a main point of contact',
-    description: 'Error text'
-  },
-  relationshipPlaceHolder: {
-    id: 'register.SelectContactPoint.relationshipPlaceHolder',
-    defaultMessage: 'eg. Grandmother',
-    description: 'Relationship place holder'
-  },
-  spouse: {
-    id: 'register.SelectContactPoint.spouse',
-    defaultMessage: 'Spouse',
-    description:
-      'The title that appears when selecting spouse as a main point of contact'
-  },
-  son: {
-    id: 'register.SelectContactPoint.son',
-    defaultMessage: 'Son',
-    description:
-      'The title that appears when selecting son as a main point of contact'
-  },
-  daughter: {
-    id: 'register.SelectContactPoint.daughter',
-    defaultMessage: 'Daughter',
-    description:
-      'The title that appears when selecting daughter as a main point of contact'
-  },
-  extendedFamily: {
-    id: 'register.SelectContactPoint.extendedFamily',
-    defaultMessage: 'Extended family',
-    description:
-      'The title that appears when selecting extended family as a main point of contact'
-  }
-})
+import { messages } from '@register/i18n/messages/views/selectContactPoint'
+import {
+  formMessages,
+  constantsMessages,
+  buttonMessages
+} from '@register/i18n/messages'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -179,7 +88,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.MOTHER}`,
         option: {
-          label: intl.formatMessage(messages.motherLabel),
+          label: intl.formatMessage(formMessages.mother),
           value: ContactPoint.MOTHER
         },
         disabled: false
@@ -187,7 +96,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.FATHER}`,
         option: {
-          label: intl.formatMessage(messages.fatherLabel),
+          label: intl.formatMessage(formMessages.father),
           value: ContactPoint.FATHER
         },
         disabled: false
@@ -195,7 +104,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.OTHER}`,
         option: {
-          label: intl.formatMessage(messages.otherLabel),
+          label: intl.formatMessage(formMessages.someoneElse),
           value: ContactPoint.OTHER
         },
         disabled: false
@@ -206,7 +115,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.MOTHER}`,
         option: {
-          label: intl.formatMessage(messages.motherLabel),
+          label: intl.formatMessage(formMessages.mother),
           value: ContactPoint.MOTHER
         },
         disabled: false
@@ -214,7 +123,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.FATHER}`,
         option: {
-          label: intl.formatMessage(messages.fatherLabel),
+          label: intl.formatMessage(formMessages.father),
           value: ContactPoint.FATHER
         },
         disabled: false
@@ -222,7 +131,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.SPOUSE}`,
         option: {
-          label: intl.formatMessage(messages.spouse),
+          label: intl.formatMessage(formMessages.spouse),
           value: ContactPoint.SPOUSE
         },
         disabled: false
@@ -230,7 +139,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.SON}`,
         option: {
-          label: intl.formatMessage(messages.son),
+          label: intl.formatMessage(formMessages.son),
           value: ContactPoint.SON
         },
         disabled: false
@@ -238,7 +147,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.DAUGHTER}`,
         option: {
-          label: intl.formatMessage(messages.daughter),
+          label: intl.formatMessage(formMessages.daughter),
           value: ContactPoint.DAUGHTER
         },
         disabled: false
@@ -246,7 +155,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.EXTENDED_FAMILY}`,
         option: {
-          label: intl.formatMessage(messages.extendedFamily),
+          label: intl.formatMessage(formMessages.relationExtendedFamily),
           value: ContactPoint.EXTENDED_FAMILY
         },
         disabled: false
@@ -254,7 +163,7 @@ const setContactPointFields = (
       {
         id: `contact_${ContactPoint.OTHER}`,
         option: {
-          label: intl.formatMessage(messages.otherLabel),
+          label: intl.formatMessage(formMessages.someoneElse),
           value: ContactPoint.OTHER
         },
         disabled: false
@@ -425,11 +334,11 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       <InputField
         id="phone_number"
         key={`${id}_phoneNumberFieldContainer`}
-        label={this.props.intl.formatMessage(messages.phoneNoLabel)}
+        label={this.props.intl.formatMessage(formMessages.phoneNumber)}
         touched={this.state.touched}
         error={
           this.state.isPhoneNoError
-            ? this.props.intl.formatMessage(messages.phoneNoError)
+            ? this.props.intl.formatMessage(messages.phoneNumberNotValid)
             : ''
         }
         hideAsterisk={true}
@@ -485,7 +394,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
             icon={() => <BackArrow />}
             onClick={this.props.goBack}
           >
-            {intl.formatMessage(messages.goBack)}
+            {intl.formatMessage(buttonMessages.back)}
           </TertiaryButton>
 
           <Title>{intl.formatMessage(messages.heading)}</Title>
@@ -532,7 +441,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                     label={
                       event === Event.BIRTH
                         ? intl.formatMessage(messages.birthRelationshipLabel)
-                        : intl.formatMessage(messages.deathRelationshipLabel)
+                        : intl.formatMessage(constantsMessages.relationship)
                     }
                     touched={this.state.touched}
                     hideAsterisk={true}
@@ -541,7 +450,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
                       id="relationship_input"
                       name="relationship"
                       placeholder={intl.formatMessage(
-                        messages.relationshipPlaceHolder
+                        formMessages.relationshipPlaceHolder
                       )}
                       value={this.state.relationship}
                       isSmallSized={true}
@@ -560,7 +469,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
               type="submit"
               onClick={this.handleSubmit}
             >
-              {intl.formatMessage(messages.continueButton)}
+              {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </form>
         </BodyContent>

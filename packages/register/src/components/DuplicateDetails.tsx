@@ -10,12 +10,19 @@ import {
   Delete
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { defineMessages, injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, InjectedIntlProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { goToPage as goToPageAction } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import Moment from 'react-moment'
 import { getRejectionReasonDisplayValue } from '@register/views/SearchResult/SearchResult'
+import {
+  buttonMessages,
+  formMessages,
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/duplicates'
 
 export enum Event {
   BIRTH = 'BIRTH',
@@ -67,116 +74,6 @@ interface IProps {
   rejectHandler?: () => void
   goToPage: typeof goToPageAction
 }
-
-const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-} = defineMessages({
-  name: {
-    id: 'register.duplicates.details.name',
-    defaultMessage: 'Name',
-    description: 'Name label'
-  },
-  dob: {
-    id: 'register.duplicates.details.dob',
-    defaultMessage: 'D.o.B.',
-    description: 'Date of birth label'
-  },
-  gender: {
-    id: 'register.duplicates.details.gender',
-    defaultMessage: 'Gender',
-    description: 'Gender label'
-  },
-  dateOfApplication: {
-    id: 'register.duplicates.details.dateOfApplication',
-    defaultMessage: 'Date of application',
-    description: 'Date of application label'
-  },
-  trackingId: {
-    id: 'register.duplicates.details.trackingId',
-    defaultMessage: 'Tracking ID',
-    description: 'Tracking ID label'
-  },
-  notDuplicate: {
-    id: 'register.duplicates.details.notDuplicate',
-    defaultMessage: 'Not a duplicate?',
-    description: 'A Question which is a link: Not a duplicate?'
-  },
-  mother: {
-    id: 'register.duplicates.details.mother',
-    defaultMessage: 'Mother',
-    description: 'Mother section label'
-  },
-  father: {
-    id: 'register.duplicates.details.father',
-    defaultMessage: 'Father',
-    description: 'Father section label'
-  },
-  id: {
-    id: 'register.duplicates.details.id',
-    defaultMessage: 'ID',
-    description: 'ID Label'
-  },
-  applicationState: {
-    id: 'register.duplicates.details.applicationState',
-    defaultMessage: 'Application {action} on',
-    description: 'A label to describe when the application was actioned on'
-  },
-  by: {
-    id: 'register.duplicates.details.by',
-    defaultMessage: 'By',
-    description: 'Label for By (the person who performed the action)'
-  },
-  reason: {
-    id: 'register.duplicates.details.reason',
-    defaultMessage: 'Reason',
-    description: 'Label for Reason the application was rejected'
-  },
-  review: {
-    id: 'register.duplicates.details.review',
-    defaultMessage: 'Review',
-    description: 'A label from the review button'
-  },
-  BIRTH: {
-    id: 'register.duplicates.details.birthEvent',
-    defaultMessage: 'Birth',
-    description: 'A label from the birth event'
-  },
-  DEATH: {
-    id: 'register.duplicates.details.deathEvent',
-    defaultMessage: 'Death',
-    description: 'A label from the death event'
-  },
-  application: {
-    id: 'register.duplicates.details.application',
-    defaultMessage: 'application',
-    description: 'A label for application'
-  },
-  DECLARED: {
-    id: 'register.duplicates.details.submitted',
-    defaultMessage: 'submitted',
-    description: 'A label for submitted'
-  },
-  REJECTED: {
-    id: 'register.duplicates.details.rejected',
-    defaultMessage: 'rejected',
-    description: 'A label for rejected'
-  },
-  REGISTERED: {
-    id: 'register.duplicates.details.registered',
-    defaultMessage: 'registered',
-    description: 'A label for registered'
-  },
-  CERTIFIED: {
-    id: 'register.duplicates.details.certified',
-    defaultMessage: 'certified',
-    description: 'A label for certified'
-  },
-  rejectLinkText: {
-    id: 'register.duplicates.button.reject',
-    defaultMessage: 'Reject',
-    description: 'A label for reject link'
-  }
-})
 
 const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
   border-top: ${({ theme }) => ` 4px solid ${theme.colors.primary}`};
@@ -291,16 +188,21 @@ class DuplicateDetailsClass extends React.Component<
       <DetailsBox id={`detail_box_${data.id}`} currentStatus={currentStatus}>
         <DetailTextContainer>
           <DetailText>
-            <b>{intl.formatMessage(messages.name)}:</b> {data.child.name}
+            <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
+            {data.child.name}
             <br />
-            <b>{intl.formatMessage(messages.dob)}:</b> {data.child.dob}
+            <b>{intl.formatMessage(constantsMessages.dob)}:</b> {data.child.dob}
             <br />
-            <b>{intl.formatMessage(messages.gender)}:</b> {data.child.gender}
+            <b>{intl.formatMessage(constantsMessages.gender)}:</b>{' '}
+            {data.child.gender}
             <br />
-            <b>{intl.formatMessage(messages.dateOfApplication)}:</b>{' '}
+            <b>
+              {intl.formatMessage(constantsMessages.dateOfApplication)}:
+            </b>{' '}
             <Moment format="DD-MM-YYYY">{data.dateOfApplication}</Moment>
             <br />
-            <b>{intl.formatMessage(messages.trackingId)}:</b> {data.trackingId}
+            <b>{intl.formatMessage(constantsMessages.trackingId)}:</b>{' '}
+            {data.trackingId}
             <br />
             <br />
           </DetailText>
@@ -316,25 +218,31 @@ class DuplicateDetailsClass extends React.Component<
         <DetailTextSplitContainer>
           {data.mother && (
             <DetailText>
-              <b>{intl.formatMessage(messages.mother)}</b>
+              <b>{intl.formatMessage(formMessages.mother)}</b>
               <br />
-              <b>{intl.formatMessage(messages.name)}:</b> {data.mother.name}
+              <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
+              {data.mother.name}
               <br />
-              <b>{intl.formatMessage(messages.dob)}:</b> {data.mother.dob}
+              <b>{intl.formatMessage(constantsMessages.dob)}:</b>{' '}
+              {data.mother.dob}
               <br />
-              <b>{intl.formatMessage(messages.id)}:</b> {data.mother.id}
+              <b>{intl.formatMessage(constantsMessages.id)}:</b>{' '}
+              {data.mother.id}
               <br />
             </DetailText>
           )}
           {data.father && (
             <DetailText>
-              <b>{intl.formatMessage(messages.father)}</b>
+              <b>{intl.formatMessage(formMessages.father)}</b>
               <br />
-              <b>{intl.formatMessage(messages.name)}:</b> {data.father.name}
+              <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
+              {data.father.name}
               <br />
-              <b>{intl.formatMessage(messages.dob)}:</b> {data.father.dob}
+              <b>{intl.formatMessage(constantsMessages.dob)}:</b>{' '}
+              {data.father.dob}
               <br />
-              <b>{intl.formatMessage(messages.id)}:</b> {data.father.id}
+              <b>{intl.formatMessage(constantsMessages.id)}:</b>{' '}
+              {data.father.id}
               <br />
             </DetailText>
           )}
@@ -343,7 +251,9 @@ class DuplicateDetailsClass extends React.Component<
         <TagContainer>
           <Chip
             status={<StatusGray />}
-            text={intl.formatHTMLMessage(messages[data.event.toUpperCase()])}
+            text={intl.formatHTMLMessage(
+              dynamicConstantsMessages[data.event.toLowerCase()]
+            )}
           />
           <Chip
             status={this.renderStatusIcon(currentStatus)}
@@ -359,14 +269,17 @@ class DuplicateDetailsClass extends React.Component<
               </ListStatusContainer>
               <DetailText>
                 <b>
-                  {intl.formatMessage(messages.applicationState, {
-                    action: intl.formatMessage(messages[status.action])
+                  {intl.formatMessage(constantsMessages.applicationState, {
+                    action: intl.formatMessage(
+                      dynamicConstantsMessages[status.action.toLowerCase()]
+                    )
                   })}
                   :
                 </b>{' '}
                 {status.date}
                 <br />
-                <b>{intl.formatMessage(messages.by)}:</b> {status.usersName}
+                <b>{intl.formatMessage(constantsMessages.by)}:</b>{' '}
+                {status.usersName}
                 <br />
                 {status.usersRole}
                 <br />
@@ -374,7 +287,7 @@ class DuplicateDetailsClass extends React.Component<
                 <br />
                 {status.action === Action.REJECTED && status.reasons && (
                   <>
-                    <b>{intl.formatMessage(messages.reason)}:</b>{' '}
+                    <b>{intl.formatMessage(constantsMessages.reason)}:</b>{' '}
                     {status.reasons
                       .split(',')
                       .map(reason =>
@@ -406,7 +319,7 @@ class DuplicateDetailsClass extends React.Component<
                 )
               }}
             >
-              {intl.formatMessage(messages.review)}
+              {intl.formatMessage(constantsMessages.review)}
             </PrimaryButton>
             {rejectHandler && (
               <>
@@ -416,7 +329,7 @@ class DuplicateDetailsClass extends React.Component<
                   onClick={rejectHandler}
                 >
                   <Delete />
-                  {intl.formatMessage(messages.rejectLinkText)}
+                  {intl.formatMessage(buttonMessages.reject)}
                 </RejectApplication>
               </>
             )}

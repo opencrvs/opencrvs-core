@@ -8,6 +8,7 @@ import { sentenceCase } from '@register/utils/data-formatting'
 import moment from 'moment'
 import { goToApplicationDetails } from '@register/navigation'
 import { withTheme, ITheme } from '@register/styledComponents'
+import { constantsMessages as messages } from '@register/i18n/messages'
 
 interface IInProgressProps {
   theme: ITheme
@@ -20,30 +21,6 @@ type IFullProps = IInProgressProps & InjectedIntlProps
 interface IState {
   inProgressPageNo: number
   width: number
-}
-
-const messages = {
-  listItemType: {
-    id: 'register.registrarHome.resultsType',
-    defaultMessage: 'Type',
-    description: 'Label for type of event in work queue list item'
-  },
-  listItemName: {
-    id: 'register.registrarHome.listItemName',
-    defaultMessage: 'Name',
-    description: 'Label for name in work queue list item'
-  },
-  listItemModificationDate: {
-    id: 'register.registrarHome.results.modificationDate',
-    defaultMessage: 'Last edited',
-    description: 'Label for rejection date in work queue list item'
-  },
-  dataTableNoResults: {
-    id: 'register.registrarHome.noResults',
-    defaultMessage: 'No result to display',
-    description:
-      'Text to display if the search return no results for the current filters'
-  }
 }
 
 class InProgressComponent extends React.Component<IFullProps, IState> {
@@ -140,23 +117,21 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 
   getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.md) {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(messages.listItemType),
+          label: this.props.intl.formatMessage(messages.type),
           width: 20,
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(messages.listItemName),
+          label: this.props.intl.formatMessage(messages.name),
           width: 40,
           key: 'name',
-          errorValue: 'No name provided'
+          errorValue: this.props.intl.formatMessage(messages.noNameProvided)
         },
         {
-          label: this.props.intl.formatMessage(
-            messages.listItemModificationDate
-          ),
+          label: this.props.intl.formatMessage(messages.lastEdited),
           width: 40,
           key: 'dateOfModification'
         }
@@ -164,15 +139,15 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(messages.listItemType),
+          label: this.props.intl.formatMessage(messages.type),
           width: 30,
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(messages.listItemName),
+          label: this.props.intl.formatMessage(messages.name),
           width: 70,
           key: 'name',
-          errorValue: 'No name provided'
+          errorValue: this.props.intl.formatMessage(messages.noNameProvided)
         }
       ]
     }
@@ -186,7 +161,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
         <GridTable
           content={this.transformDraftContent()}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(messages.dataTableNoResults)}
+          noResultText={intl.formatMessage(messages.noResults)}
           onPageChange={(currentPage: number) => {
             this.onPageChange(currentPage)
           }}
