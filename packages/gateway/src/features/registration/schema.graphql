@@ -416,7 +416,7 @@ type Mutation {
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
-  createDeathRegistration(details: DeathRegistrationInput!): ID!
+  createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   # process transitions
   markDeathAsVerified(
