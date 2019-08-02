@@ -36,7 +36,11 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Container = styled.div`
   position: relative;
-  margin: 0 32px 32px;
+  margin-top: 32px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 32px -32px -32px -32px;
+  }
 `
 const Content = styled.div`
   z-index: 1;
@@ -44,6 +48,10 @@ const Content = styled.div`
   position: relative;
   white-space: pre-wrap;
   color: ${({ theme }) => theme.colors.copy};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-bottom: 32px;
+  }
 `
 const UnderLayBackground = styled.div.attrs<{ background: string }>({})`
   background-color: ${({ background, theme }) =>
@@ -71,11 +79,15 @@ const Description = styled.div`
 
 const ActionContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-flow: row wrap;
   align-items: center;
 
   button:first-child {
     margin-right: 16px;
+  }
+
+  & > button {
+    margin-bottom: 8px;
   }
 `
 const messages = defineMessages({

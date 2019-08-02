@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '@register/styledComponents'
+import styled, { keyframes } from '@register/styledComponents'
 import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -19,6 +19,11 @@ import {
   goToDeathInformant,
   goToHome
 } from '@register/navigation'
+import {
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_ENTER_TIME,
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+} from '@register/utils/constants'
 
 export const messages: {
   [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
@@ -66,6 +71,30 @@ const Actions = styled.div`
   }
 `
 
+const fadeFromBottom = keyframes`
+from {
+   -webkit-transform: translateY(100%);
+   transform: translateY(100%);
+  }
+`
+const StyledContainer = styled.div`
+  top: 0;
+  min-height: calc(100vh - 40px);
+  width: 100%;
+  &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
+    animation: ${fadeFromBottom} ${PAGE_TRANSITIONS_ENTER_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
+    z-index: 999;
+  }
+
+  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-done {
+    position: fixed;
+  }
+  &.${PAGE_TRANSITIONS_CLASSNAME}-enter-active {
+    z-index: 999;
+    position: fixed;
+  }
+`
 class SelectVitalEventView extends React.Component<
   InjectedIntlProps & {
     goBack: typeof goBack
@@ -100,44 +129,48 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <Container>
-        <EventTopBar
-          title={intl.formatMessage(messages.registerNewEventTitle)}
-          goHome={this.props.goToHome}
-        />
+      <StyledContainer className={PAGE_TRANSITIONS_CLASSNAME}>
+        <Container>
+          <EventTopBar
+            title={intl.formatMessage(messages.registerNewEventTitle)}
+            goHome={this.props.goToHome}
+          />
 
-        <BodyContent>
-          <Title>{intl.formatMessage(messages.registerNewEventHeading)}</Title>
-          {this.state.goTo === 'error' && (
-            <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
-          )}
-          <Actions id="select_vital_event_view">
-            <RadioButton
-              size="large"
-              key="birthevent"
-              name="birthevent"
-              label={intl.formatMessage(messages.birth)}
-              value="birth"
-              id="select_birth_event"
-              selected={this.state.goTo === 'birth' ? 'birth' : ''}
-              onChange={() => this.setState({ goTo: 'birth' })}
-            />
-            <RadioButton
-              size="large"
-              key="deathevent"
-              name="deathevent"
-              label={intl.formatMessage(messages.death)}
-              value="death"
-              id="select_death_event"
-              selected={this.state.goTo === 'death' ? 'death' : ''}
-              onChange={() => this.setState({ goTo: 'death' })}
-            />
-          </Actions>
-          <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButton)}
-          </PrimaryButton>
-        </BodyContent>
-      </Container>
+          <BodyContent>
+            <Title>
+              {intl.formatMessage(messages.registerNewEventHeading)}
+            </Title>
+            {this.state.goTo === 'error' && (
+              <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
+            )}
+            <Actions id="select_vital_event_view">
+              <RadioButton
+                size="large"
+                key="birthevent"
+                name="birthevent"
+                label={intl.formatMessage(messages.birth)}
+                value="birth"
+                id="select_birth_event"
+                selected={this.state.goTo === 'birth' ? 'birth' : ''}
+                onChange={() => this.setState({ goTo: 'birth' })}
+              />
+              <RadioButton
+                size="large"
+                key="deathevent"
+                name="deathevent"
+                label={intl.formatMessage(messages.death)}
+                value="death"
+                id="select_death_event"
+                selected={this.state.goTo === 'death' ? 'death' : ''}
+                onChange={() => this.setState({ goTo: 'death' })}
+              />
+            </Actions>
+            <PrimaryButton id="continue" onClick={this.handleContinue}>
+              {intl.formatMessage(messages.continueButton)}
+            </PrimaryButton>
+          </BodyContent>
+        </Container>
+      </StyledContainer>
     )
   }
 }

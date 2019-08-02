@@ -291,8 +291,10 @@ async function updateCompositionWithDuplicates(
     body.relatesTo = duplicateCompositionIds
     updateComposition(composition.id, body)
   }
+  const compositionFromFhir = (await getCompositionById(
+    composition.id as string
+  )) as fhir.Composition
+  addDuplicatesToComposition(duplicateCompositionIds, compositionFromFhir)
 
-  addDuplicatesToComposition(duplicateCompositionIds, composition)
-
-  return updateInHearth(composition, composition.id)
+  return updateInHearth(compositionFromFhir, compositionFromFhir.id)
 }

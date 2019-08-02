@@ -1,5 +1,3 @@
-import { grid } from './grid'
-
 export interface IFonts {
   bodyStyle: string
   bodyBoldStyle: string
@@ -16,6 +14,7 @@ export interface IFonts {
   subtitleStyle: string
   captionStyle: string
   buttonStyle: string
+  smallButtonStyle: string
 }
 
 const countryFonts = {
@@ -99,5 +98,10 @@ export const fonts = (country: string, language: string): IFonts => ({
     line-height: 24px;
     font-weight: normal;
     letter-spacing: 1px;
-    text-transform: uppercase;`
+    text-transform: uppercase;`,
+  smallButtonStyle: `font-family: ${countryFonts[country][language].regularFontFamily};
+    font-size: 14px;
+    line-height: 0px;
+    font-weight: normal;
+    text-transform: capitalize;`
 })

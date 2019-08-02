@@ -132,16 +132,6 @@ describe('when user is in the review page', () => {
         .text()
     ).toBe('Birth Application for John Doe')
   })
-  it('clicking required field link takes user to the to field on form', async () => {
-    reviewSectionComponent
-      .find('#required_link_child_familyName')
-      .hostNodes()
-      .simulate('click')
-    await flushPromises()
-    reviewSectionComponent.update()
-    expect(history.location.pathname).toContain('child')
-    expect(history.location.hash).toBe('#familyName')
-  })
 
   it('typing additional comments input triggers onchange review form', async () => {
     store.dispatch(storeApplication(draft))
