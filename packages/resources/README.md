@@ -2,13 +2,13 @@
 
 One of the key dependencies for OpenCRVS is a reference data source. This source is likely to be bespoke for every implementing nation. The resources package contains scripts to import all reference data required for OpenCRVS.
 
-The categories of the rerference data are as follows:
+The categories of the reference data are as follows:
 
 - Administrative divisions _(A portion of a country delineated for the purpose of administration, allowing registrations to be coupled to location and staff, with GeoJSON map data that enables an interactive map of the country, in the performance appllication.)_
 - Facilities _(The places where civil registration and vital events such as births/deaths occur)_
 - Employees _(The staff required to undertake the functions of civil registration)_
 
-The feautures in this package are designed to import and convert the reference data above into the FHIR standard, then populate the OpenCRVS [Hearth](https://github.com/jembi/hearth) NoSQL database, via the OpenCRVS [OpenHIM](http://openhim.org/) interoperability layer.
+The features in this package are designed to import and convert the reference data above into the FHIR standard, then populate the OpenCRVS [Hearth](https://github.com/jembi/hearth) NoSQL database, via the OpenCRVS [OpenHIM](http://openhim.org/) interoperability layer.
 
 Given the [variety of administrative divisions between nations](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country), and the unique nature of the organisational, local government operational structure of a nation, ... and given the variety of digital capabilities and stages of digital readiness of a nation, ...
 
