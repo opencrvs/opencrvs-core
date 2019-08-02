@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue } from '../icons'
+import { BackArrowDeepBlue, BackArrowDeepSea } from '../icons'
 import { Button } from '../buttons'
 const ActionContainer = styled.div`
   width: 100%;
@@ -26,6 +26,18 @@ const BodyContent = styled.div`
 `
 const BackButtonContainer = styled.div`
   cursor: pointer;
+  #action_page_back_button_icon_hover {
+    display: none;
+  }
+
+  &:hover {
+    #action_page_back_button_icon {
+      display: none;
+    }
+    #action_page_back_button_icon_hover {
+      display: block;
+    }
+  }
 `
 const BackButton = styled(Button)`
   height: 42px;
@@ -85,7 +97,14 @@ export class ActionPageLight extends React.Component<
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <BackButton icon={icon || (() => <BackArrowDeepBlue />)} />
+              <BackButton
+                id="action_page_back_button_icon"
+                icon={icon || (() => <BackArrowDeepBlue />)}
+              />
+              <BackButton
+                id="action_page_back_button_icon_hover"
+                icon={icon || (() => <BackArrowDeepSea />)}
+              />
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
