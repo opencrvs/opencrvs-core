@@ -65,10 +65,54 @@
         owner: 1000
         mode: g+rwx
 
+    - name: 'Install UFW'
+      apt:
+        name: ufw
+        state: present
+
+    - name: 'Allow OpenSSH through UFW'
+      ufw:
+        rule: allow
+        name: OpenSSH
+
+    # Docker swarm ports - Note: all published docker container port will override UFW rules!
+    - name: 'Allow secure docker client communication'
+      ufw:
+        rule: allow
+        port: 2376
+        proto: tcp
+    - name: 'Allow docker swarm communication among nodes - TCP'
+      ufw:
+        rule: allow
+        port: 7946
+        proto: tcp
+    - name: 'Allow docker swarm communication among nodes - UDP'
+      ufw:
+        rule: allow
+        port: 7946
+        proto: udp
+    - name: 'Allow docker overlay network traffic'
+      ufw:
+        rule: allow
+        port: 4789
+        proto: udp
+
+    - name: 'Deny everything else and enable UFW'
+      ufw:
+        state: enabled
+        default: deny
+        direction: incoming
+
 - hosts: docker-manager-first
   become: yes
   become_method: sudo
   tasks:
+    - name: 'Allow secure docker swarm node communication (managers only)'
+      ufw:
+        rule: allow
+        port: 2377
+        proto: tcp
+
     - name: 'Create primary swarm manager'
       shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
       when: "docker_info.stdout.find('Swarm: inactive') != -1"
