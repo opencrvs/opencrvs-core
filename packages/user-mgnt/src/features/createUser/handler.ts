@@ -1,6 +1,7 @@
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
+  createFhirSignature,
   generateUsername,
   postFhir,
   rollback,
@@ -31,6 +32,8 @@ export default async function createUser(
   let practitionerId = null
   let roleId = null
   let autoGenPassword = null
+  let signatureId = null
+
   try {
     const practitioner = createFhirPractitioner(user)
     practitionerId = await postFhir(token, practitioner)
@@ -50,6 +53,13 @@ export default async function createUser(
 
     user.status = statuses.PENDING
     user.scope = roleScopeMapping[user.role]
+
+    // check user scope of register to push the signature
+    if (user.scope.includes('register')) {
+      const signature = createFhirSignature(user, practitionerId)
+      signatureId = await postFhir(token, signature)
+    }
+
     autoGenPassword = generateRandomPassowrd(hasDemoScope(request))
 
     const { hash, salt } = generateSaltedHash(autoGenPassword)
@@ -60,7 +70,7 @@ export default async function createUser(
 
     user.username = await generateUsername(user.name)
   } catch (err) {
-    await rollback(token, practitionerId, roleId)
+    await rollback(token, practitionerId, roleId, signatureId)
     logger.error(err)
     // cause an internal server error
     throw err
@@ -72,7 +82,7 @@ export default async function createUser(
     userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)
-    await rollback(token, practitionerId, roleId)
+    await rollback(token, practitionerId, roleId, signatureId)
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }

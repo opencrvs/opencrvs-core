@@ -6,6 +6,10 @@ import { generateSaltedHash } from '../src/utils/hash'
 import { MONGO_URL } from '../src/constants'
 mongoose.connect(MONGO_URL)
 
+const dummySignature =
+  // tslint:disable-next-line: max-line-length
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAvVBMVEVHcExNerVNerVOerZOe7RMe7NNe7ROe7UAAP9PebVLerRQfLNRebVNfLZJbbZNerROdrFNerZNe7VPerVNgLNOe7VPebZOebZVd7tAgL9MebNVgKpNe7dOe7RVVapKdbVOebZOerVOerZNd7NOebaAgIBNfbhOe7ZOebRJgLZNeLdNerRNe7VQerVOerdVgLhOerFPfbVRea5MfLNVcapNeLZVgL9SdrZOe7VPerVmZsxNe7VNebZPebdMerexCT1cAAAAP3RSTlMAYFZzZhtqaAFnLEAmQgdtDUlZaxRyKjsPBDkGPFUDGGV5mR5pAiugpA41d08wLhIXLRMlCUYMHD5aBVM/SkPScFaPAAAAk0lEQVQY033OBw6CQBAF0L/AFpogzS723nu//7FcNKDExMlkk3mZ/Fngt7bF/FwIb6ccPCJwYGFkoAtocDkfp+BLw/0YZUlyXwO57AjoG7Skz4fVLBhZopFkAAy2NZ+YA27UJVwD4WDpEbcnnFZNwsbbr4HQ7zPE1VcIm8rHHLZpesbudEHVr6+rFUVXmh8olfG3nsyFCOocKThSAAAAAElFTkSuQmCC'
+
 const pass = generateSaltedHash('test')
 
 const fieldAgent = new User({
@@ -82,6 +86,7 @@ const localRegistrar = new User({
   type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
+  signature: dummySignature,
   practitionerId: '862519b7-552f-4512-946f-35ecde896c50',
   primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
   catchmentAreaIds: [
@@ -110,6 +115,7 @@ const districtRegistrar = new User({
   type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
+  signature: dummySignature,
   practitionerId: '4e6df67a-ac2c-4bad-8516-6abc0a883e7b',
   primaryOfficeId: '4af73d73-aa6e-4770-b1d9-4274949e431e',
   catchmentAreaIds: ['d2898740-42e4-4680-b5a7-2f0a12a15199'],
@@ -133,6 +139,7 @@ const stateRegistrar = new User({
   type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
+  signature: dummySignature,
   practitionerId: '39e56f2a-23d5-4e76-ab5d-6f41ec4619db',
   primaryOfficeId: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
   catchmentAreaIds: [],
@@ -156,6 +163,7 @@ const nationalRegistrar = new User({
   type: 'SECRETARY',
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'],
   status: 'active',
+  signature: dummySignature,
   practitionerId: '3bebd40a-3a40-4c5d-ad41-a949778bc368',
   primaryOfficeId: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
   catchmentAreaIds: [],

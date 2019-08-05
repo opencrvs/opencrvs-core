@@ -742,6 +742,7 @@ export interface GQLUserInput {
   primaryOffice?: string
   catchmentArea?: Array<string | null>
   device?: string
+  signature?: string
 }
 
 export interface GQLUserIdentifierInput {
