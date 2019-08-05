@@ -5,7 +5,7 @@ export function fetchToken(username, password) {
   const resAuth = post(
     `${AUTH_URL}/authenticate`,
     JSON.stringify({
-      mobile: username,
+      username: username,
       password: password
     })
   )

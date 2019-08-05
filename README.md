@@ -29,7 +29,8 @@ Then:
 Apps can be found running in following URLs:
 
 - Styleguide: http://localhost:6060/
-- Login: http://localhost:3020/ - A test user you can use is u: 07111111111, p: test, code: 000000
+- Login: http://localhost:3020/ - A test user you can use is u: sakibal.hasan, p: test, code: 000000
+  - More test users can be found from `packages/user-mgnt/resources/populate.ts`
 - Register: http://localhost:3000/
 - Performance management: http://localhost:3001/
 
