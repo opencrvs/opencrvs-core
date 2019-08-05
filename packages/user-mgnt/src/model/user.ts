@@ -29,6 +29,7 @@ export interface IUser {
   primaryOfficeId: string
   catchmentAreaIds: string[]
   scope: string[]
+  signature: string
   status: string
   deviceId?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
