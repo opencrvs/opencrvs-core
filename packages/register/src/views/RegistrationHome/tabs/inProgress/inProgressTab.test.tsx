@@ -96,7 +96,7 @@ describe('In Progress tab', () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <InProgressTab drafts={localDrafts} registrarUnion={'123456789'} />,
+      <InProgressTab drafts={localDrafts} registrarLocationId={'123456789'} />,
       store,
       graphqlMock
     )
@@ -173,7 +173,7 @@ describe('In Progress tab', () => {
       <InProgressTab
         drafts={localDrafts}
         selectorId={'you'}
-        registrarUnion={'123456789'}
+        registrarLocationId={'123456789'}
       />,
       store,
       graphqlMock
@@ -274,7 +274,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'123456789'}
         />,
         store
       )
@@ -307,7 +307,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'123456789'}
         />,
         store
       )
@@ -420,7 +420,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'123456789'}
         />,
         store
       )
@@ -511,7 +511,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -649,7 +649,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -802,7 +802,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -882,7 +882,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock

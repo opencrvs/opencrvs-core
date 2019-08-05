@@ -9,5 +9,6 @@ interface Window {
     PERFORMANCE_URL: string
     RESOURCES_URL: string
     HEALTH_FACILITY_FILTER: string
+    CATCHMENT_AREA_TYPE: string
   }
 }

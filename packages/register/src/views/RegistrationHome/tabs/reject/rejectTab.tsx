@@ -38,7 +38,7 @@ interface IBaseRejectTabProps {
   scope: Scope | null
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
-  registrarUnion: string | null
+  registrarLocationId: string | null
   parentQueryLoading?: boolean
 }
 
@@ -113,14 +113,14 @@ class RejectTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, registrarUnion, parentQueryLoading } = this.props
+    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
 
     return (
       <Query
         query={SEARCH_EVENTS}
         variables={{
           status: [EVENT_STATUS.REJECTED],
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           count: this.pageSize,
           skip: (this.state.updatesCurrentPage - 1) * this.pageSize
         }}

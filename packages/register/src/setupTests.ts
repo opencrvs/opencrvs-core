@@ -32,5 +32,6 @@ Object.defineProperty(window, 'localStorage', {
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040/',
-  HEALTH_FACILITY_FILTER: 'UPAZILA'
+  HEALTH_FACILITY_FILTER: 'UPAZILA',
+  CATCHMENT_AREA_TYPE: 'UNION'
 }

@@ -708,6 +708,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
   getLocalLocationId() {
     const area = this.props.userDetails && this.props.userDetails.catchmentArea
+
     const identifier =
       area &&
       area.find((location: IGQLLocation) => {
@@ -716,7 +717,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
             location.identifier.find((areaIdentifier: IIdentifier) => {
               return (
                 areaIdentifier.system.endsWith('jurisdiction-type') &&
-                areaIdentifier.value === 'UNION'
+                areaIdentifier.value === window.config.CATCHMENT_AREA_TYPE
               )
             })) !== undefined
         )
