@@ -315,10 +315,13 @@ class ReviewActionComponent extends React.Component<
       : applicationToBeValidated
       ? ACTION.APPLICATION_TO_BE_VALIDATED
       : ACTION.APPLICATION_TO_BE_DECLARED
+
     const actionContent =
-      ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftApplication)]
-        .completionStatus[String(completeApplication)]
-    return (
+      (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftApplication)] &&
+        ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftApplication)]
+          .completionStatus[String(completeApplication)]) ||
+      null
+    return !actionContent ? null : (
       <Container id={id}>
         <UnderLayBackground background={background} />
         <Content>
