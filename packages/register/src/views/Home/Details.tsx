@@ -357,6 +357,63 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     }
   }
 
+  getActionForStateAndScope = (
+    event: string | undefined,
+    id: string | undefined,
+    applicationState: DraftStatus | GQLRegStatus | null
+  ) => {
+    if (
+      applicationState === REJECTED &&
+      !this.userHasRegisterOrValidateScope()
+    ) {
+      return (
+        <ActionButton id="reject_update" disabled>
+          {this.props.intl.formatMessage(messages.update)}
+        </ActionButton>
+      )
+    } else if (
+      applicationState === REGISTERED.toUpperCase() &&
+      this.userHasRegisterOrValidateScope()
+    ) {
+      return (
+        <ActionButton
+          id="registrar_print"
+          onClick={() =>
+            this.props.goToPrintCertificate(
+              (id && id.toString()) || '',
+              (event && event.toLocaleLowerCase()) || ''
+            )
+          }
+        >
+          {this.props.intl.formatMessage(buttonMessages.print)}
+        </ActionButton>
+      )
+    } else if (
+      (applicationState === IN_PROGRESS ||
+        applicationState === DECLARED ||
+        applicationState === REJECTED) &&
+      this.userHasRegisterOrValidateScope()
+    ) {
+      return (
+        <ActionButton
+          id="registrar_update"
+          onClick={() =>
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
+              (id && id.toString()) || '',
+              'review',
+              (event && event.toString()) || ''
+            )
+          }
+        >
+          {this.props.intl.formatMessage(buttonMessages.print)}
+        </ActionButton>
+      )
+    } else {
+      return undefined
+    }
+  }
+
   generateGqlHistorData = (data: GQLQuery): IHistoryData => {
     const registration =
       data.fetchRegistration && data.fetchRegistration.registration
@@ -410,7 +467,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           )
         })) ||
       []
-    const currentState = history.length > 0 ? history[0].type : null
+    const applicationState = history.length > 0 ? history[0].type : null
     const applicant: GQLPerson =
       // @ts-ignore
       (data.fetchRegistration && data.fetchRegistration.child) ||
@@ -424,68 +481,18 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
       data.fetchRegistration &&
       data.fetchRegistration.id &&
       (data.fetchRegistration.id as string)
-    if (this.userHasRegisterOrValidateScope()) {
-      return {
-        title:
-          (applicant &&
-            applicant.name &&
-            (createNamesMap(applicant.name as GQLHumanName[])[
-              this.props.language
-            ] as string)) ||
-          '',
-        history,
-        action:
-          currentState === IN_PROGRESS ||
-          currentState === DECLARED ||
-          currentState === REJECTED ? (
-            <ActionButton
-              id="registrar_update"
-              onClick={() =>
-                this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
-                  (id && id.toString()) || '',
-                  'review',
-                  (event && event.toString()) || ''
-                )
-              }
-            >
-              {this.props.intl.formatMessage(messages.update)}
-            </ActionButton>
-          ) : currentState === REGISTERED.toUpperCase() ? (
-            <ActionButton
-              id="registrar_print"
-              onClick={() =>
-                this.props.goToPrintCertificate(
-                  (id && id.toString()) || '',
-                  (event && event.toLocaleLowerCase()) || ''
-                )
-              }
-            >
-              {this.props.intl.formatMessage(buttonMessages.print)}
-            </ActionButton>
-          ) : (
-            undefined
-          )
-      }
-    } else {
-      return {
-        title:
-          (applicant &&
-            applicant.name &&
-            (createNamesMap(applicant.name as GQLHumanName[])[
-              this.props.language
-            ] as string)) ||
-          '',
-        history,
-        action:
-          currentState && currentState === REJECTED ? (
-            <ActionButton id="reject_update" disabled>
-              {this.props.intl.formatMessage(messages.update)}
-            </ActionButton>
-          ) : (
-            undefined
-          )
-      }
+    return {
+      title:
+        (applicant &&
+          applicant.name &&
+          (createNamesMap(applicant.name as GQLHumanName[])[
+            this.props.language
+          ] as string)) ||
+        '',
+      history,
+      action: applicationState
+        ? this.getActionForStateAndScope(event, id, applicationState)
+        : undefined
     }
   }
 

@@ -17,8 +17,8 @@ context('Birth Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
-    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
-    cy.get('#new_event_declaration').click()
+    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
+    cy.get('#header_new_event').click()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -113,8 +113,8 @@ context('Birth Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
-    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
-    cy.get('#new_event_declaration').click()
+    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
+    cy.get('#header_new_event').click()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -283,8 +283,8 @@ context('Birth Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
-    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
-    cy.get('#new_event_declaration').click()
+    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
+    cy.get('#header_new_event').click()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -382,8 +382,8 @@ context('Birth Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
-    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
-    cy.get('#new_event_declaration').click()
+    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
+    cy.get('#header_new_event').click()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -555,8 +555,8 @@ context('Birth Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
-    cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
-    cy.get('#new_event_declaration').click()
+    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
+    cy.get('#header_new_event').click()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()

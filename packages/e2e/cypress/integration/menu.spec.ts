@@ -15,6 +15,6 @@ context('Menu', () => {
         .type(`${i % 2}`)
     }
 
-    cy.get('#new_event_declaration').should('be.visible')
+    cy.get('#header_new_event').should('be.visible')
   })
 })
