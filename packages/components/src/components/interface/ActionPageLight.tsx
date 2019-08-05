@@ -1,7 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue, BackArrowDeepSea } from '../icons'
+import { BackArrowDeepBlue } from '../icons'
 import { Button } from '../buttons'
+import { colors } from '../colors'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -29,15 +30,6 @@ const BackButtonContainer = styled.div`
   #action_page_back_button_icon_hover {
     display: none;
   }
-
-  &:hover {
-    #action_page_back_button_icon {
-      display: none;
-    }
-    #action_page_back_button_icon_hover {
-      display: block;
-    }
-  }
 `
 const BackButton = styled(Button)`
   height: 42px;
@@ -50,6 +42,15 @@ const BackButton = styled(Button)`
     margin-left: 24px;
   }
 `
+
+const BackButtonIcon = styled(BackArrowDeepBlue)`
+  &:hover {
+    g {
+      stroke: ${colors.tertiary};
+    }
+  }
+`
+
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
@@ -99,11 +100,7 @@ export class ActionPageLight extends React.Component<
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
               <BackButton
                 id="action_page_back_button_icon"
-                icon={icon || (() => <BackArrowDeepBlue />)}
-              />
-              <BackButton
-                id="action_page_back_button_icon_hover"
-                icon={icon || (() => <BackArrowDeepSea />)}
+                icon={icon || (() => <BackButtonIcon />)}
               />
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
