@@ -299,6 +299,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         element: (
           <StyledPrimaryButton
             key="newEvent"
+            id="new_event_declaration"
             onClick={this.props.goToEvents}
             icon={() => <Plus />}
           />

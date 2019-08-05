@@ -10,7 +10,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
@@ -77,8 +79,8 @@ context('Death Integration Test', () => {
     cy.log('Waiting for application to sync...')
     cy.wait(5000) // Wait for application to be sync'd
     // LOG OUT
-    cy.get('#mobile_header_left').click()
-    cy.get('#mobile_menu_item_4').click()
+    cy.get('#ProfileMenuToggleButton').click()
+    cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
     cy.get('#username').type('mohammad.ashraful')
     cy.get('#password').type('test')
@@ -89,7 +91,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING PAGE
     cy.wait(3000)
@@ -109,7 +113,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
@@ -226,8 +232,8 @@ context('Death Integration Test', () => {
     cy.log('Waiting for application to sync...')
     cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
-    cy.get('#mobile_header_left').click()
-    cy.get('#mobile_menu_item_4').click()
+    cy.get('#ProfileMenuToggleButton').click()
+    cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
     cy.get('#username').type('mohammad.ashraful')
     cy.get('#password').type('test')
@@ -238,7 +244,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING PAGE
     cy.wait(3000)
@@ -258,7 +266,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn').click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
@@ -325,8 +335,8 @@ context('Death Integration Test', () => {
     cy.log('Waiting for application to sync...')
     cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
-    cy.get('#mobile_header_left').click()
-    cy.get('#mobile_menu_item_4').click()
+    cy.get('#ProfileMenuToggleButton').click()
+    cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
     cy.get('#username').type('mohammad.ashraful')
     cy.get('#password').type('test')
@@ -337,7 +347,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING PAGE
     cy.wait(3000)
@@ -361,7 +373,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn').click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')
@@ -477,8 +491,8 @@ context('Death Integration Test', () => {
     cy.log('Waiting for application to sync...')
     cy.wait(6000) // Wait for application to be sync'd
     // LOG OUT
-    cy.get('#mobile_header_left').click()
-    cy.get('#mobile_menu_item_4').click()
+    cy.get('#ProfileMenuToggleButton').click()
+    cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
     cy.get('#username').type('mohammad.ashraful')
     cy.get('#password').type('test')
@@ -489,7 +503,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING PAGE
     cy.wait(3000)
@@ -513,7 +529,9 @@ context('Death Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING
     cy.get('#new_event_declaration', { timeout: 30000 }).should('be.visible')

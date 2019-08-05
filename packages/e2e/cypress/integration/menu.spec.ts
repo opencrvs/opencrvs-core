@@ -10,7 +10,9 @@ context('Menu', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
 
     cy.get('#new_event_declaration').should('be.visible')
