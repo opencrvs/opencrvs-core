@@ -17,7 +17,7 @@ Object.defineProperty(window, 'localStorage', {
 ;(window as any).navigator = navigatorMock
 ;(window as any).location.reload = jest.fn()
 ;(window as any).scrollTo = () => {}
-;(window as any).config = {
+;(window as Window).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   COUNTRY: 'bgd',
   LANGUAGES: 'en,bn',
