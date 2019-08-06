@@ -1089,6 +1089,13 @@ export const BENGALI_STATE: ILanguage = {
     'validations.validNationalId':
       'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
-      'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না'
+      'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'form.field.label.userSignatureAttachmentTitle':
+      'নিবন্ধকের স্বাক্ষর সংযুক্ত করুন',
+    'form.field.label.userSignatureAttachment': 'নিবন্ধকের স্বাক্ষর',
+    'validate.application.action.modal.title': 'অনুমোদনের জন্য প্রেরিত?',
+    'validate.application.action.modal.description':
+      'এই আবেদনটি  নিবন্ধকের কাছে  নিবন্দনের জন্য  প্রেরণ করা হবে ',
+    'buttons.approve': 'অনুমোদন'
   }
 }

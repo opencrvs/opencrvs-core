@@ -1,8 +1,16 @@
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@register/components/form'
-import { IFormSection, IFormSectionData } from '@register/forms'
-import { getSectionFields, hasFormError } from '@register/forms/utils'
+import {
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup
+} from '@register/forms'
+import {
+  getSectionFields,
+  hasFormError,
+  getVisibleGroupFields
+} from '@register/forms/utils'
 import { goToCreateUserSection, goToHome } from '@register/navigation'
 import styled from '@register/styledComponents'
 import {
@@ -25,16 +33,22 @@ export const FormTitle = styled.div`
 export const Action = styled.div`
   margin-top: 32px;
 `
+
 type IProps = {
   section: IFormSection
+  formData: IFormSectionData
+  activeGroup: IFormSectionGroup
+  nextSectionId: string
+  nextGroupId: string
+}
+
+type IDispatchProps = {
   goToHome: typeof goToHome
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
   clearUserFormData: typeof clearUserFormData
-  formData: IFormSectionData
 }
-
-type IFullProps = InjectedIntlProps & IProps
+type IFullProps = InjectedIntlProps & IProps & IDispatchProps
 
 class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -44,7 +58,10 @@ class UserFormComponent extends React.Component<IFullProps> {
     if (hasFormError(getSectionFields(section), formData)) {
       this.showAllValidationErrors()
     } else {
-      this.props.goToCreateUserSection('preview')
+      this.props.goToCreateUserSection(
+        this.props.nextSectionId,
+        this.props.nextGroupId
+      )
     }
   }
 
@@ -61,8 +78,13 @@ class UserFormComponent extends React.Component<IFullProps> {
     this.props.clearUserFormData()
   }
 
+  modifyData = (values: any) => {
+    const { formData } = this.props
+    this.props.modifyUserFormData({ ...formData, ...values })
+  }
+
   render = () => {
-    const { section, intl } = this.props
+    const { section, intl, activeGroup } = this.props
 
     return (
       <>
@@ -70,12 +92,15 @@ class UserFormComponent extends React.Component<IFullProps> {
           title={intl.formatMessage(section.title)}
           goBack={this.handleBackAction}
         >
-          <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
+          <FormTitle>
+            {intl.formatMessage(activeGroup.title || section.title)}
+          </FormTitle>
           <FormFieldGenerator
+            key={activeGroup.id}
             id={section.id}
-            onChange={this.props.modifyUserFormData}
+            onChange={values => this.modifyData(values)}
             setAllFieldsDirty={false}
-            fields={getSectionFields(section)}
+            fields={getVisibleGroupFields(activeGroup)}
             onSetTouched={setTouchedFunc => {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}

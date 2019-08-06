@@ -279,6 +279,8 @@ interface IFormMessages {
   whoIsPresentLabel: ReactIntl.FormattedMessage.MessageDescriptor
   whoseContactDetailsLabel: ReactIntl.FormattedMessage.MessageDescriptor
   uploadedList: ReactIntl.FormattedMessage.MessageDescriptor
+  userSignatureAttachmentTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userSignatureAttachment: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1696,6 +1698,16 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is the contact person for this application?',
     description: 'Input label for contact details person',
     id: 'form.field.label.application.whoseContactDetails'
+  },
+  userSignatureAttachmentTitle: {
+    defaultMessage: 'Attach the registrar’s signature',
+    description: 'Title for user signature attachment',
+    id: 'form.field.label.userSignatureAttachmentTitle'
+  },
+  userSignatureAttachment: {
+    defaultMessage: 'Registrar’s signature',
+    description: 'Input label for user signature attachment',
+    id: 'form.field.label.userSignatureAttachment'
   }
 }
 

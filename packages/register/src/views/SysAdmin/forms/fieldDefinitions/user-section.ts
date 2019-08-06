@@ -4,7 +4,8 @@ import {
   FIELD_GROUP_TITLE,
   SEARCH_FIELD,
   SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import {
   bengaliOnlyNameFormat,
@@ -162,6 +163,21 @@ export const userSection: IFormSection = {
           mapping: {
             mutation: fieldNameValueTransformer('primaryOffice')
           }
+        }
+      ]
+    },
+    {
+      id: 'signature',
+      title: messages.userSignatureAttachmentTitle,
+      fields: [
+        {
+          name: 'signature',
+          type: DOCUMENT_UPLOADER_WITH_OPTION,
+          label: messages.userSignatureAttachment,
+          initialValue: '',
+          hideAsterisk: true,
+          validate: [],
+          options: []
         }
       ]
     }

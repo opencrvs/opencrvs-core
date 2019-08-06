@@ -239,6 +239,7 @@ type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
   payload: {
     sectionId: string
+    nextGroupId: string
     userFormFieldNameHash?: string
     formHistoryState?: IDynamicValues
   }
@@ -246,6 +247,7 @@ type GoToCreateUserSection = {
 
 export function goToCreateUserSection(
   sectionId: string,
+  nextGroupId: string,
   fieldNameHash?: string,
   historyState?: IDynamicValues
 ): GoToCreateUserSection {
@@ -253,6 +255,7 @@ export function goToCreateUserSection(
     type: GO_TO_CREATE_USER_SECTION,
     payload: {
       sectionId,
+      nextGroupId,
       userFormFieldNameHash: fieldNameHash,
       formHistoryState: historyState
     }
@@ -366,6 +369,7 @@ export function navigationReducer(state: INavigationState, action: any) {
     case GO_TO_CREATE_USER_SECTION:
       const {
         sectionId,
+        nextGroupId,
         userFormFieldNameHash,
         formHistoryState
       } = action.payload
@@ -373,8 +377,10 @@ export function navigationReducer(state: INavigationState, action: any) {
         state,
         Cmd.action(
           push(
-            formatUrl(CREATE_USER_SECTION, { sectionId }) +
-              (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
+            formatUrl(CREATE_USER_SECTION, {
+              sectionId,
+              groupId: nextGroupId
+            }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
             formHistoryState
           )
         )

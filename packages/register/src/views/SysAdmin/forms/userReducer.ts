@@ -37,6 +37,10 @@ const initialState: IUserFormState = {
           {
             id: 'preview-view-group',
             fields: userSection.groups[0].fields
+          },
+          {
+            id: 'preview-view-group2',
+            fields: userSection.groups[1].fields
           }
         ]
       }
@@ -152,7 +156,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         ...state,
         submitting: false,
         userForm: {
-          sections: [updatedSection, ...state.userForm.sections]
+          sections: [updatedSection, ...state.userForm.sections.slice(1)]
         }
       }
     case MODIFY_USER_FORM_DATA:
