@@ -53,7 +53,7 @@ const Container = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
-  padding: 24px 32px;
+  padding: 24px 32px 32px;
   margin: 32px auto 0;
   max-width: 940px;
   background: ${({ theme }) => theme.colors.white};
