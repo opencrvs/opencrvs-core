@@ -983,7 +983,7 @@ export const BENGALI_STATE: ILanguage = {
       '{completeApplication, select, true {এই অ্যাপ্লিকেশনটি পর্যালোচনা করার জন্য নিবন্ধকের কাছে পাঠানো হবে।} false {আবেদনটি সম্পূর্ণ করার জন্য এখন নিবন্ধকের কাছে পাঠানো হবে।}}',
     'review.modal.title.registerConfirmation': 'এই আবেদন নিবন্ধিত হবে?',
     'review.modal.title.submitConfirmation':
-      '{isComplete, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
+      '{completeApplication, select, true {পর্যালোচনার জন্য আবেদন পাঠাবেন?} false {অসম্পূর্ন আবেদন পাঠাবেন?}}',
     'review.rejection.form': 'প্রত্যাখ্যান ফর্ম',
     'review.rejection.form.commentInstruction':
       'স্বাস্থ্য কর্মী সঠিকভাবে আবেদন আপডেট করার জন্য তার কি নির্দেশাবলী প্রয়োজন প্রদান করুন',
