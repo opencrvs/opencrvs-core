@@ -7,7 +7,7 @@ import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPage } from '@register/navigation'
 import { getScope } from '@register/profile/profileSelectors'
-import { transformData } from '@register/search/transformer'
+import { transformData, Array } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
 import styled, { ITheme } from '@register/styledComponents'
 import * as Sentry from '@sentry/browser'
@@ -27,6 +27,7 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { errorMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -36,6 +37,7 @@ interface IBaseApprovalTabProps {
   goToPage: typeof goToPage
   registrarUnion: string | null
   parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
 }
 
 interface IApprovalTabState {
@@ -60,9 +62,14 @@ class ApprovalTabComponent extends React.Component<
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(
+      data,
+      this.props.intl,
+      this.props.outboxApplications,
+      [SUBMISSION_STATUS.READY_TO_APPROVE, SUBMISSION_STATUS.APPROVING]
+    )
 
-    return transformedData.map(reg => {
+    return transformedData.map((reg: any) => {
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )
@@ -210,7 +217,8 @@ class ApprovalTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    scope: getScope(state)
+    scope: getScope(state),
+    outboxApplications: state.applicationsState.applications
   }
 }
 

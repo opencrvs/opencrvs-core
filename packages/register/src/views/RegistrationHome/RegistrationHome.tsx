@@ -116,6 +116,7 @@ interface IBaseRegistrationHomeProps {
   selectorId: string
   drafts: IApplication[]
   goToEvents: typeof goToEventsAction
+  outboxApplications: IApplication[]
 }
 
 interface IRegistrationHomeState {
@@ -238,6 +239,12 @@ export class RegistrationHomeView extends React.Component<
     return <RowHistoryView eventId={itemId} />
   }
 
+  count(count: number, status: string[]) {
+    const outboxCount = this.props.outboxApplications.filter(
+      app => app.submissionStatus && status.includes(app.submissionStatus)
+    ).length
+    return count - outboxCount
+  }
   render() {
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
     const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
@@ -280,6 +287,11 @@ export class RegistrationHomeView extends React.Component<
               )
             }
 
+            const declaredCount = this.count(data.countEvents.declared, [
+              SUBMISSION_STATUS.READY_TO_REGISTER,
+              SUBMISSION_STATUS.REGISTERING
+            ])
+
             return (
               <>
                 <TopBar>
@@ -300,8 +312,8 @@ export class RegistrationHomeView extends React.Component<
                   >
                     {intl.formatMessage(messages.readyForReview)} (
                     {this.userHasRegisterScope()
-                      ? data.countEvents.declared + data.countEvents.validated
-                      : data.countEvents.declared}
+                      ? declaredCount + data.countEvents.validated
+                      : declaredCount}
                     )
                   </IconTab>
                   <IconTab
@@ -406,6 +418,7 @@ function mapStateToProps(
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
+    outboxApplications: state.applicationsState.applications,
     drafts:
       (state.applicationsState.applications &&
         state.applicationsState.applications.filter(

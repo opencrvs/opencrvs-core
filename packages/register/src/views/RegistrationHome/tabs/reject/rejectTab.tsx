@@ -8,7 +8,7 @@ import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPage, goToReviewDuplicate } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
-import { transformData } from '@register/search/transformer'
+import { transformData, Array } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
 import { ITheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
@@ -32,6 +32,7 @@ import {
   constantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -40,6 +41,7 @@ interface IBaseRejectTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarUnion: string | null
   parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
 }
 
 interface IRejectTabState {
@@ -68,8 +70,13 @@ class RejectTabComponent extends React.Component<
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-    const transformedData = transformData(data, this.props.intl)
-    return transformedData.map(reg => {
+    const transformedData = transformData(
+      data,
+      this.props.intl,
+      this.props.outboxApplications,
+      [SUBMISSION_STATUS.READY_TO_REJECT, SUBMISSION_STATUS.REJECTING]
+    )
+    return transformedData.map((reg: any) => {
       const actions = [] as IAction[]
       if (this.userHasRegisterScope()) {
         if (reg.duplicates && reg.duplicates.length > 0) {
@@ -216,7 +223,8 @@ class RejectTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    scope: getScope(state)
+    scope: getScope(state),
+    outboxApplications: state.applicationsState.applications
   }
 }
 

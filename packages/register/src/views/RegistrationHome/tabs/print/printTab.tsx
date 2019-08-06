@@ -5,7 +5,7 @@ import {
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { goToPrintCertificate } from '@register/navigation'
-import { transformData } from '@register/search/transformer'
+import { transformData, Array } from '@register/search/transformer'
 import { ITheme } from '@register/styledComponents'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
@@ -27,12 +27,15 @@ import {
   constantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IStoreState } from '@register/store'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
   registrarUnion: string | null
   parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
 }
 
 interface IPrintTabState {
@@ -58,8 +61,12 @@ class PrintTabComponent extends React.Component<
       return []
     }
 
-    const transformedData = transformData(data, this.props.intl)
-    return transformedData.map(reg => {
+    const transformedData = transformData(
+      data,
+      this.props.intl,
+      this.props.outboxApplications
+    )
+    return transformedData.map((reg: any) => {
       const actions = [
         {
           label: this.props.intl.formatMessage(buttonMessages.print),
@@ -199,8 +206,14 @@ class PrintTabComponent extends React.Component<
   }
 }
 
+function mapStateToProps(state: IStoreState) {
+  return {
+    outboxApplications: state.applicationsState.applications
+  }
+}
+
 export const PrintTab = connect(
-  null,
+  mapStateToProps,
   {
     goToPrintCertificate: goToPrintCertificate
   }
