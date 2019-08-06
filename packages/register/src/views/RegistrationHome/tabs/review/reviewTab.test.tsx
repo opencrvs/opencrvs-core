@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { createTestComponent, mockUserResponse } from '@register/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  resizeWindow
+} from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { storage } from '@register/storage'
@@ -20,12 +24,8 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { Validate } from '@opencrvs/components/lib/icons'
 
-import { Event, IForm } from '@opencrvs/register/src/forms'
-import {
-  SUBMISSION_STATUS,
-  storeApplication,
-  setInitialApplications
-} from '@register/applications'
+import { Event } from '@opencrvs/register/src/forms'
+import { SUBMISSION_STATUS, storeApplication } from '@register/applications'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -1373,12 +1373,134 @@ describe('RegistrationHome sent for review tab related tests', () => {
   })
 })
 
-describe('RegistrationHome', () => {
-  const { store, history } = createStore()
+describe('Tablet tests', () => {
+  const { store } = createStore()
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    resizeWindow(800, 1280)
+  })
+
+  afterEach(() => {
+    resizeWindow(1024, 768)
+  })
+
+  it('redirects to detail page if item is clicked', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'DECLARED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    testComponent.component
+      .find('#row_0')
+      .hostNodes()
+      .simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    expect(window.location.href).toContain(
+      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    )
+    testComponent.component.unmount()
   })
 
   it('renders declared items excluding the ready to register applications', async () => {
@@ -1488,7 +1610,7 @@ describe('RegistrationHome', () => {
     testComponent.component.unmount()
   })
 
-  it('check less count', async () => {
+  it('check declared count minus ready to review applications', async () => {
     const graphqlMock = [
       {
         request: {

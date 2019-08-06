@@ -3,9 +3,13 @@ import {
   GridTable,
   IAction
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPage, goToReviewDuplicate } from '@register/navigation'
+import {
+  goToPage,
+  goToReviewDuplicate,
+  goToApplicationDetails
+} from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
 import { transformData, Array } from '@register/search/transformer'
@@ -39,6 +43,7 @@ interface IBaseRejectTabProps {
   scope: Scope | null
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
+  goToApplicationDetails: typeof goToApplicationDetails
   registrarUnion: string | null
   parentQueryLoading?: boolean
   outboxApplications: IApplication[]
@@ -46,6 +51,7 @@ interface IBaseRejectTabProps {
 
 interface IRejectTabState {
   updatesCurrentPage: number
+  width: number
 }
 
 type IRejectTabProps = InjectedIntlProps & IBaseRejectTabProps
@@ -58,12 +64,80 @@ class RejectTabComponent extends React.Component<
   constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
+      width: window.innerWidth,
       updatesCurrentPage: 1
     }
   }
 
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getExpandable = () => {
+    return this.state.width > this.props.theme.grid.breakpoints.lg
+      ? true
+      : false
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 14,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 23,
+          key: 'name'
+        },
+        {
+          label: this.props.intl.formatMessage(
+            constantsMessages.applicantContactNumber
+          ),
+          width: 21,
+          key: 'contactNumber'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.sentOn),
+          width: 22,
+          key: 'dateOfRejection'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemAction),
+          width: 20,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'name'
+        }
+      ]
+    }
   }
 
   transformRejectedContent = (data: GQLQuery) => {
@@ -106,7 +180,13 @@ class RejectTabComponent extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        actions
+        actions,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(reg.id)
+          }
+        ]
       }
     })
   }
@@ -161,48 +241,10 @@ class RejectTabComponent extends React.Component<
             )
           }
           return (
-            <BodyContent>
+            <HomeContent>
               <GridTable
                 content={this.transformRejectedContent(data)}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.type
-                    ),
-                    width: 14,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.name
-                    ),
-                    width: 23,
-                    key: 'name'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.applicantContactNumber
-                    ),
-                    width: 21,
-                    key: 'contactNumber'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.sentOn
-                    ),
-                    width: 22,
-                    key: 'dateOfRejection'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemAction
-                    ),
-                    width: 20,
-                    key: 'actions',
-                    isActionColumn: true,
-                    alignment: ColumnContentAlignment.CENTER
-                  }
-                ]}
+                columns={this.getColumns()}
                 renderExpandedComponent={this.renderExpandedComponent}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
@@ -211,9 +253,10 @@ class RejectTabComponent extends React.Component<
                 pageSize={this.pageSize}
                 totalItems={data.searchEvents && data.searchEvents.totalItems}
                 currentPage={this.state.updatesCurrentPage}
-                expandable={true}
+                expandable={this.getExpandable()}
+                clickable={!this.getExpandable()}
               />
-            </BodyContent>
+            </HomeContent>
           )
         }}
       </Query>
@@ -231,7 +274,8 @@ function mapStateToProps(state: IStoreState) {
 export const RejectTab = connect(
   mapStateToProps,
   {
-    goToPage: goToPage,
-    goToReviewDuplicate: goToReviewDuplicate
+    goToPage,
+    goToReviewDuplicate,
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(RejectTabComponent)))
