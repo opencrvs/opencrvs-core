@@ -31,7 +31,7 @@ import {
   SYS_ADMIN_ROLES,
   REGISTRAR_ROLES
 } from '@register/utils/constants'
-import styled, { withTheme } from '@register/styledComponents'
+import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@register/navigation/routes'
 import { SentForReview } from '@register/views/FieldAgentHome/SentForReview'
 import { InProgress } from '@register/views/FieldAgentHome/InProgress'
@@ -54,8 +54,8 @@ import {
 } from '@register/search/queries'
 import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import * as Sentry from '@sentry/browser'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
+
 import {
   GQLQuery,
   GQLEventSearchSet,
@@ -159,6 +159,7 @@ type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
   RouteComponentProps<IMatchParams>
 
 interface IFieldAgentHomeState {
+  width: number
   requireUpdatesPage: number
 }
 
@@ -176,13 +177,63 @@ class FieldAgentHomeView extends React.Component<
   constructor(props: FieldAgentHomeProps) {
     super(props)
     this.state = {
+      width: window.innerWidth,
       requireUpdatesPage: 1
     }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
   }
 
   onPageChange = (newPageNumber: number) => {
     if (this.props.match.params.tabId === TAB_ID.requireUpdates) {
       this.setState({ requireUpdatesPage: newPageNumber })
+    }
+  }
+
+  getRejectedColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 20,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 40,
+          key: 'name',
+          color: this.props.theme.colors.secondaryLabel
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.sentOn),
+          width: 40,
+          key: 'daysOfRejection'
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'name',
+          color: this.props.theme.colors.secondaryLabel
+        }
+      ]
     }
   }
 
@@ -400,33 +451,10 @@ class FieldAgentHomeView extends React.Component<
                   return (
                     <>
                       {data && data.searchEvents.totalItems > 0 && (
-                        <BodyContent id="require_updates_list">
+                        <HomeContent id="require_updates_list">
                           <GridTable
                             content={this.transformRejectedContent(data)}
-                            columns={[
-                              {
-                                label: this.props.intl.formatMessage(
-                                  constantsMessages.type
-                                ),
-                                width: 30,
-                                key: 'event'
-                              },
-                              {
-                                label: this.props.intl.formatMessage(
-                                  constantsMessages.name
-                                ),
-                                width: 40,
-                                key: 'name',
-                                color: theme.colors.secondaryLabel
-                              },
-                              {
-                                label: this.props.intl.formatMessage(
-                                  constantsMessages.sentOn
-                                ),
-                                width: 30,
-                                key: 'daysOfRejection'
-                              }
-                            ]}
+                            columns={this.getRejectedColumns()}
                             noResultText={EMPTY_STRING}
                             onPageChange={(currentPage: number) => {
                               this.onPageChange(currentPage)
@@ -438,7 +466,7 @@ class FieldAgentHomeView extends React.Component<
                             currentPage={this.state.requireUpdatesPage}
                             clickable={true}
                           />
-                        </BodyContent>
+                        </HomeContent>
                       )}
                       {data && data.searchEvents.totalItems === 0 && (
                         <ZeroUpdatesContainer>

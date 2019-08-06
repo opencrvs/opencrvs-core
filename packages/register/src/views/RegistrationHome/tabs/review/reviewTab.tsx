@@ -4,9 +4,13 @@ import {
   GridTable,
   IAction
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPage, goToReviewDuplicate } from '@register/navigation'
+import {
+  goToPage,
+  goToReviewDuplicate,
+  goToApplicationDetails
+} from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
 import { transformData } from '@register/search/transformer'
@@ -40,11 +44,13 @@ interface IBaseReviewTabProps {
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
+  goToApplicationDetails: typeof goToApplicationDetails
   parentQueryLoading?: boolean
 }
 
 interface IReviewTabState {
   reviewCurrentPage: number
+  width: number
 }
 
 type IReviewTabProps = InjectedIntlProps & IBaseReviewTabProps
@@ -57,8 +63,27 @@ class ReviewTabComponent extends React.Component<
   constructor(props: IReviewTabProps) {
     super(props)
     this.state = {
+      width: window.innerWidth,
       reviewCurrentPage: 1
     }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getExpandable = () => {
+    return this.state.width > this.props.theme.grid.breakpoints.lg
+      ? true
+      : false
   }
 
   userHasRegisterScope() {
@@ -110,9 +135,73 @@ class ReviewTabComponent extends React.Component<
             ).fromNow()) ||
           '',
         actions,
-        icon
+        icon,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(reg.id)
+          }
+        ]
       }
     })
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 14,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 20,
+          key: 'trackingId'
+        },
+        {
+          label: this.props.intl.formatMessage(
+            messages.listItemApplicationDate
+          ),
+          width: 20,
+          key: 'applicationTimeElapsed'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          width: 20,
+          key: 'eventTimeElapsed'
+        },
+        {
+          width: 6,
+          key: 'icons',
+          isIconColumn: true
+        },
+        {
+          width: 20,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 64,
+          key: 'trackingId'
+        },
+        {
+          width: 6,
+          key: 'icons',
+          isIconColumn: true
+        }
+      ]
+    }
   }
 
   onPageChange = (newPageNumber: number) => {
@@ -169,7 +258,7 @@ class ReviewTabComponent extends React.Component<
           }
 
           return (
-            <BodyContent>
+            <HomeContent>
               <ReactTooltip id="validateTooltip">
                 <ToolTipContainer>
                   {this.props.intl.formatMessage(
@@ -179,47 +268,7 @@ class ReviewTabComponent extends React.Component<
               </ReactTooltip>
               <GridTable
                 content={this.transformDeclaredContent(data)}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.type
-                    ),
-                    width: 14,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.trackingId
-                    ),
-                    width: 20,
-                    key: 'trackingId'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.listItemApplicationDate
-                    ),
-                    width: 20,
-                    key: 'applicationTimeElapsed'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.eventDate
-                    ),
-                    width: 20,
-                    key: 'eventTimeElapsed'
-                  },
-                  {
-                    width: 6,
-                    key: 'icons',
-                    isIconColumn: true
-                  },
-                  {
-                    width: 20,
-                    key: 'actions',
-                    isActionColumn: true,
-                    alignment: ColumnContentAlignment.CENTER
-                  }
-                ]}
+                columns={this.getColumns()}
                 renderExpandedComponent={this.renderExpandedComponent}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
@@ -228,9 +277,10 @@ class ReviewTabComponent extends React.Component<
                 pageSize={this.pageSize}
                 totalItems={data.searchEvents && data.searchEvents.totalItems}
                 currentPage={this.state.reviewCurrentPage}
-                expandable={true}
+                expandable={this.getExpandable()}
+                clickable={!this.getExpandable()}
               />
-            </BodyContent>
+            </HomeContent>
           )
         }}
       </Query>
@@ -247,7 +297,8 @@ function mapStateToProps(state: IStoreState) {
 export const ReviewTab = connect(
   mapStateToProps,
   {
-    goToPage: goToPage,
-    goToReviewDuplicate: goToReviewDuplicate
+    goToPage,
+    goToReviewDuplicate,
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(ReviewTabComponent)))

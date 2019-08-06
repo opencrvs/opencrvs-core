@@ -4,9 +4,10 @@ import { RouteComponentProps } from 'react-router'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import {
   goToPage as goToPageAction,
-  goBack as goBackAction
+  goBack as goBackAction,
+  goToPrintCertificate as goToPrintCertificateAction
 } from '@register/navigation'
-import { getUserDetails } from '@register/profile/profileSelectors'
+import { getUserDetails, getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import { IUserDetails } from '@register/utils/userUtils'
 import {
@@ -37,7 +38,8 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Event } from '@opencrvs/register/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE
+  DRAFT_DEATH_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
 import { Query } from 'react-apollo'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
@@ -50,9 +52,13 @@ import {
 } from '@register/i18n/messages'
 import {
   REJECTED,
+  IN_PROGRESS,
+  DECLARED,
   REJECT_REASON,
-  REJECT_COMMENTS
+  REJECT_COMMENTS,
+  REGISTERED
 } from '@register/utils/constants'
+import { Scope } from '@register/utils/authUtils'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px;
@@ -117,6 +123,8 @@ interface IDetailProps {
   userDetails: IUserDetails | null
   goToPage: typeof goToPageAction
   goBack: typeof goBackAction
+  goToPrintCertificate: typeof goToPrintCertificateAction
+  scope: Scope | null
 }
 
 interface IStatus {
@@ -257,6 +265,14 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     }
   }
 
+  userHasRegisterOrValidateScope() {
+    return (
+      this.props.scope &&
+      (this.props.scope.includes('register') ||
+        this.props.scope.includes('validate'))
+    )
+  }
+
   generateDraftHistoryData = (): IHistoryData => {
     const { draft, userDetails } = this.props
     const history: IStatus[] = []
@@ -303,7 +319,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           )
         )
       }
-      const tabRoute =
+      const pageRoute =
         draft.event === Event.BIRTH
           ? DRAFT_BIRTH_PARENT_FORM_PAGE
           : DRAFT_DEATH_FORM_PAGE
@@ -312,7 +328,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           id="draft_update"
           onClick={() =>
             this.props.goToPage(
-              tabRoute,
+              pageRoute,
               draft.id,
               'preview',
               (draft.event && draft.event.toString()) || ''
@@ -338,6 +354,63 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
       title: title !== '' ? title : undefined,
       history,
       action
+    }
+  }
+
+  getActionForStateAndScope = (
+    event: string | undefined,
+    id: string | undefined,
+    applicationState: DraftStatus | GQLRegStatus | null
+  ) => {
+    if (
+      applicationState === REJECTED &&
+      !this.userHasRegisterOrValidateScope()
+    ) {
+      return (
+        <ActionButton id="reject_update" disabled>
+          {this.props.intl.formatMessage(messages.update)}
+        </ActionButton>
+      )
+    } else if (
+      applicationState === REGISTERED.toUpperCase() &&
+      this.userHasRegisterOrValidateScope()
+    ) {
+      return (
+        <ActionButton
+          id="registrar_print"
+          onClick={() =>
+            this.props.goToPrintCertificate(
+              (id && id.toString()) || '',
+              (event && event.toLocaleLowerCase()) || ''
+            )
+          }
+        >
+          {this.props.intl.formatMessage(buttonMessages.print)}
+        </ActionButton>
+      )
+    } else if (
+      (applicationState === IN_PROGRESS ||
+        applicationState === DECLARED ||
+        applicationState === REJECTED) &&
+      this.userHasRegisterOrValidateScope()
+    ) {
+      return (
+        <ActionButton
+          id="registrar_update"
+          onClick={() =>
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
+              (id && id.toString()) || '',
+              'review',
+              (event && event.toString()) || ''
+            )
+          }
+        >
+          {this.props.intl.formatMessage(buttonMessages.print)}
+        </ActionButton>
+      )
+    } else {
+      return undefined
     }
   }
 
@@ -394,13 +467,20 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           )
         })) ||
       []
-    const currentState = history.length > 0 ? history[0].type : null
+    const applicationState = history.length > 0 ? history[0].type : null
     const applicant: GQLPerson =
       // @ts-ignore
       (data.fetchRegistration && data.fetchRegistration.child) ||
       // @ts-ignore
       (data.fetchRegistration && data.fetchRegistration.deceased) ||
       null
+
+    const event =
+      registration && registration.type && (registration.type as string)
+    const id =
+      data.fetchRegistration &&
+      data.fetchRegistration.id &&
+      (data.fetchRegistration.id as string)
     return {
       title:
         (applicant &&
@@ -410,14 +490,9 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           ] as string)) ||
         '',
       history,
-      action:
-        currentState && currentState === REJECTED ? (
-          <ActionButton id="reject_update" disabled>
-            {this.props.intl.formatMessage(messages.update)}
-          </ActionButton>
-        ) : (
-          undefined
-        )
+      action: applicationState
+        ? this.getActionForStateAndScope(event, id, applicationState)
+        : undefined
     }
   }
 
@@ -554,6 +629,7 @@ function mapStateToProps(
   return {
     language: state.i18n.language,
     userDetails: getUserDetails(state),
+    scope: getScope(state),
     applicationId: match && match.params && match.params.applicationId,
     draft:
       (state.applicationsState.applications &&
@@ -576,6 +652,7 @@ export const Details = connect(
   mapStateToProps,
   {
     goToPage: goToPageAction,
-    goBack: goBackAction
+    goBack: goBackAction,
+    goToPrintCertificate: goToPrintCertificateAction
   }
 )(injectIntl(withTheme(DetailView)))
