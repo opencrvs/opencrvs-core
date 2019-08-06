@@ -79,7 +79,6 @@ import {
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
-import { userDetails } from '@register/tests/util'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -709,7 +708,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
   }
 
   render() {
-    const { intl, match } = this.props
+    const { intl, match, userDetails } = this.props
     const { searchText, searchType } = match.params
     return (
       <>
@@ -725,7 +724,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
               <Query
                 query={SEARCH_EVENTS}
                 variables={{
-                  locationIds: [getUserLocation(userDetails).id],
+                  locationIds: userDetails
+                    ? [getUserLocation(userDetails).id]
+                    : [],
                   sort: SEARCH_RESULT_SORT,
                   trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                   registrationNumber:
