@@ -291,7 +291,7 @@ export async function setupLastRegLocation(
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  const union = await getPractitionerOfficeLocation(practitioner.id)
+  const location = await getPractitionerOfficeLocation(practitioner.id)
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -307,11 +307,11 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${union.id}`
+    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
-      valueReference: { reference: `Location/${union.id}` }
+      valueReference: { reference: `Location/${location.id}` }
     })
   }
 
