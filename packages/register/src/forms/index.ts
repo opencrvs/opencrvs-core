@@ -366,6 +366,7 @@ export interface IConditionals {
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
+  isRegistrarRoleSeleted: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'

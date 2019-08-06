@@ -24,6 +24,7 @@ import {
   constantsMessages,
   formMessages as messages
 } from '@register/i18n/messages'
+import { conditionals } from '@register/forms/utils'
 
 export const userSection: IFormSection = {
   id: 'user',
@@ -169,6 +170,7 @@ export const userSection: IFormSection = {
     {
       id: 'signature',
       title: messages.userSignatureAttachmentTitle,
+      conditionals: [conditionals.isRegistrarRoleSeleted],
       fields: [
         {
           name: 'signature',

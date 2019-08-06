@@ -575,5 +575,9 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
+  },
+  isRegistrarRoleSeleted: {
+    action: 'hide',
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
   }
 }
