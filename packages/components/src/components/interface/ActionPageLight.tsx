@@ -58,12 +58,9 @@ const Container = styled.div`
   max-width: 940px;
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px;
-    width: 100%;
+    margin: 40px 54px;
+    padding: 24px 32px;
     min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
 `
 interface IProps {
