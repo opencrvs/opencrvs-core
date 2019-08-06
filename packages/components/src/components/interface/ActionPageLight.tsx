@@ -27,9 +27,6 @@ const BodyContent = styled.div`
 `
 const BackButtonContainer = styled.div`
   cursor: pointer;
-  #action_page_back_button_icon_hover {
-    display: none;
-  }
 `
 const BackButton = styled(Button)`
   height: 42px;
@@ -98,10 +95,7 @@ export class ActionPageLight extends React.Component<
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <BackButton
-                id="action_page_back_button_icon"
-                icon={icon || (() => <BackButtonIcon />)}
-              />
+              <BackButton icon={icon || (() => <BackButtonIcon />)} />
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
