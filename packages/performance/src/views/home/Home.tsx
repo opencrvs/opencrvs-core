@@ -325,7 +325,10 @@ class HomeView extends React.Component<FullProps> {
               variables={{
                 timeStart: 1527098400000,
                 timeEnd: Date.now(),
-                locationId: userDetails && getUserLocation(userDetails, 'UNION')
+                locationId:
+                  userDetails && userDetails.primaryOffice
+                    ? userDetails.primaryOffice
+                    : ''
               }}
             >
               {({
