@@ -27,7 +27,6 @@ import {
   LANG_EN,
   EMPTY_STRING,
   APPLICATION_DATE_FORMAT,
-  UNION_LOCATION_CODE,
   FIELD_AGENT_ROLES,
   SYS_ADMIN_ROLES,
   REGISTRAR_ROLES
@@ -248,8 +247,7 @@ class FieldAgentHomeView extends React.Component<
       theme
     } = this.props
     const tabId = match.params.tabId || TAB_ID.sentForReview
-    const fieldAgentLocation =
-      userDetails && getUserLocation(userDetails, UNION_LOCATION_CODE)
+    const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
     let parentQueryLoading = false
     const role = userDetails && userDetails.role
     return (
@@ -261,7 +259,7 @@ class FieldAgentHomeView extends React.Component<
               variables={{
                 userId: userDetails ? userDetails.practitionerId : '',
                 status: [EVENT_STATUS.REJECTED],
-                locationIds: [fieldAgentLocation]
+                locationIds: fieldAgentLocationId ? [fieldAgentLocationId] : []
               }}
             >
               {({
@@ -360,7 +358,9 @@ class FieldAgentHomeView extends React.Component<
                 variables={{
                   userId: userDetails ? userDetails.practitionerId : '',
                   status: [EVENT_STATUS.REJECTED],
-                  locationIds: [fieldAgentLocation],
+                  locationIds: fieldAgentLocationId
+                    ? [fieldAgentLocationId]
+                    : [],
                   count: this.pageSize,
                   skip: (this.state.requireUpdatesPage - 1) * this.pageSize
                 }}

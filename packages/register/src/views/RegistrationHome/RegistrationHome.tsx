@@ -240,9 +240,8 @@ export class RegistrationHomeView extends React.Component<
 
   render() {
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
-    const registrarLocationId =
-      userDetails &&
-      getUserLocation(userDetails, window.config.CATCHMENT_AREA_TYPE)
+    const registrarLocationId = userDetails && getUserLocation(userDetails).id
+
     let parentQueryLoading = false
 
     return (

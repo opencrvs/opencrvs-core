@@ -73,11 +73,13 @@ import { formatLongDate } from '@register/utils/date-formatting'
 import {
   IGQLLocation,
   IIdentifier,
-  IUserDetails
+  IUserDetails,
+  getUserLocation
 } from '@register/utils/userUtils'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
+import { userDetails } from '@register/tests/util'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -706,25 +708,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     return this.props.scope && this.props.scope.includes('certify')
   }
 
-  getLocalLocationId() {
-    const area = this.props.userDetails && this.props.userDetails.catchmentArea
-
-    const identifier =
-      area &&
-      area.find((location: IGQLLocation) => {
-        return (
-          (location.identifier &&
-            location.identifier.find((areaIdentifier: IIdentifier) => {
-              return (
-                areaIdentifier.system.endsWith('jurisdiction-type') &&
-                areaIdentifier.value === window.config.CATCHMENT_AREA_TYPE
-              )
-            })) !== undefined
-        )
-      })
-
-    return identifier && identifier.id
-  }
   render() {
     const { intl, match } = this.props
     const { searchText, searchType } = match.params
@@ -742,7 +725,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
               <Query
                 query={SEARCH_EVENTS}
                 variables={{
-                  locationIds: [this.getLocalLocationId()],
+                  locationIds: [getUserLocation(userDetails).id],
                   sort: SEARCH_RESULT_SORT,
                   trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                   registrationNumber:

@@ -22,6 +22,5 @@ Object.defineProperty(window, 'localStorage', {
   COUNTRY: 'bgd',
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
-  REGISTER_URL: 'http://localhost:3000',
-  CATCHMENT_AREA_TYPE: 'UNION'
+  REGISTER_URL: 'http://localhost:3000'
 }

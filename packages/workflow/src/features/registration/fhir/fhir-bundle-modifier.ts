@@ -8,7 +8,7 @@ import { getRegStatusCode } from '@workflow/features/registration/fhir/fhir-util
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
-  getPractitionerUnionLocation,
+  getPractitionerOfficeLocation,
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import {
@@ -291,7 +291,7 @@ export async function setupLastRegLocation(
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  const union = await getPractitionerUnionLocation(practitioner.id)
+  const union = await getPractitionerOfficeLocation(practitioner.id)
   if (!taskResource.extension) {
     taskResource.extension = []
   }

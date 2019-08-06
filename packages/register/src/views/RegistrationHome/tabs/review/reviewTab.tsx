@@ -167,6 +167,7 @@ class ReviewTabComponent extends React.Component<
               </ErrorText>
             )
           }
+
           return (
             <BodyContent>
               <ReactTooltip id="validateTooltip">
