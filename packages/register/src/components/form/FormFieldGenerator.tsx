@@ -59,7 +59,9 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   FIELD_GROUP_TITLE,
-  SEARCH_FIELD
+  SEARCH_FIELD,
+  SIMPLE_DOCUMENT_UPLOADER,
+  IAttachmentValue
 } from '@register/forms'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { InputField } from '@register/components/form/InputField'
@@ -90,6 +92,7 @@ import {
 import { IOfflineDataState } from '@register/offline/reducer'
 import { isEqual } from 'lodash'
 import { IValidationResult } from '@register/utils/validate'
+import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -183,6 +186,18 @@ function GeneratedInputField({
         extraValue={fieldDefinition.extraValue || ''}
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
+        }
+      />
+    )
+  }
+  if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
+    return (
+      <SimpleDocumentUploader
+        name={fieldDefinition.name}
+        label={fieldDefinition.label}
+        files={value as IAttachmentValue}
+        onComplete={(file: IAttachmentValue | {}) =>
+          onSetFieldValue(fieldDefinition.name, file)
         }
       />
     )

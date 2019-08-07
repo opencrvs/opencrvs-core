@@ -5,7 +5,8 @@ import {
   SEARCH_FIELD,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  SIMPLE_DOCUMENT_UPLOADER
 } from '@register/forms'
 import {
   bengaliOnlyNameFormat,
@@ -174,12 +175,11 @@ export const userSection: IFormSection = {
       fields: [
         {
           name: 'signature',
-          type: DOCUMENT_UPLOADER_WITH_OPTION,
+          type: SIMPLE_DOCUMENT_UPLOADER,
           label: messages.userSignatureAttachment,
           initialValue: '',
           hideAsterisk: true,
-          validate: [],
-          options: []
+          validate: []
         }
       ]
     }

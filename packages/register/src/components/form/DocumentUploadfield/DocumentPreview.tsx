@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { IFileValue } from '@register/forms'
-
+import { IFileValue, IAttachmentValue } from '@register/forms'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
 import PanViewer from '@opencrvs/components/lib/interface/components/PanViewer'
@@ -49,10 +48,10 @@ const BackButton = styled.button`
   cursor: pointer;
 `
 type IProps = {
-  previewImage: IFileValue
+  previewImage: IFileValue | IAttachmentValue
   title?: string
   goBack: () => void
-  onDelete: (image: IFileValue) => void
+  onDelete: (image: IFileValue | IAttachmentValue) => void
 }
 
 export class DocumentPreview extends React.Component<IProps> {

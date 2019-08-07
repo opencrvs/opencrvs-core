@@ -210,13 +210,18 @@ class DocumentUploaderWithOptionComp extends React.Component<
     })
   }
 
-  onDelete = (image: IFileValue) => {
+  onDelete = (image: IFormFieldValue) => {
+    const previewImage = image as IFileValue
     const addableOption = this.props.options.find(
-      (item: ISelectOption) => item.value === image.optionValues[1]
+      (item: ISelectOption) => item.value === previewImage.optionValues[1]
     ) as ISelectOption
     const dropDownOptions = this.state.dropDownOptions.concat(addableOption)
     this.setState(() => ({ dropDownOptions }))
-    remove(this.state.uploadedDocuments, (item: IFileValue) => item === image)
+    remove(
+      this.state.uploadedDocuments,
+      (item: IFileValue) => item === previewImage
+    )
+
     this.props.onComplete(this.state.uploadedDocuments)
     this.closePreviewSection()
   }
@@ -225,8 +230,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.setState({ previewImage: null })
   }
 
-  selectForPreview = (previewImage: IFileValue) => {
-    this.setState({ previewImage })
+  selectForPreview = (previewImage: IFormFieldValue) => {
+    this.setState({ previewImage: previewImage as IFileValue })
   }
 
   render() {
