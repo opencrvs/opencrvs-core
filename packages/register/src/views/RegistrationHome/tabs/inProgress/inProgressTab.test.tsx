@@ -73,7 +73,7 @@ describe('In Progress tab', () => {
         request: {
           query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             status: EVENT_STATUS.IN_PROGRESS
           }
         },
@@ -100,7 +100,10 @@ describe('In Progress tab', () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <InProgressTab drafts={localDrafts} registrarLocationId={'123456789'} />,
+      <InProgressTab
+        drafts={localDrafts}
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      />,
       store,
       graphqlMock
     )
@@ -146,7 +149,7 @@ describe('In Progress tab', () => {
         request: {
           query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             status: EVENT_STATUS.IN_PROGRESS
           }
         },
@@ -177,7 +180,7 @@ describe('In Progress tab', () => {
       <InProgressTab
         drafts={localDrafts}
         selectorId={'you'}
-        registrarLocationId={'123456789'}
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
       />,
       store,
       graphqlMock
@@ -278,7 +281,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -311,7 +314,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -424,7 +427,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
