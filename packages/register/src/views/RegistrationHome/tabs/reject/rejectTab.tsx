@@ -12,7 +12,7 @@ import {
 } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { getScope } from '@register/profile/profileSelectors'
-import { transformData, Array } from '@register/search/transformer'
+import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
 import { ITheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'

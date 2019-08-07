@@ -9,8 +9,7 @@ import {
 import { InjectedIntl } from 'react-intl'
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
-import { IApplication, SUBMISSION_STATUS } from '@register/applications'
-import { DECLARED, REGISTERED } from '@register/utils/constants'
+import { IApplication } from '@register/applications'
 export interface Array {
   [key: string]: any
 }
