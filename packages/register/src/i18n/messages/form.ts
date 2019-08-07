@@ -281,6 +281,7 @@ interface IFormMessages {
   uploadedList: ReactIntl.FormattedMessage.MessageDescriptor
   userSignatureAttachmentTitle: ReactIntl.FormattedMessage.MessageDescriptor
   userSignatureAttachment: ReactIntl.FormattedMessage.MessageDescriptor
+  userSignatureAttachmentDesc: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1708,6 +1709,12 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Registrar’s signature',
     description: 'Input label for user signature attachment',
     id: 'form.field.label.userSignatureAttachment'
+  },
+  userSignatureAttachmentDesc: {
+    defaultMessage:
+      'Ask the registrar to sign a piece of paper and then scan or take a photo.',
+    description: 'Input label for user signature attachment',
+    id: 'form.field.label.userSignatureAttachmentDesc'
   }
 }
 

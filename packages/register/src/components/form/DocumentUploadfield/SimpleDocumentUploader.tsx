@@ -37,10 +37,16 @@ const DocumentUploader = styled(ImageUploader)`
   }
 `
 
+const FieldDescription = styled.div`
+  margin-top: -8px;
+  margin-bottom: 24px;
+`
+
 type IFullProps = {
   name: string
   label: string
   files?: IAttachmentValue
+  description?: string
   onComplete: (files: IAttachmentValue | {}) => void
 } & InjectedIntlProps
 
@@ -118,19 +124,18 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const { label, intl, files } = this.props
-
-    console.log(files)
+    const { label, intl, files, description } = this.props
 
     return (
       <UploaderWrapper>
+        {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
           {this.state.errorMessage && (
             <ErrorText>{this.state.errorMessage}</ErrorText>
           )}
         </ErrorMessage>
         <DocumentListPreview
-          attachment={this.props.files}
+          attachment={files}
           onSelect={this.selectForPreview}
           label={label}
         />

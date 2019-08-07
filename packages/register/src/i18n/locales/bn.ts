@@ -1096,6 +1096,8 @@ export const BENGALI_STATE: ILanguage = {
     'validate.application.action.modal.title': 'অনুমোদনের জন্য প্রেরিত?',
     'validate.application.action.modal.description':
       'এই আবেদনটি  নিবন্ধকের কাছে  নিবন্দনের জন্য  প্রেরণ করা হবে ',
-    'buttons.approve': 'অনুমোদন'
+    'buttons.approve': 'অনুমোদন',
+    'form.field.label.userSignatureAttachmentDesc':
+      'নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।'
   }
 }

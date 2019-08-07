@@ -1100,6 +1100,8 @@ export const ENGLISH_STATE: ILanguage = {
       'The Passport Number can only be alpha numeric and must be {validLength} characters long',
     'form.field.label.userSignatureAttachmentTitle':
       'Attach the registrar’s signature',
-    'form.field.label.userSignatureAttachment': 'Registrar’s signature'
+    'form.field.label.userSignatureAttachment': 'Registrar’s signature',
+    'form.field.label.userSignatureAttachmentDesc':
+      'Ask the registrar to sign a piece of paper and then scan or take a photo.'
   }
 }

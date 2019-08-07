@@ -177,6 +177,7 @@ export const userSection: IFormSection = {
           name: 'signature',
           type: SIMPLE_DOCUMENT_UPLOADER,
           label: messages.userSignatureAttachment,
+          description: messages.userSignatureAttachmentDesc,
           initialValue: '',
           hideAsterisk: true,
           validate: []

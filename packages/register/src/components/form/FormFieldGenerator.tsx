@@ -195,6 +195,7 @@ function GeneratedInputField({
       <SimpleDocumentUploader
         name={fieldDefinition.name}
         label={fieldDefinition.label}
+        description={fieldDefinition.description}
         files={value as IAttachmentValue}
         onComplete={(file: IAttachmentValue | {}) =>
           onSetFieldValue(fieldDefinition.name, file)
