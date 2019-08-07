@@ -37,7 +37,7 @@ describe('administrative handler receives a request', () => {
 
       const res = await server.server.inject({
         method: 'GET',
-        url: '/locations',
+        url: '/bgd/locations',
         headers: {
           Authorization: `Bearer ${token}`
         }
