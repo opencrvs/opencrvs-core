@@ -134,5 +134,4 @@ services:
     environment:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://hearth:3447/fhir
-      - ADMINISTRATIVE_STRUCTURE_URL=http://174.136.37.245:8090/gen
       - AUTH_URL=http://auth:4040
