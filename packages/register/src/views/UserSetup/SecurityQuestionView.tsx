@@ -7,7 +7,7 @@ import {
   QUESTION_KEYS
 } from '@register/i18n/messages'
 import styled from 'styled-components'
-import { TextInput, Select } from '@opencrvs/components/lib/forms'
+import { TextInput, Select, InputError } from '@opencrvs/components/lib/forms'
 import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -253,9 +253,12 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     touched={this.state.showError}
                   />
                   {this.state.showError && !questionnaire.selectedQuestion && (
-                    <Error id={`question-${index}-validation-message`}>
+                    <InputError
+                      id={`question-${index}-validation-message`}
+                      centred={false}
+                    >
                       {intl.formatMessage(messages.selectSecurityQuestion)}
-                    </Error>
+                    </InputError>
                   )}
                 </Wrapper>
                 <Wrapper>
@@ -275,9 +278,12 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   />
                   {this.state.showError &&
                     !this.state.questionnaire[index].answer && (
-                      <Error id={`answer-${index}-validation-message`}>
+                      <InputError
+                        id={`answer-${index}-validation-message`}
+                        centred={false}
+                      >
                         {intl.formatMessage(messages.enterResponse)}
-                      </Error>
+                      </InputError>
                     )}
                 </Wrapper>
               </QuestionWrapper>
