@@ -736,6 +736,9 @@ export const officeMock = JSON.stringify({
       value: 'CRVS_OFFICE'
     }
   ],
+  type: {
+    coding: [{ code: 'CRVS_OFFICE' }]
+  },
   physicalType: {
     coding: [
       {

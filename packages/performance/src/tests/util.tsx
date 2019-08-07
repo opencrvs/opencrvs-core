@@ -200,7 +200,7 @@ export const user = {
       __typename: 'Location'
     }
   ],
-  primaryOffice: undefined,
+  primaryOffice: { id: '0627c48a-c721-4ff9-bc6e-1fba59a2332a' },
   __typename: 'User'
 }
 
@@ -215,6 +215,7 @@ export const userDetails = {
     { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
   ],
   role: 'DISTRICT_REGISTRAR',
+  primaryOffice: { id: '0627c48a-c721-4ff9-bc6e-1fba59a2332a' },
   catchmentArea: [
     {
       id: 'a590de84-1d84-4dcf-a20b-8e60c7c66130',

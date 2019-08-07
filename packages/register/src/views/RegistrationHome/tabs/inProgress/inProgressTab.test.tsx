@@ -991,7 +991,7 @@ describe('Tablet tests', () => {
       <InProgressTab
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
-        registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
       />,
       store,
       graphqlMock
