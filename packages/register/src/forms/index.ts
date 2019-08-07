@@ -259,7 +259,8 @@ export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
 }
 export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
   type: typeof SIMPLE_DOCUMENT_UPLOADER
-  onCompleted?: (response: string) => void
+  allowedDocType?: string[]
+  onCompleted?: (response: any) => void
 }
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
@@ -535,6 +536,8 @@ export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
 export interface Ii18nSimpleDocumentUploaderFormField
   extends Ii18nFormFieldBase {
   type: typeof SIMPLE_DOCUMENT_UPLOADER
+  allowedDocType?: string[]
+  onCompleted?: (response: any) => void
 }
 export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD

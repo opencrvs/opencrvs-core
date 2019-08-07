@@ -178,6 +178,7 @@ export const userSection: IFormSection = {
           type: SIMPLE_DOCUMENT_UPLOADER,
           label: messages.userSignatureAttachment,
           description: messages.userSignatureAttachmentDesc,
+          allowedDocType: ['image/png'],
           initialValue: '',
           hideAsterisk: true,
           validate: []

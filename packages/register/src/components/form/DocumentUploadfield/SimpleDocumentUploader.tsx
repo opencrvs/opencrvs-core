@@ -47,6 +47,7 @@ type IFullProps = {
   label: string
   files?: IAttachmentValue
   description?: string
+  allowedDocType?: string[]
   onComplete: (files: IAttachmentValue | {}) => void
 } & InjectedIntlProps
 
@@ -86,13 +87,11 @@ class SimpleDocumentUploaderComponent extends React.Component<
       base64String = base64String.split('base64,')[1]
       Jimp.read(new Buffer(base64String, 'base64'))
         .then(buffer => {
-          if (!ALLOWED_IMAGE_TYPE.includes(buffer.getMIME())) {
+          if (
+            this.props.allowedDocType &&
+            !this.props.allowedDocType.includes(buffer.getMIME())
+          ) {
             throw new Error('File type not supported')
-          } else if (uploadedImage.size > 2097152) {
-            return buffer
-              .resize(2000, Jimp.AUTO)
-              .quality(70)
-              .getBase64Async(buffer.getMIME())
           }
           return data as string
         })
@@ -101,10 +100,13 @@ class SimpleDocumentUploaderComponent extends React.Component<
             type: uploadedImage.type,
             data: buffer
           })
+          this.setState({
+            errorMessage: ''
+          })
         })
         .catch(() => {
           this.setState({
-            errorMessage: 'error'
+            errorMessage: 'File type not supported'
           })
         })
     })
