@@ -49,7 +49,7 @@ const PasswordContents = styled.div`
 `
 const ValidationRulesSection = styled.div`
   background: ${({ theme }) => theme.colors.background};
-  margin: 23px 0 17px;
+  margin: 16px 0 24px;
   padding: 8px 24px;
   & div {
     padding: 8px 0;
