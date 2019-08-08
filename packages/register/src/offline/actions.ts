@@ -1,6 +1,8 @@
 import { ILocation } from '@register/offline/reducer'
+import { ILanguage } from '@register/i18n/reducer'
 import {
   ILocationDataResponse,
+  ILanguagesDataResponse,
   IFacilitiesDataResponse
 } from '@register/utils/referenceApi'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -9,6 +11,18 @@ export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
   type: typeof GET_LOCATIONS
   payload: string
+}
+
+export const LANGUAGES_LOADED = 'OFFLINE/LANGUAGES_LOADED'
+export type LanguagesLoadedAction = {
+  type: typeof LANGUAGES_LOADED
+  payload: ILanguage[]
+}
+
+export const LANGUAGES_FAILED = 'OFFLINE/LANGUAGES_FAILED'
+export type LanguagesFailedAction = {
+  type: typeof LANGUAGES_FAILED
+  payload: Error
 }
 
 export const LOCATIONS_LOADED = 'OFFLINE/LOCATIONS_LOADED'
@@ -49,6 +63,14 @@ export const GET_OFFLINE_DATA_FAILED = 'OFFLINE/GET_OFFLINE_DATA_FAILED'
 export type IGetOfflineDataFailedAction = {
   type: typeof GET_OFFLINE_DATA_FAILED
 }
+export const FORMAT_LOCATIONS = 'OFFLINE/FORMAT_LOCATIONS'
+export type IFilterLocationsAction = {
+  type: typeof FORMAT_LOCATIONS
+}
+export const LOAD_LOCATIONS = 'OFFLINE/LOAD_LOCATIONS'
+export type ILoadLocationsAction = {
+  type: typeof LOAD_LOCATIONS
+}
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -58,6 +80,10 @@ export type Action =
   | IGetOfflineDataFailedAction
   | FacilitiesLoadedAction
   | FacilitiesFailedAction
+  | LanguagesFailedAction
+  | LanguagesLoadedAction
+  | IFilterLocationsAction
+  | ILoadLocationsAction
 
 export const locationsLoaded = (
   payload: ILocationDataResponse
@@ -97,4 +123,24 @@ export const getOfflineDataSuccess = (
 
 export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
   type: GET_OFFLINE_DATA_FAILED
+})
+
+export const languagesLoaded = (
+  payload: ILanguagesDataResponse
+): LanguagesLoadedAction => ({
+  type: LANGUAGES_LOADED,
+  payload: payload.data
+})
+
+export const languagesFailed = (error: Error): LanguagesFailedAction => ({
+  type: LANGUAGES_FAILED,
+  payload: error
+})
+
+export const filterLocationsByLanguage = (): IFilterLocationsAction => ({
+  type: FORMAT_LOCATIONS
+})
+
+export const loadLocations = (): ILoadLocationsAction => ({
+  type: LOAD_LOCATIONS
 })

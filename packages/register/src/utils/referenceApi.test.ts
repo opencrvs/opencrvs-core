@@ -9,7 +9,7 @@ export const mockFetchLocations = {
     {
       id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
       name: 'Barisal',
-      nameBn: 'বরিশাল',
+      alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -23,7 +23,7 @@ export const mockFetchFacilities = {
     {
       id: '3fadd4e1-bcfd-470b-a997-07bc09631e2c',
       name: 'Moktarpur Union Parishad',
-      nameBn: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+      alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
       physicalType: 'Building',
       type: 'CRVS_OFFICE',
       partOf: 'Location/9ce9fdba-ae24-467f-87ab-5b5498a0217f'

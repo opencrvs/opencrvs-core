@@ -2,6 +2,7 @@ import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from '@register/offline/reducer'
 import { getToken } from '@register/utils/authUtils'
+import { ILanguage } from '@register/i18n/reducer'
 
 export interface ILocationDataResponse {
   data: { [key: string]: ILocation }
@@ -9,6 +10,34 @@ export interface ILocationDataResponse {
 
 export interface IFacilitiesDataResponse {
   data: { [key: string]: ILocation }
+}
+
+export interface ILanguagesDataResponse {
+  data: ILanguage[]
+}
+
+async function loadLanguages(): Promise<any> {
+  const url = resolve(
+    window.config.RESOURCES_URL,
+    `${window.config.COUNTRY}/languages/register`
+  )
+
+  // @ts-ignore
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const body = await res.json()
+  return {
+    data: body.data
+  }
 }
 
 async function loadLocations(): Promise<any> {
@@ -60,5 +89,6 @@ async function loadFacilities(): Promise<any> {
 
 export const referenceApi = {
   loadLocations,
-  loadFacilities
+  loadFacilities,
+  loadLanguages
 }

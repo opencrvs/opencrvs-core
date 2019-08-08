@@ -2179,7 +2179,7 @@ export const mockOfflineData = {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
       name: 'Shaheed Taj Uddin Ahmad Medical College',
-      nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+      alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
@@ -2187,7 +2187,7 @@ export const mockOfflineData = {
     'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
       id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
       name: 'Kaliganj Union Sub Center',
-      nameBn: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
+      alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -2195,7 +2195,7 @@ export const mockOfflineData = {
     '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
       id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
       name: 'Kaliganj Upazila Health Complex',
-      nameBn: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
+      alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -2203,7 +2203,7 @@ export const mockOfflineData = {
     '0d8474da-0361-4d32-979e-af91f020309e': {
       id: '0d8474da-0361-4d32-979e-af91f020309e',
       name: 'Dholashadhukhan Cc',
-      nameBn: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
+      alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -2214,7 +2214,7 @@ export const mockOfflineData = {
     '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
       name: 'Barisal',
-      nameBn: 'বরিশাল',
+      alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2223,7 +2223,7 @@ export const mockOfflineData = {
     '8cbc862a-b817-4c29-a490-4a8767ff023c': {
       id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
       name: 'Chittagong',
-      nameBn: 'চট্টগ্রাম',
+      alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2232,7 +2232,7 @@ export const mockOfflineData = {
     '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b': {
       id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
       name: 'Dhaka',
-      nameBn: 'ঢাকা',
+      alias: 'ঢাকা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2241,7 +2241,7 @@ export const mockOfflineData = {
     '7304b306-1b0d-4640-b668-5bf39bc78f48': {
       id: '7304b306-1b0d-4640-b668-5bf39bc78f48',
       name: 'Khulna',
-      nameBn: 'খুলনা',
+      alias: 'খুলনা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2250,7 +2250,7 @@ export const mockOfflineData = {
     '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a': {
       id: '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a',
       name: 'Rajshahi',
-      nameBn: 'রাজশাহী',
+      alias: 'রাজশাহী',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2259,7 +2259,7 @@ export const mockOfflineData = {
     '2b55d13f-f700-4373-8255-c0febd4733b6': {
       id: '2b55d13f-f700-4373-8255-c0febd4733b6',
       name: 'Rangpur',
-      nameBn: 'রংপুর',
+      alias: 'রংপুর',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2268,7 +2268,7 @@ export const mockOfflineData = {
     '59f7f044-84b8-4a6c-955d-271aa3e5af46': {
       id: '59f7f044-84b8-4a6c-955d-271aa3e5af46',
       name: 'Sylhet',
-      nameBn: 'সিলেট',
+      alias: 'সিলেট',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2277,7 +2277,7 @@ export const mockOfflineData = {
     '237f3404-d417-41fe-9130-3d049800a1e5': {
       id: '237f3404-d417-41fe-9130-3d049800a1e5',
       name: 'Mymensingh',
-      nameBn: 'ময়মনসিংহ',
+      alias: 'ময়মনসিংহ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2286,7 +2286,7 @@ export const mockOfflineData = {
     'bc4b9f99-0db3-4815-926d-89fd56889407': {
       id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
       name: 'BARGUNA',
-      nameBn: 'বরগুনা',
+      alias: 'বরগুনা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2295,7 +2295,7 @@ export const mockOfflineData = {
     'dabffdf7-c174-4450-b306-5a3c2c0e2c0e': {
       id: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
       name: 'BARISAL',
-      nameBn: 'বরিশাল',
+      alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2304,7 +2304,7 @@ export const mockOfflineData = {
     'a5b61fc5-f0c9-4f54-a934-eba18f9110c2': {
       id: 'a5b61fc5-f0c9-4f54-a934-eba18f9110c2',
       name: 'BHOLA',
-      nameBn: 'ভোলা',
+      alias: 'ভোলা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2313,7 +2313,7 @@ export const mockOfflineData = {
     '5ffa5780-5ddf-4549-a391-7ad3ba2334d4': {
       id: '5ffa5780-5ddf-4549-a391-7ad3ba2334d4',
       name: 'JHALOKATI',
-      nameBn: 'ঝালকাঠি',
+      alias: 'ঝালকাঠি',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2322,7 +2322,7 @@ export const mockOfflineData = {
     'c8dcf1fe-bf92-404b-81c0-31d6802a1a68': {
       id: 'c8dcf1fe-bf92-404b-81c0-31d6802a1a68',
       name: 'PATUAKHALI',
-      nameBn: 'পটুয়াখালী ',
+      alias: 'পটুয়াখালী ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2331,7 +2331,7 @@ export const mockOfflineData = {
     '9c86160a-f704-464a-8b7d-9eae2b4cf1f9': {
       id: '9c86160a-f704-464a-8b7d-9eae2b4cf1f9',
       name: 'PIROJPUR',
-      nameBn: 'পিরোজপুর ',
+      alias: 'পিরোজপুর ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2340,7 +2340,7 @@ export const mockOfflineData = {
     '1846f07e-6f5c-4507-b5d6-126716b0856b': {
       id: '1846f07e-6f5c-4507-b5d6-126716b0856b',
       name: 'BANDARBAN',
-      nameBn: 'বান্দরবান',
+      alias: 'বান্দরবান',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2349,7 +2349,7 @@ export const mockOfflineData = {
     'cf141982-36a1-4308-9090-0445c311f5ae': {
       id: 'cf141982-36a1-4308-9090-0445c311f5ae',
       name: 'BRAHMANBARIA',
-      nameBn: 'ব্রাহ্মণবাড়িয়া',
+      alias: 'ব্রাহ্মণবাড়িয়া',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2358,7 +2358,7 @@ export const mockOfflineData = {
     '478f518e-8d86-439d-8618-5cfa8d3bf5dd': {
       id: '478f518e-8d86-439d-8618-5cfa8d3bf5dd',
       name: 'CHANDPUR',
-      nameBn: 'চাঁদপুর',
+      alias: 'চাঁদপুর',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2367,7 +2367,7 @@ export const mockOfflineData = {
     'db5faba3-8143-4924-a44a-8562ed5e0437': {
       id: 'db5faba3-8143-4924-a44a-8562ed5e0437',
       name: 'CHITTAGONG',
-      nameBn: 'চট্টগ্রাম',
+      alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2376,7 +2376,7 @@ export const mockOfflineData = {
     '5926982b-845c-4463-80aa-cbfb86762e0a': {
       id: '5926982b-845c-4463-80aa-cbfb86762e0a',
       name: 'COMILLA',
-      nameBn: 'কুমিল্লা',
+      alias: 'কুমিল্লা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2385,7 +2385,7 @@ export const mockOfflineData = {
     'a3455e64-164c-4bf4-b834-16640a85efd8': {
       id: 'a3455e64-164c-4bf4-b834-16640a85efd8',
       name: "COX'S BAZAR",
-      nameBn: 'কক্সবাজার ',
+      alias: 'কক্সবাজার ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2394,7 +2394,7 @@ export const mockOfflineData = {
     '1dfc716a-c5f7-4d39-ad71-71d2a359210c': {
       id: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
       name: 'FENI',
-      nameBn: 'ফেনী',
+      alias: 'ফেনী',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',

@@ -10,7 +10,7 @@ type ISupportedType =
 export interface IOISFLocation {
   bbsCode: string
   name: string
-  nameBn: string
+  alias: string
   id: number
 }
 
@@ -21,7 +21,7 @@ export interface IStatistic {
 export interface ILocation {
   id?: string
   name?: string
-  nameBn?: string
+  alias?: string
   physicalType?: string
   jurisdictionType?: string
   type?: string

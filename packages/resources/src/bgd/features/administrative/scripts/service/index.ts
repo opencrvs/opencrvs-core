@@ -32,7 +32,7 @@ const composeFhirLocation = (
       }
     ],
     name: titleCase(location.name), // English name
-    alias: [location.nameBn], // Bangla name in element 0
+    alias: [location.alias], // Bangla name in element 0
     description: oisfA2IParams as string, // Reference to the route params used internally in OISF/A2I to find this location
     status: 'active',
     mode: 'instance',
@@ -130,7 +130,7 @@ export function generateLocationResource(
   const loc = {} as ILocation
   loc.id = fhirLocation.id
   loc.name = fhirLocation.name
-  loc.nameBn = fhirLocation.alias && fhirLocation.alias[0]
+  loc.alias = fhirLocation.alias && fhirLocation.alias[0]
   loc.physicalType =
     fhirLocation.physicalType &&
     fhirLocation.physicalType.coding &&
