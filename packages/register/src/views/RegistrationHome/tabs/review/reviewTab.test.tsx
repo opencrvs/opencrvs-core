@@ -2,7 +2,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  flushPromises
 } from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
@@ -1649,10 +1650,7 @@ describe('Tablet tests', () => {
       graphqlMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 1)
-    })
+    await flushPromises()
 
     testComponent.component.update()
     const app = testComponent.component
