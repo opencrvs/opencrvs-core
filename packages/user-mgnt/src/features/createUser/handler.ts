@@ -53,7 +53,11 @@ export default async function createUser(
 
     user.status = statuses.PENDING
     user.scope = roleScopeMapping[user.role]
-
+    // dummy signature data till UI finish
+    user.signature = {
+      type: 'png',
+      data: 'data'
+    }
     // check user scope of register to push the signature
     if (user.scope.includes('register')) {
       const signature = createFhirSignature(user, practitionerId)

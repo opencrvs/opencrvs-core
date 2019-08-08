@@ -24,19 +24,19 @@ export const createFhirSignature = (
   practitionerId: string
 ): IFhirSignature => {
   return {
-    resourceType: 'signature',
-    blob: user.signature,
+    resourceType: 'Signature',
+    blob: user.signature.data,
     type: [
       {
         system: 'http://opencrvs.org/specs/signature',
-        code: 'signature'
+        code: 'Signature'
       }
     ],
     whoReference: {
       reference: `Practitioner/${practitionerId}`
     },
     when: new Date().toISOString(),
-    contentType: 'png'
+    contentType: user.signature.type
   }
 }
 

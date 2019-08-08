@@ -333,8 +333,14 @@ export interface GQLUser {
   type?: string
   email?: string
   status?: string
+  signature?: GQLSingature
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
+}
+
+export interface GQLSingature {
+  data?: string
+  type?: string
 }
 
 export interface GQLComment {
@@ -742,13 +748,18 @@ export interface GQLUserInput {
   primaryOffice?: string
   catchmentArea?: Array<string | null>
   device?: string
-  signature?: string
+  signature?: GQLSignatureInput
 }
 
 export interface GQLUserIdentifierInput {
   use?: string
   system?: string
   value?: string
+}
+
+export interface GQLSignatureInput {
+  data?: string
+  type?: string
 }
 
 export interface GQLCommentInput {
@@ -856,6 +867,7 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
+  Singature?: GQLSingatureTypeResolver
   Comment?: GQLCommentTypeResolver
   Certificate?: GQLCertificateTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1978,6 +1990,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
+  signature?: UserToSignatureResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
 }
@@ -2022,11 +2035,28 @@ export interface UserToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface UserToSignatureResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSingatureTypeResolver<TParent = any> {
+  data?: SingatureToDataResolver<TParent>
+  type?: SingatureToTypeResolver<TParent>
+}
+
+export interface SingatureToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SingatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
