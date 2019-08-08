@@ -5,7 +5,6 @@ import {
   SEARCH_FIELD,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  DOCUMENT_UPLOADER_WITH_OPTION,
   SIMPLE_DOCUMENT_UPLOADER
 } from '@register/forms'
 import {
@@ -169,10 +168,18 @@ export const userSection: IFormSection = {
       ]
     },
     {
-      id: 'signature',
+      id: 'signature-attachment',
       title: messages.userSignatureAttachmentTitle,
       conditionals: [conditionals.isRegistrarRoleSeleted],
       fields: [
+        {
+          name: 'attachmentTitle',
+          type: FIELD_GROUP_TITLE,
+          label: messages.userAttachmentSection,
+          required: false,
+          initialValue: '',
+          validate: []
+        },
         {
           name: 'signature',
           type: SIMPLE_DOCUMENT_UPLOADER,

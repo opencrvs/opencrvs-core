@@ -2,24 +2,17 @@ import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@register/components/form/DocumentUploadfield/DocumentPreview'
 import { IFormFieldValue, IAttachmentValue } from '@register/forms'
-import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as Jimp from 'jimp'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
-import { buttonMessages } from '@register/i18n/messages'
+import {
+  buttonMessages,
+  formMessages as messages
+} from '@register/i18n/messages'
+import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
 
-const UploaderWrapper = styled.div`
-  margin-bottom: 20px;
-`
-const Flex = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`
-const ErrorMessage = styled.div`
-  margin-bottom: 20px;
-`
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
   background: ${({ theme }) => theme.colors.white};
@@ -52,21 +45,8 @@ type IFullProps = {
 } & InjectedIntlProps
 
 type IState = {
-  errorMessage: string
+  isError: boolean
   previewImage: IAttachmentValue | null
-}
-
-const getBase64String = (file: File) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => {
-      if (reader.result) {
-        return resolve(reader.result)
-      }
-    }
-    reader.onerror = error => reject(error)
-  })
 }
 
 class SimpleDocumentUploaderComponent extends React.Component<
@@ -76,7 +56,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      errorMessage: EMPTY_STRING,
+      isError: false,
       previewImage: null
     }
   }
@@ -101,12 +81,12 @@ class SimpleDocumentUploaderComponent extends React.Component<
             data: buffer
           })
           this.setState({
-            errorMessage: ''
+            isError: false
           })
         })
         .catch(() => {
           this.setState({
-            errorMessage: 'File type not supported'
+            isError: true
           })
         })
     })
@@ -126,29 +106,31 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const { label, intl, files, description } = this.props
-
+    const { label, intl, files, description, allowedDocType } = this.props
     return (
-      <UploaderWrapper>
+      <>
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
-          {this.state.errorMessage && (
-            <ErrorText>{this.state.errorMessage}</ErrorText>
+          {this.state.isError && allowedDocType && (
+            <ErrorText>
+              {intl.formatMessage(messages.fileUploadError, {
+                type: allowedDocType.join()
+              })}
+            </ErrorText>
           )}
         </ErrorMessage>
+        {!files && (
+          <DocumentUploader
+            id="upload_document"
+            title={intl.formatMessage(messages.addFile)}
+            handleFileChange={this.handleFileChange}
+          />
+        )}
         <DocumentListPreview
           attachment={files}
           onSelect={this.selectForPreview}
           label={label}
         />
-        <Flex>
-          <DocumentUploader
-            id="upload_document"
-            title="Add file"
-            handleFileChange={this.handleFileChange}
-          />
-        </Flex>
-
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}
@@ -157,7 +139,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
             onDelete={this.onDelete}
           />
         )}
-      </UploaderWrapper>
+      </>
     )
   }
 }

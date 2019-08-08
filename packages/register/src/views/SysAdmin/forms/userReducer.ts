@@ -1,6 +1,6 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
-import { IFormSectionData, IForm } from '@register/forms'
+import { IFormSectionData, IForm, IFormSectionGroup } from '@register/forms'
 import { Action } from 'redux'
 import { formMessages as messages } from '@register/i18n/messages'
 import ApolloClient from 'apollo-client'
@@ -24,6 +24,15 @@ enum TOAST_MESSAGES {
   FAIL = 'userFormFail'
 }
 
+const previewGroups = (): IFormSectionGroup[] => {
+  return userSection.groups.map((group: IFormSectionGroup) => {
+    return {
+      id: 'preview-' + group.id,
+      fields: group.fields
+    }
+  })
+}
+
 const initialState: IUserFormState = {
   userForm: {
     sections: [
@@ -33,16 +42,7 @@ const initialState: IUserFormState = {
         viewType: 'preview',
         name: messages.userFormReviewTitle,
         title: messages.userFormTitle,
-        groups: [
-          {
-            id: 'preview-view-group',
-            fields: userSection.groups[0].fields
-          },
-          {
-            id: 'preview-view-group2',
-            fields: userSection.groups[1].fields
-          }
-        ]
+        groups: previewGroups()
       }
     ]
   },

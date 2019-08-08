@@ -29,7 +29,7 @@ const Flex = styled.div`
   display: flex;
   flex-wrap: wrap;
 `
-const ErrorMessage = styled.div`
+export const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `
 const DocumentUploader = styled(ImageUploader)`
@@ -71,7 +71,7 @@ type IState = {
   dropDownOptions: ISelectOption[]
 }
 
-const getBase64String = (file: File) => {
+export const getBase64String = (file: File) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)

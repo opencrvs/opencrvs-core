@@ -1098,6 +1098,9 @@ export const BENGALI_STATE: ILanguage = {
       'এই আবেদনটি  নিবন্ধকের কাছে  নিবন্দনের জন্য  প্রেরণ করা হবে ',
     'buttons.approve': 'অনুমোদন',
     'form.field.label.userSignatureAttachmentDesc':
-      'নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।'
+      'নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।',
+    'form.field.label.userAttachmentSection': 'সংযুক্তি',
+    'form.field.label.addFile': 'নথি যুক্ত করুন',
+    'form.field.label.fileUploadError': 'শুধুমাত্র {type} গ্রহণযোগ্য '
   }
 }

@@ -1102,6 +1102,9 @@ export const ENGLISH_STATE: ILanguage = {
       'Attach the registrar’s signature',
     'form.field.label.userSignatureAttachment': 'Registrar’s signature',
     'form.field.label.userSignatureAttachmentDesc':
-      'Ask the registrar to sign a piece of paper and then scan or take a photo.'
+      'Ask the registrar to sign a piece of paper and then scan or take a photo.',
+    'form.field.label.userAttachmentSection': 'Attachments',
+    'form.field.label.addFile': 'Add file',
+    'form.field.label.fileUploadError': '{type} supported only'
   }
 }
