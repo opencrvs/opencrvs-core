@@ -1544,7 +1544,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
-    await flushPromises()
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
 
     testComponent.component.update()
     const app = testComponent.component
