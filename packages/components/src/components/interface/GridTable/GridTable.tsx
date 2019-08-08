@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.captionStyle};
-  margin: 60px 0 25px;
+  margin: 40px 0 25px;
   padding: 0 25px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

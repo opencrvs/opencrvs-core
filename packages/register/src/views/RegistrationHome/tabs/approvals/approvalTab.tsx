@@ -3,9 +3,9 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPage } from '@register/navigation'
+import { goToPage, goToApplicationDetails } from '@register/navigation'
 import { getScope } from '@register/profile/profileSelectors'
 import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
@@ -34,12 +34,14 @@ const ToolTipContainer = styled.span`
 interface IBaseApprovalTabProps {
   theme: ITheme
   goToPage: typeof goToPage
-  registrarUnion: string | null
+  registrarLocationId: string | null
+  goToApplicationDetails: typeof goToApplicationDetails
   parentQueryLoading?: boolean
 }
 
 interface IApprovalTabState {
   approvalCurrentPage: number
+  width: number
 }
 
 type IApprovalTabProps = InjectedIntlProps & IBaseApprovalTabProps
@@ -52,7 +54,82 @@ class ApprovalTabComponent extends React.Component<
   constructor(props: IApprovalTabProps) {
     super(props)
     this.state = {
+      width: window.innerWidth,
       approvalCurrentPage: 1
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getExpandable = () => {
+    return this.state.width > this.props.theme.grid.breakpoints.lg
+      ? true
+      : false
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 14,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 20,
+          key: 'trackingId'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          width: 28,
+          key: 'eventTimeElapsed'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.sentForApprovals),
+          width: 28,
+          key: 'dateOfApproval'
+        },
+        {
+          width: 5,
+          key: 'icons',
+          isIconColumn: true
+        },
+        {
+          width: 5,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 64,
+          key: 'trackingId'
+        },
+        {
+          width: 6,
+          key: 'icons',
+          isIconColumn: true
+        }
+      ]
     }
   }
 
@@ -84,7 +161,13 @@ class ApprovalTabComponent extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        icon
+        icon,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(reg.id)
+          }
+        ]
       }
     })
   }
@@ -98,14 +181,14 @@ class ApprovalTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, registrarUnion, parentQueryLoading } = this.props
+    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
 
     return (
       <Query
         query={SEARCH_EVENTS}
         variables={{
           status: [EVENT_STATUS.VALIDATED],
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           count: this.pageSize,
           skip: (this.state.approvalCurrentPage - 1) * this.pageSize
         }}
@@ -139,7 +222,7 @@ class ApprovalTabComponent extends React.Component<
             )
           }
           return (
-            <BodyContent>
+            <HomeContent>
               <ReactTooltip id="validatedTooltip">
                 <ToolTipContainer>
                   {this.props.intl.formatMessage(
@@ -149,47 +232,7 @@ class ApprovalTabComponent extends React.Component<
               </ReactTooltip>
               <GridTable
                 content={this.transformValidatedContent(data)}
-                columns={[
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.type
-                    ),
-                    width: 14,
-                    key: 'event'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.trackingId
-                    ),
-                    width: 20,
-                    key: 'trackingId'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      constantsMessages.eventDate
-                    ),
-                    width: 28,
-                    key: 'eventTimeElapsed'
-                  },
-                  {
-                    label: this.props.intl.formatMessage(
-                      messages.sentForApprovals
-                    ),
-                    width: 28,
-                    key: 'dateOfApproval'
-                  },
-                  {
-                    width: 5,
-                    key: 'icons',
-                    isIconColumn: true
-                  },
-                  {
-                    width: 5,
-                    key: 'actions',
-                    isActionColumn: true,
-                    alignment: ColumnContentAlignment.CENTER
-                  }
-                ]}
+                columns={this.getColumns()}
                 renderExpandedComponent={this.renderExpandedComponent}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 onPageChange={(currentPage: number) => {
@@ -198,9 +241,10 @@ class ApprovalTabComponent extends React.Component<
                 pageSize={this.pageSize}
                 totalItems={data.searchEvents && data.searchEvents.totalItems}
                 currentPage={this.state.approvalCurrentPage}
-                expandable={true}
+                expandable={this.getExpandable()}
+                clickable={!this.getExpandable()}
               />
-            </BodyContent>
+            </HomeContent>
           )
         }}
       </Query>
@@ -217,6 +261,7 @@ function mapStateToProps(state: IStoreState) {
 export const ApprovalTab = connect(
   mapStateToProps,
   {
-    goToPage: goToPage
+    goToPage,
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(ApprovalTabComponent)))

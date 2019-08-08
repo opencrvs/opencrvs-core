@@ -2,12 +2,13 @@ version: '3.3'
 
 services:
   # Configure reverse proxy for public endpoints
+  # Note: these published port will override UFW rules as Docker manages it's own iptables
+  # Only publish the exact ports that are required for OpenCRVS to work
   traefik:
     image: traefik
     ports:
       - '80:80'
       - '443:443'
-      - '8090:8080'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
@@ -69,7 +70,7 @@ services:
       - mongo1
       - mongo2
       - mongo3
-    command: 'mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27017\"},{_id:2,host:\"mongo3:27017\"}]})"'
+    command: bash -c 'sleep 20; mongo --host mongo1 --eval "rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27017\"},{_id:2,host:\"mongo3:27017\"}]})"'
     deploy:
       restart_policy:
         condition: none

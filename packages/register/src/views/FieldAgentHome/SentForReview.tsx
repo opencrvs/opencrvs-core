@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GridTable,
   ColumnContentAlignment,
@@ -24,10 +24,12 @@ import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
 import { goToApplicationDetails } from '@register/navigation'
 import { constantsMessages as messages } from '@register/i18n/messages'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { withTheme, ITheme } from '@register/styledComponents'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {
+  theme: ITheme
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
   goToApplicationDetails: typeof goToApplicationDetails
@@ -35,6 +37,7 @@ interface ISentForReviewProps {
 
 interface IState {
   sentForReviewPageNo: number
+  width: number
 }
 
 type IFullProps = ISentForReviewProps & InjectedIntlProps
@@ -46,7 +49,10 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     super(props)
 
     this.pageSize = 10
-    this.state = { sentForReviewPageNo: 1 }
+    this.state = {
+      width: window.innerWidth,
+      sentForReviewPageNo: 1
+    }
   }
 
   submissionStatusMap = (
@@ -101,6 +107,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
   }
 
   componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
     this.props.applicationsReadyToSend
       .filter(
         (application: IApplication) =>
@@ -195,38 +202,71 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     this.setState({ sentForReviewPageNo: pageNumber })
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(messages.type),
+          width: 15,
+          key: 'event'
+        },
+        {
+          width: 45,
+          label: this.props.intl.formatMessage(messages.name),
+          key: 'name'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.submissionStatus),
+          width: 35,
+          key: 'submissionStatus',
+          color: getTheme(window.config.COUNTRY, getDefaultLanguage()).colors
+            .secondaryLabel
+        },
+        {
+          label: '',
+          width: 5,
+          alignment: ColumnContentAlignment.CENTER,
+          key: 'statusIndicator'
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(messages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          width: 65,
+          label: this.props.intl.formatMessage(messages.name),
+          key: 'name'
+        },
+        {
+          label: '',
+          width: 5,
+          alignment: ColumnContentAlignment.CENTER,
+          key: 'statusIndicator'
+        }
+      ]
+    }
+  }
+
   render() {
     const { intl, applicationsReadyToSend } = this.props
 
     return (
-      <BodyContent>
+      <HomeContent>
         <GridTable
           content={this.transformApplicationsReadyToSend()}
-          columns={[
-            {
-              label: this.props.intl.formatMessage(messages.type),
-              width: 15,
-              key: 'event'
-            },
-            {
-              width: 45,
-              label: this.props.intl.formatMessage(messages.name),
-              key: 'name'
-            },
-            {
-              label: this.props.intl.formatMessage(messages.submissionStatus),
-              width: 35,
-              key: 'submissionStatus',
-              color: getTheme(window.config.COUNTRY, getDefaultLanguage())
-                .colors.secondaryLabel
-            },
-            {
-              label: '',
-              width: 5,
-              alignment: ColumnContentAlignment.CENTER,
-              key: 'statusIndicator'
-            }
-          ]}
+          columns={this.getColumns()}
           noResultText={intl.formatMessage(messages.noResults)}
           totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
           onPageChange={this.onPageChange}
@@ -234,7 +274,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           clickable={true}
           currentPage={this.state.sentForReviewPageNo}
         />
-      </BodyContent>
+      </HomeContent>
     )
   }
 }
@@ -242,4 +282,4 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 export const SentForReview = connect(
   null,
   { deleteApplication, goToApplicationDetails }
-)(injectIntl(SentForReviewComponent))
+)(injectIntl(withTheme(SentForReviewComponent)))

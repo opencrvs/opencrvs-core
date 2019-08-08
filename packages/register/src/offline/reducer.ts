@@ -4,8 +4,7 @@ import { storage } from '@register/storage'
 import { referenceApi } from '@register/utils/referenceApi'
 import * as i18nActions from '@register/i18n/actions'
 import { ILanguageState, languages, IntlMessages } from '@register/i18n/reducer'
-import { getUserLocation } from '@register/utils/userUtils'
-import { filterLocations } from '@register/utils/locationUtils'
+import { filterLocations, getLocation } from '@register/utils/locationUtils'
 import { tempData } from '@register/offline/temp/tempLocations'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
@@ -166,7 +165,7 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
       return loop(
         {
           ...state,
-          healthFacilityFilterLocation: getUserLocation(
+          healthFacilityFilterLocation: getLocation(
             action.payload,
             window.config.HEALTH_FACILITY_FILTER
           )

@@ -2,7 +2,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockUserResponse,
-  validToken
+  fieldAgentScopeToken,
+  registerScopeToken
 } from '@register/tests/util'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
@@ -10,7 +11,7 @@ import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
-
+import { FIELD_AGENT_ROLES, REGISTRAR_ROLES } from '@register/utils/constants'
 import { checkAuth } from '@register/profile/profileActions'
 import { Details } from '@register/views/Home/Details'
 import {
@@ -24,7 +25,7 @@ import { Event } from '@register/forms'
 const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 
-const nameObj = {
+const registrarNameObj = {
   data: {
     getUser: {
       name: [
@@ -36,7 +37,25 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      role: 'DISTRICT_REGISTRAR'
+      role: REGISTRAR_ROLES[0]
+    }
+  }
+}
+
+const nameObj = {
+  data: {
+    getUser: {
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Sakib',
+          familyName: 'Al Hasan',
+          __typename: 'HumanName'
+        },
+        { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+      ],
+      role: FIELD_AGENT_ROLES[0],
+      practitionerId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
     }
   }
 }
@@ -49,8 +68,8 @@ const defaultStatus = {
     name: [
       {
         use: 'en',
-        firstNames: 'Mohammad',
-        familyName: 'Ashraful'
+        firstNames: 'Sakib',
+        familyName: 'Al Hasan'
       },
       {
         use: 'bn',
@@ -58,7 +77,7 @@ const defaultStatus = {
         familyName: ''
       }
     ],
-    role: 'LOCAL_REGISTRAR'
+    role: FIELD_AGENT_ROLES[0]
   },
   location: {
     id: '123',
@@ -78,19 +97,55 @@ const defaultStatus = {
   comments: null
 }
 
-merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
+const registrarDefaultStatus = {
+  id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+  timestamp: '2019-04-03T07:08:24.936Z',
+  user: {
+    id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Sakib',
+        familyName: 'Al Hasan'
+      },
+      {
+        use: 'bn',
+        firstNames: '',
+        familyName: ''
+      }
+    ],
+    role: FIELD_AGENT_ROLES[0]
+  },
+  location: {
+    id: '123',
+    name: 'Kaliganj Union Sub Center',
+    alias: ['']
+  },
+  office: {
+    id: '123',
+    name: 'Kaliganj Union Sub Center',
+    alias: [''],
+    address: {
+      district: '7876',
+      state: 'iuyiuy'
+    }
+  },
+  type: 'DECLARED',
+  comments: null
+}
 
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('Details tests', () => {
+describe('Field Agnet tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
-    getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
+    merge(mockUserResponse, nameObj)
+    mockFetchUserDetails.mockReturnValue(mockUserResponse)
+    queries.fetchUserDetails = mockFetchUserDetails
+    getItem.mockReturnValue(fieldAgentScopeToken)
+    store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
   })
 
   it('loads properly for draft application with create row', () => {
@@ -306,7 +361,7 @@ describe('Details tests', () => {
 
     testComponent.component.unmount()
   })
-  it('loads properly for required update application', async () => {
+  it('loads properly for required update application, and does not show update button for a field agent', async () => {
     const graphqlMock = [
       {
         request: {
@@ -407,6 +462,9 @@ describe('Details tests', () => {
     expect(
       testComponent.component.find('#history_row_0_REJECTED').hostNodes()
     ).toHaveLength(1)
+    expect(
+      testComponent.component.find('#registrar_update').hostNodes()
+    ).toHaveLength(0)
     expect(
       testComponent.component.find('#history_row_1_APPLICATION').hostNodes()
     ).toHaveLength(1)
@@ -584,6 +642,247 @@ describe('Details tests', () => {
 
     testComponent.component.unmount()
   })
+})
+
+describe('Registrar tests', () => {
+  const { store } = createStore()
+
+  beforeAll(() => {
+    merge(mockUserResponse, registrarNameObj)
+    mockFetchUserDetails.mockReturnValue(mockUserResponse)
+    queries.fetchUserDetails = mockFetchUserDetails
+  })
+
+  it('Shows update button for a rejected application if the user is a registrar', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: '1'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: '1',
+              // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
+              deceased: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
+              informant: {
+                individual: {
+                  telecom: [
+                    {
+                      use: '',
+                      system: 'phone',
+                      value: '01622688231'
+                    }
+                  ]
+                }
+              },
+              registration: {
+                id: '1',
+                type: 'death',
+                trackingId: 'DQRZWDR',
+                contactPhoneNumber: '',
+                status: [
+                  {
+                    ...registrarDefaultStatus,
+                    type: 'REJECTED',
+                    comments: [
+                      {
+                        comment: 'reason=duplicate&comment=dup'
+                      }
+                    ]
+                  },
+                  { ...registrarDefaultStatus, type: 'APPLICATION' }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <Details
+        match={{
+          params: {
+            applicationId: '1'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#registrar_update').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component.unmount()
+  })
+
+  it('Shows print button for a registered application if the user is a registrar', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: FETCH_REGISTRATION_BY_COMPOSITION,
+          variables: {
+            id: '1'
+          }
+        },
+        result: {
+          data: {
+            fetchRegistration: {
+              id: '1',
+              // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              child: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
+              deceased: {
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Anik'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'অনিক'
+                  }
+                ]
+              },
+              informant: {
+                individual: {
+                  telecom: [
+                    {
+                      use: '',
+                      system: 'phone',
+                      value: '01622688231'
+                    }
+                  ]
+                }
+              },
+              registration: {
+                id: '1',
+                type: 'death',
+                trackingId: 'DQRZWDR',
+                contactPhoneNumber: '',
+                status: [
+                  {
+                    ...registrarDefaultStatus,
+                    type: 'REGISTERED',
+                    comments: [
+                      {
+                        comment: 'reason=duplicate&comment=dup'
+                      }
+                    ]
+                  },
+                  { ...registrarDefaultStatus, type: 'APPLICATION' }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <Details
+        match={{
+          params: {
+            applicationId: '1'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#registrar_print').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component.unmount()
+  })
+
   it('Renders error page in-case of any network error', async () => {
     const graphqlMock = [
       {
