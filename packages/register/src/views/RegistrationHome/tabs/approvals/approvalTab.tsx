@@ -146,7 +146,7 @@ class ApprovalTabComponent extends React.Component<
       [SUBMISSION_STATUS.READY_TO_APPROVE, SUBMISSION_STATUS.APPROVING]
     )
 
-    return transformedData.map((reg: any) => {
+    return transformedData.map(reg => {
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )

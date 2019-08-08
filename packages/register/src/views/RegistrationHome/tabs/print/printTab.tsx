@@ -137,7 +137,7 @@ class PrintTabComponent extends React.Component<
       this.props.intl,
       this.props.outboxApplications
     )
-    return transformedData.map((reg: any) => {
+    return transformedData.map(reg => {
       const actions = [
         {
           label: this.props.intl.formatMessage(buttonMessages.print),

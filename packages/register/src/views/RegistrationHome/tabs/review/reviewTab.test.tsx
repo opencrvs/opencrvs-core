@@ -1651,7 +1651,7 @@ describe('Tablet tests', () => {
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 1)
     })
 
     testComponent.component.update()

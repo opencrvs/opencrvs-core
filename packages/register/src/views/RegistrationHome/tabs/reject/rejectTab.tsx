@@ -150,7 +150,7 @@ class RejectTabComponent extends React.Component<
       this.props.outboxApplications,
       [SUBMISSION_STATUS.READY_TO_REJECT, SUBMISSION_STATUS.REJECTING]
     )
-    return transformedData.map((reg: any) => {
+    return transformedData.map(reg => {
       const actions = [] as IAction[]
       if (this.userHasRegisterScope()) {
         if (reg.duplicates && reg.duplicates.length > 0) {
