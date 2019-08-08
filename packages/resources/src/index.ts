@@ -14,8 +14,8 @@ import {
 } from '@resources/constants'
 import { validateFunc } from '@opencrvs/commons'
 
-import locationsHandler from '@resources/features/administrative/handler'
-import facilitiesHandler from '@resources/features/facilities/handler'
+import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
+import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -45,21 +45,21 @@ export async function createServer() {
 
   server.route({
     method: 'GET',
-    path: '/locations',
-    handler: locationsHandler,
+    path: '/bgd/locations',
+    handler: bgdLocationsHandler,
     options: {
       tags: ['api'],
-      description: 'Returns locations.json'
+      description: 'Returns Bangladesh locations.json'
     }
   })
 
   server.route({
     method: 'GET',
-    path: '/facilities',
-    handler: facilitiesHandler,
+    path: '/bgd/facilities',
+    handler: bgdFacilitiesHandler,
     options: {
       tags: ['api'],
-      description: 'Returns facilities.json'
+      description: 'Returns Bangladesh facilities.json'
     }
   })
 

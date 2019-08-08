@@ -5,6 +5,7 @@ export interface IGrid {
     sm: number
     md: number
     lg: number
+    xl: number
   }
   columns: number
   gutter: number
@@ -16,9 +17,10 @@ export interface IGrid {
 export const grid: IGrid = {
   breakpoints: {
     xs: 0,
-    sm: 360,
-    md: 600,
-    lg: 1024
+    sm: 359,
+    md: 599,
+    lg: 1023,
+    xl: 1279
   },
   columns: 12,
   gutter: 12,

@@ -2,13 +2,14 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrowDeepBlue } from '../icons'
 import { Button } from '../buttons'
+import { colors } from '../colors'
 const ActionContainer = styled.div`
   width: 100%;
 `
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
+  ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,6 +39,15 @@ const BackButton = styled(Button)`
     margin-left: 24px;
   }
 `
+
+const BackButtonIcon = styled(BackArrowDeepBlue)`
+  &:hover {
+    g {
+      stroke: ${colors.tertiary};
+    }
+  }
+`
+
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
@@ -82,7 +92,7 @@ export class ActionPageLight extends React.Component<
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <BackButton icon={icon || (() => <BackArrowDeepBlue />)} />
+              <BackButton icon={icon || (() => <BackButtonIcon />)} />
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}

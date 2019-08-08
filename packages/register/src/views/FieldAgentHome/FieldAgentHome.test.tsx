@@ -51,7 +51,7 @@ const countQueryGraphqlMock = {
     variables: {
       userId: nameObj.data.getUser.practitionerId,
       status: [EVENT_STATUS.REJECTED],
-      locationIds: ['123456789']
+      locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
     }
   },
   result: {
@@ -107,7 +107,7 @@ describe('FieldAgentHome tests', () => {
           query: COUNT_USER_WISE_APPLICATIONS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         error: new Error('boom')
@@ -210,7 +210,7 @@ describe('FieldAgentHome tests', () => {
         variables: {
           userId: nameObj.data.getUser.practitionerId,
           status: [EVENT_STATUS.REJECTED],
-          locationIds: ['123456789'],
+          locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
           count: 10,
           skip: 0
         }
@@ -291,7 +291,7 @@ describe('FieldAgentHome tests', () => {
         variables: {
           userId: nameObj.data.getUser.practitionerId,
           status: [EVENT_STATUS.REJECTED],
-          locationIds: ['123456789'],
+          locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
           count: 10,
           skip: 0
         }

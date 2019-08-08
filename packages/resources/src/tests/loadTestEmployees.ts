@@ -1,9 +1,10 @@
 import * as fs from 'fs'
 
-import { EMPLOYEES_SOURCE, TEST_SOURCE } from '@resources/constants'
+import { TEST_SOURCE } from '@resources/constants'
+import { EMPLOYEES_SOURCE } from '@resources/bgd/constants'
 import chalk from 'chalk'
 import { internal } from 'boom'
-import { composeAndSavePractitioners } from '@resources/features/employees/scripts/service'
+import { composeAndSavePractitioners } from '@resources/bgd/features/employees/scripts/service'
 
 const sourceJSON = `${EMPLOYEES_SOURCE}test-employees.json`
 const testLocations = JSON.parse(

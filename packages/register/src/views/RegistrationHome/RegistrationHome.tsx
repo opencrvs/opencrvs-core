@@ -166,7 +166,7 @@ export class RegistrationHomeView extends React.Component<
   renderInProgressTabWithCount = (
     tabId: string,
     drafts: IApplication[],
-    registrarUnion: string
+    registrarLocationId: string
   ) => {
     const { intl } = this.props
 
@@ -174,7 +174,7 @@ export class RegistrationHomeView extends React.Component<
       <Query
         query={COUNT_EVENT_REGISTRATION_BY_STATUS}
         variables={{
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           status: EVENT_STATUS.IN_PROGRESS
         }}
       >
@@ -240,7 +240,8 @@ export class RegistrationHomeView extends React.Component<
 
   render() {
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
-    const registrarUnion = userDetails && getUserLocation(userDetails, 'UNION')
+    const registrarLocationId = userDetails && getUserLocation(userDetails).id
+
     let parentQueryLoading = false
 
     return (
@@ -249,7 +250,7 @@ export class RegistrationHomeView extends React.Component<
         <Query
           query={COUNT_REGISTRATION_QUERY}
           variables={{
-            locationIds: [registrarUnion]
+            locationIds: [registrarLocationId]
           }}
         >
           {({
@@ -286,7 +287,7 @@ export class RegistrationHomeView extends React.Component<
                   {this.renderInProgressTabWithCount(
                     tabId,
                     drafts,
-                    registrarUnion as string
+                    registrarLocationId as string
                   )}
                   <IconTab
                     id={`tab_${TAB_ID.readyForReview}`}
@@ -354,31 +355,31 @@ export class RegistrationHomeView extends React.Component<
           <InProgressTab
             drafts={drafts}
             selectorId={selectorId}
-            registrarUnion={registrarUnion}
+            registrarLocationId={registrarLocationId}
             parentQueryLoading={parentQueryLoading}
           />
         )}
         {tabId === TAB_ID.readyForReview && (
           <ReviewTab
-            registrarUnion={registrarUnion}
+            registrarLocationId={registrarLocationId}
             parentQueryLoading={parentQueryLoading}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
           <RejectTab
-            registrarUnion={registrarUnion}
+            registrarLocationId={registrarLocationId}
             parentQueryLoading={parentQueryLoading}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
           <ApprovalTab
-            registrarUnion={registrarUnion}
+            registrarLocationId={registrarLocationId}
             parentQueryLoading={parentQueryLoading}
           />
         )}
         {tabId === TAB_ID.readyForPrint && (
           <PrintTab
-            registrarUnion={registrarUnion}
+            registrarLocationId={registrarLocationId}
             parentQueryLoading={parentQueryLoading}
           />
         )}

@@ -50,11 +50,15 @@ You can open all of them by running `yarn open`
 
 Start the development environment as described above, then:
 
-1. `cd packages/resource && yarn populate && cd ../..`
-2. `cd packages/user-mgnt && yarn populate && cd ../..`
-3. Login to the OpenHIM console and upload the base config file.
-4. `yarn db:backup:create`
-5. Commit and push the new db dump archive files that have been created.
+1. `cd packages/resource && yarn populate:<<insert alpha3 country code>> && cd ../..`
+2. Start the server and curl the practioners from hearth using the mobile phone numbers in resources/src/bgd/features/employees/generated/test-employees.csv to get the associated PractitionerRole id. e.g: `curl http://localhost:3447/fhir/Practitioner\?telecom\=phone\|01711111111`
+3. Curl the PractitionerRole resource to get the location IDs. e.g.: `curl http://localhost:3447/fhir/PractitionerRole/<<insert id>>`
+4. Curl the Locations by ID to check them and find the ones that should be inserted into user-mgnt/resources/populate.ts. Check the comments in user-mgnt/resources/populate.ts
+5. Manually add the IDs into user-mgnt/resources/populate.ts
+6. `cd packages/user-mgnt && yarn populate && cd ../..`
+7. Login to the OpenHIM console and upload the base config file.
+8. `yarn db:backup:create`
+9. Commit and push the new db dump archive files that have been created.
 
 ### tmuxed development setup
 
