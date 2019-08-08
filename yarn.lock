@@ -2211,6 +2211,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.9.tgz#2e8d678039d27943ce53a1913386133227fd9066"
   integrity sha512-NelG/dSahlXYtSoVPErrp06tYFrvzj8XLWmKA+X8x0W//4MqbUyZu++giUG/v0bjAT6/Qxa8IjodrfdACyb0Fg==
 
+"@types/pdfmake@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@types/pdfmake/-/pdfmake-0.1.8.tgz#ea01d912203381bc658757b33363390fa0d07cf0"
+  integrity sha512-Pbi9K99VfM3LLiKYSIe5JTM5f5KEZr+CslZcuDYzOsjq/6NOejoLoXcp+9C9um1c+2RpcgQymUHvFUEDPTAgig==
+
 "@types/podium@*":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/podium/-/podium-1.0.0.tgz#bfaa2151be2b1d6109cc69f7faa9dac2cba3bb20"

@@ -454,7 +454,8 @@ class PrintCertificateActionComponent extends React.Component<
                     issuerDetails,
                     amount,
                     this.props.language,
-                    event
+                    event,
+                    this.props.draft
                   )
                 }}
               />
