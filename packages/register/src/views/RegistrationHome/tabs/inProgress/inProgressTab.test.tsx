@@ -73,7 +73,7 @@ describe('In Progress tab', () => {
         request: {
           query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             status: EVENT_STATUS.IN_PROGRESS
           }
         },
@@ -100,7 +100,10 @@ describe('In Progress tab', () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <InProgressTab drafts={localDrafts} registrarUnion={'123456789'} />,
+      <InProgressTab
+        drafts={localDrafts}
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      />,
       store,
       graphqlMock
     )
@@ -146,7 +149,7 @@ describe('In Progress tab', () => {
         request: {
           query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             status: EVENT_STATUS.IN_PROGRESS
           }
         },
@@ -177,7 +180,7 @@ describe('In Progress tab', () => {
       <InProgressTab
         drafts={localDrafts}
         selectorId={'you'}
-        registrarUnion={'123456789'}
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
       />,
       store,
       graphqlMock
@@ -278,7 +281,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -311,7 +314,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -424,7 +427,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -515,7 +518,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -653,7 +656,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -806,7 +809,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -886,7 +889,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -988,7 +991,7 @@ describe('Tablet tests', () => {
       <InProgressTab
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
-        registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
       />,
       store,
       graphqlMock

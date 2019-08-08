@@ -95,7 +95,7 @@ interface IBaseRegistrarHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToApplicationDetails: typeof goToApplicationDetails
   selectorId: string
-  registrarUnion: string | null
+  registrarLocationId: string | null
   drafts: IApplication[]
   parentQueryLoading?: boolean
 }
@@ -287,7 +287,7 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressSelectorsWithCounts = (
     selectorId: string,
     drafts: IApplication[],
-    registrarUnion: string
+    registrarLocationId: string
   ) => {
     const { intl } = this.props
 
@@ -295,7 +295,7 @@ export class InProgressTabComponent extends React.Component<
       <Query
         query={COUNT_EVENT_REGISTRATION_BY_STATUS}
         variables={{
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           status: EVENT_STATUS.IN_PROGRESS
         }}
       >
@@ -525,7 +525,7 @@ export class InProgressTabComponent extends React.Component<
     const {
       theme,
       intl,
-      registrarUnion,
+      registrarLocationId,
       selectorId,
       drafts,
       parentQueryLoading
@@ -536,7 +536,7 @@ export class InProgressTabComponent extends React.Component<
         {this.renderInProgressSelectorsWithCounts(
           selectorId,
           drafts,
-          registrarUnion as string
+          registrarLocationId as string
         )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
@@ -559,7 +559,7 @@ export class InProgressTabComponent extends React.Component<
             query={LIST_EVENT_REGISTRATIONS_BY_STATUS}
             variables={{
               status: EVENT_STATUS.IN_PROGRESS,
-              locationIds: [registrarUnion],
+              locationIds: [registrarLocationId],
               count: this.pageSize,
               skip: (this.state.progressCurrentPage - 1) * this.pageSize
             }}
