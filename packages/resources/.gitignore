@@ -22,8 +22,8 @@ yarn-error.log*
 
 .vscode
 
-src/features/facilities/generated/bn/crvs-facilities.json
-src/features/facilities/generated/bn/health-facilities.json
-src/features/administrative/generated/bn/locations.json
-src/features/facilities/generated/bn/locations.json
+src/bgd/features/facilities/generated/crvs-facilities.json
+src/bgd/features/facilities/generated/health-facilities.json
+src/bgd/features/administrative/generated/locations.json
+src/bgd/features/facilities/generated/locations.json
 src/tests/locations.json

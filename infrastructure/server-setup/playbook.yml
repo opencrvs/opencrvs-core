@@ -47,6 +47,21 @@
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
+    - name: 'Check file for encrypted file system exists'
+      stat:
+        path: /cryptfs_file_sparse.img
+        get_checksum: False
+        get_md5: False
+      register: st
+
+    - name: 'Bootstrap encrypted data folder'
+      script: ../cryptfs/bootstrap.sh -s 100g -p {{encrypt_passphrase}}
+      when: (not st.stat.exists) and encrypt_data
+
+    - name: 'Mount encrypted data folder'
+      script: ../cryptfs/mount.sh -p {{encrypt_passphrase}}
+      when: st.stat.exists and encrypt_data
+
     - name: 'Create mongo data directory'
       file:
         path: /data/mongo

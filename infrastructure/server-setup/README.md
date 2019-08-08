@@ -45,3 +45,11 @@ yarn deploy <server_hostname> <version>
 ```
 
 Version can be any git commit hash, git tag or 'latest'
+
+## Enabling encryption
+
+For production servers we offer the ability to setup an encrypted /data folder for the docker containers to use. This allows us to support encryption at rest. To do this run the ansible script with these extra variables. Note, if the server is already setup the docker stack must be stopped and ALL DATA WILL BE LOST when switching to an ecrypted folder. It is useful to set this up from the beginning.
+
+```
+ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
+```

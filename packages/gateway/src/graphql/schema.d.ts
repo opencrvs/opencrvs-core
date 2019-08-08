@@ -586,7 +586,7 @@ export interface GQLMutation {
   markBirthAsCertified: string
   markEventAsVoided: string
   notADuplicate: string
-  createDeathRegistration: string
+  createDeathRegistration: GQLCreatedIds
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsValidated?: string
