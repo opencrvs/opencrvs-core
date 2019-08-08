@@ -72,6 +72,12 @@ const Container = styled.div`
     padding: 24px 32px;
     min-height: 100vh;
   }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+    margin: 0;
+    padding: 24px 32px;
+    min-height: 100vh;
+  }
 `
 interface IProps {
   title?: string
