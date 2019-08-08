@@ -11,7 +11,9 @@ context('User Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
-      cy.get(`#keypad-${i % 2}`).click()
+      cy.get('#pin-keypad-container')
+        .click()
+        .type(`${i % 2}`)
     }
     cy.get('#add-user').click()
     cy.get('#firstNames').type('নাইম')
@@ -33,8 +35,8 @@ context('User Integration Test', () => {
     cy.get('#submit_user_form').click()
     cy.wait(5000) // Wait for application to be sync'd
     // LOG OUT
-    cy.get('#mobile_header_left').click()
-    cy.get('#mobile_menu_item_3').click()
+    cy.get('#ProfileMenuToggleButton').click()
+    cy.get('#ProfileMenuItem1').click()
     // LOG IN AS FIELD AGENT
     cy.get('#username').type('n.ahmed')
     cy.get('#password').type('test')

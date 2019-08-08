@@ -4,7 +4,7 @@ import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
   GQLBirthRegistration,
   GQLDeathRegistration,
@@ -15,7 +15,8 @@ import {
 import { IApplication } from '@register/applications'
 import {
   goToPage as goToPageAction,
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction
+  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goToApplicationDetails
 } from '@register/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -80,19 +81,27 @@ const TabGroup = styled.div`
   > :last-child {
     border-radius: 0 4px 4px 0;
   }
-  padding-top: 16px;
+  padding-top: 30px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding-left: 16px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-top: 5px;
+  }
 `
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
+  goToApplicationDetails: typeof goToApplicationDetails
   selectorId: string
-  registrarUnion: string | null
+  registrarLocationId: string | null
   drafts: IApplication[]
   parentQueryLoading?: boolean
 }
 
 interface IRegistrarHomeState {
+  width: number
   progressCurrentPage: number
 }
 
@@ -117,6 +126,7 @@ export class InProgressTabComponent extends React.Component<
   constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
+      width: window.innerWidth,
       progressCurrentPage: 1
     }
   }
@@ -187,7 +197,13 @@ export class InProgressTabComponent extends React.Component<
           dateOfModification:
             (lastModificationDate && moment(lastModificationDate).fromNow()) ||
             '',
-          actions
+          actions,
+          rowClickHandler: [
+            {
+              label: 'rowClickHandler',
+              handler: () => this.props.goToApplicationDetails(regId)
+            }
+          ]
         }
       }
     )
@@ -257,7 +273,13 @@ export class InProgressTabComponent extends React.Component<
         dateOfModification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||
           '',
-        actions
+        actions,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(draft.id)
+          }
+        ]
       }
     })
   }
@@ -265,7 +287,7 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressSelectorsWithCounts = (
     selectorId: string,
     drafts: IApplication[],
-    registrarUnion: string
+    registrarLocationId: string
   ) => {
     const { intl } = this.props
 
@@ -273,7 +295,7 @@ export class InProgressTabComponent extends React.Component<
       <Query
         query={COUNT_EVENT_REGISTRATION_BY_STATUS}
         variables={{
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           status: EVENT_STATUS.IN_PROGRESS
         }}
       >
@@ -381,52 +403,145 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressDataExpandedComponent = (itemId: string) => {
     return <RemoteInProgressDataDetails eventId={itemId} />
   }
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getExpandable = () => {
+    return this.state.width > this.props.theme.grid.breakpoints.lg
+      ? true
+      : false
+  }
+
+  getDraftColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 15,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 35,
+          key: 'name',
+          errorValue: this.props.intl.formatMessage(
+            constantsMessages.noNameProvided
+          )
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.lastEdited),
+          width: 35,
+          key: 'dateOfModification'
+        },
+        {
+          label: this.props.intl.formatMessage(messages.listItemAction),
+          width: 15,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'name',
+          errorValue: this.props.intl.formatMessage(
+            constantsMessages.noNameProvided
+          )
+        }
+      ]
+    }
+  }
+
+  getRemoteDraftColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 15,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 30,
+          key: 'name',
+          errorValue: this.props.intl.formatMessage(
+            constantsMessages.noNameProvided
+          )
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          width: 20,
+          key: 'dateOfModification'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 15,
+          key: 'trackingId'
+        },
+        {
+          width: 20,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 30,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'name',
+          errorValue: this.props.intl.formatMessage(
+            constantsMessages.noNameProvided
+          )
+        }
+      ]
+    }
+  }
 
   render() {
     const {
       theme,
       intl,
-      registrarUnion,
+      registrarLocationId,
       selectorId,
       drafts,
       parentQueryLoading
     } = this.props
 
     return (
-      <BodyContent>
+      <HomeContent>
         {this.renderInProgressSelectorsWithCounts(
           selectorId,
           drafts,
-          registrarUnion as string
+          registrarLocationId as string
         )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
             content={this.transformDraftContent()}
-            columns={[
-              {
-                label: intl.formatMessage(constantsMessages.type),
-                width: 15,
-                key: 'event'
-              },
-              {
-                label: intl.formatMessage(constantsMessages.name),
-                width: 35,
-                key: 'name',
-                errorValue: intl.formatMessage(constantsMessages.noNameProvided)
-              },
-              {
-                label: intl.formatMessage(constantsMessages.lastEdited),
-                width: 35,
-                key: 'dateOfModification'
-              },
-              {
-                label: intl.formatMessage(messages.listItemAction),
-                width: 15,
-                key: 'actions',
-                isActionColumn: true,
-                alignment: ColumnContentAlignment.CENTER
-              }
-            ]}
+            columns={this.getDraftColumns()}
             renderExpandedComponent={this.renderDraftDataExpandedComponent}
             noResultText={intl.formatMessage(constantsMessages.noResults)}
             onPageChange={(currentPage: number) => {
@@ -435,7 +550,8 @@ export class InProgressTabComponent extends React.Component<
             pageSize={this.pageSize}
             totalItems={drafts && drafts.length}
             currentPage={this.state.progressCurrentPage}
-            expandable={true}
+            expandable={this.getExpandable()}
+            clickable={!this.getExpandable()}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts && (
@@ -443,7 +559,7 @@ export class InProgressTabComponent extends React.Component<
             query={LIST_EVENT_REGISTRATIONS_BY_STATUS}
             variables={{
               status: EVENT_STATUS.IN_PROGRESS,
-              locationIds: [registrarUnion],
+              locationIds: [registrarLocationId],
               count: this.pageSize,
               skip: (this.state.progressCurrentPage - 1) * this.pageSize
             }}
@@ -479,37 +595,7 @@ export class InProgressTabComponent extends React.Component<
               return (
                 <GridTable
                   content={this.transformRemoteDraftsContent(data)}
-                  columns={[
-                    {
-                      label: intl.formatMessage(constantsMessages.type),
-                      width: 15,
-                      key: 'event'
-                    },
-                    {
-                      label: intl.formatMessage(constantsMessages.name),
-                      width: 30,
-                      key: 'name',
-                      errorValue: intl.formatMessage(
-                        constantsMessages.noNameProvided
-                      )
-                    },
-                    {
-                      label: intl.formatMessage(constantsMessages.eventDate),
-                      width: 20,
-                      key: 'dateOfModification'
-                    },
-                    {
-                      label: intl.formatMessage(constantsMessages.trackingId),
-                      width: 15,
-                      key: 'trackingId'
-                    },
-                    {
-                      width: 20,
-                      key: 'actions',
-                      isActionColumn: true,
-                      alignment: ColumnContentAlignment.CENTER
-                    }
-                  ]}
+                  columns={this.getRemoteDraftColumns()}
                   renderExpandedComponent={
                     this.renderInProgressDataExpandedComponent
                   }
@@ -523,13 +609,14 @@ export class InProgressTabComponent extends React.Component<
                     data.listEventRegistrations.totalItems
                   }
                   currentPage={this.state.progressCurrentPage}
-                  expandable={true}
+                  expandable={this.getExpandable()}
+                  clickable={!this.getExpandable()}
                 />
               )
             }}
           </Query>
         )}
-      </BodyContent>
+      </HomeContent>
     )
   }
 }
@@ -538,6 +625,7 @@ export const InProgressTab = connect(
   null,
   {
     goToPage: goToPageAction,
-    goToRegistrarHomeTab: goToRegistrarHomeTabAction
+    goToRegistrarHomeTab: goToRegistrarHomeTabAction,
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(InProgressTabComponent)))
