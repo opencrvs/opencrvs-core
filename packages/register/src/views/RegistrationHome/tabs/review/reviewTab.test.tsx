@@ -1381,7 +1381,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            status: [EVENT_STATUS.DECLARED],
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['123456789'],
             count: 10,
             skip: 0
@@ -1390,13 +1390,43 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             searchEvents: {
-              totalItems: 1,
+              totalItems: 2,
               results: [
                 {
                   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be7',
                   type: 'Birth',
                   registration: {
                     status: 'DECLARED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde2',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7ba1',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
@@ -1453,17 +1483,8 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store,
       graphqlMock
     )
-    const validateScopeToken = jwt.sign(
-      { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -1475,7 +1496,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       .first()
       .prop('content')
 
-    expect(data.length).toBe(0)
+    expect(data.length).toBe(1)
 
     testComponent.component.unmount()
   })
@@ -1519,17 +1540,8 @@ describe('RegistrationHome sent for review tab related tests', () => {
       graphqlMock
     )
 
-    const validateScopeToken = jwt.sign(
-      { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
     // wait for mocked data to load mockedProvider
     await flushPromises()
@@ -1541,7 +1553,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         .find('#tab_review')
         .hostNodes()
         .text()
-    ).toContain('Ready for review (9)')
+    ).toContain('Ready for review (11)')
     testComponent.component.unmount()
   })
 })
