@@ -41,6 +41,7 @@ export const convertToLocal = (
   )
 }
 
+// @todo remove this as it's not used anywhere (other than tests)
 export async function getLoggedInPractitionerPrimaryLocation(
   token: string
 ): Promise<fhir.Location> {
@@ -57,10 +58,10 @@ export async function getPractitionerPrimaryLocation(
   )
 }
 
-export async function getPractitionerUnionLocation(
+export async function getPractitionerOfficeLocation(
   practitionerId: string
 ): Promise<fhir.Location> {
-  return getUnionLocationFromLocationList(
+  return getOfficeLocationFromLocationList(
     await getPractitionerLocations(practitionerId)
   )
 }
@@ -88,23 +89,23 @@ export function getPrimaryLocationFromLocationList(
   return primaryOffice
 }
 
-export function getUnionLocationFromLocationList(
+function getOfficeLocationFromLocationList(
   locations: [fhir.Location]
 ): fhir.Location {
-  let union: fhir.Location | undefined
+  let office: fhir.Location | undefined
   locations.forEach((location: fhir.Location) => {
-    if (location.identifier) {
-      location.identifier.forEach((identifier: fhir.Identifier) => {
-        if (identifier.value === 'UNION') {
-          union = location
+    if (location.type && location.type.coding) {
+      location.type.coding.forEach(code => {
+        if (code.code === 'CRVS_OFFICE') {
+          office = location
         }
       })
     }
   })
-  if (!union) {
-    throw new Error('No union found')
+  if (!office) {
+    throw new Error('No CRVS office found')
   }
-  return union
+  return office
 }
 
 export async function getLoggedInPractitionerLocations(

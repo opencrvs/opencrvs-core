@@ -73,7 +73,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',

@@ -55,7 +55,7 @@ const registrationAgent = new User({
   scope: ['validate', 'certify', 'demo'],
   status: 'active',
   practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
+  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
   catchmentAreaIds: [
     'd2898740-42e4-4680-b5a7-2f0a12a15199',
     '4af73d73-aa6e-4770-b1d9-4274949e431e',
@@ -83,7 +83,7 @@ const localRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: '862519b7-552f-4512-946f-35ecde896c50',
-  primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
+  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
   catchmentAreaIds: [
     'd2898740-42e4-4680-b5a7-2f0a12a15199',
     '4af73d73-aa6e-4770-b1d9-4274949e431e',
@@ -180,7 +180,7 @@ const sysAdmin = new User({
   scope: ['sysadmin', 'demo'],
   status: 'active',
   practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
+  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
   catchmentAreaIds: [
     'd2898740-42e4-4680-b5a7-2f0a12a15199',
     '4af73d73-aa6e-4770-b1d9-4274949e431e',
