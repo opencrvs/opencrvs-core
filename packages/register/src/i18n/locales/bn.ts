@@ -1097,10 +1097,6 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.label.userSignatureAttachmentTitle':
       'নিবন্ধকের স্বাক্ষর সংযুক্ত করুন',
     'form.field.label.userSignatureAttachment': 'নিবন্ধকের স্বাক্ষর',
-    'validate.application.action.modal.title': 'অনুমোদনের জন্য প্রেরিত?',
-    'validate.application.action.modal.description':
-      'এই আবেদনটি  নিবন্ধকের কাছে  নিবন্দনের জন্য  প্রেরণ করা হবে ',
-    'buttons.approve': 'অনুমোদন',
     'form.field.label.userSignatureAttachmentDesc':
       'নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।',
     'form.field.label.userAttachmentSection': 'সংযুক্তি',
