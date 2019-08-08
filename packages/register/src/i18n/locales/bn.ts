@@ -723,7 +723,7 @@ export const BENGALI_STATE: ILanguage = {
     'form.field.SearchField.modalTitle': `{fieldName, select, registrationOffice {নির্ধারিত নিবন্ধন অফিস}}`,
     'form.field.SearchField.officeLocationId': 'আইডি: {locationId}',
     'form.field.SearchField.placeHolderText': 'অনুসন্ধান',
-    'form.field.select.placeholder': 'নির্বাচন করুন...',
+    'form.field.select.placeholder': 'নির্বাচন করুন',
     'form.section.accountDetails': 'অ্যাকাউন্ট তথ্য',
     'form.section.applicant.name': 'আবেদনকারী',
     'form.section.applicant.title': 'আবেদনকারীর বিবরণ',

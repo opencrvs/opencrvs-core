@@ -117,7 +117,7 @@ describe('form component', () => {
             .find('#districtPermanent')
             .hostNodes()
             .text()
-        ).toEqual('Select...')
+        ).toEqual('Select')
       })
       it('doesnt reset non dependent select fields', () => {
         expect(

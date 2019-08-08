@@ -726,7 +726,7 @@ export const ENGLISH_STATE: ILanguage = {
     'form.field.SearchField.modalTitle': `{fieldName, select, registrationOffice {Assigned Register Office}}`,
     'form.field.SearchField.officeLocationId': 'Id: {locationId}',
     'form.field.SearchField.placeHolderText': 'Search',
-    'form.field.select.placeholder': 'Select...',
+    'form.field.select.placeholder': 'Select',
     'form.section.accountDetails': 'Account details',
     'form.section.applicant.name': 'Applicant',
     'form.section.applicant.title': "Applicant's details",
