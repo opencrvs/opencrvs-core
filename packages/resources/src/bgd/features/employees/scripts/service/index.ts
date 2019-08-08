@@ -25,6 +25,7 @@ interface ITestPractitioner {
   role: string
   mobile: string
   email: string
+  signature?: string
 }
 
 const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
@@ -77,7 +78,29 @@ const composeFhirPractitionerRole = (
     location
   }
 }
-
+interface IFhirSignature extends fhir.Signature {
+  resourceType: string
+}
+const composeFhirSignature = (
+  practitioner: ITestPractitioner,
+  practitionerReference: string
+): IFhirSignature => {
+  return {
+    resourceType: 'Signature',
+    blob: practitioner.signature,
+    type: [
+      {
+        system: `${ORG_URL}/specs/signature`,
+        code: 'Signature'
+      }
+    ],
+    whoReference: {
+      reference: practitionerReference
+    },
+    when: new Date().toISOString(),
+    contentType: 'png'
+  }
+}
 export async function composeAndSavePractitioners(
   practitioners: ITestPractitioner[],
   divisions: fhir.Location[],
@@ -136,6 +159,7 @@ export async function composeAndSavePractitioners(
     ).catch(err => {
       throw Error('Cannot save practitioner to FHIR')
     })) as Response
+
     const practitionerLocationHeader = savedPractitionerResponse.headers.get(
       'location'
     ) as string
@@ -144,6 +168,29 @@ export async function composeAndSavePractitioners(
     }`
     // tslint:disable-next-line:no-console
     console.log(`Practitioner saved to fhir: ${practitionerReference}`)
+    // save signature
+    if (practitioner.signature) {
+      const newSignature: fhir.Signature = composeFhirSignature(
+        practitioner,
+        practitionerReference
+      )
+      const savedSignatureResponse = (await sendToFhir(
+        newSignature,
+        '/Signature',
+        'POST'
+      ).catch(err => {
+        throw Error('Cannot save practitioner signature to FHIR')
+      })) as Response
+
+      const signatureLocationHeader = savedSignatureResponse.headers.get(
+        'location'
+      ) as string
+      const signatureReference = `Signature/${
+        signatureLocationHeader.split('/')[3]
+      }`
+      // tslint:disable-next-line:no-console
+      console.log(`Practitioner saved to fhir: ${signatureReference}`)
+    }
 
     // Create and save PractitionerRole
     const newPractitionerRole: fhir.PractitionerRole = composeFhirPractitionerRole(

@@ -9,6 +9,10 @@ type UserIdentifier { # -> identifier
   system: String # -> .system
   value: String # -> .system
 }
+input SignatureInput {
+  data: String
+  type: String
+}
 
 input UserInput {
   name: [HumanNameInput]
@@ -21,9 +25,12 @@ input UserInput {
   primaryOffice: String
   catchmentArea: [String]
   device: String
-  signature: String
+  signature: SignatureInput
 }
-
+type Singature {
+  data: String
+  type: String
+}
 type User {
   id: ID
   userMgntUserID: ID
@@ -35,6 +42,7 @@ type User {
   type: String
   email: String
   status: String
+  signature: Singature
   primaryOffice: Location
   catchmentArea: [Location]
 }
