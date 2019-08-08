@@ -1,0 +1,587 @@
+{
+  "cities": [
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "1"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "50"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Barisal City Corp.",
+      "alias": [
+        "বরিশাল সিটি কর্পোরেশন"
+      ],
+      "description": "division=1&district=2&citycorporation=1",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/5ec7744f-1c8a-4e79-baa2-e2c02dcb2f0b"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "c597a0b2-7048-44cd-ad43-652f6341edc2"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "2"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "16"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Chittagong City Corp.",
+      "alias": [
+        "চট্টগ্রাম সিটি কর্পোরেশন"
+      ],
+      "description": "division=2&district=10&citycorporation=2",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/1128c13d-4c53-4960-8c1c-de058174690a"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "6a3a348f-178d-4891-b6a7-9fe52a666572"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "3"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "50"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Comilla City Corp.",
+      "alias": [
+        "কুমিল্লা সিটি কর্পোরেশন"
+      ],
+      "description": "division=2&district=11&citycorporation=3",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/7ebc2d37-033d-4777-883c-9bc4f52f54ab"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "2cfa4194-a651-497f-9621-f447516d71de"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "4"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "20"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Dhaka Dakshin City Corp.",
+      "alias": [
+        "ঢাকা সিটি কর্পোরেশন"
+      ],
+      "description": "division=3&district=18&citycorporation=4",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/904fe4db-536c-4d0a-a342-9d2534b47c67"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "cc702bf7-f8a3-4c75-8928-645b227295d4"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "5"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "25"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Dhaka Uttar City Corp.",
+      "alias": [
+        "ঢাকা সিটি কর্পোরেশন"
+      ],
+      "description": "division=3&district=18&citycorporation=5",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/904fe4db-536c-4d0a-a342-9d2534b47c67"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "1d7cb11a-6c01-4ca2-b7ed-c58e610efb1f"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "7"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "33"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Gazipur City Corporation",
+      "alias": [
+        "গাজীপুর সিটি কর্পোরেশন"
+      ],
+      "description": "division=3&district=20&citycorporation=7",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/74a79ebc-9a6d-4d4c-a17f-4d3f2672c6e4"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "cb9dd966-65f0-4af4-b3d2-7a045bc711f8"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "6"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "44"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Narayanganj City Corp.",
+      "alias": [
+        "ঢাকা সিটি কর্পোরেশন"
+      ],
+      "description": "division=3&district=28&citycorporation=6",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/55edd94e-88b6-468d-9e71-6a83cdc43dd8"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "1b53f354-ad4e-4eff-be78-825fd1506005"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "8"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "33"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Khulna City Corp.",
+      "alias": [
+        "খুলনা সিটি কর্পোরেশন"
+      ],
+      "description": "division=4&district=39&citycorporation=8",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/6e2ad3d2-d881-4f89-9a28-577b4d8120e7"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "47ef0504-0a87-4a36-aba0-f1c6fb53230b"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "9"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "66"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Rajshahi City Corp.",
+      "alias": [
+        "রাজশাহী সিটি কর্পোরেশন"
+      ],
+      "description": "division=5&district=51&citycorporation=9",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/a463cbb2-fb29-4fa2-992a-13ce617df6c7"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "e6aceef2-6091-43da-9e2d-9a76e8107957"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "10"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "75"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Rangpur City Corporation",
+      "alias": [
+        "রংপুর সিটি কর্পোরেশন"
+      ],
+      "description": "division=6&district=59&citycorporation=10",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/86fc6e25-01d5-40a5-86bf-10799be2be53"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "69ce56e5-73e7-4a44-9cc0-c160c9e5197e"
+    },
+    {
+      "resourceType": "Location",
+      "identifier": [
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "value": "11"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/bbs-code",
+          "value": "50"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+          "value": "CITYCORPORATION"
+        }
+      ],
+      "name": "Sylhet City Corp.",
+      "alias": [
+        "সিলেট সিটি কর্পোরেশন"
+      ],
+      "description": "division=7&district=64&citycorporation=11",
+      "status": "active",
+      "mode": "instance",
+      "partOf": {
+        "reference": "Location/7cd295b8-9a98-4587-8e6a-2358778fff97"
+      },
+      "type": {
+        "coding": [
+          {
+            "system": "http://opencrvs.org/specs/location-type",
+            "code": "ADMIN_STRUCTURE"
+          }
+        ]
+      },
+      "physicalType": {
+        "coding": [
+          {
+            "code": "jdn",
+            "display": "Jurisdiction"
+          }
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+          "valueAttachment": {
+            "contentType": "application/geo+json",
+            "data": "<base64>"
+          }
+        }
+      ],
+      "id": "88346816-6fc5-47dc-aa73-b138525aa563"
+    }
+  ]
+}
