@@ -175,6 +175,7 @@ export const userSection: IFormSection = {
         {
           name: 'attachmentTitle',
           type: FIELD_GROUP_TITLE,
+          hidden: true,
           label: messages.userAttachmentSection,
           required: false,
           initialValue: '',
