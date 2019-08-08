@@ -26,7 +26,7 @@ const Instruction = styled.p`
   margin: 13px 64px 27px 0px;
 `
 const Action = styled.div`
-  margin-top: 50px;
+  margin-top: 58px;
 `
 
 const GlobalError = styled.div`
