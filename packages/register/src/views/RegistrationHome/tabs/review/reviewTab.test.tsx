@@ -2,7 +2,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  flushPromises
 } from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
@@ -1371,137 +1372,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(testComponent.component.find(Validate)).toHaveLength(1)
     testComponent.component.unmount()
   })
-})
-
-describe('Tablet tests', () => {
-  const { store } = createStore()
-
-  beforeAll(() => {
-    getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
-    resizeWindow(800, 1280)
-  })
-
-  afterEach(() => {
-    resizeWindow(1024, 768)
-  })
-
-  it('redirects to detail page if item is clicked', async () => {
-    const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: SEARCH_EVENTS,
-          variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            locationIds: ['123456789'],
-            count: 10,
-            skip: 0
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'VALIDATED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'DECLARED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrationHome />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    testComponent.component
-      .find('#row_0')
-      .hostNodes()
-      .simulate('click')
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
-    expect(window.location.href).toContain(
-      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-    )
-    testComponent.component.unmount()
-  })
 
   it('renders declared items excluding the ready to register applications', async () => {
     const TIME_STAMP = '1544188309380'
@@ -1649,10 +1519,20 @@ describe('Tablet tests', () => {
       graphqlMock
     )
 
+    const validateScopeToken = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    getItem.mockReturnValue(validateScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    await flushPromises()
 
     testComponent.component.update()
     const app = testComponent.component
@@ -1662,6 +1542,137 @@ describe('Tablet tests', () => {
         .hostNodes()
         .text()
     ).toContain('Ready for review (9)')
+    testComponent.component.unmount()
+  })
+})
+
+describe('Tablet tests', () => {
+  const { store } = createStore()
+
+  beforeAll(() => {
+    getItem.mockReturnValue(registerScopeToken)
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    resizeWindow(800, 1280)
+  })
+
+  afterEach(() => {
+    resizeWindow(1024, 768)
+  })
+
+  it('redirects to detail page if item is clicked', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'DECLARED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    testComponent.component
+      .find('#row_0')
+      .hostNodes()
+      .simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    expect(window.location.href).toContain(
+      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    )
     testComponent.component.unmount()
   })
 })
