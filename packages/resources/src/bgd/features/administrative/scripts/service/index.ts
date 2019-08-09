@@ -32,7 +32,7 @@ const composeFhirLocation = (
       }
     ],
     name: titleCase(location.name), // English name
-    alias: [location.alias], // Bangla name in element 0
+    alias: [location.nameBn], // Bangla name in element 0
     description: oisfA2IParams as string, // Reference to the route params used internally in OISF/A2I to find this location
     status: 'active',
     mode: 'instance',

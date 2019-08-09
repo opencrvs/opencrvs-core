@@ -10,7 +10,7 @@ type ISupportedType =
 export interface IOISFLocation {
   bbsCode: string
   name: string
-  alias: string
+  nameBn: string
   id: number
 }
 
