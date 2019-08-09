@@ -102,7 +102,6 @@ type IProps = {
   registrationId: string
   draft: IApplication
   registerForm: IForm
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
 }
 
 type IFullProps = InjectedIntlProps &
@@ -238,7 +237,7 @@ class ReviewCertificateActionComponent extends React.Component<
                         <ButtonWrapper>
                           <PrimaryButton
                             align={0}
-                            id="myButton"
+                            id="confirm-print"
                             onClick={this.toggleModal}
                             icon={() => <Check />}
                           >
@@ -259,12 +258,19 @@ class ReviewCertificateActionComponent extends React.Component<
             </QueryProvider>
 
             <ResponsiveModal
+              id="confirm-print-modal"
               title={intl.formatMessage(certificateMessages.modalTitle)}
               actions={[
-                <CustomTertiaryButton onClick={this.toggleModal}>
+                <CustomTertiaryButton
+                  onClick={this.toggleModal}
+                  id="close-modal"
+                >
                   {intl.formatHTMLMessage(buttonMessages.cancel)}
                 </CustomTertiaryButton>,
-                <PrimaryButton onClick={this.readyToCertify}>
+                <PrimaryButton
+                  onClick={this.readyToCertify}
+                  id="print-certificate"
+                >
                   {intl.formatHTMLMessage(buttonMessages.print)}
                 </PrimaryButton>
               ]}
