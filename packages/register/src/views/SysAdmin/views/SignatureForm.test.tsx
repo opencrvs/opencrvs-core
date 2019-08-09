@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { createTestComponent, flushPromises } from '@register/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  getFileFromBase64String,
+  validImageB64String,
+  inValidImageB64String
+} from '@register/tests/util'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { createStore } from '@register/store'
 import { ReactWrapper } from 'enzyme'
@@ -66,6 +72,31 @@ describe('signature upload tests', () => {
         .text()
 
       expect(error).toBe('Required for registration')
+    })
+
+    it('No error while uploading if valid file', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      testComponent
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'index.png',
+                'image/png'
+              )
+            ]
+          }
+        })
+      await flushPromises()
+      testComponent.update()
+
+      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
     })
 
     it('clicking on confirm button will go to review page', async () => {
