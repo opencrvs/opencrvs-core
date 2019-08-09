@@ -93,7 +93,7 @@ class UserFormComponent extends React.Component<IFullProps> {
           title={intl.formatMessage(section.title)}
           goBack={this.handleBackAction}
         >
-          <FormTitle>
+          <FormTitle id="form-title">
             {intl.formatMessage(activeGroup.title || section.title)}
           </FormTitle>
           <FormFieldGenerator

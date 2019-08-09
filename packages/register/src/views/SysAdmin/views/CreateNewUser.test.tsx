@@ -9,7 +9,8 @@ import {
   mockIncompleteFormData,
   mockCompleteFormData,
   mockUserGraphqlOperation,
-  mockFetchRoleGraphqlOperation
+  mockFetchRoleGraphqlOperation,
+  mockDataWithRegistarRoleSelected
 } from '@register/views/SysAdmin/user/utils'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
@@ -77,6 +78,25 @@ describe('create new user tests', () => {
       await flushPromises()
 
       expect(history.location.pathname).toContain('preview')
+    })
+
+    it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+
+      testComponent
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+
+      expect(history.location.pathname).toContain(
+        '/createUser/user/signature-attachment'
+      )
     })
   })
 

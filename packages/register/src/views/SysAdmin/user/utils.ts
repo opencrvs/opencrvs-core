@@ -48,6 +48,28 @@ export const mockCompleteFormData = {
   username: ''
 }
 
+export const mockDataWithRegistarRoleSelected = {
+  accountDetails: '',
+  assignedRegisterOffice: '',
+  device: '',
+  familyName: 'হোসেন',
+  familyNameEng: 'Hossain',
+  firstNames: '',
+  firstNamesEng: '',
+  nid: '1014881922121',
+  phoneNumber: '01662132132',
+  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
+  role: 'LOCAL_REGISTRAR',
+  type: 'SECRETARY',
+  userDetails: '',
+  username: '',
+  signature: {
+    type: 'image/png',
+    data:
+      'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RW'
+  }
+}
+
 export const mockUserGraphqlOperation = {
   request: {
     query: createUserMutation,

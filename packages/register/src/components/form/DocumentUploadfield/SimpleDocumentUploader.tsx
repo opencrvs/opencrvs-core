@@ -126,7 +126,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
           {errorMessage && allowedDocType && (
-            <ErrorText>{errorMessage}</ErrorText>
+            <ErrorText id="field-error">{errorMessage}</ErrorText>
           )}
         </ErrorMessage>
         {!files && (
