@@ -11,6 +11,7 @@ import {
   mockUserGraphqlOperation,
   mockFetchRoleGraphqlOperation
 } from '@register/views/SysAdmin/user/utils'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 describe('create new user tests', () => {
   const { store, history } = createStore()
@@ -23,7 +24,8 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user'
+              sectionId: 'user',
+              groupId: userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -86,7 +88,8 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'preview'
+              sectionId: 'preview',
+              groupId: 'preview-' + userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -113,7 +116,7 @@ describe('create new user tests', () => {
         .hostNodes()
         .simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user')
+      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
       expect(history.location.hash).toBe('#familyNameEng')
     })
 

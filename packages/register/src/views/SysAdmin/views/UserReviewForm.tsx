@@ -140,8 +140,8 @@ class UserReviewFormComponent extends React.Component<
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
-    goToCreateUserSection: (sec: string, fieldName: string) =>
-      dispatch(goToCreateUserSection(sec, fieldName)),
+    goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
+      dispatch(goToCreateUserSection(sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
     submitForm: () => {
       const variables = draftToGqlTransformer(
