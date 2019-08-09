@@ -1,6 +1,6 @@
 import { referenceApi } from '@register/utils/referenceApi'
 import * as fetchMock from 'jest-fetch-mock'
-import nock from 'nock'
+// import nock from 'nock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
@@ -31,13 +31,13 @@ export const mockFetchFacilities = {
   ]
 }
 
-nock(window.config.RESOURCES_URL)
-  .get('/locations')
-  .reply(200, mockFetchLocations)
+// nock(window.config.RESOURCES_URL)
+//   .get('/locations')
+//   .reply(200, mockFetchLocations)
 
-nock(window.config.RESOURCES_URL)
-  .get('/facilities')
-  .reply(200, mockFetchFacilities)
+// nock(window.config.RESOURCES_URL)
+//   .get('/facilities')
+//   .reply(200, mockFetchFacilities)
 
 describe('referenceApi', () => {
   beforeEach(() => {
