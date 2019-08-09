@@ -192,11 +192,16 @@ export function goToReviewDuplicate(applicationId: string) {
   )
 }
 
-export function goToPrintCertificate(registrationId: string, event: string) {
+export function goToPrintCertificate(
+  registrationId: string,
+  event: string,
+  groupId?: string
+) {
   return push(
     formatUrl(PRINT_CERTIFICATE, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString()
+      eventType: event.toLowerCase().toString(),
+      groupId: groupId || 'birthCertCollectorGroup'
     })
   )
 }

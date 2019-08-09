@@ -40,6 +40,7 @@ import { getDefaultLanguage } from '@register/i18n/utils'
 import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
 import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
 import { Payment } from './views/PrintCertificate/Payment'
+import { CollectorForm } from './components/CollectorForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -188,7 +189,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.PRINT_CERTIFICATE}
-                                            component={PrintCertificateAction}
+                                            component={CollectorForm}
                                           />
                                           <ProtectedRoute
                                             exact
