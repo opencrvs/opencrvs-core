@@ -1,18 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { ActionPageLight, Spinner } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { goBack } from '@register/navigation'
-import { IDVerifier } from '@register/components/IDVerifier'
-import {
-  QueryProvider,
-  QueryContext
-} from '@register/views/DataProvider/QueryProvider'
-import { Action, Event } from '@register/forms'
-import * as Sentry from '@sentry/browser'
+import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
+import { Event } from '@register/forms'
 import { RouteComponentProps } from 'react-router'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { errorMessages } from '@register/i18n/messages'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { IStoreState } from '@register/store'
+import { IApplication, modifyApplication } from '@register/applications'
+import { messages } from '@register/i18n/messages/views/certificate'
 
 interface IMatchParams {
   registrationId: string
@@ -20,78 +16,82 @@ interface IMatchParams {
   collector: string
 }
 
+interface IStateProps {
+  application: IApplication
+}
 interface IDispatchProps {
   goBack: typeof goBack
+  modifyApplication: typeof modifyApplication
 }
 
-type FullProps = RouteComponentProps<IMatchParams> &
-  IDispatchProps &
-  InjectedIntlProps
+type IOwnProps = RouteComponentProps<IMatchParams> & InjectedIntlProps
 
-class VerifyCollectorComponent extends React.Component<FullProps> {
+type IFullProps = IStateProps & IDispatchProps & IOwnProps
+
+class VerifyCollectorComponent extends React.Component<IFullProps> {
+  handleVerification = (verified: boolean) => {
+    const updatedApplicationData = {
+      ...this.props.application.data,
+      certificateCollector: {
+        verified
+      }
+    }
+
+    const applicationWithVerificationStatus = {
+      ...this.props.application,
+      data: updatedApplicationData
+    }
+
+    this.props.modifyApplication(applicationWithVerificationStatus)
+  }
+
   render() {
-    const { eventType, registrationId } = this.props.match.params
-    const { intl } = this.props
-
+    const { collector } = this.props.match.params
+    const { intl, application } = this.props
     return (
       <ActionPageLight
         goBack={this.props.goBack}
-        title="Certificate collection"
+        title={intl.formatMessage(messages.certificateCollectionTitle)}
       >
-        <QueryProvider
-          event={eventType}
-          action={Action.LOAD_CERTIFICATE_APPLICATION}
-          payload={{ id: registrationId }}
-        >
-          <QueryContext.Consumer>
-            {({ loading, error, data }) => {
-              if (loading) {
-                return <Spinner id="print-certificate-spinner" />
+        <IDVerifier
+          title={intl.formatMessage(messages.idCheckTitle)}
+          collectorInformation={application.data[collector]}
+          actionProps={{
+            positiveAction: {
+              label: intl.formatMessage(messages.idCheckVerify),
+              handler: () => {
+                this.handleVerification(true)
               }
-
-              if (data) {
-                return (
-                  <IDVerifier
-                    title="Check their proof of ID. Does it match the following details?"
-                    queryData={data}
-                    event="birth"
-                    collector="MOTHER"
-                    actionProps={{
-                      positiveAction: {
-                        label: 'Yes',
-                        handler: () => {
-                          console.log('Yes clicked')
-                        }
-                      },
-                      negativeAction: {
-                        label: 'No',
-                        handler: () => {
-                          console.log('No clicked')
-                        }
-                      }
-                    }}
-                  />
-                )
+            },
+            negativeAction: {
+              label: intl.formatMessage(messages.idCheckWithoutVerify),
+              handler: () => {
+                this.handleVerification(false)
               }
-              if (error) {
-                Sentry.captureException(error)
-
-                return (
-                  <ErrorText id="print-certificate-queue-error-text">
-                    {intl.formatMessage(errorMessages.printQueryError)}
-                  </ErrorText>
-                )
-              }
-              return JSON.stringify(data)
-            }}
-          </QueryContext.Consumer>
-        </QueryProvider>
+            }
+          }}
+        />
       </ActionPageLight>
     )
   }
 }
 
+const mapStateToProps = (
+  state: IStoreState,
+  ownProps: IOwnProps
+): IStateProps => {
+  const { registrationId } = ownProps.match.params
+
+  const application = state.applicationsState.applications.find(
+    draft => draft.id === registrationId
+  ) as IApplication
+
+  return {
+    application
+  }
+}
+
 export const VerifyCollector = connect(
-  null,
-  { goBack }
+  mapStateToProps,
+  { goBack, modifyApplication }
 )(injectIntl(VerifyCollectorComponent))
