@@ -63,14 +63,16 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   handleFileChange = (uploadedImage: File) => {
+    const allowedDocType = this.props.allowedDocType
     getBase64String(uploadedImage).then(data => {
       let base64String = data as string
       base64String = base64String.split('base64,')[1]
       Jimp.read(new Buffer(base64String, 'base64'))
         .then(buffer => {
           if (
-            this.props.allowedDocType &&
-            !this.props.allowedDocType.includes(buffer.getMIME())
+            allowedDocType &&
+            allowedDocType.length > 0 &&
+            !allowedDocType.includes(buffer.getMIME())
           ) {
             throw new Error('File type not supported')
           }
@@ -86,10 +88,11 @@ class SimpleDocumentUploaderComponent extends React.Component<
           })
         })
         .catch(() => {
-          this.props.allowedDocType &&
+          allowedDocType &&
+            allowedDocType.length > 0 &&
             this.setState({
               error: this.props.intl.formatMessage(messages.fileUploadError, {
-                type: this.props.allowedDocType.join()
+                type: allowedDocType.join()
               })
             })
         })
@@ -110,26 +113,18 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const {
-      label,
-      intl,
-      files,
-      description,
-      allowedDocType,
-      error
-    } = this.props
-
+    const { label, intl, files, description, error } = this.props
     const errorMessage = this.state.error || error || ''
 
     return (
       <>
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
-          {errorMessage && allowedDocType && (
+          {errorMessage && (
             <ErrorText id="field-error">{errorMessage}</ErrorText>
           )}
         </ErrorMessage>
-        {!files && (
+        {(!files || !files.data) && (
           <DocumentUploader
             id="upload_document"
             title={intl.formatMessage(messages.addFile)}
