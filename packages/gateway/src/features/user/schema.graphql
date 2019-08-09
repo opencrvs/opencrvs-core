@@ -21,6 +21,12 @@ input UserInput {
   primaryOffice: String
   catchmentArea: [String]
   device: String
+  signature: SignatureInput
+}
+
+input SignatureInput {
+  data: String
+  type: String
 }
 
 type User {

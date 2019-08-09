@@ -742,12 +742,18 @@ export interface GQLUserInput {
   primaryOffice?: string
   catchmentArea?: Array<string | null>
   device?: string
+  signature?: GQLSignatureInput
 }
 
 export interface GQLUserIdentifierInput {
   use?: string
   system?: string
   value?: string
+}
+
+export interface GQLSignatureInput {
+  data?: string
+  type?: string
 }
 
 export interface GQLCommentInput {
