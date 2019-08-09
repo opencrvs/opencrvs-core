@@ -8,17 +8,16 @@ const ActionContainer = styled.div`
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
+  ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
 `
 const BodyContent = styled.div`
-  max-width: 940px;
   width: 100%;
   height: 64px;
-  margin: auto;
+  margin: 0 24px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;
@@ -34,9 +33,6 @@ const BackButton = styled(Button)`
   margin: 0;
   margin-right: 16px;
   padding: 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 24px;
-  }
 `
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
