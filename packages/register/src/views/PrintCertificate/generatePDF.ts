@@ -106,42 +106,6 @@ export function generateMoneyReceipt(
   const eventText = moneyReceiptDefinitionText(event, intl).EVENT
   const DOE = moneyReceiptDefinitionText(event, intl).DOE
   const dateOfPayment = moment().format(CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT)
-  const fonts = {
-    bn: {
-      notosans: {
-        normal: 'NotoSansBengali-Light.ttf',
-        regular: 'NotoSansBengali-Light.ttf',
-        bold: 'NotoSansBengali-Regular.ttf'
-      },
-      notosanscurrency: {
-        normal: 'NotoSansBengali-Light.ttf',
-        regular: 'NotoSansBengali-Light.ttf',
-        bold: 'NotoSansBengali-Light.ttf'
-      },
-      notosanslocation: {
-        normal: 'NotoSans-Light.ttf',
-        regular: 'NotoSans-Light.ttf',
-        bold: 'NotoSans-Regular.ttf'
-      }
-    },
-    en: {
-      notosanscurrency: {
-        normal: 'NotoSansBengali-Light.ttf',
-        regular: 'NotoSansBengali-Light.ttf',
-        bold: 'NotoSansBengali-Light.ttf'
-      },
-      notosans: {
-        normal: 'NotoSans-Light.ttf',
-        regular: 'NotoSans-Light.ttf',
-        bold: 'NotoSans-Regular.ttf'
-      },
-      notosanslocation: {
-        normal: 'NotoSans-Light.ttf',
-        regular: 'NotoSans-Light.ttf',
-        bold: 'NotoSans-Regular.ttf'
-      }
-    }
-  }
 
   const docDefinition = {
     info: {
@@ -217,12 +181,6 @@ export function generateMoneyReceipt(
       }
     }
   }
-  // @ts-ignore
-  const font = fonts[language]
-  pdfMake.vfs = pdfFonts
-  // const generatedPDF = pdfMake.createPdf(docDefinition, null, font)
-
-  // generatedPDF.print()
   printPDF(receiptTemplate, application, intl)
 }
 

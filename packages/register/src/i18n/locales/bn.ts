@@ -65,7 +65,7 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.nationality': 'জাতীয়তা',
     'certificate.parent.details.label.number': 'সংখ্যা',
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
-    'certificate.receipt.amount': 'পরিশোধিত মূল্য: \n\n',
+    'certificate.receipt.amount': 'পরিশোধিত মূল্য: ',
     'certificate.receipt.header': '{event} নিবন্ধন রশিদ',
     'certificate.receipt.issuedAt': 'প্রদানের স্থান:',
     'certificate.receipt.issuer':

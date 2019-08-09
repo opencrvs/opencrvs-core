@@ -6,12 +6,16 @@ import pdfMake, {
 } from 'pdfmake/build/pdfmake'
 import { commonVFS } from '@register/pdfRenderer/common_vfs'
 import { fieldTransformers } from '@register/pdfRenderer/transformer'
+import {
+  IIntLabelPayload,
+  IApplicantNamePayload
+} from '@register/pdfRenderer/transformer/types'
 import { InjectedIntl } from 'react-intl'
 import { IApplication } from '@register/applications'
 
 export interface IFieldTransformer {
   transformer: string
-  payload: any
+  payload: IIntLabelPayload | IApplicantNamePayload
 }
 
 export interface IPDFTemplate {
@@ -35,7 +39,6 @@ export function createPDF(
           `{${field}}`,
           // @ts-ignore
           fieldTransformers[template.transformers[field].transformer](
-            template,
             application,
             intl,
             template.transformers[field].payload
