@@ -63,6 +63,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   handleFileChange = (uploadedImage: File) => {
+    if (!uploadedImage) {
+      return
+    }
     const allowedDocType = this.props.allowedDocType
     getBase64String(uploadedImage).then(data => {
       let base64String = data as string

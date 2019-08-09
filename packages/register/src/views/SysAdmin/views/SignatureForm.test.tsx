@@ -99,6 +99,25 @@ describe('signature upload tests', () => {
       expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
     })
 
+    it('return if not file', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      testComponent
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: []
+          }
+        })
+      await flushPromises()
+      testComponent.update()
+
+      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+    })
+
     it('clicking on confirm button will go to review page', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)
