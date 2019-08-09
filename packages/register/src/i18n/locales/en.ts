@@ -814,6 +814,16 @@ export const ENGLISH_STATE: ILanguage = {
       'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
     'print.certificate.certificatePreview': 'Certificate Preview',
     'print.certificate.collector.father': 'Father',
+    'print.certificate.collector.idCheck.actions.verify': 'Yes',
+    'print.certificate.collector.idCheck.actions.withoutVerify': 'No',
+    'print.certificate.collector.idCheck.title':
+      'Check proof of ID. Does it match the following details?',
+    'print.certificate.collector.idCheckDialog.actions.cancel': 'Cancel',
+    'print.certificate.collector.idCheckDialog.actions.send': 'SEND',
+    'print.certificate.collector.idCheckDialog.description':
+      'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
+    'print.certificate.collector.idCheckDialog.title':
+      'Continue without proof of ID?',
     'print.certificate.collector.informant': 'Informant',
     'print.certificate.collector.mother': 'Mother',
     'print.certificate.collector.other': 'Other',

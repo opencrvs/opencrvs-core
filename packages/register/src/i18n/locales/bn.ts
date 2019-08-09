@@ -810,6 +810,16 @@ export const BENGALI_STATE: ILanguage = {
       'সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:',
     'print.certificate.certificatePreview': 'সার্টিফিকেট প্রাকদর্শন',
     'print.certificate.collector.father': 'পিতা',
+    'print.certificate.collector.idCheck.actions.verify': 'হ্যাঁ',
+    'print.certificate.collector.idCheck.actions.withoutVerify': 'না',
+    'print.certificate.collector.idCheck.title':
+      'আইডির প্রমাণ পরীক্ষা করুন। এটি নিম্নলিখিত বিবরণ মেলে?',
+    'print.certificate.collector.idCheckDialog.actions.cancel': 'বাতিল',
+    'print.certificate.collector.idCheckDialog.actions.send': 'পাঠান',
+    'print.certificate.collector.idCheckDialog.description':
+      'দয়া করে সচেতন হন আপনি যদি এগিয়ে যান তবে আপনি সংগ্রাহকের কাছ থেকে আইডির প্রয়োজনীয় প্রমাণ ছাড়াই একটি সনদপত্র দেওয়ার জন্য দায়বদ্ধ থাকবেন',
+    'print.certificate.collector.idCheckDialog.title':
+      'আইডি প্রমাণ ছাড়াই চালিয়ে যাবেন?',
     'print.certificate.collector.informant': 'তথ্যদাতা',
     'print.certificate.collector.mother': 'মা',
     'print.certificate.collector.other': 'অন্যান্য',

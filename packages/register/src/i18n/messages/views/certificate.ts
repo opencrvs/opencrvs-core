@@ -14,6 +14,13 @@ interface ICertificateMessages {
   father: ReactIntl.FormattedMessage.MessageDescriptor
   firstName: ReactIntl.FormattedMessage.MessageDescriptor
   firstNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogCancel: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogConfirm: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckVerify: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckWithoutVerify: ReactIntl.FormattedMessage.MessageDescriptor
   informant: ReactIntl.FormattedMessage.MessageDescriptor
   informantHasReviewedInformaiton: ReactIntl.FormattedMessage.MessageDescriptor
   manualPaymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
@@ -111,6 +118,47 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'First Name(s)(in english)',
     description: 'Parent first names',
     id: 'certificate.parent.details.label.firstNameInEng'
+  },
+  idCheckDialogCancel: {
+    defaultMessage: 'Cancel',
+    description:
+      'The for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.actions.cancel'
+  },
+  idCheckDialogConfirm: {
+    defaultMessage: 'SEND',
+    description:
+      'The for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.actions.send'
+  },
+  idCheckDialogDescription: {
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
+    description:
+      'The description for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.description'
+  },
+  idCheckDialogTitle: {
+    defaultMessage: 'Continue without proof of ID?',
+    description:
+      'The title for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.title'
+  },
+  idCheckTitle: {
+    defaultMessage: 'Check proof of ID. Does it match the following details?',
+    description: 'The title for id check component',
+    id: 'print.certificate.collector.idCheck.title'
+  },
+  idCheckVerify: {
+    defaultMessage: 'Yes',
+    description: 'The label for id check component action when verify details',
+    id: 'print.certificate.collector.idCheck.actions.verify'
+  },
+  idCheckWithoutVerify: {
+    defaultMessage: 'No',
+    description:
+      'The label for id check component action when does not verify details',
+    id: 'print.certificate.collector.idCheck.actions.withoutVerify'
   },
   informant: {
     defaultMessage: 'Informant',
