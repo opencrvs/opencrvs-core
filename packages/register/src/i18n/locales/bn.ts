@@ -1071,9 +1071,6 @@ export const BENGALI_STATE: ILanguage = {
     'userSetup.type.hospital': 'হাসপাতাল',
     'userSetupReview.instruction':
       'আপনার অ্যাকাউন্টের সঠিক বিবরণ নিশ্চিত করতে নীচের তথ্যগুলো যাচাই করুন এবং প্রয়োজনীয় পরিবর্তন করে আপনার অ্যাকাউন্টের সঠিক তথ্য নিশ্চিত করুন।',
-    'validate.application.action.modal.description':
-      'এই আবেদন নিবন্ধন করতে রেজিস্ট্রারের কাছে পাঠানো হবে',
-    'validate.application.action.modal.title': 'অনুমোদনের জন্য পাঠাবেন?',
     'validate.complete.application.action.description':
       'অনুমোদন দ্বারা আপনি নিশ্চিত যে আবেদন নিবন্ধন করতে প্রস্তুত',
     'validate.complete.application.action.title': 'অনুমোদন করার জন্য প্রস্তুত?',
