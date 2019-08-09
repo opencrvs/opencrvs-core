@@ -27,7 +27,7 @@ input UserInput {
   device: String
   signature: SignatureInput
 }
-type Singature {
+type Signature {
   data: String
   type: String
 }
@@ -42,7 +42,7 @@ type User {
   type: String
   email: String
   status: String
-  signature: Singature
+  signature: Signature
   primaryOffice: Location
   catchmentArea: [Location]
 }
