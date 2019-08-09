@@ -8,7 +8,6 @@ import {
 } from '@register/forms'
 import { userMessages } from '@register/i18n/messages'
 import { getRolesQuery } from './queries'
-import { validImageB64String } from '@register/tests/util'
 
 export enum UserStatus {
   ACTIVE,
@@ -66,7 +65,8 @@ export const mockDataWithRegistarRoleSelected = {
   username: '',
   signature: {
     type: 'image/png',
-    data: validImageB64String
+    data:
+      'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
   }
 }
 
