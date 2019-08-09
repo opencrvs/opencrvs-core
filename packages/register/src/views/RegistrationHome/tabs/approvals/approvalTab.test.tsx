@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { createTestComponent, mockUserResponse } from '@register/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  resizeWindow
+} from '@register/tests/util'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { storage } from '@register/storage'
@@ -166,7 +170,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         error: new Error('boom')
@@ -212,7 +216,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
@@ -270,7 +274,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.VALIDATED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -397,7 +401,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.VALIDATED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -446,7 +450,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.VALIDATED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -498,7 +502,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.VALIDATED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -686,6 +690,148 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(
       testComponent.component.find('#VALIDATED-0').hostNodes().length
     ).toBe(1)
+    testComponent.component.unmount()
+  })
+})
+
+describe('Tablet tests', () => {
+  const { store } = createStore()
+
+  beforeAll(() => {
+    getItem.mockReturnValue(validateScopeToken)
+    store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    resizeWindow(800, 1280)
+  })
+
+  afterEach(() => {
+    resizeWindow(1024, 768)
+  })
+
+  it('redirects to detail page if item is clicked', async () => {
+    jest.clearAllMocks()
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.VALIDATED],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'VALIDATED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    contactNumber: null,
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: null
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome
+        match={{
+          params: {
+            tabId: 'approvals'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftCount={1}
+      />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(validateScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    testComponent.component
+      .find('#row_0')
+      .hostNodes()
+      .simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    expect(window.location.href).toContain(
+      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    )
     testComponent.component.unmount()
   })
 })

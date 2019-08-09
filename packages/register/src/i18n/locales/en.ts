@@ -996,7 +996,7 @@ export const ENGLISH_STATE: ILanguage = {
       '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
     'review.modal.title.registerConfirmation': 'Register this application?',
     'review.modal.title.submitConfirmation':
-      '{isComplete, select, true {Send application for review?} false {Send incomplete application?}}',
+      '{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}',
     'review.rejection.form': 'Rejection form',
     'review.rejection.form.commentInstruction':
       'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',

@@ -27,7 +27,7 @@ describe('when user is in the home page', () => {
         variables: {
           timeStart: 1527098400000,
           timeEnd: 1567142659530,
-          locationId: '123456789'
+          locationId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
         }
       },
       result: {
