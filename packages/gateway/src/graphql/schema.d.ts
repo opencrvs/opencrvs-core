@@ -333,12 +333,12 @@ export interface GQLUser {
   type?: string
   email?: string
   status?: string
-  signature?: GQLSingature
+  signature?: GQLSignature
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
 }
 
-export interface GQLSingature {
+export interface GQLSignature {
   data?: string
   type?: string
 }
@@ -867,7 +867,7 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
-  Singature?: GQLSingatureTypeResolver
+  Signature?: GQLSignatureTypeResolver
   Comment?: GQLCommentTypeResolver
   Certificate?: GQLCertificateTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2047,16 +2047,16 @@ export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLSingatureTypeResolver<TParent = any> {
-  data?: SingatureToDataResolver<TParent>
-  type?: SingatureToTypeResolver<TParent>
+export interface GQLSignatureTypeResolver<TParent = any> {
+  data?: SignatureToDataResolver<TParent>
+  type?: SignatureToTypeResolver<TParent>
 }
 
-export interface SingatureToDataResolver<TParent = any, TResult = any> {
+export interface SignatureToDataResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SingatureToTypeResolver<TParent = any, TResult = any> {
+export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
