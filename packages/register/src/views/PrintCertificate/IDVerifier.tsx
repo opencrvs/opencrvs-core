@@ -31,6 +31,7 @@ interface IVerifierActionProps {
 }
 
 interface IIDVerifierProps {
+  id?: string
   title: string
   collectorInformation: IFormSectionData
   actionProps: IVerifierActionProps
@@ -87,6 +88,7 @@ class IDVerifierComponent extends React.Component<
   getGenericCollectorInfo = (
     info: IIDVerifierProps['collectorInformation']
   ) => {
+    let iD
     let iDType
     let firstNames
     let familyName
@@ -94,7 +96,7 @@ class IDVerifierComponent extends React.Component<
     let nationality
 
     const { locale } = this.props.intl
-
+    iD = info.iD || info.applicantID
     iDType = info.iDType || info.iDTypeOther
     firstNames =
       locale === 'en'
@@ -109,6 +111,7 @@ class IDVerifierComponent extends React.Component<
     nationality = info.nationality
 
     return {
+      iD,
       iDType,
       firstNames,
       familyName,
@@ -120,6 +123,7 @@ class IDVerifierComponent extends React.Component<
   renderLabelValue = () => {
     const { collectorInformation, intl } = this.props
     const {
+      iD,
       iDType,
       firstNames,
       familyName,
@@ -134,7 +138,7 @@ class IDVerifierComponent extends React.Component<
           value={
             intl.formatMessage(identityNameMapper(iDType as string)) +
             ' | ' +
-            collectorInformation.iD
+            iD
           }
         />
         {firstNames && (
@@ -169,10 +173,10 @@ class IDVerifierComponent extends React.Component<
   render() {
     const { positiveAction, negativeAction } = this.props.actionProps
     const { showPrompt } = this.state
-    const { intl } = this.props
+    const { intl, id } = this.props
 
     return (
-      <>
+      <div id={id}>
         <Title>{this.props.title}</Title>
         <Content>
           <UnderLayBackground />
@@ -197,17 +201,26 @@ class IDVerifierComponent extends React.Component<
           </DangerButton>
         </ActionContainer>
         <ResponsiveModal
+          id="withoutVerificationPrompt"
           show={showPrompt}
           title={intl.formatMessage(certificateMessages.idCheckDialogTitle)}
           contentHeight={96}
           handleClose={this.togglePrompt}
           actions={[
-            <TertiaryButton key="cancel" onClick={this.togglePrompt}>
+            <TertiaryButton
+              id="cancel"
+              key="cancel"
+              onClick={this.togglePrompt}
+            >
               {intl.formatMessage(certificateMessages.idCheckDialogCancel)}
             </TertiaryButton>,
             <PrimaryButton
+              id="send"
               key="continue"
-              onClick={this.props.actionProps.negativeAction.handler}
+              onClick={() => {
+                this.props.actionProps.negativeAction.handler()
+                this.togglePrompt()
+              }}
             >
               {intl.formatMessage(certificateMessages.idCheckDialogConfirm)}
             </PrimaryButton>
@@ -215,7 +228,7 @@ class IDVerifierComponent extends React.Component<
         >
           {intl.formatMessage(certificateMessages.idCheckDialogDescription)}
         </ResponsiveModal>
-      </>
+      </div>
     )
   }
 }

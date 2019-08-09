@@ -54,6 +54,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         title={intl.formatMessage(messages.certificateCollectionTitle)}
       >
         <IDVerifier
+          id="idVerifier"
           title={intl.formatMessage(messages.idCheckTitle)}
           collectorInformation={application.data[collector]}
           actionProps={{
