@@ -31,6 +31,7 @@ export const MY_DRAFTS = '/my-drafts'
 export const REVIEW_DUPLICATES = '/duplicates/:applicationId'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
+export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'

@@ -19,6 +19,7 @@ export const ENGLISH_STATE: ILanguage = {
     'buttons.drafts': 'Drafts',
     'buttons.edit': 'Edit',
     'buttons.editRegistration': 'Edit Registration',
+    'buttons.editRecord': 'Edit Record',
     'buttons.exit': 'EXIT',
     'buttons.finish': 'Finish',
     'buttons.goToHomePage': 'Go to Homepage',
@@ -845,6 +846,15 @@ export const ENGLISH_STATE: ILanguage = {
     'print.certificate.signature.person2': 'Local Registrar Mohammad Ashraful',
     'print.certificate.userReviewed':
       'The informant has reviewed and confirmed that the information on the certificate is correct.',
+    'print.certificate.button.confirmPrint': 'Confirm and Print',
+    'print.certificate.review.title':
+      'Are all the details on the {event} certificate correct?',
+    'print.certificate.review.description':
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.',
+    'print.certificate.review.modal.title': 'Print Certificate?',
+    'print.certificate.review.modal.body':
+      'A PDF of the certificate will open in a new tab - please print from there',
+    'print.certificate.toast.message': 'Certificate is ready to print',
     'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {birth} death {death}} application has been sent for review.} registration {{eventType, select, birth {birth} death {death}} has been registered.} duplication {{eventType, select, birth {birth} death {death}} has been registered.} rejection {{eventType, select, birth {birth} death {death}} application has been rejected.} certificate {{eventType, select, birth {birth} death {death}} certificate has been completed.} offline {{eventType, select, birth {birth} death {death}} application will be sent when you reconnect.} }`,
     'register.confirmationScreen.buttons.back': 'Back to homescreen',
     'register.confirmationScreen.buttons.back.duplicate': 'Back to duplicate',

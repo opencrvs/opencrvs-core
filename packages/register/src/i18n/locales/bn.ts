@@ -7,6 +7,7 @@ export const BENGALI_STATE: ILanguage = {
     'birth.form.section.child.name': 'শিশু',
     'birth.form.section.child.title': 'শিশুর বিবরণ',
     'buttons.apply': 'প্রয়োগ করুন',
+    'buttons.approve': 'অনুমোদন করুন',
     'buttons.back': 'পিছনে',
     'buttons.cancel': 'বাতিল করুন',
     'buttons.change': 'পরিবর্তন',
@@ -18,6 +19,7 @@ export const BENGALI_STATE: ILanguage = {
     'buttons.drafts': 'খসড়া',
     'buttons.edit': 'সম্পাদন',
     'buttons.editRegistration': 'নিবন্ধন সম���পাদনা করুন',
+    'buttons.editRecord': 'সম্পাদনা করুন',
     'buttons.exit': 'বাহির',
     'buttons.finish': 'সমাপ্ত',
     'buttons.goToHomePage': 'Go to Homepage',
@@ -840,6 +842,14 @@ export const BENGALI_STATE: ILanguage = {
       'স্থানীয় রেজিস্ট্রার মোহাম্মদ আশরাফুল',
     'print.certificate.userReviewed':
       'তথ্যদাতা পর্যালোচনা করেছেন এবং নিশ্চিত করেছেন যে শংসাপত্রের তথ্য সঠিক।',
+    'print.certificate.button.confirmPrint': 'নিশ্চিত এবং মুদ্রণ করুন',
+    'print.certificate.review.title': '{event} সনদের সমস্ত বিবরণ কি সঠিক?',
+    'print.certificate.review.description':
+      'দয়া করে নিশ্চিত করুন যে আবেদনকারী পর্যালোচনা করেছেন যে শংসাপত্রের তথ্য সঠিক এবং এটি মুদ্রণের জন্য প্রস্তুত।',
+    'print.certificate.review.modal.title': 'সনদপত্র মুদ্রণ?',
+    'print.certificate.review.modal.body':
+      'সনদপত্রের একটি পিডিএফ একটি নতুন ট্যাবে খুলবে - দয়া করে সেখান থেকে মুদ্রণ করুন',
+    'print.certificate.toast.message': 'সনদপত্র মুদ্রণের জন্য প্রস্তুত',
     'register.confirmationScreen.boxHeaderDesc': `{event, select, declaration {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন পর্যালোচনার জন্য পাঠানো হয়েছে।} registration {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} duplication {{eventType, select, birth {জন্ম} death {মৃত্যু}} নিবন্ধন নিবন্ধিত হয়েছে।} rejection {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদন প্রত্যাখ্যাত হয়েছে।} certificate {{eventType, select, birth {জন্ম} death {মৃত্যু}} সনদপত্র সম্পূর্ণ হয়েছে।} offline {{eventType, select, birth {জন্ম} death {মৃত্যু}} আবেদনটি আপনি পুনরায় সংযুক্ত হলে পাঠানো হবে।} }`,
     'register.confirmationScreen.buttons.back': 'হোমপেইজে ফিরে  যান',
     'register.confirmationScreen.buttons.back.duplicate': 'নকলে ফিরে যান',
@@ -1049,8 +1059,11 @@ export const BENGALI_STATE: ILanguage = {
     'userSetup.securityQuestions.favoriteFood': 'আপনার প্রিয় খাদ্য কি?',
     'userSetup.securityQuestions.favoriteMovie': 'আপনার প্রিয় সিনেমা কি?',
     'userSetup.securityQuestions.favoriteSong': 'আপনার প্রিয় গান কি?',
+    'validate.application.action.modal.description':
+      'এই আবেদন নিবন্ধন করতে রেজিস্ট্রারের কাছে পাঠানো হবে',
     'userSetup.securityQuestions.favoriteTeacher':
       'আপনার প্রিয় স্কুল শিক্ষকের নাম কি?',
+    'validate.application.action.modal.title': 'অনুমোদনের জন্য পাঠাবেন?',
     'userSetup.securityQuestions.firstChildName':
       'আপনার প্রথম সন্তানের নাম কি?',
     'userSetup.securityQuestions.hightSchool': 'আপনার উচ্চ বিদ্যালয় নাম কি?',
