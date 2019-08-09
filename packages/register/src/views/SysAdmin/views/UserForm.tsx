@@ -9,7 +9,8 @@ import {
 import {
   getSectionFields,
   hasFormError,
-  getVisibleGroupFields
+  getVisibleGroupFields,
+  getActiveGroupFields
 } from '@register/forms/utils'
 import { goToCreateUserSection, goToHome } from '@register/navigation'
 import styled from '@register/styledComponents'
@@ -54,8 +55,8 @@ class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   handleFormAction = () => {
-    const { section, formData } = this.props
-    if (hasFormError(getSectionFields(section), formData)) {
+    const { formData, activeGroup } = this.props
+    if (hasFormError(getActiveGroupFields(activeGroup), formData)) {
       this.showAllValidationErrors()
     } else {
       this.props.goToCreateUserSection(

@@ -198,6 +198,7 @@ function GeneratedInputField({
         description={fieldDefinition.description}
         allowedDocType={fieldDefinition.allowedDocType}
         files={value as IAttachmentValue}
+        error={error}
         onComplete={(file: IAttachmentValue | {}) =>
           onSetFieldValue(fieldDefinition.name, file)
         }

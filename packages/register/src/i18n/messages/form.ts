@@ -1716,12 +1716,12 @@ const messagesToDefine: IFormMessages = {
   userSignatureAttachmentDesc: {
     defaultMessage:
       'Ask the registrar to sign a piece of paper and then scan or take a photo.',
-    description: 'Input label for user signature attachment',
+    description: 'Description for user signature attachment',
     id: 'form.field.label.userSignatureAttachmentDesc'
   },
   userAttachmentSection: {
     defaultMessage: 'Attachments',
-    description: 'Input label for user signature attachment',
+    description: 'label for user signature attachment',
     id: 'form.field.label.userAttachmentSection'
   },
   addFile: {

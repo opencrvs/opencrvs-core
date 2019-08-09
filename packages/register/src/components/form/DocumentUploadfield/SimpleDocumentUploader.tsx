@@ -41,11 +41,12 @@ type IFullProps = {
   files?: IAttachmentValue
   description?: string
   allowedDocType?: string[]
+  error?: string
   onComplete: (files: IAttachmentValue | {}) => void
 } & InjectedIntlProps
 
 type IState = {
-  isError: boolean
+  error: string
   previewImage: IAttachmentValue | null
 }
 
@@ -56,7 +57,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      isError: false,
+      error: '',
       previewImage: null
     }
   }
@@ -81,13 +82,16 @@ class SimpleDocumentUploaderComponent extends React.Component<
             data: buffer
           })
           this.setState({
-            isError: false
+            error: ''
           })
         })
         .catch(() => {
-          this.setState({
-            isError: true
-          })
+          this.props.allowedDocType &&
+            this.setState({
+              error: this.props.intl.formatMessage(messages.fileUploadError, {
+                type: this.props.allowedDocType.join()
+              })
+            })
         })
     })
   }
@@ -106,17 +110,23 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const { label, intl, files, description, allowedDocType } = this.props
+    const {
+      label,
+      intl,
+      files,
+      description,
+      allowedDocType,
+      error
+    } = this.props
+
+    const errorMessage = this.state.error || error || ''
+
     return (
       <>
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
-          {this.state.isError && allowedDocType && (
-            <ErrorText>
-              {intl.formatMessage(messages.fileUploadError, {
-                type: allowedDocType.join()
-              })}
-            </ErrorText>
+          {errorMessage && allowedDocType && (
+            <ErrorText>{errorMessage}</ErrorText>
           )}
         </ErrorMessage>
         {!files && (
