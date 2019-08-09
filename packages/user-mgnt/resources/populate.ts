@@ -6,10 +6,6 @@ import { generateSaltedHash } from '../src/utils/hash'
 import { MONGO_URL } from '../src/constants'
 mongoose.connect(MONGO_URL)
 
-const dummySignature =
-  // tslint:disable-next-line: max-line-length
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAvVBMVEVHcExNerVNerVOerZOe7RMe7NNe7ROe7UAAP9PebVLerRQfLNRebVNfLZJbbZNerROdrFNerZNe7VPerVNgLNOe7VPebZOebZVd7tAgL9MebNVgKpNe7dOe7RVVapKdbVOebZOerVOerZNd7NOebaAgIBNfbhOe7ZOebRJgLZNeLdNerRNe7VQerVOerdVgLhOerFPfbVRea5MfLNVcapNeLZVgL9SdrZOe7VPerVmZsxNe7VNebZPebdMerexCT1cAAAAP3RSTlMAYFZzZhtqaAFnLEAmQgdtDUlZaxRyKjsPBDkGPFUDGGV5mR5pAiugpA41d08wLhIXLRMlCUYMHD5aBVM/SkPScFaPAAAAk0lEQVQY033OBw6CQBAF0L/AFpogzS723nu//7FcNKDExMlkk3mZ/Fngt7bF/FwIb6ccPCJwYGFkoAtocDkfp+BLw/0YZUlyXwO57AjoG7Skz4fVLBhZopFkAAy2NZ+YA27UJVwD4WDpEbcnnFZNwsbbr4HQ7zPE1VcIm8rHHLZpesbudEHVr6+rFUVXmh8olfG3nsyFCOocKThSAAAAAElFTkSuQmCC'
-
 const pass = generateSaltedHash('test')
 
 const fieldAgent = new User({
@@ -29,14 +25,14 @@ const fieldAgent = new User({
   type: 'CHA',
   scope: ['declare', 'demo'],
   status: 'active',
-  practitionerId: 'd5c2e811-117b-45b2-9056-cd8a2081919c',
+  practitionerId: 'af1b5a41-8f74-40dd-869c-a1326d956974',
   primaryOfficeId:
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a' /* TODO: when office details arrive change to office id - currently set to union id */,
+    '3009e53d-cc73-4cf3-9a63-08f7ed14b7dc' /* TODO: when office details arrive change to office id - currently set to union id */,
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199', // should be a division
-    '4af73d73-aa6e-4770-b1d9-4274949e431e', // should be a district child of the above division
-    'd757aee6-0691-42d5-92dd-ab731cb640d6', // should be an upazila child of the above district
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a' // should be a union child of the above upazila
+    '9f3fbeaa-34a8-47bd-9a03-f1bf7f0f7896', // should be a division
+    'f3a7bb32-f7dd-4694-8cb7-eb24040bf283', // should be a district child of the above division
+    'bac28dfe-18c4-489f-af87-5ece950e2695', // should be an upazila child of the above district
+    '3009e53d-cc73-4cf3-9a63-08f7ed14b7dc' // should be a union child of the above upazila
   ],
   securityQuestionAnswers: []
 })
@@ -58,13 +54,13 @@ const registrationAgent = new User({
   type: 'ENTREPENEUR',
   scope: ['validate', 'certify', 'demo'],
   status: 'active',
-  practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
+  practitionerId: '8335abe5-e669-4eb6-93c9-24fc03ede6aa',
+  primaryOfficeId: 'd2e438fb-c547-4d5f-ad0c-6bcd8ac6d3e8',
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    '9f3fbeaa-34a8-47bd-9a03-f1bf7f0f7896',
+    '74d75fdf-414f-46ff-9cbd-5ac72b5c286a',
+    '6d090bd9-86c1-4fa0-b25a-c374fc82fff7',
+    'd2e438fb-c547-4d5f-ad0c-6bcd8ac6d3e8'
   ],
   securityQuestionAnswers: []
 })
@@ -86,14 +82,13 @@ const localRegistrar = new User({
   type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
-  signature: { data: dummySignature, type: 'png' },
-  practitionerId: '862519b7-552f-4512-946f-35ecde896c50',
-  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
+  practitionerId: '5ca9c765-f695-43da-bf33-e4c1614e5b16',
+  primaryOfficeId: '3009e53d-cc73-4cf3-9a63-08f7ed14b7dc',
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    '9f3fbeaa-34a8-47bd-9a03-f1bf7f0f7896',
+    'f3a7bb32-f7dd-4694-8cb7-eb24040bf283',
+    'bac28dfe-18c4-489f-af87-5ece950e2695',
+    '3009e53d-cc73-4cf3-9a63-08f7ed14b7dc'
   ],
   securityQuestionAnswers: []
 })
@@ -115,10 +110,9 @@ const districtRegistrar = new User({
   type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
-  signature: { data: dummySignature, type: 'png' },
-  practitionerId: '4e6df67a-ac2c-4bad-8516-6abc0a883e7b',
-  primaryOfficeId: '4af73d73-aa6e-4770-b1d9-4274949e431e',
-  catchmentAreaIds: ['d2898740-42e4-4680-b5a7-2f0a12a15199'],
+  practitionerId: '07170456-dacb-418c-a75a-5b4b9484ec68',
+  primaryOfficeId: 'f3a7bb32-f7dd-4694-8cb7-eb24040bf283',
+  catchmentAreaIds: ['f3a7bb32-f7dd-4694-8cb7-eb24040bf283'],
   securityQuestionAnswers: []
 })
 
@@ -139,9 +133,8 @@ const stateRegistrar = new User({
   type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
-  signature: { data: dummySignature, type: 'png' },
-  practitionerId: '39e56f2a-23d5-4e76-ab5d-6f41ec4619db',
-  primaryOfficeId: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+  practitionerId: '5de25d91-ec59-4ed0-bf96-92421cb520a3',
+  primaryOfficeId: '9f3fbeaa-34a8-47bd-9a03-f1bf7f0f7896',
   catchmentAreaIds: [],
   securityQuestionAnswers: []
 })
@@ -163,9 +156,8 @@ const nationalRegistrar = new User({
   type: 'SECRETARY',
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'],
   status: 'active',
-  signature: { data: dummySignature, type: 'png' },
-  practitionerId: '3bebd40a-3a40-4c5d-ad41-a949778bc368',
-  primaryOfficeId: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+  practitionerId: '9a1d0751-3e78-43ad-9c41-38d4574b6cfa',
+  primaryOfficeId: '9f3fbeaa-34a8-47bd-9a03-f1bf7f0f7896',
   catchmentAreaIds: [],
   securityQuestionAnswers: []
 })
@@ -187,13 +179,13 @@ const sysAdmin = new User({
   type: 'LOCAL_SYSTEM_ADMIN',
   scope: ['sysadmin', 'demo'],
   status: 'active',
-  practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
+  practitionerId: 'c15a2bed-e79d-4fba-a4a4-c3fa0ed600ab',
+  primaryOfficeId: '3009e53d-cc73-4cf3-9a63-08f7ed14b7dc',
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    '9f3fbeaa-34a8-47bd-9a03-f1bf7f0f7896',
+    'f3a7bb32-f7dd-4694-8cb7-eb24040bf283',
+    'bac28dfe-18c4-489f-af87-5ece950e2695',
+    '3009e53d-cc73-4cf3-9a63-08f7ed14b7dc'
   ],
   securityQuestionAnswers: []
 })
