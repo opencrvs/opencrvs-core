@@ -379,6 +379,7 @@ export interface IConditionals {
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
   isRegistrarRoleSelected: IConditional
+  certCollectorOther: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
@@ -419,6 +420,7 @@ export interface IFormSectionGroup {
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
+  error?: FormattedMessage.MessageDescriptor
 }
 
 export interface IForm {
