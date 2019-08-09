@@ -21,10 +21,7 @@ import { Action, Event, IForm, IFormData } from '@register/forms'
 import { constantsMessages, errorMessages } from '@register/i18n/messages'
 import { buttonMessages } from '@register/i18n/messages/buttons'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
-import {
-  goToHome,
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction
-} from '@register/navigation'
+import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { gqlToDraftTransformer } from '@register/transformer'
@@ -179,7 +176,9 @@ class ReviewCertificateActionComponent extends React.Component<
           title={intl.formatHTMLMessage(
             certificateMessages.certificateCollectionTitle
           )}
-          goHome={() => dispatch(goToHome())}
+          goHome={() =>
+            dispatch(goToRegistrarHomeTabAction(TAB_ID.readyForPrint))
+          }
         />
         <BodyContent>
           <FormContainer>
