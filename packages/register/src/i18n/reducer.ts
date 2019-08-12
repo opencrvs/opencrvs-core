@@ -2,7 +2,7 @@ import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@register/i18n/actions'
 // import { ENGLISH_STATE } from '@register/i18n/locales/en'
 //import { BENGALI_STATE } from '@register/i18n/locales/bn'
-import { getDefaultLanguage } from '@register/i18n/utils'
+import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
 import * as offlineActions from '@register/offline/actions'
 
 export interface IntlMessages {
@@ -25,10 +25,35 @@ export type IntlState = {
   languages: ILanguageState
 }
 
+interface ISupportedLanguages {
+  code: string
+  language: string
+}
+
+const supportedLanguages: ISupportedLanguages[] = [
+  { code: 'en', language: 'English' },
+  { code: 'bn', language: 'বাংলা' }
+]
+
+export const initLanguages = () => {
+  const initLanguages: ILanguageState = {}
+  getAvailableLanguages().forEach(lang => {
+    const languageDescription = supportedLanguages.find(
+      obj => obj.code === lang
+    ) as ISupportedLanguages
+    initLanguages[lang] = {
+      lang,
+      displayName: languageDescription.language,
+      messages: {}
+    }
+  })
+  return initLanguages
+}
+
 export const initialState: IntlState = {
   language: getDefaultLanguage(),
   messages: { default: 'default' },
-  languages: {}
+  languages: initLanguages()
 }
 
 const getNextMessages = (

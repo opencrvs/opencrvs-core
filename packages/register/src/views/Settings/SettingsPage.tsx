@@ -166,10 +166,12 @@ class SettingsView extends React.Component<IProps & IState, IState> {
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.map((lang: string) => {
-      langChoice.push({
-        value: lang,
-        label: languages[lang].displayName
-      })
+      if (languages[lang]) {
+        langChoice.push({
+          value: lang,
+          label: languages[lang].displayName
+        })
+      }
     })
 
     let englishName = ''
