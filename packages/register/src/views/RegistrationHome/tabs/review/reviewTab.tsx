@@ -43,8 +43,8 @@ interface IBaseReviewTabProps {
   scope: Scope | null
   goToPage: typeof goToPage
   goToReviewDuplicate: typeof goToReviewDuplicate
+  registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  registrarUnion: string | null
   parentQueryLoading?: boolean
 }
 
@@ -213,7 +213,8 @@ class ReviewTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, registrarUnion, parentQueryLoading } = this.props
+    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
+
     const queryStatuses = this.userHasRegisterScope()
       ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
       : [EVENT_STATUS.DECLARED]
@@ -222,7 +223,7 @@ class ReviewTabComponent extends React.Component<
         query={SEARCH_EVENTS}
         variables={{
           status: queryStatuses,
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           count: this.pageSize,
           skip: (this.state.reviewCurrentPage - 1) * this.pageSize
         }}
@@ -255,6 +256,7 @@ class ReviewTabComponent extends React.Component<
               </ErrorText>
             )
           }
+
           return (
             <HomeContent>
               <ReactTooltip id="validateTooltip">

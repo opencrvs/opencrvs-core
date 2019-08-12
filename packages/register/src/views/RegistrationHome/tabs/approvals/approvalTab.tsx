@@ -34,8 +34,8 @@ const ToolTipContainer = styled.span`
 interface IBaseApprovalTabProps {
   theme: ITheme
   goToPage: typeof goToPage
+  registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  registrarUnion: string | null
   parentQueryLoading?: boolean
 }
 
@@ -181,14 +181,14 @@ class ApprovalTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, registrarUnion, parentQueryLoading } = this.props
+    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
 
     return (
       <Query
         query={SEARCH_EVENTS}
         variables={{
           status: [EVENT_STATUS.VALIDATED],
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           count: this.pageSize,
           skip: (this.state.approvalCurrentPage - 1) * this.pageSize
         }}

@@ -86,7 +86,11 @@ export const intlReducer: LoopReducer<IntlState, any> = (
           ...state,
           languages: offlineLanguagesState
         },
-        Cmd.list([Cmd.action(offlineActions.filterLocationsByLanguage())])
+        Cmd.list([
+          Cmd.action(
+            offlineActions.filterLocationsByLanguage(offlineLanguagesState)
+          )
+        ])
       )
     case actions.STORE_LANGUAGES:
       const languagesLoaded = action.payload as ILanguage[]
@@ -99,7 +103,9 @@ export const intlReducer: LoopReducer<IntlState, any> = (
           ...state,
           languages: loadedLanguagesState
         },
-        Cmd.list([Cmd.action(offlineActions.loadLocations())])
+        Cmd.list([
+          Cmd.action(offlineActions.loadLocations(loadedLanguagesState))
+        ])
       )
     case actions.ADD_OFFLINE_KEYS:
       let updatedMessages = getNextMessages(state.language, state.languages)

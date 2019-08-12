@@ -10,24 +10,16 @@ describe('getUserDetails', () => {
 
 describe('getUserLocation', () => {
   it('returns the correct location', () => {
-    expect(getUserLocation(userDetails, 'UNION')).toEqual('123456789')
+    expect(getUserLocation(userDetails)).toEqual({
+      id: '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    })
   })
 
-  it('returns empty location in case of invalid location key', () => {
-    expect(getUserLocation(userDetails, 'INVALID')).toEqual('')
-  })
-  it('Throws error if catchmentArea is missing for loggedin user', () => {
+  it('Throws error if primaryOffice is missing for loggedin user', () => {
     const clonedDetails = cloneDeep(userDetails)
-    delete clonedDetails.catchmentArea
-    expect(() => getUserLocation(clonedDetails, 'UNION')).toThrowError(
-      'The user has no catchment area'
-    )
-  })
-  it('Throws error in-case of missing identifier of catchementArea', () => {
-    const clonedDetails = cloneDeep(userDetails)
-    delete clonedDetails.catchmentArea[3].identifier
-    expect(() => getUserLocation(clonedDetails, 'UNION')).toThrowError(
-      'The catchment area has no identifier'
+    delete clonedDetails.primaryOffice
+    expect(() => getUserLocation(clonedDetails)).toThrowError(
+      'The user has no primary office'
     )
   })
 })

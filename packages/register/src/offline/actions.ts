@@ -1,5 +1,5 @@
 import { ILocation } from '@register/offline/reducer'
-import { ILanguage } from '@register/i18n/reducer'
+import { ILanguage, ILanguageState } from '@register/i18n/reducer'
 import {
   ILocationDataResponse,
   ILanguagesDataResponse,
@@ -66,10 +66,12 @@ export type IGetOfflineDataFailedAction = {
 export const FORMAT_LOCATIONS = 'OFFLINE/FORMAT_LOCATIONS'
 export type IFilterLocationsAction = {
   type: typeof FORMAT_LOCATIONS
+  payload: ILanguageState
 }
 export const LOAD_LOCATIONS = 'OFFLINE/LOAD_LOCATIONS'
 export type ILoadLocationsAction = {
   type: typeof LOAD_LOCATIONS
+  payload: ILanguageState
 }
 export type Action =
   | GetLocations
@@ -137,10 +139,16 @@ export const languagesFailed = (error: Error): LanguagesFailedAction => ({
   payload: error
 })
 
-export const filterLocationsByLanguage = (): IFilterLocationsAction => ({
-  type: FORMAT_LOCATIONS
+export const filterLocationsByLanguage = (
+  languageState: ILanguageState
+): IFilterLocationsAction => ({
+  type: FORMAT_LOCATIONS,
+  payload: languageState
 })
 
-export const loadLocations = (): ILoadLocationsAction => ({
-  type: LOAD_LOCATIONS
+export const loadLocations = (
+  languageState: ILanguageState
+): ILoadLocationsAction => ({
+  type: LOAD_LOCATIONS,
+  payload: languageState
 })

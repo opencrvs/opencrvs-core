@@ -3,14 +3,8 @@ import * as actions from '@register/offline/actions'
 import { storage } from '@register/storage'
 import { referenceApi } from '@register/utils/referenceApi'
 import * as i18nActions from '@register/i18n/actions'
-import {
-  ILanguage,
-  ILanguageState,
-  IntlMessages,
-  initLanguages
-} from '@register/i18n/reducer'
-import { getUserLocation } from '@register/utils/userUtils'
-import { filterLocations } from '@register/utils/locationUtils'
+import { ILanguage, ILanguageState, IntlMessages } from '@register/i18n/reducer'
+import { filterLocations, getLocation } from '@register/utils/locationUtils'
 import { tempData } from '@register/offline/temp/tempLocations'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
@@ -50,7 +44,6 @@ export const formatLocationLanguageState = (
       }
     }
   })
-  console.log(languages)
   return languages
 }
 
@@ -67,12 +60,14 @@ export type IOfflineDataState = {
   offlineDataLoaded: boolean
   loadingError: boolean
   languages: ILanguage[]
+  languageState: ILanguageState
 }
 
 export const initialState: IOfflineDataState = {
   locations: {},
   facilities: {},
   languages: [],
+  languageState: {},
   // rejected: [],
   // records: [],
   offlineDataLoaded: false,
@@ -94,14 +89,15 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
         {
           ...state,
           loadingError: false,
-          languages: action.payload
+          language: action.payload
         },
         Cmd.list([Cmd.action(i18nActions.storeLanguages(action.payload))])
       )
     case actions.LOAD_LOCATIONS:
       return loop(
         {
-          ...state
+          ...state,
+          languageState: action.payload
         },
         Cmd.run<actions.LocationsFailedAction, actions.LocationsLoadedAction>(
           referenceApi.loadLocations,
@@ -158,11 +154,11 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
     case actions.FACILITIES_FAILED:
       locationLanguageState = formatLocationLanguageState(
         Object.values(state.locations),
-        initLanguages()
+        state.languageState
       )
       facilitesLanguageState = formatLocationLanguageState(
         Object.values(tempData.facilities),
-        initLanguages()
+        state.languageState
       )
       return loop(
         {
@@ -192,11 +188,11 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
 
       locationLanguageState = formatLocationLanguageState(
         Object.values(state.locations),
-        initLanguages()
+        state.languageState
       )
       facilitesLanguageState = formatLocationLanguageState(
         Object.values(action.payload),
-        initLanguages()
+        state.languageState
       )
 
       return loop(
@@ -215,7 +211,7 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
       return loop(
         {
           ...state,
-          healthFacilityFilterLocation: getUserLocation(
+          healthFacilityFilterLocation: getLocation(
             action.payload,
             window.config.HEALTH_FACILITY_FILTER
           )
@@ -270,15 +266,16 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
     case actions.FORMAT_LOCATIONS:
       locationLanguageState = formatLocationLanguageState(
         Object.values(state.locations),
-        initLanguages()
+        action.payload
       )
       facilitesLanguageState = formatLocationLanguageState(
         Object.values(state.facilities),
-        initLanguages()
+        action.payload
       )
       return loop(
         {
-          ...state
+          ...state,
+          languageState: action.payload
         },
         Cmd.list([
           Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
