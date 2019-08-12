@@ -1,7 +1,5 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@register/i18n/actions'
-// import { ENGLISH_STATE } from '@register/i18n/locales/en'
-//import { BENGALI_STATE } from '@register/i18n/locales/bn'
 import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
 import * as offlineActions from '@register/offline/actions'
 
