@@ -1426,7 +1426,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
