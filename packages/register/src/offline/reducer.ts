@@ -83,13 +83,14 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
   | Loop<IOfflineDataState, actions.Action | i18nActions.Action> => {
   let locationLanguageState: ILanguageState
   let facilitesLanguageState: ILanguageState
+
   switch (action.type) {
     case actions.LANGUAGES_LOADED:
-      return loop(
+      return loop<IOfflineDataState, any>(
         {
           ...state,
           loadingError: false,
-          language: action.payload
+          languages: action.payload
         },
         Cmd.list([Cmd.action(i18nActions.storeLanguages(action.payload))])
       )
@@ -231,11 +232,11 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
         offlineDataString ? offlineDataString : '{}'
       )
 
-      if (
-        offlineData.locations &&
-        offlineData.facilities &&
-        offlineData.languages
-      ) {
+      // @todo what is this condition?
+      const hasAllRequiredData =
+        offlineData.locations && offlineData.facilities && offlineData.languages
+
+      if (hasAllRequiredData) {
         return loop(
           {
             ...state,

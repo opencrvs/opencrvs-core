@@ -12,6 +12,7 @@ import { ReactWrapper } from 'enzyme'
 import { DuplicateDetails } from '@register/components/DuplicateDetails'
 import { clone } from 'lodash'
 import { SEARCH_RESULT } from '@register/navigation/routes'
+import { waitForElement, waitFor } from '@register/tests/wait-for-element'
 
 const assign = window.location.assign as jest.Mock
 
@@ -499,14 +500,11 @@ describe('Review Duplicates component', () => {
       graphqlMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-
-    testComponent.component.update()
-
-    expect(testComponent.component.find(DuplicateDetails)).toHaveLength(2)
+    const details = await waitForElement(
+      testComponent.component,
+      DuplicateDetails
+    )
+    expect(details).toHaveLength(2)
   })
 
   it('query gateway correctly and displays the returned duplicates correctly in case of minimal data', async () => {
@@ -524,14 +522,12 @@ describe('Review Duplicates component', () => {
       graphqlMockMinimal
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
+    const details = await waitForElement(
+      testComponent.component,
+      DuplicateDetails
+    )
 
-    testComponent.component.update()
-
-    expect(testComponent.component.find(DuplicateDetails)).toHaveLength(2)
+    expect(details).toHaveLength(2)
   })
 
   it('displays error text when the query to fetch duplicates fails', async () => {
@@ -584,19 +580,14 @@ describe('Review Duplicates component', () => {
       graphqlErrorMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    const error = await waitForElement(
+      testComponent.component,
+      '#duplicates-error-text'
+    )
 
-    testComponent.component.update()
-
-    expect(
-      testComponent.component
-        .find('#duplicates-error-text')
-        .children()
-        .text()
-    ).toBe('An error occurred while fetching data')
+    expect(error.children().text()).toBe(
+      'An error occurred while fetching data'
+    )
   })
 
   it('displays error text when the query to fetch the duplicates DETAILS fails', async () => {
@@ -626,19 +617,14 @@ describe('Review Duplicates component', () => {
       graphqlErrorMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    const error = await waitForElement(
+      testComponent.component,
+      '#duplicates-error-text'
+    )
 
-    testComponent.component.update()
-
-    expect(
-      testComponent.component
-        .find('#duplicates-error-text')
-        .children()
-        .text()
-    ).toBe('An error occurred while fetching data')
+    expect(error.children().text()).toBe(
+      'An error occurred while fetching data'
+    )
   })
   describe('reject for duplication', () => {
     let component: ReactWrapper<{}, {}>
@@ -657,11 +643,7 @@ describe('Review Duplicates component', () => {
         graphqlMock
       )
       component = testComponent.component
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
+      await waitForElement(component, '#review-duplicates-grid')
     })
     it('detail boxes are loaded properly', () => {
       expect(
@@ -870,7 +852,7 @@ describe('Review Duplicates component', () => {
       ).toHaveLength(0)
     })
 
-    it('successfully redirects to work queue if all duplicates removed', async () => {
+    it.only('successfully redirects to work queue if all duplicates removed', async () => {
       const mock = clone(graphqlMock)
       // @ts-ignore
       mock.push({
@@ -920,11 +902,16 @@ describe('Review Duplicates component', () => {
 
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 100)
+        setTimeout(resolve, 2100)
       })
       testComponent.component.update()
+      await waitFor(() => {
+        console.log(assign.mock.calls)
 
-      expect(assign).toBeCalledWith(SEARCH_RESULT)
+        return assign.mock.calls.length > 0
+      })
+
+      // expect(assign).toBeCalledWith(SEARCH_RESULT)
     })
 
     it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {

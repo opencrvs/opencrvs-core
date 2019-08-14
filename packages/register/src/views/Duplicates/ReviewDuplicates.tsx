@@ -395,7 +395,6 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               !data.fetchBirthRegistration.registration
             ) {
               Sentry.captureException(error)
-              console.error(error)
 
               return (
                 <ErrorText id="duplicates-error-text">
