@@ -31,8 +31,7 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "coverage",
-    "src/setupTests.ts"
+    "coverage"
   ],
   "extends": "./tsconfig.paths.json"
 }

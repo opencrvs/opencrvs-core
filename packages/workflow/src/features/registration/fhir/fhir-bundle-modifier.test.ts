@@ -560,7 +560,7 @@ describe('Verify fhir bundle modifier functions', () => {
         expect(taskResource.extension[3]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastLocation',
           valueReference: {
-            reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
+            reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd12yy'
           }
         })
       }

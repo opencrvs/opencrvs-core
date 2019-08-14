@@ -36,8 +36,8 @@ import { IApplication } from '@register/applications'
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
+  registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  registrarUnion: string | null
   parentQueryLoading?: boolean
   outboxApplications: IApplication[]
 }
@@ -182,14 +182,14 @@ class PrintTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, registrarUnion, parentQueryLoading } = this.props
+    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
 
     return (
       <Query
         query={SEARCH_EVENTS}
         variables={{
           status: [EVENT_STATUS.REGISTERED],
-          locationIds: [registrarUnion],
+          locationIds: [registrarLocationId],
           count: this.pageSize,
           skip: (this.state.printCurrentPage - 1) * this.pageSize
         }}
