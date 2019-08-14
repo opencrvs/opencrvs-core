@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from '@register/offline/reducer'
 import { getToken } from '@register/utils/authUtils'
@@ -17,7 +16,6 @@ async function loadLocations(): Promise<any> {
     `${window.config.COUNTRY}/locations`
   )
 
-  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -40,7 +38,6 @@ async function loadFacilities(): Promise<any> {
     window.config.RESOURCES_URL,
     `${window.config.COUNTRY}/facilities`
   )
-  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
