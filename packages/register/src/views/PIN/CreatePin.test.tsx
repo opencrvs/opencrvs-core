@@ -7,7 +7,7 @@ import { ReactWrapper } from 'enzyme'
 
 storage.setItem = jest.fn()
 
-describe('Create PIN view',  () => {
+describe('Create PIN view', () => {
   let c: ReactWrapper
 
   beforeEach(() => {

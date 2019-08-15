@@ -6,7 +6,7 @@ import { ReactWrapper } from 'enzyme'
 
 const { store } = createStore()
 
-describe('CreatePassword page tests',  () => {
+describe('CreatePassword page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     const testComponent = createTestComponent(

@@ -88,7 +88,7 @@ describe('Verify handlers', () => {
     })
   })
 
-  describe('When the request is made',  () => {
+  describe('When the request is made', () => {
     let token: string
     beforeEach(async () => {
       ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResult)
