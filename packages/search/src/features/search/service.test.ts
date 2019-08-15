@@ -1,7 +1,7 @@
 import { searchComposition } from '@search/features/search/service'
 import { client } from '@search/elasticsearch/client'
 
-describe('elasticsearch db helper', async () => {
+describe('elasticsearch db helper',  () => {
   it('should index a composition with proper configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
     const searchQuery = {

@@ -31,7 +31,7 @@ const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
-describe('ReviewForm tests', async () => {
+describe('ReviewForm tests',  () => {
   const { store, history } = createStore()
   const scope = ['register']
   const mock: any = jest.fn()

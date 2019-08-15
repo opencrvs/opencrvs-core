@@ -42,7 +42,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
-describe('SysAdminHome tests', async () => {
+describe('SysAdminHome tests',  () => {
   const { store } = createStore()
 
   beforeAll(() => {

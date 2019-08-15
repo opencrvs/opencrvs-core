@@ -46,7 +46,7 @@ import { getToken } from '@register/utils/authUtils'
 import { formMessages as messages } from '@register/i18n/messages'
 import * as profileSelectors from '@register/profile/profileSelectors'
 
-describe('when user logs in', async () => {
+describe('when user logs in',  () => {
   // Some mock data
 
   const draft1 = createApplication(Event.BIRTH)
@@ -197,7 +197,7 @@ describe('when user is in the register form before initial draft load', () => {
   })
 })
 
-describe('when user is in the register form for birth event', async () => {
+describe('when user is in the register form for birth event',  () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.BIRTH)
   store.dispatch(storeApplication(draft))
@@ -275,7 +275,7 @@ describe('when user is in the register form for birth event', async () => {
   })
 })
 
-describe('when user is in the register form for death event', async () => {
+describe('when user is in the register form for death event',  () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
   store.dispatch(setInitialApplications())
@@ -1042,7 +1042,7 @@ describe('when user is in the register form review section', () => {
   })
 })
 
-describe('When user is in Preview section death event', async () => {
+describe('When user is in Preview section death event',  () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
   store.dispatch(setInitialApplications())
@@ -1185,7 +1185,7 @@ describe('When user is in Preview section death event', async () => {
   })
 })
 
-describe('When user is in Preview section death event in offline mode', async () => {
+describe('When user is in Preview section death event in offline mode',  () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
   store.dispatch(setInitialApplications())

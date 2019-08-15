@@ -71,7 +71,7 @@ describe('Unlock page loads Properly', () => {
   })
 })
 
-describe('For wrong inputs', async () => {
+describe('For wrong inputs',  () => {
   const { store } = createStore()
   const testComponent = createTestComponent(
     <Unlock onCorrectPinMatch={() => null} />,
@@ -188,7 +188,7 @@ describe('For wrong inputs', async () => {
   })
 })
 
-describe('Logout Sequence', async () => {
+describe('Logout Sequence',  () => {
   const { store } = createStore()
   const redirect = jest.fn()
   const testComponent = createTestComponent(

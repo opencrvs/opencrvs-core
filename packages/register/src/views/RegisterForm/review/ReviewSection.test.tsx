@@ -21,6 +21,8 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { v4 as uuid } from 'uuid'
+import { waitForElement } from '@register/tests/wait-for-element'
+import { isMobileDevice } from '@register/utils/commonUtils'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
@@ -63,6 +65,10 @@ Object.defineProperty(window, 'outerWidth', {
   value: 1034
 })
 
+beforeEach(() => {
+  ;(isMobileDevice as jest.Mock).mockRestore()
+})
+
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
@@ -77,16 +83,12 @@ describe('when user is in the review page', () => {
       store
     )
     reviewSectionComponent = testComponent.component
+    await waitForElement(reviewSectionComponent, '#review_header')
   })
 
   it('Goes to child document while scroll to child section', async () => {
     window.dispatchEvent(new Event('scroll'))
-    await flushPromises()
-    reviewSectionComponent.update()
-
-    expect(
-      reviewSectionComponent.find('#document_section_child').hostNodes()
-    ).toHaveLength(1)
+    await waitForElement(reviewSectionComponent, '#document_section_child')
   })
 
   describe('when user clicks on change link', () => {

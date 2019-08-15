@@ -9,7 +9,7 @@ import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 
-describe('elasticsearch db helper', async () => {
+describe('elasticsearch db helper',  () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>
   let searchSpy: jest.SpyInstance<any, any[]>

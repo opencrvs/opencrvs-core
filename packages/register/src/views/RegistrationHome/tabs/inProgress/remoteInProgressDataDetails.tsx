@@ -127,9 +127,7 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
     const { locale } = this.props.intl
     const registration =
       data && data.fetchRegistration && data.fetchRegistration.registration
-    if (registration && registration.contact) {
-      console.log(registration.contact)
-    }
+
     return {
       informantRelation:
         registration &&
