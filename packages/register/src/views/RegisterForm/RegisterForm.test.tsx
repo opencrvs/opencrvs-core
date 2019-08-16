@@ -4,8 +4,7 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames,
-  flushPromises
+  mockDeathApplicationDataWithoutFirstNames
 } from '@register/tests/util'
 import { RegisterForm } from '@register/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -41,7 +40,6 @@ import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/querie
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
-import { getToken } from '@register/utils/authUtils'
 
 import { formMessages as messages } from '@register/i18n/messages'
 import * as profileSelectors from '@register/profile/profileSelectors'
