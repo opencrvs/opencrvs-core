@@ -1,5 +1,10 @@
 import { isMobileDevice } from '@register/utils/commonUtils'
+
 describe('Common Utils Test', () => {
+  beforeEach(() => {
+    ;(isMobileDevice as jest.Mock).mockRestore()
+  })
+
   it('Should simulate Mobile Devise', () => {
     const mobileDevise = isMobileDevice()
     expect(mobileDevise).toBe(true)

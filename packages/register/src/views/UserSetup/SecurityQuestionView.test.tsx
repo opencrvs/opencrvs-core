@@ -10,7 +10,7 @@ import * as React from 'react'
 
 const { store } = createStore()
 
-describe('Security Question Page', async () => {
+describe('Security Question Page', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     const testComponent = createTestComponent(

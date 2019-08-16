@@ -136,7 +136,8 @@ describe('when user is selecting the informant', () => {
       )
     })
   })
-
+  console.warn = () => {}
+  console.error = () => {}
   describe('when select both parents', () => {
     it('takes user to the select primary applicant view', () => {
       app

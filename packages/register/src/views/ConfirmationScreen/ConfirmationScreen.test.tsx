@@ -30,7 +30,6 @@ describe('when user is in the confirmation screen page for birth declaration', (
     fullNameInEng
   })
   beforeEach(async () => {
-    window.location.assign = jest.fn()
     const testComponent = createTestComponent(
       <ConfirmationScreen
         location={mock}
@@ -546,7 +545,7 @@ describe('when user is in the confirmation screen page for birth duplication', (
         .find('#go_to_duplicate_button')
         .first()
         .text()
-    ).toEqual(`Back to duplicate`)
+    ).toEqual(`Back to duplicates`)
   })
   it('Should redirect the user to the homepage', async () => {
     confirmationScreenComponent
