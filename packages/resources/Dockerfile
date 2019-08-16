@@ -9,10 +9,10 @@ COPY package.json package.json
 COPY packages/resources/package.json packages/resources/package.json
 COPY packages/commons/package.json packages/commons/package.json
 COPY yarn.lock yarn.lock
-RUN yarn install --prodction
+RUN yarn install --production
 
 # Copy package source
-COPY --from=opencrvs-build packages/resources/build packages/resources/build
+COPY --from=opencrvs-build packages/resources/src packages/resources/src
 
 # Copy dependant package(s) source
 COPY --from=opencrvs-build packages/commons packages/commons

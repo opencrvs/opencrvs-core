@@ -9,12 +9,5 @@ export async function languagesHandler(
   h: Hapi.ResponseToolkit
 ): Promise<ILanguageDataResponse> {
   const application = request.params.application
-  let result
-  try {
-    result = await getLanguages(application)
-  } catch (err) {
-    throw Error(err)
-  }
-
-  return result
+  return getLanguages(application)
 }

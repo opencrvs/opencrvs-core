@@ -9,15 +9,12 @@
     "test": "jest  --silent --noStackTrace && yarn test:compilation",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
     "prep:employees:bgd": "ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/prepare-source-employees.ts",
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
     "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts",
     "save:testData": "yarn prep:employees:bgd && yarn save:testLocations && yarn save:testEmployees",
-    "populate:bgd": "bash populateBgd.sh",
-    "build": "tsc",
-    "postbuild": "ef-tspm",
-    "build:clean": "rm -rf build"
+    "populate:bgd": "bash populateBgd.sh"
   },
   "devDependencies": {
     "csv2json": "^1.4.2",
