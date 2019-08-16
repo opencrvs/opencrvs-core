@@ -160,7 +160,13 @@ describe('return the correct label on dynamic fields', () => {
           statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
-        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        {
+          ...mockOfflineData,
+          offlineDataLoaded: true,
+          loadingError: false,
+          languages: [],
+          languageState: {}
+        },
         'bn'
       )
     ).toBe('চট্টগ্রাম')
@@ -175,7 +181,13 @@ describe('return the correct label on dynamic fields', () => {
           statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
-        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        {
+          ...mockOfflineData,
+          offlineDataLoaded: true,
+          loadingError: false,
+          languages: [],
+          languageState: {}
+        },
         'en'
       )
     ).toBe('Chittagong')
