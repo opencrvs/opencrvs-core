@@ -70,12 +70,7 @@ import {
   extractCommentFragmentValue
 } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
-import {
-  IGQLLocation,
-  IIdentifier,
-  IUserDetails,
-  getUserLocation
-} from '@register/utils/userUtils'
+import { IUserDetails, getUserLocation } from '@register/utils/userUtils'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
 import { Header } from '@register/components/interface/Header/Header'
