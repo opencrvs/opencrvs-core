@@ -867,7 +867,7 @@ describe('Review Duplicates component', () => {
         result: {
           data: {
             // @ts-ignore
-            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
+            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
           }
         }
       })
@@ -900,18 +900,9 @@ describe('Review Duplicates component', () => {
         .hostNodes()
         .simulate('click')
 
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 2100)
-      })
-      testComponent.component.update()
-      await waitFor(() => {
-        console.log(assign.mock.calls)
+      await waitFor(() => assign.mock.calls.length > 0)
 
-        return assign.mock.calls.length > 0
-      })
-
-      // expect(assign).toBeCalledWith(SEARCH_RESULT)
+      expect(assign).toBeCalledWith(SEARCH_RESULT)
     })
 
     it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {

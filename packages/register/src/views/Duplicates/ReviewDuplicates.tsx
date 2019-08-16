@@ -350,6 +350,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
 
   successfulDuplicateRemoval = (response: string) => {
     this.toggleNotDuplicateModal()
+
     if (response === this.state.selectedCompositionID) {
       window.location.assign(SEARCH_RESULT)
     } else {
@@ -548,9 +549,9 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             id: applicationId,
             duplicateId: this.state.selectedCompositionID
           }}
-          onCompleted={(data: any) =>
+          onCompleted={(data: any) => {
             this.successfulDuplicateRemoval(data.notADuplicate)
-          }
+          }}
         >
           {(submitNotADuplicateMutation: any, { data }: { data?: any }) => {
             return (

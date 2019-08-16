@@ -40,6 +40,17 @@ storage.getItem = storageGetItemMock
 storage.setItem = storageSetItemMock
 
 /*
+ * Console
+ */
+
+const warn = jest.fn()
+const error = jest.fn()
+const debug = jest.fn()
+console.warn = warn
+console.error = error
+console.debug = debug
+
+/*
  * GraphQL Queries
  */
 
@@ -106,6 +117,9 @@ beforeEach(() => {
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
   assign.mockClear()
+  warn.mockReset()
+  error.mockReset()
+  debug.mockReset()
 
   /*
    * Assign sane defaults for everything

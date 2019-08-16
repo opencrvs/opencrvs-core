@@ -68,6 +68,7 @@ export const intlReducer: LoopReducer<IntlState, any> = (
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language, state.languages)
+
       return {
         ...state,
         language: action.payload.language,

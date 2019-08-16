@@ -19,7 +19,12 @@ export async function waitFor(condition: () => boolean) {
         )
       }
 
-      if (condition()) {
+      let result = false
+      try {
+        result = condition()
+      } catch (err) {}
+
+      if (result) {
         clearInterval(intervalId)
         return resolve()
       }
