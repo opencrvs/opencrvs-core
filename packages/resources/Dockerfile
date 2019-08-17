@@ -6,6 +6,8 @@ ENV NPM_CONFIG_LOGLEVEL warn
 
 # Install npm dependencies first (so they may be cached if dependencies don't change)
 COPY package.json package.json
+COPY package.json package.json
+COPY packages/resources/tsconfig.json packages/resources/tsconfig.json
 COPY packages/resources/package.json packages/resources/package.json
 COPY packages/commons/package.json packages/commons/package.json
 COPY yarn.lock yarn.lock
