@@ -8,14 +8,25 @@ import { commonVFS } from '@register/pdfRenderer/common_vfs'
 import { fieldTransformers } from '@register/pdfRenderer/transformer'
 import {
   IIntLabelPayload,
-  IApplicantNamePayload
+  IApplicantNamePayload,
+  IFeildValuePayload,
+  IDateFeildValuePayload,
+  IConditionalIntLabelPayload
 } from '@register/pdfRenderer/transformer/types'
 import { InjectedIntl } from 'react-intl'
 import { IApplication } from '@register/applications'
+import { IUserDetails } from '@register/utils/userUtils'
+import { isUserDetailsDataBase } from '@register/pdfRenderer/transformer/utils'
 
 export interface IFieldTransformer {
   transformer: string
-  payload: IIntLabelPayload | IApplicantNamePayload
+  baseData?: string // deafult is application data
+  payload?:
+    | IIntLabelPayload
+    | IConditionalIntLabelPayload
+    | IApplicantNamePayload
+    | IFeildValuePayload
+    | IDateFeildValuePayload
 }
 
 export interface IPDFTemplate {
@@ -28,6 +39,7 @@ export interface IPDFTemplate {
 export function createPDF(
   template: IPDFTemplate,
   application: IApplication,
+  userDetails: IUserDetails,
   intl: InjectedIntl
 ): TCreatedPdf {
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
@@ -35,14 +47,30 @@ export function createPDF(
   if (template.transformers) {
     Object.keys(template.transformers).forEach(field => {
       if (template.transformers && template.transformers[field]) {
-        definitionString = definitionString.replace(
-          `{${field}}`,
-          // @ts-ignore
-          fieldTransformers[template.transformers[field].transformer](
-            application,
-            intl,
-            template.transformers[field].payload
+        const transformerDef = template.transformers[field]
+        // @ts-ignore
+        const transformFunction = fieldTransformers[transformerDef.transformer]
+        if (!transformFunction) {
+          throw new Error(
+            `No transform function found for given name: ${transformerDef.transformer}`
           )
+        }
+        definitionString = definitionString.replace(
+          new RegExp(`{${field}}`, 'gi'),
+          transformerDef.payload
+            ? transformFunction(
+                isUserDetailsDataBase(transformerDef)
+                  ? userDetails
+                  : application,
+                intl,
+                transformerDef.payload
+              )
+            : transformFunction(
+                isUserDetailsDataBase(transformerDef)
+                  ? userDetails
+                  : application,
+                intl
+              )
         )
       }
     })
@@ -57,7 +85,8 @@ export function createPDF(
 export function printPDF(
   template: IPDFTemplate,
   application: IApplication,
+  userDetails: IUserDetails,
   intl: InjectedIntl
 ) {
-  createPDF(template, application, intl).print()
+  createPDF(template, application, userDetails, intl).print()
 }

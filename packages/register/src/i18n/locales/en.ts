@@ -67,7 +67,9 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.receipt.amount': 'Amount paid: ',
     'certificate.receipt.header': 'Receipt for {event} certificate of',
-    'certificate.receipt.issuedAt': 'Issued at:',
+    'certificate.receipt.issuedAt': 'Issued at: ',
+    'certificate.receipt.issuedBy': 'By: ',
+    'certificate.receipt.issuedDate': 'Date of payment: ',
     'certificate.receipt.issuer':
       'By: {role}, {name}\n Date of payment: {dateOfPayment}',
     'certificate.receipt.service': 'Service: ',
@@ -1097,6 +1099,16 @@ export const ENGLISH_STATE: ILanguage = {
     'validations.validNationalId':
       'The National ID can only be numeric and must be {validLength} digits long',
     'validations.validPassportNumber':
-      'The Passport Number can only be alpha numeric and must be {validLength} characters long'
+      'The Passport Number can only be alpha numeric and must be {validLength} characters long',
+    'certificate.receipt.service1.birth':
+      'Birth registratin after 45 days of date of birth',
+    'certificate.receipt.service1.death':
+      'Death registratin after 45 days of date of death',
+    'certificate.receipt.service2.birth':
+      'Birth registratin after 5 years of date of birth',
+    'certificate.receipt.service2.death':
+      'Death registratin after 5 years of date of death',
+    'certificate.receipt.service1.amount': '\u09F3 25.00',
+    'certificate.receipt.service2.amount': '\u09F3 50.00'
   }
 }

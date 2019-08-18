@@ -455,7 +455,8 @@ class PrintCertificateActionComponent extends React.Component<
                     amount,
                     this.props.language,
                     event,
-                    this.props.draft
+                    this.props.draft,
+                    this.props.userDetails
                   )
                 }}
               />
@@ -820,7 +821,7 @@ class PrintCertificateActionComponent extends React.Component<
       const nameObj = userDetails.name.find(
         (storedName: GQLHumanName | null) => {
           const name = storedName as GQLHumanName
-          return name.use === language
+          return name.use === 'en'
         }
       ) as GQLHumanName
       fullName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`

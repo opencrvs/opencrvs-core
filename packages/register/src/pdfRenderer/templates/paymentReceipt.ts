@@ -44,11 +44,10 @@ export const template: IPDFTemplate = {
       },
       '\n\n\n\n',
       {
-        columns: [
+        text: [
           {
             text: '{issuedAtLabel}',
             font: 'notosans',
-            width: 58,
             style: 'subheader'
           },
           {
@@ -58,11 +57,10 @@ export const template: IPDFTemplate = {
         ]
       },
       {
-        columns: [
+        text: [
           {
             text: '{issuedByLabel}',
             font: 'notosans',
-            width: 20,
             style: 'subheader'
           },
           {
@@ -72,11 +70,10 @@ export const template: IPDFTemplate = {
         ]
       },
       {
-        columns: [
+        text: [
           {
             text: '{issuedDateLabel}',
             font: 'notosans',
-            width: 100,
             style: 'subheader'
           },
           {
@@ -132,7 +129,31 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    //    serviceDescription: {},
+    serviceDescription: {
+      transformer: 'getServiceLabel',
+      payload: {
+        '45d+birth': {
+          defaultMessage: 'Birth registratin after 45 days of date of birth',
+          description: 'Label for service 1 for birth',
+          id: 'certificate.receipt.service1.birth'
+        },
+        '45d+death': {
+          defaultMessage: 'Death registratin after 45 days of date of death',
+          description: 'Label for service 1 for death',
+          id: 'certificate.receipt.service1.death'
+        },
+        '5y+birth': {
+          defaultMessage: 'Birth registratin after 5 years of date of birth',
+          description: 'Label for service 2 for birth',
+          id: 'certificate.receipt.service2.birth'
+        },
+        '5y+death': {
+          defaultMessage: 'Death registratin after 5 years of date of death',
+          description: 'Label for service 2 for death',
+          id: 'certificate.receipt.service2.death'
+        }
+      }
+    },
     amountLabel: {
       transformer: 'getIntlLabel',
       payload: {
@@ -143,7 +164,21 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    //  amount: {},
+    amount: {
+      transformer: 'getServiceAmount',
+      payload: {
+        '45d+': {
+          defaultMessage: '\u09F3 25',
+          description: 'Amount for service 1',
+          id: 'certificate.receipt.service1.amount'
+        },
+        '5y+': {
+          defaultMessage: '\u09F3 50',
+          description: 'Amount for service 2',
+          id: 'certificate.receipt.service2.amount'
+        }
+      }
+    },
     issuedAtLabel: {
       transformer: 'getIntlLabel',
       payload: {
@@ -154,7 +189,13 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    //issuedLocation: {},
+    issuedLocation: {
+      transformer: 'getLoggedInUserFieldValue',
+      baseData: 'userdetails',
+      payload: {
+        valueKey: 'primaryOffice.name'
+      }
+    },
     issuedByLabel: {
       transformer: 'getIntlLabel',
       payload: {
@@ -165,7 +206,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    //issuedBy: {},
+    issuedBy: {
+      transformer: 'getLoggedInUserRoleAndName',
+      baseData: 'userdetails'
+    },
     issuedDateLabel: {
       transformer: 'getIntlLabel',
       payload: {
@@ -175,7 +219,12 @@ export const template: IPDFTemplate = {
           id: 'certificate.receipt.issuedDate'
         }
       }
+    },
+    issuedDate: {
+      transformer: 'getDateFieldValue',
+      payload: {
+        format: 'DD.MM.YYYY'
+      }
     }
-    //issuedDate: {}
   }
 }

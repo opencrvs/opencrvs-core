@@ -67,7 +67,9 @@ export const BENGALI_STATE: ILanguage = {
     'certificate.parent.details.label.typeOfID': 'আইডি প্রকার',
     'certificate.receipt.amount': 'পরিশোধিত মূল্য: ',
     'certificate.receipt.header': '{event} নিবন্ধন রশিদ',
-    'certificate.receipt.issuedAt': 'প্রদানের স্থান:',
+    'certificate.receipt.issuedAt': 'প্রদানের স্থান: ',
+    'certificate.receipt.issuedBy': 'দ্বারা: ',
+    'certificate.receipt.issuedDate': 'পেমেন্ট তারিখ: ',
     'certificate.receipt.issuer':
       'প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}',
     'certificate.receipt.service': 'সেবা: ',
@@ -1093,6 +1095,14 @@ export const BENGALI_STATE: ILanguage = {
     'validations.validNationalId':
       'জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না',
     'validations.validPassportNumber':
-      'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না'
+      'পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না',
+    'certificate.receipt.service1.birth': 'জন্মের ৪৫ দিনের পরে জন্ম নিবন্ধক',
+    'certificate.receipt.service1.death':
+      'মৃত্যুর ৪৫ দিনের পরে ডেথ রেজিস্ট্রেশন',
+    'certificate.receipt.service2.birth': 'জন্মের ৫ বছর পরে জন্ম নিবন্ধন',
+    'certificate.receipt.service2.death':
+      'মৃত্যুর তারিখের ৫ বছর পরে ডেথ রেজিস্ট্রেশন',
+    'certificate.receipt.service1.amount': '\u09F3 ২৫.০০',
+    'certificate.receipt.service2.amount': '\u09F3 ৫০.০০'
   }
 }
