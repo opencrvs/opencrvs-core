@@ -6,7 +6,16 @@ const schemaString = readFileSync(graphQLSchemaPath).toString()
 
 export function getSchema() {
   const schema = makeExecutableSchema({
-    typeDefs: schemaString
+    typeDefs: schemaString,
+    /*
+     * This disables the following warnings:
+     *
+     * Type "EventSearchSet" is missing a "resolveType" resolver.
+     * Pass false into "resolverValidationOptions.requireResolversForResolveType" to disable this warning.
+     */
+    resolverValidationOptions: {
+      requireResolversForResolveType: false
+    }
   })
 
   addMockFunctionsToSchema({
