@@ -1,16 +1,11 @@
 import { InjectedIntl } from 'react-intl'
 import pdfMake from 'pdfmake/build/pdfmake'
 import { commonVFS as pdfFonts } from '@register/pdfRenderer/common_vfs'
-import {
-  CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT,
-  CERTIFICATE_DATE_FORMAT
-} from '@register/utils/constants'
+import { CERTIFICATE_DATE_FORMAT } from '@register/utils/constants'
 import moment from 'moment'
 import 'moment/locale/bn'
 import 'moment/locale/en-ie'
 import { Event } from '@register/forms'
-import { messages } from '@register/i18n/messages/views/certificate'
-import { constantsMessages } from '@register/i18n/messages'
 import { printPDF } from '@register/pdfRenderer'
 import { template as receiptTemplate } from '@register/pdfRenderer/templates/paymentReceipt'
 import { IApplication } from '@register/applications'
@@ -71,118 +66,11 @@ const certificateDefinitionText = {
   }
 }
 
-interface IDefinitionMap {
-  [key: string]: any
-}
-
-const moneyReceiptDefinitionText = (event: string, intl: InjectedIntl) => {
-  const definitionMap: IDefinitionMap = {
-    [Event.BIRTH]: {
-      EVENT: intl.formatMessage(constantsMessages.birth),
-      DOE: intl.formatMessage(constantsMessages.dob)
-    },
-    [Event.DEATH]: {
-      EVENT: intl.formatMessage(constantsMessages.death),
-      DOE: intl.formatMessage(constantsMessages.dod)
-    },
-    DEAFULT: {
-      EVENT: '',
-      DOE: ''
-    }
-  }
-
-  return event in definitionMap ? definitionMap[event] : definitionMap.DEAFULT
-}
-
 export function generateMoneyReceipt(
   intl: InjectedIntl,
-  registrant: Registrant,
-  IssuerDetails: Issuer,
-  amount: string,
-  language: string,
-  event: string,
   application: IApplication,
   userDetails: IUserDetails | null
 ) {
-  moment.locale(language)
-  const eventText = moneyReceiptDefinitionText(event, intl).EVENT
-  const DOE = moneyReceiptDefinitionText(event, intl).DOE
-  const dateOfPayment = moment().format(CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT)
-
-  const docDefinition = {
-    info: {
-      title: `Receipt-for-${event}-certificate`
-    },
-    defaultStyle: {
-      font: 'notosans'
-    },
-    content: [
-      {
-        text: intl.formatMessage(messages.certificateReceiptHeader, {
-          event: eventText
-        }),
-        style: 'header'
-      },
-      {
-        text: registrant.name,
-        style: 'header'
-      },
-      '\n\n',
-      {
-        text: [
-          {
-            text: intl.formatMessage(messages.receiptService, {
-              event: eventText
-            })
-          },
-          {
-            text: intl.formatMessage(messages.certificateReceiptSubHeader, {
-              event: eventText,
-              DOBDiff: registrant.DOBDiff,
-              DOE
-            }),
-            style: 'subheader'
-          }
-        ]
-      },
-      intl.formatMessage(messages.receiptPaidAmount),
-      {
-        text: `${amount}\n\n`,
-        style: 'amount'
-      },
-      {
-        columns: [
-          {
-            text: intl.formatMessage(messages.receiptIssuedAt),
-            font: 'notosans',
-            width: 65
-          },
-          {
-            text: IssuerDetails.issuedAt,
-            font: 'notosanslocation'
-          }
-        ]
-      },
-      intl.formatMessage(messages.receiptIssuer, {
-        role: IssuerDetails.role,
-        name: IssuerDetails.name,
-        dateOfPayment
-      })
-    ],
-    styles: {
-      header: {
-        fontSize: 18
-      },
-      amount: {
-        font: 'notosanscurrency',
-        fontSize: 30,
-        bold: true
-      },
-      subheader: {
-        bold: true
-      }
-    }
-  }
   if (!userDetails) {
     throw new Error('No user details found')
   }

@@ -1,8 +1,13 @@
-import { IPDFTemplate } from '@register/pdfRenderer'
+import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 import { localFonts } from '@register/pdfRenderer/templates/localFonts'
 
 export const template: IPDFTemplate = {
   definition: {
+    pageSize: {
+      // A5 document size
+      width: 419.528,
+      height: 595.276
+    },
     info: {
       title: 'Payment receipt'
     },
@@ -20,27 +25,44 @@ export const template: IPDFTemplate = {
       },
       '\n\n',
       {
-        text: [
-          {
-            text: '{serviceTitle}',
-            style: 'subheader'
-          },
-          {
-            text: '{serviceDescription}'
-          }
-        ]
-      },
-      {
-        text: [
-          {
-            text: '{amountLabel}',
-            style: 'subheader'
-          },
-          {
-            text: '{amount}',
-            style: 'amount'
-          }
-        ]
+        table: {
+          widths: ['100%'],
+          body: [
+            [
+              {
+                margin: [15, 15, 15, 0],
+                border: [false, false, false, false],
+                fillColor: '#F2F3F4',
+                text: [
+                  {
+                    text: '{serviceTitle}',
+                    style: 'subheader'
+                  },
+                  {
+                    text: '{serviceDescription}'
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                margin: [15, 0, 15, 15],
+                border: [false, false, false, false],
+                fillColor: '#F2F3F4',
+                text: [
+                  {
+                    text: '{amountLabel}',
+                    style: 'subheader'
+                  },
+                  {
+                    text: '{amount}',
+                    style: 'amount'
+                  }
+                ]
+              }
+            ]
+          ]
+        }
       },
       '\n\n\n\n',
       {
@@ -100,10 +122,10 @@ export const template: IPDFTemplate = {
   vfs: localFonts.vfs,
   transformers: {
     header: {
-      transformer: 'getIntlLabel',
+      transformer: 'IntlLabel',
       payload: {
         messageDescriptor: {
-          defaultMessage: 'Receipt for {event} certificate of',
+          defaultMessage: 'Receipt for {event} Certificate of',
           description: 'Receipt header for payment on certificate',
           id: 'certificate.receipt.header'
         },
@@ -113,14 +135,20 @@ export const template: IPDFTemplate = {
       }
     },
     registrantName: {
-      transformer: 'getApplicantName',
+      transformer: 'ApplicantName',
       payload: {
-        bn: ['firstNames', 'familyName'],
-        en: ['firstNamesEng', 'familyNameEng']
+        key: {
+          birth: 'child',
+          death: 'deceased'
+        },
+        format: {
+          bn: ['firstNames', 'familyName'],
+          en: ['firstNamesEng', 'familyNameEng']
+        }
       }
     },
     serviceTitle: {
-      transformer: 'getIntlLabel',
+      transformer: 'IntlLabel',
       payload: {
         messageDescriptor: {
           defaultMessage: 'Service:',
@@ -130,7 +158,7 @@ export const template: IPDFTemplate = {
       }
     },
     serviceDescription: {
-      transformer: 'getServiceLabel',
+      transformer: 'ServiceLabel',
       payload: {
         '45d+birth': {
           defaultMessage: 'Birth registratin after 45 days of date of birth',
@@ -155,7 +183,7 @@ export const template: IPDFTemplate = {
       }
     },
     amountLabel: {
-      transformer: 'getIntlLabel',
+      transformer: 'IntlLabel',
       payload: {
         messageDescriptor: {
           defaultMessage: 'Amount paid: ',
@@ -165,7 +193,7 @@ export const template: IPDFTemplate = {
       }
     },
     amount: {
-      transformer: 'getServiceAmount',
+      transformer: 'ServiceAmount',
       payload: {
         '45d+': {
           defaultMessage: '\u09F3 25',
@@ -180,7 +208,7 @@ export const template: IPDFTemplate = {
       }
     },
     issuedAtLabel: {
-      transformer: 'getIntlLabel',
+      transformer: 'IntlLabel',
       payload: {
         messageDescriptor: {
           defaultMessage: 'Issued at:',
@@ -190,14 +218,14 @@ export const template: IPDFTemplate = {
       }
     },
     issuedLocation: {
-      transformer: 'getLoggedInUserFieldValue',
+      transformer: 'LoggedInUserFieldValue',
       baseData: 'userdetails',
       payload: {
         valueKey: 'primaryOffice.name'
       }
     },
     issuedByLabel: {
-      transformer: 'getIntlLabel',
+      transformer: 'IntlLabel',
       payload: {
         messageDescriptor: {
           defaultMessage: 'By:',
@@ -207,11 +235,11 @@ export const template: IPDFTemplate = {
       }
     },
     issuedBy: {
-      transformer: 'getLoggedInUserRoleAndName',
+      transformer: 'LoggedInUserRoleAndName',
       baseData: 'userdetails'
     },
     issuedDateLabel: {
-      transformer: 'getIntlLabel',
+      transformer: 'IntlLabel',
       payload: {
         messageDescriptor: {
           defaultMessage: 'Date of payment:',
@@ -221,7 +249,7 @@ export const template: IPDFTemplate = {
       }
     },
     issuedDate: {
-      transformer: 'getDateFieldValue',
+      transformer: 'DateFieldValue',
       payload: {
         format: 'DD.MM.YYYY'
       }

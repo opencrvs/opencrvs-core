@@ -1,41 +1,18 @@
-import pdfMake, {
-  TDocumentDefinitions,
-  TFontFamily,
-  TFontFamilyTypes,
-  TCreatedPdf
-} from 'pdfmake/build/pdfmake'
+import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { commonVFS } from '@register/pdfRenderer/common_vfs'
-import { fieldTransformers } from '@register/pdfRenderer/transformer'
+import { transformers } from '@register/pdfRenderer/transformer'
 import {
-  IIntLabelPayload,
-  IApplicantNamePayload,
-  IFeildValuePayload,
-  IDateFeildValuePayload,
-  IConditionalIntLabelPayload
+  IPDFTemplate,
+  TransformerData
 } from '@register/pdfRenderer/transformer/types'
 import { InjectedIntl } from 'react-intl'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
 import { isUserDetailsDataBase } from '@register/pdfRenderer/transformer/utils'
 
-export interface IFieldTransformer {
-  transformer: string
-  baseData?: string // deafult is application data
-  payload?:
-    | IIntLabelPayload
-    | IConditionalIntLabelPayload
-    | IApplicantNamePayload
-    | IFeildValuePayload
-    | IDateFeildValuePayload
-}
-
-export interface IPDFTemplate {
-  definition: TDocumentDefinitions
-  fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
-  vfs: TFontFamily
-  transformers?: { [field: string]: IFieldTransformer }
-}
-
+/*
+  Converts template definition into actual PDF using defined transformers, applicationData and userDetails
+*/
 export function createPDF(
   template: IPDFTemplate,
   application: IApplication,
@@ -48,29 +25,18 @@ export function createPDF(
     Object.keys(template.transformers).forEach(field => {
       if (template.transformers && template.transformers[field]) {
         const transformerDef = template.transformers[field]
-        // @ts-ignore
-        const transformFunction = fieldTransformers[transformerDef.transformer]
+        const transformFunction = transformers[transformerDef.transformer]
         if (!transformFunction) {
           throw new Error(
             `No transform function found for given name: ${transformerDef.transformer}`
           )
         }
+        const transformerData = (isUserDetailsDataBase(transformerDef)
+          ? userDetails
+          : application) as TransformerData
         definitionString = definitionString.replace(
           new RegExp(`{${field}}`, 'gi'),
-          transformerDef.payload
-            ? transformFunction(
-                isUserDetailsDataBase(transformerDef)
-                  ? userDetails
-                  : application,
-                intl,
-                transformerDef.payload
-              )
-            : transformFunction(
-                isUserDetailsDataBase(transformerDef)
-                  ? userDetails
-                  : application,
-                intl
-              )
+          transformFunction(transformerData, intl, transformerDef.payload) || ''
         )
       }
     })

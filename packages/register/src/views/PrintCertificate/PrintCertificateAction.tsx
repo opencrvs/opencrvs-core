@@ -450,11 +450,6 @@ class PrintCertificateActionComponent extends React.Component<
                 onClick={() => {
                   generateMoneyReceipt(
                     intl,
-                    registrant,
-                    issuerDetails,
-                    amount,
-                    this.props.language,
-                    event,
                     this.props.draft,
                     this.props.userDetails
                   )

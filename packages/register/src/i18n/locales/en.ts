@@ -66,7 +66,7 @@ export const ENGLISH_STATE: ILanguage = {
     'certificate.parent.details.label.number': 'Number',
     'certificate.parent.details.label.typeOfID': 'Type of ID',
     'certificate.receipt.amount': 'Amount paid: ',
-    'certificate.receipt.header': 'Receipt for {event} certificate of',
+    'certificate.receipt.header': 'Receipt for {event} Certificate of',
     'certificate.receipt.issuedAt': 'Issued at: ',
     'certificate.receipt.issuedBy': 'By: ',
     'certificate.receipt.issuedDate': 'Date of payment: ',
