@@ -1,6 +1,7 @@
 const colorDictionary = {
   blackStormy: '#35495D',
   blueDeepSea: '#4C68C1',
+  blueDeepSeaLight: '#F1F3FA',
   blueBabyBaby: '#5E93ED',
   purpleDrafty: '#8049B7',
   orangeAmber: '#F1B162',
@@ -71,5 +72,8 @@ export const colors = {
   dividerDark: colorDictionary.greySmoky,
 
   // Light Grey background
-  lightGreyBackground: colorDictionary.lightGrey
+  lightGreyBackground: colorDictionary.lightGrey,
+
+  // Deep sea light background
+  blueDeepSeaLight: colorDictionary.blueDeepSeaLight
 }

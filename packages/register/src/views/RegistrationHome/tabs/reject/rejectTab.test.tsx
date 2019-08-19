@@ -20,6 +20,7 @@ import {
 } from '@register/views/RegistrationHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -160,7 +161,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         error: new Error('boom')
@@ -206,7 +207,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
@@ -240,18 +241,9 @@ describe('RegistrationHome sent for update tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    const tab = await waitForElement(testComponent.component, '#tab_updates')
 
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_updates')
-        .hostNodes()
-        .text()
-    ).toContain('Sent for updates (5)')
+    expect(tab.hostNodes().text()).toContain('Sent for updates (5)')
   })
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
@@ -262,7 +254,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -349,12 +341,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+    const data = table.prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
@@ -366,8 +354,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
-
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -378,7 +364,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -409,14 +395,10 @@ describe('RegistrationHome sent for update tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+
+    const data = table.prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar in sent for update tab if items more than 11', async () => {
@@ -426,7 +408,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -451,23 +433,13 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
-    expect(
-      testComponent.component.find('#pagination').hostNodes()
-    ).toHaveLength(1)
+    await waitForElement(testComponent.component, '#pagination')
 
     testComponent.component
       .find('#pagination button')
       .last()
       .hostNodes()
       .simulate('click')
-
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for required updates', async () => {
@@ -478,7 +450,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -671,7 +643,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -815,7 +787,7 @@ describe('Tablet tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }

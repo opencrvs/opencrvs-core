@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { IFileValue } from '@register/forms'
-
+import { IFileValue, IAttachmentValue } from '@register/forms'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
 import PanViewer from '@opencrvs/components/lib/interface/components/PanViewer'
@@ -49,15 +48,16 @@ const BackButton = styled.button`
   cursor: pointer;
 `
 type IProps = {
-  previewImage: IFileValue
+  previewImage: IFileValue | IAttachmentValue
+  disableDelete?: boolean
   title?: string
   goBack: () => void
-  onDelete: (image: IFileValue) => void
+  onDelete: (image: IFileValue | IAttachmentValue) => void
 }
 
 export class DocumentPreview extends React.Component<IProps> {
   render = () => {
-    const { previewImage, title, goBack, onDelete } = this.props
+    const { previewImage, title, goBack, onDelete, disableDelete } = this.props
     return (
       <PreviewContainer id="preview_image_field">
         <PreviewContainerHeader>
@@ -65,12 +65,14 @@ export class DocumentPreview extends React.Component<IProps> {
             <ArrowBack />
             <Title>{title}</Title>
           </BackButton>
-          <span>
-            <Button
-              icon={() => <Delete color="white" />}
-              onClick={() => onDelete(previewImage)}
-            />
-          </span>
+          {!disableDelete && (
+            <span>
+              <Button
+                icon={() => <Delete color="white" />}
+                onClick={() => onDelete(previewImage)}
+              />
+            </span>
+          )}
         </PreviewContainerHeader>
         <ImageHolder>
           {previewImage.data && (

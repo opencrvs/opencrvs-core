@@ -7,10 +7,11 @@ import {
   QUESTION_KEYS
 } from '@register/i18n/messages'
 import styled from 'styled-components'
-import { TextInput, Select } from '@opencrvs/components/lib/forms'
+import { TextInput, Select, InputError } from '@opencrvs/components/lib/forms'
 import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { H4 } from '@opencrvs/components/lib/typography/Headings'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
@@ -49,8 +50,8 @@ const H3 = styled.h3`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 const P = styled.p`
-  margin-bottom: 37px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.copy};
+  margin: 16px 0 24px;
 `
 const QuestionWrapper = styled.div`
   margin-bottom: 66px;
@@ -61,6 +62,11 @@ const Wrapper = styled.div`
   flex-flow: column;
   margin-bottom: 20px;
 `
+const Label = styled.label`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  margin: 0 0 6px 0;
+`
+
 const FullWidthSelect = styled(Select)`
   width: 70%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -233,12 +239,12 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
             return (
               <QuestionWrapper id={`question-${index}-wrapper`} key={index}>
                 <Wrapper>
-                  <label>
+                  <Label>
                     {intl.formatMessage(messages.securityQuestionLabel, {
                       count: index + 1
                     })}
                     <Error>*</Error>
-                  </label>
+                  </Label>
                   <FullWidthSelect
                     id={`question-${index}`}
                     onChange={(value: string) =>
@@ -253,16 +259,19 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                     touched={this.state.showError}
                   />
                   {this.state.showError && !questionnaire.selectedQuestion && (
-                    <Error id={`question-${index}-validation-message`}>
+                    <InputError
+                      id={`question-${index}-validation-message`}
+                      centred={false}
+                    >
                       {intl.formatMessage(messages.selectSecurityQuestion)}
-                    </Error>
+                    </InputError>
                   )}
                 </Wrapper>
                 <Wrapper>
-                  <label>
+                  <Label>
                     {intl.formatMessage(messages.answer)}
                     <Error>*</Error>
-                  </label>
+                  </Label>
                   <FullWidthInput
                     id={`answer-${index}`}
                     onChange={answer => this.onAnswerChange(answer, index)}
@@ -275,9 +284,12 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
                   />
                   {this.state.showError &&
                     !this.state.questionnaire[index].answer && (
-                      <Error id={`answer-${index}-validation-message`}>
+                      <InputError
+                        id={`answer-${index}-validation-message`}
+                        centred={false}
+                      >
                         {intl.formatMessage(messages.enterResponse)}
-                      </Error>
+                      </InputError>
                     )}
                 </Wrapper>
               </QuestionWrapper>
@@ -304,7 +316,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         }}
         title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
       >
-        <H3>{intl.formatMessage(messages.userFormSecurityQuestionsHeading)}</H3>
+        <H4>{intl.formatMessage(messages.userFormSecurityQuestionsHeading)}</H4>
         <P>
           {intl.formatMessage(messages.userFormSecurityQuestionsDescription)}
         </P>

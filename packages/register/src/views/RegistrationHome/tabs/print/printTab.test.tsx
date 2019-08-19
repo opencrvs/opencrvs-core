@@ -160,7 +160,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         error: new Error('boom')
@@ -206,7 +206,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
@@ -263,7 +263,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REGISTERED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -379,7 +379,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REGISTERED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -428,7 +428,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REGISTERED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -480,7 +480,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REGISTERED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -671,7 +671,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REJECTED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -797,7 +797,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
@@ -816,7 +816,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REGISTERED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -945,7 +945,7 @@ describe('Tablet tests', () => {
         request: {
           query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['123456789']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
@@ -964,7 +964,7 @@ describe('Tablet tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             status: [EVENT_STATUS.REGISTERED],
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
             skip: 0
           }
@@ -1069,7 +1069,7 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    console.log(testComponent.component.debug())
+
     testComponent.component.unmount()
   })
 })

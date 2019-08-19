@@ -5,15 +5,25 @@ import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
+import { IFormSection, ISerializedFormSection } from '@register/forms'
 
 const { store } = createStore()
+
+function deserializeFormSection(form: ISerializedFormSection): IFormSection {
+  return null as any
+}
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(() => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <UserForm section={userSection} />,
+      <UserForm
+        section={deserializeFormSection(userSection)}
+        activeGroup={deserializeFormSection(userSection).groups[0]}
+        nextGroupId="preview-user-view-group"
+        nextSectionId="preview"
+      />,
       store
     )
     component = testComponent.component

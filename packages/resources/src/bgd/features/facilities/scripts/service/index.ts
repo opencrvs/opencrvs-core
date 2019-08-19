@@ -68,7 +68,7 @@ export function generateLocationResource(
   const loc = {} as ILocation
   loc.id = fhirLocation.id
   loc.name = fhirLocation.name
-  loc.nameBn = fhirLocation.alias && fhirLocation.alias[0]
+  loc.alias = fhirLocation.alias && fhirLocation.alias[0]
   loc.physicalType =
     fhirLocation.physicalType &&
     fhirLocation.physicalType.coding &&

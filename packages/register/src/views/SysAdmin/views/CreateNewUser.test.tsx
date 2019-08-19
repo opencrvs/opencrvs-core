@@ -9,8 +9,10 @@ import {
   mockIncompleteFormData,
   mockCompleteFormData,
   mockUserGraphqlOperation,
-  mockFetchRoleGraphqlOperation
+  mockFetchRoleGraphqlOperation,
+  mockDataWithRegistarRoleSelected
 } from '@register/views/SysAdmin/user/utils'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 describe('create new user tests', () => {
   const { store, history } = createStore()
@@ -23,7 +25,8 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user'
+              sectionId: 'user',
+              groupId: userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -57,7 +60,7 @@ describe('create new user tests', () => {
           .find('#phoneNumber_error')
           .hostNodes()
           .text()
-      ).toBe('Required for registration')
+      ).toBe('Required')
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
@@ -76,6 +79,25 @@ describe('create new user tests', () => {
 
       expect(history.location.pathname).toContain('preview')
     })
+
+    it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+
+      testComponent
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+
+      expect(history.location.pathname).toContain(
+        '/createUser/user/signature-attachment'
+      )
+    })
   })
 
   describe('when user in review page', () => {
@@ -86,7 +108,8 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'preview'
+              sectionId: 'preview',
+              groupId: 'preview-' + userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -113,7 +136,7 @@ describe('create new user tests', () => {
         .hostNodes()
         .simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user')
+      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
       expect(history.location.hash).toBe('#familyNameEng')
     })
 

@@ -95,7 +95,10 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <StyledContainer className={PAGE_TRANSITIONS_CLASSNAME}>
+      <StyledContainer
+        id="select-vital-event-view"
+        className={PAGE_TRANSITIONS_CLASSNAME}
+      >
         <Container>
           <EventTopBar
             title={intl.formatMessage(messages.registerNewEventTitle)}

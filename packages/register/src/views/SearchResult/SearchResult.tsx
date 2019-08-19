@@ -73,7 +73,8 @@ import { formatLongDate } from '@register/utils/date-formatting'
 import {
   IGQLLocation,
   IIdentifier,
-  IUserDetails
+  IUserDetails,
+  getUserLocation
 } from '@register/utils/userUtils'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/SearchResult/queries'
@@ -706,26 +707,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     return this.props.scope && this.props.scope.includes('certify')
   }
 
-  getLocalLocationId() {
-    const area = this.props.userDetails && this.props.userDetails.catchmentArea
-    const identifier =
-      area &&
-      area.find((location: IGQLLocation) => {
-        return (
-          (location.identifier &&
-            location.identifier.find((areaIdentifier: IIdentifier) => {
-              return (
-                areaIdentifier.system.endsWith('jurisdiction-type') &&
-                areaIdentifier.value === 'UNION'
-              )
-            })) !== undefined
-        )
-      })
-
-    return identifier && identifier.id
-  }
   render() {
-    const { intl, match } = this.props
+    const { intl, match, userDetails } = this.props
     const { searchText, searchType } = match.params
     return (
       <>
@@ -741,7 +724,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
               <Query
                 query={SEARCH_EVENTS}
                 variables={{
-                  locationIds: [this.getLocalLocationId()],
+                  locationIds: userDetails
+                    ? [getUserLocation(userDetails).id]
+                    : [],
                   sort: SEARCH_RESULT_SORT,
                   trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                   registrationNumber:

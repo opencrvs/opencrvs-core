@@ -4,7 +4,8 @@ import {
   SEARCH_FIELD,
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
-  ISerializedFormSection
+  ISerializedFormSection,
+  SIMPLE_DOCUMENT_UPLOADER
 } from '@register/forms'
 
 import { NATIONAL_ID } from '@register/forms/identity'
@@ -12,6 +13,7 @@ import {
   constantsMessages,
   formMessages as messages
 } from '@register/i18n/messages'
+import { conditionals } from '@register/forms/utils'
 
 export const userSection: ISerializedFormSection = {
   id: 'user',
@@ -172,6 +174,33 @@ export const userSection: ISerializedFormSection = {
               parameters: ['primaryOffice']
             }
           }
+        }
+      ]
+    },
+    {
+      id: 'signature-attachment',
+      title: messages.userSignatureAttachmentTitle,
+      conditionals: [conditionals.isRegistrarRoleSelected],
+      fields: [
+        {
+          name: 'attachmentTitle',
+          type: FIELD_GROUP_TITLE,
+          hidden: true,
+          label: messages.userAttachmentSection,
+          required: false,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'signature',
+          type: SIMPLE_DOCUMENT_UPLOADER,
+          label: messages.userSignatureAttachment,
+          description: messages.userSignatureAttachmentDesc,
+          allowedDocType: ['image/png'],
+          initialValue: '',
+          required: true,
+          hideAsterisk: true,
+          validate: []
         }
       ]
     }

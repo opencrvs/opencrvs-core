@@ -3,9 +3,8 @@ import * as fs from 'fs'
 import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { ENGLISH_STATE } from '@register/i18n/locales/en'
-import { BENGALI_STATE } from '@register/i18n/locales/bn'
 import { Parser } from 'json2csv'
+import { ILanguage } from '@register/i18n/reducer'
 
 interface ITranslationCSVItem {
   Translation_Key: string
@@ -43,6 +42,13 @@ function buildTranslationsCSVData(
 }
 
 async function extractMessages() {
+  const register = JSON.parse(
+    fs
+      .readFileSync(
+        '../resources/src/bgd/features/languages/generated/register.json'
+      )
+      .toString()
+  )
   let results: any[] = []
   const pattern = 'src/**/*.@(tsx|ts)'
   try {
@@ -65,9 +71,12 @@ async function extractMessages() {
           description: r.description
         }
       })
-
-      const englishTranslations = ENGLISH_STATE.messages
-      const bengaliTranslations = BENGALI_STATE.messages
+      const englishTranslations = register.data.find(
+        (obj: ILanguage) => obj.lang === 'en'
+      ).messages
+      const bengaliTranslations = register.data.find(
+        (obj: ILanguage) => obj.lang === 'bn'
+      ).messages
       let missingKeys = false
 
       Object.keys(reactIntlSource).forEach(key => {
@@ -76,9 +85,11 @@ async function extractMessages() {
           // eslint-disable-line no-console
           console.log(
             `${chalk.red(
-              `No translation key exists for message id: ${chalk.white(
+              `No English translation key exists for message id: ${chalk.white(
                 key
-              )} in ${chalk.white('locales/en.ts')}`
+              )} in ${chalk.white(
+                'resources/src/bgd/features/languages/generated/register.json'
+              )}`
             )}`
           )
         }
@@ -87,9 +98,11 @@ async function extractMessages() {
           // eslint-disable-line no-console
           console.log(
             `${chalk.redBright(
-              `No translation key exists for message id: ${chalk.white(
+              `No Bengali translation key exists for message id: ${chalk.white(
                 key
-              )} in ${chalk.yellow(`locales/bn.ts`)}`
+              )} in ${chalk.yellow(
+                `resources/src/bgd/features/languages/generated/register.json`
+              )}`
             )}`
           )
         }
@@ -112,11 +125,17 @@ async function extractMessages() {
       const bengaliLanguageCSV = json2csvParser.parse(
         buildTranslationsCSVData(bengaliTranslations, reactIntlSource)
       )
-      fs.writeFileSync(`src/i18n/locales/bn.csv`, bengaliLanguageCSV)
+      fs.writeFileSync(
+        `../resources/src/bgd/features/languages/generated/bn.csv`,
+        bengaliLanguageCSV
+      )
       const englishLanguageCSV = json2csvParser.parse(
         buildTranslationsCSVData(englishTranslations, reactIntlSource)
       )
-      fs.writeFileSync(`src/i18n/locales/en.csv`, englishLanguageCSV)
+      fs.writeFileSync(
+        `../resources/src/bgd/features/languages/generated/en.csv`,
+        englishLanguageCSV
+      )
     })
   } catch (err) {
     // eslint-disable-line no-console

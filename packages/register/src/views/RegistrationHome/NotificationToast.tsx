@@ -36,11 +36,13 @@ class NotificationToast extends React.Component<IFullProps> {
     const outboxData = this.props.application.filter(
       item =>
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT ||
-        item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
         item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
+        item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY ||
+        item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
         item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
         item.submissionStatus === SUBMISSION_STATUS.REJECTING ||
+        item.submissionStatus === SUBMISSION_STATUS.CERTIFYING ||
         item.submissionStatus === SUBMISSION_STATUS.FAILED_NETWORK
     )
 

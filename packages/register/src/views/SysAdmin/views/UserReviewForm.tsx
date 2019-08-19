@@ -8,7 +8,9 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  ISerializedFormSection
+  ISerializedFormSection,
+  SIMPLE_DOCUMENT_UPLOADER,
+  IAttachmentValue
 } from '@register/forms'
 import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
@@ -27,7 +29,8 @@ import {
   userMessages,
   buttonMessages as messages
 } from '@register/i18n/messages'
-import { getSectionFields } from '@register/forms/utils'
+import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
+import { SimpleDocumentUploader } from '@register/components/form/DocumentUploadfield/SimpleDocumentUploader'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -36,7 +39,7 @@ export interface IUserReviewFormProps {
 }
 
 interface IDispatchProps {
-  goToCreateUserSection: (sec: string, fieldName: string) => void
+  goToCreateUserSection: typeof goToCreateUserSection
   submitForm: () => void
   goBack: typeof goBack
 }
@@ -48,26 +51,44 @@ interface ISectionData {
 
 type IFullProps = IUserReviewFormProps & InjectedIntlProps
 
+function deserializeFormSection(form: ISerializedFormSection): IFormSection {
+  return null as any
+}
+
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
   transformSectionData = () => {
-    const { intl, section } = this.props
+    const { intl } = this.props
     const sections: ISectionData[] = []
-    getSectionFields(section).forEach((field: IFormField) => {
-      if (field && field.type === FIELD_GROUP_TITLE) {
-        sections.push({ title: intl.formatMessage(field.label), items: [] })
-      } else if (field && sections.length > 0) {
-        sections[sections.length - 1].items.push({
-          label: intl.formatMessage(field.label),
-          value: this.getValue(field),
-          action: {
-            id: `btn_change_${field.name}`,
-            label: intl.formatMessage(messages.change),
-            handler: () => this.props.goToCreateUserSection('user', field.name)
-          }
-        })
-      }
+
+    getVisibleSectionGroupsBasedOnConditions(
+      deserializeFormSection(userSection),
+      this.props.formData
+    ).forEach(group => {
+      group.fields.forEach((field: IFormField) => {
+        if (field && field.type === FIELD_GROUP_TITLE) {
+          sections.push({ title: intl.formatMessage(field.label), items: [] })
+        } else if (field && sections.length > 0) {
+          sections[sections.length - 1].items.push({
+            label:
+              field.type === SIMPLE_DOCUMENT_UPLOADER
+                ? ''
+                : intl.formatMessage(field.label),
+            value: this.getValue(field),
+            action: {
+              id: `btn_change_${field.name}`,
+              label: intl.formatMessage(messages.change),
+              handler: () =>
+                this.props.goToCreateUserSection(
+                  userSection.id,
+                  group.id,
+                  field.name
+                )
+            }
+          })
+        }
+      })
     })
 
     return sections
@@ -75,6 +96,19 @@ class UserReviewFormComponent extends React.Component<
 
   getValue = (field: IFormField) => {
     const { intl, formData } = this.props
+
+    if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+      return (
+        <SimpleDocumentUploader
+          label={intl.formatMessage(field.label)}
+          disableDeleteInPreview={true}
+          name={field.name}
+          onComplete={() => {}}
+          files={formData[field.name] as IAttachmentValue}
+        />
+      )
+    }
+
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
         ? field.name === 'role'
@@ -110,14 +144,10 @@ class UserReviewFormComponent extends React.Component<
   }
 }
 
-function deserializeFormSection(form: ISerializedFormSection): IFormSection {
-  return null as any
-}
-
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
-    goToCreateUserSection: (sec: string, fieldName: string) =>
-      dispatch(goToCreateUserSection(sec, fieldName)),
+    goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
+      dispatch(goToCreateUserSection(sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
     submitForm: () => {
       const variables = draftToGqlTransformer(

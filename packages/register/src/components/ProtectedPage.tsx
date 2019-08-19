@@ -34,6 +34,7 @@ class ProtectedPageComponent extends React.Component<
 
   async componentDidMount() {
     const newState = { ...this.state }
+
     if (await storage.getItem(SCREEN_LOCK)) {
       newState.secured = false
     } else {
@@ -75,6 +76,7 @@ class ProtectedPageComponent extends React.Component<
   async getPIN(): Promise<string> {
     const currentUserID = await getCurrentUserID()
     const userData = await storage.getItem('USER_DATA')
+
     if (!userData) {
       return ''
     }
@@ -93,23 +95,31 @@ class ProtectedPageComponent extends React.Component<
   }
   render() {
     const { pendingUser, secured, pinExists } = this.state
-    return (
-      (pendingUser && <ProtectedAccount />) ||
-      (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
-      (isMobileDevice() && (
+
+    if (pendingUser) {
+      return <ProtectedAccount />
+    }
+
+    if (!pinExists) {
+      return <SecureAccount onComplete={this.markAsSecured} />
+    }
+
+    if (isMobileDevice()) {
+      return (
         <PageVisibility onChange={this.handleVisibilityChange}>
           {(secured && this.props.children) ||
             (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
         </PageVisibility>
-      )) || (
-        <IdleTimer
-          onIdle={this.onIdle}
-          timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
-        >
-          {(secured && this.props.children) ||
-            (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
-        </IdleTimer>
       )
+    }
+    return (
+      <IdleTimer
+        onIdle={this.onIdle}
+        timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
+      >
+        {(secured && this.props.children) ||
+          (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+      </IdleTimer>
     )
   }
 }

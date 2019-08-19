@@ -38,6 +38,15 @@ function deserializeFormSection(form: ISerializedFormSection): IFormSection {
   return null as any
 }
 
+const previewGroups = () => {
+  return userSection.groups.map(group => {
+    return {
+      id: 'preview-' + group.id,
+      fields: group.fields
+    }
+  })
+}
+
 const initialState: IUserFormState = {
   userForm: deserializeForm({
     sections: [
@@ -47,12 +56,7 @@ const initialState: IUserFormState = {
         viewType: 'preview',
         name: messages.userFormReviewTitle,
         title: messages.userFormTitle,
-        groups: [
-          {
-            id: 'preview-view-group',
-            fields: userSection.groups[0].fields
-          }
-        ]
+        groups: previewGroups()
       }
     ]
   }),
@@ -168,7 +172,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userForm: {
           sections: [
             deserializeFormSection(updatedSection),
-            ...state.userForm.sections
+            ...state.userForm.sections.slice(1)
           ]
         }
       }
