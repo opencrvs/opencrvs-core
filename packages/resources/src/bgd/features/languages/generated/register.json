@@ -958,7 +958,13 @@
         "validations.validDeathRegistrationNumber": "The Death Registration Number can only be alpha numeric and must be {validLength} characters long",
         "validations.validDrivingLicenseNumber": "The Driving License Number can only be alpha numeric and must be {validLength} characters long",
         "validations.validNationalId": "The National ID can only be numeric and must be {validLength} digits long",
-        "validations.validPassportNumber": "The Passport Number can only be alpha numeric and must be {validLength} characters long"
+        "validations.validPassportNumber": "The Passport Number can only be alpha numeric and must be {validLength} characters long",
+        "form.field.label.userSignatureAttachmentTitle": "Attach the registrar’s signature",
+        "form.field.label.userSignatureAttachment": "Registrar’s signature",
+        "form.field.label.userSignatureAttachmentDesc": "Ask the registrar to sign a piece of paper and then scan or take a photo.",
+        "form.field.label.userAttachmentSection": "Attachments",
+        "form.field.label.addFile": "Add file",
+        "form.field.label.fileUploadError": "{type} supported only"
       }
     },
     {
@@ -1925,7 +1931,13 @@
         "validations.validDeathRegistrationNumber": "মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না",
         "validations.validDrivingLicenseNumber": "ড্রাইভিং লাইসেন্স নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না",
         "validations.validNationalId": "জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না",
-        "validations.validPassportNumber": "পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না"
+        "validations.validPassportNumber": "পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না",
+        "form.field.label.userSignatureAttachmentTitle": "নিবন্ধকের স্বাক্ষর সংযুক্ত করুন",
+        "form.field.label.userSignatureAttachment": "নিবন্ধকের স্বাক্ষর",
+        "form.field.label.userSignatureAttachmentDesc": "নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।",
+        "form.field.label.userAttachmentSection": "সংযুক্তি",
+        "form.field.label.addFile": "নথি যুক্ত করুন",
+        "form.field.label.fileUploadError": "শুধুমাত্র {type} গ্রহণযোগ্য "
       }
     }
   ]

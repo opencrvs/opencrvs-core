@@ -1,24 +1,26 @@
 import * as React from 'react'
-import { createTestComponent, flushPromises } from '@register/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  getFileFromBase64String,
+  validImageB64String
+} from '@register/tests/util'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { createStore } from '@register/store'
 import { ReactWrapper } from 'enzyme'
-import { FormFieldGenerator } from '@register/components/form'
 import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
 import {
-  mockIncompleteFormData,
-  mockCompleteFormData,
-  mockUserGraphqlOperation,
   mockFetchRoleGraphqlOperation,
-  mockDataWithRegistarRoleSelected
+  mockDataWithRegistarRoleSelected,
+  mockUserGraphqlOperation
 } from '@register/views/SysAdmin/user/utils'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
-describe('create new user tests', () => {
+describe('signature upload tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
 
-  describe('when user is in create new user form', () => {
+  describe('when user is in signature upload form page', () => {
     beforeEach(() => {
       testComponent = createTestComponent(
         // @ts-ignore
@@ -26,7 +28,7 @@ describe('create new user tests', () => {
           match={{
             params: {
               sectionId: 'user',
-              groupId: userSection.groups[0].id
+              groupId: userSection.groups[1].id
             },
             isExact: true,
             path: '/createUser',
@@ -38,49 +40,85 @@ describe('create new user tests', () => {
       ).component
     })
 
+    it('show the signature form page', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      const title = testComponent
+        .find('#form-title')
+        .hostNodes()
+        .text()
+
+      expect(title).toBe('Attach the registrar’s signature')
+    })
+
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      store.dispatch(modifyUserFormData(mockIncompleteFormData))
-
       testComponent
         .find('#confirm_form')
         .hostNodes()
         .simulate('click')
-
       await flushPromises()
-
       testComponent.update()
 
-      expect(
-        testComponent
-          .find(FormFieldGenerator)
-          .find('#phoneNumber_error')
-          .hostNodes()
-          .text()
-      ).toBe('Required')
+      const error = testComponent
+        .find('#field-error')
+        .hostNodes()
+        .text()
+
+      expect(error).toBe('Required')
     })
 
-    it('clicking on confirm button with complete data takes user to preview page', async () => {
+    it('No error while uploading if valid file', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-
-      store.dispatch(modifyUserFormData(mockCompleteFormData))
-
       testComponent
-        .find('#confirm_form')
+        .find('#image_file_uploader_field')
         .hostNodes()
-        .simulate('click')
+        .simulate('change', {
+          target: {
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'index.png',
+                'image/png'
+              )
+            ]
+          }
+        })
       await flushPromises()
+      testComponent.update()
 
-      expect(history.location.pathname).toContain('preview')
+      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
     })
 
-    it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
+    it('return if not file', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      testComponent
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: []
+          }
+        })
+      await flushPromises()
+      testComponent.update()
+
+      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+    })
+
+    it('clicking on confirm button will go to review page', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
@@ -93,16 +131,17 @@ describe('create new user tests', () => {
         .hostNodes()
         .simulate('click')
       await flushPromises()
+      testComponent.update()
 
       expect(history.location.pathname).toContain(
-        '/createUser/user/signature-attachment'
+        '/createUser/preview/preview-user-view-group'
       )
     })
   })
 
   describe('when user in review page', () => {
     beforeEach(() => {
-      store.dispatch(modifyUserFormData(mockCompleteFormData))
+      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
       testComponent = createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -128,16 +167,6 @@ describe('create new user tests', () => {
           .hostNodes()
           .text()
       ).toBe('Please review the new users details')
-    })
-
-    it('clicking change button on a field takes user back to form', async () => {
-      testComponent
-        .find('#btn_change_familyNameEng')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#familyNameEng')
     })
 
     it('clicking submit button submits the form data', async () => {

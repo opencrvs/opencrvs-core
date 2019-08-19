@@ -4,7 +4,8 @@ import {
   FIELD_GROUP_TITLE,
   SEARCH_FIELD,
   SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SIMPLE_DOCUMENT_UPLOADER
 } from '@register/forms'
 import {
   bengaliOnlyNameFormat,
@@ -23,6 +24,7 @@ import {
   constantsMessages,
   formMessages as messages
 } from '@register/i18n/messages'
+import { conditionals } from '@register/forms/utils'
 
 export const userSection: IFormSection = {
   id: 'user',
@@ -162,6 +164,33 @@ export const userSection: IFormSection = {
           mapping: {
             mutation: fieldNameValueTransformer('primaryOffice')
           }
+        }
+      ]
+    },
+    {
+      id: 'signature-attachment',
+      title: messages.userSignatureAttachmentTitle,
+      conditionals: [conditionals.isRegistrarRoleSelected],
+      fields: [
+        {
+          name: 'attachmentTitle',
+          type: FIELD_GROUP_TITLE,
+          hidden: true,
+          label: messages.userAttachmentSection,
+          required: false,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'signature',
+          type: SIMPLE_DOCUMENT_UPLOADER,
+          label: messages.userSignatureAttachment,
+          description: messages.userSignatureAttachmentDesc,
+          allowedDocType: ['image/png'],
+          initialValue: '',
+          required: true,
+          hideAsterisk: true,
+          validate: []
         }
       ]
     }
