@@ -42,6 +42,7 @@ type IFullProps = {
   description?: string
   allowedDocType?: string[]
   error?: string
+  disableDeleteInPreview?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
 } & InjectedIntlProps
 
@@ -116,7 +117,14 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const { label, intl, files, description, error } = this.props
+    const {
+      label,
+      intl,
+      files,
+      description,
+      error,
+      disableDeleteInPreview
+    } = this.props
     const errorMessage = this.state.error || error || ''
 
     return (
@@ -142,6 +150,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}
+            disableDelete={disableDeleteInPreview}
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}

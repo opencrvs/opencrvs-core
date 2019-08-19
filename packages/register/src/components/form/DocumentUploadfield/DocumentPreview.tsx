@@ -49,6 +49,7 @@ const BackButton = styled.button`
 `
 type IProps = {
   previewImage: IFileValue | IAttachmentValue
+  disableDelete?: boolean
   title?: string
   goBack: () => void
   onDelete: (image: IFileValue | IAttachmentValue) => void
@@ -56,7 +57,7 @@ type IProps = {
 
 export class DocumentPreview extends React.Component<IProps> {
   render = () => {
-    const { previewImage, title, goBack, onDelete } = this.props
+    const { previewImage, title, goBack, onDelete, disableDelete } = this.props
     return (
       <PreviewContainer id="preview_image_field">
         <PreviewContainerHeader>
@@ -64,12 +65,14 @@ export class DocumentPreview extends React.Component<IProps> {
             <ArrowBack />
             <Title>{title}</Title>
           </BackButton>
-          <span>
-            <Button
-              icon={() => <Delete color="white" />}
-              onClick={() => onDelete(previewImage)}
-            />
-          </span>
+          {!disableDelete && (
+            <span>
+              <Button
+                icon={() => <Delete color="white" />}
+                onClick={() => onDelete(previewImage)}
+              />
+            </span>
+          )}
         </PreviewContainerHeader>
         <ImageHolder>
           {previewImage.data && (

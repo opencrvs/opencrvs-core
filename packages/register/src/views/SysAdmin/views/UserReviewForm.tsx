@@ -96,6 +96,7 @@ class UserReviewFormComponent extends React.Component<
       return (
         <SimpleDocumentUploader
           label={intl.formatMessage(field.label)}
+          disableDeleteInPreview={true}
           name={field.name}
           onComplete={() => {}}
           files={formData[field.name] as IAttachmentValue}
