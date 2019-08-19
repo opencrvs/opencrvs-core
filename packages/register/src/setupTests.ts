@@ -94,8 +94,8 @@ const {
 
 jest.mock('@register/utils/referenceApi', () => ({
   referenceApi: {
-    loadLocations: () => Promise.resolve({ data: mockOfflineData.locations }),
-    loadFacilities: () => Promise.resolve({ data: mockOfflineData.facilities }),
+    loadLocations: () => Promise.resolve(mockOfflineData.locations),
+    loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
     loadLanguages: () =>
       Promise.resolve(
         JSON.parse(
@@ -104,7 +104,7 @@ jest.mock('@register/utils/referenceApi', () => ({
               '../resources/src/bgd/features/languages/generated/register.json'
             )
             .toString()
-        )
+        ).data
       )
   }
 }))

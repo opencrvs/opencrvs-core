@@ -1,28 +1,22 @@
-import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from '@register/offline/reducer'
 import { getToken } from '@register/utils/authUtils'
 import { ILanguage } from '@register/i18n/reducer'
 
 export interface ILocationDataResponse {
-  data: { [key: string]: ILocation }
+  [locationId: string]: ILocation
 }
-
 export interface IFacilitiesDataResponse {
-  data: { [key: string]: ILocation }
+  [facilityId: string]: ILocation
 }
+export type ILanguagesDataResponse = ILanguage[]
 
-export interface ILanguagesDataResponse {
-  data: ILanguage[]
-}
-
-async function loadLanguages(): Promise<any> {
+async function loadLanguages(): Promise<ILanguagesDataResponse> {
   const url = resolve(
     window.config.RESOURCES_URL,
     `${window.config.COUNTRY}/languages/register`
   )
 
-  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -34,19 +28,16 @@ async function loadLanguages(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
-  return {
-    data: body.data
-  }
+  const response = await res.json()
+  return response.data
 }
 
-async function loadLocations(): Promise<any> {
+async function loadLocations(): Promise<ILocationDataResponse> {
   const url = resolve(
     window.config.RESOURCES_URL,
     `${window.config.COUNTRY}/locations`
   )
 
-  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -58,18 +49,16 @@ async function loadLocations(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
-  return {
-    data: body.data
-  }
+  const response = await res.json()
+  return response.data
 }
 
-async function loadFacilities(): Promise<any> {
+async function loadFacilities(): Promise<IFacilitiesDataResponse> {
   const url = resolve(
     window.config.RESOURCES_URL,
     `${window.config.COUNTRY}/facilities`
   )
-  // @ts-ignore
+
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -81,10 +70,8 @@ async function loadFacilities(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
-  return {
-    data: body.data
-  }
+  const response = await res.json()
+  return response.data
 }
 
 export const referenceApi = {

@@ -1,12 +1,13 @@
 import { referenceApi } from '@register/utils/referenceApi'
 import * as fetchMock from 'jest-fetch-mock'
-import nock from 'nock'
+
+jest.unmock('@register/utils/referenceApi')
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 export const mockFetchLocations = {
-  data: [
-    {
+  data: {
+    'ba819b89-57ec-4d8b-8b91-e8865579a40f': {
       id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
       name: 'Barisal',
       alias: 'বরিশাল',
@@ -15,7 +16,7 @@ export const mockFetchLocations = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     }
-  ]
+  }
 }
 
 export const mockFetchFacilities = {
@@ -31,36 +32,22 @@ export const mockFetchFacilities = {
   ]
 }
 
-nock(window.config.RESOURCES_URL)
-  .get('/locations')
-  .reply(200, mockFetchLocations)
-
-nock(window.config.RESOURCES_URL)
-  .get('/facilities')
-  .reply(200, mockFetchFacilities)
-
 describe('referenceApi', () => {
   beforeEach(() => {
     fetch.resetMocks()
   })
 
-  /*
-   * TODO: Need to resolve the weared travis issue "TypeError: Cannot read property 'body' of null"
-   */
-  it.skip('retrieves the locations.json from the server', async () => {
+  it('retrieves the locations.json from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchLocations))
 
     const data = await referenceApi.loadLocations()
-    expect(data).toEqual(mockFetchLocations)
+    expect(data).toEqual(mockFetchLocations.data)
   })
 
-  /*
-   * TODO: Need to resolve the weared travis issue "TypeError: Cannot read property 'body' of null"
-   */
-  it.skip('retrieves the facilities.json from the server', async () => {
+  it('retrieves the facilities.json from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchFacilities))
 
     const data = await referenceApi.loadFacilities()
-    expect(data).toEqual(mockFetchFacilities)
+    expect(data).toEqual(mockFetchFacilities.data)
   })
 })

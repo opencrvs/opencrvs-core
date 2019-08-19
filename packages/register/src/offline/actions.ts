@@ -91,7 +91,7 @@ export const locationsLoaded = (
   payload: ILocationDataResponse
 ): LocationsLoadedAction => ({
   type: LOCATIONS_LOADED,
-  payload: payload.data
+  payload: payload
 })
 
 export const facilitiesFailed = (error: Error): FacilitiesFailedAction => ({
@@ -103,7 +103,7 @@ export const facilitiesLoaded = (
   payload: IFacilitiesDataResponse
 ): FacilitiesLoadedAction => ({
   type: FACILITIES_LOADED,
-  payload: payload.data
+  payload: payload
 })
 
 export const locationsFailed = (error: Error): LocationsFailedAction => ({
@@ -131,7 +131,7 @@ export const languagesLoaded = (
   payload: ILanguagesDataResponse
 ): LanguagesLoadedAction => ({
   type: LANGUAGES_LOADED,
-  payload: payload.data
+  payload: payload
 })
 
 export const languagesFailed = (error: Error): LanguagesFailedAction => ({
