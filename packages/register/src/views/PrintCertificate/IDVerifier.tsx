@@ -88,27 +88,20 @@ class IDVerifierComponent extends React.Component<
   getGenericCollectorInfo = (
     info: IIDVerifierProps['collectorInformation']
   ) => {
-    let iD
-    let iDType
-    let firstNames
-    let familyName
-    let birthDate
-    let nationality
-
     const { locale } = this.props.intl
-    iD = info.iD || info.applicantID
-    iDType = info.iDType || info.iDTypeOther
-    firstNames =
+    const iD = info.iD || info.applicantID
+    const iDType = info.iDType || info.iDTypeOther
+    const firstNames =
       locale === 'en'
         ? info.firstNamesEng || info.applicantFirstNamesEng
         : info.firstNames || info.applicantFirstNames
-    familyName =
+    const familyName =
       locale === 'en'
         ? info.familyNameEng || info.applicantFamilyNameEng
         : info.familyName || info.applicantFamilyName
-    birthDate =
+    const birthDate =
       info.motherBirthDate || info.fatherBirthDate || info.applicantBirthDate
-    nationality = info.nationality
+    const nationality = info.nationality
 
     return {
       iD,

@@ -3,8 +3,7 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   mockApplicationData,
-  mockDeathApplicationData,
-  flushPromises
+  mockDeathApplicationData
 } from '@register/tests/util'
 import { VerifyCollector } from './VerifyCollector'
 import { storeApplication } from '@register/applications'
@@ -13,7 +12,6 @@ import { ReactWrapper } from 'enzyme'
 
 describe('verify collector tests', () => {
   const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
 
   const birthApplication = {
     id: 'mockBirth1234',
@@ -36,9 +34,7 @@ describe('verify collector tests', () => {
       const testComponent = createTestComponent(
         // @ts-ignore
         <VerifyCollector
-          location={mockLocation}
           history={history}
-          staticContext={mockLocation}
           match={{
             params: {
               registrationId: 'mockBirth1234',
@@ -62,9 +58,7 @@ describe('verify collector tests', () => {
         testComponent = createTestComponent(
           // @ts-ignore
           <VerifyCollector
-            location={mockLocation}
             history={history}
-            staticContext={mockLocation}
             match={{
               params: {
                 registrationId: 'mockBirth1234',
@@ -165,9 +159,7 @@ describe('verify collector tests', () => {
       const testComponent = createTestComponent(
         // @ts-ignore
         <VerifyCollector
-          location={mockLocation}
           history={history}
-          staticContext={mockLocation}
           match={{
             params: {
               registrationId: 'mockDeath1234',
