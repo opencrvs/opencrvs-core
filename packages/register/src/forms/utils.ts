@@ -377,14 +377,6 @@ export const getSectionFields = (
   return fields
 }
 
-export const getFieldsFromFormSectionGroup = (
-  formSectionGroup: IFormSectionGroup
-) => {
-  let fields: IFormField[] = []
-  formSectionGroup.fields.forEach(field => (fields = fields.concat(field)))
-  return fields
-}
-
 export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData
