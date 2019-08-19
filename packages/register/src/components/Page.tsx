@@ -141,7 +141,7 @@ class Component extends React.Component<
 
     if (initialApplicationsLoaded && offlineDataLoaded) {
       return (
-        <div>
+        <div id="readyApplication">
           <StyledPage {...this.props}>{children}</StyledPage>
         </div>
       )

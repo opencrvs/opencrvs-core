@@ -356,7 +356,7 @@ describe('admin service', () => {
         'f8bebc4c-1bd2-4b72-961b-379a78f347a2': {
           id: 'f8bebc4c-1bd2-4b72-961b-379a78f347a2',
           name: 'Barisal',
-          nameBn: 'বরিশাল',
+          alias: 'বরিশাল',
           physicalType: 'Jurisdiction',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
@@ -364,7 +364,7 @@ describe('admin service', () => {
         '0adfddb7-f499-44fb-b640-2123c90b685b': {
           id: '0adfddb7-f499-44fb-b640-2123c90b685b',
           name: 'Chittagong',
-          nameBn: 'চট্টগ্রাম',
+          alias: 'চট্টগ্রাম',
           physicalType: 'Jurisdiction',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
@@ -372,7 +372,7 @@ describe('admin service', () => {
         '9975af98-cefb-4025-8c0f-d3fa63a17eed': {
           id: '9975af98-cefb-4025-8c0f-d3fa63a17eed',
           name: 'Dhaka',
-          nameBn: 'ঢাকা',
+          alias: 'ঢাকা',
           physicalType: 'Jurisdiction',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
@@ -380,7 +380,7 @@ describe('admin service', () => {
         'c05b71cc-800c-415f-8db7-a78f81a59aa8': {
           id: 'c05b71cc-800c-415f-8db7-a78f81a59aa8',
           name: 'Khulna',
-          nameBn: 'খুলনা',
+          alias: 'খুলনা',
           physicalType: 'Jurisdiction',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
@@ -388,7 +388,7 @@ describe('admin service', () => {
         '013c77b5-aa9f-40e5-9f7b-abb43d86724b': {
           id: '013c77b5-aa9f-40e5-9f7b-abb43d86724b',
           name: 'Rajshahi',
-          nameBn: 'রাজশাহী',
+          alias: 'রাজশাহী',
           physicalType: 'Jurisdiction',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'

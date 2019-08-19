@@ -16,4 +16,8 @@ export const EMPLOYEES_SOURCE = path.join(
   process.cwd(),
   'src/bgd/features/employees/generated/'
 )
+export const LANGUAGES_SOURCE = path.join(
+  process.cwd(),
+  'src/bgd/features/languages/generated/'
+)
 export const ADMINISTRATIVE_STRUCTURE_URL = 'http://174.136.37.245:8090/gen'

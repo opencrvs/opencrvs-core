@@ -8,7 +8,7 @@ describe('locationUtil tests', () => {
           '111': {
             id: '111',
             name: 'Test',
-            nameBn: 'Test',
+            alias: 'Test',
             physicalType: 'Jurisdiction',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
@@ -16,7 +16,7 @@ describe('locationUtil tests', () => {
           '222': {
             id: '222',
             name: 'Test',
-            nameBn: 'Test',
+            alias: 'Test',
             physicalType: 'Jurisdiction',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/321'
@@ -24,7 +24,7 @@ describe('locationUtil tests', () => {
           '333': {
             id: '333',
             name: 'Test',
-            nameBn: 'Test',
+            alias: 'Test',
             physicalType: 'Jurisdiction',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'

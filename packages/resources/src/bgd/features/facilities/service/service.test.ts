@@ -280,7 +280,7 @@ describe('facilities service', () => {
         '2917f245-d25e-4789-8de2-22b2d8498764': {
           id: '2917f245-d25e-4789-8de2-22b2d8498764',
           name: 'Moktarpur Union Parishad',
-          nameBn: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+          alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
           physicalType: 'Building',
           type: 'CRVS_OFFICE',
           partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
@@ -288,7 +288,7 @@ describe('facilities service', () => {
         '30763019-ced1-4932-80d9-fa94ccda729a': {
           id: '30763019-ced1-4932-80d9-fa94ccda729a',
           name: 'Nagari Union Parishad',
-          nameBn: 'নাগারি ইউনিয়ন পরিষদ',
+          alias: 'নাগারি ইউনিয়ন পরিষদ',
           physicalType: 'Building',
           type: 'CRVS_OFFICE',
           partOf: 'Location/0d253962-9a7d-4200-b138-aec2c3dc8569'
@@ -296,7 +296,7 @@ describe('facilities service', () => {
         'e96b7828-4b22-43bf-aee9-8959949893a2': {
           id: 'e96b7828-4b22-43bf-aee9-8959949893a2',
           name: 'Shaheed Taj Uddin Ahmad Medical College',
-          nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+          alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
           physicalType: 'Building',
           type: 'HEALTH_FACILITY',
           partOf: 'Location/cc4353ce-ec0e-4f3e-81b4-224061385154'
@@ -304,7 +304,7 @@ describe('facilities service', () => {
         '37a715b8-5e6a-4f1a-8308-72ef8348ad54': {
           id: '37a715b8-5e6a-4f1a-8308-72ef8348ad54',
           name: 'Kaliganj Union Sub Center',
-          nameBn: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
+          alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
           physicalType: 'Building',
           type: 'HEALTH_FACILITY',
           partOf: 'Location/3b0680cb-ef9b-4c46-bc8b-bbfdcaa49162'

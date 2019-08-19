@@ -2154,7 +2154,7 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a register scope')
     })
   })
-  describe('queryRegistrationByIdentifier()', async () => {
+  describe('queryRegistrationByIdentifier()', () => {
     it('returns registration', async () => {
       fetch.mockResponses(
         [
@@ -2235,7 +2235,7 @@ describe('Registration root resolvers', () => {
     })
   })
 
-  describe('queryPersonByIdentifier()', async () => {
+  describe('queryPersonByIdentifier()', () => {
     it('returns person', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
