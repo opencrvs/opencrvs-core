@@ -35,7 +35,7 @@ export const template: IPDFTemplate = {
                 fillColor: '#F2F3F4',
                 text: [
                   {
-                    text: '{serviceTitle}',
+                    text: '{serviceTitle} ',
                     style: 'subheader'
                   },
                   {
@@ -51,7 +51,7 @@ export const template: IPDFTemplate = {
                 fillColor: '#F2F3F4',
                 text: [
                   {
-                    text: '{amountLabel}',
+                    text: '{amountLabel} ',
                     style: 'subheader'
                   },
                   {
@@ -68,7 +68,7 @@ export const template: IPDFTemplate = {
       {
         text: [
           {
-            text: '{issuedAtLabel}',
+            text: '{issuedAtLabel} ',
             font: 'notosans',
             style: 'subheader'
           },
@@ -81,7 +81,7 @@ export const template: IPDFTemplate = {
       {
         text: [
           {
-            text: '{issuedByLabel}',
+            text: '{issuedByLabel} ',
             font: 'notosans',
             style: 'subheader'
           },
@@ -94,7 +94,7 @@ export const template: IPDFTemplate = {
       {
         text: [
           {
-            text: '{issuedDateLabel}',
+            text: '{issuedDateLabel} ',
             font: 'notosans',
             style: 'subheader'
           },

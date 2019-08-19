@@ -106,29 +106,12 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   return userDetails
 }
 
-export function getUserLocation(
-  userDetails: IUserDetails,
-  locationKey: string
-): string {
-  if (!userDetails.catchmentArea) {
-    throw Error('The user has no catchment area')
+export function getUserLocation(userDetails: IUserDetails) {
+  if (!userDetails.primaryOffice) {
+    throw Error('The user has no primary office')
   }
 
-  const filteredArea: IGQLLocation[] = userDetails.catchmentArea.filter(
-    (area: IGQLLocation) => {
-      if (area.identifier) {
-        const relevantIdentifier: IIdentifier[] = area.identifier.filter(
-          (identifier: IIdentifier) => {
-            return identifier.value === locationKey
-          }
-        )
-        return relevantIdentifier[0] ? area : false
-      } else {
-        throw Error('The catchment area has no identifier')
-      }
-    }
-  )
-  return filteredArea[0] ? filteredArea[0].id : ''
+  return userDetails.primaryOffice
 }
 
 export async function storeUserDetails(userDetails: IUserDetails) {

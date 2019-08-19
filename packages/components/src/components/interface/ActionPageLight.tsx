@@ -2,13 +2,14 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrowDeepBlue } from '../icons'
 import { Button } from '../buttons'
+import { colors } from '../colors'
 const ActionContainer = styled.div`
   width: 100%;
 `
 const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
+  ${({ theme }) => theme.shadows.mistyShadow};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,6 +39,15 @@ const BackButton = styled(Button)`
     margin-left: 24px;
   }
 `
+
+const BackButtonIcon = styled(BackArrowDeepBlue)`
+  &:hover {
+    g {
+      stroke: ${colors.tertiary};
+    }
+  }
+`
+
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   text-transform: uppercase;
@@ -53,17 +63,20 @@ const Container = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
-  padding: 24px 32px;
+  padding: 24px 32px 32px;
   margin: 32px auto 0;
   max-width: 940px;
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px;
-    width: 100%;
+    margin: 40px 54px;
+    padding: 24px 32px;
     min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+    margin: 0;
+    padding: 24px 32px;
+    min-height: 100vh;
   }
 `
 interface IProps {
@@ -85,7 +98,7 @@ export class ActionPageLight extends React.Component<
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <BackButton icon={icon || (() => <BackArrowDeepBlue />)} />
+              <BackButton icon={icon || (() => <BackButtonIcon />)} />
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}

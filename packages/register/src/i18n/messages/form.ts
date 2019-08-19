@@ -279,6 +279,12 @@ interface IFormMessages {
   whoIsPresentLabel: ReactIntl.FormattedMessage.MessageDescriptor
   whoseContactDetailsLabel: ReactIntl.FormattedMessage.MessageDescriptor
   uploadedList: ReactIntl.FormattedMessage.MessageDescriptor
+  userSignatureAttachmentTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  userSignatureAttachment: ReactIntl.FormattedMessage.MessageDescriptor
+  userAttachmentSection: ReactIntl.FormattedMessage.MessageDescriptor
+  userSignatureAttachmentDesc: ReactIntl.FormattedMessage.MessageDescriptor
+  addFile: ReactIntl.FormattedMessage.MessageDescriptor
+  fileUploadError: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1696,6 +1702,37 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is the contact person for this application?',
     description: 'Input label for contact details person',
     id: 'form.field.label.application.whoseContactDetails'
+  },
+  userSignatureAttachmentTitle: {
+    defaultMessage: 'Attach the registrar’s signature',
+    description: 'Title for user signature attachment',
+    id: 'form.field.label.userSignatureAttachmentTitle'
+  },
+  userSignatureAttachment: {
+    defaultMessage: 'Registrar’s signature',
+    description: 'Input label for user signature attachment',
+    id: 'form.field.label.userSignatureAttachment'
+  },
+  userSignatureAttachmentDesc: {
+    defaultMessage:
+      'Ask the registrar to sign a piece of paper and then scan or take a photo.',
+    description: 'Description for user signature attachment',
+    id: 'form.field.label.userSignatureAttachmentDesc'
+  },
+  userAttachmentSection: {
+    defaultMessage: 'Attachments',
+    description: 'label for user signature attachment',
+    id: 'form.field.label.userAttachmentSection'
+  },
+  addFile: {
+    defaultMessage: 'Add file',
+    description: 'text for add file button',
+    id: 'form.field.label.addFile'
+  },
+  fileUploadError: {
+    defaultMessage: '{type} supported only',
+    description: 'text for error on file upload',
+    id: 'form.field.label.fileUploadError'
   }
 }
 

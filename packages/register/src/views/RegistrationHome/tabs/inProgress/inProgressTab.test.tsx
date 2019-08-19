@@ -15,7 +15,11 @@ import { checkAuth } from '@register/profile/profileActions'
 import { queries } from '@register/profile/queries'
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
-import { createTestComponent, mockUserResponse } from '@register/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  resizeWindow
+} from '@register/tests/util'
 import {
   COUNT_EVENT_REGISTRATION_BY_STATUS,
   FETCH_REGISTRATION_BY_COMPOSITION,
@@ -69,7 +73,7 @@ describe('In Progress tab', () => {
         request: {
           query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             status: EVENT_STATUS.IN_PROGRESS
           }
         },
@@ -96,7 +100,10 @@ describe('In Progress tab', () => {
     ]
     const testComponent = createTestComponent(
       // @ts-ignore
-      <InProgressTab drafts={localDrafts} registrarUnion={'123456789'} />,
+      <InProgressTab
+        drafts={localDrafts}
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      />,
       store,
       graphqlMock
     )
@@ -142,7 +149,7 @@ describe('In Progress tab', () => {
         request: {
           query: COUNT_EVENT_REGISTRATION_BY_STATUS,
           variables: {
-            locationIds: ['123456789'],
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             status: EVENT_STATUS.IN_PROGRESS
           }
         },
@@ -173,7 +180,7 @@ describe('In Progress tab', () => {
       <InProgressTab
         drafts={localDrafts}
         selectorId={'you'}
-        registrarUnion={'123456789'}
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
       />,
       store,
       graphqlMock
@@ -274,7 +281,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -307,7 +314,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -420,7 +427,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarUnion={'123456789'}
+          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         />,
         store
       )
@@ -511,7 +518,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -649,7 +656,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -802,7 +809,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -882,7 +889,7 @@ describe('In Progress tab', () => {
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarUnion={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         />,
         store,
         graphqlMock
@@ -915,5 +922,102 @@ describe('In Progress tab', () => {
       )
       testComponent.component.unmount()
     })
+  })
+})
+
+describe('Tablet tests', () => {
+  const { store } = createStore()
+
+  beforeAll(() => {
+    getItem.mockReturnValue(registerScopeToken)
+    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    resizeWindow(800, 1280)
+  })
+
+  afterEach(() => {
+    resizeWindow(1024, 768)
+  })
+
+  it('redirects to detail page if item is clicked', async () => {
+    jest.clearAllMocks()
+    const TIME_STAMP = 1562912635549
+    const drafts: IApplication[] = []
+    drafts.push(createApplication(Event.BIRTH))
+    const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    const graphqlMock = [
+      {
+        request: {
+          query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
+          variables: {
+            locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
+            status: EVENT_STATUS.IN_PROGRESS,
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            listEventRegistrations: {
+              totalItems: 1,
+              results: [
+                {
+                  id: applicationId,
+                  registration: {
+                    type: 'BIRTH',
+                    trackingId: 'BQ2IDOP'
+                  },
+                  child: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Anik',
+                        familyName: 'Hoque'
+                      }
+                    ]
+                  },
+                  deceased: null,
+                  createdAt: TIME_STAMP
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    // @ts-ignore
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <InProgressTab
+        drafts={drafts}
+        selectorId={SELECTOR_ID.fieldAgentDrafts}
+        registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+      />,
+      store,
+      graphqlMock
+    )
+
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    testComponent.component
+      .find('#row_0')
+      .hostNodes()
+      .simulate('click')
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    expect(window.location.href).toContain(
+      '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    )
+    testComponent.component.unmount()
   })
 })

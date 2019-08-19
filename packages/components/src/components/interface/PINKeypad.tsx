@@ -124,7 +124,12 @@ export class PINKeypad extends React.Component<IProps, IState> {
   render() {
     const { pin } = this.state
     return (
-      <Container tabIndex={0} onKeyDown={this.keyDown} {...this.props}>
+      <Container
+        id="pin-keypad-container"
+        tabIndex={0}
+        onKeyDown={this.keyDown}
+        {...this.props}
+      >
         <div>
           {new Array(pin.length).fill('').map((e, i) => (
             <DotFilled key={`dot-filled-${i}`} />

@@ -18,15 +18,21 @@ On Linux you will also need to:
 - increase vm max heap for elasticsearch using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 - run `chmod 775 data/elasticsearch` from root of the project
 
+On Mac you will need:
+
+- [Docker For Mac](https://docs.docker.com/docker-for-mac/)
+
 Then:
 
 1. Clone the repo
 2. Run `yarn` to install deps
 3. Run `docker swarm init` - out host has to be a swarm to use the overlay network as we use in staging and qa
-4. Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` (services in this repo)
+4. **Starting the dev environment (necessary for Ubuntu):**Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` (services in this repo)
+   **Starting the dev environment (necessary for OSX):**
+   Docker For Mac can affect OpenCRVS ability to find containers on localhost. Find your local IP address and start the dev environment like this: `LOCAL_IP=192.168.0.5 yarn dev`
 5. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
 
-Apps can be found running in following URLs:
+That's it! You should be running OpenCRVS with test users and test locations set to Bangladesh by default. Apps can be found running at the following URLs:
 
 - Styleguide: http://localhost:6060/
 - Login: http://localhost:3020/ - A test user you can use is u: sakibal.hasan, p: test, code: 000000
@@ -35,8 +41,6 @@ Apps can be found running in following URLs:
 - Performance management: http://localhost:3001/
 
 You can open all of them by running `yarn open`
-
-**Troubleshooting (necessary for OSX):** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose:deps`
 
 ### Manual backup setup (already done for you if you restore the pre-populated db dump)
 
@@ -50,11 +54,16 @@ You can open all of them by running `yarn open`
 
 Start the development environment as described above, then:
 
-1. `cd packages/resource && yarn populate && cd ../..`
-2. `cd packages/user-mgnt && yarn populate && cd ../..`
-3. Login to the OpenHIM console and upload the base config file.
-4. `yarn db:backup:create`
-5. Commit and push the new db dump archive files that have been created.
+1. Start the dev environment - as explained above.
+2. Populate reference data for your country requirements from the resources package. `cd packages/resource && yarn populate:<<insert alpha3 country code>> && cd ../..`
+3. Curl the practioners from hearth using the mobile phone numbers in resources/src/<<insert alpha3 country code>>/features/employees/generated/test-employees.csv to get the associated PractitionerRole id. e.g: `curl http://localhost:3447/fhir/Practitioner\?telecom\=phone\|01711111111`
+4. Curl the PractitionerRole resource to get the location IDs. e.g.: `curl http://localhost:3447/fhir/PractitionerRole/<<insert id>>`
+5. Curl the Locations by ID to check them and find the ones that should be inserted into user-mgnt/resources/populate.ts. Check the comments in user-mgnt/resources/populate.ts
+6. Manually add the IDs into user-mgnt/resources/populate.ts
+7. `cd packages/user-mgnt && yarn populate && cd ../..`
+8. Login to the OpenHIM console and upload the base config file.
+9. `yarn db:backup:create`
+10. Commit and push the new db dump archive files that have been created.
 
 ### tmuxed development setup
 
@@ -76,6 +85,7 @@ The `yarn compose:*` scripts only setup the dependencies in docker containers an
 For the command above there is:
 
 - base scripts which build and start the containers. E.g. `yarn compose:deps`
+  **Troubleshooting (necessary for OSX):** If you have issue with the OpenHIM not being able to access services running locally (probably a hostname not found error) then you can try specify your IP address manually using: `LOCAL_IP=192.168.0.5 yarn compose:deps`
 - `*:build` scripts which just build the images
 - `*:up` scripts which just run pre-build images in containers
 - `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)

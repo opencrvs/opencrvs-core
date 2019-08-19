@@ -1,20 +1,22 @@
-import fetch from 'node-fetch'
 import { resolve } from 'url'
 import { ILocation } from '@register/offline/reducer'
 import { getToken } from '@register/utils/authUtils'
+import { ILanguage } from '@register/i18n/reducer'
 
 export interface ILocationDataResponse {
-  data: { [key: string]: ILocation }
+  [locationId: string]: ILocation
 }
-
 export interface IFacilitiesDataResponse {
-  data: { [key: string]: ILocation }
+  [facilityId: string]: ILocation
 }
+export type ILanguagesDataResponse = ILanguage[]
 
-async function loadLocations(): Promise<any> {
-  const url = resolve(window.config.RESOURCES_URL, 'locations')
+async function loadLanguages(): Promise<ILanguagesDataResponse> {
+  const url = resolve(
+    window.config.RESOURCES_URL,
+    `${window.config.COUNTRY}/languages/register`
+  )
 
-  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -26,15 +28,16 @@ async function loadLocations(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
-  return {
-    data: body.data
-  }
+  const response = await res.json()
+  return response.data
 }
 
-async function loadFacilities(): Promise<any> {
-  const url = resolve(window.config.RESOURCES_URL, 'facilities')
-  // @ts-ignore
+async function loadLocations(): Promise<ILocationDataResponse> {
+  const url = resolve(
+    window.config.RESOURCES_URL,
+    `${window.config.COUNTRY}/locations`
+  )
+
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -46,13 +49,33 @@ async function loadFacilities(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
-  return {
-    data: body.data
+  const response = await res.json()
+  return response.data
+}
+
+async function loadFacilities(): Promise<IFacilitiesDataResponse> {
+  const url = resolve(
+    window.config.RESOURCES_URL,
+    `${window.config.COUNTRY}/facilities`
+  )
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
   }
+
+  const response = await res.json()
+  return response.data
 }
 
 export const referenceApi = {
   loadLocations,
-  loadFacilities
+  loadFacilities,
+  loadLanguages
 }
