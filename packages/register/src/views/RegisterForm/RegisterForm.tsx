@@ -190,7 +190,7 @@ type State = {
 const fadeFromTop = keyframes`
 from {
    -webkit-transform: translateY(-100%);
-   transform: translateY(-100%); 
+   transform: translateY(-100%);
   }
 `
 const StyledContainer = styled(Container)`
@@ -455,7 +455,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     }
                   ]}
                 />
-                <BodyContent>
+                <BodyContent id="register_form">
                   <TertiaryButton
                     align={ICON_ALIGNMENT.LEFT}
                     icon={() => <BackArrow />}

@@ -65,6 +65,7 @@ export const setUserDetails = (
   type: SET_USER_DETAILS,
   payload
 })
+
 export const modifyUserDetails = (
   payload: IUserDetails
 ): ModifyUserDetailsAction => ({

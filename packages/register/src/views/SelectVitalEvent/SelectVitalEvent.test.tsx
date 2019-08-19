@@ -1,72 +1,28 @@
 import {
   createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
-  getItem,
   flushPromises,
-  setItem
+  waitForReady
 } from '@register/tests/util'
 import { SELECT_VITAL_EVENT } from '@register/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { Store } from 'redux'
-import { getOfflineDataSuccess } from '@register/offline/actions'
-import { storage } from '@register/storage'
-import * as CommonUtils from '@register/utils/commonUtils'
-import * as fetchAny from 'jest-fetch-mock'
-
-const fetch = fetchAny as any
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
-jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
-
-beforeEach(() => {
-  window.history.replaceState({}, '', '/')
-  assign.mockClear()
-})
+import { waitForElement } from '@register/tests/wait-for-element'
 
 describe('when user is selecting the vital event', () => {
   let app: ReactWrapper
   let history: History
-  let store: Store
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
     const testApp = createTestApp()
     app = testApp.app
-    await flushPromises()
-    app.update()
     history = testApp.history
-    store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+    await waitForReady(app)
   })
 
   describe('when user is in vital event selection view', () => {
     beforeEach(async () => {
       history.replace(SELECT_VITAL_EVENT)
-      await flushPromises()
-      app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      for (let i = 1; i <= 8; i++) {
-        app
-          .find(`#keypad-${i % 2}`)
-          .hostNodes()
-          .simulate('click')
-      }
-      await flushPromises()
-      app.update()
+      await waitForElement(app, '#select_vital_event_view')
     })
     it('lists the options', () => {
       expect(app.find('#select_vital_event_view')).toHaveLength(2)

@@ -16,7 +16,7 @@ describe('facilities handler receives a request', () => {
         {
           id: '3fadd4e1-bcfd-470b-a997-07bc09631e2c',
           name: 'Moktarpur Union Parishad',
-          nameBn: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+          alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
           physicalType: 'Building',
           type: 'CRVS_OFFICE',
           partOf: 'Location/0'
