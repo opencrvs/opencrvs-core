@@ -39,6 +39,7 @@ import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectCon
 import TransitionWrapper from './components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
+import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -193,6 +194,10 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.VERIFY_COLLECTOR}
                                             component={VerifyCollector}
+                                          />
+                                          <ProtectedRoute
+                                            path={routes.REVIEW_CERTIFICATE}
+                                            component={ReviewCertificateAction}
                                           />
                                           <ProtectedRoute
                                             path={routes.SETTINGS}

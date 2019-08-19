@@ -6,6 +6,7 @@
       "messages": {
         "birth.form.section.child.name": "Child",
         "birth.form.section.child.title": "Child's details",
+        "buttons.editRecord": "Edit Record",
         "buttons.apply": "Apply",
         "buttons.approve": "Approve",
         "buttons.back": "Back",
@@ -740,6 +741,12 @@
         "password.mismatch": "Passwords do not match",
         "password.number": "At least one number",
         "password.validation.msg": "Password must have:",
+        "print.certificate.button.confirmPrint": "Confirm and Print",
+        "print.certificate.review.title": "Are all the details on the {event} certificate correct?",
+        "print.certificate.review.description": "Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.",
+        "print.certificate.review.modal.title": "Print Certificate?",
+        "print.certificate.review.modal.body": "A PDF of the certificate will open in a new tab - please print from there",
+        "print.certificate.toast.message": "Certificate is ready to print",
         "print.certificate.addAnotherSignature": "Add another",
         "print.certificate.birthService": "Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:",
         "print.certificate.certificatePreview": "Certificate Preview",
@@ -958,7 +965,13 @@
         "validations.validDeathRegistrationNumber": "The Death Registration Number can only be alpha numeric and must be {validLength} characters long",
         "validations.validDrivingLicenseNumber": "The Driving License Number can only be alpha numeric and must be {validLength} characters long",
         "validations.validNationalId": "The National ID can only be numeric and must be {validLength} digits long",
-        "validations.validPassportNumber": "The Passport Number can only be alpha numeric and must be {validLength} characters long"
+        "validations.validPassportNumber": "The Passport Number can only be alpha numeric and must be {validLength} characters long",
+        "form.field.label.userSignatureAttachmentTitle": "Attach the registrar’s signature",
+        "form.field.label.userSignatureAttachment": "Registrar’s signature",
+        "form.field.label.userSignatureAttachmentDesc": "Ask the registrar to sign a piece of paper and then scan or take a photo.",
+        "form.field.label.userAttachmentSection": "Attachments",
+        "form.field.label.addFile": "Add file",
+        "form.field.label.fileUploadError": "{type} supported only"
       }
     },
     {
@@ -967,6 +980,7 @@
       "messages": {
         "birth.form.section.child.name": "শিশু",
         "birth.form.section.child.title": "শিশুর বিবরণ",
+        "buttons.editRecord": "সম্পাদনা করুন",
         "buttons.apply": "প্রয়োগ করুন",
         "buttons.approve": "অনুমোদন করুন",
         "buttons.back": "পিছনে",
@@ -1706,6 +1720,12 @@
         "password.mismatch": "উল্লেখিত পাসওয়ার্ড মিলে নি",
         "password.number": "অন্ততঃ একটি নম্বর",
         "password.validation.msg": "পাসওয়ার্ড-এ যে বিষয়গুলো অবশ্যই থাকতে হবে:",
+        "print.certificate.button.confirmPrint": "নিশ্চিত এবং মুদ্রণ করুন",
+        "print.certificate.review.title": "{event} সনদের সমস্ত বিবরণ কি সঠিক?",
+        "print.certificate.review.description": "দয়া করে নিশ্চিত করুন যে আবেদনকারী পর্যালোচনা করেছেন যে শংসাপত্রের তথ্য সঠিক এবং এটি মুদ্রণের জন্য প্রস্তুত।",
+        "print.certificate.review.modal.body": "সনদপত্রের একটি পিডিএফ একটি নতুন ট্যাবে খুলবে - দয়া করে সেখান থেকে মুদ্রণ করুন",
+        "print.certificate.review.modal.title": "সনদপত্র মুদ্রণ?",
+        "print.certificate.toast.message": "সনদপত্র মুদ্রণের জন্য প্রস্তুত",
         "print.certificate.addAnotherSignature": "আরও একটি স্বাক্ষর যোগ করুন",
         "print.certificate.birthService": "সেবা: <strong>জন্মদিবসের {service} পরে জন্ম নিবন্ধন</strong><br/>পাওনা অঙ্ক:",
         "print.certificate.certificatePreview": "সার্টিফিকেট প্রাকদর্শন",
@@ -1925,7 +1945,13 @@
         "validations.validDeathRegistrationNumber": "মৃত্যু নিবন্ধন নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না",
         "validations.validDrivingLicenseNumber": "ড্রাইভিং লাইসেন্স নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না",
         "validations.validNationalId": "জাতীয় পরিচয় পত্র নম্বর শুধু মাত্র ইংরেজি সংখ্যায় হবে যেখানে {validLength} সংখ্যার বেশি গ্রহণযোগ্য হবে না",
-        "validations.validPassportNumber": "পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না"
+        "validations.validPassportNumber": "পাসপোর্ট নম্বরে ইংরেজি অক্ষর ও সংখ্যা দেয়া যাবে যেখানে {validLength} অক্ষর ও সংখ্যার বেশি গ্রহণযোগ্য হবে না",
+        "form.field.label.userSignatureAttachmentTitle": "নিবন্ধকের স্বাক্ষর সংযুক্ত করুন",
+        "form.field.label.userSignatureAttachment": "নিবন্ধকের স্বাক্ষর",
+        "form.field.label.userSignatureAttachmentDesc": "নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।",
+        "form.field.label.userAttachmentSection": "সংযুক্তি",
+        "form.field.label.addFile": "নথি যুক্ত করুন",
+        "form.field.label.fileUploadError": "শুধুমাত্র {type} গ্রহণযোগ্য "
       }
     }
   ]

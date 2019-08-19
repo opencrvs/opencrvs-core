@@ -29,6 +29,7 @@ export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
 export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
+export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
@@ -123,9 +124,15 @@ export type IFormFieldValue =
   | boolean
   | IFileValue[]
   | { [key: string]: string }
+  | IAttachmentValue
 
 export interface IFileValue {
   optionValues: IFormFieldValue[]
+  type: string
+  data: string
+}
+
+export interface IAttachmentValue {
   type: string
   data: string
 }
@@ -250,6 +257,10 @@ export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: ISelectOption[]
 }
+export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
+  type: typeof SIMPLE_DOCUMENT_UPLOADER
+  allowedDocType?: string[]
+}
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
   onCompleted?: (response: string) => void
@@ -313,6 +324,7 @@ export type IFormField =
   | IDynamicListFormField
   | ILoaderButton
   | ISearchFormField
+  | ISimpleDocumentUploaderFormField
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
   IFormFieldWithDynamicDefinitions
@@ -366,6 +378,7 @@ export interface IConditionals {
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
+  isRegistrarRoleSelected: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
@@ -519,6 +532,11 @@ export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: SelectComponentOption[]
 }
+export interface Ii18nSimpleDocumentUploaderFormField
+  extends Ii18nFormFieldBase {
+  type: typeof SIMPLE_DOCUMENT_UPLOADER
+  allowedDocType?: string[]
+}
 export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
   onCompleted?: (response: string) => void
@@ -570,6 +588,7 @@ export type Ii18nFormField =
   | Ii18nPDFDocumentViewerFormField
   | Ii18nLoaderButtonField
   | Ii18nSearchFormField
+  | Ii18nSimpleDocumentUploaderFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
