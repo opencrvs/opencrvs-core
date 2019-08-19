@@ -49,14 +49,12 @@ interface ICertificateMessages {
   amountDue: ReactIntl.FormattedMessage.MessageDescriptor
   typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
   whoToCollect: ReactIntl.FormattedMessage.MessageDescriptor
-<<<<<<< HEAD
   confirmAndPrint: ReactIntl.FormattedMessage.MessageDescriptor
   retiewTitle: ReactIntl.FormattedMessage.MessageDescriptor
   retiewDescription: ReactIntl.FormattedMessage.MessageDescriptor
   modalTitle: ReactIntl.FormattedMessage.MessageDescriptor
   modalBody: ReactIntl.FormattedMessage.MessageDescriptor
   toastMessage: ReactIntl.FormattedMessage.MessageDescriptor
-=======
   otherCollectorFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
   otherCollectorFormParagraph: ReactIntl.FormattedMessage.MessageDescriptor
   certificateCollectorError: ReactIntl.FormattedMessage.MessageDescriptor
@@ -67,7 +65,7 @@ interface ICertificateMessages {
   noSignedAffidavitAvailable: ReactIntl.FormattedMessage.MessageDescriptor
   noAffidavitModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
   noAffidavitModalDescription: ReactIntl.FormattedMessage.MessageDescriptor
->>>>>>> WIP: Certificate Collector Form
+  signedAffidavitFileLabel: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -321,7 +319,6 @@ const messagesToDefine: ICertificateMessages = {
     description: 'The label for collector of certificate select',
     id: 'print.certificate.collector.whoToCollect'
   },
-<<<<<<< HEAD
   confirmAndPrint: {
     defaultMessage: 'Confirm and Print',
     description: 'The text for Confirm & print button',
@@ -353,7 +350,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.toast.message',
     defaultMessage: 'Certificate is ready to print',
     description: 'Floating Toast message upon certificate ready to print'
-=======
+  },
   otherCollectorFormTitle: {
     defaultMessage: 'What is their ID and name',
     description: 'Title for other collector form',
@@ -409,7 +406,11 @@ const messagesToDefine: ICertificateMessages = {
     description:
       'Modal description for other coller form submission without signed affidavit',
     id: 'print.certificate.collector.other.affidavit.form.modal.description'
->>>>>>> WIP: Certificate Collector Form
+  },
+  signedAffidavitFileLabel: {
+    defaultMessage: 'Signed affidavit',
+    description: 'File label for signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.file.label'
   }
 }
 

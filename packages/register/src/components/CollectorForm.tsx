@@ -8,6 +8,7 @@ import {
   createReviewApplication,
   IApplication,
   modifyApplication,
+  deleteApplication,
   storeApplication
 } from '@register/applications'
 import {
@@ -15,17 +16,19 @@ import {
   Event,
   IForm,
   IFormData,
+  IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup,
-  IFormField
+  IFormSectionGroup
 } from '@register/forms'
 import {
-  getVisibleSectionGroupsBasedOnConditions,
-  getSectionFields
-} from '@register/forms/utils'
+  certCollectorGroupForBirthAppWithFatherDetails,
+  certCollectorGroupForBirthAppWithoutFatherDetails
+} from '@register/forms/certificate/fieldDefinitions/collectorSection'
+import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
+import { getValidationErrorsForForm } from '@register/forms/validation'
 import { buttonMessages, errorMessages } from '@register/i18n/messages'
-import { formMessages as messages } from '@register/i18n/messages/form'
+import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 import { goToHome, goToPrintCertificate } from '@register/navigation'
 import { PRINT_CERTIFICATE } from '@register/navigation/routes'
 import { IStoreState } from '@register/store'
@@ -45,13 +48,6 @@ import { RouteComponentProps } from 'react-router'
 import { Dispatch } from 'redux'
 import { withTheme } from 'styled-components'
 import { FormFieldGenerator } from './form'
-import {
-  certCollectorGroupForBirthAppWithFatherDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails
-} from '@register/forms/certificate/fieldDefinitions/collectorSection'
-import { getValidationErrorsForForm } from '@register/forms/validation'
-import { ErrorMessage } from '@opencrvs/components/lib/forms'
-import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -70,8 +66,8 @@ interface IBaseProps {
   goToHome: typeof goToHome
   storeApplication: typeof storeApplication
   modifyApplication: typeof modifyApplication
+  deleteApplication: typeof deleteApplication
   goToPrintCertificate: typeof goToPrintCertificate
-  dispatch: Dispatch
 }
 
 type IProps = IBaseProps & InjectedIntlProps
@@ -169,7 +165,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     fields: IFormField[],
     draft: IApplication | undefined
   ) => {
-    console.log(JSON.stringify(nextGroup))
     let errLength = 0
     if (draft) {
       const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
@@ -184,15 +179,36 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         showError: true
       })
     } else if (currentGroup === 'affidavit') {
-      this.setState({ showModalForNoSignedAffidavit: true })
+      if (draft && draft.data[sectionId] && draft.data[sectionId].signedFile) {
+        this.goToIDCheck()
+      } else {
+        if (
+          draft &&
+          draft.data[sectionId] &&
+          draft.data[sectionId].checkbox &&
+          (draft.data[sectionId].checkbox as string[]).length > 0
+        ) {
+          this.setState({ showModalForNoSignedAffidavit: true })
+        } else {
+          this.setState({
+            showError: true
+          })
+        }
+      }
     } else {
       this.setState({ showError: false, showModalForNoSignedAffidavit: false })
       if (!nextGroup) {
-        // this.props.goToHome()
+        this.props.goToHome()
       } else {
         this.props.goToPrintCertificate(applicationId, event, nextGroup)
       }
     }
+
+    draft && this.props.deleteApplication(draft)
+  }
+
+  goToIDCheck = () => {
+    this.props.goToHome()
   }
 
   toggleSubmitModalOpen = () => {
@@ -204,13 +220,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   render() {
     const {
       intl,
-      dispatch,
       event,
       applicationId,
       application,
       formSection,
       formGroup,
       goToHome,
+      deleteApplication,
       registerForm
     } = this.props
 
@@ -223,7 +239,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       formGroup,
       application
     )
-    console.log(`next: ${JSON.stringify(nextSectionGroup)}`)
     let applicationToBeCertified: IApplication = application as IApplication
     if (!applicationToBeCertified) {
       return (
@@ -271,7 +286,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       <>
         <ActionPageLight
           title={intl.formatMessage(formSection.title)}
-          goBack={goToHome}
+          goBack={() => {
+            deleteApplication(applicationToBeCertified)
+            goToHome()
+          }}
         >
           <FormSectionTitle>
             {formGroup.fields.length === 1 &&
@@ -309,7 +327,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
                 formSection.id,
                 formGroup.fields,
-                application
+                applicationToBeCertified
               )
             }}
           >
@@ -333,17 +351,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               <PrimaryButton
                 key="submit"
                 id="submit_confirm"
-                onClick={() => {
-                  this.continueButtonHandler(
-                    applicationToBeCertified.id,
-                    formGroup.id,
-                    nextSectionGroup ? nextSectionGroup.groupId : undefined,
-                    applicationToBeCertified.event.toLowerCase(),
-                    formSection.id,
-                    formGroup.fields,
-                    application
-                  )
-                }}
+                onClick={this.goToIDCheck}
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
               </PrimaryButton>
@@ -436,6 +444,7 @@ export const CollectorForm = connect(
     goToHome: goToHome,
     storeApplication,
     modifyApplication,
+    deleteApplication,
     goToPrintCertificate
   }
 )(injectIntl(withTheme(CollectorFormComponent)))
