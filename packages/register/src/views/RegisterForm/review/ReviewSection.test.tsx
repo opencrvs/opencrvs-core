@@ -21,6 +21,8 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { v4 as uuid } from 'uuid'
+import { waitForElement } from '@register/tests/wait-for-element'
+import { isMobileDevice } from '@register/utils/commonUtils'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
@@ -63,6 +65,10 @@ Object.defineProperty(window, 'outerWidth', {
   value: 1034
 })
 
+beforeEach(() => {
+  ;(isMobileDevice as jest.Mock).mockRestore()
+})
+
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
@@ -77,16 +83,12 @@ describe('when user is in the review page', () => {
       store
     )
     reviewSectionComponent = testComponent.component
+    await waitForElement(reviewSectionComponent, '#review_header')
   })
 
   it('Goes to child document while scroll to child section', async () => {
     window.dispatchEvent(new Event('scroll'))
-    await flushPromises()
-    reviewSectionComponent.update()
-
-    expect(
-      reviewSectionComponent.find('#document_section_child').hostNodes()
-    ).toHaveLength(1)
+    await waitForElement(reviewSectionComponent, '#document_section_child')
   })
 
   describe('when user clicks on change link', () => {
@@ -158,7 +160,13 @@ describe('return the correct label on dynamic fields', () => {
           statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
-        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        {
+          ...mockOfflineData,
+          offlineDataLoaded: true,
+          loadingError: false,
+          languages: [],
+          languageState: {}
+        },
         'bn'
       )
     ).toBe('চট্টগ্রাম')
@@ -173,7 +181,13 @@ describe('return the correct label on dynamic fields', () => {
           statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
-        { ...mockOfflineData, offlineDataLoaded: true, loadingError: false },
+        {
+          ...mockOfflineData,
+          offlineDataLoaded: true,
+          loadingError: false,
+          languages: [],
+          languageState: {}
+        },
         'en'
       )
     ).toBe('Chittagong')

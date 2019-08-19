@@ -1069,7 +1069,7 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    console.log(testComponent.component.debug())
+
     testComponent.component.unmount()
   })
 })

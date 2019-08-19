@@ -13,7 +13,7 @@ import {
   AUTH_URL
 } from '@resources/constants'
 import { validateFunc } from '@opencrvs/commons'
-
+import { languagesHandler as bgdLanguagesHandler } from '@resources/bgd/features/languages/handler'
 import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
 
@@ -57,6 +57,16 @@ export async function createServer() {
     method: 'GET',
     path: '/bgd/facilities',
     handler: bgdFacilitiesHandler,
+    options: {
+      tags: ['api'],
+      description: 'Returns Bangladesh facilities.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/bgd/languages/{application}',
+    handler: bgdLanguagesHandler,
     options: {
       tags: ['api'],
       description: 'Returns Bangladesh facilities.json'
