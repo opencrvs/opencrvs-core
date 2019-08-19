@@ -7,7 +7,8 @@ import {
   FIELD_GROUP_TITLE,
   IFormField,
   IFormSection,
-  IFormSectionData
+  IFormSectionData,
+  ISerializedFormSection
 } from '@register/forms'
 import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
@@ -109,6 +110,10 @@ class UserReviewFormComponent extends React.Component<
   }
 }
 
+function deserializeFormSection(form: ISerializedFormSection): IFormSection {
+  return null as any
+}
+
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
     goToCreateUserSection: (sec: string, fieldName: string) =>
@@ -116,7 +121,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goBack: () => dispatch(goBack()),
     submitForm: () => {
       const variables = draftToGqlTransformer(
-        { sections: [userSection] },
+        { sections: [deserializeFormSection(userSection)] },
         { user: props.formData }
       )
       dispatch(submitUserFormData(props.client, createUserMutation, variables))

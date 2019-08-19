@@ -4,7 +4,7 @@ import { childSection } from '@register/forms/register/fieldDefinitions/birth/ch
 import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
 import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
 
-export const documentForWhomFhirMapping = {
+export const birthDocumentForWhomFhirMapping = {
   Child: 'CHILD',
   Father: 'FATHER',
   Mother: 'MOTHER',
@@ -13,28 +13,28 @@ export const documentForWhomFhirMapping = {
   ChildAge: 'CHILD_AGE'
 }
 
-export const sectionMapping = {
+export const birthSectionMapping = {
   [childSection.id]: [
-    documentForWhomFhirMapping.Child,
-    documentForWhomFhirMapping.ChildAge
+    birthDocumentForWhomFhirMapping.Child,
+    birthDocumentForWhomFhirMapping.ChildAge
   ],
   [motherSection.id]: [
-    documentForWhomFhirMapping.Mother,
-    documentForWhomFhirMapping.Parent
+    birthDocumentForWhomFhirMapping.Mother,
+    birthDocumentForWhomFhirMapping.Parent
   ],
   [fatherSection.id]: [
-    documentForWhomFhirMapping.Father,
-    documentForWhomFhirMapping
+    birthDocumentForWhomFhirMapping.Father,
+    birthDocumentForWhomFhirMapping
   ]
 }
 
-export const sectionTitle = {
+export const birthSectionTitle = {
   [childSection.id]: 'Child',
   [motherSection.id]: 'Mother',
   [fatherSection.id]: 'Father'
 }
 
-export const documentTypeFhirMapping = {
+export const birthDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
@@ -63,7 +63,7 @@ export function birthFieldToAttachmentTransformer(
     sectionId,
     field,
     'registration',
-    documentForWhomFhirMapping,
-    documentTypeFhirMapping
+    birthDocumentForWhomFhirMapping,
+    birthDocumentTypeFhirMapping
   )
 }

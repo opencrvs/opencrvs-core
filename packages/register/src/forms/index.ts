@@ -1,4 +1,4 @@
-import { Validation, ValidationInitializer } from '@register/utils/validate'
+import { ValidationInitializer } from '@register/utils/validate'
 import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
@@ -10,6 +10,10 @@ import {
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
+
+import * as mutations from './mappings/mutation'
+import * as queries from './mappings/query'
+import * as validators from '@opencrvs/register/src/utils/validate'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -144,15 +148,65 @@ export type IFormFieldQueryMapFunction = (
   fieldDefinition: IFormField
 ) => void
 
+type FunctionParamsToDescriptor<T> = T extends Array<any>
+  ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
+  : T extends IFormFieldQueryMapFunction
+  ? IFormFieldQueryMapDescriptor<any>
+  : T extends IFormFieldMutationMapFunction
+  ? IFormFieldMutationMapDescriptor<any>
+  : T
+
+export type IFormFieldMutationMapDescriptor<
+  T extends keyof typeof mutations = keyof typeof mutations
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+}
+
+export type IFormFieldQueryMapDescriptor<
+  T extends keyof typeof queries = keyof typeof queries
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+}
+
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
 }
+
+/*
+ * These types are here only for replacing mapping types to
+ * serializable ones in IFormField. The default Omit type doesn't work
+ * with type unions :(
+ */
+
+type UnionKeys<T> = T extends any ? keyof T : never
+type UnionPick<T, K extends any> = T extends any
+  ? Pick<T, Extract<K, keyof T>>
+  : never
+
+type UnionOmit<T, K extends UnionKeys<T>> = UnionPick<
+  T,
+  Exclude<UnionKeys<T>, K>
+>
+
+export type SerializedFormField = UnionOmit<
+  IFormField,
+  'validate' | 'mapping'
+> & {
+  validate: IValidatorDescriptor[]
+  mapping?: {
+    mutation?: IFormFieldMutationMapDescriptor
+    query?: IFormFieldQueryMapDescriptor
+  }
+}
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: FormattedMessage.MessageDescriptor
-  validate: Validation[]
+  validate: validators.Validation[]
   required?: boolean
   prefix?: string
   postfix?: string
@@ -370,6 +424,32 @@ export interface IConditionals {
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
+type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
+
+export type IFormSectionMutationMapDescriptor<
+  T extends keyof typeof mutations = any
+> = {
+  operation: T
+  parameters: Params<typeof mutations[T]>
+}
+
+export type IFormSectionQueryMapDescriptor<
+  T extends keyof typeof queries = any
+> = {
+  operation: T
+  parameters: Params<typeof queries[T]>
+}
+
+export type IValidatorDescriptor<T extends keyof typeof validators = any> = {
+  operation: T
+  parameters: Params<typeof validators[T]>
+}
+
+export type IFormSectionMapping = {
+  mutation?: IFormSectionMutationMapFunction
+  query?: IFormSectionQueryMapFunction
+}
+
 export type IFormSectionMutationMapFunction = (
   transFormedData: any,
   draftData: IFormData,
@@ -382,10 +462,6 @@ export type IFormSectionQueryMapFunction = (
   sectionId: string
 ) => void
 
-export type IFormSectionMapping = {
-  mutation?: IFormSectionMutationMapFunction
-  query?: IFormSectionQueryMapFunction
-}
 export interface IFormSection {
   id: string
   viewType: ViewType
@@ -397,6 +473,19 @@ export interface IFormSection {
   notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapping
   hasDocumentSection?: boolean
+}
+
+export type ISerializedFormSection = Omit<
+  IFormSection,
+  'groups' | 'mapping'
+> & {
+  groups: Array<
+    Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
+  >
+  mapping?: {
+    mutation?: IFormFieldMutationMapDescriptor
+    query?: IFormFieldQueryMapDescriptor
+  }
 }
 
 export interface IFormSectionGroup {
@@ -411,6 +500,9 @@ export interface IFormSectionGroup {
 export interface IForm {
   sections: IFormSection[]
 }
+export interface ISerializedForm {
+  sections: ISerializedFormSection[]
+}
 
 export interface Ii18nSelectOption {
   value: string
@@ -422,7 +514,7 @@ export interface Ii18nFormFieldBase {
   type: string
   label: string
   description?: string
-  validate: Validation[]
+  validate: validators.Validation[]
   required?: boolean
   prefix?: string
   initialValue?: IFormFieldValue

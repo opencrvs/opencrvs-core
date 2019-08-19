@@ -1,6 +1,6 @@
 import { IFormField, IFormData } from '@register/forms'
 
-export const eventLocationMutationTransformer = (
+export const birthEventLocationMutationTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (

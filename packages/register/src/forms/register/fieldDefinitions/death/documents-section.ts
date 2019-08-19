@@ -1,18 +1,14 @@
 import {
-  IFormSection,
   ViewType,
   PARAGRAPH,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  ISerializedFormSection
 } from '@register/forms'
-import {
-  deathFieldToAttachmentTransformer,
-  documentForWhomFhirMapping
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
-import { deathAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
+import { deathDocumentForWhomFhirMapping } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 import { formMessages as messages } from '@register/i18n/messages'
 import { conditionals } from '@register/forms/utils'
 
-export const documentsSection: IFormSection = {
+export const documentsSection: ISerializedFormSection = {
   id: 'documents',
   viewType: 'form' as ViewType,
   name: messages.documentsName,
@@ -34,7 +30,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.deceasedIDProof,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping["Proof of Deceased's ID"],
+          extraValue: deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
           hideAsterisk: true,
           validate: [],
           options: [
@@ -44,8 +40,14 @@ export const documentsSection: IFormSection = {
             { value: 'Passport', label: messages.docTypePassport }
           ],
           mapping: {
-            mutation: deathFieldToAttachmentTransformer,
-            query: deathAttachmentToFieldTransformer
+            mutation: {
+              operation: 'deathFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'deathAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -53,7 +55,8 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.applicantIDProof,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping["Proof of Applicant's ID"],
+          extraValue:
+            deathDocumentForWhomFhirMapping["Proof of Applicant's ID"],
           hideAsterisk: true,
           validate: [],
           options: [
@@ -63,8 +66,14 @@ export const documentsSection: IFormSection = {
             { value: 'Passport', label: messages.docTypePassport }
           ],
           mapping: {
-            mutation: deathFieldToAttachmentTransformer,
-            query: deathAttachmentToFieldTransformer
+            mutation: {
+              operation: 'deathFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'deathAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -72,7 +81,8 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.deceasedDeathProof,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping['Proof of Death of Deceased'],
+          extraValue:
+            deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
           hideAsterisk: true,
           validate: [],
           options: [
@@ -102,8 +112,14 @@ export const documentsSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: deathFieldToAttachmentTransformer,
-            query: deathAttachmentToFieldTransformer
+            mutation: {
+              operation: 'deathFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'deathAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -112,7 +128,7 @@ export const documentsSection: IFormSection = {
           label: messages.deceasedPermanentAddressProof,
           initialValue: '',
           extraValue:
-            documentForWhomFhirMapping['Proof Deceased Permanent Address'],
+            deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
           hideAsterisk: true,
           validate: [],
           options: [
@@ -123,8 +139,14 @@ export const documentsSection: IFormSection = {
           ],
           conditionals: [conditionals.deceasedNationIdSelected],
           mapping: {
-            mutation: deathFieldToAttachmentTransformer,
-            query: deathAttachmentToFieldTransformer
+            mutation: {
+              operation: 'deathFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'deathAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         }
       ]

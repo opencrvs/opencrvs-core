@@ -40,7 +40,6 @@ import {
   IForm,
   IFormField,
   IFormFieldValue,
-  IFormSection,
   IFormSectionData,
   Ii18nFormField,
   INFORMATIVE_RADIO_GROUP,
@@ -59,7 +58,8 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   FIELD_GROUP_TITLE,
-  SEARCH_FIELD
+  SEARCH_FIELD,
+  IFormSection
 } from '@register/forms'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { InputField } from '@register/components/form/InputField'

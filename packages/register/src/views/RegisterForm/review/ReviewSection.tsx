@@ -73,12 +73,12 @@ import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
-  sectionMapping as birthSectionMapping,
-  sectionTitle as birthSectionTitle
+  birthSectionMapping,
+  birthSectionTitle
 } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import {
-  sectionMapping as deathSectionMapping,
-  sectionTitle as deathSectionTitle
+  deathSectionMapping,
+  deathSectionTitle
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 
 const RequiredField = styled.span`

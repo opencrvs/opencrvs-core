@@ -1,17 +1,14 @@
 import { formMessages as messages } from '@register/i18n/messages'
 import {
-  IFormSection,
   PARAGRAPH,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  ISerializedFormSection
 } from '@register/forms'
-import {
-  birthFieldToAttachmentTransformer,
-  documentForWhomFhirMapping
-} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
-import { birthAttachmentToFieldTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/documents-mappings'
+import { birthDocumentForWhomFhirMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+
 import { conditionals } from '@register/forms/utils'
 
-export const documentsSection: IFormSection = {
+export const documentsSection: ISerializedFormSection = {
   id: 'documents',
   viewType: 'form',
   name: messages.documentsName,
@@ -55,7 +52,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.proofOfMothersID,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping.Mother,
+          extraValue: birthDocumentForWhomFhirMapping.Mother,
           hideAsterisk: true,
           validate: [],
           options: [
@@ -67,8 +64,14 @@ export const documentsSection: IFormSection = {
             { value: 'Other', label: messages.docTypeOther }
           ],
           mapping: {
-            mutation: birthFieldToAttachmentTransformer,
-            query: birthAttachmentToFieldTransformer
+            mutation: {
+              operation: 'birthFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'birthAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -76,7 +79,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.proofOfFathersID,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping.Father,
+          extraValue: birthDocumentForWhomFhirMapping.Father,
           hideAsterisk: true,
           validate: [],
           options: [
@@ -88,8 +91,14 @@ export const documentsSection: IFormSection = {
             { value: 'Other', label: messages.docTypeOther }
           ],
           mapping: {
-            mutation: birthFieldToAttachmentTransformer,
-            query: birthAttachmentToFieldTransformer
+            mutation: {
+              operation: 'birthFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'birthAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -97,7 +106,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.proofOfParentPermanentAddress,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping.Parent,
+          extraValue: birthDocumentForWhomFhirMapping.Parent,
           hideAsterisk: true,
           validate: [],
           options: [
@@ -105,8 +114,14 @@ export const documentsSection: IFormSection = {
             { value: 'Other', label: messages.docTypeOther }
           ],
           mapping: {
-            mutation: birthFieldToAttachmentTransformer,
-            query: birthAttachmentToFieldTransformer
+            mutation: {
+              operation: 'birthFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'birthAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -114,7 +129,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.docTypeChildBirthProof,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping.Child,
+          extraValue: birthDocumentForWhomFhirMapping.Child,
           hideAsterisk: true,
           validate: [],
           options: [
@@ -133,8 +148,14 @@ export const documentsSection: IFormSection = {
             { value: 'Other', label: messages.docTypeOther }
           ],
           mapping: {
-            mutation: birthFieldToAttachmentTransformer,
-            query: birthAttachmentToFieldTransformer
+            mutation: {
+              operation: 'birthFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'birthAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -142,7 +163,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.docTypeChildAgeProof,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping.ChildAge,
+          extraValue: birthDocumentForWhomFhirMapping.ChildAge,
           hideAsterisk: true,
           validate: [],
           options: [
@@ -159,8 +180,14 @@ export const documentsSection: IFormSection = {
           ],
           conditionals: [conditionals.withIn45Days, conditionals.after5yrs],
           mapping: {
-            mutation: birthFieldToAttachmentTransformer,
-            query: birthAttachmentToFieldTransformer
+            mutation: {
+              operation: 'birthFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'birthAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -168,7 +195,7 @@ export const documentsSection: IFormSection = {
           type: DOCUMENT_UPLOADER_WITH_OPTION,
           label: messages.docTypeChildAgeProof,
           initialValue: '',
-          extraValue: documentForWhomFhirMapping.ChildAge,
+          extraValue: birthDocumentForWhomFhirMapping.ChildAge,
           hideAsterisk: true,
           validate: [],
           options: [
@@ -184,8 +211,14 @@ export const documentsSection: IFormSection = {
             conditionals.between46daysTo5yrs
           ],
           mapping: {
-            mutation: birthFieldToAttachmentTransformer,
-            query: birthAttachmentToFieldTransformer
+            mutation: {
+              operation: 'birthFieldToAttachmentTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'birthAttachmentToFieldTransformer',
+              parameters: []
+            }
           }
         }
       ]

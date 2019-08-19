@@ -1,6 +1,12 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
-import { IFormSectionData, IForm } from '@register/forms'
+import {
+  IFormSectionData,
+  IForm,
+  ISerializedForm,
+  ISerializedFormSection,
+  IFormSection
+} from '@register/forms'
 import { Action } from 'redux'
 import { formMessages as messages } from '@register/i18n/messages'
 import ApolloClient from 'apollo-client'
@@ -24,8 +30,16 @@ enum TOAST_MESSAGES {
   FAIL = 'userFormFail'
 }
 
+function deserializeForm(form: ISerializedForm): IForm {
+  return null as any
+}
+
+function deserializeFormSection(form: ISerializedFormSection): IFormSection {
+  return null as any
+}
+
 const initialState: IUserFormState = {
-  userForm: {
+  userForm: deserializeForm({
     sections: [
       userSection,
       {
@@ -41,7 +55,7 @@ const initialState: IUserFormState = {
         ]
       }
     ]
-  },
+  }),
   userFormData: {},
   submitting: true,
   submissionError: false
@@ -152,7 +166,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         ...state,
         submitting: false,
         userForm: {
-          sections: [updatedSection, ...state.userForm.sections]
+          sections: [
+            deserializeFormSection(updatedSection),
+            ...state.userForm.sections
+          ]
         }
       }
     case MODIFY_USER_FORM_DATA:

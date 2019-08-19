@@ -57,7 +57,7 @@ import {
   gqlToDraftTransformer,
   draftToGqlTransformer
 } from '@register/transformer'
-import { documentForWhomFhirMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+import { birthDocumentForWhomFhirMapping } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import {
   MutationProvider,
   MutationContext
@@ -368,7 +368,9 @@ class PrintCertificateActionComponent extends React.Component<
       details: draftToGqlTransformer(registerForm, draft.data)
     }
     let individual = null
-    if (data.personCollectingCertificate === documentForWhomFhirMapping.Other) {
+    if (
+      data.personCollectingCertificate === birthDocumentForWhomFhirMapping.Other
+    ) {
       individual = {
         name: [
           {

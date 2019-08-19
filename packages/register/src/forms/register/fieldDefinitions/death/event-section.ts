@@ -1,15 +1,15 @@
 import {
-  IFormSection,
   ViewType,
   DATE,
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEXT,
-  NUMBER
+  NUMBER,
+  ISerializedFormSection
 } from '@register/forms'
 import { RadioSize } from '@opencrvs/components/lib/forms'
-import { isValidDeathOccurrenceDate } from '@register/utils/validate'
+
 import { formMessages as messages } from '@register/i18n/messages'
 import { countries } from '@register/forms/countries'
 import { conditionals } from '@register/forms/utils'
@@ -17,27 +17,8 @@ import {
   OFFLINE_FACILITIES_KEY,
   OFFLINE_LOCATIONS_KEY
 } from '@register/offline/reducer'
-import {
-  sectionFieldToBundleFieldTransformer,
-  copyEventAddressTransformer
-} from '@register/forms/mappings/mutation/field-mappings'
-import {
-  fieldToDeceasedDateTransformation,
-  eventLocationMutationTransformer,
-  setRegistrationSectionTransformer
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/event-mappings'
-import {
-  eventLocationIDQueryTransformer,
-  bundleFieldToSectionFieldTransformer,
-  eventLocationQueryTransformer
-} from '@register/forms/mappings/query/field-mappings'
-import {
-  deceasedDateToFieldTransformation,
-  deathPlaceToFieldTransformer,
-  getRegistrationSectionTransformer
-} from '@register/forms/register/fieldDefinitions/death/mappings/query/event-mappings'
 
-export const eventSection: IFormSection = {
+export const eventSection: ISerializedFormSection = {
   id: 'deathEvent',
   viewType: 'form' as ViewType,
   name: messages.deathEventName,
@@ -54,10 +35,18 @@ export const eventSection: IFormSection = {
           ignorePlaceHolder: true,
           required: true,
           initialValue: '',
-          validate: [isValidDeathOccurrenceDate],
+          validate: [
+            { operation: 'isValidDeathOccurrenceDate', parameters: [] }
+          ],
           mapping: {
-            mutation: fieldToDeceasedDateTransformation('deceased'),
-            query: deceasedDateToFieldTransformation('deceased')
+            mutation: {
+              operation: 'fieldToDeceasedDateTransformation',
+              parameters: ['deceased']
+            },
+            query: {
+              operation: 'deceasedDateToFieldTransformation',
+              parameters: ['deceased']
+            }
           }
         }
       ]
@@ -91,8 +80,14 @@ export const eventSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: sectionFieldToBundleFieldTransformer('mannerOfDeath'),
-            query: bundleFieldToSectionFieldTransformer('mannerOfDeath')
+            mutation: {
+              operation: 'sectionFieldToBundleFieldTransformer',
+              parameters: ['mannerOfDeath']
+            },
+            query: {
+              operation: 'bundleFieldToSectionFieldTransformer',
+              parameters: ['mannerOfDeath']
+            }
           }
         }
       ]
@@ -123,8 +118,11 @@ export const eventSection: IFormSection = {
           ],
           conditionals: [],
           mapping: {
-            mutation: copyEventAddressTransformer('deceased'),
-            query: deathPlaceToFieldTransformer
+            mutation: {
+              operation: 'copyEventAddressTransformer',
+              parameters: ['deceased']
+            },
+            query: { operation: 'deathPlaceToFieldTransformer', parameters: [] }
           }
         }
       ]
@@ -146,8 +144,14 @@ export const eventSection: IFormSection = {
             dependency: 'deathPlaceAddress'
           },
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationIDQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationIDQueryTransformer',
+              parameters: []
+            }
           }
         }
       ]
@@ -167,8 +171,14 @@ export const eventSection: IFormSection = {
           placeholder: messages.select,
           options: countries,
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -185,8 +195,14 @@ export const eventSection: IFormSection = {
           },
           conditionals: [conditionals.country],
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -203,8 +219,14 @@ export const eventSection: IFormSection = {
           },
           conditionals: [conditionals.country, conditionals.state],
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -225,8 +247,14 @@ export const eventSection: IFormSection = {
             conditionals.district
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(6),
-            query: eventLocationQueryTransformer(6)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [6]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [6]
+            }
           }
         },
         {
@@ -249,8 +277,14 @@ export const eventSection: IFormSection = {
             conditionals.isNotCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(4),
-            query: eventLocationQueryTransformer(4)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [4]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [4]
+            }
           }
         },
         {
@@ -268,8 +302,14 @@ export const eventSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(5),
-            query: eventLocationQueryTransformer(5)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [5]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [5]
+            }
           }
         },
         {
@@ -287,8 +327,14 @@ export const eventSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(3),
-            query: eventLocationQueryTransformer(3)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [3]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [3]
+            }
           }
         },
         {
@@ -306,8 +352,14 @@ export const eventSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(2),
-            query: eventLocationQueryTransformer(2)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [2]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [2]
+            }
           }
         },
         {
@@ -325,8 +377,14 @@ export const eventSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(0, 'postalCode'),
-            query: eventLocationQueryTransformer(0, 'postalCode')
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [0, 'postalCode']
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [0, 'postalCode']
+            }
           }
         },
         {
@@ -344,8 +402,14 @@ export const eventSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(1),
-            query: eventLocationQueryTransformer(1)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [1]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [1]
+            }
           }
         },
         {
@@ -363,8 +427,14 @@ export const eventSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(0, 'postalCode'),
-            query: eventLocationQueryTransformer(0, 'postalCode')
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [0, 'postalCode']
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [0, 'postalCode']
+            }
           }
         }
       ]
@@ -384,8 +454,14 @@ export const eventSection: IFormSection = {
           placeholder: messages.select,
           options: countries,
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -402,8 +478,14 @@ export const eventSection: IFormSection = {
           },
           conditionals: [conditionals.country],
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -420,8 +502,14 @@ export const eventSection: IFormSection = {
           },
           conditionals: [conditionals.country, conditionals.state],
           mapping: {
-            mutation: eventLocationMutationTransformer(),
-            query: eventLocationQueryTransformer()
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -442,8 +530,14 @@ export const eventSection: IFormSection = {
             conditionals.district
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(6),
-            query: eventLocationQueryTransformer(6)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [6]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [6]
+            }
           }
         },
         {
@@ -466,8 +560,14 @@ export const eventSection: IFormSection = {
             conditionals.isNotCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(4),
-            query: eventLocationQueryTransformer(4)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [4]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [4]
+            }
           }
         },
         {
@@ -485,8 +585,14 @@ export const eventSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(5),
-            query: eventLocationQueryTransformer(5)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [5]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [5]
+            }
           }
         },
         {
@@ -504,8 +610,14 @@ export const eventSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(3),
-            query: eventLocationQueryTransformer(3)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [3]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [3]
+            }
           }
         },
         {
@@ -523,8 +635,14 @@ export const eventSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(2),
-            query: eventLocationQueryTransformer(2)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [2]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [2]
+            }
           }
         },
         {
@@ -542,8 +660,14 @@ export const eventSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(0, 'postalCode'),
-            query: eventLocationQueryTransformer(0, 'postalCode')
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [0, 'postalCode']
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [0, 'postalCode']
+            }
           }
         },
         {
@@ -561,8 +685,14 @@ export const eventSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(1),
-            query: eventLocationQueryTransformer(1)
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [1]
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [1]
+            }
           }
         },
         {
@@ -580,15 +710,27 @@ export const eventSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: eventLocationMutationTransformer(0, 'postalCode'),
-            query: eventLocationQueryTransformer(0, 'postalCode')
+            mutation: {
+              operation: 'deathEventLocationMutationTransformer',
+              parameters: [0, 'postalCode']
+            },
+            query: {
+              operation: 'eventLocationQueryTransformer',
+              parameters: [0, 'postalCode']
+            }
           }
         }
       ]
     }
   ],
   mapping: {
-    mutation: setRegistrationSectionTransformer,
-    query: getRegistrationSectionTransformer
+    mutation: {
+      operation: 'setDeathRegistrationSectionTransformer',
+      parameters: []
+    },
+    query: {
+      operation: 'getDeathRegistrationSectionTransformer',
+      parameters: []
+    }
   }
 }

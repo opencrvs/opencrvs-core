@@ -20,7 +20,7 @@ export const fieldToDeceasedDateTransformation = (
   return transformedData
 }
 
-export const eventLocationMutationTransformer = (
+export const deathEventLocationMutationTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (
@@ -64,7 +64,7 @@ export const eventLocationMutationTransformer = (
   return transformedData
 }
 
-export function setRegistrationSectionTransformer(
+export function setDeathRegistrationSectionTransformer(
   transformedData: any,
   draftData: IFormData,
   sectionId: string

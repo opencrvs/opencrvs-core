@@ -3,7 +3,7 @@ import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/
 import { deceasedSection } from '@register/forms/register/fieldDefinitions/death/deceased-section'
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 
-export const documentForWhomFhirMapping = {
+export const deathDocumentForWhomFhirMapping = {
   "Proof of Deceased's ID": 'DECEASED_ID_PROOF',
   'Proof Deceased Permanent Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
@@ -11,24 +11,24 @@ export const documentForWhomFhirMapping = {
   "Proof of Applicant's ID": 'APPLICANT_ID_PROOF'
 }
 
-export const sectionMapping = {
+export const deathSectionMapping = {
   [deceasedSection.id]: [
-    documentForWhomFhirMapping["Proof of Deceased's ID"],
-    documentForWhomFhirMapping['Proof Deceased Permanent Address'],
-    documentForWhomFhirMapping['Proof of Death of Deceased'],
-    documentForWhomFhirMapping['Proof of Date of Birth of Deceased']
+    deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
+    deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
+    deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
+    deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']
   ],
   [applicantsSection.id]: [
-    documentForWhomFhirMapping["Proof of Applicant's ID"]
+    deathDocumentForWhomFhirMapping["Proof of Applicant's ID"]
   ]
 }
 
-export const sectionTitle = {
+export const deathSectionTitle = {
   [deceasedSection.id]: 'Deceased',
   [applicantsSection.id]: 'Applicant'
 }
 
-export const documentTypeFhirMapping = {
+export const deathDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
@@ -53,7 +53,7 @@ export function deathFieldToAttachmentTransformer(
     sectionId,
     field,
     'registration',
-    documentForWhomFhirMapping,
-    documentTypeFhirMapping
+    deathDocumentForWhomFhirMapping,
+    deathDocumentTypeFhirMapping
   )
 }

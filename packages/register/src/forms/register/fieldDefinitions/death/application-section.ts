@@ -9,18 +9,10 @@ import {
   RADIO_GROUP,
   TEL,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
-  FETCH_BUTTON
+  FETCH_BUTTON,
+  ISerializedFormSection
 } from '@register/forms'
-import {
-  bengaliOnlyNameFormat,
-  englishOnlyNameFormat,
-  isValidBirthDate,
-  validIDNumber,
-  numeric,
-  maxLength,
-  isDateInPast,
-  phoneNumberFormat
-} from '@register/utils/validate'
+import { validIDNumber } from '@register/utils/validate'
 import { countries } from '@register/forms/countries'
 import {
   identityNameMapper,
@@ -31,35 +23,7 @@ import { formMessages as messages } from '@register/i18n/messages'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import { conditionals } from '@register/forms/utils'
 
-import {
-  fieldValueSectionExchangeTransformer,
-  fieldToAddressTransformer,
-  fieldToIdentifierTransformer,
-  fieldToNameTransformer,
-  fieldNameTransformer,
-  fieldToArrayTransformer,
-  copyAddressTransformer,
-  fieldToPhoneNumberTransformer
-} from '@register/forms/mappings/mutation/field-mappings'
-import {
-  nestedValueToFieldTransformer,
-  identifierToFieldTransformer,
-  nameToFieldTransformer,
-  arrayToFieldTransformer,
-  fieldValueTransformer,
-  addressToFieldTransformer,
-  sameAddressFieldTransformer,
-  sectionFieldExchangeTransformer
-} from '@register/forms/mappings/query/field-mappings'
-import {
-  phoneNumberToFieldTransformer,
-  getInformantSectionTransformer
-} from '@register/forms/register/fieldDefinitions/death/mappings/query/application-mappings'
-import {
-  fieldValueNestingTransformer,
-  setInformantSectionTransformer,
-  OBJECT_TYPE
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/applicant-mapping'
+import { OBJECT_TYPE } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/applicant-mapping'
 import {
   FETCH_REGISTRATION,
   transformRegistrationData
@@ -71,7 +35,7 @@ import {
 
 const NESTED_SECTION = 'individual'
 
-export const applicantsSection: IFormSection = {
+export const applicantsSection: ISerializedFormSection = {
   id: 'informant',
   viewType: 'form' as ViewType,
   name: messages.applicantName,
@@ -91,14 +55,27 @@ export const applicantsSection: IFormSection = {
           placeholder: messages.select,
           options: deathIdentityOptions,
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToIdentifierTransformer('type')
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              identifierToFieldTransformer('type')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToIdentifierTransformer',
+                  parameters: ['type']
+                }
+              ]
+            },
+
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'identifierToFieldTransformer',
+                  parameters: ['type']
+                }
+              ]
+            }
           }
         },
         {
@@ -110,14 +87,26 @@ export const applicantsSection: IFormSection = {
           validate: [],
           conditionals: [conditionals.iDType],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToIdentifierTransformer('otherType')
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              identifierToFieldTransformer('otherType')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToIdentifierTransformer',
+                  parameters: ['otherType']
+                }
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'identifierToFieldTransformer',
+                  parameters: ['otherType']
+                }
+              ]
+            }
           }
         },
         {
@@ -146,14 +135,26 @@ export const applicantsSection: IFormSection = {
           validate: [],
           conditionals: [conditionals.iDAvailable],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToIdentifierTransformer('id')
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              identifierToFieldTransformer('id')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToIdentifierTransformer',
+                  parameters: ['id']
+                }
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'identifierToFieldTransformer',
+                  parameters: ['id']
+                }
+              ]
+            }
           }
         },
         {
@@ -208,14 +209,20 @@ export const applicantsSection: IFormSection = {
           placeholder: messages.select,
           options: countries,
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToArrayTransformer
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              arrayToFieldTransformer
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                { operation: 'fieldToArrayTransformer', parameters: [] }
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                { operation: 'arrayToFieldTransformer', parameters: [] }
+              ]
+            }
           }
         },
         {
@@ -224,17 +231,29 @@ export const applicantsSection: IFormSection = {
           label: messages.applicantsGivenNames,
           required: false,
           initialValue: '',
-          validate: [bengaliOnlyNameFormat],
+          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToNameTransformer('bn', 'firstNames'),
-              OBJECT_TYPE.NAME
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              nameToFieldTransformer('bn', 'firstNames')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToNameTransformer',
+                  parameters: ['bn', 'firstNames']
+                },
+                OBJECT_TYPE.NAME
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'nameToFieldTransformer',
+                  parameters: ['bn', 'firstNames']
+                }
+              ]
+            }
           }
         },
         {
@@ -243,17 +262,29 @@ export const applicantsSection: IFormSection = {
           label: messages.applicantsFamilyName,
           required: true,
           initialValue: '',
-          validate: [bengaliOnlyNameFormat],
+          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToNameTransformer('bn', 'familyName'),
-              OBJECT_TYPE.NAME
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              nameToFieldTransformer('bn', 'familyName')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToNameTransformer',
+                  parameters: ['bn', 'familyName']
+                },
+                OBJECT_TYPE.NAME
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'nameToFieldTransformer',
+                  parameters: ['bn', 'familyName']
+                }
+              ]
+            }
           }
         },
         {
@@ -262,17 +293,29 @@ export const applicantsSection: IFormSection = {
           label: messages.applicantsGivenNamesEng,
           required: false,
           initialValue: '',
-          validate: [englishOnlyNameFormat],
+          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToNameTransformer('en', 'firstNames'),
-              OBJECT_TYPE.NAME
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              nameToFieldTransformer('en', 'firstNames')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToNameTransformer',
+                  parameters: ['en', 'firstNames']
+                },
+                OBJECT_TYPE.NAME
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'nameToFieldTransformer',
+                  parameters: ['en', 'firstNames']
+                }
+              ]
+            }
           }
         },
         {
@@ -281,17 +324,29 @@ export const applicantsSection: IFormSection = {
           label: messages.applicantsFamilyNameEng,
           required: true,
           initialValue: '',
-          validate: [englishOnlyNameFormat],
+          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToNameTransformer('en', 'familyName'),
-              OBJECT_TYPE.NAME
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              nameToFieldTransformer('en', 'familyName')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToNameTransformer',
+                  parameters: ['en', 'familyName']
+                },
+                OBJECT_TYPE.NAME
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'nameToFieldTransformer',
+                  parameters: ['en', 'familyName']
+                }
+              ]
+            }
           }
         },
         {
@@ -300,16 +355,28 @@ export const applicantsSection: IFormSection = {
           label: messages.applicantsDateOfBirth,
           required: false,
           initialValue: '',
-          validate: [isValidBirthDate, isDateInPast],
+          validate: [
+            { operation: 'isValidBirthDate', parameters: [] },
+            { operation: 'isDateInPast', parameters: [] }
+          ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldNameTransformer('birthDate')
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              fieldValueTransformer('birthDate')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                { operation: 'fieldNameTransformer', parameters: ['birthDate'] }
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldValueTransformer',
+                  parameters: ['birthDate']
+                }
+              ]
+            }
           }
         },
         {
@@ -343,11 +410,14 @@ export const applicantsSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: fieldValueSectionExchangeTransformer(
-              'informant',
-              'relationship'
-            ),
-            query: sectionFieldExchangeTransformer('informant', 'relationship')
+            mutation: {
+              operation: 'fieldValueSectionExchangeTransformer',
+              parameters: ['informant', 'relationship']
+            },
+            query: {
+              operation: 'sectionFieldExchangeTransformer',
+              parameters: ['informant', 'relationship']
+            }
           }
         },
         {
@@ -358,14 +428,14 @@ export const applicantsSection: IFormSection = {
           initialValue: '',
           validate: [],
           mapping: {
-            mutation: fieldValueSectionExchangeTransformer(
-              'informant',
-              'otherRelationship'
-            ),
-            query: sectionFieldExchangeTransformer(
-              'informant',
-              'otherRelationship'
-            )
+            mutation: {
+              operation: 'fieldValueSectionExchangeTransformer',
+              parameters: ['informant', 'otherRelationship']
+            },
+            query: {
+              operation: 'sectionFieldExchangeTransformer',
+              parameters: ['informant', 'otherRelationship']
+            }
           },
           conditionals: [conditionals.otherRelationship]
         },
@@ -375,17 +445,23 @@ export const applicantsSection: IFormSection = {
           label: messages.phoneNumber,
           required: true,
           initialValue: '',
-          validate: [phoneNumberFormat],
+          validate: [{ operation: 'phoneNumberFormat', parameters: [] }],
           hidden: true,
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToPhoneNumberTransformer()
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              phoneNumberToFieldTransformer
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                { operation: 'fieldToPhoneNumberTransformer', parameters: [] }
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                { operation: 'phoneNumberToFieldTransformer', parameters: [] }
+              ]
+            }
           }
         },
         {
@@ -406,15 +482,27 @@ export const applicantsSection: IFormSection = {
           placeholder: messages.select,
           options: countries,
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT'),
-              OBJECT_TYPE.NAME
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT']
+                },
+                OBJECT_TYPE.NAME
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT']
+                }
+              ]
+            }
           }
         },
         {
@@ -431,15 +519,27 @@ export const applicantsSection: IFormSection = {
           },
           conditionals: [conditionals.country],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT']
+                }
+              ]
+            }
           }
         },
         {
@@ -456,15 +556,27 @@ export const applicantsSection: IFormSection = {
           },
           conditionals: [conditionals.country, conditionals.state],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT']
+                }
+              ]
+            }
           }
         },
         {
@@ -484,15 +596,27 @@ export const applicantsSection: IFormSection = {
             conditionals.district
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 6),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 6)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 6]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 6]
+                }
+              ]
+            }
           }
         },
         {
@@ -515,15 +639,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isNotCityLocation
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 4),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 4)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 4]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 4]
+                }
+              ]
+            }
           }
         },
         {
@@ -542,15 +678,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 5),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 5)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 5]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 5]
+                }
+              ]
+            }
           }
         },
         {
@@ -568,15 +716,27 @@ export const applicantsSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 3),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 3)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 3]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 3]
+                }
+              ]
+            }
           }
         },
         {
@@ -595,15 +755,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 2),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 2)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 2]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 2]
+                }
+              ]
+            }
           }
         },
         {
@@ -612,7 +784,10 @@ export const applicantsSection: IFormSection = {
           label: messages.postCode,
           required: false,
           initialValue: '',
-          validate: [numeric, maxLength(4)],
+          validate: [
+            { operation: 'numeric', parameters: [] },
+            { operation: 'maxLength', parameters: [4] }
+          ],
           conditionals: [
             conditionals.country,
             conditionals.state,
@@ -622,15 +797,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isCityLocation
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 0, 'postalCode')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 0, 'postalCode']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 0, 'postalCode']
+                }
+              ]
+            }
           }
         },
         {
@@ -648,15 +835,27 @@ export const applicantsSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 1),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 1)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 1]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 1]
+                }
+              ]
+            }
           }
         },
         {
@@ -665,7 +864,10 @@ export const applicantsSection: IFormSection = {
           label: messages.postCode,
           required: false,
           initialValue: '',
-          validate: [numeric, maxLength(4)],
+          validate: [
+            { operation: 'numeric', parameters: [] },
+            { operation: 'maxLength', parameters: [4] }
+          ],
           conditionals: [
             conditionals.country,
             conditionals.state,
@@ -674,15 +876,27 @@ export const applicantsSection: IFormSection = {
             conditionals.addressLine3
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('CURRENT', 0, 'postalCode'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('CURRENT', 0, 'postalCode')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['CURRENT', 0, 'postalCode']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['CURRENT', 0, 'postalCode']
+                }
+              ]
+            }
           }
         },
         {
@@ -698,27 +912,39 @@ export const applicantsSection: IFormSection = {
           ],
           conditionals: [],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              copyAddressTransformer(
-                'CURRENT',
-                'informant',
-                'PERMANENT',
-                'informant',
-                true,
-                NESTED_SECTION
-              ),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              sameAddressFieldTransformer(
-                'CURRENT',
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
                 NESTED_SECTION,
-                'PERMANENT',
-                NESTED_SECTION
-              )
-            )
+                {
+                  operation: 'copyAddressTransformer',
+                  parameters: [
+                    'CURRENT',
+                    'informant',
+                    'PERMANENT',
+                    'informant',
+                    true,
+                    NESTED_SECTION
+                  ]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'sameAddressFieldTransformer',
+                  parameters: [
+                    'CURRENT',
+                    NESTED_SECTION,
+                    'PERMANENT',
+                    NESTED_SECTION
+                  ]
+                }
+              ]
+            }
           }
         },
         {
@@ -732,15 +958,27 @@ export const applicantsSection: IFormSection = {
           options: countries,
           conditionals: [conditionals.applicantPermanentAddressSameAsCurrent],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 0, 'country'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 0, 'country')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 0, 'country']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 0, 'country']
+                }
+              ]
+            }
           }
         },
         {
@@ -760,15 +998,27 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 0, 'state'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 0, 'state')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 0, 'state']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 0, 'state']
+                }
+              ]
+            }
           }
         },
         {
@@ -789,15 +1039,27 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 0, 'district'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 0, 'district')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 0, 'district']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 0, 'district']
+                }
+              ]
+            }
           }
         },
         {
@@ -819,15 +1081,27 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 6),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 6)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 6]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 6]
+                }
+              ]
+            }
           }
         },
         {
@@ -851,15 +1125,27 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 4),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 4)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 4]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 4]
+                }
+              ]
+            }
           }
         },
         {
@@ -877,15 +1163,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isCityLocationPermanent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 5),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 5)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 5]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 5]
+                }
+              ]
+            }
           }
         },
         {
@@ -904,15 +1202,27 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 3),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 3)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 3]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 3]
+                }
+              ]
+            }
           }
         },
         {
@@ -930,15 +1240,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isCityLocationPermanent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 2),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 2)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 2]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 2]
+                }
+              ]
+            }
           }
         },
         {
@@ -947,7 +1269,10 @@ export const applicantsSection: IFormSection = {
           label: messages.postCode,
           required: false,
           initialValue: '',
-          validate: [numeric, maxLength(4)],
+          validate: [
+            { operation: 'numeric', parameters: [] },
+            { operation: 'maxLength', parameters: [4] }
+          ],
           conditionals: [
             conditionals.countryPermanent,
             conditionals.statePermanent,
@@ -956,15 +1281,27 @@ export const applicantsSection: IFormSection = {
             conditionals.isCityLocationPermanent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 0, 'postalCode')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 0, 'postalCode']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 0, 'postalCode']
+                }
+              ]
+            }
           }
         },
         {
@@ -983,15 +1320,27 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 1),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 1)
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 1]
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 1]
+                }
+              ]
+            }
           }
         },
         {
@@ -1000,7 +1349,10 @@ export const applicantsSection: IFormSection = {
           label: messages.postCode,
           required: false,
           initialValue: '',
-          validate: [numeric, maxLength(4)],
+          validate: [
+            { operation: 'numeric', parameters: [] },
+            { operation: 'maxLength', parameters: [4] }
+          ],
           conditionals: [
             conditionals.countryPermanent,
             conditionals.statePermanent,
@@ -1010,22 +1362,34 @@ export const applicantsSection: IFormSection = {
             conditionals.applicantPermanentAddressSameAsCurrent
           ],
           mapping: {
-            mutation: fieldValueNestingTransformer(
-              NESTED_SECTION,
-              fieldToAddressTransformer('PERMANENT', 0, 'postalCode'),
-              OBJECT_TYPE.ADDRESS
-            ),
-            query: nestedValueToFieldTransformer(
-              NESTED_SECTION,
-              addressToFieldTransformer('PERMANENT', 0, 'postalCode')
-            )
+            mutation: {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: ['PERMANENT', 0, 'postalCode']
+                },
+                OBJECT_TYPE.ADDRESS
+              ]
+            },
+            query: {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                NESTED_SECTION,
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: ['PERMANENT', 0, 'postalCode']
+                }
+              ]
+            }
           }
         }
       ]
     }
   ],
   mapping: {
-    mutation: setInformantSectionTransformer,
-    query: getInformantSectionTransformer
+    mutation: { operation: 'setInformantSectionTransformer', parameters: [] },
+    query: { operation: 'getInformantSectionTransformer', parameters: [] }
   }
 }

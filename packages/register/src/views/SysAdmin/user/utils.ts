@@ -4,7 +4,9 @@ import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/use
 import {
   IFormField,
   ISelectFormFieldWithOptions,
-  ISelectFormFieldWithDynamicOptions
+  ISelectFormFieldWithDynamicOptions,
+  IFormSection,
+  ISerializedFormSection
 } from '@register/forms'
 import { userMessages } from '@register/i18n/messages'
 import { getRolesQuery } from './queries'
@@ -48,11 +50,15 @@ export const mockCompleteFormData = {
   username: ''
 }
 
+function deserializeFormSection(form: ISerializedFormSection): IFormSection {
+  return null as any
+}
+
 export const mockUserGraphqlOperation = {
   request: {
     query: createUserMutation,
     variables: draftToGqlTransformer(
-      { sections: [userSection] },
+      { sections: [deserializeFormSection(userSection)] },
       { user: mockCompleteFormData }
     )
   },

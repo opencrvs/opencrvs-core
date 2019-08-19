@@ -1,22 +1,15 @@
 import {
-  IFormSection,
   ViewType,
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
-  TEXT
+  TEXT,
+  ISerializedFormSection
 } from '@register/forms'
 import { formMessages as messages } from '@register/i18n/messages'
-import { maxLength, blockAlphaNumericDot } from '@register/utils/validate'
 import { conditionals } from '@register/forms/utils'
-import {
-  sectionFieldToBundleFieldTransformer,
-  ignoreFieldTransformer
-} from '@register/forms/mappings/mutation/field-mappings'
-import { bundleFieldToSectionFieldTransformer } from '@register/forms/mappings/query/field-mappings'
-import { hasCaseOfDeathSectionTransformer } from '@register/forms/register/fieldDefinitions/death/mappings/query/cause-of-death-mappings'
 import { RadioSize } from '@opencrvs/components/lib/forms'
 
-export const causeOfDeathSection: IFormSection = {
+export const causeOfDeathSection: ISerializedFormSection = {
   id: 'causeOfDeath',
   viewType: 'form' as ViewType,
   name: messages.causeOfDeathName,
@@ -42,8 +35,11 @@ export const causeOfDeathSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: ignoreFieldTransformer,
-            query: hasCaseOfDeathSectionTransformer
+            mutation: { operation: 'ignoreFieldTransformer', parameters: [] },
+            query: {
+              operation: 'hasCaseOfDeathSectionTransformer',
+              parameters: []
+            }
           }
         }
       ]
@@ -72,10 +68,14 @@ export const causeOfDeathSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: sectionFieldToBundleFieldTransformer(
-              'causeOfDeathMethod'
-            ),
-            query: bundleFieldToSectionFieldTransformer('causeOfDeathMethod')
+            mutation: {
+              operation: 'sectionFieldToBundleFieldTransformer',
+              parameters: ['causeOfDeathMethod']
+            },
+            query: {
+              operation: 'bundleFieldToSectionFieldTransformer',
+              parameters: ['causeOfDeathMethod']
+            }
           }
         },
         {
@@ -84,10 +84,19 @@ export const causeOfDeathSection: IFormSection = {
           initialValue: '',
           label: messages.causeOfDeathCode,
           required: false,
-          validate: [blockAlphaNumericDot, maxLength(17)],
+          validate: [
+            { operation: 'blockAlphaNumericDot', parameters: [] },
+            { operation: 'maxLength', parameters: [17] }
+          ],
           mapping: {
-            mutation: sectionFieldToBundleFieldTransformer('causeOfDeath'),
-            query: bundleFieldToSectionFieldTransformer('causeOfDeath')
+            mutation: {
+              operation: 'sectionFieldToBundleFieldTransformer',
+              parameters: ['causeOfDeath']
+            },
+            query: {
+              operation: 'bundleFieldToSectionFieldTransformer',
+              parameters: ['causeOfDeath']
+            }
           }
         }
       ]

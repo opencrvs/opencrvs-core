@@ -1,26 +1,13 @@
 import { formMessages as messages } from '@register/i18n/messages'
 import {
-  IFormSection,
   SELECT_WITH_OPTIONS,
   TEL,
   TEXTAREA,
-  WARNING
+  WARNING,
+  ISerializedFormSection
 } from '@register/forms'
-import { phoneNumberFormat } from '@register/utils/validate'
-import {
-  fieldNameTransformer,
-  fieldToCommentTransformer,
-  sectionFieldToBundleFieldTransformer
-} from '@register/forms/mappings/mutation/field-mappings'
-import {
-  fieldValueTransformer,
-  bundleFieldToSectionFieldTransformer,
-  commentToFieldTransformer
-} from '@register/forms/mappings/query/field-mappings'
-import { setRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/registration-mappings'
-import { getRegistrationSectionTransformer } from '@register/forms/register/fieldDefinitions/birth/mappings/query/registration-mappings'
 
-export const registrationSection: IFormSection = {
+export const registrationSection: ISerializedFormSection = {
   id: 'registration',
   viewType: 'hidden',
   name: messages.registrationName,
@@ -56,8 +43,14 @@ export const registrationSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: sectionFieldToBundleFieldTransformer(),
-            query: bundleFieldToSectionFieldTransformer()
+            mutation: {
+              operation: 'sectionFieldToBundleFieldTransformer',
+              parameters: []
+            },
+            query: {
+              operation: 'bundleFieldToSectionFieldTransformer',
+              parameters: []
+            }
           }
         },
         {
@@ -83,8 +76,14 @@ export const registrationSection: IFormSection = {
             }
           ],
           mapping: {
-            mutation: fieldNameTransformer('contact'),
-            query: fieldValueTransformer('contact')
+            mutation: {
+              operation: 'fieldNameTransformer',
+              parameters: ['contact']
+            },
+            query: {
+              operation: 'fieldValueTransformer',
+              parameters: ['contact']
+            }
           }
         },
         {
@@ -93,10 +92,16 @@ export const registrationSection: IFormSection = {
           label: messages.registrationPhoneLabel,
           required: true,
           initialValue: '',
-          validate: [phoneNumberFormat],
+          validate: [{ operation: 'phoneNumberFormat', parameters: [] }],
           mapping: {
-            mutation: fieldNameTransformer('contactPhoneNumber'),
-            query: fieldValueTransformer('contactPhoneNumber')
+            mutation: {
+              operation: 'fieldNameTransformer',
+              parameters: ['contactPhoneNumber']
+            },
+            query: {
+              operation: 'fieldValueTransformer',
+              parameters: ['contactPhoneNumber']
+            }
           }
         },
         {
@@ -115,15 +120,24 @@ export const registrationSection: IFormSection = {
           validate: [],
           description: messages.commentsOrNotesDescription,
           mapping: {
-            mutation: fieldToCommentTransformer,
-            query: commentToFieldTransformer
+            mutation: {
+              operation: 'fieldToCommentTransformer',
+              parameters: []
+            },
+            query: { operation: 'commentToFieldTransformer', parameters: [] }
           }
         }
       ]
     }
   ],
   mapping: {
-    mutation: setRegistrationSectionTransformer,
-    query: getRegistrationSectionTransformer
+    mutation: {
+      operation: 'setBirthRegistrationSectionTransformer',
+      parameters: []
+    },
+    query: {
+      operation: 'getBirthRegistrationSectionTransformer',
+      parameters: []
+    }
   }
 }
