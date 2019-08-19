@@ -3,8 +3,7 @@ import {
   createTestComponent,
   flushPromises,
   getFileFromBase64String,
-  validImageB64String,
-  inValidImageB64String
+  validImageB64String
 } from '@register/tests/util'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { createStore } from '@register/store'
@@ -12,7 +11,8 @@ import { ReactWrapper } from 'enzyme'
 import { modifyUserFormData } from '@register/views/SysAdmin/forms/userReducer'
 import {
   mockFetchRoleGraphqlOperation,
-  mockDataWithRegistarRoleSelected
+  mockDataWithRegistarRoleSelected,
+  mockUserGraphqlOperation
 } from '@register/views/SysAdmin/user/utils'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
@@ -136,6 +136,48 @@ describe('signature upload tests', () => {
       expect(history.location.pathname).toContain(
         '/createUser/preview/preview-user-view-group'
       )
+    })
+  })
+
+  describe('when user in review page', () => {
+    beforeEach(() => {
+      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+      testComponent = createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: 'preview',
+              groupId: 'preview-' + userSection.groups[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        store,
+        [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
+      ).component
+    })
+
+    it('renders review header', () => {
+      expect(
+        testComponent
+          .find('#preview_title')
+          .hostNodes()
+          .text()
+      ).toBe('Please review the new users details')
+    })
+
+    it('clicking submit button submits the form data', async () => {
+      testComponent
+        .find('#submit_user_form')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+
+      expect(store.getState().userForm.submitting).toBe(false)
     })
   })
 })
