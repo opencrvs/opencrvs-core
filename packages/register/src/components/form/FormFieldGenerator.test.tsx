@@ -28,7 +28,9 @@ const offlineResources = {
   facilities: mockOfflineData.facilities,
   healthFacilityFilterLocation: '',
   offlineDataLoaded: true,
-  loadingError: false
+  loadingError: false,
+  languages: [],
+  languageState: {}
 }
 
 describe('form component', () => {

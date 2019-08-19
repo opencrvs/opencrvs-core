@@ -85,8 +85,8 @@ context('Birth Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get('#pin-keypad-container')
-      .click()
-      .type(`${i % 2}`)
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING PAGE
     cy.wait(3000)
@@ -350,8 +350,8 @@ context('Birth Integration Test', () => {
     cy.get('#createPinBtn', { timeout: 30000 }).click()
     for (let i = 1; i <= 8; i++) {
       cy.get('#pin-keypad-container')
-      .click()
-      .type(`${i % 2}`)
+        .click()
+        .type(`${i % 2}`)
     }
     // LANDING PAGE
     cy.wait(3000)
