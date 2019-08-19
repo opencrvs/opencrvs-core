@@ -167,10 +167,9 @@ export const profileReducer: LoopReducer<
       )
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
-      const userDetailsCollection = JSON.parse(
+      const userDetailsCollection: IUserDetails | null = JSON.parse(
         userDetailsString ? userDetailsString : 'null'
       )
-
       // if the user detail cannot be found or they don't match the user specified in the token
       if (
         state.tokenPayload &&
@@ -193,7 +192,7 @@ export const profileReducer: LoopReducer<
             ...state,
             userDetails: userDetailsCollection
           },
-          Cmd.action(offlineActions.setOfflineData(userDetailsCollection))
+          Cmd.action(offlineActions.setOfflineData(userDetailsCollection!))
         )
       }
 

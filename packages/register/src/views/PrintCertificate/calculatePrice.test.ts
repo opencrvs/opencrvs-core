@@ -3,7 +3,7 @@ import {
   timeElapsed
 } from '@register/views/PrintCertificate/calculatePrice'
 
-describe('calculateDays, timeElapsed tests', async () => {
+describe('calculateDays, timeElapsed tests', () => {
   it('timeElapsedInWords function returns required time duration in words', () => {
     // @ts-ignore
     Date.now = jest.fn(() => new Date('2019-01-01'))

@@ -7,7 +7,7 @@ import { activateUserMutation } from './queries'
 
 const { store } = createStore()
 
-describe('SetupReviewPage page tests', async () => {
+describe('SetupReviewPage page tests', () => {
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
   })

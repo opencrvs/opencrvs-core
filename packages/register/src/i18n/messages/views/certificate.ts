@@ -42,6 +42,12 @@ interface ICertificateMessages {
   serviceYear: ReactIntl.FormattedMessage.MessageDescriptor
   typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
   whoToCollect: ReactIntl.FormattedMessage.MessageDescriptor
+  confirmAndPrint: ReactIntl.FormattedMessage.MessageDescriptor
+  retiewTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  retiewDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  modalTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  modalBody: ReactIntl.FormattedMessage.MessageDescriptor
+  toastMessage: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -254,6 +260,38 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Who is collecting the certificate?',
     description: 'The label for collector of certificate select',
     id: 'print.certificate.collector.whoToCollect'
+  },
+  confirmAndPrint: {
+    defaultMessage: 'Confirm and Print',
+    description: 'The text for Confirm & print button',
+    id: 'print.certificate.button.confirmPrint'
+  },
+  retiewTitle: {
+    defaultMessage: 'Are all the details on the {event} certificate correct?',
+    description: 'Certificate review title',
+    id: 'print.certificate.review.title'
+  },
+  retiewDescription: {
+    defaultMessage:
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.',
+    description: 'Certificate review description',
+    id: 'print.certificate.review.description'
+  },
+  modalTitle: {
+    id: 'print.certificate.review.modal.title',
+    defaultMessage: 'Print Certificate?',
+    description: 'Print certificate modal title text'
+  },
+  modalBody: {
+    id: 'print.certificate.review.modal.body',
+    defaultMessage:
+      'A PDF of the certificate will open in a new tab - please print from there',
+    description: 'Print certificate modal body text'
+  },
+  toastMessage: {
+    id: 'print.certificate.toast.message',
+    defaultMessage: 'Certificate is ready to print',
+    description: 'Floating Toast message upon certificate ready to print'
   }
 }
 

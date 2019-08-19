@@ -38,6 +38,7 @@ import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/S
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
 import TransitionWrapper from './components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -186,6 +187,10 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             path={routes.PRINT_CERTIFICATE}
                                             component={PrintCertificateAction}
+                                          />
+                                          <ProtectedRoute
+                                            path={routes.REVIEW_CERTIFICATE}
+                                            component={ReviewCertificateAction}
                                           />
                                           <ProtectedRoute
                                             path={routes.SETTINGS}
