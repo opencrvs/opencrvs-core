@@ -37,6 +37,7 @@ interface IButtonsMessages {
   upload: ReactIntl.FormattedMessage.MessageDescriptor
   yes: ReactIntl.FormattedMessage.MessageDescriptor
   approve: ReactIntl.FormattedMessage.MessageDescriptor
+  editRecord: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -219,6 +220,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Yes',
     description: 'Yes button text',
     id: 'buttons.yes'
+  },
+  editRecord: {
+    id: 'buttons.editRecord',
+    defaultMessage: 'Edit record',
+    description: 'Edit record button text on review certificate'
   }
 }
 
