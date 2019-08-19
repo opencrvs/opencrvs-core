@@ -21,7 +21,7 @@ export interface IStatistic {
 export interface ILocation {
   id?: string
   name?: string
-  nameBn?: string
+  alias?: string
   physicalType?: string
   jurisdictionType?: string
   type?: string
