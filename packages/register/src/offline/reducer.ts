@@ -232,7 +232,6 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
         offlineDataString ? offlineDataString : '{}'
       )
 
-      // @todo what is this condition?
       const hasAllRequiredData =
         offlineData.locations && offlineData.facilities && offlineData.languages
 

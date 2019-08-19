@@ -3,11 +3,13 @@ import {
   createTestApp,
   mockOfflineData,
   createTestComponent,
-  getItem
+  getItem,
+  flushPromises
 } from '@register/tests/util'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { createClient } from '@register/utils/apolloClient'
 import * as actions from '@register/notification/actions'
+import { referenceApi } from '@register/utils/referenceApi'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
 import { createStore } from '@register/store'
 import { waitFor } from './tests/wait-for-element'
@@ -72,16 +74,26 @@ describe('when session expired', () => {
 })
 
 describe('when user has a valid token in local storage', () => {
-  const { store } = createTestApp()
-
   beforeEach(() => {
     getItem.mockReturnValue(validToken)
-
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
 
   it("doesn't redirect user to SSO", async () => {
+    createTestApp()
+    await flushPromises()
     expect(assign.mock.calls).toHaveLength(0)
+  })
+
+  it('loads languages, facilities and locations on startup', async () => {
+    const loadFacilities = jest.spyOn(referenceApi, 'loadFacilities')
+    const loadLanguages = jest.spyOn(referenceApi, 'loadLanguages')
+    const loadLocations = jest.spyOn(referenceApi, 'loadLocations')
+
+    createTestApp()
+    await flushPromises()
+    expect(loadFacilities).toHaveBeenCalled()
+    expect(loadLanguages).toHaveBeenCalled()
+    expect(loadLocations).toHaveBeenCalled()
   })
 })
 
