@@ -1,4 +1,3 @@
-import { Footer } from '@opencrvs/components/lib/interface/'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
 import { History, Location } from 'history'
@@ -237,9 +236,6 @@ export class App extends React.Component<IAppProps> {
                               />
                             </ProtectedPage>
                           </MainSection>
-                          <Footer>
-                            <p>OpenCRVS {new Date().getFullYear()}</p>
-                          </Footer>
                         </Page>
                       </NotificationComponent>
                     </ScrollToTop>
