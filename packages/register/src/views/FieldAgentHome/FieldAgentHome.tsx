@@ -80,7 +80,10 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 8px;
   }
-  ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  ${({ active }) =>
+    active
+      ? 'border-bottom: 3px solid #5E93ED'
+      : 'border-bottom: 3px solid transparent'};
   & > div {
     padding: 0 8px;
   }
