@@ -37,7 +37,6 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { Dispatch } from 'redux'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -102,11 +101,14 @@ type IProps = {
   registrationId: string
   draft: IApplication
   registerForm: IForm
+  modifyApplication: typeof modifyApplication
+  goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
+  storeApplication: typeof storeApplication
 }
 
 type IFullProps = InjectedIntlProps &
   RouteComponentProps<{}> &
-  IProps & { dispatch: Dispatch; drafts: IApplicationsState }
+  IProps & { drafts: IApplicationsState }
 
 class ReviewCertificateActionComponent extends React.Component<
   IFullProps,
@@ -127,12 +129,12 @@ class ReviewCertificateActionComponent extends React.Component<
   }
 
   readyToCertify = () => {
-    const { dispatch, draft } = this.props
+    const { draft } = this.props
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
-    dispatch(modifyApplication(draft))
+    this.props.modifyApplication(draft)
     this.toggleModal()
-    dispatch(goToRegistrarHomeTabAction(TAB_ID.readyForPrint))
+    this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
   }
 
   getTitle = () => {
@@ -162,7 +164,7 @@ class ReviewCertificateActionComponent extends React.Component<
 
   render = () => {
     const {
-      dispatch,
+      goToRegistrarHomeTabAction,
       registrationId,
       event,
       intl,
@@ -175,9 +177,7 @@ class ReviewCertificateActionComponent extends React.Component<
           title={intl.formatHTMLMessage(
             certificateMessages.certificateCollectionTitle
           )}
-          goHome={() =>
-            dispatch(goToRegistrarHomeTabAction(TAB_ID.readyForPrint))
-          }
+          goHome={() => goToRegistrarHomeTabAction(TAB_ID.readyForPrint)}
         />
         <BodyContent>
           <FormContainer>
@@ -203,8 +203,7 @@ class ReviewCertificateActionComponent extends React.Component<
                   }
 
                   if (data) {
-                    // @ts-ignore
-                    const retrievedData = data[dataKey]
+                    const retrievedData = data[dataKey as keyof typeof data]
                     const transData: IFormData = gqlToDraftTransformer(
                       this.props.registerForm,
                       retrievedData
@@ -218,7 +217,7 @@ class ReviewCertificateActionComponent extends React.Component<
                       draft => draft.id === registrationId
                     )
                     if (!draftExist) {
-                      dispatch(storeApplication(reviewDraft))
+                      this.props.storeApplication(reviewDraft)
                     }
 
                     return (
@@ -329,6 +328,12 @@ function mapStatetoProps(
     registerForm: state.registerForm.registerForm[event]
   }
 }
+const mapDispatchToProps = {
+  modifyApplication,
+  goToRegistrarHomeTabAction,
+  storeApplication
+}
 export const ReviewCertificateAction = connect(
-  (state: IStoreState) => mapStatetoProps
-)(injectIntl(ReviewCertificateActionComponent))
+  mapStatetoProps,
+  mapDispatchToProps
+)(injectIntl<IFullProps>(ReviewCertificateActionComponent))

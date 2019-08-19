@@ -158,9 +158,11 @@ export class RegistrationHomeView extends React.Component<
     this.state = {
       reviewCurrentPage: 1,
       updatesCurrentPage: 1,
-      showCertificateToast: !!this.props.applications.filter(
-        item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
-      ).length
+      showCertificateToast: Boolean(
+        this.props.applications.filter(
+          item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
+        ).length
+      )
     }
   }
 
