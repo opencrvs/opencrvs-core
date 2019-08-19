@@ -377,9 +377,11 @@ export const getSectionFields = (
   return fields
 }
 
-export const getActiveGroupFields = (activeGroup: IFormSectionGroup) => {
+export const getFieldsFromFormSectionGroup = (
+  formSectionGroup: IFormSectionGroup
+) => {
   let fields: IFormField[] = []
-  activeGroup.fields.forEach(field => (fields = fields.concat(field)))
+  formSectionGroup.fields.forEach(field => (fields = fields.concat(field)))
   return fields
 }
 
@@ -582,7 +584,7 @@ export const conditionals: IConditionals = {
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
   },
-  isRegistrarRoleSeleted: {
+  isRegistrarRoleSelected: {
     action: 'hide',
     expression: 'values.role!=="LOCAL_REGISTRAR"'
   }

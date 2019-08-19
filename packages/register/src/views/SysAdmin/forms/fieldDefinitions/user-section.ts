@@ -170,7 +170,7 @@ export const userSection: IFormSection = {
     {
       id: 'signature-attachment',
       title: messages.userSignatureAttachmentTitle,
-      conditionals: [conditionals.isRegistrarRoleSeleted],
+      conditionals: [conditionals.isRegistrarRoleSelected],
       fields: [
         {
           name: 'attachmentTitle',

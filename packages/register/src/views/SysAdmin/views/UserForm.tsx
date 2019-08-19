@@ -10,7 +10,7 @@ import {
   getSectionFields,
   hasFormError,
   getVisibleGroupFields,
-  getActiveGroupFields
+  getFieldsFromFormSectionGroup
 } from '@register/forms/utils'
 import { goToCreateUserSection, goToHome } from '@register/navigation'
 import styled from '@register/styledComponents'
@@ -56,7 +56,7 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   handleFormAction = () => {
     const { formData, activeGroup } = this.props
-    if (hasFormError(getActiveGroupFields(activeGroup), formData)) {
+    if (hasFormError(getFieldsFromFormSectionGroup(activeGroup), formData)) {
       this.showAllValidationErrors()
     } else {
       this.props.goToCreateUserSection(
