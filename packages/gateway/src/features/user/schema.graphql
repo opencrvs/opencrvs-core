@@ -9,10 +9,6 @@ type UserIdentifier { # -> identifier
   system: String # -> .system
   value: String # -> .system
 }
-input SignatureInput {
-  data: String
-  type: String
-}
 
 input SignatureInput {
   data: String
@@ -32,6 +28,7 @@ input UserInput {
   device: String
   signature: SignatureInput
 }
+
 type Signature {
   data: String
   type: String
