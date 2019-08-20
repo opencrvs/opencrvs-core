@@ -8,7 +8,6 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  ISerializedFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue
 } from '@register/forms'
@@ -31,6 +30,7 @@ import {
 } from '@register/i18n/messages'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { SimpleDocumentUploader } from '@register/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -50,10 +50,6 @@ interface ISectionData {
 }
 
 type IFullProps = IUserReviewFormProps & InjectedIntlProps
-
-function deserializeFormSection(form: ISerializedFormSection): IFormSection {
-  return null as any
-}
 
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps

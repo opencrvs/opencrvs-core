@@ -453,7 +453,9 @@ export type IFormSectionQueryMapDescriptor<
   parameters: Params<typeof queries[T]>
 }
 
-export type IValidatorDescriptor<T extends keyof typeof validators = any> = {
+export type IValidatorDescriptor<
+  T extends keyof typeof validators = keyof typeof validators
+> = {
   operation: T
   parameters: Params<typeof validators[T]>
 }

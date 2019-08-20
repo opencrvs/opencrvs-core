@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, ISerializedForm } from '@register/forms'
+import { IForm } from '@register/forms'
 import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
 import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
 import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
@@ -11,16 +11,13 @@ import { eventSection } from '@register/forms/register/fieldDefinitions/death/ev
 import { causeOfDeathSection } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
 import { documentsSection as deathDocumentsSection } from '@register/forms/register/fieldDefinitions/death/documents-section'
 import { messages } from '@register/i18n/messages/views/review'
+import { deserializeForm } from '@register/forms/mappings/deserializer'
 
 export type IRegisterFormState = {
   registerForm: {
     birth: IForm
     death: IForm
   }
-}
-
-function deserializeForm(form: ISerializedForm): IForm {
-  return null as any
 }
 
 export const initialState: IRegisterFormState = {
