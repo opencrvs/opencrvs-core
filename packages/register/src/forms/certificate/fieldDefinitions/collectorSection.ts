@@ -28,7 +28,7 @@ export const certCollectorGroupForBirthAppWithFatherDetails: IFormSectionGroup =
   error: certificateMessages.certificateCollectorError,
   fields: [
     {
-      name: 'collector',
+      name: 'type',
       type: RADIO_GROUP,
       size: RadioSize.LARGE,
       label: certificateMessages.whoToCollect,
@@ -50,7 +50,7 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
   error: certificateMessages.certificateCollectorError,
   fields: [
     {
-      name: 'collector',
+      name: 'type',
       type: RADIO_GROUP,
       size: RadioSize.LARGE,
       label: certificateMessages.whoToCollect,
@@ -66,7 +66,7 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
 }
 
 export const collectBirthCertificateFormSection: IFormSection = {
-  id: 'collectBirthCertificate',
+  id: 'collector',
   viewType: 'form',
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
@@ -178,7 +178,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           validate: []
         },
         {
-          name: 'checkbox',
+          name: 'noAffidavitAgreement',
           type: CHECKBOX_GROUP,
           label: certificateMessages.noLabel,
           initialValue: [],
@@ -197,7 +197,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
 }
 
 export const collectDeathCertificateFormSection: IFormSection = {
-  id: 'collectDeathCertificate',
+  id: 'collector',
   viewType: 'form',
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
@@ -208,7 +208,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
       error: certificateMessages.certificateCollectorError,
       fields: [
         {
-          name: 'collector',
+          name: 'type',
           type: RADIO_GROUP,
           size: RadioSize.LARGE,
           label: certificateMessages.whoToCollect,
@@ -216,7 +216,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           initialValue: true,
           validate: [],
           options: [
-            { value: 'APPLICANT', label: formMessages.applicantName },
+            { value: 'INFORMANT', label: formMessages.applicantName },
             { value: 'OTHER', label: formMessages.someoneElse }
           ]
         }
@@ -329,7 +329,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           validate: []
         },
         {
-          name: 'checkbox',
+          name: 'noAffidavitAgreement',
           type: CHECKBOX_GROUP,
           label: certificateMessages.noLabel,
           required: false,
