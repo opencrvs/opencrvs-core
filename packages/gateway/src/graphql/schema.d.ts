@@ -333,14 +333,8 @@ export interface GQLUser {
   type?: string
   email?: string
   status?: string
-  signature?: GQLSignature
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
-}
-
-export interface GQLSignature {
-  data?: string
-  type?: string
 }
 
 export interface GQLComment {
@@ -867,7 +861,6 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
-  Signature?: GQLSignatureTypeResolver
   Comment?: GQLCommentTypeResolver
   Certificate?: GQLCertificateTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1990,7 +1983,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
-  signature?: UserToSignatureResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
 }
@@ -2035,28 +2027,11 @@ export interface UserToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToSignatureResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLSignatureTypeResolver<TParent = any> {
-  data?: SignatureToDataResolver<TParent>
-  type?: SignatureToTypeResolver<TParent>
-}
-
-export interface SignatureToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -31,6 +31,7 @@ type Signature {
   data: String
   type: String
 }
+
 type User {
   id: ID
   userMgntUserID: ID
@@ -42,7 +43,6 @@ type User {
   type: String
   email: String
   status: String
-  signature: Signature
   primaryOffice: Location
   catchmentArea: [Location]
 }
