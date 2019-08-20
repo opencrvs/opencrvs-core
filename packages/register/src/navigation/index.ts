@@ -9,6 +9,7 @@ import {
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
+  CERTIFICATE_COLLECTOR,
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
   SEARCH,
@@ -21,8 +22,7 @@ import {
   SELECT_BIRTH_MAIN_CONTACT_POINT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
   VERIFY_COLLECTOR,
-  REVIEW_CERTIFICATE,
-  PRINT_CERTIFICATE
+  REVIEW_CERTIFICATE
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
@@ -198,7 +198,7 @@ export function goToPrintCertificate(
   groupId?: string
 ) {
   return push(
-    formatUrl(PRINT_CERTIFICATE, {
+    formatUrl(CERTIFICATE_COLLECTOR, {
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'birthCertCollectorGroup'

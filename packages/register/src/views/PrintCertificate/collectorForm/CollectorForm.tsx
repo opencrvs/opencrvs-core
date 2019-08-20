@@ -25,7 +25,7 @@ import {
 import {
   certCollectorGroupForBirthAppWithFatherDetails,
   certCollectorGroupForBirthAppWithoutFatherDetails
-} from '@register/forms/certificate/collectorForm/collectorSection'
+} from '@register/forms/certificate/fieldDefinitions/collectorSection'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { buttonMessages, errorMessages } from '@register/i18n/messages'
@@ -35,7 +35,7 @@ import {
   goToPrintCertificate,
   goToVerifyCollector
 } from '@register/navigation'
-import { PRINT_CERTIFICATE } from '@register/navigation/routes'
+import { CERTIFICATE_COLLECTOR } from '@register/navigation/routes'
 import { IStoreState } from '@register/store'
 import styled, { ITheme } from '@register/styledComponents'
 import { gqlToDraftTransformer } from '@register/transformer'
@@ -455,7 +455,7 @@ const mapStateToProps = (
   return {
     registerForm: state.registerForm.registerForm[event],
     event,
-    pageRoute: PRINT_CERTIFICATE,
+    pageRoute: CERTIFICATE_COLLECTOR,
     applicationId: registrationId,
     application,
     formSection,
