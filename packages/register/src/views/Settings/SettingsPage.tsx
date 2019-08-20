@@ -165,7 +165,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
     const { userDetails, intl, languages } = this.props
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
-    availableLangs.map((lang: string) => {
+    availableLangs.forEach((lang: string) => {
       if (languages[lang]) {
         langChoice.push({
           value: lang,
