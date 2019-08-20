@@ -25,7 +25,7 @@ import {
 import {
   certCollectorGroupForBirthAppWithFatherDetails,
   certCollectorGroupForBirthAppWithoutFatherDetails
-} from '@register/forms/certificate/fieldDefinitions/collectorSection'
+} from '@register/forms/certificate/collectorForm/collectorSection'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { buttonMessages, errorMessages } from '@register/i18n/messages'
@@ -52,7 +52,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Dispatch } from 'redux'
 import { withTheme } from 'styled-components'
-import { FormFieldGenerator } from './form'
+import { FormFieldGenerator } from '@register/components/form'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
