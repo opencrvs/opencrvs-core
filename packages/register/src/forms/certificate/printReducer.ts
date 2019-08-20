@@ -2,7 +2,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import {
   collectBirthCertificateFormSection,
   collectDeathCertificateFormSection
-} from '@register/forms/certificate/fieldDefinitions/collectorSection'
+} from '@register/forms/certificate/collectorForm/collectorSection'
 import { Action } from 'redux'
 import { IFormSection } from '@register/forms'
 import { paymentFormSection } from '@register/forms/certificate/fieldDefinitions/payment-section'

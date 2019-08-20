@@ -40,6 +40,7 @@ import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollecto
 import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
 import { Payment } from './views/PrintCertificate/Payment'
 import { CollectorForm } from './components/CollectorForm'
+import { CollectorForm } from '@register/forms/certificate/collectorForm/CollectorForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
