@@ -347,6 +347,18 @@ interface IDynamicCertificateMessages {
 }
 
 const dynamicMessagesToDefine = {
+  birthService: {
+    id: 'print.certificate.birthService',
+    defaultMessage:
+      'Service: <strong>Birth registration after {service} of D.o.B.</strong><br/>Amount Due:',
+    description: 'Amount due on certificate for birth label'
+  },
+  deathService: {
+    id: 'print.certificate.deathService',
+    defaultMessage:
+      'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
+    description: 'Amount due on certificate for death label'
+  },
   birthServiceAfter: {
     id: 'certificate.receipt.birthService.after',
     defaultMessage: 'Birth registration after 5 years of date of birth',

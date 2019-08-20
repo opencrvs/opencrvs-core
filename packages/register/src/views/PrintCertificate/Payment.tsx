@@ -5,7 +5,10 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@register/i18n/messages/views/certificate'
 import { buttonMessages } from '@register/i18n/messages'
-import { goBack } from '@register/navigation'
+import {
+  goBack,
+  goToReviewCertificate as goToReviewCertificateAction
+} from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { RouteComponentProps } from 'react-router'
 import { Event } from '@register/forms'
@@ -14,6 +17,8 @@ import { ITheme } from '@register/styledComponents'
 import { connect } from 'react-redux'
 import { calculatePrice, getServiceMessage } from './calculatePrice'
 import { Print } from '@opencrvs/components/lib/icons'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IUserDetails } from '@register/utils/userUtils'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -44,16 +49,29 @@ const StyledValue = styled.span`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
-function LabelValue({ label, value }: { label: string; value: string }) {
+function LabelValue({
+  id,
+  label,
+  value
+}: {
+  id: string
+  label: string
+  value: string
+}) {
   return (
-    <div>
+    <div id={id}>
       <StyledLabel>{label}</StyledLabel>
       <StyledValue>{value}</StyledValue>
     </div>
   )
 }
 
-type State = {}
+interface ICertDetail {
+  [key: string]: any
+}
+interface ICertDetails {
+  [key: string]: ICertDetail
+}
 
 interface IProps {
   event: Event
@@ -61,11 +79,13 @@ interface IProps {
   language: string
   application: IApplication
   theme: ITheme
+  goToReviewCertificate: typeof goToReviewCertificateAction
+  userDetails: IUserDetails | null
 }
 
 type IFullProps = IProps & InjectedIntlProps
 
-class PaymentComponent extends React.Component<IFullProps, State> {
+class PaymentComponent extends React.Component<IFullProps> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {}
@@ -78,7 +98,13 @@ class PaymentComponent extends React.Component<IFullProps, State> {
         return data.deceased.deathOfDate
     }
   }
-  continue = () => {}
+  continue = () => {
+    this.props.goToReviewCertificate(
+      this.props.registrationId,
+      this.props.event
+    )
+  }
+
   render = () => {
     const { intl, application, event } = this.props
     const eventDate = this.getEventDate(application.data, event)
@@ -96,16 +122,23 @@ class PaymentComponent extends React.Component<IFullProps, State> {
           </Instruction>
           <GreyBody>
             <LabelValue
+              id="service"
               label={intl.formatMessage(messages.receiptService)}
               value={intl.formatMessage(serviceMessage)}
             />
             <LabelValue
+              id="amountDue"
               label={intl.formatMessage(messages.amountDue)}
               value={intl.formatMessage(messages.paymentAmount, {
                 paymentAmount
               })}
             />
-            <TertiaryButton icon={() => <Print />} align={0}>
+            <TertiaryButton
+              id="print-receipt"
+              icon={() => <Print />}
+              align={0}
+              onClick={() => {}}
+            >
               {intl.formatMessage(messages.printReceipt)}
             </TertiaryButton>
           </GreyBody>
@@ -117,16 +150,6 @@ class PaymentComponent extends React.Component<IFullProps, State> {
         </ActionPageLight>
       </>
     )
-  }
-}
-
-const getEvent = (eventType: string | undefined) => {
-  switch (eventType && eventType.toLowerCase()) {
-    case 'birth':
-    default:
-      return Event.BIRTH
-    case 'death':
-      return Event.DEATH
   }
 }
 
@@ -148,10 +171,14 @@ function mapStatetoProps(
     event: application.event,
     registrationId,
     language: state.i18n.language,
-    application
+    application,
+    userDetails: getUserDetails(state)
   }
 }
 
-export const Payment = connect((state: IStoreState) => mapStatetoProps)(
-  injectIntl(withTheme(PaymentComponent))
-)
+export const Payment = connect(
+  mapStatetoProps,
+  {
+    goToReviewCertificate: goToReviewCertificateAction
+  }
+)(injectIntl(withTheme(PaymentComponent)))
