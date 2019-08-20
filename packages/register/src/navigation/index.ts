@@ -20,7 +20,8 @@ import {
   CREATE_USER_SECTION,
   SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT
+  SELECT_DEATH_MAIN_CONTACT_POINT,
+  VERIFY_COLLECTOR
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
@@ -199,6 +200,20 @@ export function goToPrintCertificate(registrationId: string, event: string) {
   )
 }
 
+export function goToVerifyCollector(
+  registrationId: string,
+  event: string,
+  collector: string
+) {
+  return push(
+    formatUrl(VERIFY_COLLECTOR, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString(),
+      collector: collector.toLowerCase().toString()
+    })
+  )
+}
+
 export function goToDeathRegistration(applicationId: string) {
   return push(
     formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
@@ -239,6 +254,7 @@ type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
   payload: {
     sectionId: string
+    nextGroupId: string
     userFormFieldNameHash?: string
     formHistoryState?: IDynamicValues
   }
@@ -246,6 +262,7 @@ type GoToCreateUserSection = {
 
 export function goToCreateUserSection(
   sectionId: string,
+  nextGroupId: string,
   fieldNameHash?: string,
   historyState?: IDynamicValues
 ): GoToCreateUserSection {
@@ -253,6 +270,7 @@ export function goToCreateUserSection(
     type: GO_TO_CREATE_USER_SECTION,
     payload: {
       sectionId,
+      nextGroupId,
       userFormFieldNameHash: fieldNameHash,
       formHistoryState: historyState
     }
@@ -366,6 +384,7 @@ export function navigationReducer(state: INavigationState, action: any) {
     case GO_TO_CREATE_USER_SECTION:
       const {
         sectionId,
+        nextGroupId,
         userFormFieldNameHash,
         formHistoryState
       } = action.payload
@@ -373,8 +392,10 @@ export function navigationReducer(state: INavigationState, action: any) {
         state,
         Cmd.action(
           push(
-            formatUrl(CREATE_USER_SECTION, { sectionId }) +
-              (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
+            formatUrl(CREATE_USER_SECTION, {
+              sectionId,
+              groupId: nextGroupId
+            }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
             formHistoryState
           )
         )

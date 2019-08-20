@@ -14,6 +14,11 @@ input SignatureInput {
   type: String
 }
 
+input SignatureInput {
+  data: String
+  type: String
+}
+
 input UserInput {
   name: [HumanNameInput]
   identifier: [UserIdentifierInput]

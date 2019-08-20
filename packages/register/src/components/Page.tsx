@@ -26,6 +26,7 @@ const languageFromProps = ({ language }: IPageProps) => language
 const StyledPage = styled.div.attrs<IPageProps>({})`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
+  margin-bottom: 80px;
   justify-content: space-between;
   display: flex;
   flex-direction: column;
@@ -140,7 +141,7 @@ class Component extends React.Component<
 
     if (initialApplicationsLoaded && offlineDataLoaded) {
       return (
-        <div>
+        <div id="readyApplication">
           <StyledPage {...this.props}>{children}</StyledPage>
         </div>
       )

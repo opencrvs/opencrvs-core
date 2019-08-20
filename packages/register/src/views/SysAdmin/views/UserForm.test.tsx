@@ -13,7 +13,12 @@ describe('Create new user page tests', () => {
   beforeEach(() => {
     const testComponent = createTestComponent(
       // @ts-ignore
-      <UserForm section={userSection} />,
+      <UserForm
+        section={userSection}
+        activeGroup={userSection.groups[0]}
+        nextGroupId="preview-user-view-group"
+        nextSectionId="preview"
+      />,
       store
     )
     component = testComponent.component

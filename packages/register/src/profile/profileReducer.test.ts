@@ -1,7 +1,7 @@
 import * as actions from '@register/profile/profileActions'
 import { initialState } from '@register/profile/profileReducer'
 import { createStore, AppStore } from '@register/store'
-import { mockUserResponse } from '@register/tests/util'
+import { mockUserResponse, getItem } from '@register/tests/util'
 import { storage } from '@register/storage'
 
 storage.removeItem = jest.fn()
@@ -11,6 +11,7 @@ const removeItem = window.localStorage.removeItem as jest.Mock
 describe('profileReducer tests', () => {
   let store: AppStore
   beforeEach(() => {
+    getItem.mockReset()
     store = createStore().store
   })
 
