@@ -9,7 +9,8 @@ import {
   IApplication,
   modifyApplication,
   deleteApplication,
-  storeApplication
+  storeApplication,
+  writeApplication
 } from '@register/applications'
 import {
   Action,
@@ -65,6 +66,7 @@ interface IBaseProps {
   theme: ITheme
   goToHome: typeof goToHome
   storeApplication: typeof storeApplication
+  writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   goToPrintCertificate: typeof goToPrintCertificate
@@ -173,38 +175,47 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         Object.values(errors).map(Object.values)
         // @ts-ignore
       ).filter(errs => errs.length > 0).length
-    }
-    if (errLength > 0) {
-      this.setState({
-        showError: true
-      })
-    } else if (currentGroup === 'affidavit') {
-      if (draft && draft.data[sectionId] && draft.data[sectionId].signedFile) {
-        this.goToIDCheck()
-      } else {
+
+      if (errLength > 0) {
+        this.setState({
+          showError: true
+        })
+      } else if (currentGroup === 'affidavit') {
         if (
           draft &&
           draft.data[sectionId] &&
-          draft.data[sectionId].checkbox &&
-          (draft.data[sectionId].checkbox as string[]).length > 0
+          draft.data[sectionId].signedFile
         ) {
-          this.setState({ showModalForNoSignedAffidavit: true })
+          this.props.writeApplication(draft)
+          this.goToIDCheck()
         } else {
-          this.setState({
-            showError: true
-          })
+          if (
+            draft &&
+            draft.data[sectionId] &&
+            draft.data[sectionId].checkbox &&
+            (draft.data[sectionId].checkbox as string[]).length > 0
+          ) {
+            this.props.writeApplication(draft)
+            this.setState({ showModalForNoSignedAffidavit: true })
+          } else {
+            this.setState({
+              showError: true
+            })
+          }
+        }
+      } else {
+        this.setState({
+          showError: false,
+          showModalForNoSignedAffidavit: false
+        })
+        if (!nextGroup) {
+          this.props.writeApplication(draft)
+          this.goToIDCheck()
+        } else {
+          this.props.goToPrintCertificate(applicationId, event, nextGroup)
         }
       }
-    } else {
-      this.setState({ showError: false, showModalForNoSignedAffidavit: false })
-      if (!nextGroup) {
-        this.props.goToHome()
-      } else {
-        this.props.goToPrintCertificate(applicationId, event, nextGroup)
-      }
     }
-
-    draft && this.props.deleteApplication(draft)
   }
 
   goToIDCheck = () => {
@@ -344,7 +355,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               <TertiaryButton
                 id="cancel-btn"
                 key="cancel"
-                onClick={this.toggleSubmitModalOpen}
+                onClick={() => {
+                  deleteApplication(applicationToBeCertified)
+                  this.toggleSubmitModalOpen()
+                }}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
               </TertiaryButton>,
@@ -443,6 +457,7 @@ export const CollectorForm = connect(
   {
     goToHome: goToHome,
     storeApplication,
+    writeApplication,
     modifyApplication,
     deleteApplication,
     goToPrintCertificate
