@@ -11,7 +11,7 @@ import {
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { RouteComponentProps } from 'react-router'
-import { Event } from '@register/forms'
+import { Event, IFormData } from '@register/forms'
 import { IApplication } from '@register/applications'
 import { ITheme } from '@register/styledComponents'
 import { connect } from 'react-redux'
@@ -65,14 +65,6 @@ function LabelValue({
     </div>
   )
 }
-
-interface ICertDetail {
-  [key: string]: any
-}
-interface ICertDetails {
-  [key: string]: ICertDetail
-}
-
 interface IProps {
   event: Event
   registrationId: string
@@ -90,12 +82,13 @@ class PaymentComponent extends React.Component<IFullProps> {
     super(props)
     this.state = {}
   }
-  getEventDate(data: any, event: Event) {
+
+  getEventDate(data: IFormData, event: Event): string {
     switch (event) {
       case Event.BIRTH:
-        return data.child.childBirthDate
+        return data.child.childBirthDate as string
       case Event.DEATH:
-        return data.deceased.deathOfDate
+        return data.deathEvent.deathDate as string
     }
   }
   continue = () => {
@@ -153,14 +146,24 @@ class PaymentComponent extends React.Component<IFullProps> {
   }
 }
 
+const getEvent = (eventType: string | undefined) => {
+  switch (eventType && eventType.toLowerCase()) {
+    case 'birth':
+    default:
+      return Event.BIRTH
+    case 'death':
+      return Event.DEATH
+  }
+}
+
 function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
-  const { registrationId } = props.match.params
-
+  const { registrationId, eventType } = props.match.params
+  const event = getEvent(eventType)
   const application = state.applicationsState.applications.find(
-    app => app.id === registrationId
+    app => app.id === registrationId && app.event === event
   )
 
   if (!application) {
