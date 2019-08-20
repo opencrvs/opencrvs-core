@@ -27,7 +27,7 @@ const fieldAgent = new User({
   status: 'active',
   practitionerId: '8807e4d8-1440-4507-a882-5891ded9bbd5',
   primaryOfficeId:
-    '0197c3f0-6eba-45a8-a284-2602e603e205' /* TODO: when office details arrive change to office id - currently set to union id */,
+    'a6473e18-f5ec-467e-9a33-a6a6754c7ee7' /* TODO: when office details arrive change to office id - currently set to union id */,
   catchmentAreaIds: [
     'b272a5dd-7e2e-46db-9eeb-b3b3c915a547', // should be a division
     '8503cefe-24b2-46fb-afd9-efff42c67c1a', // should be a district child of the above division
@@ -55,7 +55,7 @@ const registrationAgent = new User({
   scope: ['validate', 'certify', 'demo'],
   status: 'active',
   practitionerId: '2aa2d4e0-5804-41b1-8ce4-12fb113970b1',
-  primaryOfficeId: 'e71c01b8-88c6-4efb-84e9-73f9091e27d5',
+  primaryOfficeId: '51993c23-560b-465b-a7ad-5fd7b9f9fd5a',
   catchmentAreaIds: [
     'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
     'bf795ccf-feb8-47c8-93e9-323e0d60821e',
@@ -83,7 +83,7 @@ const localRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: 'b61f0345-3759-433e-a2e2-2dd3a0e1bdf9',
-  primaryOfficeId: '0197c3f0-6eba-45a8-a284-2602e603e205',
+  primaryOfficeId: 'a6473e18-f5ec-467e-9a33-a6a6754c7ee7',
   catchmentAreaIds: [
     'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
     '8503cefe-24b2-46fb-afd9-efff42c67c1a',
@@ -111,7 +111,7 @@ const districtRegistrar = new User({
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
   practitionerId: '60cd7bac-68c9-4474-a0a6-a11cb08f4f60',
-  primaryOfficeId: '8503cefe-24b2-46fb-afd9-efff42c67c1a',
+  primaryOfficeId: 'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
   catchmentAreaIds: ['8503cefe-24b2-46fb-afd9-efff42c67c1a'],
   securityQuestionAnswers: []
 })
@@ -180,7 +180,7 @@ const sysAdmin = new User({
   scope: ['sysadmin', 'demo'],
   status: 'active',
   practitionerId: '64112dc5-473f-4176-97d7-387162e66a44',
-  primaryOfficeId: '0197c3f0-6eba-45a8-a284-2602e603e205',
+  primaryOfficeId: 'a6473e18-f5ec-467e-9a33-a6a6754c7ee7',
   catchmentAreaIds: [
     'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
     '8503cefe-24b2-46fb-afd9-efff42c67c1a',
