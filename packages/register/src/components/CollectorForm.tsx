@@ -30,7 +30,11 @@ import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { buttonMessages, errorMessages } from '@register/i18n/messages'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
-import { goToHome, goToPrintCertificate } from '@register/navigation'
+import {
+  goToHome,
+  goToPrintCertificate,
+  goToVerifyCollector
+} from '@register/navigation'
 import { PRINT_CERTIFICATE } from '@register/navigation/routes'
 import { IStoreState } from '@register/store'
 import styled, { ITheme } from '@register/styledComponents'
@@ -70,6 +74,7 @@ interface IBaseProps {
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   goToPrintCertificate: typeof goToPrintCertificate
+  goToVerifyCollector: typeof goToVerifyCollector
 }
 
 type IProps = IBaseProps & InjectedIntlProps
@@ -187,13 +192,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           draft.data[sectionId].signedFile
         ) {
           this.props.writeApplication(draft)
-          this.goToIDCheck()
+          // Dispatch action to redirect to payment form
         } else {
           if (
             draft &&
             draft.data[sectionId] &&
-            draft.data[sectionId].checkbox &&
-            (draft.data[sectionId].checkbox as string[]).length > 0
+            draft.data[sectionId].noAffidavitAgreement &&
+            (draft.data[sectionId].noAffidavitAgreement as string[]).length > 0
           ) {
             this.props.writeApplication(draft)
             this.setState({ showModalForNoSignedAffidavit: true })
@@ -210,7 +215,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         })
         if (!nextGroup) {
           this.props.writeApplication(draft)
-          this.goToIDCheck()
+          this.props.goToVerifyCollector(
+            applicationId,
+            event,
+            draft.data &&
+              draft.data.collector &&
+              (draft.data.collector.type as string)
+          )
         } else {
           this.props.goToPrintCertificate(applicationId, event, nextGroup)
         }
@@ -417,6 +428,7 @@ const mapStateToProps = (
   const application = state.applicationsState.applications.find(
     application => application.id === registrationId
   )
+  console.log(JSON.stringify(application))
   const formSection = getCollectCertificateForm(event, state)
   if (event === Event.BIRTH && groupId === 'birthCertCollectorGroup') {
     if (
@@ -460,6 +472,7 @@ export const CollectorForm = connect(
     writeApplication,
     modifyApplication,
     deleteApplication,
-    goToPrintCertificate
+    goToPrintCertificate,
+    goToVerifyCollector
   }
 )(injectIntl(withTheme(CollectorFormComponent)))

@@ -582,6 +582,6 @@ export const conditionals: IConditionals = {
   },
   certCollectorOther: {
     action: 'hide',
-    expression: 'values.collector !== "OTHER"'
+    expression: 'values.type !== "OTHER"'
   }
 }
