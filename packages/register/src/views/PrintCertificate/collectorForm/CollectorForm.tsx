@@ -33,7 +33,9 @@ import { messages as certificateMessages } from '@register/i18n/messages/views/c
 import {
   goToHome,
   goToPrintCertificate,
-  goToVerifyCollector
+  goToVerifyCollector,
+  goToReviewCertificate,
+  goToPrintCertificatePayment
 } from '@register/navigation'
 import { CERTIFICATE_COLLECTOR } from '@register/navigation/routes'
 import { IStoreState } from '@register/store'
@@ -53,6 +55,11 @@ import { RouteComponentProps } from 'react-router'
 import { Dispatch } from 'redux'
 import { withTheme } from 'styled-components'
 import { FormFieldGenerator } from '@register/components/form'
+import {
+  isFreeOfCost,
+  getEventDate,
+  getEvent
+} from '@register/views/PrintCertificate/calculatePrice'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -75,6 +82,8 @@ interface IBaseProps {
   deleteApplication: typeof deleteApplication
   goToPrintCertificate: typeof goToPrintCertificate
   goToVerifyCollector: typeof goToVerifyCollector
+  goToReviewCertificate: typeof goToReviewCertificate
+  goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
 
 type IProps = IBaseProps & InjectedIntlProps
@@ -185,7 +194,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           draft.data[sectionId].signedFile
         ) {
           this.props.writeApplication(draft)
-          // Dispatch action to redirect to payment form
+
+          this.goToNextFormForSomeoneElse(applicationId, draft, event)
         } else {
           if (
             draft &&
@@ -219,6 +229,23 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           this.props.goToPrintCertificate(applicationId, event, nextGroup)
         }
       }
+    }
+  }
+
+  goToNextFormForSomeoneElse = (
+    applicationId: string,
+    application: IApplication,
+    event: string
+  ) => {
+    if (
+      isFreeOfCost(
+        getEvent(event),
+        getEventDate(application.data, getEvent(event))
+      )
+    ) {
+      this.props.goToReviewCertificate(applicationId, event)
+    } else {
+      this.props.goToPrintCertificatePayment(applicationId, event)
     }
   }
 
@@ -369,7 +396,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               <PrimaryButton
                 key="submit"
                 id="submit_confirm"
-                onClick={this.goToIDCheck}
+                onClick={() =>
+                  this.goToNextFormForSomeoneElse(
+                    applicationId,
+                    applicationToBeCertified,
+                    event
+                  )
+                }
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
               </PrimaryButton>
@@ -384,16 +417,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         )}
       </>
     )
-  }
-}
-
-const getEvent = (eventType: string | undefined) => {
-  switch (eventType && eventType.toLowerCase()) {
-    case 'birth':
-    default:
-      return Event.BIRTH
-    case 'death':
-      return Event.DEATH
   }
 }
 
@@ -421,7 +444,6 @@ const mapStateToProps = (
   const application = state.applicationsState.applications.find(
     application => application.id === registrationId
   )
-  console.log(JSON.stringify(application))
   const formSection = getCollectCertificateForm(event, state)
   if (event === Event.BIRTH && groupId === 'birthCertCollectorGroup') {
     if (
@@ -430,7 +452,7 @@ const mapStateToProps = (
     )
       formSection.groups.shift()
     if (application && application.data && application.data.father) {
-      if (application.data.father.fatherDetailsExist) {
+      if (application.data.father.fathersDetailsExist) {
         formSection.groups.unshift(
           certCollectorGroupForBirthAppWithFatherDetails
         )
@@ -466,6 +488,8 @@ export const CollectorForm = connect(
     modifyApplication,
     deleteApplication,
     goToPrintCertificate,
-    goToVerifyCollector
+    goToVerifyCollector,
+    goToReviewCertificate,
+    goToPrintCertificatePayment
   }
 )(injectIntl(withTheme(CollectorFormComponent)))

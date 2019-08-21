@@ -22,7 +22,8 @@ import {
   SELECT_BIRTH_MAIN_CONTACT_POINT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
   VERIFY_COLLECTOR,
-  REVIEW_CERTIFICATE
+  REVIEW_CERTIFICATE,
+  PRINT_CERTIFICATE_PAYMENT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
@@ -225,6 +226,18 @@ export function goToVerifyCollector(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       collector: collector.toLowerCase().toString()
+    })
+  )
+}
+
+export function goToPrintCertificatePayment(
+  registrationId: string,
+  event: string
+) {
+  return push(
+    formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString()
     })
   )
 }
