@@ -79,13 +79,6 @@ interface IBaseProps {
 
 type IProps = IBaseProps & InjectedIntlProps
 
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
-}
-
 function getNextSectionIds(
   formSection: IFormSection,
   formSectionGroup: IFormSectionGroup,
