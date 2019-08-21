@@ -68,7 +68,7 @@ describe('verify collector tests', () => {
     })
 
     it('invalid application id', () => {
-      try {
+      expect(() =>
         createTestComponent(
           // @ts-ignore
           <Payment
@@ -85,9 +85,7 @@ describe('verify collector tests', () => {
           />,
           store
         )
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error)
-      }
+      ).toThrowError()
     })
   })
 

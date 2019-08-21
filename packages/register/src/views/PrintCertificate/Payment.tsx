@@ -79,11 +79,6 @@ interface IProps {
 type IFullProps = IProps & InjectedIntlProps
 
 class PaymentComponent extends React.Component<IFullProps> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {}
-  }
-
   getEventDate(data: IFormData, event: Event): string {
     switch (event) {
       case Event.BIRTH:
