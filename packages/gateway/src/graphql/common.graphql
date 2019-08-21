@@ -97,6 +97,7 @@ input RelatedPersonInput {
   _fhirID: ID # -> .id
   relationship: RelationshipType
   otherRelationship: String
+  affidavit: [AttachmentInput]
   individual: PersonInput
 }
 
@@ -105,6 +106,7 @@ type RelatedPerson { # -> Related Person
   _fhirID: ID # -> .id
   relationship: RelationshipType # -> .relationship.coding
   otherRelationship: String # -> .relationship.coding
+  affidavit: [Attachment] # -> .photo.coding
   individual: Person # -> .patient.reference
 }
 

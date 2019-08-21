@@ -1926,6 +1926,173 @@ const builders: IFieldBuilders = {
             )
           }
         },
+        affidavit: {
+          _fhirID: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            docRef.id = fieldValue as string
+          },
+          originalFileName: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            if (!docRef.identifier) {
+              docRef.identifier = []
+            }
+
+            docRef.identifier.push({
+              system: `${OPENCRVS_SPECIFICATION_URL}id/original-file-name`,
+              value: fieldValue
+            })
+          },
+          systemFileName: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            if (!docRef.identifier) {
+              docRef.identifier = []
+            }
+
+            docRef.identifier.push({
+              system: `${OPENCRVS_SPECIFICATION_URL}id/system-file-name`,
+              value: fieldValue
+            })
+          },
+          status: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            docRef.docStatus = fieldValue
+          },
+          type: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            docRef.type = {
+              coding: [
+                {
+                  system: `${OPENCRVS_SPECIFICATION_URL}supporting-doc-type`,
+                  code: fieldValue
+                }
+              ]
+            }
+          },
+          createdAt: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            docRef.created = fieldValue
+            docRef.indexed = fieldValue
+          },
+          contentType: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            if (!docRef.content) {
+              docRef.content = [
+                {
+                  attachment: {}
+                }
+              ]
+            }
+            docRef.content[0].attachment.contentType = fieldValue
+          },
+          data: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            if (!docRef.content) {
+              docRef.content = [
+                {
+                  attachment: {}
+                }
+              ]
+            }
+            docRef.content[0].attachment.data = fieldValue
+          },
+          subject: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const docRef = selectOrCreateDocRefResource(
+              ATTACHMENT_DOCS_CODE,
+              ATTACHMENT_DOCS_TITLE,
+              fhirBundle,
+              context,
+              ATTACHMENT_CONTEXT_KEY
+            )
+            if (!docRef.subject) {
+              docRef.subject = {}
+            }
+            docRef.subject.display = fieldValue
+          }
+        },
         /* expecting value for this only when other is selected as relationship */
         individual: {
           identifier: {
