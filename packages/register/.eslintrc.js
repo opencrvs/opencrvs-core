@@ -16,6 +16,7 @@ module.exports = {
     jest: true
   },
   rules: {
+    'import/namespace': 'off',
     'prettier/prettier': [
       'error',
       {
