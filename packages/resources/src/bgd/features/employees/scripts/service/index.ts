@@ -1,4 +1,3 @@
-import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
 import {
   getLocationIDByDescription,
@@ -8,6 +7,7 @@ import {
   titleCase
 } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
+import { logger } from '@resources/logger'
 
 interface ITestPractitioner {
   division: string
@@ -143,8 +143,8 @@ export async function composeAndSavePractitioners(
       )
       locations.push({ reference: `Location/${unionID as string}` })
     }
-    // tslint:disable-next-line:no-console
-    console.log(
+
+    logger.info(
       'Attaching the following locations: ' + JSON.stringify(locations)
     )
 
@@ -152,13 +152,13 @@ export async function composeAndSavePractitioners(
     const newPractitioner: fhir.Practitioner = composeFhirPractitioner(
       practitioner
     )
-    const savedPractitionerResponse = (await sendToFhir(
+    const savedPractitionerResponse = await sendToFhir(
       newPractitioner,
       '/Practitioner',
       'POST'
     ).catch(err => {
       throw Error('Cannot save practitioner to FHIR')
-    })) as Response
+    })
 
     const practitionerLocationHeader = savedPractitionerResponse.headers.get(
       'location'
@@ -166,21 +166,22 @@ export async function composeAndSavePractitioners(
     const practitionerReference = `Practitioner/${
       practitionerLocationHeader.split('/')[3]
     }`
-    // tslint:disable-next-line:no-console
-    console.log(`Practitioner saved to fhir: ${practitionerReference}`)
-    // save signature
+
+    logger.info(`Practitioner saved to fhir: ${practitionerReference}`)
+
+    // Create and save signature
     if (practitioner.signature) {
       const newSignature: fhir.Signature = composeFhirSignature(
         practitioner,
         practitionerReference
       )
-      const savedSignatureResponse = (await sendToFhir(
+      const savedSignatureResponse = await sendToFhir(
         newSignature,
         '/Signature',
         'POST'
       ).catch(err => {
         throw Error('Cannot save practitioner signature to FHIR')
-      })) as Response
+      })
 
       const signatureLocationHeader = savedSignatureResponse.headers.get(
         'location'
@@ -188,8 +189,8 @@ export async function composeAndSavePractitioners(
       const signatureReference = `Signature/${
         signatureLocationHeader.split('/')[3]
       }`
-      // tslint:disable-next-line:no-console
-      console.log(`Practitioner saved to fhir: ${signatureReference}`)
+
+      logger.info(`Practitioner signature saved to fhir: ${signatureReference}`)
     }
 
     // Create and save PractitionerRole
@@ -199,24 +200,25 @@ export async function composeAndSavePractitioners(
       locations
     )
 
-    const savedPractitionerRoleResponse = (await sendToFhir(
+    const savedPractitionerRoleResponse = await sendToFhir(
       newPractitionerRole,
       '/PractitionerRole',
       'POST'
     ).catch(err => {
       throw Error('Cannot save practitioner role to FHIR')
-    })) as Response
+    })
+
     const practitionerRoleLocationHeader = savedPractitionerRoleResponse.headers.get(
       'location'
     ) as string
     const practitionerRoleReference = `PractitionerRole/${
       practitionerRoleLocationHeader.split('/')[3]
     }`
-    // tslint:disable-next-line:no-console
-    console.log(`PractitionerRole saved to fhir: ${practitionerRoleReference}`)
+
+    logger.info(`PractitionerRole saved to fhir: ${practitionerRoleReference}`)
   }
-  // tslint:disable-next-line:no-console
-  console.log(
+
+  logger.info(
     `${chalk.blueBright(
       '/////////////////////////// FINISHED SAVING RESOURCES - THANK YOU FOR WAITING ///////////////////////////'
     )}`
