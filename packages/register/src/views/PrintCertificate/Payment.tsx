@@ -6,7 +6,7 @@ import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@register/i18n/messages/views/certificate'
 import { buttonMessages } from '@register/i18n/messages'
 import {
-  goBack,
+  goBack as goBackAction,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
@@ -72,6 +72,7 @@ interface IProps {
   application: IApplication
   theme: ITheme
   goToReviewCertificate: typeof goToReviewCertificateAction
+  goBack: typeof goBackAction
   userDetails: IUserDetails | null
 }
 
@@ -99,7 +100,7 @@ class PaymentComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { intl, application, event } = this.props
+    const { intl, application, event, goBack } = this.props
     const eventDate = this.getEventDate(application.data, event)
 
     const paymentAmount = calculatePrice(event, eventDate)
@@ -182,6 +183,7 @@ function mapStatetoProps(
 export const Payment = connect(
   mapStatetoProps,
   {
+    goBack: goBackAction,
     goToReviewCertificate: goToReviewCertificateAction
   }
 )(injectIntl(withTheme(PaymentComponent)))
