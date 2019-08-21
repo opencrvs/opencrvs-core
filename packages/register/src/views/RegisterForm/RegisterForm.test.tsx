@@ -123,9 +123,7 @@ describe('when user logs in', () => {
       const details = await getApplicationsOfCurrentUser()
       const currentUserDrafts = (JSON.parse(details) as IUserData).applications
       expect(currentUserDrafts.length).toBe(3)
-      expect(
-        currentUserDrafts.find(draft => draft.id === draft.id)
-      ).toBeTruthy()
+      expect(currentUserDrafts[0]).toBeTruthy()
     })
 
     it("should delete the draft from the current user's array of applications", async () => {

@@ -469,7 +469,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     formSections: IFormSection[],
     errorsOnFields: any
   ) => {
-    const { intl, draft, offlineResources, language, pageRoute } = this.props
+    const { intl, draft, offlineResources, language } = this.props
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
