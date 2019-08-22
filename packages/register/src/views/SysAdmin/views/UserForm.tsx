@@ -11,7 +11,7 @@ import {
   hasFormError,
   getVisibleGroupFields
 } from '@register/forms/utils'
-import { goToCreateUserSection, goToHome } from '@register/navigation'
+import { goToCreateUserSection, goBack } from '@register/navigation'
 import styled from '@register/styledComponents'
 import {
   modifyUserFormData,
@@ -25,6 +25,7 @@ import { buttonMessages } from '@register/i18n/messages'
 import { IOfflineData } from '@register/offline/reducer'
 import { getOfflineData } from '@register/offline/selectors'
 import { IStoreState } from '@register/store'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -50,7 +51,7 @@ type IStateProps = {
 }
 
 type IDispatchProps = {
-  goToHome: typeof goToHome
+  goBack: typeof goBack
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
   clearUserFormData: typeof clearUserFormData
@@ -81,8 +82,10 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 
   handleBackAction = () => {
-    this.props.goToHome()
-    this.props.clearUserFormData()
+    this.props.goBack()
+    if (this.props.activeGroup.id === userSection.groups[0].id) {
+      this.props.clearUserFormData()
+    }
   }
 
   modifyData = (values: any) => {
@@ -134,5 +137,5 @@ export const UserForm = connect<
     ...ownProps,
     resources: getOfflineData(state)
   }),
-  { modifyUserFormData, goToCreateUserSection, goToHome, clearUserFormData }
+  { modifyUserFormData, goToCreateUserSection, goBack, clearUserFormData }
 )(injectIntl(UserFormComponent))

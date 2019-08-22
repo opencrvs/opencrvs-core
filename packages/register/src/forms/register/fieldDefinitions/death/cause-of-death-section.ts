@@ -24,7 +24,7 @@ export const causeOfDeathSection: ISerializedFormSection = {
           label: messages.causeOfDeathEstablished,
           notice: messages.causeOfDeathNotice,
           required: false,
-          initialValue: false,
+          initialValue: '',
           size: RadioSize.LARGE,
           validate: [],
           options: [

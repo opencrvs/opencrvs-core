@@ -16,10 +16,9 @@ const HeaderContainer = styled.div`
   position: relative;
 `
 const BodyContent = styled.div`
-  max-width: 940px;
   width: 100%;
   height: 64px;
-  margin: auto;
+  margin: 0 24px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;
@@ -35,9 +34,6 @@ const BackButton = styled(Button)`
   margin: 0;
   margin-right: 16px;
   padding: 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 24px;
-  }
 `
 
 const BackButtonIcon = styled(BackArrowDeepBlue)`

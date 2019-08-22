@@ -1,6 +1,7 @@
 language: node_js
 node_js:
   - 'lts/*'
+script: yarn test && yarn lint
 jobs:
   include:
     - stage: tests (unit and integration)

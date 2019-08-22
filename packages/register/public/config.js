@@ -7,5 +7,9 @@ window.config = {
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
-  RESOURCES_URL: 'http://localhost:3040/'
+  RESOURCES_URL: 'http://localhost:3040/',
+  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
+  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
+  CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50 // taka
 }
