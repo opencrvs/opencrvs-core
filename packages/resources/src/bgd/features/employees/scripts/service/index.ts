@@ -51,7 +51,20 @@ const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
         given: practitioner.givenNamesBengali.split(' ')
       }
     ],
-    gender: practitioner.gender
+    gender: practitioner.gender,
+    extension: practitioner.signature
+      ? [
+          {
+            url: 'http://opencrvs.org/specs/extension/employee-signature',
+            valueSignature: {
+              type: [{ userSelected: true }],
+              when: new Date().toISOString(),
+              contentType: 'image/png',
+              blob: practitioner.signature
+            }
+          }
+        ]
+      : []
   }
 }
 
@@ -76,29 +89,6 @@ const composeFhirPractitionerRole = (
       }
     ],
     location
-  }
-}
-interface IFhirSignature extends fhir.Signature {
-  resourceType: string
-}
-const composeFhirSignature = (
-  practitioner: ITestPractitioner,
-  practitionerReference: string
-): IFhirSignature => {
-  return {
-    resourceType: 'Signature',
-    blob: practitioner.signature,
-    type: [
-      {
-        system: `${ORG_URL}/specs/signature`,
-        code: 'Signature'
-      }
-    ],
-    whoReference: {
-      reference: practitionerReference
-    },
-    when: new Date().toISOString(),
-    contentType: 'png'
   }
 }
 export async function composeAndSavePractitioners(
@@ -168,30 +158,6 @@ export async function composeAndSavePractitioners(
     }`
 
     logger.info(`Practitioner saved to fhir: ${practitionerReference}`)
-
-    // Create and save signature
-    if (practitioner.signature) {
-      const newSignature: fhir.Signature = composeFhirSignature(
-        practitioner,
-        practitionerReference
-      )
-      const savedSignatureResponse = await sendToFhir(
-        newSignature,
-        '/Signature',
-        'POST'
-      ).catch(err => {
-        throw Error('Cannot save practitioner signature to FHIR')
-      })
-
-      const signatureLocationHeader = savedSignatureResponse.headers.get(
-        'location'
-      ) as string
-      const signatureReference = `Signature/${
-        signatureLocationHeader.split('/')[3]
-      }`
-
-      logger.info(`Practitioner signature saved to fhir: ${signatureReference}`)
-    }
 
     // Create and save PractitionerRole
     const newPractitionerRole: fhir.PractitionerRole = composeFhirPractitionerRole(
