@@ -10,7 +10,8 @@ import {
   IDateFeildValuePayload,
   IFunctionTransformer,
   TransformerData,
-  TransformerPayload
+  TransformerPayload,
+  IFormattedFeildValuePayload
 } from '@register/pdfRenderer/transformer/types'
 import moment from 'moment'
 
@@ -78,7 +79,9 @@ export const fieldTransformers: IFunctionTransformer = {
       formatPayload.key[application.event]
     )
     let applicantName = ''
-    formatPayload.format[intl.locale].forEach(field => {
+    formatPayload.format[
+      formatPayload.language ? formatPayload.language : intl.locale
+    ].forEach(field => {
       applicantName = applicantName.concat(`${applicantObj[field] || ''} `)
     })
     return applicantName.substr(0, applicantName.length - 1)
@@ -128,7 +131,40 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!dateValue) {
       return null
     }
-    moment.locale(intl.locale)
+    moment.locale(formatPayload.language ? formatPayload.language : intl.locale)
     return moment(dateValue).format(formatPayload.format)
+  },
+
+  /*
+    FormattedFieldValue transforms the value for one/many given keys from the application data in a provided format
+    @params: 
+      - formattedKeys: Mendatory field. It will be able to traverse through the object structure 
+      and fetch the appropriate value if found otherwise will throw exception. 
+      Ex: '{child.firstName}, {child.lastName}'        
+  */
+  FormattedFieldValue: (
+    application: TransformerData,
+    intl: InjectedIntl,
+    payload?: TransformerPayload
+  ) => {
+    const key = payload && (payload as IFormattedFeildValuePayload)
+    if (!key) {
+      throw new Error('No payload found for this transformer')
+    }
+    const keys = key.formattedKeys.match(/\{.*?\}/g)
+    const keyValues: { [key: string]: string } = {}
+    keys &&
+      keys.forEach(key => {
+        keyValues[key] = getValueFromApplicationDataByKey(
+          application.data,
+          // Getting rid of { }
+          key.substr(1, key.length - 2)
+        )
+      })
+    let value = key.formattedKeys
+    Object.keys(keyValues).forEach(key => {
+      value = value.replace(new RegExp(`${key}`, 'g'), keyValues[key] || '')
+    })
+    return value
   }
 }

@@ -38,6 +38,11 @@ export const localFonts = {
         normal: 'NotoSans-Light.ttf',
         regular: 'NotoSans-Light.ttf',
         bold: 'NotoSans-Regular.ttf'
+      },
+      notosansbn: {
+        normal: 'NotoSansBengali-Light.ttf',
+        regular: 'NotoSansBengali-Light.ttf',
+        bold: 'NotoSansBengali-Regular.ttf'
       }
     }
   }

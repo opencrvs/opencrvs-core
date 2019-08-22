@@ -605,3 +605,5 @@ export interface IAttachment {
   title?: string
   description?: string
 }
+
+export interface IStatus {}

@@ -3,9 +3,13 @@ import {
   IConditionalIntLabelPayload,
   TransformerData,
   IFunctionTransformer,
-  TransformerPayload
+  TransformerPayload,
+  IFeildValuePayload
 } from '@register/pdfRenderer/transformer/types'
-import { getEventDifference } from '@register/pdfRenderer/transformer/utils'
+import {
+  getEventDifference,
+  getValueFromApplicationDataByKey
+} from '@register/pdfRenderer/transformer/utils'
 
 export const serviceTransformers: IFunctionTransformer = {
   /*
@@ -53,5 +57,36 @@ export const serviceTransformers: IFunctionTransformer = {
         )) ||
       ''
     )
+  },
+
+  BanglaNumberConversion: (
+    application: TransformerData,
+    intl: InjectedIntl,
+    payload?: TransformerPayload
+  ) => {
+    const key = payload && (payload as IFeildValuePayload)
+    if (!key) {
+      throw new Error('No payload found for this transformer')
+    }
+    let value = getValueFromApplicationDataByKey(
+      application.data,
+      key.valueKey
+    ) as string
+    const numMap: { [key: string]: string } = {
+      0: '০',
+      1: '১',
+      2: '২',
+      3: '৩',
+      4: '৪',
+      5: '৫',
+      6: '৬',
+      7: '৭',
+      8: '৮',
+      9: '৯'
+    }
+    Object.keys(numMap).forEach(engNumber => {
+      value = value.replace(new RegExp(engNumber, 'g'), numMap[engNumber])
+    })
+    return value
   }
 }

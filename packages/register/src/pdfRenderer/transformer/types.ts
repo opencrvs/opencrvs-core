@@ -20,6 +20,7 @@ export type TransformerPayload =
   | IApplicantNamePayload
   | IFeildValuePayload
   | IDateFeildValuePayload
+  | IFormattedFeildValuePayload
 
 export interface IFieldTransformer {
   transformer: string
@@ -50,6 +51,7 @@ export interface IApplicantNamePayload {
   format: {
     [language: string]: string[] // corresponding field names
   }
+  language?: string
 }
 
 export interface IFeildValuePayload {
@@ -61,4 +63,9 @@ export interface IDateFeildValuePayload {
     [event: string]: string // data key: child.dob || deceased.dod
   }
   format: string
+  language?: string
+}
+
+export interface IFormattedFeildValuePayload {
+  formattedKeys: string // ex: {child.firstName}, {child.lastName}
 }

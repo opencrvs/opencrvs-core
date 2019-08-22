@@ -431,7 +431,7 @@ class PrintCertificateActionComponent extends React.Component<
               id="print-confirm-button"
               disabled={!enableConfirmButton}
               onClick={() => {
-                this.previewCertificatePDF(certificateDetails)
+                this.previewCertificatePDF()
                 this.onConfirmForm()
               }}
             >
@@ -462,7 +462,7 @@ class PrintCertificateActionComponent extends React.Component<
                 id="payment-confirm-button"
                 disabled={!enableConfirmButton}
                 onClick={() => {
-                  this.previewCertificatePDF(certificateDetails)
+                  this.previewCertificatePDF()
                   this.onConfirmForm()
                 }}
               >
@@ -532,7 +532,11 @@ class PrintCertificateActionComponent extends React.Component<
                 icon={() => <StyledPrintIcon />}
                 disabled={!enableConfirmButton}
                 onClick={() => {
-                  generateAndPrintCertificate(certificateDetails)
+                  generateAndPrintCertificate(
+                    this.props.intl,
+                    this.props.draft,
+                    this.props.userDetails
+                  )
                 }}
               />
             </ButtonContainer>
@@ -553,16 +557,21 @@ class PrintCertificateActionComponent extends React.Component<
     }
   }
 
-  previewCertificatePDF(certificateDetails: CertificateDetails) {
-    generateCertificateDataURL(certificateDetails, (certificatePdf: string) => {
-      this.setState(prevState => {
-        const result = {
-          ...prevState,
-          certificatePdf
-        }
-        return result
-      })
-    })
+  previewCertificatePDF() {
+    generateCertificateDataURL(
+      this.props.intl,
+      this.props.draft,
+      this.props.userDetails,
+      (certificatePdf: string) => {
+        this.setState(prevState => {
+          const result = {
+            ...prevState,
+            certificatePdf
+          }
+          return result
+        })
+      }
+    )
   }
 
   onConfirmForm = () => {

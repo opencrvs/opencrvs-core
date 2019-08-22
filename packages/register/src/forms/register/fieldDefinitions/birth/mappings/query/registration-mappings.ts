@@ -1,4 +1,8 @@
 import { IFormData, Event } from '@register/forms'
+import {
+  GQLRegWorkflow,
+  GQLRegStatus
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export function getRegistrationSectionTransformer(
   transformedData: IFormData,
@@ -16,5 +20,17 @@ export function getRegistrationSectionTransformer(
 
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
     transformedData[sectionId].type = Event.BIRTH
+  }
+
+  if (queryData[sectionId].status) {
+    const regStatus = (queryData[sectionId].status as GQLRegWorkflow[]).find(
+      status => {
+        return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      }
+    )
+    if (regStatus) {
+      // @ts-ignore
+      transformedData[sectionId].regStatus = regStatus
+    }
   }
 }

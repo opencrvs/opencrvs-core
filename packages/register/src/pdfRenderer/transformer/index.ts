@@ -4,7 +4,7 @@ import { serviceTransformers } from '@register/pdfRenderer/transformer/serviceTr
 import { IFunctionTransformer } from './types'
 
 /*
-  Transforms fields mentioned on pdf template
+  Transforms fields based on pdf template
  */
 export const transformers: IFunctionTransformer = {
   ...fieldTransformers,
