@@ -9,7 +9,6 @@ import {
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
-  PRINT_CERTIFICATE,
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
   SEARCH,
@@ -21,7 +20,9 @@ import {
   SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_BIRTH_MAIN_CONTACT_POINT,
   SELECT_DEATH_MAIN_CONTACT_POINT,
-  VERIFY_COLLECTOR
+  VERIFY_COLLECTOR,
+  REVIEW_CERTIFICATE,
+  PRINT_CERTIFICATE
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
@@ -194,6 +195,15 @@ export function goToReviewDuplicate(applicationId: string) {
 export function goToPrintCertificate(registrationId: string, event: string) {
   return push(
     formatUrl(PRINT_CERTIFICATE, {
+      registrationId: registrationId.toString(),
+      eventType: event.toLowerCase().toString()
+    })
+  )
+}
+
+export function goToReviewCertificate(registrationId: string, event: string) {
+  return push(
+    formatUrl(REVIEW_CERTIFICATE, {
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString()
     })
