@@ -95,7 +95,12 @@ function getNextSectionIds(
 ) {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     formSection,
-    (application && application.data[formSection.id]) || {}
+    (application &&
+      application.data.registration &&
+      application.data.registration.certificates &&
+      // @ts-ignore
+      application.data.registration.certificates[0][formSection.id]) ||
+      {}
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === formSectionGroup.id
@@ -115,7 +120,14 @@ const getErrorsOnFieldsBySection = (
   fields: IFormField[],
   draft: IApplication
 ) => {
-  const errors = getValidationErrorsForForm(fields, draft.data[sectionId] || {})
+  const errors = getValidationErrorsForForm(
+    fields,
+    (draft.data.registration &&
+      draft.data.registration.certificates &&
+      // @ts-ignore
+      draft.data.registration.certificates[0][sectionId]) ||
+      {}
+  )
 
   return {
     [sectionId]: fields.reduce((fields, field) => {
@@ -149,16 +161,30 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
   modifyApplication = (
     sectionData: IFormSectionData,
-    activeSection: IFormSection,
     application: IApplication
   ) => {
+    const collector =
+      (application.data.registration.certificates &&
+        // @ts-ignore
+        application.data.registration.certificates[0].collector) ||
+      {}
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
-        [activeSection.id]: {
-          ...application.data[activeSection.id],
-          ...sectionData
+        registration: {
+          ...application.data.registration,
+          // @ts-ignore
+          certificates: [
+            {
+              collector: {
+                // @ts-ignore
+                ...collector,
+                ...sectionData
+              },
+              hasShowedVerifiedDocument: false
+            }
+          ]
         }
       }
     })
@@ -183,25 +209,23 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         // @ts-ignore
       ).filter(errs => errs.length > 0).length
 
+      const collector =
+        draft.data.registration.certificates &&
+        // @ts-ignore
+        draft.data.registration.certificates[0][sectionId]
       if (errLength > 0) {
         this.setState({
           showError: true
         })
       } else if (currentGroup === 'affidavit') {
-        if (
-          draft &&
-          draft.data[sectionId] &&
-          draft.data[sectionId].signedFile
-        ) {
+        if (collector.affidavitFile && collector.affidavitFile.data) {
           this.props.writeApplication(draft)
 
           this.goToNextFormForSomeoneElse(applicationId, draft, event)
         } else {
           if (
-            draft &&
-            draft.data[sectionId] &&
-            draft.data[sectionId].noAffidavitAgreement &&
-            (draft.data[sectionId].noAffidavitAgreement as string[]).length > 0
+            collector.noAffidavitAgreement &&
+            (collector.noAffidavitAgreement as string[]).length > 0
           ) {
             this.props.writeApplication(draft)
             this.setState({ showModalForNoSignedAffidavit: true })
@@ -218,13 +242,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         })
         if (!nextGroup) {
           this.props.writeApplication(draft)
-          this.props.goToVerifyCollector(
-            applicationId,
-            event,
-            draft.data &&
-              draft.data.collector &&
-              (draft.data.collector.type as string)
-          )
+          this.props.goToVerifyCollector(applicationId, event, collector.type)
         } else {
           this.props.goToPrintCertificate(applicationId, event, nextGroup)
         }
@@ -341,18 +359,14 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             </>
           </FormSectionTitle>
           {showError && (
-            <ErrorText>
+            <ErrorText id="form_error">
               {(formGroup.error && intl.formatMessage(formGroup.error)) || ''}
             </ErrorText>
           )}
           <FormFieldGenerator
             id={formGroup.id}
             onChange={values => {
-              debouncedModifyApplication(
-                values,
-                formSection,
-                applicationToBeCertified
-              )
+              debouncedModifyApplication(values, applicationToBeCertified)
             }}
             setAllFieldsDirty={false}
             fields={formGroup.fields}
@@ -378,6 +392,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         </ActionPageLight>
         {showModalForNoSignedAffidavit && (
           <ResponsiveModal
+            id="noAffidavitAgreementConfirmationModal"
             title={intl.formatMessage(
               certificateMessages.noAffidavitModalTitle
             )}
@@ -445,11 +460,8 @@ const mapStateToProps = (
     application => application.id === registrationId
   )
   const formSection = getCollectCertificateForm(event, state)
-  if (event === Event.BIRTH && groupId === 'birthCertCollectorGroup') {
-    if (
-      formSection.groups &&
-      formSection.groups[0].id === 'birthCertCollectorGroup'
-    )
+  if (event === Event.BIRTH && groupId === 'certCollector') {
+    if (formSection.groups && formSection.groups[0].id === 'certCollector')
       formSection.groups.shift()
     if (application && application.data && application.data.father) {
       if (application.data.father.fathersDetailsExist) {
