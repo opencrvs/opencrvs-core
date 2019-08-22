@@ -75,6 +75,10 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
       }`
       : ''
   }}
+
+  .react-select__value-container {
+    padding: 0;
+  }
 `
 
 function getSelectedOption(

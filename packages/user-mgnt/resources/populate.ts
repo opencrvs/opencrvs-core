@@ -25,14 +25,14 @@ const fieldAgent = new User({
   type: 'CHA',
   scope: ['declare', 'demo'],
   status: 'active',
-  practitionerId: 'd5c2e811-117b-45b2-9056-cd8a2081919c',
+  practitionerId: '8807e4d8-1440-4507-a882-5891ded9bbd5',
   primaryOfficeId:
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a' /* TODO: when office details arrive change to office id - currently set to union id */,
+    'a6473e18-f5ec-467e-9a33-a6a6754c7ee7' /* TODO: when office details arrive change to office id - currently set to union id */,
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199', // should be a division
-    '4af73d73-aa6e-4770-b1d9-4274949e431e', // should be a district child of the above division
-    'd757aee6-0691-42d5-92dd-ab731cb640d6', // should be an upazila child of the above district
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a' // should be a union child of the above upazila
+    'b272a5dd-7e2e-46db-9eeb-b3b3c915a547', // should be a division
+    '8503cefe-24b2-46fb-afd9-efff42c67c1a', // should be a district child of the above division
+    '29307288-24df-43c9-abb3-3f457e27520b', // should be an upazila child of the above district
+    '0197c3f0-6eba-45a8-a284-2602e603e205' // should be a union child of the above upazila
   ],
   securityQuestionAnswers: []
 })
@@ -54,13 +54,13 @@ const registrationAgent = new User({
   type: 'ENTREPENEUR',
   scope: ['validate', 'certify', 'demo'],
   status: 'active',
-  practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
+  practitionerId: '2aa2d4e0-5804-41b1-8ce4-12fb113970b1',
+  primaryOfficeId: '51993c23-560b-465b-a7ad-5fd7b9f9fd5a',
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
+    'bf795ccf-feb8-47c8-93e9-323e0d60821e',
+    '4464fb0a-1917-4c3c-ae63-54c318110f97',
+    'e71c01b8-88c6-4efb-84e9-73f9091e27d5'
   ],
   securityQuestionAnswers: []
 })
@@ -82,13 +82,13 @@ const localRegistrar = new User({
   type: 'CHAIRMAN',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
-  practitionerId: '862519b7-552f-4512-946f-35ecde896c50',
-  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
+  practitionerId: 'b61f0345-3759-433e-a2e2-2dd3a0e1bdf9',
+  primaryOfficeId: 'a6473e18-f5ec-467e-9a33-a6a6754c7ee7',
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
+    '8503cefe-24b2-46fb-afd9-efff42c67c1a',
+    '29307288-24df-43c9-abb3-3f457e27520b',
+    '0197c3f0-6eba-45a8-a284-2602e603e205'
   ],
   securityQuestionAnswers: []
 })
@@ -110,9 +110,9 @@ const districtRegistrar = new User({
   type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
-  practitionerId: '4e6df67a-ac2c-4bad-8516-6abc0a883e7b',
-  primaryOfficeId: '4af73d73-aa6e-4770-b1d9-4274949e431e',
-  catchmentAreaIds: ['d2898740-42e4-4680-b5a7-2f0a12a15199'],
+  practitionerId: '60cd7bac-68c9-4474-a0a6-a11cb08f4f60',
+  primaryOfficeId: 'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
+  catchmentAreaIds: ['8503cefe-24b2-46fb-afd9-efff42c67c1a'],
   securityQuestionAnswers: []
 })
 
@@ -133,8 +133,8 @@ const stateRegistrar = new User({
   type: 'MAYOR',
   scope: ['register', 'performance', 'certify', 'demo'],
   status: 'active',
-  practitionerId: '39e56f2a-23d5-4e76-ab5d-6f41ec4619db',
-  primaryOfficeId: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+  practitionerId: '0864ece0-a3d7-4857-85d7-a098676f70ec',
+  primaryOfficeId: 'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
   catchmentAreaIds: [],
   securityQuestionAnswers: []
 })
@@ -156,8 +156,8 @@ const nationalRegistrar = new User({
   type: 'SECRETARY',
   scope: ['register', 'performance', 'certify', 'config', 'teams', 'demo'],
   status: 'active',
-  practitionerId: '3bebd40a-3a40-4c5d-ad41-a949778bc368',
-  primaryOfficeId: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+  practitionerId: '10371c7f-fc1a-4390-92f0-03d6dd47e3cd',
+  primaryOfficeId: 'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
   catchmentAreaIds: [],
   securityQuestionAnswers: []
 })
@@ -179,13 +179,13 @@ const sysAdmin = new User({
   type: 'LOCAL_SYSTEM_ADMIN',
   scope: ['sysadmin', 'demo'],
   status: 'active',
-  practitionerId: '9680f408-8a3f-49f4-ab25-4e0338434c19',
-  primaryOfficeId: '0564787d-a849-4190-b2b8-0466f75d4d8c',
+  practitionerId: '64112dc5-473f-4176-97d7-387162e66a44',
+  primaryOfficeId: 'a6473e18-f5ec-467e-9a33-a6a6754c7ee7',
   catchmentAreaIds: [
-    'd2898740-42e4-4680-b5a7-2f0a12a15199',
-    '4af73d73-aa6e-4770-b1d9-4274949e431e',
-    'd757aee6-0691-42d5-92dd-ab731cb640d6',
-    '0627c48a-c721-4ff9-bc6e-1fba59a2332a'
+    'b272a5dd-7e2e-46db-9eeb-b3b3c915a547',
+    '8503cefe-24b2-46fb-afd9-efff42c67c1a',
+    '29307288-24df-43c9-abb3-3f457e27520b',
+    '0197c3f0-6eba-45a8-a284-2602e603e205'
   ],
   securityQuestionAnswers: []
 })

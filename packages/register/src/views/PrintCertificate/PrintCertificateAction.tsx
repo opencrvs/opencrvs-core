@@ -6,7 +6,6 @@ import { FormFieldGenerator } from '@register/components/form'
 import {
   IFormSection,
   IFormSectionData,
-  INFORMATIVE_RADIO_GROUP,
   PARAGRAPH,
   IFormData,
   PDF_DOCUMENT_VIEWER,
@@ -893,17 +892,6 @@ class PrintCertificateActionComponent extends React.Component<
                   if (data) {
                     // @ts-ignore
                     const retrievedData = data[dataKey]
-                    let fields = collectCertificateForm.groups[0].fields
-                    fields = fields.map(field => {
-                      if (field && field.type === INFORMATIVE_RADIO_GROUP) {
-                        if (field.dynamicInformationRetriever) {
-                          field.information = field.dynamicInformationRetriever(
-                            retrievedData
-                          )
-                        }
-                      }
-                      return field
-                    })
 
                     const eventDate = this.getEventDate(retrievedData, event)
 
