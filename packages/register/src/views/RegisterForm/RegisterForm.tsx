@@ -33,16 +33,15 @@ import {
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
-import { IOfflineDataState } from '@register/offline/reducer'
+
 import { HOME } from '@register/navigation/routes'
-import { getOfflineState } from '@register/offline/selectors'
+import { getOfflineData } from '@register/offline/selectors'
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled, { keyframes } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { isNull, isUndefined, merge } from 'lodash'
-// @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
@@ -59,6 +58,7 @@ import {
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@register/utils/constants'
+import { IOfflineData } from '@register/offline/reducer'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -169,7 +169,7 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
-  offlineResources: IOfflineDataState
+  offlineResources: IOfflineData
 }
 
 export type FullProps = IFormProps &
@@ -525,7 +525,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={getVisibleGroupFields(activeSectionGroup)}
-                      offlineResources={offlineResources}
+                      resources={offlineResources}
                       draftData={application.data}
                     />
                   </form>
@@ -650,7 +650,7 @@ function mapStateToProps(
     application.data[activeSection.id] || {}
   )
 
-  const offlineResources = getOfflineState(state)
+  const offlineResources = getOfflineData(state)
 
   return {
     registerForm,

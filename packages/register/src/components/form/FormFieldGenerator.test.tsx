@@ -23,16 +23,6 @@ export interface IMotherSectionFormData {
   firstName: string
 }
 
-const offlineResources = {
-  locations: mockOfflineData.locations,
-  facilities: mockOfflineData.facilities,
-  healthFacilityFilterLocation: '',
-  offlineDataLoaded: true,
-  loadingError: false,
-  languages: [],
-  languageState: {}
-}
-
 describe('form component', () => {
   const { store } = createStore()
   const draft = createApplication(Event.BIRTH)
@@ -44,7 +34,7 @@ describe('form component', () => {
       id="mother"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      offlineResources={offlineResources}
+      resources={mockOfflineData}
       fields={[
         {
           name: 'countryPermanent',
@@ -144,7 +134,7 @@ describe('form component registration section', () => {
       id="registration"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      offlineResources={offlineResources}
+      resources={mockOfflineData}
       fields={[
         {
           name: 'registrationPhone',

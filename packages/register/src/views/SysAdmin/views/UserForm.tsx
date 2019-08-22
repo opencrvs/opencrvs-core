@@ -22,6 +22,9 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { buttonMessages } from '@register/i18n/messages'
+import { IOfflineData } from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
+import { IStoreState } from '@register/store'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -42,13 +45,17 @@ type IProps = {
   nextGroupId: string
 }
 
+type IStateProps = {
+  resources: IOfflineData
+}
+
 type IDispatchProps = {
   goToHome: typeof goToHome
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
   clearUserFormData: typeof clearUserFormData
 }
-type IFullProps = InjectedIntlProps & IProps & IDispatchProps
+type IFullProps = InjectedIntlProps & IProps & IStateProps & IDispatchProps
 
 class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -84,7 +91,7 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { section, intl, activeGroup } = this.props
+    const { section, intl, activeGroup, resources } = this.props
 
     return (
       <>
@@ -98,6 +105,7 @@ class UserFormComponent extends React.Component<IFullProps> {
           <FormFieldGenerator
             key={activeGroup.id}
             id={section.id}
+            resources={resources}
             onChange={values => this.modifyData(values)}
             setAllFieldsDirty={false}
             fields={getVisibleGroupFields(activeGroup)}
@@ -116,7 +124,15 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 }
 
-export const UserForm = connect(
-  null,
+export const UserForm = connect<
+  IStateProps,
+  IDispatchProps,
+  IProps,
+  IStoreState
+>(
+  (state: IStoreState, ownProps: IProps) => ({
+    ...ownProps,
+    resources: getOfflineData(state)
+  }),
   { modifyUserFormData, goToCreateUserSection, goToHome, clearUserFormData }
-)(injectIntl<IFullProps>(UserFormComponent))
+)(injectIntl(UserFormComponent))

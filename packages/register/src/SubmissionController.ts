@@ -52,14 +52,12 @@ const SUCCESS_SUBMISSION_STATUS: IActionList = {
 export class SubmissionController {
   private store: AppStore
   private client: ApolloClient<{}>
-  private registerForms: { [key: string]: IForm }
   private syncRunning: boolean = false
   private syncCount: number = 0
 
   constructor(store: AppStore) {
     this.store = store
     this.client = createClient(store)
-    this.registerForms = getRegisterForm(this.store.getState())
   }
 
   public start = () => {
@@ -109,12 +107,15 @@ export class SubmissionController {
     }
 
     const applicationAction = ACTION_LIST[application.action || ''] || null
+
+    const forms = getRegisterForm(this.store.getState())!
+
     const result = getMutationMapping(
       application.event,
       // @ts-ignore
       applicationAction,
       application.payload,
-      this.registerForms[application.event],
+      forms[application.event],
       application
     )
     const { mutation, variables } = result || {

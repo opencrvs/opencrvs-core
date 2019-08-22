@@ -73,12 +73,12 @@ import { RouteComponentProps } from 'react-router'
 import { goToHome } from '@register/navigation'
 import { CONFIRMATION_SCREEN } from '@register/navigation/routes'
 import {
-  IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
-  ILocation
+  ILocation,
+  IOfflineData
 } from '@register/offline/reducer'
-import { getOfflineState } from '@register/offline/selectors'
+import { getOfflineData } from '@register/offline/selectors'
 import { renderSelectDynamicLabel } from '@register/views/RegisterForm/review/ReviewSection'
 import * as Sentry from '@sentry/browser'
 import {
@@ -90,6 +90,7 @@ import {
   messages,
   dynamicMessages
 } from '@register/i18n/messages/views/certificate'
+import { getEventRegisterForm } from '@register/forms/register/application-selectors'
 
 const COLLECT_CERTIFICATE = 'collectCertificate'
 const PAYMENT = 'payment'
@@ -271,7 +272,7 @@ type IProps = {
   certificatePreviewFormSection: IFormSection
   registerForm: IForm
   userDetails: IUserDetails | null
-  offlineResources: IOfflineDataState
+  resources: IOfflineData
   draft: IApplication
   theme: ITheme
 }
@@ -628,7 +629,7 @@ class PrintCertificateActionComponent extends React.Component<
   getCertificateDetails(
     data: ICertDetails,
     intl: InjectedIntl,
-    offlineResources: IOfflineDataState
+    offlineResources: IOfflineData
   ): CertificateDetails {
     const { event } = this.props
     let names
@@ -860,7 +861,7 @@ class PrintCertificateActionComponent extends React.Component<
       paymentFormSection,
       drafts: { applications: drafts },
       dispatch,
-      offlineResources
+      resources: offlineResources
     } = this.props
 
     const { currentForm } = this.state
@@ -980,6 +981,7 @@ class PrintCertificateActionComponent extends React.Component<
                         <Box>
                           <FormFieldGenerator
                             id={form.id}
+                            resources={offlineResources}
                             onChange={this.storeData}
                             setAllFieldsDirty={false}
                             fields={form.groups[0].fields}
@@ -1069,10 +1071,10 @@ function mapStatetoProps(
       state.printCertificateForm.certificatePreviewForm,
     draft,
     drafts: state.applicationsState,
-    registerForm: state.registerForm.registerForm[event],
+    registerForm: getEventRegisterForm(state, event),
     collectCertificateForm: getCollectCertificateForm(event, state),
     userDetails: getUserDetails(state),
-    offlineResources: getOfflineState(state)
+    offlineResources: getOfflineData(state)
   }
 }
 export const PrintCertificateAction = connect(

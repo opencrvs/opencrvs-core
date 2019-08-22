@@ -8,20 +8,19 @@ import {
   getConditionalActionsForField,
   getFieldValidation
 } from '@opencrvs/register/src/forms/utils'
-import { IOfflineDataState } from '@register/offline/reducer'
+import { IOfflineData } from '@register/offline/reducer'
 
 export function getValidationErrorsForField(
   field: IFormField,
   values: IFormSectionData,
-  offlineResources?: IOfflineDataState
+  resources?: IOfflineData
 ) {
   const value = values[field.name]
   const conditionalActions = getConditionalActionsForField(
     field,
     values,
-    offlineResources
+    resources
   )
-
   if (conditionalActions.includes('hide')) {
     return []
   }
@@ -45,15 +44,10 @@ export type Errors = { [key: string]: string }
 
 export function getValidationErrorsForForm(
   fields: IFormField[],
-  values: IFormSectionData,
-  offlineResources?: IOfflineDataState
+  values: IFormSectionData
 ): { [key: string]: IValidationResult[] } {
   return fields.reduce((errorsForAllFields: Errors, field) => {
-    const validationErrors = getValidationErrorsForField(
-      field,
-      values,
-      offlineResources
-    )
+    const validationErrors = getValidationErrorsForField(field, values)
     return {
       ...errorsForAllFields,
       [field.name]: validationErrors

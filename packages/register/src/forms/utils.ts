@@ -31,10 +31,10 @@ import {
 import { InjectedIntl, FormattedMessage } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import {
-  IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
-  ILocation
+  ILocation,
+  IOfflineData
 } from '@register/offline/reducer'
 import { Validation } from '@register/utils/validate'
 import moment from 'moment'
@@ -192,7 +192,7 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  resources?: IOfflineDataState
+  resources: IOfflineData
 ) => {
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (!dependencyVal) {
@@ -333,8 +333,11 @@ export function getQueryData(
 
 export const getConditionalActionsForField = (
   field: IFormField,
+  /*
+   * These are used in the eval expression
+   */
   values: IFormSectionData,
-  resources?: IOfflineDataState,
+  resources?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {

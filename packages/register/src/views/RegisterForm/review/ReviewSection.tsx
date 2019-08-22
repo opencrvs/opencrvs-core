@@ -32,12 +32,12 @@ import {
 import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
 import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
-import { getOfflineState } from '@register/offline/selectors'
+import { getOfflineData } from '@register/offline/selectors'
 import {
-  IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
-  ILocation
+  ILocation,
+  IOfflineData
 } from '@register/offline/reducer'
 import { getLanguage } from '@register/i18n/selectors'
 import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
@@ -159,7 +159,7 @@ interface IProps {
     payload?: IPayload
   ) => void
   scope: Scope | null
-  offlineResources: IOfflineDataState
+  offlineResources: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
   writeApplication: typeof writeApplication
@@ -200,7 +200,7 @@ export function renderSelectDynamicLabel(
   options: IDynamicOptions,
   draftData: IFormSectionData,
   intl: InjectedIntl,
-  resources: IOfflineDataState,
+  resources: IOfflineData,
   language: string
 ) {
   if (!options.resource) {
@@ -244,7 +244,7 @@ const renderValue = (
   section: IFormSection,
   field: IFormField,
   intl: InjectedIntl,
-  offlineResources: IOfflineDataState,
+  offlineResources: IOfflineData,
   language: string
 ) => {
   const value: IFormFieldValue = draft.data[section.id]
@@ -469,7 +469,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     formSections: IFormSection[],
     errorsOnFields: any
   ) => {
-    const { intl, draft, offlineResources, language, pageRoute } = this.props
+    const { intl, draft, offlineResources, language } = this.props
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,
@@ -697,9 +697,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
 export const ReviewSection = connect(
   (state: IStoreState) => ({
-    registerForm: getRegisterForm(state),
+    // register form is always ready when this view is initialized
+    registerForm: getRegisterForm(state)!,
     scope: getScope(state),
-    offlineResources: getOfflineState(state),
+    offlineResources: getOfflineData(state),
     language: getLanguage(state)
   }),
   { goToPageGroup, writeApplication }
