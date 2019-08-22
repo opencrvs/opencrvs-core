@@ -4,6 +4,9 @@ import {
   mockUserResponse,
   resizeWindow
 } from '@register/tests/util'
+
+import { waitForElement, waitFor } from '@register/tests/wait-for-element'
+
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { storage } from '@register/storage'
@@ -23,6 +26,9 @@ import moment from 'moment'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { Validate } from '@opencrvs/components/lib/icons'
+
+import { Event } from '@opencrvs/register/src/forms'
+import { SUBMISSION_STATUS, storeApplication } from '@register/applications'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -129,9 +135,14 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('RegistrationHome sent for review tab related tests', () => {
-  const { store, history } = createStore()
+  let store: ReturnType<typeof createStore>['store']
+  let history: ReturnType<typeof createStore>['history']
 
   beforeAll(() => {
+    const createdStore = createStore()
+    store = createdStore.store
+    history = createdStore.history
+
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
@@ -152,10 +163,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store
     )
 
-    // @ts-ignore
-    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
+    expect(
+      testComponent.component.containsMatchingElement(Spinner as any)
+    ).toBe(true)
   })
   it('renders error text when an error occurs', async () => {
     const graphqlMock = [
@@ -186,21 +196,12 @@ describe('RegistrationHome sent for review tab related tests', () => {
       graphqlMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    const element = await waitForElement(
+      testComponent.component,
+      '#search-result-error-text-review'
+    )
 
-    testComponent.component.update()
-
-    expect(
-      testComponent.component
-        .find('#search-result-error-text-review')
-        .children()
-        .text()
-    ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
+    expect(element.children().text()).toBe('An error occurred while searching')
   })
 
   it('check sent for review tab count', async () => {
@@ -242,23 +243,11 @@ describe('RegistrationHome sent for review tab related tests', () => {
       graphqlMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_review')
-        .hostNodes()
-        .text()
-    ).toContain('Ready for review (12)')
-    testComponent.component.unmount()
+    const element = await waitForElement(testComponent.component, '#tab_review')
+    expect(element.hostNodes().text()).toContain('Ready for review (12)')
   })
 
-  it('renders all items returned from graphql query in ready for reivew', async () => {
+  it('renders all items returned from graphql query in ready for review', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
@@ -364,12 +353,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const gridTable = await waitForElement(testComponent.component, GridTable)
+
+    const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_APPLICATION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
@@ -382,8 +368,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
-
-    testComponent.component.unmount()
   })
 
   it('renders only declared items for registration agents', async () => {
@@ -500,12 +484,8 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(validateScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const gridTable = await waitForElement(testComponent.component, GridTable)
+    const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_APPLICATION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
@@ -518,8 +498,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
-
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -561,14 +539,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const gridTable = await waitForElement(testComponent.component, GridTable)
+    const data = gridTable.prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar if items more than 11 in ReviewTab', async () => {
@@ -605,22 +578,18 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
+    const pagination = await waitForElement(
+      testComponent.component,
+      '#pagination'
+    )
 
-    expect(
-      testComponent.component.find('#pagination').hostNodes()
-    ).toHaveLength(1)
+    expect(pagination.hostNodes()).toHaveLength(1)
 
     testComponent.component
       .find('#pagination button')
       .last()
       .hostNodes()
       .simulate('click')
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for validated status', async () => {
@@ -803,23 +772,19 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.component.update()
-    const instance = testComponent.component.find(GridTable).instance() as any
+    const gridTable = (await waitForElement(
+      testComponent.component,
+      GridTable
+    )).instance()
 
-    instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    expect(
-      testComponent.component.find('#VALIDATED-0').hostNodes().length
-    ).toBe(1)
-    testComponent.component.unmount()
+    gridTable.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
+
+    const element = await waitForElement(
+      testComponent.component,
+      '#VALIDATED-0'
+    )
+
+    expect(element.hostNodes().length).toBe(1)
   })
 
   it('renders expanded area for declared status', async () => {
@@ -1002,23 +967,16 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.component.update()
-    const instance = testComponent.component.find(GridTable).instance() as any
+    const instance = (await waitForElement(
+      testComponent.component,
+      GridTable
+    )).instance()
 
     instance.toggleExpanded('bc09200d-0160-43b4-9e2b-5b9e90424e95')
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    expect(testComponent.component.find('#DECLARED-0').hostNodes().length).toBe(
-      1
-    )
-    testComponent.component.unmount()
+
+    const element = await waitForElement(testComponent.component, '#DECLARED-0')
+
+    expect(element.hostNodes().length).toBe(1)
   })
 
   it('redirects user to review page on review action click', async () => {
@@ -1117,29 +1075,19 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-
-    expect(
-      testComponent.component.find('#ListItemAction-0-Review').hostNodes()
-    ).toHaveLength(1)
-    testComponent.component
-      .find('#ListItemAction-0-Review')
-      .hostNodes()
-      .simulate('click')
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
-    expect(window.location.href).toContain(
-      '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    const action = await waitForElement(
+      testComponent.component,
+      '#ListItemAction-0-Review'
     )
-    testComponent.component.unmount()
+    expect(action.hostNodes()).toHaveLength(1)
+    action.hostNodes().simulate('click')
+
+    testComponent.component.update()
+    await waitFor(() =>
+      window.location.href.includes(
+        '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      )
+    )
   })
 
   it('redirects user to duplicate page on review action click', async () => {
@@ -1238,29 +1186,17 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
+    const action = await waitForElement(
+      testComponent.component,
+      '#ListItemAction-1-Review'
+    )
 
-    expect(
-      testComponent.component.find('#ListItemAction-1-Review').hostNodes()
-    ).toHaveLength(1)
-    testComponent.component
-      .find('#ListItemAction-1-Review')
-      .hostNodes()
-      .simulate('click')
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
+    expect(action.hostNodes()).toHaveLength(1)
+    action.hostNodes().simulate('click')
 
     expect(history.location.pathname).toContain(
       '/duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e95'
     )
-    testComponent.component.unmount()
   })
 
   it('check the validate icon', async () => {
@@ -1359,14 +1295,176 @@ describe('RegistrationHome sent for review tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
+    const validate = await waitForElement(testComponent.component, Validate)
 
-    expect(testComponent.component.find(Validate)).toHaveLength(1)
-    testComponent.component.unmount()
+    expect(validate).toHaveLength(1)
+  })
+
+  it('renders declared items excluding the ready to register applications', async () => {
+    const TIME_STAMP = '1544188309380'
+    Date.now = jest.fn(() => 1554055200000)
+    const graphqlMock = [
+      {
+        request: {
+          query: SEARCH_EVENTS,
+          variables: {
+            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            locationIds: ['123456789'],
+            count: 10,
+            skip: 0
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be7',
+                  type: 'Birth',
+                  registration: {
+                    status: 'DECLARED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde2',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7ba1',
+                  type: 'Birth',
+                  registration: {
+                    status: 'VALIDATED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde2',
+                    duplicates: null,
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+
+    const customDraft = {
+      id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be7',
+      data: {},
+      event: Event.BIRTH,
+      submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER
+    }
+    store.dispatch(storeApplication(customDraft))
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome
+        match={{
+          params: {
+            tabId: 'review'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftCount={1}
+      />,
+      store,
+      graphqlMock
+    )
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    const gridTable = await waitForElement(testComponent.component, GridTable)
+
+    const data = gridTable.first().prop('content')
+
+    expect(data.length).toBe(1)
+  })
+
+  it('check declared count minus ready to review applications', async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: COUNT_REGISTRATION_QUERY,
+          variables: {
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
+          }
+        },
+        result: {
+          data: {
+            countEvents: {
+              declared: 10,
+              validated: 2,
+              registered: 7,
+              rejected: 5
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = createTestComponent(
+      // @ts-ignore
+      <RegistrationHome
+        match={{
+          params: {
+            tabId: 'review'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        draftCount={1}
+      />,
+      store,
+      graphqlMock
+    )
+
+    const reviewTab = await waitForElement(
+      testComponent.component,
+      '#tab_review'
+    )
+
+    expect(reviewTab.hostNodes().text()).toContain('Ready for review (11)')
   })
 })
 
@@ -1479,24 +1577,11 @@ describe('Tablet tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    testComponent.component
-      .find('#row_0')
-      .hostNodes()
-      .simulate('click')
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
+    const row = await waitForElement(testComponent.component, '#row_0')
+    row.hostNodes().simulate('click')
 
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })

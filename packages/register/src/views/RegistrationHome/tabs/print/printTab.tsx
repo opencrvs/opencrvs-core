@@ -30,6 +30,8 @@ import {
   constantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IStoreState } from '@register/store'
+import { IApplication } from '@register/applications'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -37,6 +39,7 @@ interface IBasePrintTabProps {
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
   parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
 }
 
 interface IPrintTabState {
@@ -129,7 +132,11 @@ class PrintTabComponent extends React.Component<
       return []
     }
 
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(
+      data,
+      this.props.intl,
+      this.props.outboxApplications
+    )
     return transformedData.map(reg => {
       const actions = [
         {
@@ -239,8 +246,14 @@ class PrintTabComponent extends React.Component<
   }
 }
 
+function mapStateToProps(state: IStoreState) {
+  return {
+    outboxApplications: state.applicationsState.applications
+  }
+}
+
 export const PrintTab = connect(
-  null,
+  mapStateToProps,
   {
     goToPrintCertificate,
     goToApplicationDetails

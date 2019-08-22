@@ -34,6 +34,7 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { errorMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -46,6 +47,7 @@ interface IBaseReviewTabProps {
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
   parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
 }
 
 interface IReviewTabState {
@@ -94,8 +96,12 @@ class ReviewTabComponent extends React.Component<
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-    const transformedData = transformData(data, this.props.intl)
-
+    const transformedData = transformData(
+      data,
+      this.props.intl,
+      this.props.outboxApplications,
+      [SUBMISSION_STATUS.READY_TO_REGISTER, SUBMISSION_STATUS.REGISTERING]
+    )
     return transformedData.map(reg => {
       const actions = [] as IAction[]
       let icon: JSX.Element = <div />
@@ -290,7 +296,8 @@ class ReviewTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    scope: getScope(state)
+    scope: getScope(state),
+    outboxApplications: state.applicationsState.applications
   }
 }
 
