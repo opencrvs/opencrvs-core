@@ -17,7 +17,7 @@ import {
 import { countries } from '@register/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 
-import { formMessages as addressMessages } from '@register/i18n/messages'
+import { formMessages } from '@register/i18n/messages'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -28,7 +28,9 @@ const offlineResources = {
   facilities: mockOfflineData.facilities,
   healthFacilityFilterLocation: '',
   offlineDataLoaded: true,
-  loadingError: false
+  loadingError: false,
+  languages: [],
+  languageState: {}
 }
 
 describe('form component', () => {
@@ -47,7 +49,7 @@ describe('form component', () => {
         {
           name: 'countryPermanent',
           type: SELECT_WITH_OPTIONS,
-          label: addressMessages.country,
+          label: formMessages.country,
           required: true,
           initialValue: window.config.COUNTRY.toUpperCase(),
           validate: [],
@@ -56,7 +58,7 @@ describe('form component', () => {
         {
           name: 'statePermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.state,
+          label: formMessages.state,
           required: true,
           initialValue: '',
           validate: [],
@@ -68,9 +70,10 @@ describe('form component', () => {
         {
           name: 'districtPermanent',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: addressMessages.district,
+          label: formMessages.district,
           required: true,
           initialValue: '',
+          placeholder: formMessages.select,
           validate: [],
           dynamicOptions: {
             resource: OFFLINE_LOCATIONS_KEY,
@@ -80,7 +83,7 @@ describe('form component', () => {
         {
           name: 'phone',
           type: TEL,
-          label: addressMessages.district,
+          label: formMessages.district,
           required: true,
           initialValue: '',
           validate: []
@@ -117,7 +120,7 @@ describe('form component', () => {
             .find('#districtPermanent')
             .hostNodes()
             .text()
-        ).toEqual('Select...')
+        ).toEqual('Select')
       })
       it('doesnt reset non dependent select fields', () => {
         expect(

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, InjectedIntlProps, FormattedMessage } from 'react-intl'
 import { IStoreState } from '@register/store'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -165,11 +165,13 @@ class SettingsView extends React.Component<IProps & IState, IState> {
     const { userDetails, intl, languages } = this.props
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
-    availableLangs.map((lang: string) => {
-      langChoice.push({
-        value: lang,
-        label: languages[lang].displayName
-      })
+    availableLangs.forEach((lang: string) => {
+      if (languages[lang]) {
+        langChoice.push({
+          value: lang,
+          label: languages[lang].displayName
+        })
+      }
     })
 
     let englishName = ''
@@ -325,7 +327,12 @@ class SettingsView extends React.Component<IProps & IState, IState> {
           show={this.state.showSuccessNotification}
           callback={this.toggleSuccessNotification}
         >
-          {intl.formatMessage(messages.changeLanguageSuccessMessage)}
+          <FormattedMessage
+            {...messages.changeLanguageSuccessMessage}
+            values={{
+              language: languages[this.state.selectedLanguage].displayName
+            }}
+          />
         </Notification>
       </>
     )

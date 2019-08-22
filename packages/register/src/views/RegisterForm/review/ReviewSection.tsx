@@ -80,6 +80,7 @@ import {
   sectionMapping as deathSectionMapping,
   sectionTitle as deathSectionTitle
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+import { getDefaultLanguage } from '@register/i18n/utils'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -224,10 +225,10 @@ export function renderSelectDynamicLabel(
       }
 
       if (selectedLocation) {
-        if (language === 'en') {
-          return selectedLocation.name
+        if (language !== getDefaultLanguage()) {
+          return selectedLocation.alias
         } else {
-          return selectedLocation.nameBn
+          return selectedLocation.name
         }
       } else {
         return false
@@ -468,7 +469,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     formSections: IFormSection[],
     errorsOnFields: any
   ) => {
-    const { intl, draft, offlineResources, language, pageRoute } = this.props
+    const { intl, draft, offlineResources, language } = this.props
     const isVisibleField = (field: IFormField, section: IFormSection) => {
       const conditionalActions = getConditionalActionsForField(
         field,

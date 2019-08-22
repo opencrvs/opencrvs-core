@@ -37,7 +37,12 @@ const mockUser: IUser & { password: string } = {
   catchmentAreaIds: [],
   scope: ['register'],
   deviceId: 'D444',
-  password: 'test'
+  password: 'test',
+  signature: {
+    type: 'image/png',
+    data:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+  }
 }
 
 describe('createUser handler', () => {

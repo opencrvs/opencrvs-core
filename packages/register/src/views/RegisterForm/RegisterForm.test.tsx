@@ -4,8 +4,7 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames,
-  flushPromises
+  mockDeathApplicationDataWithoutFirstNames
 } from '@register/tests/util'
 import { RegisterForm } from '@register/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -41,12 +40,11 @@ import { FETCH_REGISTRATION } from '@opencrvs/register/src/forms/register/querie
 import { FETCH_PERSON } from '@opencrvs/register/src/forms/register/queries/person'
 import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
-import { getToken } from '@register/utils/authUtils'
 
 import { formMessages as messages } from '@register/i18n/messages'
 import * as profileSelectors from '@register/profile/profileSelectors'
 
-describe('when user logs in', async () => {
+describe('when user logs in', () => {
   // Some mock data
 
   const draft1 = createApplication(Event.BIRTH)
@@ -125,9 +123,7 @@ describe('when user logs in', async () => {
       const details = await getApplicationsOfCurrentUser()
       const currentUserDrafts = (JSON.parse(details) as IUserData).applications
       expect(currentUserDrafts.length).toBe(3)
-      expect(
-        currentUserDrafts.find(draft => draft.id === draft.id)
-      ).toBeTruthy()
+      expect(currentUserDrafts[0]).toBeTruthy()
     })
 
     it("should delete the draft from the current user's array of applications", async () => {
@@ -197,7 +193,7 @@ describe('when user is in the register form before initial draft load', () => {
   })
 })
 
-describe('when user is in the register form for birth event', async () => {
+describe('when user is in the register form for birth event', () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.BIRTH)
   store.dispatch(storeApplication(draft))
@@ -275,7 +271,7 @@ describe('when user is in the register form for birth event', async () => {
   })
 })
 
-describe('when user is in the register form for death event', async () => {
+describe('when user is in the register form for death event', () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
   store.dispatch(setInitialApplications())
@@ -1042,7 +1038,7 @@ describe('when user is in the register form review section', () => {
   })
 })
 
-describe('When user is in Preview section death event', async () => {
+describe('When user is in Preview section death event', () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
   store.dispatch(setInitialApplications())
@@ -1185,7 +1181,7 @@ describe('When user is in Preview section death event', async () => {
   })
 })
 
-describe('When user is in Preview section death event in offline mode', async () => {
+describe('When user is in Preview section death event in offline mode', () => {
   const { store, history } = createStore()
   const draft = createApplication(Event.DEATH)
   store.dispatch(setInitialApplications())

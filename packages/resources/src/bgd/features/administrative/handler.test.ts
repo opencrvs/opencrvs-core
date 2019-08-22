@@ -16,7 +16,7 @@ describe('administrative handler receives a request', () => {
         {
           id: 'ba819b89-57ec-4d8b-8b91-e8865579a40f',
           name: 'Barisal',
-          nameBn: 'বরিশাল',
+          alias: 'বরিশাল',
           physicalType: 'Jurisdiction',
           jurisdictionType: 'DIVISION',
           type: 'ADMIN_STRUCTURE',

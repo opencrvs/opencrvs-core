@@ -1,5 +1,12 @@
 import { Event } from '@register/forms'
 import moment from 'moment'
+import { dynamicMessages } from '@register/i18n/messages/views/certificate'
+
+const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
+const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
+
+const LOWEST_CHARGE = window.config.CERTIFICATE_PRINT_LOWEST_CHARGE
+const HIGHEST_CHARGE = window.config.CERTIFICATE_PRINT_HIGHEST_CHARGE
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365
@@ -16,13 +23,13 @@ interface IDayRange {
 }
 
 const ranges: IRange[] = [
-  { start: 0, end: 45, value: 0 },
+  { start: 0, end: FREE_PERIOD, value: 0 },
   {
-    start: 46,
-    end: 5 * YEAR_IN_DAYS,
-    value: 25
+    start: FREE_PERIOD + 1,
+    end: CHARGE_UP_LIMIT,
+    value: LOWEST_CHARGE
   },
-  { start: 5 * YEAR_IN_DAYS + 1, value: 50 }
+  { start: CHARGE_UP_LIMIT + 1, value: HIGHEST_CHARGE }
 ]
 
 function getValue(
@@ -80,4 +87,11 @@ export function calculatePrice(event: Event, eventDate: string) {
   const result = dayRange.getValue(event, days)
 
   return result.toFixed(2)
+}
+
+export function getServiceMessage(event: Event, eventDate: string) {
+  const days = calculateDays(eventDate)
+  return days > CHARGE_UP_LIMIT
+    ? dynamicMessages[`${event}ServiceAfter`]
+    : dynamicMessages[`${event}ServiceBetween`]
 }

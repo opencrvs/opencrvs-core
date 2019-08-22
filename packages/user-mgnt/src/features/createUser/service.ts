@@ -16,6 +16,30 @@ export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
   }
 }
 
+interface IFhirSignature extends fhir.Signature {
+  resourceType: string
+}
+export const createFhirSignature = (
+  user: IUser,
+  practitionerId: string
+): IFhirSignature => {
+  return {
+    resourceType: 'Signature',
+    blob: user.signature.data,
+    type: [
+      {
+        system: 'http://opencrvs.org/specs/signature',
+        code: 'Signature'
+      }
+    ],
+    whoReference: {
+      reference: `Practitioner/${practitionerId}`
+    },
+    when: new Date().toISOString(),
+    contentType: user.signature.type
+  }
+}
+
 export const createFhirPractitionerRole = (
   user: IUser,
   practitionerId: string
@@ -97,7 +121,8 @@ export const deleteFhir = async (
 export const rollback = async (
   token: string,
   practitionerId: string | null,
-  roleId: string | null
+  roleId: string | null,
+  signatureId: string | null
 ) => {
   if (practitionerId) {
     await deleteFhir(token, 'Practitioner', practitionerId)
@@ -105,6 +130,9 @@ export const rollback = async (
 
   if (roleId) {
     await deleteFhir(token, 'PractitionerRole', roleId)
+  }
+  if (signatureId) {
+    await deleteFhir(token, 'signature', signatureId)
   }
 }
 

@@ -14,6 +14,13 @@ interface ICertificateMessages {
   father: ReactIntl.FormattedMessage.MessageDescriptor
   firstName: ReactIntl.FormattedMessage.MessageDescriptor
   firstNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogCancel: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogConfirm: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckDialogTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckVerify: ReactIntl.FormattedMessage.MessageDescriptor
+  idCheckWithoutVerify: ReactIntl.FormattedMessage.MessageDescriptor
   informant: ReactIntl.FormattedMessage.MessageDescriptor
   informantHasReviewedInformaiton: ReactIntl.FormattedMessage.MessageDescriptor
   manualPaymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
@@ -24,6 +31,7 @@ interface ICertificateMessages {
   number: ReactIntl.FormattedMessage.MessageDescriptor
   other: ReactIntl.FormattedMessage.MessageDescriptor
   payment: ReactIntl.FormattedMessage.MessageDescriptor
+  paymentInstruction: ReactIntl.FormattedMessage.MessageDescriptor
   paymentAmount: ReactIntl.FormattedMessage.MessageDescriptor
   paymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
   person1: ReactIntl.FormattedMessage.MessageDescriptor
@@ -38,10 +46,15 @@ interface ICertificateMessages {
   receiptService: ReactIntl.FormattedMessage.MessageDescriptor
   selectSignature: ReactIntl.FormattedMessage.MessageDescriptor
   service: ReactIntl.FormattedMessage.MessageDescriptor
-  serviceMonth: ReactIntl.FormattedMessage.MessageDescriptor
-  serviceYear: ReactIntl.FormattedMessage.MessageDescriptor
+  amountDue: ReactIntl.FormattedMessage.MessageDescriptor
   typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
   whoToCollect: ReactIntl.FormattedMessage.MessageDescriptor
+  confirmAndPrint: ReactIntl.FormattedMessage.MessageDescriptor
+  retiewTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  retiewDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  modalTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  modalBody: ReactIntl.FormattedMessage.MessageDescriptor
+  toastMessage: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -112,6 +125,47 @@ const messagesToDefine: ICertificateMessages = {
     description: 'Parent first names',
     id: 'certificate.parent.details.label.firstNameInEng'
   },
+  idCheckDialogCancel: {
+    defaultMessage: 'Cancel',
+    description:
+      'The for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.actions.cancel'
+  },
+  idCheckDialogConfirm: {
+    defaultMessage: 'SEND',
+    description:
+      'The for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.actions.send'
+  },
+  idCheckDialogDescription: {
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector',
+    description:
+      'The description for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.description'
+  },
+  idCheckDialogTitle: {
+    defaultMessage: 'Continue without proof of ID?',
+    description:
+      'The title for the dialog when details of the collector not verified',
+    id: 'print.certificate.collector.idCheckDialog.title'
+  },
+  idCheckTitle: {
+    defaultMessage: 'Check proof of ID. Does it match the following details?',
+    description: 'The title for id check component',
+    id: 'print.certificate.collector.idCheck.title'
+  },
+  idCheckVerify: {
+    defaultMessage: 'Yes',
+    description: 'The label for id check component action when verify details',
+    id: 'print.certificate.collector.idCheck.actions.verify'
+  },
+  idCheckWithoutVerify: {
+    defaultMessage: 'No',
+    description:
+      'The label for id check component action when does not verify details',
+    id: 'print.certificate.collector.idCheck.actions.withoutVerify'
+  },
   informant: {
     defaultMessage: 'Informant',
     description:
@@ -160,9 +214,15 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other'
   },
   payment: {
-    defaultMessage: 'Payment',
+    defaultMessage: 'Payment is required',
     description: 'The title for payment section',
     id: 'print.certificate.payment'
+  },
+  paymentInstruction: {
+    defaultMessage:
+      'Please collect the payment, print the receipt and hand it over to the payee.',
+    description: 'Description for payment section',
+    id: 'print.certificate.paymentInstruction'
   },
   paymentAmount: {
     defaultMessage: '৳ {paymentAmount}',
@@ -233,17 +293,10 @@ const messagesToDefine: ICertificateMessages = {
     description: 'The label for service paragraph',
     id: 'print.certificate.serviceMonth'
   },
-  serviceMonth: {
-    defaultMessage:
-      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph',
-    id: 'print.certificate.serviceMonth'
-  },
-  serviceYear: {
-    defaultMessage:
-      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph',
-    id: 'print.certificate.serviceYear'
+  amountDue: {
+    defaultMessage: 'Amount Due:',
+    description: 'The label for due amount',
+    id: 'certificate.receipt.amountDue'
   },
   typeOfID: {
     defaultMessage: 'Type of ID',
@@ -254,6 +307,38 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Who is collecting the certificate?',
     description: 'The label for collector of certificate select',
     id: 'print.certificate.collector.whoToCollect'
+  },
+  confirmAndPrint: {
+    defaultMessage: 'Confirm and Print',
+    description: 'The text for Confirm & print button',
+    id: 'print.certificate.button.confirmPrint'
+  },
+  retiewTitle: {
+    defaultMessage: 'Are all the details on the {event} certificate correct?',
+    description: 'Certificate review title',
+    id: 'print.certificate.review.title'
+  },
+  retiewDescription: {
+    defaultMessage:
+      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.',
+    description: 'Certificate review description',
+    id: 'print.certificate.review.description'
+  },
+  modalTitle: {
+    id: 'print.certificate.review.modal.title',
+    defaultMessage: 'Print Certificate?',
+    description: 'Print certificate modal title text'
+  },
+  modalBody: {
+    id: 'print.certificate.review.modal.body',
+    defaultMessage:
+      'A PDF of the certificate will open in a new tab - please print from there',
+    description: 'Print certificate modal body text'
+  },
+  toastMessage: {
+    id: 'print.certificate.toast.message',
+    defaultMessage: 'Certificate is ready to print',
+    description: 'Floating Toast message upon certificate ready to print'
   }
 }
 
@@ -272,6 +357,28 @@ const dynamicMessagesToDefine = {
     id: 'print.certificate.deathService',
     defaultMessage:
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
+    description: 'Amount due on certificate for death label'
+  },
+  birthServiceAfter: {
+    id: 'certificate.receipt.birthService.after',
+    defaultMessage: 'Birth registration after 5 years of date of birth',
+    description: 'Amount due on certificate for birth label'
+  },
+  deathServiceAfter: {
+    id: 'certificate.receipt.deathService.after',
+    defaultMessage: 'Death registration after 5 years of date of death',
+    description: 'Amount due on certificate for death label'
+  },
+  birthServiceBetween: {
+    id: 'certificate.receipt.birthService.between',
+    defaultMessage:
+      'Birth registration between 45 days and 5 years of date of birth',
+    description: 'Amount due on certificate for birth label'
+  },
+  deathServiceBetween: {
+    id: 'certificate.receipt.deathService.between',
+    defaultMessage:
+      'Death registration between 45 days and 5 years of date of death',
     description: 'Amount due on certificate for death label'
   }
 }

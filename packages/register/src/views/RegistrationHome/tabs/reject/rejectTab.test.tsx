@@ -241,18 +241,9 @@ describe('RegistrationHome sent for update tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    const tab = await waitForElement(testComponent.component, '#tab_updates')
 
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_updates')
-        .hostNodes()
-        .text()
-    ).toContain('Sent for updates (5)')
+    expect(tab.hostNodes().text()).toContain('Sent for updates (5)')
   })
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
@@ -350,12 +341,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+    const data = table.prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
@@ -367,8 +354,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
-
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -410,14 +395,10 @@ describe('RegistrationHome sent for update tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+
+    const data = table.prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar in sent for update tab if items more than 11', async () => {
@@ -452,21 +433,13 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    const pagination = await waitForElement(
-      testComponent.component,
-      '#pagination'
-    )
-
-    expect(pagination.hostNodes()).toHaveLength(1)
+    await waitForElement(testComponent.component, '#pagination')
 
     testComponent.component
       .find('#pagination button')
       .last()
       .hostNodes()
       .simulate('click')
-
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for required updates', async () => {

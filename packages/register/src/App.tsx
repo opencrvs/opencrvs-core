@@ -1,4 +1,3 @@
-import { Footer } from '@opencrvs/components/lib/interface/'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
 import { History, Location } from 'history'
@@ -38,6 +37,9 @@ import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/S
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
 import TransitionWrapper from './components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
+import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
+import { Payment } from './views/PrintCertificate/Payment'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -184,8 +186,24 @@ export class App extends React.Component<IAppProps> {
                                             component={ReviewDuplicates}
                                           />
                                           <ProtectedRoute
+                                            exact
                                             path={routes.PRINT_CERTIFICATE}
                                             component={PrintCertificateAction}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_COLLECTOR}
+                                            component={VerifyCollector}
+                                          />
+                                          <ProtectedRoute
+                                            path={routes.REVIEW_CERTIFICATE}
+                                            component={ReviewCertificateAction}
+                                          />
+                                          <ProtectedRoute
+                                            path={
+                                              routes.PRINT_CERTIFICATE_PAYMENT
+                                            }
+                                            component={Payment}
                                           />
                                           <ProtectedRoute
                                             path={routes.SETTINGS}
@@ -237,9 +255,6 @@ export class App extends React.Component<IAppProps> {
                               />
                             </ProtectedPage>
                           </MainSection>
-                          <Footer>
-                            <p>OpenCRVS {new Date().getFullYear()}</p>
-                          </Footer>
                         </Page>
                       </NotificationComponent>
                     </ScrollToTop>

@@ -15,6 +15,10 @@ interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string
 }
+interface ISignature {
+  type: string
+  data: string
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -29,6 +33,7 @@ export interface IUser {
   primaryOfficeId: string
   catchmentAreaIds: string[]
   scope: string[]
+  signature: ISignature
   status: string
   deviceId?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]

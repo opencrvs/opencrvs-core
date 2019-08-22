@@ -2,10 +2,10 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 
-export async function waitFor(condition: () => boolean) {
-  const MAX_TIME = 2000
-  const INTERVAL = 10
+const MAX_TIME = 2000
+const INTERVAL = 10
 
+export async function waitFor(condition: () => boolean) {
   return new Promise((resolve, reject) => {
     let remainingTime = MAX_TIME
 
@@ -19,7 +19,12 @@ export async function waitFor(condition: () => boolean) {
         )
       }
 
-      if (condition()) {
+      let result = false
+      try {
+        result = condition()
+      } catch (err) {}
+
+      if (result) {
         clearInterval(intervalId)
         return resolve()
       }
@@ -48,6 +53,12 @@ export async function waitForElement<T>(
   rootComponent: ReactWrapper,
   selector: T
 ) {
-  await waitFor(() => rootComponent.update().find(selector).length > 0)
+  try {
+    await waitFor(() => rootComponent.update().find(selector).length > 0)
+  } catch (err) {
+    throw new Error(
+      `Couldn't find selector ${selector} from component in ${MAX_TIME}ms`
+    )
+  }
   return rootComponent.update().find(selector)
 }

@@ -1,4 +1,8 @@
-import { GQLResolver, GQLUserIdentifierInput } from '@gateway/graphql/schema'
+import {
+  GQLResolver,
+  GQLUserIdentifierInput,
+  GQLSignatureInput
+} from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 interface IUserModelData {
@@ -31,7 +35,9 @@ export interface IUserPayload
   }[]
   role: string
   type: string
+  signature?: GQLSignatureInput
 }
+
 export interface IUserSearchPayload {
   username?: string
   mobile?: string

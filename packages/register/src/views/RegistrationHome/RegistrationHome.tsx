@@ -15,7 +15,9 @@ import {
 import {
   ISearchInputProps,
   Spinner,
-  TopBar
+  TopBar,
+  FloatingNotification,
+  NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 import { Header } from '@register/components/interface/Header/Header'
@@ -51,6 +53,7 @@ import { ReviewTab } from './tabs/review/reviewTab'
 import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { errorMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { messages as certificateMessage } from '@register/i18n/messages/views/certificate'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -70,7 +73,10 @@ export const IconTab = styled(Button).attrs<IProps>({})`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 8px;
   }
-  ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  ${({ active }) =>
+    active
+      ? 'border-bottom: 3px solid #5E93ED'
+      : 'border-bottom: 3px solid transparent'};
   & > div {
     padding: 0 8px;
   }
@@ -115,6 +121,7 @@ interface IBaseRegistrationHomeProps {
   tabId: string
   selectorId: string
   drafts: IApplication[]
+  applications: IApplication[]
   goToEvents: typeof goToEventsAction
   outboxApplications: IApplication[]
 }
@@ -122,6 +129,7 @@ interface IBaseRegistrationHomeProps {
 interface IRegistrationHomeState {
   reviewCurrentPage: number
   updatesCurrentPage: number
+  showCertificateToast: boolean
 }
 
 type IRegistrationHomeProps = InjectedIntlProps &
@@ -153,7 +161,12 @@ export class RegistrationHomeView extends React.Component<
     super(props)
     this.state = {
       reviewCurrentPage: 1,
-      updatesCurrentPage: 1
+      updatesCurrentPage: 1,
+      showCertificateToast: Boolean(
+        this.props.applications.filter(
+          item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
+        ).length
+      )
     }
   }
 
@@ -403,6 +416,18 @@ export class RegistrationHomeView extends React.Component<
           />
         </FABContainer>
         <NotificationToast />
+
+        {this.state.showCertificateToast && (
+          <FloatingNotification
+            type={NOTIFICATION_TYPE.SUCCESS}
+            show={this.state.showCertificateToast}
+            callback={() => {
+              this.setState({ showCertificateToast: false })
+            }}
+          >
+            {intl.formatHTMLMessage(certificateMessage.toastMessage)}
+          </FloatingNotification>
+        )}
       </>
     )
   }
@@ -414,6 +439,7 @@ function mapStateToProps(
 ) {
   const { match } = props
   return {
+    applications: state.applicationsState.applications,
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),

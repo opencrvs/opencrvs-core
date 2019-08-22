@@ -190,7 +190,7 @@ type State = {
 const fadeFromTop = keyframes`
 from {
    -webkit-transform: translateY(-100%);
-   transform: translateY(-100%); 
+   transform: translateY(-100%);
   }
 `
 const StyledContainer = styled(Container)`
@@ -257,17 +257,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     disabled: boolean,
     sections: IFormSection[]
   ) => {
-    const result: IFormSection[] = []
-    sections.map((section: IFormSection) => {
-      result.push(
-        merge(
-          {
-            disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled
-          },
-          section
-        )
+    const result: IFormSection[] = sections.map((section: IFormSection) => {
+      return merge(
+        {
+          disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled
+        },
+        section
       )
-      return
     })
     return result
   }
@@ -455,7 +451,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     }
                   ]}
                 />
-                <BodyContent>
+                <BodyContent id="register_form">
                   <TertiaryButton
                     align={ICON_ALIGNMENT.LEFT}
                     icon={() => <BackArrow />}
