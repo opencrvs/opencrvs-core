@@ -47,7 +47,7 @@ export class CheckboxGroup extends React.Component<ICheckboxGroup> {
             return (
               <Checkbox
                 {...props}
-                id={props.id + option.label}
+                id={props.id + option.value}
                 key={option.label}
                 name={option.label}
                 label={option.label}

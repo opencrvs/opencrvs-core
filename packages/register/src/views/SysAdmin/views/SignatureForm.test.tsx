@@ -97,6 +97,7 @@ describe('signature upload tests', () => {
         })
       await flushPromises()
       testComponent.update()
+      console.log(testComponent.debug())
 
       expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
     })

@@ -202,7 +202,7 @@ export function goToPrintCertificate(
     formatUrl(CERTIFICATE_COLLECTOR, {
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
-      groupId: groupId || 'birthCertCollectorGroup'
+      groupId: groupId || 'certCollector'
     })
   )
 }

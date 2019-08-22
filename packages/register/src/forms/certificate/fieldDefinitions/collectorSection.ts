@@ -23,7 +23,7 @@ import { messages as certificateMessages } from '@register/i18n/messages/views/c
 import { validIDNumber } from '@register/utils/validate'
 
 export const certCollectorGroupForBirthAppWithFatherDetails: IFormSectionGroup = {
-  id: 'birthCertCollectorGroup',
+  id: 'certCollector',
   title: certificateMessages.whoToCollect,
   error: certificateMessages.certificateCollectorError,
   fields: [
@@ -45,7 +45,7 @@ export const certCollectorGroupForBirthAppWithFatherDetails: IFormSectionGroup =
 }
 
 export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup = {
-  id: 'birthCertCollectorGroup',
+  id: 'certCollector',
   title: certificateMessages.whoToCollect,
   error: certificateMessages.certificateCollectorError,
   fields: [
@@ -72,7 +72,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
   title: certificateMessages.certificateCollectionTitle,
   groups: [
     {
-      id: 'otherCollectorGroup',
+      id: 'otherCertCollector',
       conditionals: [conditionals.certCollectorOther],
       title: certificateMessages.otherCollectorFormTitle,
       error: certificateMessages.certificateOtherCollectorInfoError,
@@ -169,7 +169,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           validate: []
         },
         {
-          name: 'signedFile',
+          name: 'affidavitFile',
           type: SIMPLE_DOCUMENT_UPLOADER,
           label: certificateMessages.signedAffidavitFileLabel,
           description: certificateMessages.noLabel,
@@ -203,7 +203,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
   title: certificateMessages.certificateCollectionTitle,
   groups: [
     {
-      id: 'deathCertCollectorGroup',
+      id: 'certCollector',
       title: certificateMessages.certificateCollectionTitle,
       error: certificateMessages.certificateCollectorError,
       fields: [
@@ -223,7 +223,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
       ]
     },
     {
-      id: 'otherCollectorGroup',
+      id: 'otherCertCollector',
       conditionals: [conditionals.certCollectorOther],
       title: certificateMessages.otherCollectorFormTitle,
       error: certificateMessages.certificateOtherCollectorInfoError,
@@ -320,7 +320,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           validate: []
         },
         {
-          name: 'signedFile',
+          name: 'affidavitFile',
           type: SIMPLE_DOCUMENT_UPLOADER,
           label: certificateMessages.signedAffidavitFileLabel,
           description: certificateMessages.noLabel,
