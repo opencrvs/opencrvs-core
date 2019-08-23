@@ -139,7 +139,7 @@ const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
-  margin-top: 48px;
+  margin-top: 56px;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
