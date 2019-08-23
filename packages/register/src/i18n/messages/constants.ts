@@ -38,6 +38,8 @@ interface IConstantsMessages {
   labelRole: ReactIntl.FormattedMessage.MessageDescriptor
   lastEdited: ReactIntl.FormattedMessage.MessageDescriptor
   name: ReactIntl.FormattedMessage.MessageDescriptor
+  newBirthRegistration: ReactIntl.FormattedMessage.MessageDescriptor
+  newDeathRegistration: ReactIntl.FormattedMessage.MessageDescriptor
   noNameProvided: ReactIntl.FormattedMessage.MessageDescriptor
   noResults: ReactIntl.FormattedMessage.MessageDescriptor
   pendingConnection: ReactIntl.FormattedMessage.MessageDescriptor
@@ -251,6 +253,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Name',
     description: 'Name label',
     id: 'constants.name'
+  },
+  newBirthRegistration: {
+    id: 'register.selectInformant.newBirthRegistration',
+    defaultMessage: 'New birth application',
+    description: 'The title that appears for new birth registrations'
+  },
+  newDeathRegistration: {
+    id: 'register.selectInformant.newDeathRegistration',
+    defaultMessage: 'New death application',
+    description: 'The title that appears for new death registrations'
   },
   noNameProvided: {
     defaultMessage: 'No name provided',

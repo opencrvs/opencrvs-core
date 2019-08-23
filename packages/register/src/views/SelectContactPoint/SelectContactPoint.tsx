@@ -379,10 +379,23 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       ? Event.BIRTH
       : Event.DEATH
     const contactPointFields = setContactPointFields(intl, event)
+
+    let titleMessage
+    switch (event) {
+      case Event.BIRTH:
+        titleMessage = constantsMessages.newBirthRegistration
+        break
+      case Event.DEATH:
+        titleMessage = constantsMessages.newDeathRegistration
+        break
+      default:
+        titleMessage = constantsMessages.newBirthRegistration
+    }
+
     return (
       <Container>
         <EventTopBar
-          title={intl.formatMessage(messages.title)}
+          title={intl.formatMessage(titleMessage)}
           goHome={() => {
             this.props.setInitialApplications()
             this.props.goToHome()
