@@ -135,7 +135,8 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.applicationValidatedOn'
   },
   areYouSure: {
-    defaultMessage: 'Are you sure?',
+    defaultMessage:
+      'A {event} certificate will be generated with your signature for issuance.',
     description: 'Description for are you sure label in modals',
     id: 'constants.areYouSure'
   },
