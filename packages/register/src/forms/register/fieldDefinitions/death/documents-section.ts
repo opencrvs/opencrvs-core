@@ -17,7 +17,6 @@ export const documentsSection: IFormSection = {
   viewType: 'form' as ViewType,
   name: messages.documentsName,
   title: messages.documentsTitle,
-  optional: true,
   groups: [
     {
       id: 'documents-view-group',
@@ -25,7 +24,7 @@ export const documentsSection: IFormSection = {
         {
           name: 'paragraph',
           type: PARAGRAPH,
-          label: messages.paragraph,
+          label: messages.deceasedParagraph,
           initialValue: '',
           validate: []
         },
