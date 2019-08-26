@@ -54,12 +54,12 @@ const registrationAgent = new User({
   scope: ['validate', 'certify', 'demo'],
   status: 'active',
   practitionerId: '8aa975fa-9e69-4a1b-a0e0-1e4aae27e829',
-  primaryOfficeId: '7218ed8f-3b07-43ee-b764-bf3843056ba2',
+  primaryOfficeId: '54538456-fcf6-4276-86ac-122a7eb47703',
   catchmentAreaIds: [
     '319b0d8f-e330-45b8-8bd5-863a234d4cc5',
-    '435d7138-7235-41b6-afe5-a678de5915f3',
-    'e32ee1ed-8018-4e82-812a-7da0a347d578',
-    'b1f7149d-3583-48de-93a8-616bc3b5c9ce'
+    '98fc6e35-7290-45b8-ac50-78f8075fcac5',
+    'b3e9c030-fce7-4b10-8179-9b9951e9d7fc',
+    '4422415a-f1b0-47c5-8332-7062294670ca'
   ],
   securityQuestionAnswers: []
 })
