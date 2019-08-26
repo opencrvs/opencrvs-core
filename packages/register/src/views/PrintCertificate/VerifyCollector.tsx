@@ -53,6 +53,33 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
   }
 
+  handleNegativeVerification = () => {
+    const { application } = this.props
+    const certificate =
+      (application.data.registration.certificates &&
+        // @ts-ignore
+        application.data.registration.certificates[0]) ||
+      {}
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        registration: {
+          ...application.data.registration,
+          // @ts-ignore
+          certificates: [
+            {
+              ...certificate,
+              hasShowedVerifiedDocument: true
+            }
+          ]
+        }
+      }
+    })
+
+    this.handleVerification()
+  }
+
   render() {
     const { collector } = this.props.match.params
     const { intl, application } = this.props
@@ -72,7 +99,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
             },
             negativeAction: {
               label: intl.formatMessage(messages.idCheckWithoutVerify),
-              handler: this.handleVerification
+              handler: this.handleNegativeVerification
             }
           }}
         />
