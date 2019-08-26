@@ -57,7 +57,13 @@ const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
           {
             url: 'http://opencrvs.org/specs/extension/employee-signature',
             valueSignature: {
-              type: [{ userSelected: true }],
+              type: [
+                {
+                  system: 'urn:iso-astm:E1762-95:2013',
+                  code: '1.2.840.10065.1.12.1.13',
+                  display: 'Review Signature'
+                }
+              ],
               when: new Date().toISOString(),
               contentType: 'image/png',
               blob: practitioner.signature
