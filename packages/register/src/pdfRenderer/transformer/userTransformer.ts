@@ -52,19 +52,5 @@ export const userTransformers: IFunctionTransformer = {
     return userDetails.role
       ? intl.formatMessage(userMessages[userDetails.role])
       : ''
-  },
-
-  /*
-    LoggedInUserRoleAndName provides the role and username of the loggedIn user.     
-    TODO: need replace with regx
-  */
-  LoggedInUserRoleAndName: (
-    userDetails: TransformerData,
-    intl: InjectedIntl
-  ) => {
-    return `${userTransformers.LoggedInUserRole(
-      userDetails,
-      intl
-    )}, ${userTransformers.LoggedInUserName(userDetails, intl)}`
   }
 }

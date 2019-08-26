@@ -3,7 +3,7 @@ import { localFonts } from '@register/pdfRenderer/templates/localFonts'
 import {
   SEAL_BD_GOVT,
   DUMMY_SIGNATURE
-} from '@register/pdfRenderer/templates/assets'
+} from '@opencrvs/register/src/pdfRenderer/templates/logo'
 
 export const template: IPDFTemplate = {
   definition: {

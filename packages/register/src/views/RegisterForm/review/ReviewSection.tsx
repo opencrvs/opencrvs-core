@@ -66,7 +66,7 @@ import { buttonMessages } from '@register/i18n/messages'
 import { REJECTED, BIRTH } from '@register/utils/constants'
 import { ReviewHeader } from './ReviewHeader'
 // TODO: we need to move this to resource package as well
-import { SEAL_BD_GOVT } from '@register/pdfRenderer/templates/assets'
+import { SEAL_BD_GOVT } from '@opencrvs/register/src/pdfRenderer/templates/logo'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'

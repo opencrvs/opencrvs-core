@@ -86,6 +86,10 @@ export const template: IPDFTemplate = {
             style: 'subheader'
           },
           {
+            text: '{issuedByRole}'
+          },
+          ', ',
+          {
             text: '{issuedBy}',
             font: 'notosanslocation'
           }
@@ -99,8 +103,7 @@ export const template: IPDFTemplate = {
             style: 'subheader'
           },
           {
-            text: '{issuedDate}',
-            font: 'notosanslocation'
+            text: '{issuedDate}'
           }
         ]
       }
@@ -234,8 +237,12 @@ export const template: IPDFTemplate = {
         }
       }
     },
+    issuedByRole: {
+      transformer: 'LoggedInUserRole',
+      baseData: 'userdetails'
+    },
     issuedBy: {
-      transformer: 'LoggedInUserRoleAndName',
+      transformer: 'LoggedInUserName',
       baseData: 'userdetails'
     },
     issuedDateLabel: {
