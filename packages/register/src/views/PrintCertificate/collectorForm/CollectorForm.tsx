@@ -59,7 +59,7 @@ import {
   isFreeOfCost,
   getEventDate,
   getEvent
-} from '@register/views/PrintCertificate/calculatePrice'
+} from '@register/views/PrintCertificate/utils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
