@@ -1,7 +1,12 @@
 import * as actions from '@register/profile/profileActions'
 import { initialState } from '@register/profile/profileReducer'
 import { createStore, AppStore } from '@register/store'
-import { mockUserResponse, getItem } from '@register/tests/util'
+import {
+  mockUserResponse,
+  getItem,
+  mockUserSignature,
+  mockRegAgentUserResponse
+} from '@register/tests/util'
 import { storage } from '@register/storage'
 
 storage.removeItem = jest.fn()
@@ -38,6 +43,28 @@ describe('profileReducer tests', () => {
     }
     store.dispatch(action)
     expect(store.getState().profile.userDetailsFetched).toEqual(true)
+  })
+
+  it('sets user signature', async () => {
+    store.dispatch({
+      type: actions.SET_USER_DETAILS,
+      payload: mockRegAgentUserResponse
+    })
+
+    const action = {
+      type: actions.SET_USER_SIGNATURE,
+      payload: mockUserSignature
+    }
+    store.dispatch(action)
+
+    const userDetails = store.getState().profile.userDetails
+    let signatureData = ''
+
+    if (userDetails) {
+      signatureData = userDetails.signatureData as string
+    }
+
+    expect(signatureData).toEqual(mockUserSignature.data.getSignature.data)
   })
 
   it('removes details, tike and logs out a user', async () => {
