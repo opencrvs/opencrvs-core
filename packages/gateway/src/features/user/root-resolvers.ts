@@ -102,11 +102,12 @@ export const resolvers: GQLResolver = {
         authHeader
       )
 
-      // @ts-ignore
-      const signature: fhir.Signature | undefined = findExtension(
+      const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
         practitioner.extension || []
       )
+
+      const signature = signatureExtension && signatureExtension.valueSignature
 
       if (signature) {
         return {

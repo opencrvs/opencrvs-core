@@ -8,6 +8,7 @@ export const REDIRECT_TO_AUTHENTICATION = 'PROFILE/REDIRECT_TO_AUTHENTICATION'
 export const FETCH_USER_DETAILS = 'PROFILE/FETCH_USER_DETAILS'
 export const SET_USER_DETAILS = 'PROFILE/SET_USER_DETAILS'
 export const MODIFY_USER_DETAILS = 'PROFILE/MODIFY_USER_DETAILS'
+export const SET_USER_SIGNATURE = 'PROFILE/SET_USER_SIGNATURE'
 export const SET_INITIAL_USER_DETAILS = 'PROFILE/SET_INITIAL_USER_DETAILS'
 export const GET_USER_DETAILS_SUCCESS = 'PROFILE/GET_USER_DETAILS_SUCCESS'
 export const GET_USER_DETAILS_FAILED = 'PROFILE/GET_USER_DETAILS_FAILED'
@@ -29,6 +30,11 @@ type SetUserDetailsAction = {
 type ModifyUserDetailsAction = {
   type: typeof MODIFY_USER_DETAILS
   payload: IUserDetails
+}
+
+type SetUserSignatureAction = {
+  type: typeof SET_USER_SIGNATURE
+  payload: ApolloQueryResult<GQLQuery>
 }
 
 export type IGetStorageUserDetailsSuccessAction = {
@@ -53,6 +59,7 @@ export type Action =
   | IGetStorageUserDetailsSuccessAction
   | IGetStorageUserDetailsFailedAction
   | ModifyUserDetailsAction
+  | SetUserSignatureAction
 
 export const checkAuth = (payload: IURLParams): CheckAuthAction => ({
   type: CHECK_AUTH,
@@ -63,6 +70,13 @@ export const setUserDetails = (
   payload: ApolloQueryResult<GQLQuery>
 ): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
+  payload
+})
+
+export const setUserSignature = (
+  payload: ApolloQueryResult<GQLQuery>
+): SetUserSignatureAction => ({
+  type: SET_USER_SIGNATURE,
   payload
 })
 

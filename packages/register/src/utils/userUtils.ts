@@ -31,6 +31,7 @@ export interface IUserDetails {
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
   language: string
+  signatureData?: string
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
