@@ -161,26 +161,26 @@ export const applicantsSection: ISerializedFormSection = {
           initialValue: '',
           queryMap: {
             BIRTH_REGISTRATION_NUMBER: {
-              query: FETCH_REGISTRATION,
+              query: { operation: 'FETCH_REGISTRATION' },
               inputs: [
                 {
                   name: 'identifier',
                   valueField: 'applicantID'
                 }
               ],
-              responseTransformer: transformRegistrationData,
+              responseTransformer: { operation: 'transformRegistrationData' },
               modalInfoText: messages.fetchRegistrationModalInfo,
               errorText: messages.fetchRegistrationModalErrorText
             },
             NATIONAL_ID: {
-              query: FETCH_PERSON,
+              query: { operation: 'FETCH_PERSON' },
               inputs: [
                 {
                   name: 'identifier',
                   valueField: 'applicantID'
                 }
               ],
-              responseTransformer: transformInformantData,
+              responseTransformer: { operation: 'transformInformantData' },
               modalInfoText: messages.fetchPersonByNIDModalInfo,
               errorText: messages.fetchPersonByNIDModalErrorText
             }

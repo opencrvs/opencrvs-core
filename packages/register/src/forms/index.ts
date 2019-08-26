@@ -13,8 +13,10 @@ import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 import * as mutations from './mappings/mutation'
 import * as queries from './mappings/query'
+import * as graphQLQueries from './mappings/queries'
 import * as labels from './mappings/label'
 import * as types from './mappings/type'
+import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/register/src/utils/validate'
 
 export const TEXT = 'TEXT'
@@ -239,9 +241,14 @@ type SerializedFormFieldWithDynamicDefinitions = UnionOmit<
   dynamicDefinitions: ISerializedDynamicFormFieldDefinitions
 }
 
+type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
+  queryMap: ISerializedQueryMap
+}
+
 export type SerializedFormField = UnionOmit<
-  | Exclude<IFormField, IFormFieldWithDynamicDefinitions>
-  | SerializedFormFieldWithDynamicDefinitions,
+  | Exclude<IFormField, IFormFieldWithDynamicDefinitions | ILoaderButton>
+  | SerializedFormFieldWithDynamicDefinitions
+  | ILoaderButtonWithSerializedQueryMap,
   'validate' | 'mapping'
 > & {
   validate: IValidatorDescriptor[]
@@ -380,6 +387,13 @@ export interface IQuery {
   modalInfoText: FormattedMessage.MessageDescriptor
   errorText: FormattedMessage.MessageDescriptor
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
+}
+
+export interface ISerializedQueryMap {
+  [key: string]: Omit<IQuery, 'responseTransformer' | 'query'> & {
+    responseTransformer: Operation<typeof responseTransformers>
+    query: Operation<typeof graphQLQueries>
+  }
 }
 export interface IQueryMap {
   [key: string]: IQuery

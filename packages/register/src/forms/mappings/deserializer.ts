@@ -2,6 +2,8 @@ import { Validation } from '@register/utils/validate'
 import * as mutations from '@register/forms/mappings/mutation'
 import * as queries from '@register/forms/mappings/query'
 import * as labels from '@register/forms/mappings/label'
+import * as responseTransformers from '@register/forms/mappings/response-transformers'
+import * as graphQLQueries from '@register/forms/mappings/queries'
 import * as types from '@register/forms/mappings/type'
 import * as validators from '@opencrvs/register/src/utils/validate'
 
@@ -22,7 +24,12 @@ import {
   IQueryDescriptor,
   QueryFactoryOperation,
   IMutationDescriptor,
-  MutationFactoryOperation
+  MutationFactoryOperation,
+  FETCH_BUTTON,
+  IQueryMap,
+  ISerializedQueryMap,
+  ILoaderButton,
+  IFormFieldWithDynamicDefinitions
 } from '@register/forms'
 
 /*
@@ -94,6 +101,11 @@ function sectionMutationDescriptorToMutationFunction(
   }
   return transformer
 }
+
+function isOperation(param: any): param is IMutationDescriptor {
+  return typeof param === 'object' && param['operation']
+}
+
 function fieldQueryDescriptorToQueryFunction(
   descriptor: IQueryDescriptor
 ): IFormFieldQueryMapFunction {
@@ -102,13 +114,20 @@ function fieldQueryDescriptorToQueryFunction(
 
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
-    return factory(...descriptor.parameters)
+
+    const potentiallyNestedOperations = descriptor.parameters as Array<
+      IQueryDescriptor
+    >
+
+    const parameters = potentiallyNestedOperations.map(parameter =>
+      isOperation(parameter)
+        ? fieldQueryDescriptorToQueryFunction(parameter)
+        : parameter
+    )
+
+    return factory(...parameters)
   }
   return transformer
-}
-
-function isOperation(param: any): param is IMutationDescriptor {
-  return typeof param === 'object' && param['operation']
 }
 
 function fieldMutationDescriptorToMutationFunction(
@@ -120,9 +139,11 @@ function fieldMutationDescriptorToMutationFunction(
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
 
-    const params = descriptor.parameters as Array<IMutationDescriptor | any>
+    const potentiallyNestedOperations = descriptor.parameters as Array<
+      IMutationDescriptor
+    >
 
-    const parameters = params.map(parameter =>
+    const parameters = potentiallyNestedOperations.map(parameter =>
       isOperation(parameter)
         ? fieldMutationDescriptorToMutationFunction(parameter)
         : parameter
@@ -175,6 +196,20 @@ function deserializeDynamicDefinitions(
   }
 }
 
+function deserializeQueryMap(queryMap: ISerializedQueryMap) {
+  return Object.keys(queryMap).reduce<IQueryMap>((deserialized, key) => {
+    return {
+      ...deserialized,
+      [key]: {
+        ...queryMap[key],
+        responseTransformer:
+          responseTransformers[queryMap[key].responseTransformer.operation],
+        query: graphQLQueries[queryMap[key].query.operation]
+      }
+    }
+  }, {})
+}
+
 export function deserializeFormSection(
   section: ISerializedFormSection
 ): IFormSection {
@@ -212,7 +247,13 @@ export function deserializeFormSection(
           dynamicDefinitions: deserializeDynamicDefinitions(
             field.dynamicDefinitions
           )
-        }
+        } as IFormFieldWithDynamicDefinitions
+      }
+      if (field.type === FETCH_BUTTON) {
+        return {
+          ...baseFields,
+          queryMap: deserializeQueryMap(field.queryMap)
+        } as ILoaderButton
       }
 
       // @todo check why returning baseFields gives a compiler error

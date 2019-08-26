@@ -233,6 +233,14 @@ function reducer(
         }
       }
     }
+
+    // @hack this is only here to provide a way of hydrating the state during tests
+    case actions.READY: {
+      return {
+        ...state,
+        offlineData: action.payload
+      }
+    }
     default:
       return state
   }

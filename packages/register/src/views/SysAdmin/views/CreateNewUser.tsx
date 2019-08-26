@@ -80,7 +80,6 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
 
   render() {
     const { section, submitting } = this.props
-
     if (submitting) {
       return this.renderLoadingPage()
     }
