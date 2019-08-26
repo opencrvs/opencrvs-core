@@ -15,7 +15,7 @@ import { Event, IFormData } from '@register/forms'
 import { IApplication } from '@register/applications'
 import { ITheme } from '@register/styledComponents'
 import { connect } from 'react-redux'
-import { calculatePrice, getServiceMessage } from './calculatePrice'
+import { calculatePrice, getServiceMessage, getEventDate } from './utils'
 import { Print } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -79,14 +79,6 @@ interface IProps {
 type IFullProps = IProps & InjectedIntlProps
 
 class PaymentComponent extends React.Component<IFullProps> {
-  getEventDate(data: IFormData, event: Event): string {
-    switch (event) {
-      case Event.BIRTH:
-        return data.child.childBirthDate as string
-      case Event.DEATH:
-        return data.deathEvent.deathDate as string
-    }
-  }
   continue = () => {
     this.props.goToReviewCertificate(
       this.props.registrationId,
@@ -96,7 +88,7 @@ class PaymentComponent extends React.Component<IFullProps> {
 
   render = () => {
     const { intl, application, event, goBack } = this.props
-    const eventDate = this.getEventDate(application.data, event)
+    const eventDate = getEventDate(application.data, event)
 
     const paymentAmount = calculatePrice(event, eventDate)
 
