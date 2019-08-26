@@ -6,6 +6,8 @@ import { template as deathCertificateTemplate } from '@register/pdfRenderer/temp
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@opencrvs/register/src/utils/userUtils'
 import { Event } from '@register/forms'
+import 'moment/locale/bn'
+import 'moment/locale/en-ie'
 
 export type MultiLingualDetails = {
   bn: string
@@ -33,7 +35,7 @@ export type Issuer = {
   issuedAt: string
 }
 
-export function generateMoneyReceipt(
+export function printMoneyReceipt(
   intl: InjectedIntl,
   application: IApplication,
   userDetails: IUserDetails | null
@@ -44,7 +46,7 @@ export function generateMoneyReceipt(
   printPDF(receiptTemplate, application, userDetails, intl)
 }
 
-export async function generateCertificateDataURL(
+export async function previewCertificate(
   intl: InjectedIntl,
   application: IApplication,
   userDetails: IUserDetails | null,
@@ -65,7 +67,7 @@ export async function generateCertificateDataURL(
   })
 }
 
-export function generateAndPrintCertificate(
+export function printCertificate(
   intl: InjectedIntl,
   application: IApplication,
   userDetails: IUserDetails | null

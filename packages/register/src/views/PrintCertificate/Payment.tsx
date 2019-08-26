@@ -11,7 +11,7 @@ import {
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { RouteComponentProps } from 'react-router'
-import { Event, IFormData } from '@register/forms'
+import { Event } from '@register/forms'
 import { IApplication, modifyApplication } from '@register/applications'
 import { ITheme } from '@register/styledComponents'
 import { connect } from 'react-redux'
@@ -19,6 +19,7 @@ import { calculatePrice, getServiceMessage, getEventDate } from './utils'
 import { Print } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
+import { printMoneyReceipt } from '@register/views/PrintCertificate/PDFUtils'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -148,7 +149,13 @@ class PaymentComponent extends React.Component<IFullProps> {
               id="print-receipt"
               icon={() => <Print />}
               align={0}
-              onClick={() => {}}
+              onClick={() =>
+                printMoneyReceipt(
+                  this.props.intl,
+                  this.props.application,
+                  this.props.userDetails
+                )
+              }
             >
               {intl.formatMessage(messages.printReceipt)}
             </TertiaryButton>

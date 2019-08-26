@@ -5,8 +5,6 @@ import { Pagination, Spinner } from '../../interface'
 
 const Container = styled.div`
   margin: 10px 0;
-  padding: 5px 0;
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

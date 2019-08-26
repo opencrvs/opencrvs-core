@@ -1,42 +1,34 @@
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { PDFViewer } from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { Check } from '@opencrvs/components/lib/icons'
 import {
   Box,
   EventTopBar,
-  ResponsiveModal,
-  Spinner
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
-  createReviewApplication,
   IApplication,
   IApplicationsState,
   modifyApplication,
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/register/src/applications'
-import { Action, Event, IForm, IFormData } from '@register/forms'
-import { constantsMessages, errorMessages } from '@register/i18n/messages'
+import { Action, Event, IForm } from '@register/forms'
+import { constantsMessages } from '@register/i18n/messages'
 import { buttonMessages } from '@register/i18n/messages/buttons'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
-import { gqlToDraftTransformer } from '@register/transformer'
-import {
-  QueryContext,
-  QueryProvider
-} from '@register/views/DataProvider/QueryProvider'
 import { TAB_ID } from '@register/views/RegistrationHome/tabs/inProgress/inProgressTab'
-import * as Sentry from '@sentry/browser'
-import 'moment/locale/bn'
-import 'moment/locale/en-ie'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { IUserDetails } from '@register/utils/userUtils'
+import { previewCertificate } from '@register/views/PrintCertificate/PDFUtils'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -49,9 +41,6 @@ export const ActionPageWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: scroll;
-`
-const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
 `
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -100,6 +89,7 @@ type IProps = {
   event: Event
   registrationId: string
   draft: IApplication
+  userDetails: IUserDetails | null
   registerForm: IForm
   modifyApplication: typeof modifyApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
@@ -119,6 +109,20 @@ class ReviewCertificateActionComponent extends React.Component<
     this.state = {
       certificatePdf: '',
       showConfirmationModal: false
+    }
+  }
+  componentDidMount() {
+    if (this.state.certificatePdf === '') {
+      previewCertificate(
+        this.props.intl,
+        this.props.draft,
+        this.props.userDetails,
+        (base64PDF: string) => {
+          this.setState({
+            certificatePdf: base64PDF
+          })
+        }
+      )
     }
   }
 
@@ -163,13 +167,7 @@ class ReviewCertificateActionComponent extends React.Component<
   }
 
   render = () => {
-    const {
-      goToRegistrarHomeTabAction,
-      registrationId,
-      event,
-      intl,
-      drafts: { applications: drafts }
-    } = this.props
+    const { goToRegistrarHomeTabAction, intl } = this.props
 
     return (
       <Container>
@@ -181,80 +179,34 @@ class ReviewCertificateActionComponent extends React.Component<
         />
         <BodyContent>
           <FormContainer>
-            <QueryProvider
-              event={event}
-              action={Action.LOAD_CERTIFICATE_APPLICATION}
-              payload={{ id: registrationId }}
-            >
-              <QueryContext.Consumer>
-                {({ loading, error, data, dataKey }) => {
-                  if (loading) {
-                    return <StyledSpinner id="print-certificate-spinner" />
-                  }
+            <Box>
+              <Title>{this.getTitle()}</Title>
+              <Info>
+                {intl.formatHTMLMessage(certificateMessages.retiewDescription)}
+              </Info>
 
-                  if (error) {
-                    Sentry.captureException(error)
+              <PdfWrapper id="pdfwrapper">
+                <PDFViewer
+                  id="pdfholder"
+                  pdfSource={this.state.certificatePdf}
+                />
+              </PdfWrapper>
 
-                    return (
-                      <ErrorText id="print-certificate-queue-error-text">
-                        {intl.formatMessage(errorMessages.printQueryError)}
-                      </ErrorText>
-                    )
-                  }
+              <ButtonWrapper>
+                <PrimaryButton
+                  align={0}
+                  id="confirm-print"
+                  onClick={this.toggleModal}
+                  icon={() => <Check />}
+                >
+                  {intl.formatHTMLMessage(certificateMessages.confirmAndPrint)}
+                </PrimaryButton>
 
-                  if (data) {
-                    const retrievedData = data[dataKey as keyof typeof data]
-                    const transData: IFormData = gqlToDraftTransformer(
-                      this.props.registerForm,
-                      retrievedData
-                    )
-                    const reviewDraft = createReviewApplication(
-                      registrationId,
-                      transData,
-                      event
-                    )
-                    const draftExist = !!drafts.find(
-                      draft => draft.id === registrationId
-                    )
-                    if (!draftExist) {
-                      this.props.storeApplication(reviewDraft)
-                    }
-
-                    return (
-                      <Box>
-                        <Title>{this.getTitle()}</Title>
-                        <Info>
-                          {intl.formatHTMLMessage(
-                            certificateMessages.retiewDescription
-                          )}
-                        </Info>
-
-                        <PdfWrapper>
-                          <PDFViewer pdfSource="" />
-                        </PdfWrapper>
-
-                        <ButtonWrapper>
-                          <PrimaryButton
-                            align={0}
-                            id="confirm-print"
-                            onClick={this.toggleModal}
-                            icon={() => <Check />}
-                          >
-                            {intl.formatHTMLMessage(
-                              certificateMessages.confirmAndPrint
-                            )}
-                          </PrimaryButton>
-
-                          <CustomTertiaryButton disabled>
-                            {intl.formatHTMLMessage(buttonMessages.editRecord)}
-                          </CustomTertiaryButton>
-                        </ButtonWrapper>
-                      </Box>
-                    )
-                  }
-                }}
-              </QueryContext.Consumer>
-            </QueryProvider>
+                <CustomTertiaryButton disabled>
+                  {intl.formatHTMLMessage(buttonMessages.editRecord)}
+                </CustomTertiaryButton>
+              </ButtonWrapper>
+            </Box>
 
             <ResponsiveModal
               id="confirm-print-modal"
@@ -325,6 +277,7 @@ function mapStatetoProps(
     registrationId,
     draft,
     drafts: state.applicationsState,
+    userDetails: getUserDetails(state),
     registerForm: state.registerForm.registerForm[event]
   }
 }
