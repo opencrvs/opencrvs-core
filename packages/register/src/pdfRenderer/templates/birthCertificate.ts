@@ -396,14 +396,14 @@ export const template: IPDFTemplate = {
       operation: 'FormattedFieldValue',
       parameters: {
         formattedKeys:
-          '{registration.regStatus.office.name}, {registration.regStatus.office.address.district}, {registration.regStatus.office.address.state}'
+          '{registration.regStatus.officeName}, {registration.regStatus.officeAddressLevel3}, {registration.regStatus.officeAddressLevel4}'
       }
     },
     {
       field: 'registrationBnLocation',
       operation: 'FormattedFieldValue',
       parameters: {
-        formattedKeys: '{registration.regStatus.office.alias}'
+        formattedKeys: '{registration.regStatus.officeAlias}'
       }
     },
     {

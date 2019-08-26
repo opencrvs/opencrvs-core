@@ -66,13 +66,34 @@ export function getRegistrationSectionTransformer(
   }
 
   if (queryData[REGISTRATION_SECTION].status) {
-    const regStatus = (queryData[REGISTRATION_SECTION]
+    const registrationStatus = (queryData[REGISTRATION_SECTION]
       .status as GQLRegWorkflow[]).find(status => {
       return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
     })
-    if (regStatus) {
-      // @ts-ignore
-      transformedData[REGISTRATION_SECTION].regStatus = regStatus
+    if (registrationStatus) {
+      transformedData[REGISTRATION_SECTION] = {
+        ...transformedData[REGISTRATION_SECTION],
+        regStatus: {
+          type: registrationStatus.type || '',
+          officeName:
+            (registrationStatus.office && registrationStatus.office.name) || '',
+          officeAlias:
+            (registrationStatus.office &&
+              registrationStatus.office.alias &&
+              registrationStatus.office.alias.join(' ')) ||
+            '',
+          officeAddressLevel3:
+            (registrationStatus.office &&
+              registrationStatus.office.address &&
+              registrationStatus.office.address.district) ||
+            '',
+          officeAddressLevel4:
+            (registrationStatus.office &&
+              registrationStatus.office.address &&
+              registrationStatus.office.address.state) ||
+            ''
+        }
+      }
     }
   }
 }
