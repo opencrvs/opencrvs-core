@@ -472,6 +472,17 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
 
+  //  Affidavit checking
+  expect(fhir.entry[9].resource.extension).toEqual([
+    {
+      url: 'http://opencrvs.org/specs/extension/relatedperson-affidavittype',
+      valueAttachment: {
+        contentType: 'image/jpg',
+        data: 'ExampleData'
+      }
+    }
+  ])
+
   expect(fhir.entry[9].resource.resourceType).toBe('RelatedPerson')
   expect(fhir.entry[9].resource.relationship).toEqual({
     coding: [
