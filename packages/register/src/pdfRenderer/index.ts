@@ -21,24 +21,22 @@ export function createPDF(
 ): TCreatedPdf {
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
-  if (template.transformers) {
-    Object.keys(template.transformers).forEach(field => {
-      if (template.transformers && template.transformers[field]) {
-        const transformerDef = template.transformers[field]
-        const transformFunction = transformers[transformerDef.transformer]
-        if (!transformFunction) {
-          throw new Error(
-            `No transform function found for given name: ${transformerDef.transformer}`
-          )
-        }
-        const transformerData = (isUserDetailsDataBase(transformerDef)
-          ? userDetails
-          : application) as TransformerData
-        definitionString = definitionString.replace(
-          new RegExp(`{${field}}`, 'gi'),
-          transformFunction(transformerData, intl, transformerDef.payload) || ''
+  if (template.transformers && template.transformers.length > 0) {
+    template.transformers.forEach(transformerDef => {
+      const transformFunction = transformers[transformerDef.operation]
+      if (!transformFunction) {
+        throw new Error(
+          `No transform function found for given name: ${transformerDef.operation}`
         )
       }
+      const transformerData = (isUserDetailsDataBase(transformerDef)
+        ? userDetails
+        : application) as TransformerData
+      definitionString = definitionString.replace(
+        new RegExp(`{${transformerDef.field}}`, 'gi'),
+        transformFunction(transformerData, intl, transformerDef.parameters) ||
+          ''
+      )
     })
   }
   return pdfMake.createPdf(

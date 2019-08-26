@@ -302,36 +302,41 @@ export const template: IPDFTemplate = {
   },
   fonts: localFonts.fonts,
   vfs: localFonts.vfs,
-  transformers: {
-    registrationNumber: {
-      transformer: 'FieldValue',
-      payload: {
+  transformers: [
+    {
+      field: 'registrationNumber',
+      operation: 'FieldValue',
+      parameters: {
         valueKey: 'registration.registrationNumber'
       }
     },
-    bnRegistrationNumber: {
-      transformer: 'BanglaNumberConversion',
-      payload: {
+    {
+      field: 'bnRegistrationNumber',
+      operation: 'BanglaNumberConversion',
+      parameters: {
         valueKey: 'registration.registrationNumber'
       }
     },
-    certificateDate: {
-      transformer: 'DateFieldValue',
-      payload: {
+    {
+      field: 'certificateDate',
+      operation: 'DateFieldValue',
+      parameters: {
         format: 'DD MMMM YYYY',
         language: 'en'
       }
     },
-    bnCertificateDate: {
-      transformer: 'DateFieldValue',
-      payload: {
+    {
+      field: 'bnCertificateDate',
+      operation: 'DateFieldValue',
+      parameters: {
         format: 'DD MMMM YYYY',
         language: 'bn'
       }
     },
-    applicantName: {
-      transformer: 'ApplicantName',
-      payload: {
+    {
+      field: 'applicantName',
+      operation: 'ApplicantName',
+      parameters: {
         key: {
           death: 'deceased'
         },
@@ -341,9 +346,10 @@ export const template: IPDFTemplate = {
         language: 'en'
       }
     },
-    applicantBnName: {
-      transformer: 'ApplicantName',
-      payload: {
+    {
+      field: 'applicantBnName',
+      operation: 'ApplicantName',
+      parameters: {
         key: {
           death: 'deceased'
         },
@@ -353,9 +359,10 @@ export const template: IPDFTemplate = {
         language: 'bn'
       }
     },
-    eventDate: {
-      transformer: 'DateFieldValue',
-      payload: {
+    {
+      field: 'eventDate',
+      operation: 'DateFieldValue',
+      parameters: {
         key: {
           death: 'deathEvent.deathDate'
         },
@@ -363,9 +370,10 @@ export const template: IPDFTemplate = {
         language: 'en'
       }
     },
-    eventBnDate: {
-      transformer: 'DateFieldValue',
-      payload: {
+    {
+      field: 'eventBnDate',
+      operation: 'DateFieldValue',
+      parameters: {
         key: {
           death: 'deathEvent.deathDate'
         },
@@ -373,25 +381,26 @@ export const template: IPDFTemplate = {
         language: 'bn'
       }
     },
-    //eventLocation: {},
-    //eventBnLocation: {},
-    registrationLocation: {
-      transformer: 'FormattedFieldValue',
-      payload: {
+    {
+      field: 'registrationLocation',
+      operation: 'FormattedFieldValue',
+      parameters: {
         formattedKeys:
           '{registration.regStatus.office.name}, {registration.regStatus.office.address.district}, {registration.regStatus.office.address.state}'
       }
     },
-    registrationBnLocation: {
-      transformer: 'FormattedFieldValue',
-      payload: {
+    {
+      field: 'registrationBnLocation',
+      operation: 'FormattedFieldValue',
+      parameters: {
         formattedKeys: '{registration.regStatus.office.alias}'
       }
     },
-    registrarName: {
-      transformer: 'LoggedInUserName',
+    {
+      field: 'registrarName',
+      operation: 'LoggedInUserName',
       baseData: 'userdetails'
     },
-    role: { transformer: 'LoggedInUserRole', baseData: 'userdetails' }
-  }
+    { field: 'role', operation: 'LoggedInUserRole', baseData: 'userdetails' }
+  ]
 }

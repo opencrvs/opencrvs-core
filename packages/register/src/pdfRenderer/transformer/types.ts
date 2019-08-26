@@ -11,7 +11,7 @@ export interface IPDFTemplate {
   definition: TDocumentDefinitions
   fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
   vfs: TFontFamily
-  transformers?: { [field: string]: IFieldTransformer }
+  transformers?: IFieldTransformer[]
 }
 
 export type TransformerPayload =
@@ -23,9 +23,10 @@ export type TransformerPayload =
   | IFormattedFeildValuePayload
 
 export interface IFieldTransformer {
-  transformer: string
+  field: string
+  operation: string
   baseData?: string // deafult is application data
-  payload?: TransformerPayload
+  parameters?: TransformerPayload
 }
 
 export type TransformerData = IApplication & IUserDetails

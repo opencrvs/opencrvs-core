@@ -30,7 +30,7 @@ export const template: IPDFTemplate = {
           body: [
             [
               {
-                margin: [15, 15, 15, 0],
+                margin: [14, 15, 14, 0],
                 border: [false, false, false, false],
                 fillColor: '#F2F3F4',
                 text: [
@@ -123,10 +123,11 @@ export const template: IPDFTemplate = {
   },
   fonts: localFonts.fonts,
   vfs: localFonts.vfs,
-  transformers: {
-    header: {
-      transformer: 'IntlLabel',
-      payload: {
+  transformers: [
+    {
+      field: 'header',
+      operation: 'IntlLabel',
+      parameters: {
         messageDescriptor: {
           defaultMessage: 'Receipt for {event} Certificate of',
           description: 'Receipt header for payment on certificate',
@@ -137,9 +138,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    registrantName: {
-      transformer: 'ApplicantName',
-      payload: {
+    {
+      field: 'registrantName',
+      operation: 'ApplicantName',
+      parameters: {
         key: {
           birth: 'child',
           death: 'deceased'
@@ -150,9 +152,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    serviceTitle: {
-      transformer: 'IntlLabel',
-      payload: {
+    {
+      field: 'serviceTitle',
+      operation: 'IntlLabel',
+      parameters: {
         messageDescriptor: {
           defaultMessage: 'Service:',
           description: 'Service received for receipt label',
@@ -160,9 +163,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    serviceDescription: {
-      transformer: 'ServiceLabel',
-      payload: {
+    {
+      field: 'serviceDescription',
+      operation: 'ServiceLabel',
+      parameters: {
         '45d+birth': {
           defaultMessage: 'Birth registratin after 45 days of date of birth',
           description: 'Label for service 1 for birth',
@@ -185,9 +189,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    amountLabel: {
-      transformer: 'IntlLabel',
-      payload: {
+    {
+      field: 'amountLabel',
+      operation: 'IntlLabel',
+      parameters: {
         messageDescriptor: {
           defaultMessage: 'Amount paid: ',
           description: 'Amount paid for certificate label',
@@ -195,9 +200,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    amount: {
-      transformer: 'ServiceAmount',
-      payload: {
+    {
+      field: 'amount',
+      operation: 'ServiceAmount',
+      parameters: {
         '45d+': {
           defaultMessage: '\u09F3 25',
           description: 'Amount for service 1',
@@ -210,9 +216,10 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    issuedAtLabel: {
-      transformer: 'IntlLabel',
-      payload: {
+    {
+      field: 'issuedAtLabel',
+      operation: 'IntlLabel',
+      parameters: {
         messageDescriptor: {
           defaultMessage: 'Issued at:',
           description: 'Receipt on payment on certificate issued at label',
@@ -220,13 +227,15 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    issuedLocation: {
-      transformer: 'LoggedInUserOfficeName',
+    {
+      field: 'issuedLocation',
+      operation: 'LoggedInUserOfficeName',
       baseData: 'userdetails'
     },
-    issuedByLabel: {
-      transformer: 'IntlLabel',
-      payload: {
+    {
+      field: 'issuedByLabel',
+      operation: 'IntlLabel',
+      parameters: {
         messageDescriptor: {
           defaultMessage: 'By:',
           description: 'Receipt on payment on certificate issued by label',
@@ -234,17 +243,20 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    issuedByRole: {
-      transformer: 'LoggedInUserRole',
+    {
+      field: 'issuedByRole',
+      operation: 'LoggedInUserRole',
       baseData: 'userdetails'
     },
-    issuedBy: {
-      transformer: 'LoggedInUserName',
+    {
+      field: 'issuedBy',
+      operation: 'LoggedInUserName',
       baseData: 'userdetails'
     },
-    issuedDateLabel: {
-      transformer: 'IntlLabel',
-      payload: {
+    {
+      field: 'issuedDateLabel',
+      operation: 'IntlLabel',
+      parameters: {
         messageDescriptor: {
           defaultMessage: 'Date of payment:',
           description: 'Receipt on payment on certificate issued date label',
@@ -252,11 +264,12 @@ export const template: IPDFTemplate = {
         }
       }
     },
-    issuedDate: {
-      transformer: 'DateFieldValue',
-      payload: {
+    {
+      field: 'issuedDate',
+      operation: 'DateFieldValue',
+      parameters: {
         format: 'DD.MM.YYYY'
       }
     }
-  }
+  ]
 }
