@@ -46,9 +46,6 @@ type IState = {
   showError: boolean
 }
 
-const H3 = styled.h3`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-`
 const P = styled.p`
   color: ${({ theme }) => theme.colors.copy};
   margin: 16px 0 24px;
