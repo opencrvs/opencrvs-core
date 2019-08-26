@@ -131,7 +131,6 @@ interface IFormMessages {
   documentsName: ReactIntl.FormattedMessage.MessageDescriptor
   documentsTitle: ReactIntl.FormattedMessage.MessageDescriptor
   documentsUploadName: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsUploadTitle: ReactIntl.FormattedMessage.MessageDescriptor
   educationAttainmentISCED1: ReactIntl.FormattedMessage.MessageDescriptor
   educationAttainmentISCED2: ReactIntl.FormattedMessage.MessageDescriptor
   educationAttainmentISCED3: ReactIntl.FormattedMessage.MessageDescriptor
@@ -330,7 +329,7 @@ const messagesToDefine: IFormMessages = {
     id: 'user.form.securityquestion.answer'
   },
   applicantIDProof: {
-    defaultMessage: "Proof of Applicant's ID",
+    defaultMessage: 'Proof of applicant ID',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.applicantIDProof'
   },
@@ -724,12 +723,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedDateOfBirth'
   },
   deceasedDeathProof: {
-    defaultMessage: 'Proof of Death of Deceased',
+    defaultMessage: 'Proof of death of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedDeathProof'
   },
   deceasedDoBProof: {
-    defaultMessage: 'Proof of Date of Birth of Deceased',
+    defaultMessage: 'Proof of date of birth of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedDoBProof'
   },
@@ -754,7 +753,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedGivenNamesEng'
   },
   deceasedIDProof: {
-    defaultMessage: "Proof of Deceased's ID",
+    defaultMessage: "Proof of deceased's ID",
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedIDProof'
   },
@@ -775,7 +774,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedDocumentParagraph'
   },
   deceasedPermanentAddressProof: {
-    defaultMessage: 'Proof of Permanent Address of Deceased',
+    defaultMessage: 'Proof of permanent address of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedPermanentAddressProof'
   },
@@ -845,32 +844,32 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeTaxReceipt'
   },
   docTypeBR: {
-    defaultMessage: 'Birth Registration',
+    defaultMessage: 'Birth registration certificate',
     description: 'Label for select option Birth Registration',
     id: 'form.field.label.docTypeBR'
   },
   docTypeChildAgeProof: {
-    defaultMessage: 'Proof of Child Age',
+    defaultMessage: 'Proof of child age',
     description: 'Label for select option Child Age Proof',
     id: 'form.field.label.docTypeChildAgeProof'
   },
   docTypeChildBirthProof: {
-    defaultMessage: 'Proof of Place and Date of Birth',
+    defaultMessage: 'Proof of place and date of birth',
     description: 'Label for select option Child Birth Proof',
     id: 'form.field.label.docTypeChildBirthProof'
   },
   docTypeCopyOfBurialReceipt: {
-    defaultMessage: 'Certified Copy of Burial Receipt',
+    defaultMessage: 'Certified copy of burial receipt',
     description: 'Label for select option Certified Copy of Burial Receipt',
     id: 'form.field.label.docTypeCopyOfBurialReceipt'
   },
   docTypeDeathCertificate: {
-    defaultMessage: 'Attested Certificate of Death',
+    defaultMessage: 'Attested certificate of death',
     description: 'Label for select option Attested Certificate of Death',
     id: 'form.field.label.docTypeDeathCertificate'
   },
   docTypeDoctorCertificate: {
-    defaultMessage: 'Doctor Certificate',
+    defaultMessage: 'Doctor certificate',
     description: 'Label for select option Doctor Certificate',
     id: 'form.field.label.docTypeDoctorCertificate'
   },
@@ -880,22 +879,22 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeEPICard'
   },
   docTypeEPIStaffCertificate: {
-    defaultMessage: 'EPI Staff Certificate',
+    defaultMessage: 'EPI staff certificate',
     description: 'Label for select option EPI Card',
     id: 'form.field.label.docTypeEPIStaffCertificate'
   },
   docTypeFuneralReceipt: {
-    defaultMessage: 'Certified Copy of Funeral Receipt',
+    defaultMessage: 'Certified copy of funeral receipt',
     description: 'Label for select option Certified Copy of Funeral Receipt',
     id: 'form.field.label.docTypeFuneralReceipt'
   },
   docTypeHospitalDischargeCertificate: {
-    defaultMessage: 'Hospital Discharge Certificate',
+    defaultMessage: 'Hospital discharge certificate',
     description: 'Label for select option Hospital Discharge Certificate',
     id: 'form.field.label.docTypeHospitalDischargeCertificate'
   },
   docTypeLetterOfDeath: {
-    defaultMessage: 'Attested Letter of Death',
+    defaultMessage: 'Attested letter of death',
     description: 'Label for select option Attested Letter of Death',
     id: 'form.field.label.docTypeLetterOfDeath'
   },
@@ -920,12 +919,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypePassport'
   },
   docTypePostMortemReport: {
-    defaultMessage: 'Certified Post Mortem Report',
+    defaultMessage: 'Certified post mortem report',
     description: 'Label for select option Post Mortem Report',
     id: 'form.field.label.docTypePostMortemReport'
   },
   docTypeSC: {
-    defaultMessage: 'School Certificate',
+    defaultMessage: 'School certificate',
     description: 'Label for radio option School Certificate',
     id: 'form.field.label.docTypeSC'
   },
@@ -940,7 +939,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.documents.name'
   },
   documentsTitle: {
-    defaultMessage: 'Supporting documents',
+    defaultMessage: 'Attach supporting documents',
     description: 'Form section title for Documents',
     id: 'form.section.documents.title'
   },
@@ -948,11 +947,6 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Documents Upload',
     description: 'Form section name for Documents Upload',
     id: 'form.section.upload.documentsName'
-  },
-  documentsUploadTitle: {
-    defaultMessage: 'Supporting documents',
-    description: 'Form section title for Documents',
-    id: 'form.section.upload.documentsTitle'
   },
   educationAttainmentISCED1: {
     defaultMessage: 'Primary',

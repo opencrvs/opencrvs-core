@@ -392,10 +392,10 @@ class ReviewActionComponent extends React.Component<
         </Content>
         {actionContent.modal && (
           <ResponsiveModal
-            title={intl.formatMessage(
-              actionContent.modal.title.message,
-              actionContent.modal.title.payload
-            )}
+            title={intl.formatMessage(actionContent.modal.title.message, {
+              ...actionContent.modal.title.payload,
+              event: application.event
+            })}
             contentHeight={96}
             actions={[
               <TertiaryButton
@@ -443,10 +443,10 @@ class ReviewActionComponent extends React.Component<
             show={this.state.showSubmitModal}
             handleClose={this.toggleSubmitModalOpen}
           >
-            {intl.formatMessage(
-              actionContent.modal.description.message,
-              actionContent.modal.description.payload
-            )}
+            {intl.formatMessage(actionContent.modal.description.message, {
+              ...actionContent.modal.description.payload,
+              event: application.event
+            })}
           </ResponsiveModal>
         )}
       </Container>

@@ -1,8 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrowDeepBlue } from '../icons'
-import { Button } from '../buttons'
-import { colors } from '../colors'
+import { Button, CircleButton } from '../buttons'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -25,23 +24,12 @@ const BodyContent = styled.div`
   align-items: center;
 `
 const BackButtonContainer = styled.div`
+  margin-right: 8px;
   cursor: pointer;
 `
 const BackButton = styled(Button)`
-  height: 42px;
-  background: ${({ theme }) => theme.colors.white};
   justify-content: center;
-  margin: 0;
-  margin-right: 16px;
-  padding: 0;
-`
-
-const BackButtonIcon = styled(BackArrowDeepBlue)`
-  &:hover {
-    g {
-      stroke: ${colors.tertiary};
-    }
-  }
+  height: auto;
 `
 
 const BackButtonText = styled.span`
@@ -94,7 +82,9 @@ export class ActionPageLight extends React.Component<
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <BackButton icon={icon || (() => <BackButtonIcon />)} />
+              <CircleButton>
+                <BackButton icon={icon || (() => <BackArrowDeepBlue />)} />
+              </CircleButton>
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}
