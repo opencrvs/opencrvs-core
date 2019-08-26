@@ -34,6 +34,8 @@ export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
 export const VERIFY_COLLECTOR = '/print/:registrationId/:eventType/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
+export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
+
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
 export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'

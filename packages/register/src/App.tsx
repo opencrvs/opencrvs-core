@@ -39,6 +39,7 @@ import TransitionWrapper from './components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
 import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
+import { Payment } from './views/PrintCertificate/Payment'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -197,6 +198,12 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             path={routes.REVIEW_CERTIFICATE}
                                             component={ReviewCertificateAction}
+                                          />
+                                          <ProtectedRoute
+                                            path={
+                                              routes.PRINT_CERTIFICATE_PAYMENT
+                                            }
+                                            component={Payment}
                                           />
                                           <ProtectedRoute
                                             path={routes.SETTINGS}

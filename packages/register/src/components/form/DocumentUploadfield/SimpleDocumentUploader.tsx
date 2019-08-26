@@ -112,7 +112,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   onDelete = (image: IFormFieldValue) => {
-    this.props.onComplete({})
+    this.props.onComplete('')
     this.closePreviewSection()
   }
 

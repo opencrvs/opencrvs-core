@@ -36,6 +36,7 @@ import {
   constantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -45,6 +46,7 @@ interface IBaseRejectTabProps {
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
   parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
 }
 
 interface IRejectTabState {
@@ -142,7 +144,12 @@ class RejectTabComponent extends React.Component<
     if (!data.searchEvents || !data.searchEvents.results) {
       return []
     }
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(
+      data,
+      this.props.intl,
+      this.props.outboxApplications,
+      [SUBMISSION_STATUS.READY_TO_REJECT, SUBMISSION_STATUS.REJECTING]
+    )
     return transformedData.map(reg => {
       const actions = [] as IAction[]
       if (this.userHasRegisterScope()) {
@@ -259,7 +266,8 @@ class RejectTabComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    scope: getScope(state)
+    scope: getScope(state),
+    outboxApplications: state.applicationsState.applications
   }
 }
 

@@ -31,6 +31,7 @@ interface ICertificateMessages {
   number: ReactIntl.FormattedMessage.MessageDescriptor
   other: ReactIntl.FormattedMessage.MessageDescriptor
   payment: ReactIntl.FormattedMessage.MessageDescriptor
+  paymentInstruction: ReactIntl.FormattedMessage.MessageDescriptor
   paymentAmount: ReactIntl.FormattedMessage.MessageDescriptor
   paymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
   person1: ReactIntl.FormattedMessage.MessageDescriptor
@@ -45,8 +46,7 @@ interface ICertificateMessages {
   receiptService: ReactIntl.FormattedMessage.MessageDescriptor
   selectSignature: ReactIntl.FormattedMessage.MessageDescriptor
   service: ReactIntl.FormattedMessage.MessageDescriptor
-  serviceMonth: ReactIntl.FormattedMessage.MessageDescriptor
-  serviceYear: ReactIntl.FormattedMessage.MessageDescriptor
+  amountDue: ReactIntl.FormattedMessage.MessageDescriptor
   typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
   whoToCollect: ReactIntl.FormattedMessage.MessageDescriptor
   confirmAndPrint: ReactIntl.FormattedMessage.MessageDescriptor
@@ -214,9 +214,15 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other'
   },
   payment: {
-    defaultMessage: 'Payment',
+    defaultMessage: 'Payment is required',
     description: 'The title for payment section',
     id: 'print.certificate.payment'
+  },
+  paymentInstruction: {
+    defaultMessage:
+      'Please collect the payment, print the receipt and hand it over to the payee.',
+    description: 'Description for payment section',
+    id: 'print.certificate.paymentInstruction'
   },
   paymentAmount: {
     defaultMessage: '৳ {paymentAmount}',
@@ -287,17 +293,10 @@ const messagesToDefine: ICertificateMessages = {
     description: 'The label for service paragraph',
     id: 'print.certificate.serviceMonth'
   },
-  serviceMonth: {
-    defaultMessage:
-      'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph',
-    id: 'print.certificate.serviceMonth'
-  },
-  serviceYear: {
-    defaultMessage:
-      'Service: <strong>Birth registration after {service, plural, =0 {0 year} one {1 year} other{{service} years}} of D.o.B.</strong><br/>Amount Due:',
-    description: 'The label for service paragraph',
-    id: 'print.certificate.serviceYear'
+  amountDue: {
+    defaultMessage: 'Amount Due:',
+    description: 'The label for due amount',
+    id: 'certificate.receipt.amountDue'
   },
   typeOfID: {
     defaultMessage: 'Type of ID',
@@ -358,6 +357,28 @@ const dynamicMessagesToDefine = {
     id: 'print.certificate.deathService',
     defaultMessage:
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
+    description: 'Amount due on certificate for death label'
+  },
+  birthServiceAfter: {
+    id: 'certificate.receipt.birthService.after',
+    defaultMessage: 'Birth registration after 5 years of date of birth',
+    description: 'Amount due on certificate for birth label'
+  },
+  deathServiceAfter: {
+    id: 'certificate.receipt.deathService.after',
+    defaultMessage: 'Death registration after 5 years of date of death',
+    description: 'Amount due on certificate for death label'
+  },
+  birthServiceBetween: {
+    id: 'certificate.receipt.birthService.between',
+    defaultMessage:
+      'Birth registration between 45 days and 5 years of date of birth',
+    description: 'Amount due on certificate for birth label'
+  },
+  deathServiceBetween: {
+    id: 'certificate.receipt.deathService.between',
+    defaultMessage:
+      'Death registration between 45 days and 5 years of date of death',
     description: 'Amount due on certificate for death label'
   }
 }
