@@ -92,7 +92,7 @@ export const registrationSection: ISerializedFormSection = {
           label: messages.registrationPhoneLabel,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'phoneNumberFormat', parameters: [] }],
+          validate: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldNameTransformer',
@@ -121,10 +121,9 @@ export const registrationSection: ISerializedFormSection = {
           description: messages.commentsOrNotesDescription,
           mapping: {
             mutation: {
-              operation: 'fieldToCommentTransformer',
-              parameters: []
+              operation: 'fieldToCommentTransformer'
             },
-            query: { operation: 'commentToFieldTransformer', parameters: [] }
+            query: { operation: 'commentToFieldTransformer' }
           }
         }
       ]
@@ -132,12 +131,10 @@ export const registrationSection: ISerializedFormSection = {
   ],
   mapping: {
     mutation: {
-      operation: 'setBirthRegistrationSectionTransformer',
-      parameters: []
+      operation: 'setBirthRegistrationSectionTransformer'
     },
     query: {
-      operation: 'getBirthRegistrationSectionTransformer',
-      parameters: []
+      operation: 'getBirthRegistrationSectionTransformer'
     }
   }
 }

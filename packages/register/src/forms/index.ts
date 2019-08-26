@@ -13,6 +13,8 @@ import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
 import * as mutations from './mappings/mutation'
 import * as queries from './mappings/query'
+import * as labels from './mappings/label'
+import * as types from './mappings/type'
 import * as validators from '@opencrvs/register/src/utils/validate'
 
 export const TEXT = 'TEXT'
@@ -94,6 +96,24 @@ export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
 
+export interface ISerializedDynamicFormFieldDefinitions {
+  label?: {
+    dependency: string
+    labelMapper: Operation<typeof labels>
+  }
+  type?:
+    | IStaticFieldType
+    | {
+        kind: 'dynamic'
+        dependency: string
+        typeMapper: Operation<typeof types>
+      }
+  validate?: Array<{
+    dependencies: string[]
+    validator: FactoryOperation<typeof validators>
+  }>
+}
+
 export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   type?: IDynamicFieldType | IStaticFieldType
@@ -142,7 +162,7 @@ export interface IAttachmentValue {
 }
 
 export type IFormFieldMutationMapFunction = (
-  transFormedData: any,
+  transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   fieldDefinition: IFormField
@@ -155,19 +175,33 @@ export type IFormFieldQueryMapFunction = (
   fieldDefinition: IFormField
 ) => void
 
+/*
+ * Takes in an array of function arguments (array, number, string, function)
+ * and replaces all functions with the descriptor type
+ *
+ * So type Array<number | Function | string> would become
+ * Array<number | Descriptor | string>
+ */
 type FunctionParamsToDescriptor<T> = T extends Array<any>
   ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
   : T extends IFormFieldQueryMapFunction
-  ? IFormFieldQueryMapDescriptor<any>
+  ? IQueryDescriptor
   : T extends IFormFieldMutationMapFunction
-  ? IFormFieldMutationMapDescriptor<any>
+  ? IMutationDescriptor
   : T
 
-export type IFormFieldMutationMapDescriptor<
-  T extends keyof typeof mutations = keyof typeof mutations
-> = {
-  operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+interface FactoryOperation<
+  OperationMap,
+  Key extends keyof OperationMap = keyof OperationMap
+> {
+  operation: Key
+  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>>
+}
+interface Operation<
+  OperationMap,
+  Key extends keyof OperationMap = keyof OperationMap
+> {
+  operation: Key
 }
 
 export type IFormFieldQueryMapDescriptor<
@@ -198,14 +232,22 @@ type UnionOmit<T, K extends UnionKeys<T>> = UnionPick<
   Exclude<UnionKeys<T>, K>
 >
 
+type SerializedFormFieldWithDynamicDefinitions = UnionOmit<
+  IFormFieldWithDynamicDefinitions,
+  'dynamicDefinitions'
+> & {
+  dynamicDefinitions: ISerializedDynamicFormFieldDefinitions
+}
+
 export type SerializedFormField = UnionOmit<
-  IFormField,
+  | Exclude<IFormField, IFormFieldWithDynamicDefinitions>
+  | SerializedFormFieldWithDynamicDefinitions,
   'validate' | 'mapping'
 > & {
   validate: IValidatorDescriptor[]
   mapping?: {
-    mutation?: IFormFieldMutationMapDescriptor
-    query?: IFormFieldQueryMapDescriptor
+    mutation?: IMutationDescriptor
+    query?: IQueryDescriptor
   }
 }
 
@@ -439,26 +481,109 @@ export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
 
-export type IFormSectionMutationMapDescriptor<
-  T extends keyof typeof mutations = any
-> = {
-  operation: T
-  parameters: Params<typeof mutations[T]>
+/*
+ * TEMPORARY @todo
+ *
+ * Remove when form field definitions are removed from codebase
+ */
+
+type FilterType<Base, Condition> = {
+  [Key in keyof Base]: Base[Key] extends Condition ? Key : never
 }
 
-export type IFormSectionQueryMapDescriptor<
-  T extends keyof typeof queries = any
-> = {
-  operation: T
-  parameters: Params<typeof queries[T]>
-}
+// Validation
 
-export type IValidatorDescriptor<
-  T extends keyof typeof validators = keyof typeof validators
+type ValidationFactoryOperationKeys = FilterType<
+  typeof validators,
+  (...args: any[]) => (...args: any[]) => any
+>[keyof typeof validators]
+
+type ValidationDefaultOperationKeys = Exclude<
+  keyof typeof validators,
+  ValidationFactoryOperationKeys
+>
+
+export type ValidationFactoryOperation<
+  T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
   parameters: Params<typeof validators[T]>
 }
+
+type ValidationDefaultOperation<
+  T extends ValidationDefaultOperationKeys = ValidationDefaultOperationKeys
+> = {
+  operation: T
+}
+
+export type IValidatorDescriptor =
+  | ValidationFactoryOperation
+  | ValidationDefaultOperation
+
+// Queries
+
+type QueryFactoryOperationKeys = FilterType<
+  typeof queries,
+  (...args: any[]) => (...args: any[]) => any
+>[keyof typeof queries]
+
+type QueryDefaultOperationKeys = Exclude<
+  keyof typeof queries,
+  QueryFactoryOperationKeys
+>
+
+export type QueryFactoryOperation<
+  T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+}
+
+type QueryDefaultOperation<
+  T extends QueryDefaultOperationKeys = QueryDefaultOperationKeys
+> = {
+  operation: T
+}
+
+export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
+
+// Mutations
+
+type MutationFactoryOperationKeys = FilterType<
+  typeof mutations,
+  (...args: any[]) => (...args: any[]) => any
+>[keyof typeof mutations]
+
+type MutationDefaultOperationKeys = Exclude<
+  keyof typeof mutations,
+  MutationFactoryOperationKeys
+>
+
+export type MutationFactoryOperation<
+  T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+}
+
+type MutationDefaultOperation<
+  T extends MutationDefaultOperationKeys = MutationDefaultOperationKeys
+> = {
+  operation: T
+}
+
+export type IMutationDescriptor =
+  | MutationFactoryOperation
+  | MutationDefaultOperation
+
+/*
+ * / TEMPORARY @todo
+ *
+ */
+
+// Initial type as it's always used as an object.
+// Should be stricter than this
+export type TransformedData = { [key: string]: any }
 
 export type IFormSectionMapping = {
   mutation?: IFormSectionMutationMapFunction
@@ -466,7 +591,7 @@ export type IFormSectionMapping = {
 }
 
 export type IFormSectionMutationMapFunction = (
-  transFormedData: any,
+  transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) => void
@@ -498,8 +623,8 @@ export type ISerializedFormSection = Omit<
     Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
   >
   mapping?: {
-    mutation?: IFormFieldMutationMapDescriptor
-    query?: IFormFieldQueryMapDescriptor
+    mutation?: IMutationDescriptor
+    query?: IQueryDescriptor
   }
 }
 

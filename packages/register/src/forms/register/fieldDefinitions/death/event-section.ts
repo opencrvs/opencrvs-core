@@ -35,9 +35,7 @@ export const eventSection: ISerializedFormSection = {
           ignorePlaceHolder: true,
           required: true,
           initialValue: '',
-          validate: [
-            { operation: 'isValidDeathOccurrenceDate', parameters: [] }
-          ],
+          validate: [{ operation: 'isValidDeathOccurrenceDate' }],
           mapping: {
             mutation: {
               operation: 'fieldToDeceasedDateTransformation',
@@ -122,7 +120,7 @@ export const eventSection: ISerializedFormSection = {
               operation: 'copyEventAddressTransformer',
               parameters: ['deceased']
             },
-            query: { operation: 'deathPlaceToFieldTransformer', parameters: [] }
+            query: { operation: 'deathPlaceToFieldTransformer' }
           }
         }
       ]
@@ -725,12 +723,10 @@ export const eventSection: ISerializedFormSection = {
   ],
   mapping: {
     mutation: {
-      operation: 'setDeathRegistrationSectionTransformer',
-      parameters: []
+      operation: 'setDeathRegistrationSectionTransformer'
     },
     query: {
-      operation: 'getDeathRegistrationSectionTransformer',
-      parameters: []
+      operation: 'getDeathRegistrationSectionTransformer'
     }
   }
 }

@@ -1,8 +1,8 @@
 import {
-  IFormSection,
   ViewType,
   SELECT_WITH_OPTIONS,
-  PARAGRAPH
+  PARAGRAPH,
+  IFormSection
 } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
 

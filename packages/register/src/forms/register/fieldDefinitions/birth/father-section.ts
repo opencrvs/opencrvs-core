@@ -19,14 +19,6 @@ import {
   TEL,
   ISerializedFormSection
 } from '@register/forms'
-import {
-  validIDNumber,
-  dateGreaterThan,
-  dateLessThan,
-  dateNotInFuture,
-  dateFormatIsCorrect,
-  dateInPast
-} from '@register/utils/validate'
 
 import { conditionals } from '@register/forms/utils'
 
@@ -38,11 +30,6 @@ import {
   FETCH_PERSON,
   transformPersonData
 } from '@register/forms/register/queries/person'
-import {
-  getFatherDateOfBirthLabel,
-  getDateOfMarriageLabel
-} from '@register/forms/register/fieldDefinitions/birth/staticLabel'
-
 export interface IFatherSectionFormData {
   firstName: string
   foo: string
@@ -122,16 +109,16 @@ export const fatherSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'iDType',
-              labelMapper: identityNameMapper
+              labelMapper: { operation: 'identityNameMapper' }
             },
             type: {
               kind: 'dynamic',
               dependency: 'iDType',
-              typeMapper: identityTypeMapper
+              typeMapper: { operation: 'identityTypeMapper' }
             },
             validate: [
               {
-                validator: validIDNumber,
+                validator: { operation: 'validIDNumber', parameters: [] },
                 dependencies: ['iDType']
               }
             ]
@@ -205,8 +192,8 @@ export const fatherSection: ISerializedFormSection = {
           options: countries,
           conditionals: [conditionals.fathersDetailsExist],
           mapping: {
-            mutation: { operation: 'fieldToArrayTransformer', parameters: [] },
-            query: { operation: 'arrayToFieldTransformer', parameters: [] }
+            mutation: { operation: 'fieldToArrayTransformer' },
+            query: { operation: 'arrayToFieldTransformer' }
           }
         },
         {
@@ -215,7 +202,7 @@ export const fatherSection: ISerializedFormSection = {
           label: messages.fatherFirstNames,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           conditionals: [conditionals.fathersDetailsExist],
           mapping: {
             mutation: {
@@ -231,7 +218,7 @@ export const fatherSection: ISerializedFormSection = {
           label: messages.fatherFamilyName,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           conditionals: [conditionals.fathersDetailsExist],
           mapping: {
             mutation: {
@@ -247,7 +234,7 @@ export const fatherSection: ISerializedFormSection = {
           label: messages.fatherFirstNamesEng,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           conditionals: [conditionals.fathersDetailsExist],
           mapping: {
             mutation: {
@@ -266,7 +253,7 @@ export const fatherSection: ISerializedFormSection = {
           label: messages.fatherFamilyNameEng,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           conditionals: [conditionals.fathersDetailsExist],
           mapping: {
             mutation: {
@@ -285,7 +272,7 @@ export const fatherSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'fatherBirthDate',
-              labelMapper: getFatherDateOfBirthLabel
+              labelMapper: { operation: 'getFatherDateOfBirthLabel' }
             },
             type: {
               kind: 'static',
@@ -293,15 +280,15 @@ export const fatherSection: ISerializedFormSection = {
             },
             validate: [
               {
-                validator: dateFormatIsCorrect,
+                validator: { operation: 'dateFormatIsCorrect', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateInPast,
+                validator: { operation: 'dateInPast', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateLessThan,
+                validator: { operation: 'dateLessThan', parameters: [] },
                 dependencies: ['dateOfMarriage']
               }
             ]
@@ -364,7 +351,9 @@ export const fatherSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'dateOfMarriage',
-              labelMapper: getDateOfMarriageLabel
+              labelMapper: {
+                operation: 'getDateOfMarriageLabel'
+              }
             },
             type: {
               kind: 'static',
@@ -372,15 +361,15 @@ export const fatherSection: ISerializedFormSection = {
             },
             validate: [
               {
-                validator: dateFormatIsCorrect,
+                validator: { operation: 'dateFormatIsCorrect', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateNotInFuture,
+                validator: { operation: 'dateNotInFuture', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateGreaterThan,
+                validator: { operation: 'dateGreaterThan', parameters: [] },
                 dependencies: ['fatherBirthDate']
               }
             ]
@@ -693,7 +682,7 @@ export const fatherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -748,7 +737,7 @@ export const fatherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1028,7 +1017,7 @@ export const fatherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1083,7 +1072,7 @@ export const fatherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1109,6 +1098,6 @@ export const fatherSection: ISerializedFormSection = {
     }
   ],
   mapping: {
-    query: { operation: 'emptyFatherSectionTransformer', parameters: [] }
+    query: { operation: 'emptyFatherSectionTransformer' }
   }
 }

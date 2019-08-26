@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from '@register/forms'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
 import { deceasedSection } from '@register/forms/register/fieldDefinitions/death/deceased-section'
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
@@ -42,7 +42,7 @@ export const deathDocumentTypeFhirMapping = {
 }
 
 export function deathFieldToAttachmentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField

@@ -3,6 +3,8 @@ import { IForm } from '@register/forms'
 import * as offlineActions from '@register/offline/actions'
 import { deserializeForm } from '@register/forms/mappings/deserializer'
 
+import { messages } from '@register/i18n/messages/views/review'
+
 export type IRegisterFormState =
   | {
       state: 'LOADING'
@@ -33,12 +35,34 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
+      const birth = deserializeForm(action.payload.forms.registerForm.birth)
+      const death = deserializeForm(action.payload.forms.registerForm.death)
+
+      const preview = {
+        id: 'preview',
+        viewType: 'preview' as const,
+        name: messages.previewName,
+        title: messages.previewTitle,
+        groups: [
+          {
+            id: 'preview-view-group',
+            fields: []
+          }
+        ]
+      }
+
       return {
         ...state,
         state: 'READY',
         registerForm: {
-          birth: deserializeForm(action.payload.forms.registerForm.birth),
-          death: deserializeForm(action.payload.forms.registerForm.death)
+          birth: {
+            ...birth,
+            sections: [...birth.sections, preview]
+          },
+          death: {
+            ...death,
+            sections: [...death.sections, preview]
+          }
         }
       }
     default:

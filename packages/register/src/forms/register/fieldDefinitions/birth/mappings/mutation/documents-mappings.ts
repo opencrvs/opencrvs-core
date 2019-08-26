@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from '@register/forms'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
 import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
 import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
@@ -52,7 +52,7 @@ export const birthDocumentTypeFhirMapping = {
 }
 
 export function birthFieldToAttachmentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField

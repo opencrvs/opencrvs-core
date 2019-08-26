@@ -35,10 +35,9 @@ export const causeOfDeathSection: ISerializedFormSection = {
             }
           ],
           mapping: {
-            mutation: { operation: 'ignoreFieldTransformer', parameters: [] },
+            mutation: { operation: 'ignoreFieldTransformer' },
             query: {
-              operation: 'hasCaseOfDeathSectionTransformer',
-              parameters: []
+              operation: 'hasCaseOfDeathSectionTransformer'
             }
           }
         }
@@ -85,8 +84,13 @@ export const causeOfDeathSection: ISerializedFormSection = {
           label: messages.causeOfDeathCode,
           required: false,
           validate: [
-            { operation: 'blockAlphaNumericDot', parameters: [] },
-            { operation: 'maxLength', parameters: [17] }
+            {
+              operation: 'blockAlphaNumericDot'
+            },
+            {
+              operation: 'maxLength',
+              parameters: [17]
+            }
           ],
           mapping: {
             mutation: {

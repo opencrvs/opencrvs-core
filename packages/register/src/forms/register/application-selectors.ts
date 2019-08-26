@@ -15,7 +15,6 @@ function getKey<K extends keyof IRegisterFormState>(
 // Register form needs to be ready before this function is called
 export const getRegisterForm = (state: IStoreState) => {
   const form = getKey(state, 'registerForm')
-
   if (!form) {
     throw new Error(
       'Selector called before data was ready. This should never happen'

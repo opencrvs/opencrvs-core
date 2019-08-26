@@ -612,6 +612,7 @@ function mapStateToProps(
   const { match, registerForm, application } = props
 
   const sectionId = match.params.pageId || registerForm.sections[0].id
+
   const activeSection = registerForm.sections.find(
     section => section.id === sectionId
   )

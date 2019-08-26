@@ -102,16 +102,16 @@ export const motherSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'iDType',
-              labelMapper: identityNameMapper
+              labelMapper: { operation: 'identityNameMapper' }
             },
             type: {
               kind: 'dynamic',
               dependency: 'iDType',
-              typeMapper: identityTypeMapper
+              typeMapper: { operation: 'identityTypeMapper' }
             },
             validate: [
               {
-                validator: validIDNumber,
+                validator: { operation: 'validIDNumber', parameters: [] },
                 dependencies: ['iDType']
               }
             ]
@@ -183,8 +183,8 @@ export const motherSection: ISerializedFormSection = {
           placeholder: messages.select,
           options: countries,
           mapping: {
-            mutation: { operation: 'fieldToArrayTransformer', parameters: [] },
-            query: { operation: 'arrayToFieldTransformer', parameters: [] }
+            mutation: { operation: 'fieldToArrayTransformer' },
+            query: { operation: 'arrayToFieldTransformer' }
           }
         },
         {
@@ -193,7 +193,7 @@ export const motherSection: ISerializedFormSection = {
           label: messages.motherFirstNames,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -208,7 +208,7 @@ export const motherSection: ISerializedFormSection = {
           label: messages.motherFamilyName,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -223,7 +223,7 @@ export const motherSection: ISerializedFormSection = {
           label: messages.motherFirstNamesEng,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -241,7 +241,7 @@ export const motherSection: ISerializedFormSection = {
           label: messages.motherFamilyNameEng,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -259,7 +259,7 @@ export const motherSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'motherBirthDate',
-              labelMapper: getMotherDateOfBirthLabel
+              labelMapper: { operation: 'getMotherDateOfBirthLabel' }
             },
             type: {
               kind: 'static',
@@ -267,15 +267,15 @@ export const motherSection: ISerializedFormSection = {
             },
             validate: [
               {
-                validator: dateFormatIsCorrect,
+                validator: { operation: 'dateFormatIsCorrect', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateInPast,
+                validator: { operation: 'dateInPast', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateLessThan,
+                validator: { operation: 'dateLessThan', parameters: [] },
                 dependencies: ['dateOfMarriage']
               }
             ]
@@ -336,7 +336,7 @@ export const motherSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'dateOfMarriage',
-              labelMapper: getDateOfMarriageLabel
+              labelMapper: { operation: 'getDateOfMarriageLabel' }
             },
             type: {
               kind: 'static',
@@ -344,15 +344,15 @@ export const motherSection: ISerializedFormSection = {
             },
             validate: [
               {
-                validator: dateFormatIsCorrect,
+                validator: { operation: 'dateFormatIsCorrect', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateNotInFuture,
+                validator: { operation: 'dateNotInFuture', parameters: [] },
                 dependencies: []
               },
               {
-                validator: dateGreaterThan,
+                validator: { operation: 'dateGreaterThan', parameters: [] },
                 dependencies: ['motherBirthDate']
               }
             ]
@@ -625,7 +625,7 @@ export const motherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -678,7 +678,7 @@ export const motherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -950,7 +950,7 @@ export const motherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1005,7 +1005,7 @@ export const motherSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [

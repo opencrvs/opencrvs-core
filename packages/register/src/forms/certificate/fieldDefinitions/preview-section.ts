@@ -1,4 +1,4 @@
-import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from '@register/forms'
+import { ViewType, PDF_DOCUMENT_VIEWER, IFormSection } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
 
 export const certificatePreview: IFormSection = {

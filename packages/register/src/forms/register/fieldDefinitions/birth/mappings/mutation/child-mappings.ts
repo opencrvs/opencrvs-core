@@ -1,10 +1,10 @@
-import { IFormField, IFormData } from '@register/forms'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 
 export const birthEventLocationMutationTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField

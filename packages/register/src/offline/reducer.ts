@@ -26,6 +26,7 @@ export interface IOfflineData {
   facilities: { [key: string]: ILocation }
   languages: ILanguage[]
   forms: {
+    // @todo this is also used in review, so it could be named just form
     registerForm: {
       birth: ISerializedForm
       death: ISerializedForm

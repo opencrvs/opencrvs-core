@@ -39,7 +39,7 @@ export const childSection: ISerializedFormSection = {
           label: messages.childFirstNames,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -57,7 +57,7 @@ export const childSection: ISerializedFormSection = {
           label: messages.childFamilyName,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -72,7 +72,7 @@ export const childSection: ISerializedFormSection = {
           label: messages.childFirstNamesEng,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -90,7 +90,7 @@ export const childSection: ISerializedFormSection = {
           label: messages.childFamilyNameEng,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -123,7 +123,7 @@ export const childSection: ISerializedFormSection = {
           label: messages.childDateOfBirth,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'isValidBirthDate', parameters: [] }],
+          validate: [{ operation: 'isValidBirthDate' }],
           mapping: {
             mutation: {
               operation: 'fieldNameTransformer',
@@ -202,7 +202,7 @@ export const childSection: ISerializedFormSection = {
           required: true,
           initialValue: '',
           validate: [
-            { operation: 'greaterThanZero', parameters: [] },
+            { operation: 'greaterThanZero' },
             { operation: 'maxLength', parameters: [2] }
           ],
           mapping: {

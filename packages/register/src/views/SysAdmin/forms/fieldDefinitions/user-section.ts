@@ -38,7 +38,7 @@ export const userSection: ISerializedFormSection = {
           label: messages.firstNameBn,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -52,7 +52,7 @@ export const userSection: ISerializedFormSection = {
           label: messages.lastNameBn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -66,7 +66,7 @@ export const userSection: ISerializedFormSection = {
           label: messages.firstNameEn,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -80,7 +80,7 @@ export const userSection: ISerializedFormSection = {
           label: messages.lastNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -94,7 +94,7 @@ export const userSection: ISerializedFormSection = {
           label: messages.phoneNumber,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'phoneNumberFormat', parameters: [] }],
+          validate: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldNameTransformer',

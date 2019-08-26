@@ -31,8 +31,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -62,8 +61,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -93,8 +91,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -126,8 +123,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -210,8 +206,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "isValidBirthDate",
-                    "parameters": []
+                    "operation": "isValidBirthDate"
                   }
                 ],
                 "mapping": {
@@ -395,8 +390,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "greaterThanZero",
-                    "parameters": []
+                    "operation": "greaterThanZero"
                   },
                   {
                     "operation": "maxLength",
@@ -3209,14 +3203,24 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "labelMapper": {
+                      "operation": "identityNameMapper"
+                    }
                   },
                   "type": {
                     "kind": "dynamic",
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "typeMapper": {
+                      "operation": "identityTypeMapper"
+                    }
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "validIDNumber",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "iDType"
                       ]
@@ -5711,12 +5715,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "fieldToArrayTransformer",
-                    "parameters": []
+                    "operation": "fieldToArrayTransformer"
                   },
                   "query": {
-                    "operation": "arrayToFieldTransformer",
-                    "parameters": []
+                    "operation": "arrayToFieldTransformer"
                   }
                 }
               },
@@ -5732,8 +5734,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -5763,8 +5764,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -5794,8 +5794,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -5827,8 +5826,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -5853,7 +5851,10 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "motherBirthDate"
+                    "dependency": "motherBirthDate",
+                    "labelMapper": {
+                      "operation": "getMotherDateOfBirthLabel"
+                    }
                   },
                   "type": {
                     "kind": "static",
@@ -5861,12 +5862,24 @@
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "dateFormatIsCorrect",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateInPast",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateLessThan",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "dateOfMarriage"
                       ]
@@ -5968,7 +5981,10 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "dateOfMarriage"
+                    "dependency": "dateOfMarriage",
+                    "labelMapper": {
+                      "operation": "getDateOfMarriageLabel"
+                    }
                   },
                   "type": {
                     "kind": "static",
@@ -5976,12 +5992,24 @@
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "dateFormatIsCorrect",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateNotInFuture",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateGreaterThan",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "motherBirthDate"
                       ]
@@ -8484,8 +8512,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -8597,8 +8624,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -11120,8 +11146,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -11241,8 +11266,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -11472,14 +11496,24 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "labelMapper": {
+                      "operation": "identityNameMapper"
+                    }
                   },
                   "type": {
                     "kind": "dynamic",
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "typeMapper": {
+                      "operation": "identityTypeMapper"
+                    }
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "validIDNumber",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "iDType"
                       ]
@@ -13986,12 +14020,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "fieldToArrayTransformer",
-                    "parameters": []
+                    "operation": "fieldToArrayTransformer"
                   },
                   "query": {
-                    "operation": "arrayToFieldTransformer",
-                    "parameters": []
+                    "operation": "arrayToFieldTransformer"
                   }
                 }
               },
@@ -14007,8 +14039,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "conditionals": [
@@ -14044,8 +14075,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "conditionals": [
@@ -14081,8 +14111,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "conditionals": [
@@ -14120,8 +14149,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "conditionals": [
@@ -14152,7 +14180,10 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "fatherBirthDate"
+                    "dependency": "fatherBirthDate",
+                    "labelMapper": {
+                      "operation": "getFatherDateOfBirthLabel"
+                    }
                   },
                   "type": {
                     "kind": "static",
@@ -14160,12 +14191,24 @@
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "dateFormatIsCorrect",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateInPast",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateLessThan",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "dateOfMarriage"
                       ]
@@ -14279,7 +14322,10 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "dateOfMarriage"
+                    "dependency": "dateOfMarriage",
+                    "labelMapper": {
+                      "operation": "getDateOfMarriageLabel"
+                    }
                   },
                   "type": {
                     "kind": "static",
@@ -14287,12 +14333,24 @@
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "dateFormatIsCorrect",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateNotInFuture",
+                        "parameters": []
+                      },
                       "dependencies": []
                     },
                     {
+                      "validator": {
+                        "operation": "dateGreaterThan",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "fatherBirthDate"
                       ]
@@ -16893,8 +16951,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -17014,8 +17071,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -19571,8 +19627,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -19692,8 +19747,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -19752,8 +19806,7 @@
         ],
         "mapping": {
           "query": {
-            "operation": "emptyFatherSectionTransformer",
-            "parameters": []
+            "operation": "emptyFatherSectionTransformer"
           }
         }
       },
@@ -19904,8 +19957,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "phoneNumberFormat",
-                    "parameters": []
+                    "operation": "phoneNumberFormat"
                   }
                 ],
                 "mapping": {
@@ -19952,12 +20004,10 @@
                 },
                 "mapping": {
                   "mutation": {
-                    "operation": "fieldToCommentTransformer",
-                    "parameters": []
+                    "operation": "fieldToCommentTransformer"
                   },
                   "query": {
-                    "operation": "commentToFieldTransformer",
-                    "parameters": []
+                    "operation": "commentToFieldTransformer"
                   }
                 }
               }
@@ -19966,12 +20016,10 @@
         ],
         "mapping": {
           "mutation": {
-            "operation": "setBirthRegistrationSectionTransformer",
-            "parameters": []
+            "operation": "setBirthRegistrationSectionTransformer"
           },
           "query": {
-            "operation": "getBirthRegistrationSectionTransformer",
-            "parameters": []
+            "operation": "getBirthRegistrationSectionTransformer"
           }
         }
       },
@@ -20119,12 +20167,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "birthFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "birthFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "birthAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "birthAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -20192,12 +20238,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "birthFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "birthFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "birthAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "birthAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -20233,12 +20277,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "birthFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "birthFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "birthAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "birthAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -20290,12 +20332,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "birthFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "birthFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "birthAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "birthAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -20357,12 +20397,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "birthFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "birthFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "birthAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "birthAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -20416,36 +20454,14 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "birthFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "birthFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "birthAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "birthAttachmentToFieldTransformer"
                   }
                 }
               }
             ]
-          }
-        ]
-      },
-      {
-        "id": "preview",
-        "viewType": "preview",
-        "name": {
-          "defaultMessage": "Preview",
-          "description": "Form section name for Preview",
-          "id": "register.form.section.preview.name"
-        },
-        "title": {
-          "defaultMessage": "Preview",
-          "description": "Form section title for Preview",
-          "id": "register.form.section.preview.title"
-        },
-        "groups": [
-          {
-            "id": "preview-view-group",
-            "fields": []
           }
         ]
       }
@@ -20605,14 +20621,24 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "labelMapper": {
+                      "operation": "identityNameMapper"
+                    }
                   },
                   "type": {
                     "kind": "dynamic",
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "typeMapper": {
+                      "operation": "identityTypeMapper"
+                    }
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "validIDNumber",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "iDType"
                       ]
@@ -23108,12 +23134,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "fieldToArrayTransformer",
-                    "parameters": []
+                    "operation": "fieldToArrayTransformer"
                   },
                   "query": {
-                    "operation": "arrayToFieldTransformer",
-                    "parameters": []
+                    "operation": "arrayToFieldTransformer"
                   }
                 }
               },
@@ -23129,8 +23153,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -23160,8 +23183,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -23191,8 +23213,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -23224,8 +23245,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -23308,8 +23328,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "isValidBirthDate",
-                    "parameters": []
+                    "operation": "isValidBirthDate"
                   }
                 ]
               },
@@ -25773,8 +25792,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -25886,8 +25904,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -28397,8 +28414,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -28518,8 +28534,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -28612,8 +28627,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "isValidDeathOccurrenceDate",
-                    "parameters": []
+                    "operation": "isValidDeathOccurrenceDate"
                   }
                 ],
                 "mapping": {
@@ -28778,8 +28792,7 @@
                     ]
                   },
                   "query": {
-                    "operation": "deathPlaceToFieldTransformer",
-                    "parameters": []
+                    "operation": "deathPlaceToFieldTransformer"
                   }
                 }
               }
@@ -33840,12 +33853,10 @@
         ],
         "mapping": {
           "mutation": {
-            "operation": "setDeathRegistrationSectionTransformer",
-            "parameters": []
+            "operation": "setDeathRegistrationSectionTransformer"
           },
           "query": {
-            "operation": "getDeathRegistrationSectionTransformer",
-            "parameters": []
+            "operation": "getDeathRegistrationSectionTransformer"
           }
         }
       },
@@ -33880,7 +33891,7 @@
                   "id": "form.section.causeOfDeathNotice"
                 },
                 "required": false,
-                "initialValue": false,
+                "initialValue": "",
                 "size": "large",
                 "validate": [],
                 "options": [
@@ -33903,12 +33914,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "ignoreFieldTransformer",
-                    "parameters": []
+                    "operation": "ignoreFieldTransformer"
                   },
                   "query": {
-                    "operation": "hasCaseOfDeathSectionTransformer",
-                    "parameters": []
+                    "operation": "hasCaseOfDeathSectionTransformer"
                   }
                 }
               }
@@ -33989,8 +33998,7 @@
                 "required": false,
                 "validate": [
                   {
-                    "operation": "blockAlphaNumericDot",
-                    "parameters": []
+                    "operation": "blockAlphaNumericDot"
                   },
                   {
                     "operation": "maxLength",
@@ -34194,14 +34202,24 @@
                 "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
                 "dynamicDefinitions": {
                   "label": {
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "labelMapper": {
+                      "operation": "identityNameMapper"
+                    }
                   },
                   "type": {
                     "kind": "dynamic",
-                    "dependency": "iDType"
+                    "dependency": "iDType",
+                    "typeMapper": {
+                      "operation": "identityTypeMapper"
+                    }
                   },
                   "validate": [
                     {
+                      "validator": {
+                        "operation": "validIDNumber",
+                        "parameters": []
+                      },
                       "dependencies": [
                         "iDType"
                       ]
@@ -36718,8 +36736,7 @@
                     "parameters": [
                       "individual",
                       {
-                        "operation": "fieldToArrayTransformer",
-                        "parameters": []
+                        "operation": "fieldToArrayTransformer"
                       }
                     ]
                   },
@@ -36728,8 +36745,7 @@
                     "parameters": [
                       "individual",
                       {
-                        "operation": "arrayToFieldTransformer",
-                        "parameters": []
+                        "operation": "arrayToFieldTransformer"
                       }
                     ]
                   }
@@ -36747,8 +36763,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -36793,8 +36808,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "bengaliOnlyNameFormat",
-                    "parameters": []
+                    "operation": "bengaliOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -36839,8 +36853,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -36885,8 +36898,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "englishOnlyNameFormat",
-                    "parameters": []
+                    "operation": "englishOnlyNameFormat"
                   }
                 ],
                 "mapping": {
@@ -36931,12 +36943,10 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "isValidBirthDate",
-                    "parameters": []
+                    "operation": "isValidBirthDate"
                   },
                   {
-                    "operation": "isDateInPast",
-                    "parameters": []
+                    "operation": "isDateInPast"
                   }
                 ],
                 "mapping": {
@@ -37104,8 +37114,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "phoneNumberFormat",
-                    "parameters": []
+                    "operation": "phoneNumberFormat"
                   }
                 ],
                 "hidden": true,
@@ -37125,8 +37134,7 @@
                     "parameters": [
                       "individual",
                       {
-                        "operation": "phoneNumberToFieldTransformer",
-                        "parameters": []
+                        "operation": "phoneNumberToFieldTransformer"
                       }
                     ]
                   }
@@ -39626,8 +39634,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -39769,8 +39776,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -42416,8 +42422,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -42559,8 +42564,7 @@
                 "initialValue": "",
                 "validate": [
                   {
-                    "operation": "numeric",
-                    "parameters": []
+                    "operation": "numeric"
                   },
                   {
                     "operation": "maxLength",
@@ -42632,12 +42636,10 @@
         ],
         "mapping": {
           "mutation": {
-            "operation": "setInformantSectionTransformer",
-            "parameters": []
+            "operation": "setInformantSectionTransformer"
           },
           "query": {
-            "operation": "getInformantSectionTransformer",
-            "parameters": []
+            "operation": "getInformantSectionTransformer"
           }
         }
       },
@@ -42718,12 +42720,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "deathFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "deathFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "deathAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "deathAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -42775,12 +42775,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "deathFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "deathFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "deathAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "deathAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -42848,12 +42846,10 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "deathFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "deathFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "deathAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "deathAttachmentToFieldTransformer"
                   }
                 }
               },
@@ -42911,36 +42907,14 @@
                 ],
                 "mapping": {
                   "mutation": {
-                    "operation": "deathFieldToAttachmentTransformer",
-                    "parameters": []
+                    "operation": "deathFieldToAttachmentTransformer"
                   },
                   "query": {
-                    "operation": "deathAttachmentToFieldTransformer",
-                    "parameters": []
+                    "operation": "deathAttachmentToFieldTransformer"
                   }
                 }
               }
             ]
-          }
-        ]
-      },
-      {
-        "id": "preview",
-        "viewType": "preview",
-        "name": {
-          "defaultMessage": "Preview",
-          "description": "Form section name for Preview",
-          "id": "register.form.section.preview.name"
-        },
-        "title": {
-          "defaultMessage": "Preview",
-          "description": "Form section title for Preview",
-          "id": "register.form.section.preview.title"
-        },
-        "groups": [
-          {
-            "id": "preview-view-group",
-            "fields": []
           }
         ]
       }

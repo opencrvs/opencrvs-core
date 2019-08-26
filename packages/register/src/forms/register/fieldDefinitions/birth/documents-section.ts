@@ -65,12 +65,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'birthFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'birthFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'birthAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'birthAttachmentToFieldTransformer'
             }
           }
         },
@@ -92,12 +90,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'birthFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'birthFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'birthAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'birthAttachmentToFieldTransformer'
             }
           }
         },
@@ -115,12 +111,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'birthFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'birthFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'birthAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'birthAttachmentToFieldTransformer'
             }
           }
         },
@@ -149,12 +143,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'birthFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'birthFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'birthAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'birthAttachmentToFieldTransformer'
             }
           }
         },
@@ -181,12 +173,10 @@ export const documentsSection: ISerializedFormSection = {
           conditionals: [conditionals.withIn45Days, conditionals.after5yrs],
           mapping: {
             mutation: {
-              operation: 'birthFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'birthFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'birthAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'birthAttachmentToFieldTransformer'
             }
           }
         },
@@ -212,12 +202,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'birthFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'birthFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'birthAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'birthAttachmentToFieldTransformer'
             }
           }
         }

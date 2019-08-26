@@ -41,12 +41,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'deathFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'deathFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'deathAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'deathAttachmentToFieldTransformer'
             }
           }
         },
@@ -67,12 +65,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'deathFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'deathFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'deathAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'deathAttachmentToFieldTransformer'
             }
           }
         },
@@ -113,12 +109,10 @@ export const documentsSection: ISerializedFormSection = {
           ],
           mapping: {
             mutation: {
-              operation: 'deathFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'deathFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'deathAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'deathAttachmentToFieldTransformer'
             }
           }
         },
@@ -140,12 +134,10 @@ export const documentsSection: ISerializedFormSection = {
           conditionals: [conditionals.deceasedNationIdSelected],
           mapping: {
             mutation: {
-              operation: 'deathFieldToAttachmentTransformer',
-              parameters: []
+              operation: 'deathFieldToAttachmentTransformer'
             },
             query: {
-              operation: 'deathAttachmentToFieldTransformer',
-              parameters: []
+              operation: 'deathAttachmentToFieldTransformer'
             }
           }
         }

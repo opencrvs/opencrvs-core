@@ -12,13 +12,9 @@ import {
   ISerializedFormSection
 } from '@register/forms'
 import { formMessages as messages } from '@register/i18n/messages'
-import { validIDNumber } from '@register/utils/validate'
+
 import { countries } from '@register/forms/countries'
-import {
-  identityNameMapper,
-  identityTypeMapper,
-  deathIdentityOptions
-} from '@register/forms/identity'
+import { deathIdentityOptions } from '@register/forms/identity'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import { conditionals } from '@register/forms/utils'
 
@@ -86,16 +82,16 @@ export const deceasedSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'iDType',
-              labelMapper: identityNameMapper
+              labelMapper: { operation: 'identityNameMapper' }
             },
             type: {
               kind: 'dynamic',
               dependency: 'iDType',
-              typeMapper: identityTypeMapper
+              typeMapper: { operation: 'identityTypeMapper' }
             },
             validate: [
               {
-                validator: validIDNumber,
+                validator: { operation: 'validIDNumber', parameters: [] },
                 dependencies: ['iDType']
               }
             ]
@@ -167,8 +163,8 @@ export const deceasedSection: ISerializedFormSection = {
           validate: [],
           options: countries,
           mapping: {
-            mutation: { operation: 'fieldToArrayTransformer', parameters: [] },
-            query: { operation: 'arrayToFieldTransformer', parameters: [] }
+            mutation: { operation: 'fieldToArrayTransformer' },
+            query: { operation: 'arrayToFieldTransformer' }
           }
         },
         {
@@ -177,7 +173,7 @@ export const deceasedSection: ISerializedFormSection = {
           label: messages.deceasedGivenNames,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -192,7 +188,7 @@ export const deceasedSection: ISerializedFormSection = {
           label: messages.deceasedFamilyName,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -207,7 +203,7 @@ export const deceasedSection: ISerializedFormSection = {
           label: messages.deceasedGivenNamesEng,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -225,7 +221,7 @@ export const deceasedSection: ISerializedFormSection = {
           label: messages.deceasedFamilyNameEng,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -258,7 +254,7 @@ export const deceasedSection: ISerializedFormSection = {
           label: messages.deceasedDateOfBirth,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'isValidBirthDate', parameters: [] }]
+          validate: [{ operation: 'isValidBirthDate' }]
         },
         {
           name: 'maritalStatus',
@@ -512,7 +508,7 @@ export const deceasedSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -565,7 +561,7 @@ export const deceasedSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -830,7 +826,7 @@ export const deceasedSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -885,7 +881,7 @@ export const deceasedSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [

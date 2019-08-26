@@ -102,8 +102,12 @@ export const intlReducer: LoopReducer<IntlState, any> = (
     case offlineActions.READY:
       const languages = action.payload.languages
 
-      const loadedLanguagesState: ILanguageState = Object.fromEntries(
-        languages.map(language => [language.lang, language])
+      const loadedLanguagesState: ILanguageState = languages.reduce(
+        (indexedByLang, language) => ({
+          ...indexedByLang,
+          [language.lang]: language
+        }),
+        {}
       )
 
       const languagesWithLocations = formatLocationLanguageState(

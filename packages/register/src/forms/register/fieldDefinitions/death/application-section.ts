@@ -1,5 +1,4 @@
 import {
-  IFormSection,
   ViewType,
   TEXT,
   SELECT_WITH_OPTIONS,
@@ -12,13 +11,10 @@ import {
   FETCH_BUTTON,
   ISerializedFormSection
 } from '@register/forms'
-import { validIDNumber } from '@register/utils/validate'
+
 import { countries } from '@register/forms/countries'
-import {
-  identityNameMapper,
-  identityTypeMapper,
-  deathIdentityOptions
-} from '@register/forms/identity'
+import { deathIdentityOptions } from '@register/forms/identity'
+
 import { formMessages as messages } from '@register/i18n/messages'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 import { conditionals } from '@register/forms/utils'
@@ -115,16 +111,16 @@ export const applicantsSection: ISerializedFormSection = {
           dynamicDefinitions: {
             label: {
               dependency: 'iDType',
-              labelMapper: identityNameMapper
+              labelMapper: { operation: 'identityNameMapper' }
             },
             type: {
               kind: 'dynamic',
               dependency: 'iDType',
-              typeMapper: identityTypeMapper
+              typeMapper: { operation: 'identityTypeMapper' }
             },
             validate: [
               {
-                validator: validIDNumber,
+                validator: { operation: 'validIDNumber', parameters: [] },
                 dependencies: ['iDType']
               }
             ]
@@ -213,14 +209,14 @@ export const applicantsSection: ISerializedFormSection = {
               operation: 'fieldValueNestingTransformer',
               parameters: [
                 NESTED_SECTION,
-                { operation: 'fieldToArrayTransformer', parameters: [] }
+                { operation: 'fieldToArrayTransformer' }
               ]
             },
             query: {
               operation: 'nestedValueToFieldTransformer',
               parameters: [
                 NESTED_SECTION,
-                { operation: 'arrayToFieldTransformer', parameters: [] }
+                { operation: 'arrayToFieldTransformer' }
               ]
             }
           }
@@ -231,7 +227,7 @@ export const applicantsSection: ISerializedFormSection = {
           label: messages.applicantsGivenNames,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldValueNestingTransformer',
@@ -262,7 +258,7 @@ export const applicantsSection: ISerializedFormSection = {
           label: messages.applicantsFamilyName,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldValueNestingTransformer',
@@ -293,7 +289,7 @@ export const applicantsSection: ISerializedFormSection = {
           label: messages.applicantsGivenNamesEng,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldValueNestingTransformer',
@@ -324,7 +320,7 @@ export const applicantsSection: ISerializedFormSection = {
           label: messages.applicantsFamilyNameEng,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat', parameters: [] }],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
             mutation: {
               operation: 'fieldValueNestingTransformer',
@@ -356,8 +352,8 @@ export const applicantsSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'isValidBirthDate', parameters: [] },
-            { operation: 'isDateInPast', parameters: [] }
+            { operation: 'isValidBirthDate' },
+            { operation: 'isDateInPast' }
           ],
           mapping: {
             mutation: {
@@ -445,7 +441,7 @@ export const applicantsSection: ISerializedFormSection = {
           label: messages.phoneNumber,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'phoneNumberFormat', parameters: [] }],
+          validate: [{ operation: 'phoneNumberFormat' }],
           hidden: true,
           mapping: {
             mutation: {
@@ -459,7 +455,7 @@ export const applicantsSection: ISerializedFormSection = {
               operation: 'nestedValueToFieldTransformer',
               parameters: [
                 NESTED_SECTION,
-                { operation: 'phoneNumberToFieldTransformer', parameters: [] }
+                { operation: 'phoneNumberToFieldTransformer' }
               ]
             }
           }
@@ -785,7 +781,7 @@ export const applicantsSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -865,7 +861,7 @@ export const applicantsSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1270,7 +1266,7 @@ export const applicantsSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1350,7 +1346,7 @@ export const applicantsSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: [
-            { operation: 'numeric', parameters: [] },
+            { operation: 'numeric' },
             { operation: 'maxLength', parameters: [4] }
           ],
           conditionals: [
@@ -1389,7 +1385,7 @@ export const applicantsSection: ISerializedFormSection = {
     }
   ],
   mapping: {
-    mutation: { operation: 'setInformantSectionTransformer', parameters: [] },
-    query: { operation: 'getInformantSectionTransformer', parameters: [] }
+    mutation: { operation: 'setInformantSectionTransformer' },
+    query: { operation: 'getInformantSectionTransformer' }
   }
 }

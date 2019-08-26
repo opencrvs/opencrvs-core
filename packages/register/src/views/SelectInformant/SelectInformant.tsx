@@ -500,6 +500,13 @@ const mapStateToProps = (
   props: RouteComponentProps<{ applicationId: string }>
 ) => {
   const { match } = props
+  console.log(
+    store.applicationsState.applications,
+    store.applicationsState.applications.find(
+      ({ id }) => id === match.params.applicationId
+    )
+  )
+
   return {
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
@@ -521,4 +528,4 @@ export const SelectInformant = withRouter(
       modifyApplication
     }
   )(injectIntl(SelectInformantView))
-) as any
+)

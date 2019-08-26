@@ -19,7 +19,12 @@ import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContai
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { waitForElement } from './wait-for-element'
 import { readFileSync } from 'fs'
-import { IOfflineData } from '@register/offline/reducer'
+
+import { offlineDataReady, setOfflineData } from '@register/offline/actions'
+import { ISerializedForm, Event } from '@register/forms'
+import { Store, AnyAction } from 'redux'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { getReviewForm } from '@register/forms/register/review-selectors'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -103,32 +108,6 @@ export const { intl } = intlProvider.getChildContext()
 
 function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
   return React.cloneElement(node, { intl })
-}
-
-export function createTestComponent(
-  node: React.ReactElement<ITestView>,
-  store: AppStore,
-  graphqlMocks: any = null
-) {
-  const component = mount(
-    <MockedProvider mocks={graphqlMocks} addTypename={false}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider
-            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-          >
-            {nodeWithIntlProp(node)}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </MockedProvider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
-  )
-
-  return { component, store }
 }
 
 export function createShallowRenderedComponent(
@@ -2192,13 +2171,13 @@ export const mockDeathApplicationData = {
   }
 }
 
-export const mockOfflineData: IOfflineData = {
+export const mockOfflineData = {
   forms: {
     registerForm: JSON.parse(
       require('fs')
         .readFileSync('../resources/src/bgd/features/forms/register.json')
         .toString()
-    )
+    ) as { birth: ISerializedForm; death: ISerializedForm }
   },
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
@@ -2435,6 +2414,48 @@ export const mockOfflineData: IOfflineData = {
   ).data
 }
 
+export function createTestComponent(
+  node: React.ReactElement<ITestView>,
+  store: AppStore,
+  graphqlMocks: any = null
+) {
+  /*
+   * Would it work to replace this fn with createTestApp()
+   * call send return only the component that requires testing..
+   *
+   * Feels odd the whole boilerplate has to be recreated
+   */
+
+  store.dispatch(
+    offlineDataReady({
+      languages: mockOfflineData.languages,
+      forms: mockOfflineData.forms,
+      locations: mockOfflineData.locations,
+      facilities: mockOfflineData.facilities
+    })
+  )
+
+  const component = mount(
+    <MockedProvider mocks={graphqlMocks} addTypename={false}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider
+            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
+          >
+            {nodeWithIntlProp(node)}
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    </MockedProvider>,
+    {
+      context: { intl },
+      childContextTypes: { intl: intlShape }
+    }
+  )
+
+  return { component, store }
+}
+
 export const mockDeathApplicationDataWithoutFirstNames = {
   deceased: {
     iDType: 'NATIONAL_ID',
@@ -2598,4 +2619,22 @@ export async function goToMotherSection(component: ReactWrapper) {
 
 export function waitForReady(app: ReactWrapper) {
   return waitForElement(app, '#readyApplication')
+}
+
+export async function getRegisterFormFromStore(
+  store: Store<IStoreState, AnyAction>,
+  event: Event
+) {
+  await store.dispatch(setOfflineData(userDetails))
+  const state = store.getState()
+  return getRegisterForm(state)[event]
+}
+
+export async function getReviewFormFromStore(
+  store: Store<IStoreState, AnyAction>,
+  event: Event
+) {
+  await store.dispatch(setOfflineData(userDetails))
+  const state = store.getState()
+  return getReviewForm(state)![event]
 }
