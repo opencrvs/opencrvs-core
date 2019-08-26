@@ -194,7 +194,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     applicationId: string,
     currentGroup: string,
     nextGroup: string | undefined,
-    event: string,
+    event: Event,
 
     sectionId: string,
     fields: IFormField[],
@@ -253,14 +253,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   goToNextFormForSomeoneElse = (
     applicationId: string,
     application: IApplication,
-    event: string
+    event: Event
   ) => {
-    if (
-      isFreeOfCost(
-        getEvent(event),
-        getEventDate(application.data, getEvent(event))
-      )
-    ) {
+    if (isFreeOfCost(event, getEventDate(application.data, event))) {
       this.props.goToReviewCertificate(applicationId, event)
     } else {
       this.props.goToPrintCertificatePayment(applicationId, event)
@@ -379,7 +374,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 applicationToBeCertified.id,
                 formGroup.id,
                 nextSectionGroup ? nextSectionGroup.groupId : undefined,
-                applicationToBeCertified.event.toLowerCase(),
+                event,
 
                 formSection.id,
                 formGroup.fields,
