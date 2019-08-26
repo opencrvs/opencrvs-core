@@ -221,11 +221,8 @@ export const template: IPDFTemplate = {
       }
     },
     issuedLocation: {
-      transformer: 'LoggedInUserFieldValue',
-      baseData: 'userdetails',
-      payload: {
-        valueKey: 'primaryOffice.name'
-      }
+      transformer: 'LoggedInUserOfficeName',
+      baseData: 'userdetails'
     },
     issuedByLabel: {
       transformer: 'IntlLabel',

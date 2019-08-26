@@ -1,12 +1,15 @@
 import { IFieldTransformer } from '@register/pdfRenderer/transformer/types'
-import { Event } from '@opencrvs/register/src/forms'
+import {
+  Event,
+  IFormData,
+  IFormSectionData,
+  IFormFieldValue
+} from '@opencrvs/register/src/forms'
 import moment from 'moment'
 import { TransformerData } from './types'
+import { IUserDetails, IGQLLocation } from '@register/utils/userUtils'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 
-interface IData {
-  // It's really hard to understand what can be the possible type here
-  [key: string]: any
-}
 const eventMessageDescriptor = {
   [Event.BIRTH]: {
     defaultMessage: 'Birth',
@@ -20,15 +23,19 @@ const eventMessageDescriptor = {
   }
 }
 export function getValueFromApplicationDataByKey(
-  data: IData,
+  data: IFormData,
   valueKey: string
 ) {
   const keyTree: string[] = valueKey.split('.')
 
-  let valueObject: IData | null = null
+  let valueObject: IFormSectionData | IFormFieldValue | null = null
+
   try {
     keyTree.forEach(keyNode => {
-      valueObject = valueObject === null ? data[keyNode] : valueObject[keyNode]
+      valueObject =
+        valueObject === null
+          ? data[keyNode]
+          : (valueObject as IFormSectionData)[keyNode]
     })
   } catch (error) {
     throw new Error(`Given value key structure is not valid: ${valueKey}`)

@@ -27,22 +27,13 @@ export const userTransformers: IFunctionTransformer = {
   },
 
   /*
-    LoggedInUserFieldValue transforms the value for any given key from the userDetails data
-    @params: 
-      - key: Mendatory field. It will be able to traverse through the object structure 
-      and fetch the appropriate value if found otherwise will throw exception. Ex: 'primaryOffice.name'        
+    LoggedInUserOfficeName provides local office name of the loggedIn user.    
   */
-  LoggedInUserFieldValue: (
+  LoggedInUserOfficeName: (
     userDetails: TransformerData,
-    intl: InjectedIntl,
-    payload?: TransformerPayload
+    intl: InjectedIntl
   ) => {
-    const key = payload && (payload as IFeildValuePayload)
-    if (!key) {
-      throw new Error('No payload found for this transformer')
-    }
-
-    return getValueFromApplicationDataByKey(userDetails, key.valueKey)
+    return userDetails.primaryOffice ? userDetails.primaryOffice.name || '' : ''
   },
 
   /*
