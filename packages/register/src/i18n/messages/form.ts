@@ -19,6 +19,7 @@ interface IFormMessages {
   applicantsGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
   applicantsIdType: ReactIntl.FormattedMessage.MessageDescriptor
   applicantsNationality: ReactIntl.FormattedMessage.MessageDescriptor
+  applicantsRelationWithChild: ReactIntl.FormattedMessage.MessageDescriptor
   applicantsRelationWithDeceased: ReactIntl.FormattedMessage.MessageDescriptor
   applicantTitle: ReactIntl.FormattedMessage.MessageDescriptor
   assignedRegisterOffice: ReactIntl.FormattedMessage.MessageDescriptor
@@ -284,6 +285,10 @@ interface IFormMessages {
   userSignatureAttachmentDesc: ReactIntl.FormattedMessage.MessageDescriptor
   addFile: ReactIntl.FormattedMessage.MessageDescriptor
   fileUploadError: ReactIntl.FormattedMessage.MessageDescriptor
+  typeOfId: ReactIntl.FormattedMessage.MessageDescriptor
+  firstName: ReactIntl.FormattedMessage.MessageDescriptor
+  lastName: ReactIntl.FormattedMessage.MessageDescriptor
+  relationship: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -377,6 +382,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality',
     id: 'form.field.label.applicants.nationality'
+  },
+  applicantsRelationWithChild: {
+    defaultMessage: 'Relationship to child',
+    description: 'Label for Relationship to child',
+    id: 'form.field.label.applicantsRelationWithChild'
   },
   applicantsRelationWithDeceased: {
     defaultMessage: 'Relationship to Deceased',
@@ -1727,6 +1737,27 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: '{type} supported only',
     description: 'text for error on file upload',
     id: 'form.field.label.fileUploadError'
+  },
+  typeOfId: {
+    defaultMessage: 'Type of ID',
+    description: "Input label for certificate collector's id type options",
+    id: 'form.field.label.typeOfId'
+  },
+  firstName: {
+    defaultMessage: 'First name',
+    description: "Input label for certificate collector's first name",
+    id: 'form.field.label.firstName'
+  },
+  lastName: {
+    defaultMessage: 'Last name',
+    description: "Input label for certificate collector's last name",
+    id: 'form.field.label.lastName'
+  },
+  relationship: {
+    defaultMessage: 'Relationship',
+    description:
+      "Input label for certificate collector's relationship to the subject",
+    id: 'form.field.label.relationship'
   }
 }
 

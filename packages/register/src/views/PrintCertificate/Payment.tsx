@@ -12,10 +12,10 @@ import {
 import { IStoreState } from '@register/store'
 import { RouteComponentProps } from 'react-router'
 import { Event, IFormData } from '@register/forms'
-import { IApplication } from '@register/applications'
+import { IApplication, modifyApplication } from '@register/applications'
 import { ITheme } from '@register/styledComponents'
 import { connect } from 'react-redux'
-import { calculatePrice, getServiceMessage } from './calculatePrice'
+import { calculatePrice, getServiceMessage, getEventDate } from './utils'
 import { Print } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -71,6 +71,7 @@ interface IProps {
   language: string
   application: IApplication
   theme: ITheme
+  modifyApplication: typeof modifyApplication
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   userDetails: IUserDetails | null
@@ -79,15 +80,36 @@ interface IProps {
 type IFullProps = IProps & InjectedIntlProps
 
 class PaymentComponent extends React.Component<IFullProps> {
-  getEventDate(data: IFormData, event: Event): string {
-    switch (event) {
-      case Event.BIRTH:
-        return data.child.childBirthDate as string
-      case Event.DEATH:
-        return data.deathEvent.deathDate as string
-    }
-  }
-  continue = () => {
+  continue = (paymentAmount: string) => {
+    const { application } = this.props
+    const certificate =
+      (application.data.registration.certificates &&
+        // @ts-ignore
+        application.data.registration.certificates[0]) ||
+      {}
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        registration: {
+          ...application.data.registration,
+          // @ts-ignore
+          certificates: [
+            {
+              ...certificate,
+              payment: {
+                type: 'MANUAL',
+                total: paymentAmount,
+                amount: paymentAmount,
+                outcome: 'COMPLETED',
+                date: Date.now()
+              }
+            }
+          ]
+        }
+      }
+    })
+
     this.props.goToReviewCertificate(
       this.props.registrationId,
       this.props.event
@@ -96,7 +118,7 @@ class PaymentComponent extends React.Component<IFullProps> {
 
   render = () => {
     const { intl, application, event, goBack } = this.props
-    const eventDate = this.getEventDate(application.data, event)
+    const eventDate = getEventDate(application.data, event)
 
     const paymentAmount = calculatePrice(event, eventDate)
 
@@ -132,7 +154,10 @@ class PaymentComponent extends React.Component<IFullProps> {
             </TertiaryButton>
           </GreyBody>
           <Action>
-            <PrimaryButton id="Continue" onClick={this.continue}>
+            <PrimaryButton
+              id="Continue"
+              onClick={() => this.continue(paymentAmount)}
+            >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>
@@ -179,6 +204,7 @@ export const Payment = connect(
   mapStatetoProps,
   {
     goBack: goBackAction,
+    modifyApplication,
     goToReviewCertificate: goToReviewCertificateAction
   }
 )(injectIntl(withTheme(PaymentComponent)))
