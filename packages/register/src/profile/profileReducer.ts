@@ -143,18 +143,17 @@ export const profileReducer: LoopReducer<
     case actions.SET_USER_SIGNATURE:
       const resultData = action.payload && action.payload.data
       const signature = resultData && resultData.getSignature
+      const user = state.userDetails
 
-      if (signature && state.userDetails) {
-        const userDetails = state.userDetails
-        userDetails.signatureData = signature.data
+      if (signature && user && user.role === 'REGISTRATION_AGENT') {
+        user.signatureData = signature.data
 
         return loop(
           {
             ...state,
-            userDetails
+            userDetails: user
           },
-
-          Cmd.run(() => storeUserDetails(userDetails))
+          Cmd.run(() => storeUserDetails(user))
         )
       } else {
         return {
