@@ -2003,7 +2003,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -2021,7 +2021,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -2041,7 +2041,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -2059,7 +2059,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -2077,7 +2077,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
