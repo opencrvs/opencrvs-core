@@ -197,7 +197,7 @@ describe('when user has starts a new application', () => {
             .find('section')
             .children().length
 
-          expect(fileInputs).toEqual(6)
+          expect(fileInputs).toEqual(4)
         })
       })
     })
@@ -247,7 +247,7 @@ describe('when user has starts a new application', () => {
     describe('when user is in document page', () => {
       beforeEach(() => goToDocumentsSection(app))
       it('image upload field is rendered', () => {
-        expect(app.find('#upload_document').hostNodes()).toHaveLength(4)
+        expect(app.find('#upload_document').hostNodes()).toHaveLength(3)
       })
     })
   })
