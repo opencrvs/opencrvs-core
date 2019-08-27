@@ -2090,7 +2090,15 @@ export const mockApplicationData = {
   registration: {
     whoseContactDetails: 'MOTHER',
     presentAtBirthRegistration: 'BOTH_PARENTS',
-    registrationPhone: '01557394986'
+    registrationPhone: '01557394986',
+    registrationNumber: '201908122365BDSS0SE1',
+    regStatus: {
+      type: 'REGISTERED',
+      officeName: 'MokhtarPur',
+      officeAlias: 'মখতারপুর',
+      officeAddressLevel3: 'Gazipur',
+      officeAddressLevel4: 'Dhaka'
+    }
   }
 }
 
@@ -2188,6 +2196,17 @@ export const mockDeathApplicationData = {
         description: 'National ID (front)'
       }
     ]
+  },
+  registration: {
+    registrationPhone: '01557394986',
+    registrationNumber: '201908122365DDSS0SE1',
+    regStatus: {
+      type: 'REGISTERED',
+      officeName: 'MokhtarPur',
+      officeAlias: 'মখতারপুর',
+      officeAddressLevel3: 'Gazipur',
+      officeAddressLevel4: 'Dhaka'
+    }
   }
 }
 
