@@ -367,6 +367,7 @@ export interface GQLRelatedPerson {
   _fhirID?: string
   relationship?: GQLRelationshipType
   otherRelationship?: string
+  affidavit?: Array<GQLAttachment | null>
   individual?: GQLPerson
 }
 
@@ -780,6 +781,7 @@ export interface GQLRelatedPersonInput {
   _fhirID?: string
   relationship?: GQLRelationshipType
   otherRelationship?: string
+  affidavit?: Array<GQLAttachmentInput | null>
   individual?: GQLPersonInput
 }
 
@@ -2116,6 +2118,7 @@ export interface GQLRelatedPersonTypeResolver<TParent = any> {
   _fhirID?: RelatedPersonTo_fhirIDResolver<TParent>
   relationship?: RelatedPersonToRelationshipResolver<TParent>
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
+  affidavit?: RelatedPersonToAffidavitResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
 }
 
@@ -2135,6 +2138,13 @@ export interface RelatedPersonToRelationshipResolver<
 }
 
 export interface RelatedPersonToOtherRelationshipResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonToAffidavitResolver<
   TParent = any,
   TResult = any
 > {
