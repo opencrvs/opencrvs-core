@@ -151,6 +151,7 @@ export type IFormFieldValue =
   | IFileValue[]
   | { [key: string]: string }
   | IAttachmentValue
+  | ICertificate[]
 
 export interface IFileValue {
   optionValues: IFormFieldValue[]
@@ -874,6 +875,10 @@ export interface IFormSectionData {
 
 export interface IFormData {
   [key: string]: IFormSectionData
+}
+
+export interface ICertificate {
+  [key: string]: IFormSectionData | IFormFieldValue
 }
 
 export interface IAttachment {
