@@ -643,5 +643,10 @@ export const FormFieldGenerator = withFormik<
     console.log(values)
   },
   validate: (values, props: IFormSectionProps) =>
-    getValidationErrorsForForm(props.fields, values, props.offlineResources)
+    getValidationErrorsForForm(
+      props.fields,
+      values,
+      props.offlineResources,
+      props.draftData
+    )
 })(injectIntl(FormSectionComponent))
