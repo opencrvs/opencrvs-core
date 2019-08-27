@@ -268,7 +268,11 @@ export const template: IPDFTemplate = {
       field: 'issuedDate',
       operation: 'DateFieldValue',
       parameters: {
-        format: 'DD.MM.YYYY'
+        format: 'DD.MM.YYYY',
+        momentLocale: {
+          en: 'locale/en-ie',
+          bn: 'locale/bn'
+        }
       }
     }
   ]

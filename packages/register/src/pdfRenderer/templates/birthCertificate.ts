@@ -332,7 +332,10 @@ export const template: IPDFTemplate = {
       operation: 'DateFieldValue',
       parameters: {
         format: 'DD MMMM YYYY',
-        language: 'en'
+        language: 'en',
+        momentLocale: {
+          en: 'locale/en-ie'
+        }
       }
     },
     {
@@ -340,7 +343,10 @@ export const template: IPDFTemplate = {
       operation: 'DateFieldValue',
       parameters: {
         format: 'DD MMMM YYYY',
-        language: 'bn'
+        language: 'bn',
+        momentLocale: {
+          bn: 'locale/bn'
+        }
       }
     },
     {
@@ -377,7 +383,10 @@ export const template: IPDFTemplate = {
           birth: 'child.childBirthDate'
         },
         format: 'DD MMMM YYYY',
-        language: 'en'
+        language: 'en',
+        momentLocale: {
+          en: 'locale/en-ie'
+        }
       }
     },
     {
@@ -388,7 +397,10 @@ export const template: IPDFTemplate = {
           birth: 'child.childBirthDate'
         },
         format: 'DD MMMM YYYY',
-        language: 'bn'
+        language: 'bn',
+        momentLocale: {
+          bn: 'locale/bn'
+        }
       }
     },
     {

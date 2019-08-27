@@ -65,6 +65,9 @@ export interface IDateFeildValuePayload {
   }
   format: string
   language?: string
+  momentLocale?: {
+    [language: string]: string // bn: 'locale/bn'
+  }
 }
 
 export interface IFormattedFeildValuePayload {

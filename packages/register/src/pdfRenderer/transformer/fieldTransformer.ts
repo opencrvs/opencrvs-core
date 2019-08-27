@@ -131,7 +131,11 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!dateValue) {
       return null
     }
-    moment.locale(formatPayload.language ? formatPayload.language : intl.locale)
+    const locale = formatPayload.language ? formatPayload.language : intl.locale
+    if (formatPayload.momentLocale && formatPayload.momentLocale[locale]) {
+      require(`moment/${formatPayload.momentLocale[locale]}`)
+    }
+    moment.locale(locale)
     return moment(dateValue).format(formatPayload.format)
   },
 
