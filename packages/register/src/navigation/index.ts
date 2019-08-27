@@ -27,6 +27,7 @@ import {
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
+import { Event } from '@register/forms'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -207,11 +208,11 @@ export function goToPrintCertificate(
   )
 }
 
-export function goToReviewCertificate(registrationId: string, event: string) {
+export function goToReviewCertificate(registrationId: string, event: Event) {
   return push(
     formatUrl(REVIEW_CERTIFICATE, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString()
+      eventType: event
     })
   )
 }
@@ -232,12 +233,12 @@ export function goToVerifyCollector(
 
 export function goToPrintCertificatePayment(
   registrationId: string,
-  event: string
+  event: Event
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString()
+      eventType: event
     })
   )
 }

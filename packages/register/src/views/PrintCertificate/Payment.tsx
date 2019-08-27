@@ -11,7 +11,7 @@ import {
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
 import { RouteComponentProps } from 'react-router'
-import { Event, IFormData } from '@register/forms'
+import { Event, IFormData, ICertificate } from '@register/forms'
 import { IApplication, modifyApplication } from '@register/applications'
 import { ITheme } from '@register/styledComponents'
 import { connect } from 'react-redux'
@@ -82,18 +82,17 @@ type IFullProps = IProps & InjectedIntlProps
 class PaymentComponent extends React.Component<IFullProps> {
   continue = (paymentAmount: string) => {
     const { application } = this.props
-    const certificate =
-      (application.data.registration.certificates &&
-        // @ts-ignore
-        application.data.registration.certificates[0]) ||
-      {}
+    const certificates =
+      (application &&
+        (application.data.registration.certificates as ICertificate[])) ||
+      null
+    const certificate = (certificates && certificates[0]) || {}
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          // @ts-ignore
           certificates: [
             {
               ...certificate,
