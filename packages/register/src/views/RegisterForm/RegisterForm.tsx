@@ -35,7 +35,7 @@ import {
 import { toggleDraftSavedNotification } from '@register/notification/actions'
 
 import { HOME } from '@register/navigation/routes'
-import { getOfflineData } from '@register/offline/selectors'
+
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled, { keyframes } from '@register/styledComponents'
@@ -58,7 +58,6 @@ import {
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
 } from '@register/utils/constants'
-import { IOfflineData } from '@register/offline/reducer'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -169,7 +168,6 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
-  offlineResources: IOfflineData
 }
 
 export type FullProps = IFormProps &
@@ -335,7 +333,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       setAllFieldsDirty,
       application,
       registerForm,
-      offlineResources,
       handleSubmit,
       duplicate,
       activeSection,
@@ -521,7 +518,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={getVisibleGroupFields(activeSectionGroup)}
-                      resources={offlineResources}
                       draftData={application.data}
                     />
                   </form>
@@ -647,13 +643,10 @@ function mapStateToProps(
     application.data[activeSection.id] || {}
   )
 
-  const offlineResources = getOfflineData(state)
-
   return {
     registerForm,
     scope: getScope(state),
     setAllFieldsDirty,
-    offlineResources,
     activeSection,
     activeSectionGroup: {
       ...activeSectionGroup,

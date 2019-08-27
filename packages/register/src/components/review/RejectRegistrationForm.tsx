@@ -18,8 +18,6 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { goToSearchResult } from '@register/navigation'
 import { buttonMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/reject'
-import { getOfflineData } from '@register/offline/selectors'
-import { IOfflineData } from '@register/offline/reducer'
 
 const FormContainer = styled.div`
   padding: 35px 25px;
@@ -48,7 +46,6 @@ interface IProps {
   application: IApplication
   event: Event
   duplicate?: boolean
-  resources: IOfflineData
   onBack: () => void
   confirmRejectionEvent: (
     application: IApplication,
@@ -107,8 +104,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
       form,
       intl,
       confirmRejectionEvent,
-      duplicate,
-      resources
+      duplicate
     } = this.props
     const payload = this.processSubmitData()
     const { fields } = form
@@ -133,7 +129,6 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               <FormFieldGenerator
                 id="reject_form"
                 fields={fields}
-                resources={resources}
                 onChange={this.storeData}
                 setAllFieldsDirty={false}
               />
@@ -163,7 +158,6 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
 export const RejectRegistrationForm = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
-    resources: getOfflineData(state),
     form: getRejectForm(state)
   }),
   {

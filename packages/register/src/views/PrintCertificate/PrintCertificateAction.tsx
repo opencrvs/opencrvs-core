@@ -969,7 +969,6 @@ class PrintCertificateActionComponent extends React.Component<
                         <Box>
                           <FormFieldGenerator
                             id={form.id}
-                            resources={offlineResources}
                             onChange={this.storeData}
                             setAllFieldsDirty={false}
                             fields={form.groups[0].fields}

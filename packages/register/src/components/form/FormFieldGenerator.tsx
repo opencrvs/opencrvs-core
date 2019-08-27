@@ -93,6 +93,9 @@ import { IOfflineData } from '@register/offline/reducer'
 import { isEqual } from 'lodash'
 import { IValidationResult } from '@register/utils/validate'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
+import { IStoreState } from '@register/store'
+import { getOfflineData } from '@register/offline/selectors'
+import { connect } from 'react-redux'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -120,7 +123,6 @@ type GeneratedInputFieldProps = {
   resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
-
   error: string
 }
 
@@ -396,13 +398,17 @@ interface IFormSectionProps {
   fields: IFormField[]
   id: string
   setAllFieldsDirty: boolean
-  resources: IOfflineData
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
 }
 
+interface IStateProps {
+  resources: IOfflineData
+}
+
 type Props = IFormSectionProps &
+  IStateProps &
   FormikProps<IFormSectionData> &
   InjectedIntlProps
 
@@ -638,14 +644,26 @@ class FormSectionComponent extends React.Component<Props> {
   }
 }
 
-export const FormFieldGenerator = withFormik<
-  IFormSectionProps,
+const FormFieldGeneratorWithFormik = withFormik<
+  IFormSectionProps & IStateProps,
   IFormSectionData
 >({
   mapPropsToValues: props => mapFieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)
   },
-  validate: (values, props: IFormSectionProps) =>
-    getValidationErrorsForForm(props.fields, values)
+  validate: (values, props: IFormSectionProps & IStateProps) =>
+    getValidationErrorsForForm(
+      props.fields,
+      values,
+      props.resources,
+      props.draftData
+    )
 })(injectIntl(FormSectionComponent))
+
+export const FormFieldGenerator = connect(
+  (state: IStoreState, ownProps: IFormSectionProps) => ({
+    ...ownProps,
+    resources: getOfflineData(state)
+  })
+)(FormFieldGeneratorWithFormik)

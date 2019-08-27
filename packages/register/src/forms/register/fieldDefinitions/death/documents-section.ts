@@ -13,7 +13,6 @@ export const documentsSection: ISerializedFormSection = {
   viewType: 'form' as ViewType,
   name: messages.documentsName,
   title: messages.documentsTitle,
-  optional: true,
   groups: [
     {
       id: 'documents-view-group',
@@ -21,7 +20,7 @@ export const documentsSection: ISerializedFormSection = {
         {
           name: 'paragraph',
           type: PARAGRAPH,
-          label: messages.paragraph,
+          label: messages.deceasedParagraph,
           initialValue: '',
           validate: []
         },

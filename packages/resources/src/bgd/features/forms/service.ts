@@ -1,5 +1,6 @@
-const register = require('./register.json')
+import { createReadStream } from 'fs'
+import { join } from 'path'
 
-export async function getForms(): Promise<{}> {
-  return { ...register }
+export function getForms() {
+  return createReadStream(join(__dirname, './register.json'))
 }

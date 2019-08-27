@@ -1926,6 +1926,72 @@ const builders: IFieldBuilders = {
             )
           }
         },
+        affidavit: {
+          contentType: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const relatedPersonResource = selectOrCreateRelatedPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            if (!relatedPersonResource.extension) {
+              relatedPersonResource.extension = []
+            }
+            const hasAffidavit = relatedPersonResource.extension.find(
+              extention =>
+                extention.url ===
+                `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
+            )
+            if (!hasAffidavit) {
+              relatedPersonResource.extension.push({
+                url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                valueAttachment: {
+                  contentType: fieldValue
+                }
+              })
+            } else {
+              hasAffidavit.valueAttachment = {
+                ...hasAffidavit.valueAttachment,
+                contentType: fieldValue
+              }
+            }
+          },
+          data: (
+            fhirBundle: ITemplatedBundle,
+            fieldValue: string,
+            context: any
+          ) => {
+            const relatedPersonResource = selectOrCreateRelatedPersonResource(
+              fhirBundle,
+              context,
+              context.event
+            )
+            if (!relatedPersonResource.extension) {
+              relatedPersonResource.extension = []
+            }
+            const hasAffidavit = relatedPersonResource.extension.find(
+              extention =>
+                extention.url ===
+                `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
+            )
+            if (!hasAffidavit) {
+              relatedPersonResource.extension.push({
+                url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
+                valueAttachment: {
+                  data: fieldValue
+                }
+              })
+            } else {
+              hasAffidavit.valueAttachment = {
+                ...hasAffidavit.valueAttachment,
+                data: fieldValue
+              }
+            }
+          }
+        },
         /* expecting value for this only when other is selected as relationship */
         individual: {
           identifier: {
@@ -1937,7 +2003,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -1955,7 +2021,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -1975,7 +2041,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -1993,7 +2059,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,
@@ -2011,7 +2077,7 @@ const builders: IFieldBuilders = {
               const person = selectOrCreateCollectorPersonResource(
                 fhirBundle,
                 context,
-                EVENT_TYPE.BIRTH
+                context.event
               )
               setObjectPropInResourceArray(
                 person,

@@ -36,7 +36,7 @@ import {
   ILocation,
   IOfflineData
 } from '@register/offline/reducer'
-import { Validation } from '@register/utils/validate'
+import { Validation, IValidationResult } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 
@@ -386,9 +386,9 @@ export const hasFormError = (
 ): boolean => {
   const errors = getValidationErrorsForForm(fields, values)
 
-  const fieldListWithErrors = Object.keys(errors).filter(key => {
-    return errors[key] && errors[key].length > 0
-  })
+  const fieldListWithErrors = Object.values(errors).filter(
+    error => (error as IValidationResult[]).length > 0
+  )
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 

@@ -38,6 +38,7 @@ import {
   INFORMANT_FIELD_STRING
 } from '@register/utils/constants'
 import { messages } from '@register/i18n/messages/views/selectInformant'
+import { constantsMessages } from '@register/i18n/messages/constants'
 import {
   validationMessages,
   formMessages,
@@ -408,10 +409,23 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       ? Event.BIRTH
       : Event.DEATH
     const infornantFields = setInformantFields(intl, event)
+
+    let titleMessage
+    switch (event) {
+      case Event.BIRTH:
+        titleMessage = constantsMessages.newBirthRegistration
+        break
+      case Event.DEATH:
+        titleMessage = constantsMessages.newDeathRegistration
+        break
+      default:
+        titleMessage = constantsMessages.newBirthRegistration
+    }
+
     return (
       <Container>
         <EventTopBar
-          title={intl.formatMessage(messages.newBirthRegistration)}
+          title={intl.formatMessage(titleMessage)}
           goHome={this.props.goToHome}
         />
 

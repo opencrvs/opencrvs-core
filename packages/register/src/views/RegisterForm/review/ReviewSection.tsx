@@ -81,6 +81,7 @@ import {
   deathSectionTitle
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { IValidationResult } from '@register/utils/validate'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -139,7 +140,7 @@ const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
-  margin-top: 48px;
+  margin-top: 56px;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
@@ -291,14 +292,17 @@ const getErrorsOnFieldsBySection = (
 
     const errors = getValidationErrorsForForm(
       fields,
-      draft.data[section.id] || {}
+      draft.data[section.id] || {},
+      undefined,
+      draft.data
     )
 
     return {
       ...sections,
       [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
-        const validationErrors = errors[field.name]
+        const validationErrors: IValidationResult[] =
+          errors[field.name as keyof typeof errors]
 
         const value = draft.data[section.id]
           ? draft.data[section.id][field.name]

@@ -2,7 +2,8 @@ import { required, IValidationResult } from '@register/utils/validate'
 import {
   IFormField,
   IFormSectionData,
-  IDynamicFormField
+  IDynamicFormField,
+  IFormData
 } from '@register/forms'
 import {
   getConditionalActionsForField,
@@ -13,13 +14,15 @@ import { IOfflineData } from '@register/offline/reducer'
 export function getValidationErrorsForField(
   field: IFormField,
   values: IFormSectionData,
-  resources?: IOfflineData
+  resources?: IOfflineData,
+  drafts?: IFormData
 ) {
   const value = values[field.name]
   const conditionalActions = getConditionalActionsForField(
     field,
     values,
-    resources
+    resources,
+    drafts
   )
   if (conditionalActions.includes('hide')) {
     return []
@@ -36,18 +39,25 @@ export function getValidationErrorsForField(
   }
 
   return validators
-    .map(validator => validator(value))
+    .map(validator => validator(value, drafts))
     .filter(error => error !== undefined) as IValidationResult[]
 }
 
-export type Errors = { [key: string]: string }
+export type Errors = { [key: string]: IValidationResult[] }
 
 export function getValidationErrorsForForm(
   fields: IFormField[],
-  values: IFormSectionData
-): { [key: string]: IValidationResult[] } {
+  values: IFormSectionData,
+  resource?: IOfflineData,
+  drafts?: IFormData
+) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
-    const validationErrors = getValidationErrorsForField(field, values)
+    const validationErrors = getValidationErrorsForField(
+      field,
+      values,
+      resource,
+      drafts
+    )
     return {
       ...errorsForAllFields,
       [field.name]: validationErrors

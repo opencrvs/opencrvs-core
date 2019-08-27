@@ -34,7 +34,6 @@
     "lodash": "^4.17.10",
     "logrocket": "^0.6.19",
     "moment": "^2.22.2",
-    "nock": "^10.0.6",
     "patch-package": "^6.1.2",
     "pdfmake": "^0.1.40",
     "postinstall-postinstall": "^2.0.0",

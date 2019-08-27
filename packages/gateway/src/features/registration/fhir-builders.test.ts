@@ -140,6 +140,10 @@ test('should build a minimal FHIR registration document without error', async ()
           {
             collector: {
               relationship: 'OTHER',
+              affidavit: {
+                contentType: 'image/jpg',
+                data: 'ExampleData'
+              },
               individual: {
                 name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
                 identifier: [{ id: '123456', type: 'PASSPORT' }]
@@ -464,6 +468,17 @@ test('should build a minimal FHIR registration document without error', async ()
       attachment: {
         contentType: 'application/pdf',
         data: 'DUMMY-DATA'
+      }
+    }
+  ])
+
+  //  Affidavit checking
+  expect(fhir.entry[9].resource.extension).toEqual([
+    {
+      url: 'http://opencrvs.org/specs/extension/relatedperson-affidavittype',
+      valueAttachment: {
+        contentType: 'image/jpg',
+        data: 'ExampleData'
       }
     }
   ])

@@ -1,6 +1,6 @@
 import { FormattedMessage, MessageValue } from 'react-intl'
 import { validationMessages as messages } from '@register/i18n/messages'
-import { IFormFieldValue } from '@opencrvs/register/src/forms'
+import { IFormFieldValue, IFormData } from '@opencrvs/register/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_ALPHA_NUMERIC,
@@ -32,7 +32,9 @@ export type MaxLengthValidation = (
 ) => (value: IFormFieldValue) => IValidationResult | undefined
 
 export type Validation = (
-  value: IFormFieldValue
+  value: IFormFieldValue,
+  drafts?: IFormData,
+  maruf?: number
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -192,6 +194,10 @@ export const dateFormat: Validation = (value: IFormFieldValue) => {
 
 export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(new Date())
+}
+
+export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
+  return new Date(date) >= new Date(JSON.stringify(drafts.deceased.birthDate))
 }
 
 export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
@@ -480,10 +486,14 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
 }
 
 export const isValidDeathOccurrenceDate: Validation = (
-  value: IFormFieldValue
+  value: IFormFieldValue,
+  drafts
 ) => {
   const cast = value as string
-  return value && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+  return value &&
+    isDateNotInFuture(cast) &&
+    isAValidDateFormat(cast) &&
+    isDateNotBeforeBirth(cast, drafts as IFormData)
     ? undefined
     : {
         message: messages.isValidDateOfDeath

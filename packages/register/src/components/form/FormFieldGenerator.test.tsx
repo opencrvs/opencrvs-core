@@ -1,9 +1,5 @@
 import * as React from 'react'
-import {
-  createTestComponent,
-  selectOption,
-  mockOfflineData
-} from '@register/tests/util'
+import { createTestComponent, selectOption } from '@register/tests/util'
 import { FormFieldGenerator } from '@register/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createApplication, storeApplication } from '@register/applications'
@@ -34,7 +30,6 @@ describe('form component', () => {
       id="mother"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      resources={mockOfflineData}
       fields={[
         {
           name: 'countryPermanent',
@@ -135,7 +130,6 @@ describe('form component registration section', () => {
       id="registration"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      resources={mockOfflineData}
       fields={[
         {
           name: 'registrationPhone',

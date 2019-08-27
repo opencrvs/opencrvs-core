@@ -63,7 +63,6 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
     window.config.RESOURCES_URL,
     `${window.config.COUNTRY}/facilities`
   )
-
   const res = await fetch(url, {
     method: 'GET',
     headers: {
