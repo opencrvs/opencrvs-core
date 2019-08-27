@@ -363,4 +363,13 @@ describe('User type resolvers', () => {
       data: signatureData
     })
   })
+
+  it('return null as user signature for field agent', async () => {
+    const userResponse = mockResponse
+    userResponse.scope = ['declare']
+
+    const response = await userTypeResolvers.User.signature(userResponse)
+
+    expect(response).toEqual(null)
+  })
 })
