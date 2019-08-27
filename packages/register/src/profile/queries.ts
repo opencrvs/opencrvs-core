@@ -29,18 +29,14 @@ export const FETCH_USER = gql`
         name
         status
       }
+      signature {
+        data
+        type
+      }
     }
   }
 `
 
-export const FETCH_USER_SIGNATURE = gql`
-  query($locationId: String!) {
-    getSignature(locationId: $locationId) {
-      data
-      type
-    }
-  }
-`
 async function fetchUserDetails(userId: string) {
   return (
     client &&
@@ -51,17 +47,6 @@ async function fetchUserDetails(userId: string) {
   )
 }
 
-async function fetchUserSignature(locationId: string) {
-  return (
-    client &&
-    client.query({
-      query: FETCH_USER_SIGNATURE,
-      variables: { locationId }
-    })
-  )
-}
-
 export const queries = {
-  fetchUserDetails,
-  fetchUserSignature
+  fetchUserDetails
 }

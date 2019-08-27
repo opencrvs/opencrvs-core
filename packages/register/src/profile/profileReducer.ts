@@ -117,47 +117,15 @@ export const profileReducer: LoopReducer<
             userDetailsFetched: true,
             userDetails
           },
-          Cmd.list(
-            [
-              Cmd.run(() => storeUserDetails(userDetails)),
-              Cmd.action(offlineActions.setOfflineData(userDetails)),
-              Cmd.run(queries.fetchUserSignature, {
-                successActionCreator: actions.setUserSignature,
-                args: [
-                  userDetails.primaryOffice && userDetails.primaryOffice.id
-                ]
-              })
-            ],
-            {
-              sequence: true
-            }
-          )
+          Cmd.list([
+            Cmd.run(() => storeUserDetails(userDetails)),
+            Cmd.action(offlineActions.setOfflineData(userDetails))
+          ])
         )
       } else {
         return {
           ...state,
           userDetailsFetched: false
-        }
-      }
-
-    case actions.SET_USER_SIGNATURE:
-      const resultData = action.payload && action.payload.data
-      const signature = resultData && resultData.getSignature
-      const user = state.userDetails
-
-      if (signature && user && user.role === 'REGISTRATION_AGENT') {
-        user.signatureData = signature.data
-
-        return loop(
-          {
-            ...state,
-            userDetails: user
-          },
-          Cmd.run(() => storeUserDetails(user))
-        )
-      } else {
-        return {
-          ...state
         }
       }
     case actions.MODIFY_USER_DETAILS:
