@@ -201,11 +201,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     if (!draft) return
 
     const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
-    const errLength = flatten(
-      // @ts-ignore
-      Object.values(errors).map(Object.values)
-      // @ts-ignore
-    ).filter(errs => errs.length > 0).length
+    const errorValues = Object.values(errors).map(Object.values)
+    const errLength = flatten(errorValues).filter(errs => errs.length > 0)
+      .length
 
     const certificates =
       (draft.data.registration.certificates as ICertificate[]) || null
@@ -328,8 +326,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 )
               }
               if (data) {
-                // @ts-ignore
-                const retrievedData = data[dataKey]
+                const retrievedData = data[dataKey as keyof typeof data]
                 const transformedData: IFormData = gqlToDraftTransformer(
                   registerForm,
                   retrievedData
