@@ -292,7 +292,9 @@ const getErrorsOnFieldsBySection = (
 
     const errors = getValidationErrorsForForm(
       fields,
-      draft.data[section.id] || {}
+      draft.data[section.id] || {},
+      undefined,
+      draft.data
     )
 
     return {
