@@ -1,4 +1,7 @@
-import { printMoneyReceipt } from '@register/views/PrintCertificate/PDFUtils'
+import {
+  printMoneyReceipt,
+  printCertificate
+} from '@register/views/PrintCertificate/PDFUtils'
 import {
   mockApplicationData,
   userDetails,
@@ -6,6 +9,7 @@ import {
 } from '@register/tests/util'
 import { IntlProvider } from 'react-intl'
 import { Event } from '@register/forms'
+import { omit } from 'lodash'
 
 const intlProvider = new IntlProvider(
   {
@@ -20,7 +24,7 @@ const { intl } = intlProvider.getChildContext()
 
 describe('PDFUtils related tests', () => {
   it('Print from money receipt template for birth event', () => {
-    expect(
+    expect(() =>
       printMoneyReceipt(
         intl,
         {
@@ -30,10 +34,10 @@ describe('PDFUtils related tests', () => {
         },
         userDetails
       )
-    ).toBeUndefined()
+    ).not.toThrowError()
   })
   it('Print from money receipt template for death event', () => {
-    expect(
+    expect(() =>
       printMoneyReceipt(
         intl,
         {
@@ -43,6 +47,22 @@ describe('PDFUtils related tests', () => {
         },
         userDetails
       )
-    ).toBeUndefined()
+    ).not.toThrowError()
+  })
+  it('Throws exception if invalid key is provided', () => {
+    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    expect(() =>
+      printCertificate(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: deathApplication,
+          event: Event.DEATH
+        },
+        userDetails
+      )
+    ).toThrowError(
+      'Given value key structure is not valid: deathEvent.deathDate'
+    )
   })
 })

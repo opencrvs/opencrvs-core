@@ -1,12 +1,15 @@
 import { InjectedIntl } from 'react-intl'
 import {
   getValueFromApplicationDataByKey,
-  getEventMessageDescription
+  getEventMessageDescription,
+  getExecutorFieldValue
 } from '@register/pdfRenderer/transformer/utils'
 import {
   IIntLabelPayload,
+  IConditionExecutorPayload,
   IApplicantNamePayload,
   IFeildValuePayload,
+  INumberFeildConversionPayload,
   IDateFeildValuePayload,
   IFunctionTransformer,
   TransformerData,
@@ -128,9 +131,7 @@ export const fieldTransformers: IFunctionTransformer = {
           formatPayload.key[application.event]
         )
       : Date.now()
-    if (!dateValue) {
-      return null
-    }
+
     const locale = formatPayload.language ? formatPayload.language : intl.locale
     if (formatPayload.momentLocale && formatPayload.momentLocale[locale]) {
       require(`moment/${formatPayload.momentLocale[locale]}`)
@@ -168,6 +169,73 @@ export const fieldTransformers: IFunctionTransformer = {
     let value = key.formattedKeys
     Object.keys(keyValues).forEach(key => {
       value = value.replace(new RegExp(`${key}`, 'g'), keyValues[key] || '')
+    })
+    return value
+  },
+
+  /*
+    ConditionExecutor allows us to run provided conditions on given from and to fields
+    From/To fields can be a key from the application data or can be ExecutorKey type.
+    ExecutorKey type allows us to define different type of default data. Ex: CURRENT_DATE
+    Conditions is an array of type, minDiff, maxDiff and output
+    Based on matched condition, this transformer will render the result based on output type 
+  */
+  ConditionExecutor: (
+    application: TransformerData,
+    intl: InjectedIntl,
+    payload?: TransformerPayload
+  ) => {
+    const params = payload && (payload as IConditionExecutorPayload)
+    if (!params) {
+      throw new Error('No payload found for this transformer')
+    }
+    const fromValue = getExecutorFieldValue(params.fromKey, application)
+    const toValue = getExecutorFieldValue(params.toKey, application)
+
+    let value = null
+    params.conditions.forEach(condition => {
+      if (condition.type === 'COMPARE_DATE_IN_DAYS') {
+        const diffInDays = moment(toValue).diff(moment(fromValue), 'days')
+        if (
+          diffInDays >= condition.minDiff &&
+          diffInDays <= condition.maxDiff
+        ) {
+          value = fieldTransformers.IntlLabel(
+            application,
+            intl,
+            condition.output
+          )
+        }
+      }
+    })
+    return value
+  },
+
+  /*
+    NumberConversion allows us to convert any number to given format
+    @params:
+     - valueKey: Mendatory field. It will be able to traverse through the object structure 
+      and fetch the appropriate value if found otherwise will throw exception. Ex: 'registration.registrationNumber'
+     - conversionMap: Mendatory field. ex: { 0: '০', 1: '১'}   
+  */
+  NumberConversion: (
+    application: TransformerData,
+    intl: InjectedIntl,
+    payload?: TransformerPayload
+  ) => {
+    const params = payload && (payload as INumberFeildConversionPayload)
+    if (!params) {
+      throw new Error('No payload found for this transformer')
+    }
+    let value = getValueFromApplicationDataByKey(
+      application.data,
+      params.valueKey
+    ) as string
+    Object.keys(params.conversionMap).forEach(number => {
+      value = value.replace(
+        new RegExp(number, 'g'),
+        params.conversionMap[number]
+      )
     })
     return value
   }

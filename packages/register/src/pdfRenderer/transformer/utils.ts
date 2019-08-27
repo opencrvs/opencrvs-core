@@ -1,4 +1,8 @@
-import { IFieldTransformer } from '@register/pdfRenderer/transformer/types'
+import {
+  IFieldTransformer,
+  ExecutorKey,
+  IEventWiseKey
+} from '@register/pdfRenderer/transformer/types'
 import {
   Event,
   IFormData,
@@ -7,8 +11,7 @@ import {
 } from '@opencrvs/register/src/forms'
 import moment from 'moment'
 import { TransformerData } from './types'
-import { IUserDetails, IGQLLocation } from '@register/utils/userUtils'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { IApplication } from '@register/applications'
 
 const eventMessageDescriptor = {
   [Event.BIRTH]: {
@@ -60,22 +63,25 @@ export function getEventMessageDescription(
   return eventMessageDescriptor[event]
 }
 
-export function getEventDifference(application: TransformerData) {
-  let eventDate
-  if (application.event === Event.BIRTH) {
-    eventDate = application.data.child.childBirthDate as string
-  } else if (application.event === Event.DEATH) {
-    eventDate = application.data.deathEvent.deathDate as string
+export function getExecutorKeyValue(key: ExecutorKey) {
+  if (key === 'CURRENT_DATE') {
+    return Date.now()
   }
-  if (!eventDate) {
-    throw new Error(`No event date found for given event: ${application.event}`)
-  }
-  const eventAgeInDays = moment(Date.now()).diff(moment(eventDate), 'days')
-  if (eventAgeInDays <= 45) {
-    return '45d-'
-  } else if (eventAgeInDays > 1825) {
-    return '5y+'
+  throw new Error('Invalid executor key found')
+}
+
+export function getExecutorFieldValue(
+  key: ExecutorKey | IEventWiseKey,
+  application: IApplication
+) {
+  let value = null
+  if (typeof key === 'string') {
+    value = getExecutorKeyValue(key as ExecutorKey)
   } else {
-    return '45d+'
+    value = getValueFromApplicationDataByKey(
+      application.data,
+      (key as IEventWiseKey)[application.event]
+    )
   }
+  return value
 }

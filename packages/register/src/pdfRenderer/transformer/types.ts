@@ -16,11 +16,12 @@ export interface IPDFTemplate {
 
 export type TransformerPayload =
   | IIntLabelPayload
-  | IConditionalIntLabelPayload
+  | IConditionExecutorPayload
   | IApplicantNamePayload
   | IFeildValuePayload
   | IDateFeildValuePayload
   | IFormattedFeildValuePayload
+  | INumberFeildConversionPayload
 
 export interface IFieldTransformer {
   field: string
@@ -42,9 +43,6 @@ export interface IIntLabelPayload {
   messageValues?: { [valueKey: string]: string }
 }
 
-export interface IConditionalIntLabelPayload {
-  [option: string]: ReactIntl.FormattedMessage.MessageDescriptor
-}
 export interface IApplicantNamePayload {
   key: {
     [event: string]: string // data key: data.child || data.deceased
@@ -72,4 +70,29 @@ export interface IDateFeildValuePayload {
 
 export interface IFormattedFeildValuePayload {
   formattedKeys: string // ex: {child.firstName}, {child.lastName}
+}
+
+export interface INumberFeildConversionPayload {
+  valueKey: string // ex: child.dob
+  conversionMap: { [key: string]: string } // { 0: '০', 1: '১'}
+}
+
+// Based on the need, add more here
+export type ExecutorKey = 'CURRENT_DATE'
+
+export interface IEventWiseKey {
+  [event: string]: string // {birth: child.dob}
+}
+// Based on the need, add more here
+export type ConditionType = 'COMPARE_DATE_IN_DAYS'
+
+export interface IConditionExecutorPayload {
+  fromKey: IEventWiseKey | ExecutorKey
+  toKey: IEventWiseKey | ExecutorKey
+  conditions: {
+    type: ConditionType
+    minDiff: number
+    maxDiff: number
+    output: IIntLabelPayload // based on the we can add more type here
+  }[]
 }

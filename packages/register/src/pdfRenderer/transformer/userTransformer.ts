@@ -1,11 +1,8 @@
 import { InjectedIntl } from 'react-intl'
 import {
   IFunctionTransformer,
-  TransformerData,
-  IFeildValuePayload,
-  TransformerPayload
+  TransformerData
 } from '@register/pdfRenderer/transformer/types'
-import { getValueFromApplicationDataByKey } from '@register/pdfRenderer/transformer/utils'
 import { userMessages } from '@register/i18n/messages'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 

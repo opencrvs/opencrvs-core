@@ -165,28 +165,47 @@ export const template: IPDFTemplate = {
     },
     {
       field: 'serviceDescription',
-      operation: 'ServiceLabel',
+      operation: 'ConditionExecutor',
       parameters: {
-        '45d+birth': {
-          defaultMessage: 'Birth registratin after 45 days of date of birth',
-          description: 'Label for service 1 for birth',
-          id: 'certificate.receipt.service1.birth'
+        fromKey: {
+          birth: 'child.childBirthDate',
+          death: 'deathEvent.deathDate'
         },
-        '45d+death': {
-          defaultMessage: 'Death registratin after 45 days of date of death',
-          description: 'Label for service 1 for death',
-          id: 'certificate.receipt.service1.death'
-        },
-        '5y+birth': {
-          defaultMessage: 'Birth registratin after 5 years of date of birth',
-          description: 'Label for service 2 for birth',
-          id: 'certificate.receipt.service2.birth'
-        },
-        '5y+death': {
-          defaultMessage: 'Death registratin after 5 years of date of death',
-          description: 'Label for service 2 for death',
-          id: 'certificate.receipt.service2.death'
-        }
+        toKey: 'CURRENT_DATE',
+        conditions: [
+          {
+            type: 'COMPARE_DATE_IN_DAYS',
+            minDiff: 46,
+            maxDiff: 1825,
+            output: {
+              messageDescriptor: {
+                defaultMessage:
+                  '{event} registratin after 45 days of date of event',
+                description: 'Label for 45 day+ service of event',
+                id: 'certificate.receipt.service.45day'
+              },
+              messageValues: {
+                event: 'event'
+              }
+            }
+          },
+          {
+            type: 'COMPARE_DATE_IN_DAYS',
+            minDiff: 1826,
+            maxDiff: 2147483647,
+            output: {
+              messageDescriptor: {
+                defaultMessage:
+                  '{event} registratin after 5 years of date of event',
+                description: 'Label for 5 year+ service of event',
+                id: 'certificate.receipt.service.5year'
+              },
+              messageValues: {
+                event: 'event'
+              }
+            }
+          }
+        ]
       }
     },
     {
@@ -202,18 +221,39 @@ export const template: IPDFTemplate = {
     },
     {
       field: 'amount',
-      operation: 'ServiceAmount',
+      operation: 'ConditionExecutor',
       parameters: {
-        '45d+': {
-          defaultMessage: '\u09F3 25',
-          description: 'Amount for service 1',
-          id: 'certificate.receipt.service1.amount'
+        fromKey: {
+          birth: 'child.childBirthDate',
+          death: 'deathEvent.deathDate'
         },
-        '5y+': {
-          defaultMessage: '\u09F3 50',
-          description: 'Amount for service 2',
-          id: 'certificate.receipt.service2.amount'
-        }
+        toKey: 'CURRENT_DATE',
+        conditions: [
+          {
+            type: 'COMPARE_DATE_IN_DAYS',
+            minDiff: 46,
+            maxDiff: 1825,
+            output: {
+              messageDescriptor: {
+                defaultMessage: '\u09F3 25',
+                description: 'Amount for 45 day+ service of event',
+                id: 'certificate.receipt.service.45day.amount'
+              }
+            }
+          },
+          {
+            type: 'COMPARE_DATE_IN_DAYS',
+            minDiff: 1826,
+            maxDiff: 2147483647,
+            output: {
+              messageDescriptor: {
+                defaultMessage: '\u09F3 50',
+                description: 'Amount for 5 year+ service of event',
+                id: 'certificate.receipt.service.5year.amount'
+              }
+            }
+          }
+        ]
       }
     },
     {

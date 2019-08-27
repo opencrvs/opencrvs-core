@@ -997,12 +997,10 @@
         "form.field.label.userAttachmentSection": "Attachments",
         "form.field.label.addFile": "Add file",
         "form.field.label.fileUploadError": "{type} supported only",
-        "certificate.receipt.service1.birth": "Birth registration after 45 days of date of birth",
-        "certificate.receipt.service1.death": "Death registration after 45 days of date of death",
-        "certificate.receipt.service2.birth": "Birth registration after 5 years of date of birth",
-        "certificate.receipt.service2.death": "Death registration after 5 years of date of death",
-        "certificate.receipt.service1.amount": "\u09F3 25.00",
-        "certificate.receipt.service2.amount": "\u09F3 50.00"
+        "certificate.receipt.service.45day": "{event} registration after 45 days of event",
+        "certificate.receipt.service.5year": "{event} registration after 5 years of event",
+        "certificate.receipt.service.45day.amount": "\u09F3 25.00",
+        "certificate.receipt.service..5year.amount": "\u09F3 50.00"
       }
     },
     {
@@ -2008,12 +2006,10 @@
         "form.field.label.userAttachmentSection": "সংযুক্তি",
         "form.field.label.addFile": "নথি যুক্ত করুন",
         "form.field.label.fileUploadError": "শুধুমাত্র {type} গ্রহণযোগ্য ",
-        "certificate.receipt.service1.birth": "জন্মের ৪৫ দিনের পরে জন্ম নিবন্ধক",
-        "certificate.receipt.service1.death": "মৃত্যুর ৪৫ দিনের পরে ডেথ রেজিস্ট্রেশন",
-        "certificate.receipt.service2.birth": "জন্মের ৫ বছর পরে জন্ম নিবন্ধন",
-        "certificate.receipt.service2.death": "মৃত্যুর তারিখের ৫ বছর পরে ডেথ রেজিস্ট্রেশন",
-        "certificate.receipt.service1.amount": "\u09F3 ২৫.০০",
-        "certificate.receipt.service2.amount": "\u09F3 ৫০.০০"
+        "certificate.receipt.service.45day": "{event} তারিখের ৪৫ দিনের পরে জন্ম নিবন্ধন",
+        "certificate.receipt.service.5year": "{event} তারিখের ৫ বছর পরে জন্ম নিবন্ধন",
+        "certificate.receipt.service.45day.amount": "\u09F3 ২৫.০০",
+        "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০"
       }
     }
   ]
