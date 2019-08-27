@@ -6,12 +6,13 @@ import {
 } from '@opencrvs/components/lib/interface'
 import {
   createReviewApplication,
+  deleteApplication,
   IApplication,
   modifyApplication,
-  deleteApplication,
   storeApplication,
   writeApplication
 } from '@register/applications'
+import { FormFieldGenerator } from '@register/components/form'
 import {
   Action,
   Event,
@@ -31,11 +32,11 @@ import { getValidationErrorsForForm } from '@register/forms/validation'
 import { buttonMessages, errorMessages } from '@register/i18n/messages'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 import {
-  goToHome,
+  goBack,
   goToPrintCertificate,
-  goToVerifyCollector,
+  goToPrintCertificatePayment,
   goToReviewCertificate,
-  goToPrintCertificatePayment
+  goToVerifyCollector
 } from '@register/navigation'
 import { CERTIFICATE_COLLECTOR } from '@register/navigation/routes'
 import { IStoreState } from '@register/store'
@@ -45,6 +46,11 @@ import {
   QueryContext,
   QueryProvider
 } from '@register/views/DataProvider/QueryProvider'
+import {
+  getEvent,
+  getEventDate,
+  isFreeOfCost
+} from '@register/views/PrintCertificate/utils'
 import { StyledSpinner } from '@register/views/RegistrationHome/RegistrationHome'
 import * as Sentry from '@sentry/browser'
 import { debounce, flatten } from 'lodash'
@@ -52,14 +58,7 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { Dispatch } from 'redux'
 import { withTheme } from 'styled-components'
-import { FormFieldGenerator } from '@register/components/form'
-import {
-  isFreeOfCost,
-  getEventDate,
-  getEvent
-} from '@register/views/PrintCertificate/utils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -75,7 +74,7 @@ interface IBaseProps {
   formSection: IFormSection
   formGroup: IFormSectionGroup
   theme: ITheme
-  goToHome: typeof goToHome
+  goBack: typeof goBack
   storeApplication: typeof storeApplication
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
@@ -262,10 +261,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
   }
 
-  goToIDCheck = () => {
-    this.props.goToHome()
-  }
-
   toggleSubmitModalOpen = () => {
     this.setState(prevState => ({
       showModalForNoSignedAffidavit: !prevState.showModalForNoSignedAffidavit
@@ -280,7 +275,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       application,
       formSection,
       formGroup,
-      goToHome,
+      goBack,
       deleteApplication,
       registerForm
     } = this.props
@@ -343,7 +338,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           title={intl.formatMessage(formSection.title)}
           goBack={() => {
             deleteApplication(applicationToBeCertified)
-            goToHome()
+            goBack()
           }}
         >
           <FormSectionTitle>
@@ -481,15 +476,14 @@ const mapStateToProps = (
     applicationId: registrationId,
     application,
     formSection,
-    formGroup,
-    goToHome: goToHome
+    formGroup
   }
 }
 
 export const CollectorForm = connect(
   mapStateToProps,
   {
-    goToHome: goToHome,
+    goBack,
     storeApplication,
     writeApplication,
     modifyApplication,
