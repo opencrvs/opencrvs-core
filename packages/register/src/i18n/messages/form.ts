@@ -113,6 +113,7 @@ interface IFormMessages {
   docTypeBR: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeChildAgeProof: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeChildBirthProof: ReactIntl.FormattedMessage.MessageDescriptor
+  docTypeChildUnderFiveCard: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeCopyOfBurialReceipt: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeDeathCertificate: ReactIntl.FormattedMessage.MessageDescriptor
   docTypeDoctorCertificate: ReactIntl.FormattedMessage.MessageDescriptor
@@ -219,6 +220,7 @@ interface IFormMessages {
   paragraph45daysTo5Years: ReactIntl.FormattedMessage.MessageDescriptor
   paragraph: ReactIntl.FormattedMessage.MessageDescriptor
   paragraphAbove5Years: ReactIntl.FormattedMessage.MessageDescriptor
+  paragraphRequiredDocuments: ReactIntl.FormattedMessage.MessageDescriptor
   permanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
   permanentAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
   permanentAddressSameAsMother: ReactIntl.FormattedMessage.MessageDescriptor
@@ -858,6 +860,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for select option Child Birth Proof',
     id: 'form.field.label.docTypeChildBirthProof'
   },
+  docTypeChildUnderFiveCard: {
+    defaultMessage: 'Under five card',
+    description: 'Label for select option Under five card',
+    id: 'form.field.label.docTypeChildUnderFiveCard'
+  },
   docTypeCopyOfBurialReceipt: {
     defaultMessage: 'Certified copy of burial receipt',
     description: 'Label for select option Certified Copy of Burial Receipt',
@@ -1391,6 +1398,12 @@ const messagesToDefine: IFormMessages = {
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text',
     id: 'form.section.documents.paragraphAbove5Years'
+  },
+  paragraphRequiredDocuments: {
+    defaultMessage:
+      'For birth registration of birth the following documents are required:',
+    description: 'Documents Paragraph text',
+    id: 'form.section.documents.paragraphRequiredDocuments'
   },
   permanentAddress: {
     defaultMessage: 'What was their permanent address?',

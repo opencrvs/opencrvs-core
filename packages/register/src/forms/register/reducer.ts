@@ -4,7 +4,7 @@ import { childSection } from '@register/forms/register/fieldDefinitions/birth/ch
 import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
 import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
 import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
+import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/zmb/documents-section'
 import { deceasedSection } from '@register/forms/register/fieldDefinitions/death/deceased-section'
 import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 import { eventSection } from '@register/forms/register/fieldDefinitions/death/event-section'
