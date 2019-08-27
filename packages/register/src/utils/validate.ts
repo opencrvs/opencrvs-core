@@ -37,11 +37,6 @@ export type Validation = (
   maruf?: number
 ) => IValidationResult | undefined
 
-// export type DeathDateValidation = (
-//   value: IFormFieldValue,
-//   drafts: IFormData
-// ) => IValidationResult | undefined
-
 export type ValidationInitializer = (...value: any[]) => Validation
 
 const fallbackCountry = window.config.COUNTRY
