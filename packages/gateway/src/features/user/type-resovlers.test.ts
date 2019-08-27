@@ -1,4 +1,4 @@
-import { userTypeResolvers } from './type-resovlers'
+import { userTypeResolvers } from '@gateway/features/user/type-resovlers'
 import * as fetch from 'jest-fetch-mock'
 
 beforeEach(() => {
@@ -11,17 +11,18 @@ describe('User type resolvers', () => {
     name: [
       {
         use: 'en',
-        given: ['Sakib Al'],
-        family: ['Hasan']
+        given: ['Tamim'],
+        family: ['Iqbal']
       }
     ],
-    username: 'sakibal.hasan',
+    username: 'tamim.iqlbal',
     mobile: '+8801711111111',
     email: 'test@test.org',
     passwordHash:
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
-    role: 'FIELD_AGENT',
+    role: 'REGISTRATION_AGENT',
+    scope: ['certify'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -252,5 +253,114 @@ describe('User type resolvers', () => {
     )
     const res = await userTypeResolvers.User.catchmentArea(mockResponse)
     expect(res).toEqual(mockLocations)
+  })
+
+  it('return user signature as registration agent', async () => {
+    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
+    const roleBundle = {
+      resourceType: 'Bundle',
+      id: 'e9b83485-0418-47a0-b62b-c9d80a89691b',
+      total: 1,
+      entry: [
+        {
+          resource: {
+            resourceType: 'PractitionerRole',
+            practitioner: {
+              reference: 'Practitioner/dd78cad3-26dc-469a-bddb-0b45ae489491'
+            },
+            code: [
+              {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/roles',
+                    code: 'LOCAL_REGISTRAR'
+                  }
+                ]
+              }
+            ],
+            location: [
+              {
+                reference: 'Location/54538456-fcf6-4276-86ac-122a7eb47703'
+              },
+              {
+                reference: 'Location/319b0d8f-e330-45b8-8bd5-863a234d4cc5'
+              }
+            ],
+            id: '7c246f38-90c7-4f80-8266-f884c6e7b491'
+          }
+        }
+      ]
+    }
+    const practitioner = {
+      resourceType: 'Practitioner',
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/employee-signature',
+          valueSignature: {
+            type: [
+              {
+                system: 'urn:iso-astm:E1762-95:2013',
+                code: '1.2.840.10065.1.12.1.13',
+                display: 'Review Signature'
+              }
+            ],
+            when: '2019-08-22T08:43:43.461Z',
+            contentType: 'image/png',
+            blob: signatureData
+          }
+        }
+      ],
+      id: 'dd78cad3-26dc-469a-bddb-0b45ae489491'
+    }
+
+    fetch.mockResponses(
+      [JSON.stringify(roleBundle), { status: 200 }],
+      [JSON.stringify(practitioner), { status: 200 }]
+    )
+
+    const response = await userTypeResolvers.User.signature(mockResponse)
+
+    expect(response).toEqual({
+      type: 'image/png',
+      data: signatureData
+    })
+  })
+
+  it('return user signature as registrar', async () => {
+    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
+
+    const practitioner = {
+      resourceType: 'Practitioner',
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/employee-signature',
+          valueSignature: {
+            type: [
+              {
+                system: 'urn:iso-astm:E1762-95:2013',
+                code: '1.2.840.10065.1.12.1.13',
+                display: 'Review Signature'
+              }
+            ],
+            when: '2019-08-22T08:43:43.461Z',
+            contentType: 'image/png',
+            blob: signatureData
+          }
+        }
+      ],
+      id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
+    }
+
+    fetch.mockResponseOnce(JSON.stringify(practitioner), { status: 200 })
+
+    const userResponse = mockResponse
+    userResponse.scope.push('register')
+
+    const response = await userTypeResolvers.User.signature(userResponse)
+
+    expect(response).toEqual({
+      type: 'image/png',
+      data: signatureData
+    })
   })
 })

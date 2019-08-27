@@ -10,8 +10,6 @@ import {
   IUserSearchPayload,
   IUserPayload
 } from '@gateway/features/user/type-resovlers'
-import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -74,49 +72,6 @@ export const resolvers: GQLResolver = {
         }
       })
       return await res.json()
-    },
-    async getSignature(
-      _,
-      { locationId, role = 'LOCAL_REGISTRAR' },
-      authHeader
-    ) {
-      const roleBundle: fhir.Bundle = await fetchFHIR(
-        `/PractitionerRole?location=${locationId}&role=${role}`,
-        authHeader
-      )
-
-      const practitionerRole =
-        roleBundle &&
-        roleBundle.entry &&
-        roleBundle.entry &&
-        roleBundle.entry.length > 0 &&
-        (roleBundle.entry[0].resource as fhir.PractitionerRole)
-
-      const practitionerId =
-        practitionerRole &&
-        practitionerRole.practitioner &&
-        practitionerRole.practitioner.reference
-
-      const practitioner: fhir.Practitioner = await fetchFHIR(
-        `/${practitionerId}`,
-        authHeader
-      )
-
-      const signatureExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
-        practitioner.extension || []
-      )
-
-      const signature = signatureExtension && signatureExtension.valueSignature
-
-      if (signature) {
-        return {
-          type: signature.contentType,
-          data: signature.blob
-        }
-      }
-
-      return null
     }
   },
 

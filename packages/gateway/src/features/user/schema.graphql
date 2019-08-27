@@ -47,6 +47,7 @@ type User {
   status: String
   primaryOffice: Location
   catchmentArea: [Location]
+  signature: Signature
 }
 
 type SearchUserResult {
@@ -72,7 +73,6 @@ type Query {
     skip: Int
     sort: String
   ): SearchUserResult
-  getSignature(locationId: String, role: String): Signature
 }
 
 type Mutation {
