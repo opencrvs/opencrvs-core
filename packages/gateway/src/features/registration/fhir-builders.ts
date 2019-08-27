@@ -1935,7 +1935,7 @@ const builders: IFieldBuilders = {
             const relatedPersonResource = selectOrCreateRelatedPersonResource(
               fhirBundle,
               context,
-              EVENT_TYPE.BIRTH
+              context.event
             )
             if (!relatedPersonResource.extension) {
               relatedPersonResource.extension = []
@@ -1967,7 +1967,7 @@ const builders: IFieldBuilders = {
             const relatedPersonResource = selectOrCreateRelatedPersonResource(
               fhirBundle,
               context,
-              EVENT_TYPE.BIRTH
+              context.event
             )
             if (!relatedPersonResource.extension) {
               relatedPersonResource.extension = []
