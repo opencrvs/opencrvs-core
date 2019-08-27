@@ -108,7 +108,7 @@ export class SubmissionController {
 
     const applicationAction = ACTION_LIST[application.action || ''] || null
 
-    const forms = getRegisterForm(this.store.getState())!
+    const forms = getRegisterForm(this.store.getState())
 
     const result = getMutationMapping(
       application.event,

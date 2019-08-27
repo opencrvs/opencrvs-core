@@ -184,13 +184,15 @@ export type IFormFieldQueryMapFunction = (
  * So type Array<number | Function | string> would become
  * Array<number | Descriptor | string>
  */
-type FunctionParamsToDescriptor<T> = T extends Array<any>
-  ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
-  : T extends IFormFieldQueryMapFunction
-  ? IQueryDescriptor
-  : T extends IFormFieldMutationMapFunction
-  ? IMutationDescriptor
-  : T
+type FunctionParamsToDescriptor<T> =
+  // It's an array - recursively call this type for all items
+  T extends Array<any>
+    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
+    : T extends IFormFieldQueryMapFunction // It's a query transformation function - return a query transformation descriptor
+    ? IQueryDescriptor
+    : T extends IFormFieldMutationMapFunction // It's a mutation transformation function - return a mutation transformation descriptor
+    ? IMutationDescriptor
+    : T // It's a none of the above - return self
 
 interface FactoryOperation<
   OperationMap,

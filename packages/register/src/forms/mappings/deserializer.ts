@@ -76,11 +76,25 @@ function isFactoryOperation(descriptor: any) {
   return Boolean((descriptor as ValidationFactoryOperation).parameters)
 }
 
+function configurationError(
+  descriptor: { operation: string },
+  operationLabel: string
+) {
+  const error = `Cannot find a ${operationLabel} with a name ${descriptor.operation}.
+    This is a configuration error in your country specific resource package's form field definitions.`
+  console.error(error)
+  return new Error(error)
+}
+
 function sectionQueryDescriptorToQueryFunction(
   descriptor: IQueryDescriptor
 ): IFormSectionQueryMapFunction {
   const transformer: AnyFn<string> | AnyFactoryFn<string> =
     queries[descriptor.operation as QueryFunctionExports]
+
+  if (!transformer) {
+    throw configurationError(descriptor, 'query transformer')
+  }
 
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
@@ -94,6 +108,10 @@ function sectionMutationDescriptorToMutationFunction(
 ): IFormSectionMutationMapFunction {
   const transformer: AnyFn<string> | AnyFactoryFn<string> =
     mutations[descriptor.operation as MutationFunctionExports]
+
+  if (!transformer) {
+    throw configurationError(descriptor, 'mutation transformer')
+  }
 
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
@@ -111,6 +129,10 @@ function fieldQueryDescriptorToQueryFunction(
 ): IFormFieldQueryMapFunction {
   const transformer: AnyFn<string> | AnyFactoryFn<string> =
     queries[descriptor.operation as QueryFunctionExports]
+
+  if (!transformer) {
+    throw configurationError(descriptor, 'query transformer')
+  }
 
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
@@ -136,6 +158,10 @@ function fieldMutationDescriptorToMutationFunction(
   const transformer: AnyFn<string> | AnyFactoryFn<string> =
     mutations[descriptor.operation as MutationFunctionExports]
 
+  if (!transformer) {
+    throw configurationError(descriptor, 'mutation transformer')
+  }
+
   if (isFactoryOperation(descriptor)) {
     const factory = transformer as AnyFactoryFn<string>
 
@@ -159,6 +185,10 @@ function fieldValidationDescriptorToValidationFunction(
 ): Validation {
   const validator: Validation | AnyFn<Validation> =
     validators[descriptor.operation as ValidatorFunctionExports]
+
+  if (!validator) {
+    throw configurationError(descriptor, 'validator')
+  }
 
   if (isFactoryOperation(descriptor)) {
     const factory = validator as AnyFn<Validation>
