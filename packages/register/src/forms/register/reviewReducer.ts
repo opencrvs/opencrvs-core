@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm } from '@register/forms'
+import { IForm, ReviewSection } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/review'
 import * as offlineActions from '@register/offline/actions'
 import { deserializeForm } from '@register/forms/mappings/deserializer'
@@ -38,7 +38,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
       const death = deserializeForm(action.payload.forms.registerForm.death)
 
       const review = {
-        id: 'review',
+        id: ReviewSection.Review,
         viewType: 'review' as const,
         name: messages.reviewName,
         title: messages.reviewTitle,

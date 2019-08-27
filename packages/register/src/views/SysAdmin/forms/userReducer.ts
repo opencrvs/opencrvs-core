@@ -1,6 +1,6 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
-import { IFormSectionData, IForm } from '@register/forms'
+import { IFormSectionData, IForm, Section, UserSection } from '@register/forms'
 import { Action } from 'redux'
 import { formMessages as messages } from '@register/i18n/messages'
 import ApolloClient from 'apollo-client'
@@ -42,8 +42,8 @@ const initialState: IUserFormState = {
     sections: [
       userSection,
       {
-        id: 'preview',
-        viewType: 'preview',
+        id: UserSection.Preview,
+        viewType: 'preview' as const,
         name: messages.userFormReviewTitle,
         title: messages.userFormTitle,
         groups: previewGroups()

@@ -618,8 +618,49 @@ export type IFormSectionQueryMapFunction = (
   sectionId: string
 ) => void
 
+export enum BirthSection {
+  Child = 'child',
+  Mother = 'mother',
+  Father = 'father',
+  Registration = 'registration',
+  Documents = 'documents',
+  Preview = 'preview'
+}
+
+export enum DeathSection {
+  Deceased = 'deceased',
+  Event = 'deathEvent',
+  CauseOfDeath = 'causeOfDeath',
+  Applicants = 'informant',
+  DeathDocuments = 'documents',
+  Preview = 'preview'
+}
+export enum UserSection {
+  User = 'user',
+  Preview = 'preview'
+}
+export enum CertificateSection {
+  CollectCertificate = 'collectCertificate',
+  CollectDeathCertificate = 'collectDeathCertificate',
+  CertificatePreview = 'certificatePreview'
+}
+export enum PaymentSection {
+  Payment = 'payment'
+}
+export enum ReviewSection {
+  Review = 'review'
+}
+
+export type Section =
+  | ReviewSection
+  | PaymentSection
+  | BirthSection
+  | DeathSection
+  | UserSection
+  | CertificateSection
+
 export interface IFormSection {
-  id: string
+  id: Section
   viewType: ViewType
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor

@@ -5,7 +5,8 @@ import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   ISerializedFormSection,
-  SIMPLE_DOCUMENT_UPLOADER
+  SIMPLE_DOCUMENT_UPLOADER,
+  UserSection
 } from '@register/forms'
 
 import { NATIONAL_ID } from '@register/forms/identity'
@@ -16,7 +17,7 @@ import {
 import { conditionals } from '@register/forms/utils'
 
 export const userSection: ISerializedFormSection = {
-  id: 'user',
+  id: UserSection.User,
   viewType: 'form',
   name: constantsMessages.user,
   title: messages.userFormTitle,

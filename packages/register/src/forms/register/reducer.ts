@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm } from '@register/forms'
+import { IForm, Section, BirthSection, DeathSection } from '@register/forms'
 import * as offlineActions from '@register/offline/actions'
 import { deserializeForm } from '@register/forms/mappings/deserializer'
 
@@ -39,7 +39,6 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
       const death = deserializeForm(action.payload.forms.registerForm.death)
 
       const preview = {
-        id: 'preview',
         viewType: 'preview' as const,
         name: messages.previewName,
         title: messages.previewTitle,
@@ -57,11 +56,17 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
         registerForm: {
           birth: {
             ...birth,
-            sections: [...birth.sections, preview]
+            sections: [
+              ...birth.sections,
+              { ...preview, id: BirthSection.Preview }
+            ]
           },
           death: {
             ...death,
-            sections: [...death.sections, preview]
+            sections: [
+              ...death.sections,
+              { ...preview, id: DeathSection.Preview }
+            ]
           }
         }
       }

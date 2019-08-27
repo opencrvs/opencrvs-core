@@ -1,6 +1,12 @@
 import { IRegisterFormState } from '@register/forms/register/reducer'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { IFormSection, Event } from '@register/forms'
+import {
+  Section,
+  IFormSection,
+  Event,
+  DeathSection,
+  BirthSection
+} from '@register/forms'
 
 const getPartialState = (state: IStoreState): IRegisterFormState =>
   state.registerForm
@@ -30,7 +36,7 @@ export const getEventRegisterForm = (state: IStoreState, event: Event) => {
 
 export const getRegisterFormSection = (
   state: IStoreState,
-  key: string,
+  key: Section,
   event: Event
 ): IFormSection => {
   const eventRegisterForm = getEventRegisterForm(state, event)
@@ -46,4 +52,12 @@ export const getRegisterFormSection = (
   }
 
   return section
+}
+
+export const getBirthSection = (state: IStoreState, section: BirthSection) => {
+  return getRegisterFormSection(state, section, Event.BIRTH)
+}
+
+export const getDeathSection = (state: IStoreState, section: DeathSection) => {
+  return getRegisterFormSection(state, section, Event.DEATH)
 }
