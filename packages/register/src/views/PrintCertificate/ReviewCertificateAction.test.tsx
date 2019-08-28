@@ -5,6 +5,7 @@ import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@register/views/DataPr
 import { createTestComponent } from '@register/tests/util'
 import { ReviewCertificateAction } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 describe('when user wants to review death certificate', () => {
   const { store, history } = createStore()
@@ -308,9 +309,9 @@ describe('when user wants to review death certificate', () => {
     expect(modalIsDisplayed).toBe(true)
   })
 
-  it('Should close the modal on clicking the print the button', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
-    confirmBtn.simulate('click')
+  it('Should close the modal on clicking the print the button', async () => {
+    const confirmBtn = await waitForElement(component, '#confirm-print')
+    confirmBtn.hostNodes().simulate('click')
     component.update()
 
     component

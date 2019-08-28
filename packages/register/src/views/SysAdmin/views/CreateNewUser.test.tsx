@@ -60,7 +60,7 @@ describe('create new user tests', () => {
           .find('#phoneNumber_error')
           .hostNodes()
           .text()
-      ).toBe('Required')
+      ).toBe('Required for registration')
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {

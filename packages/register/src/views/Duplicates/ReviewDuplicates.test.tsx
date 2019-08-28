@@ -852,7 +852,7 @@ describe('Review Duplicates component', () => {
       ).toHaveLength(0)
     })
 
-    it.only('successfully redirects to work queue if all duplicates removed', async () => {
+    it('successfully redirects to work queue if all duplicates removed', async () => {
       const mock = clone(graphqlMock)
       // @ts-ignore
       mock.push({

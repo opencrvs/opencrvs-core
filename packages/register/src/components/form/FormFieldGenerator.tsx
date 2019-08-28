@@ -40,7 +40,6 @@ import {
   IForm,
   IFormField,
   IFormFieldValue,
-  IFormSection,
   IFormSectionData,
   Ii18nFormField,
   INFORMATIVE_RADIO_GROUP,
@@ -60,6 +59,7 @@ import {
   ILoaderButton,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD,
+  IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue
 } from '@register/forms'
@@ -89,10 +89,13 @@ import {
   FormikTouched,
   FormikValues
 } from 'formik'
-import { IOfflineDataState } from '@register/offline/reducer'
+import { IOfflineData } from '@register/offline/reducer'
 import { isEqual } from 'lodash'
 import { IValidationResult } from '@register/utils/validate'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
+import { IStoreState } from '@register/store'
+import { getOfflineData } from '@register/offline/selectors'
+import { connect } from 'react-redux'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -120,7 +123,6 @@ type GeneratedInputFieldProps = {
   resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
-
   error: string
 }
 
@@ -396,13 +398,17 @@ interface IFormSectionProps {
   fields: IFormField[]
   id: string
   setAllFieldsDirty: boolean
-  offlineResources?: IOfflineDataState
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
 }
 
+interface IStateProps {
+  resources: IOfflineData
+}
+
 type Props = IFormSectionProps &
+  IStateProps &
   FormikProps<IFormSectionData> &
   InjectedIntlProps
 
@@ -468,7 +474,7 @@ class FormSectionComponent extends React.Component<Props> {
       fields,
       setFieldValue,
       touched,
-      offlineResources,
+      resources,
       intl,
       draftData,
       setValues
@@ -489,6 +495,10 @@ class FormSectionComponent extends React.Component<Props> {
      * if (fields.length > Object.keys(values).length) {
      *   console.log({ fields, values })
      * }
+     *
+     * 22.8.2019
+     *
+     * This might be because of setState not used with the function syntax
      */
     const fieldsWithValuesDefined = fields.filter(
       field => values[field.name] !== undefined
@@ -506,7 +516,7 @@ class FormSectionComponent extends React.Component<Props> {
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             values,
-            offlineResources,
+            resources,
             draftData
           )
 
@@ -522,7 +532,7 @@ class FormSectionComponent extends React.Component<Props> {
                   options: getFieldOptions(
                     field as ISelectFormFieldWithDynamicOptions,
                     values,
-                    offlineResources
+                    resources
                   )
                 } as ISelectFormFieldWithOptions)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
@@ -634,19 +644,26 @@ class FormSectionComponent extends React.Component<Props> {
   }
 }
 
-export const FormFieldGenerator = withFormik<
-  IFormSectionProps,
+const FormFieldGeneratorWithFormik = withFormik<
+  IFormSectionProps & IStateProps,
   IFormSectionData
 >({
   mapPropsToValues: props => mapFieldsToValues(props.fields),
   handleSubmit: values => {
     console.log(values)
   },
-  validate: (values, props: IFormSectionProps) =>
+  validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
       props.fields,
       values,
-      props.offlineResources,
+      props.resources,
       props.draftData
     )
 })(injectIntl(FormSectionComponent))
+
+export const FormFieldGenerator = connect(
+  (state: IStoreState, ownProps: IFormSectionProps) => ({
+    ...ownProps,
+    resources: getOfflineData(state)
+  })
+)(FormFieldGeneratorWithFormik)

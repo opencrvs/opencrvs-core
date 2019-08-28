@@ -3,7 +3,7 @@ import {
   getFullName
 } from '@register/views/PrintCertificate/PrintCertificateAction'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@register/views/DataProvider/birth/queries'
-import { createTestComponent } from '@register/tests/util'
+import { createTestComponent, mockOfflineData } from '@register/tests/util'
 import { createStore } from '@register/store'
 import * as React from 'react'
 
@@ -193,6 +193,7 @@ describe('when user wants to print certificate', () => {
         location={mockLocation}
         history={history}
         staticContext={mockLocation}
+        resources={mockOfflineData}
         match={{
           params: {
             registrationId: 'asdhdqe2472487jsdfsdf',
@@ -333,6 +334,7 @@ describe('when user wants to print certificate', () => {
     const testComponent = createTestComponent(
       <PrintCertificateAction
         location={mockLocation}
+        resources={mockOfflineData}
         history={history}
         staticContext={mockLocation}
         match={{
@@ -666,6 +668,7 @@ describe('when user wants to print certificate', () => {
       const testComponent = createTestComponent(
         <PrintCertificateAction
           location={mockLocation}
+          resources={mockOfflineData}
           history={history}
           staticContext={mockLocation}
           match={{

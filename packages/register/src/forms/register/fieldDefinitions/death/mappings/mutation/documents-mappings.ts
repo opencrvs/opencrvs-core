@@ -1,9 +1,12 @@
-import { IFormField, IFormData } from '@register/forms'
+import {
+  IFormField,
+  IFormData,
+  TransformedData,
+  DeathSection
+} from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
-import { deceasedSection } from '@register/forms/register/fieldDefinitions/death/deceased-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
 
-export const documentForWhomFhirMapping = {
+export const deathDocumentForWhomFhirMapping = {
   "Proof of Deceased's ID": 'DECEASED_ID_PROOF',
   'Proof Deceased Permanent Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
@@ -11,24 +14,24 @@ export const documentForWhomFhirMapping = {
   "Proof of Applicant's ID": 'APPLICANT_ID_PROOF'
 }
 
-export const sectionMapping = {
-  [deceasedSection.id]: [
-    documentForWhomFhirMapping["Proof of Deceased's ID"],
-    documentForWhomFhirMapping['Proof Deceased Permanent Address'],
-    documentForWhomFhirMapping['Proof of Death of Deceased'],
-    documentForWhomFhirMapping['Proof of Date of Birth of Deceased']
+export const deathSectionMapping = {
+  [DeathSection.Deceased]: [
+    deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
+    deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
+    deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
+    deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']
   ],
-  [applicantsSection.id]: [
-    documentForWhomFhirMapping["Proof of Applicant's ID"]
+  [DeathSection.Applicants]: [
+    deathDocumentForWhomFhirMapping["Proof of Applicant's ID"]
   ]
 }
 
-export const sectionTitle = {
-  [deceasedSection.id]: 'Deceased',
-  [applicantsSection.id]: 'Applicant'
+export const deathSectionTitle = {
+  [DeathSection.Deceased]: 'Deceased',
+  [DeathSection.Applicants]: 'Applicant'
 }
 
-export const documentTypeFhirMapping = {
+export const deathDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
@@ -42,7 +45,7 @@ export const documentTypeFhirMapping = {
 }
 
 export function deathFieldToAttachmentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -53,7 +56,7 @@ export function deathFieldToAttachmentTransformer(
     sectionId,
     field,
     'registration',
-    documentForWhomFhirMapping,
-    documentTypeFhirMapping
+    deathDocumentForWhomFhirMapping,
+    deathDocumentTypeFhirMapping
   )
 }
