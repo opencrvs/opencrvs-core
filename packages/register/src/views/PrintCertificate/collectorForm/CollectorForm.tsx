@@ -16,13 +16,13 @@ import { FormFieldGenerator } from '@register/components/form'
 import {
   Action,
   Event,
+  ICertificate,
   IForm,
   IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup,
-  ICertificate
+  IFormSectionGroup
 } from '@register/forms'
 import {
   certCollectorGroupForBirthAppWithFatherDetails,
@@ -97,10 +97,12 @@ function getNextSectionIds(
     (application &&
       (application.data.registration.certificates as ICertificate[])) ||
     null
-  const certificate = (certificates && certificates[0]) || {}
+  const certificate: ICertificate = (certificates && certificates[0]) || {}
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     formSection,
-    (certificate[formSection.id] as IFormSectionData) || {}
+    (certificate[
+      formSection.id as keyof typeof certificate
+    ] as IFormSectionData) || {}
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === formSectionGroup.id
@@ -122,10 +124,11 @@ const getErrorsOnFieldsBySection = (
 ) => {
   const certificates =
     (draft && (draft.data.registration.certificates as ICertificate[])) || null
-  const certificate = (certificates && certificates[0]) || {}
+  const certificate: ICertificate = (certificates && certificates[0]) || {}
   const errors = getValidationErrorsForForm(
     fields,
-    (certificate[sectionId] as IFormSectionData) || {}
+    (certificate[sectionId as keyof typeof certificate] as IFormSectionData) ||
+      {}
   )
 
   return {
@@ -166,7 +169,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       (application &&
         (application.data.registration.certificates as ICertificate[])) ||
       null
-    const certificate = (certificates && certificates[0]) || {}
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
     const collector = certificate.collector || {}
     this.props.modifyApplication({
       ...application,
@@ -207,8 +210,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     const certificates =
       (draft.data.registration.certificates as ICertificate[]) || null
-    const certificate = (certificates && certificates[0]) || {}
-    const collector = certificate[sectionId] as IFormSectionData
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
+    const collector = certificate[
+      sectionId as keyof typeof certificate
+    ] as IFormSectionData
 
     if (errLength > 0) {
       this.setState({
