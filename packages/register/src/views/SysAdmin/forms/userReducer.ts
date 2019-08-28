@@ -1,6 +1,13 @@
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
-import { IFormSectionData, IForm, Section, UserSection } from '@register/forms'
+import {
+  IFormSectionData,
+  IForm,
+  Section,
+  UserSection,
+  IFormSection,
+  ISerializedFormSection
+} from '@register/forms'
 import { Action } from 'redux'
 import { formMessages as messages } from '@register/i18n/messages'
 import ApolloClient from 'apollo-client'
@@ -150,22 +157,31 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   switch (action.type) {
     case UPDATE_FORM_FIELD_DEFINITIONS:
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
+
+      const userSection = state.userForm.sections[0]
+
       const updatedFields = transformRoleDataToDefinitions(
         state.userForm.sections[0].groups[0].fields,
         data
       )
-      const updatedSection = { ...userSection, fields: updatedFields }
-
-      return {
+      const updatedSection: IFormSection = {
+        ...userSection,
+        groups: [
+          {
+            ...userSection.groups[0],
+            fields: updatedFields
+          },
+          ...userSection.groups.slice(1)
+        ]
+      }
+      const newState = {
         ...state,
         submitting: false,
         userForm: {
-          sections: [
-            deserializeFormSection(updatedSection),
-            ...state.userForm.sections.slice(1)
-          ]
+          sections: [updatedSection, ...state.userForm.sections.slice(1)]
         }
       }
+      return newState
     case MODIFY_USER_FORM_DATA:
       return {
         ...state,

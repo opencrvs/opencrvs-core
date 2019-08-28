@@ -148,6 +148,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   }
 
   const fields = replaceInitialValues(group.fields, state.userForm.userFormData)
+
   const nextGroupId = getNextSectionIds(
     state.userForm.userForm.sections,
     section,
