@@ -642,6 +642,7 @@ export enum UserSection {
   Preview = 'preview'
 }
 export enum CertificateSection {
+  Collector = 'collector',
   CollectCertificate = 'collectCertificate',
   CollectDeathCertificate = 'collectDeathCertificate',
   CertificatePreview = 'certificatePreview'

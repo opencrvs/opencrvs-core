@@ -60,6 +60,8 @@ import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
+import { IValidationResult } from '@register/utils/validate'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -134,7 +136,8 @@ const getErrorsOnFieldsBySection = (
   return {
     [sectionId]: fields.reduce((fields, field) => {
       // REFACTOR
-      const validationErrors = errors[field.name]
+      const validationErrors: IValidationResult[] =
+        errors[field.name as keyof typeof errors]
 
       const value = draft.data[sectionId]
         ? draft.data[sectionId][field.name]
@@ -487,7 +490,7 @@ const mapStateToProps = (
     clonedFormSection.groups[0]
 
   return {
-    registerForm: state.registerForm.registerForm[event],
+    registerForm: getRegisterForm(state)[event],
     event,
     pageRoute: CERTIFICATE_COLLECTOR,
     applicationId: registrationId,
