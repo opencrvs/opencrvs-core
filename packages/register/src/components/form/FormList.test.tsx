@@ -41,8 +41,6 @@ describe('when user is in the document upload page', () => {
       store
     )
 
-    const languagesResponse = await referenceApi.loadLanguages()
-    store.dispatch(actions.storeLanguages(languagesResponse))
     formListComponent = testComponent.component
   })
   it('renders the whole list', () => {

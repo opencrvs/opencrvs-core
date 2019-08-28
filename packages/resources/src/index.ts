@@ -13,14 +13,12 @@ import {
   AUTH_URL
 } from '@resources/constants'
 import { validateFunc } from '@opencrvs/commons'
-import { languagesHandler as bgdLanguagesHandler } from '@resources/bgd/features/languages/handler'
 import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
-import { formsHandler as bgdFormsHandler } from '@resources/bgd/features/forms/handler'
-import { languagesHandler as zmbLanguagesHandler } from '@resources/zmb/features/languages/handler'
+import { definitionsHandler as bgdDefinitionsHandler } from '@resources/bgd/features/definitions/handler'
 import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
 import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
-import { formsHandler as zmbFormsHandler } from '@resources/zmb/features/forms/handler'
+import { definitionsHandler as zmbDefinitionsHandler } from '@resources/zmb/features/definitions/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -70,27 +68,6 @@ export async function createServer() {
     }
   })
 
-  // This should go away once /definitions is complete
-  server.route({
-    method: 'GET',
-    path: '/bgd/languages/{application}',
-    handler: bgdLanguagesHandler,
-    options: {
-      tags: ['api'],
-      description: 'Returns Bangladesh facilities.json'
-    }
-  })
-
-  server.route({
-    method: 'GET',
-    path: '/bgd/forms/{application}',
-    handler: bgdFormsHandler,
-    options: {
-      tags: ['api'],
-      description: 'Returns Bangladesh forms'
-    }
-  })
-
   server.route({
     method: 'GET',
     path: '/bgd/assets/{file}',
@@ -106,9 +83,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/bgd/definitions/{application}',
-    handler: () => {
-      return
-    },
+    handler: bgdDefinitionsHandler,
     options: {
       tags: ['api'],
       description:
@@ -151,27 +126,6 @@ export async function createServer() {
     }
   })
 
-  // This should go away once /definitions is complete
-  server.route({
-    method: 'GET',
-    path: '/zmb/languages/{application}',
-    handler: zmbLanguagesHandler,
-    options: {
-      tags: ['api'],
-      description: 'Returns Bangladesh facilities.json'
-    }
-  })
-
-  server.route({
-    method: 'GET',
-    path: '/bgd/forms/{application}',
-    handler: zmbFormsHandler,
-    options: {
-      tags: ['api'],
-      description: 'Returns Bangladesh forms'
-    }
-  })
-
   server.route({
     method: 'GET',
     path: '/zmb/assets/{file}',
@@ -187,9 +141,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/zmb/definitions/{application}',
-    handler: () => {
-      return
-    },
+    handler: zmbDefinitionsHandler,
     options: {
       tags: ['api'],
       description:

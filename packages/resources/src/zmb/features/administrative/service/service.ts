@@ -1,6 +1,6 @@
 import { FHIR_URL } from '@resources/constants'
 import fetch from 'node-fetch'
-import { generateLocationResource } from '@resources/zmb/features/administrative/scripts/service'
+import { generateLocationResource } from '@resources/zmb/features/facilities/scripts/service'
 import { ILocation } from '@resources/zmb/features/utils'
 
 export interface ILocationDataResponse {

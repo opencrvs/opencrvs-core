@@ -25,10 +25,6 @@ import { ISerializedForm, Event } from '@register/forms'
 import { Store, AnyAction } from 'redux'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { getReviewForm } from '@register/forms/register/review-selectors'
-import {
-  getOfflineData,
-  getOfflineDataLoaded
-} from '@register/offline/selectors'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -2246,13 +2242,9 @@ export const mockDeathApplicationData = {
 }
 
 export const mockOfflineData = {
-  forms: {
-    registerForm: JSON.parse(
-      require('fs')
-        .readFileSync('../resources/src/bgd/features/forms/register.json')
-        .toString()
-    ) as { birth: ISerializedForm; death: ISerializedForm }
-  },
+  forms: JSON.parse(
+    readFileSync('../resources/src/bgd/features/forms/register.json').toString()
+  ) as { registerForm: { birth: ISerializedForm; death: ISerializedForm } },
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -2480,11 +2472,9 @@ export const mockOfflineData = {
     }
   },
   languages: JSON.parse(
-    require('fs')
-      .readFileSync(
-        '../resources/src/bgd/features/languages/generated/register.json'
-      )
-      .toString()
+    readFileSync(
+      '../resources/src/bgd/features/languages/generated/register.json'
+    ).toString()
   ).data
 }
 

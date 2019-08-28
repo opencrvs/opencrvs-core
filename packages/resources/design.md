@@ -24,23 +24,28 @@ The `/definitions` endpoint will return JSON with the following format along wit
 ```json
 {
   "forms": {
-    "registerBirth": {
-      ...
-    },
-    "registerDeath": {
-      ...
+    "registerForm": {
+      "birth": {
+        ...
+      },
+      "death": {
+        ...
+      }
     },
     "createUser": {
       ...
     }
   },
-  "languages": {
-    "en": { ... },
-    "bn": { ... }
-  },
+  "languages": [
+    {
+      "lang": "en",
+      "displayName": "English",
+      "messages": {}
+    }
+  ],
   "pdfs": {
-    "birthCert": { ... },
-    "deathCert": { ... },
+    "birth": { ... },
+    "death": { ... },
     "receipt": { ... }
   },
   "timestamp": ""

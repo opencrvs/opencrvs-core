@@ -77,7 +77,7 @@ function reducer(
   switch (action.type) {
     // entrypoint - called from profile reducer
     // @todo, remove profile reducers dependency to this reducer
-    case actions.SET_OFFLINE_DATA: {
+    case actions.GET_EXISTING_OFFLINE_DATA: {
       return loop(
         {
           ...state,
@@ -117,9 +117,9 @@ function reducer(
         return loop(
           state,
           Cmd.list<actions.Action>([
-            Cmd.run(referenceApi.loadLanguages, {
-              successActionCreator: actions.languagesLoaded,
-              failActionCreator: actions.languagesFailed
+            Cmd.run(referenceApi.loadDefinitions, {
+              successActionCreator: actions.definitionsLoaded,
+              failActionCreator: actions.definitionsFailed
             }),
             Cmd.run(referenceApi.loadFacilities, {
               successActionCreator: actions.facilitiesLoaded,
@@ -128,10 +128,6 @@ function reducer(
             Cmd.run(referenceApi.loadLocations, {
               successActionCreator: actions.locationsLoaded,
               failActionCreator: actions.locationsFailed
-            }),
-            Cmd.run(referenceApi.loadForms, {
-              successActionCreator: actions.formsLoaded,
-              failActionCreator: actions.formsFailed
             })
           ])
         )
@@ -139,20 +135,21 @@ function reducer(
     }
 
     /*
-     * Languages
+     * Definitions
      */
 
-    case actions.LANGUAGES_LOADED: {
+    case actions.DEFINITIONS_LOADED: {
       return {
         ...state,
         loadingError: false,
         offlineData: {
           ...state.offlineData,
-          languages: action.payload
+          languages: action.payload.languages,
+          forms: action.payload.forms
         }
       }
     }
-    case actions.LANGUAGES_FAILED: {
+    case actions.DEFINITIONS_FAILED: {
       return {
         ...state,
         loadingError: true
@@ -180,28 +177,6 @@ function reducer(
           ...state.offlineData,
           locations: tempData.locations
         }
-      }
-    }
-
-    /*
-     * Forms
-     */
-
-    case actions.FORMS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          forms: {
-            registerForm: action.payload
-          }
-        }
-      }
-    }
-    case actions.FORMS_FAILED: {
-      return {
-        ...state,
-        loadingError: true
       }
     }
 

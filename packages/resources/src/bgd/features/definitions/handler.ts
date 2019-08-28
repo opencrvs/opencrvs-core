@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
-import { getForms } from '@resources/zmb/features/forms/service'
-import { getLanguages } from '@resources/zmb/features/languages/service/service'
+import { getForms } from '@resources/bgd/features/forms/service'
+import { getLanguages } from '@resources/bgd/features/languages/service/service'
 
 export async function definitionsHandler(
   request: Hapi.Request,

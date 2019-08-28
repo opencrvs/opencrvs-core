@@ -103,8 +103,11 @@ jest.mock('@register/utils/referenceApi', (): {
   referenceApi: {
     loadLocations: () => Promise.resolve(mockOfflineData.locations),
     loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-    loadLanguages: () => Promise.resolve(mockOfflineData.languages),
-    loadForms: () => Promise.resolve(mockOfflineData.forms.registerForm)
+    loadDefinitions: () =>
+      Promise.resolve({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms
+      })
   }
 }))
 

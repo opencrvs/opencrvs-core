@@ -16,9 +16,7 @@ export interface ILanguageDataResponse {
   data: ILanguage[]
 }
 
-export async function getLanguages(
-  application: string
-): Promise<ILanguageDataResponse> {
+export function getLanguages(application: string): ILanguageDataResponse {
   const languagesUrl = path.join(LANGUAGES_SOURCE, `${application}.json`)
   const languages = JSON.parse(fs.readFileSync(languagesUrl).toString())
 
