@@ -497,12 +497,6 @@ export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
 
-/*
- * TEMPORARY @todo
- *
- * Remove when form field definitions are removed from codebase
- */
-
 type FilterType<Base, Condition> = {
   [Key in keyof Base]: Base[Key] extends Condition ? Key : never
 }
@@ -592,13 +586,8 @@ export type IMutationDescriptor =
   | MutationFactoryOperation
   | MutationDefaultOperation
 
-/*
- * / TEMPORARY @todo
- *
- */
-
 // Initial type as it's always used as an object.
-// Should be stricter than this
+// @todo should be stricter than this
 export type TransformedData = { [key: string]: any }
 
 export type IFormSectionMapping = {
