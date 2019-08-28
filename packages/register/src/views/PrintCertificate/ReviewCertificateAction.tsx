@@ -14,7 +14,7 @@ import {
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/register/src/applications'
-import { Action, Event, IForm } from '@register/forms'
+import { Action, Event, IForm, ICertificate } from '@register/forms'
 import { constantsMessages } from '@register/i18n/messages'
 import { buttonMessages } from '@register/i18n/messages/buttons'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
@@ -140,8 +140,18 @@ class ReviewCertificateActionComponent extends React.Component<
     printCertificate(this.props.intl, draft, this.props.userDetails)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
-    // @ts-ignore
-    draft.data.registration.certificates[0].data = this.state.certificatePdf
+
+    const certificate = (draft.data.registration
+      .certificates as ICertificate[])[0]
+    draft.data.registration = {
+      ...draft.data.registration,
+      certificates: [
+        {
+          ...certificate,
+          data: this.state.certificatePdf
+        }
+      ]
+    }
     this.props.modifyApplication(draft)
     this.toggleModal()
     this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)

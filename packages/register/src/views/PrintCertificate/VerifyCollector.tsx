@@ -1,19 +1,19 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { IApplication, modifyApplication } from '@register/applications'
+import { Event, ICertificate } from '@register/forms'
+import { messages } from '@register/i18n/messages/views/certificate'
 import {
   goBack,
-  goToReviewCertificate,
-  goToPrintCertificatePayment
+  goToPrintCertificatePayment,
+  goToReviewCertificate
 } from '@register/navigation'
-import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
-import { Event, IFormData } from '@register/forms'
-import { RouteComponentProps } from 'react-router'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { IStoreState } from '@register/store'
-import { IApplication, modifyApplication } from '@register/applications'
-import { messages } from '@register/i18n/messages/views/certificate'
-import { isFreeOfCost, getEventDate } from './utils'
+import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
+import * as React from 'react'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { getEventDate, isFreeOfCost } from './utils'
 
 interface IMatchParams {
   registrationId: string
@@ -55,18 +55,17 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
   handleNegativeVerification = () => {
     const { application } = this.props
-    const certificate =
-      (application.data.registration.certificates &&
-        // @ts-ignore
-        application.data.registration.certificates[0]) ||
-      {}
+    const certificates =
+      (application &&
+        (application.data.registration.certificates as ICertificate[])) ||
+      null
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          // @ts-ignore
           certificates: [
             {
               ...certificate,

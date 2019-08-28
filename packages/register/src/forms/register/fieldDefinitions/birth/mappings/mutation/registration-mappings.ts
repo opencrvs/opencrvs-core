@@ -1,4 +1,10 @@
-import { IFormData } from '@register/forms'
+import { IFormData, ICertificate, IFileValue } from '@register/forms'
+import {
+  GQLRelatedPerson,
+  GQLRelationshipType,
+  GQLPerson,
+  GQLAttachment
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export function setRegistrationSectionTransformer(
   transformedData: any,
@@ -23,6 +29,47 @@ export function setRegistrationSectionTransformer(
   }
 
   if (draftData[sectionId].certificates) {
-    transformedData[sectionId].certificates = draftData[sectionId].certificates
+    const certificate = (draftData[sectionId].certificates as ICertificate[])[0]
+    if (certificate.collector) {
+      const collector: GQLRelatedPerson = {}
+      if (certificate.collector.type) {
+        collector.relationship = certificate.collector
+          .type as GQLRelationshipType
+      }
+      if (certificate.collector.relationship) {
+        collector.otherRelationship = certificate.collector
+          .relationship as string
+        collector.individual = {
+          name: [
+            {
+              use: 'en',
+              firstNames: certificate.collector.firstName,
+              familyName: certificate.collector.lastName
+            }
+          ],
+          identifier: [
+            {
+              id: certificate.collector.iD,
+              type: certificate.collector.iDType
+            }
+          ]
+        } as GQLPerson
+      }
+      if (certificate.collector.affidavitFile) {
+        collector.affidavit = [
+          {
+            contentType: (certificate.collector.affidavitFile as IFileValue)
+              .type,
+            data: (certificate.collector.affidavitFile as IFileValue).data
+          }
+        ] as GQLAttachment[]
+      }
+      transformedData[sectionId].certificates = [
+        {
+          ...certificate,
+          collector
+        }
+      ]
+    }
   }
 }

@@ -1,25 +1,25 @@
-import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { messages } from '@register/i18n/messages/views/certificate'
+import { Print } from '@opencrvs/components/lib/icons'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { IApplication, modifyApplication } from '@register/applications'
+import { Event, ICertificate } from '@register/forms'
 import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/certificate'
 import {
   goBack as goBackAction,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@register/navigation'
-import { IStoreState } from '@register/store'
-import { RouteComponentProps } from 'react-router'
-import { Event } from '@register/forms'
-import { IApplication, modifyApplication } from '@register/applications'
-import { ITheme } from '@register/styledComponents'
-import { connect } from 'react-redux'
-import { calculatePrice, getServiceMessage, getEventDate } from './utils'
-import { Print } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { ITheme } from '@register/styledComponents'
 import { IUserDetails } from '@register/utils/userUtils'
 import { printMoneyReceipt } from '@register/views/PrintCertificate/PDFUtils'
+import * as React from 'react'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import styled, { withTheme } from 'styled-components'
+import { calculatePrice, getEventDate, getServiceMessage } from './utils'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -83,18 +83,17 @@ type IFullProps = IProps & InjectedIntlProps
 class PaymentComponent extends React.Component<IFullProps> {
   continue = (paymentAmount: string) => {
     const { application } = this.props
-    const certificate =
-      (application.data.registration.certificates &&
-        // @ts-ignore
-        application.data.registration.certificates[0]) ||
-      {}
+    const certificates =
+      (application &&
+        (application.data.registration.certificates as ICertificate[])) ||
+      null
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          // @ts-ignore
           certificates: [
             {
               ...certificate,

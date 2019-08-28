@@ -16,6 +16,7 @@ import { FormFieldGenerator } from '@register/components/form'
 import {
   Action,
   Event,
+  ICertificate,
   IForm,
   IFormData,
   IFormField,
@@ -92,14 +93,16 @@ function getNextSectionIds(
   formSectionGroup: IFormSectionGroup,
   application: IApplication | undefined
 ) {
+  const certificates =
+    (application &&
+      (application.data.registration.certificates as ICertificate[])) ||
+    null
+  const certificate: ICertificate = (certificates && certificates[0]) || {}
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     formSection,
-    (application &&
-      application.data.registration &&
-      application.data.registration.certificates &&
-      // @ts-ignore
-      application.data.registration.certificates[0][formSection.id]) ||
-      {}
+    (certificate[
+      formSection.id as keyof typeof certificate
+    ] as IFormSectionData) || {}
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === formSectionGroup.id
@@ -119,12 +122,12 @@ const getErrorsOnFieldsBySection = (
   fields: IFormField[],
   draft: IApplication
 ) => {
+  const certificates =
+    (draft && (draft.data.registration.certificates as ICertificate[])) || null
+  const certificate: ICertificate = (certificates && certificates[0]) || {}
   const errors = getValidationErrorsForForm(
     fields,
-    (draft.data.registration &&
-      draft.data.registration.certificates &&
-      // @ts-ignore
-      draft.data.registration.certificates[0][sectionId]) ||
+    (certificate[sectionId as keyof typeof certificate] as IFormSectionData) ||
       {}
   )
 
@@ -162,23 +165,22 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     sectionData: IFormSectionData,
     application: IApplication
   ) => {
-    const collector =
-      (application.data.registration.certificates &&
-        // @ts-ignore
-        application.data.registration.certificates[0].collector) ||
-      {}
+    const certificates =
+      (application &&
+        (application.data.registration.certificates as ICertificate[])) ||
+      null
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
+    const collector = certificate.collector || {}
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          // @ts-ignore
           certificates: [
             {
               collector: {
-                // @ts-ignore
-                ...collector,
+                ...(collector as IFormSectionData),
                 ...sectionData
               },
               hasShowedVerifiedDocument: false
@@ -199,53 +201,70 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     fields: IFormField[],
     draft: IApplication | undefined
   ) => {
-    let errLength = 0
-    if (draft) {
-      const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
-      errLength = flatten(
-        // @ts-ignore
-        Object.values(errors).map(Object.values)
-        // @ts-ignore
-      ).filter(errs => errs.length > 0).length
+    if (!draft) return
 
-      const collector =
-        draft.data.registration.certificates &&
-        // @ts-ignore
-        draft.data.registration.certificates[0][sectionId]
-      if (errLength > 0) {
+    const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
+    const errorValues = Object.values(errors).map(Object.values)
+    const errLength = flatten(errorValues).filter(errs => errs.length > 0)
+      .length
+
+    const certificates =
+      (draft.data.registration.certificates as ICertificate[]) || null
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
+    const collector = certificate[
+      sectionId as keyof typeof certificate
+    ] as IFormSectionData
+
+    if (errLength > 0) {
+      this.setState({
+        showError: true
+      })
+
+      return
+    }
+
+    if (currentGroup === 'affidavit') {
+      if (
+        collector.affidavitFile &&
+        (collector.affidavitFile as IFormSectionData).data
+      ) {
+        this.props.writeApplication(draft)
+        this.goToNextFormForSomeoneElse(applicationId, draft, event)
+
+        return
+      }
+      if (
+        !(
+          collector.noAffidavitAgreement &&
+          (collector.noAffidavitAgreement as string[]).length > 0
+        )
+      ) {
         this.setState({
           showError: true
         })
-      } else if (currentGroup === 'affidavit') {
-        if (collector.affidavitFile && collector.affidavitFile.data) {
-          this.props.writeApplication(draft)
 
-          this.goToNextFormForSomeoneElse(applicationId, draft, event)
-        } else {
-          if (
-            collector.noAffidavitAgreement &&
-            (collector.noAffidavitAgreement as string[]).length > 0
-          ) {
-            this.props.writeApplication(draft)
-            this.setState({ showModalForNoSignedAffidavit: true })
-          } else {
-            this.setState({
-              showError: true
-            })
-          }
-        }
-      } else {
-        this.setState({
-          showError: false,
-          showModalForNoSignedAffidavit: false
-        })
-        if (!nextGroup) {
-          this.props.writeApplication(draft)
-          this.props.goToVerifyCollector(applicationId, event, collector.type)
-        } else {
-          this.props.goToPrintCertificate(applicationId, event, nextGroup)
-        }
+        return
       }
+
+      this.props.writeApplication(draft)
+      this.setState({ showModalForNoSignedAffidavit: true })
+
+      return
+    }
+
+    this.setState({
+      showError: false,
+      showModalForNoSignedAffidavit: false
+    })
+    if (!nextGroup) {
+      this.props.writeApplication(draft)
+      this.props.goToVerifyCollector(
+        applicationId,
+        event,
+        collector.type as string
+      )
+    } else {
+      this.props.goToPrintCertificate(applicationId, event, nextGroup)
     }
   }
 
@@ -312,8 +331,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 )
               }
               if (data) {
-                // @ts-ignore
-                const retrievedData = data[dataKey]
+                const retrievedData = data[dataKey as keyof typeof data]
                 const transformedData: IFormData = gqlToDraftTransformer(
                   registerForm,
                   retrievedData

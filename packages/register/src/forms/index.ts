@@ -125,6 +125,7 @@ export type IFormFieldValue =
   | IFileValue[]
   | { [key: string]: string }
   | IAttachmentValue
+  | ICertificate[]
 
 export interface IFileValue {
   optionValues: IFormFieldValue[]
@@ -598,6 +599,26 @@ export interface IFormSectionData {
 
 export interface IFormData {
   [key: string]: IFormSectionData
+}
+
+type PaymentType = 'MANUAL'
+
+type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
+
+type Payment = {
+  paymentId?: string
+  type: PaymentType
+  total: string
+  amount: string
+  outcome: PaymentOutcomeType
+  date: number
+}
+
+export interface ICertificate {
+  collector?: IFormSectionData
+  hasShowedVerifiedDocument?: boolean
+  payments?: Payment[]
+  data?: string
 }
 
 export interface IAttachment {

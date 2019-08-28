@@ -5,6 +5,7 @@ import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@register/views/DataPr
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 describe('Certificate collector test for a birth registration without father details', () => {
   const { store, history } = createStore()
@@ -199,10 +200,7 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
+      await waitForElement(component, '#form_error')
 
       expect(
         component
@@ -302,10 +300,7 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
+      await waitForElement(component, '#form_error')
 
       expect(
         component
@@ -396,10 +391,7 @@ describe('Certificate collector test for a birth registration without father det
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
+      await waitForElement(component, '#form_error')
 
       expect(
         component
