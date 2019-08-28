@@ -175,7 +175,7 @@ interface IState {
   selected: string
   phoneNumber: string
   relationship: string
-  isPhoneNoError: boolean
+  phoneNoError: string
   touched: boolean
   isError: boolean
 }
@@ -232,19 +232,21 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           (this.props.application.data[applicantsSection.id]
             .applicantOtherRelationship as string)) ||
         '',
-      isPhoneNoError: false,
+      phoneNoError: '',
       touched: false,
       isError: false
     }
   }
 
   handlePhoneNoChange = (value: string) => {
-    let invalidPhoneNo = false
-    if (phoneNumberFormat(value)) {
-      invalidPhoneNo = true
-    }
+    const phoneNoError = phoneNumberFormat(value)
     this.setState({
-      isPhoneNoError: invalidPhoneNo ? true : false,
+      phoneNoError: phoneNoError
+        ? this.props.intl.formatMessage(
+            phoneNoError.message,
+            phoneNoError.props
+          )
+        : '',
       phoneNumber: value,
       touched: true,
       isError: false
@@ -266,7 +268,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
 
     if (
       this.state.phoneNumber &&
-      !this.state.isPhoneNoError &&
+      !this.state.phoneNoError &&
       this.state.selected !== ContactPoint.OTHER
     ) {
       const newApplication = {
@@ -300,7 +302,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         : goToDeathRegistration(application.id)
     } else if (
       this.state.phoneNumber &&
-      !this.state.isPhoneNoError &&
+      !this.state.phoneNoError &&
       this.state.selected === ContactPoint.OTHER &&
       this.state.relationship !== '' &&
       event === Event.DEATH
@@ -336,11 +338,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         key={`${id}_phoneNumberFieldContainer`}
         label={this.props.intl.formatMessage(formMessages.phoneNumber)}
         touched={this.state.touched}
-        error={
-          this.state.isPhoneNoError
-            ? this.props.intl.formatMessage(messages.phoneNumberNotValid)
-            : ''
-        }
+        error={this.state.phoneNoError}
         hideAsterisk={true}
       >
         <TextInput
@@ -352,7 +350,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
           value={this.state.phoneNumber}
           onChange={e => this.handlePhoneNoChange(e.target.value)}
           touched={this.state.touched}
-          error={this.state.isPhoneNoError}
+          error={Boolean(this.state.phoneNoError)}
         />
       </InputField>
     )
