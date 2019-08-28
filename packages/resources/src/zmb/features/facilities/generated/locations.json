@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "id": "111",
+      "name": "example",
+      "nameBn": "",
+      "physicalType": "Building",
+      "type": "CRVS_OFFICE|HEALTH_FACILITY",
+      "partOf": "Location/222"
+    }
+  ]
+}

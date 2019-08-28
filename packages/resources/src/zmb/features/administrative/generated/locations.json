@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "id": "111",
+      "name": "Example",
+      "nameBn": "",
+      "physicalType": "Jurisdiction",
+      "jurisdictionType": "PROVINCE",
+      "type": "ADMIN_STRUCTURE",
+      "partOf": "Location/0"
+    }
+  ]
+}

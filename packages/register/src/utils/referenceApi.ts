@@ -12,10 +12,7 @@ export interface IFacilitiesDataResponse {
 export type ILanguagesDataResponse = ILanguage[]
 
 async function loadLanguages(): Promise<ILanguagesDataResponse> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/languages/register`
-  )
+  const url = resolve(window.config.RESOURCES_URL, '/languages/register')
 
   const res = await fetch(url, {
     method: 'GET',
@@ -33,10 +30,7 @@ async function loadLanguages(): Promise<ILanguagesDataResponse> {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/locations`
-  )
+  const url = resolve(window.config.RESOURCES_URL, '/locations')
 
   const res = await fetch(url, {
     method: 'GET',
@@ -54,10 +48,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/facilities`
-  )
+  const url = resolve(window.config.RESOURCES_URL, '/facilities')
   const res = await fetch(url, {
     method: 'GET',
     headers: {
