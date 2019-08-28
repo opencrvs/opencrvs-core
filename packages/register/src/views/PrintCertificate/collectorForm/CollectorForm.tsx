@@ -482,7 +482,6 @@ const mapStateToProps = (
       }
     }
   }
-  console.log(JSON.stringify(clonedFormSection))
   const formGroup =
     clonedFormSection.groups.find(group => group.id === groupId) ||
     clonedFormSection.groups[0]
