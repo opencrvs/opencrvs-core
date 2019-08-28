@@ -44,6 +44,60 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 const getItem = window.localStorage.getItem as jest.Mock
 
+describe('when user wants to review death certificate', () => {
+  const { store, history } = createStore()
+  const mockLocation: any = jest.fn()
+
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    getItem.mockReturnValue(validToken)
+    store.dispatch(checkAuth({ '?token': validToken }))
+
+    store.dispatch(
+      storeApplication({
+        id: 'mockDeath1234',
+        data: mockDeathApplicationData,
+        event: Event.DEATH
+      })
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    const testComponent = createTestComponent(
+      <ReviewCertificateAction
+        location={mockLocation}
+        history={history}
+        match={{
+          params: {
+            registrationId: 'mockDeath1234',
+            eventType: Event.DEATH
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+
+    component = testComponent.component
+  })
+
+  it('Should display have the Confirm And print Button', async () => {
+    const confirmBtn = await waitForElement(component, '#confirm-print')
+    const confirmBtnExist = !!confirmBtn.hostNodes().length
+    expect(confirmBtnExist).toBe(true)
+  })
+})
+
 describe('when user wants to review birth certificate', () => {
   const { store, history } = createStore()
   const mockLocation: any = jest.fn()
@@ -122,59 +176,5 @@ describe('when user wants to review birth certificate', () => {
       .length
 
     expect(modalIsClosed).toBe(false)
-  })
-})
-
-describe('when user wants to review death certificate', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
-
-  let component: ReactWrapper<{}, {}>
-
-  beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
-
-    store.dispatch(
-      storeApplication({
-        id: 'mockDeath1234',
-        data: mockDeathApplicationData,
-        event: Event.DEATH
-      })
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    const testComponent = createTestComponent(
-      <ReviewCertificateAction
-        location={mockLocation}
-        history={history}
-        match={{
-          params: {
-            registrationId: 'mockDeath1234',
-            eventType: Event.DEATH
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
-    component = testComponent.component
-  })
-
-  it('Should display have the Confirm And print Button', () => {
-    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
-      .length
-    expect(confirmBtnExist).toBe(true)
   })
 })
