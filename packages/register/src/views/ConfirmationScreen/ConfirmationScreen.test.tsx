@@ -545,7 +545,7 @@ describe('when user is in the confirmation screen page for birth duplication', (
         .find('#go_to_duplicate_button')
         .first()
         .text()
-    ).toEqual(`Back to duplicates`)
+    ).toEqual(`Back to duplicate`)
   })
   it('Should redirect the user to the homepage', async () => {
     confirmationScreenComponent

@@ -4,7 +4,7 @@ import {
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 
-export function getRegistrationSectionTransformer(
+export function getBirthRegistrationSectionTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string

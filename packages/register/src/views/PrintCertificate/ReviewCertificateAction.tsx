@@ -32,6 +32,7 @@ import {
   previewCertificate,
   printCertificate
 } from '@register/views/PrintCertificate/PDFUtils'
+import { getEventRegisterForm } from '@register/forms/register/application-selectors'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -294,7 +295,7 @@ function mapStatetoProps(
     draft,
     drafts: state.applicationsState,
     userDetails: getUserDetails(state),
-    registerForm: state.registerForm.registerForm[event]
+    registerForm: getEventRegisterForm(state, event)
   }
 }
 const mapDispatchToProps = {

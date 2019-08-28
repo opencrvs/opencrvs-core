@@ -1,4 +1,9 @@
-import { IFormData, ICertificate, IFileValue } from '@register/forms'
+import {
+  IFormData,
+  ICertificate,
+  IFileValue,
+  TransformedData
+} from '@register/forms'
 import {
   GQLRelatedPerson,
   GQLRelationshipType,
@@ -6,8 +11,8 @@ import {
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 
-export function setRegistrationSectionTransformer(
-  transformedData: any,
+export function setBirthRegistrationSectionTransformer(
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) {

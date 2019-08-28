@@ -35,7 +35,7 @@ export const deathPlaceToFieldTransformer = (
   return transformedData
 }
 
-export function getRegistrationSectionTransformer(
+export function getDeathRegistrationSectionTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string

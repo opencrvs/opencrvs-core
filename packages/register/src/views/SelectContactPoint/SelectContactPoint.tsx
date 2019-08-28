@@ -34,16 +34,24 @@ import {
   RADIO_BUTTON_LARGE_STRING
 } from '@register/utils/constants'
 import { phoneNumberFormat } from '@register/utils/validate'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+
 import { IInformantField } from '@register/views/SelectInformant/SelectInformant'
-import { Event } from '@register/forms'
+import {
+  Event,
+  IFormSection,
+  BirthSection,
+  DeathSection
+} from '@register/forms'
 import { messages } from '@register/i18n/messages/views/selectContactPoint'
 import {
   formMessages,
   constantsMessages,
   buttonMessages
 } from '@register/i18n/messages'
+import {
+  getDeathSection,
+  getBirthSection
+} from '@register/forms/register/application-selectors'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -184,22 +192,33 @@ interface IMatchProps {
   applicationId: string
 }
 
-type IProps = InjectedIntlProps &
-  RouteComponentProps<IMatchProps> & {
-    language: string
-    application: IApplication
-    modifyApplication: typeof modifyApplication
-    writeApplication: typeof writeApplication
-    goBack: typeof goBackAction
-    goToHome: typeof goToHomeAction
-    storeApplication: typeof storeApplication
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    setInitialApplications: typeof setInitialApplications
-    goToDeathRegistration: typeof goToDeathRegistration
-  }
-class SelectContactPointView extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+interface IStateProps {
+  language: string
+  application: IApplication
+  registrationSection: IFormSection
+  applicantsSection: IFormSection
+}
+
+interface IProps {
+  modifyApplication: typeof modifyApplication
+  writeApplication: typeof writeApplication
+  goBack: typeof goBackAction
+  goToHome: typeof goToHomeAction
+  storeApplication: typeof storeApplication
+  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  setInitialApplications: typeof setInitialApplications
+  goToDeathRegistration: typeof goToDeathRegistration
+}
+
+type IFullProps = InjectedIntlProps &
+  RouteComponentProps<IMatchProps> &
+  IProps &
+  IStateProps
+
+class SelectContactPointView extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
     super(props)
+    const { registrationSection, applicantsSection } = props
     this.state = {
       selected:
         (this.props.application &&
@@ -257,7 +276,9 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       writeApplication,
       modifyApplication,
       goToBirthRegistrationAsParent,
-      goToDeathRegistration
+      goToDeathRegistration,
+      registrationSection,
+      applicantsSection
     } = this.props
     e.preventDefault()
     const event = this.props.location.pathname.includes(Event.BIRTH)
@@ -494,13 +515,15 @@ class SelectContactPointView extends React.Component<IProps, IState> {
 const mapStateToProps = (
   store: IStoreState,
   props: RouteComponentProps<{ applicationId: string }>
-) => {
+): IStateProps => {
   const { match } = props
   return {
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
-    ) as IApplication,
-    language: getLanguage(store)
+    )!,
+    language: getLanguage(store),
+    registrationSection: getBirthSection(store, BirthSection.Registration),
+    applicantsSection: getDeathSection(store, DeathSection.Applicants)
   }
 }
 
@@ -518,4 +541,4 @@ export const SelectContactPoint = withRouter(
       goToDeathRegistration
     }
   )(injectIntl(SelectContactPointView))
-) as any
+)

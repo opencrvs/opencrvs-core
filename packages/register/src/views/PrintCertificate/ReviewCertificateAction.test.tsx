@@ -16,6 +16,7 @@ import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 import { storage } from '@register/storage'
 import { checkAuth } from '@register/profile/profileActions'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const mockFetchUserDetails = jest.fn()
 
@@ -106,9 +107,9 @@ describe('when user wants to review birth certificate', () => {
     expect(modalIsDisplayed).toBe(true)
   })
 
-  it('Should close the modal on clicking the print the button', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
-    confirmBtn.simulate('click')
+  it('Should close the modal on clicking the print the button', async () => {
+    const confirmBtn = await waitForElement(component, '#confirm-print')
+    confirmBtn.hostNodes().simulate('click')
     component.update()
 
     component

@@ -54,12 +54,14 @@ import {
 } from '@register/views/PrintCertificate/utils'
 import { StyledSpinner } from '@register/views/RegistrationHome/RegistrationHome'
 import * as Sentry from '@sentry/browser'
-import { debounce, flatten } from 'lodash'
+import { debounce, flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
+import { IValidationResult } from '@register/utils/validate'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -134,7 +136,9 @@ const getErrorsOnFieldsBySection = (
   return {
     [sectionId]: fields.reduce((fields, field) => {
       // REFACTOR
-      const validationErrors = errors[field.name]
+      const validationErrors = errors[
+        field.name as keyof typeof errors
+      ] as IValidationResult[]
 
       const value = draft.data[sectionId]
         ? draft.data[sectionId][field.name]
@@ -309,7 +313,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       application
     )
     let applicationToBeCertified: IApplication = application as IApplication
-    if (!applicationToBeCertified) {
+    if (
+      !applicationToBeCertified ||
+      !applicationToBeCertified.data ||
+      !applicationToBeCertified.data.registration.regStatus
+    ) {
       return (
         <QueryProvider
           event={event}
@@ -468,32 +476,31 @@ const mapStateToProps = (
     application => application.id === registrationId
   )
   const formSection = getCollectCertificateForm(event, state)
+  const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
-    if (formSection.groups && formSection.groups[0].id === 'certCollector')
-      formSection.groups.shift()
     if (application && application.data && application.data.father) {
       if (application.data.father.fathersDetailsExist) {
-        formSection.groups.unshift(
+        clonedFormSection.groups.unshift(
           certCollectorGroupForBirthAppWithFatherDetails
         )
       } else {
-        formSection.groups.unshift(
+        clonedFormSection.groups.unshift(
           certCollectorGroupForBirthAppWithoutFatherDetails
         )
       }
     }
   }
   const formGroup =
-    formSection.groups.find(group => group.id === groupId) ||
-    formSection.groups[0]
+    clonedFormSection.groups.find(group => group.id === groupId) ||
+    clonedFormSection.groups[0]
 
   return {
-    registerForm: state.registerForm.registerForm[event],
+    registerForm: getRegisterForm(state)[event],
     event,
     pageRoute: CERTIFICATE_COLLECTOR,
     applicationId: registrationId,
     application,
-    formSection,
+    formSection: clonedFormSection,
     formGroup
   }
 }

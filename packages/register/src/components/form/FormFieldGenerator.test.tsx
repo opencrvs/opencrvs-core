@@ -1,9 +1,5 @@
 import * as React from 'react'
-import {
-  createTestComponent,
-  selectOption,
-  mockOfflineData
-} from '@register/tests/util'
+import { createTestComponent, selectOption } from '@register/tests/util'
 import { FormFieldGenerator } from '@register/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
 import { createApplication, storeApplication } from '@register/applications'
@@ -23,16 +19,6 @@ export interface IMotherSectionFormData {
   firstName: string
 }
 
-const offlineResources = {
-  locations: mockOfflineData.locations,
-  facilities: mockOfflineData.facilities,
-  healthFacilityFilterLocation: '',
-  offlineDataLoaded: true,
-  loadingError: false,
-  languages: [],
-  languageState: {}
-}
-
 describe('form component', () => {
   const { store } = createStore()
   const draft = createApplication(Event.BIRTH)
@@ -44,7 +30,6 @@ describe('form component', () => {
       id="mother"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      offlineResources={offlineResources}
       fields={[
         {
           name: 'countryPermanent',
@@ -145,7 +130,6 @@ describe('form component registration section', () => {
       id="registration"
       onChange={modifyDraft}
       setAllFieldsDirty={false}
-      offlineResources={offlineResources}
       fields={[
         {
           name: 'registrationPhone',

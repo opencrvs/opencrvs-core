@@ -3,7 +3,8 @@ import {
   createTestComponent,
   flushPromises,
   getFileFromBase64String,
-  validImageB64String
+  validImageB64String,
+  waitForReady
 } from '@register/tests/util'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { createStore } from '@register/store'
@@ -15,13 +16,14 @@ import {
   mockUserGraphqlOperation
 } from '@register/views/SysAdmin/user/utils'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
 
   describe('when user is in signature upload form page', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       testComponent = createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -71,7 +73,7 @@ describe('signature upload tests', () => {
         .hostNodes()
         .text()
 
-      expect(error).toBe('Required')
+      expect(error).toBe('Required for registration')
     })
 
     it('No error while uploading if valid file', async () => {
@@ -119,17 +121,9 @@ describe('signature upload tests', () => {
     })
 
     it('clicking on confirm button will go to review page', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
+      const confirmButton = await waitForElement(testComponent, '#confirm_form')
+      confirmButton.hostNodes().simulate('click')
       await flushPromises()
       testComponent.update()
 

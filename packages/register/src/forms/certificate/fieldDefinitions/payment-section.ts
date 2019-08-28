@@ -1,13 +1,14 @@
 import {
-  IFormSection,
   ViewType,
   SELECT_WITH_OPTIONS,
-  PARAGRAPH
+  PARAGRAPH,
+  IFormSection,
+  PaymentSection
 } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
 
 export const paymentFormSection: IFormSection = {
-  id: 'payment',
+  id: PaymentSection.Payment,
   viewType: 'form' as ViewType,
   name: messages.payment,
   title: messages.payment,

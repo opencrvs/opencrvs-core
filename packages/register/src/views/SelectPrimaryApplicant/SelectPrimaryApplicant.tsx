@@ -20,9 +20,15 @@ import {
   goToBirthContactPoint
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { messages } from '@register/i18n/messages/views/selectPrimaryApplicant'
 import { formMessages, buttonMessages } from '@register/i18n/messages'
+import {
+  IFormSection,
+  Section,
+  DeathSection,
+  BirthSection
+} from '@register/forms'
+import { getBirthSection } from '@register/forms/register/application-selectors'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -49,6 +55,7 @@ type IFullProps = InjectedIntlProps &
     goToHome: typeof goToHome
     goToBirthContactPoint: typeof goToBirthContactPoint
     goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+    registrationSection: IFormSection
   }
 
 interface IState {
@@ -62,13 +69,14 @@ enum APPLICANT {
 class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
+    const { registrationSection, application } = props
+
     this.state = {
       applicant:
-        (this.props.application &&
-          this.props.application.data &&
-          this.props.application.data[registrationSection.id] &&
-          (this.props.application.data[registrationSection.id]
-            .applicant as string)) ||
+        (application &&
+          application.data &&
+          application.data[registrationSection.id] &&
+          (application.data[registrationSection.id].applicant as string)) ||
         ''
     }
   }
@@ -77,7 +85,11 @@ class SelectPrimaryApplicantView extends React.Component<IFullProps, IState> {
       this.state.applicant === APPLICANT.MOTHER ||
       this.state.applicant === APPLICANT.FATHER
     ) {
-      const { application, goToBirthContactPoint } = this.props
+      const {
+        application,
+        goToBirthContactPoint,
+        registrationSection
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -158,9 +170,10 @@ const mapStateToProps = (
 ) => {
   const { match } = props
   return {
+    registrationSection: getBirthSection(store, BirthSection.Registration),
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
-    ) as IApplication
+    )!
   }
 }
 

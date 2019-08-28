@@ -9,7 +9,8 @@ import {
   CHECKBOX_GROUP,
   IFormSectionGroup,
   SIMPLE_DOCUMENT_UPLOADER,
-  FIELD_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  CertificateSection
 } from '@register/forms'
 import {
   birthIdentityOptions,
@@ -66,7 +67,7 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
 }
 
 export const collectBirthCertificateFormSection: IFormSection = {
-  id: 'collector',
+  id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
@@ -197,7 +198,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
 }
 
 export const collectDeathCertificateFormSection: IFormSection = {
-  id: 'collector',
+  id: CertificateSection.Collector,
   viewType: 'form',
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
