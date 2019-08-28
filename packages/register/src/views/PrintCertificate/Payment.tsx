@@ -1,24 +1,24 @@
-import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { messages } from '@register/i18n/messages/views/certificate'
+import { Print } from '@opencrvs/components/lib/icons'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { IApplication, modifyApplication } from '@register/applications'
+import { Event, ICertificate } from '@register/forms'
 import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/certificate'
 import {
   goBack as goBackAction,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@register/navigation'
-import { IStoreState } from '@register/store'
-import { RouteComponentProps } from 'react-router'
-import { Event, IFormData, ICertificate } from '@register/forms'
-import { IApplication, modifyApplication } from '@register/applications'
-import { ITheme } from '@register/styledComponents'
-import { connect } from 'react-redux'
-import { calculatePrice, getServiceMessage, getEventDate } from './utils'
-import { Print } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { ITheme } from '@register/styledComponents'
 import { IUserDetails } from '@register/utils/userUtils'
+import * as React from 'react'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import styled, { withTheme } from 'styled-components'
+import { calculatePrice, getEventDate, getServiceMessage } from './utils'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -86,7 +86,7 @@ class PaymentComponent extends React.Component<IFullProps> {
       (application &&
         (application.data.registration.certificates as ICertificate[])) ||
       null
-    const certificate = (certificates && certificates[0]) || {}
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
     this.props.modifyApplication({
       ...application,
       data: {
@@ -96,7 +96,7 @@ class PaymentComponent extends React.Component<IFullProps> {
           certificates: [
             {
               ...certificate,
-              payment: {
+              payments: {
                 type: 'MANUAL',
                 total: paymentAmount,
                 amount: paymentAmount,
