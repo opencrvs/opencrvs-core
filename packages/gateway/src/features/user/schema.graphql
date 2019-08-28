@@ -47,6 +47,7 @@ type User {
   status: String
   primaryOffice: Location
   catchmentArea: [Location]
+  signature: Signature
 }
 
 type SearchUserResult {

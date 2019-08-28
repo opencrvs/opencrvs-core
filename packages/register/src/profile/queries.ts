@@ -29,9 +29,14 @@ export const FETCH_USER = gql`
         name
         status
       }
+      signature {
+        data
+        type
+      }
     }
   }
 `
+
 async function fetchUserDetails(userId: string) {
   return (
     client &&

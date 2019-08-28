@@ -1996,6 +1996,76 @@ export const mockUserResponse = {
   }
 }
 
+export const mockRegistrarUserResponse = {
+  data: {
+    getUser: {
+      userMgntUserID: '123',
+      catchmentArea: [
+        {
+          id: 'ddab090d-040e-4bef-9475-314a448a576a',
+          name: 'Dhaka',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
+          name: 'GAZIPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '20'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+          name: 'KALIGANJ',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '165'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '123456789',
+          name: 'BAKTARPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              value: '3473'
+            }
+          ],
+          __typename: 'Location'
+        }
+      ],
+      primaryOffice: {
+        id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+        name: 'Kaliganj Union Sub Center',
+        status: 'active',
+        __typename: 'Location'
+      },
+      role: 'LOCAL_REGISTRAR',
+      signature: {
+        data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo',
+        type: 'image/png'
+      },
+      __typename: 'User'
+    }
+  }
+}
+
 export const mockApplicationData = {
   child: {
     firstNames: 'গায়ত্রী',
