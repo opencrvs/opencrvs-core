@@ -1,10 +1,12 @@
-import { IFormField, IFormData } from '@register/forms'
 import { fieldToAttachmentTransformer } from '@register/forms/mappings/mutation/field-mappings'
-import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
-import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
-import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
+import {
+  TransformedData,
+  IFormData,
+  IFormField,
+  BirthSection
+} from '@register/forms'
 
-export const documentForWhomFhirMapping = {
+export const birthDocumentForWhomFhirMapping = {
   Child: 'CHILD',
   Father: 'FATHER',
   Mother: 'MOTHER',
@@ -13,28 +15,28 @@ export const documentForWhomFhirMapping = {
   ChildAge: 'CHILD_AGE'
 }
 
-export const sectionMapping = {
-  [childSection.id]: [
-    documentForWhomFhirMapping.Child,
-    documentForWhomFhirMapping.ChildAge
+export const birthSectionMapping = {
+  [BirthSection.Child]: [
+    birthDocumentForWhomFhirMapping.Child,
+    birthDocumentForWhomFhirMapping.ChildAge
   ],
-  [motherSection.id]: [
-    documentForWhomFhirMapping.Mother,
-    documentForWhomFhirMapping.Parent
+  [BirthSection.Mother]: [
+    birthDocumentForWhomFhirMapping.Mother,
+    birthDocumentForWhomFhirMapping.Parent
   ],
-  [fatherSection.id]: [
-    documentForWhomFhirMapping.Father,
-    documentForWhomFhirMapping
+  [BirthSection.Father]: [
+    birthDocumentForWhomFhirMapping.Father,
+    birthDocumentForWhomFhirMapping
   ]
 }
 
-export const sectionTitle = {
-  [childSection.id]: 'Child',
-  [motherSection.id]: 'Mother',
-  [fatherSection.id]: 'Father'
+export const birthSectionTitle = {
+  [BirthSection.Child]: 'Child',
+  [BirthSection.Mother]: 'Mother',
+  [BirthSection.Father]: 'Father'
 }
 
-export const documentTypeFhirMapping = {
+export const birthDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
   'National ID (front)': 'NATIONAL_ID_FRONT',
   'National ID (back)': 'NATIONAL_ID_BACK',
@@ -52,9 +54,9 @@ export const documentTypeFhirMapping = {
 }
 
 export function birthFieldToAttachmentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
-  sectionId: string,
+  sectionId: BirthSection,
   field: IFormField
 ) {
   return fieldToAttachmentTransformer(
@@ -63,7 +65,7 @@ export function birthFieldToAttachmentTransformer(
     sectionId,
     field,
     'registration',
-    documentForWhomFhirMapping,
-    documentTypeFhirMapping
+    birthDocumentForWhomFhirMapping,
+    birthDocumentTypeFhirMapping
   )
 }

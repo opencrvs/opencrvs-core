@@ -1,8 +1,13 @@
-import { IFormSection, ViewType, PDF_DOCUMENT_VIEWER } from '@register/forms'
+import {
+  ViewType,
+  PDF_DOCUMENT_VIEWER,
+  IFormSection,
+  CertificateSection
+} from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
 
 export const certificatePreview: IFormSection = {
-  id: 'certificatePreview',
+  id: CertificateSection.CertificatePreview,
   viewType: 'form' as ViewType,
   name: messages.preview,
   title: messages.preview,

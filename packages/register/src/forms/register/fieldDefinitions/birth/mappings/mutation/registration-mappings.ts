@@ -1,7 +1,7 @@
-import { IFormData } from '@register/forms'
+import { IFormData, TransformedData } from '@register/forms'
 
-export function setRegistrationSectionTransformer(
-  transformedData: any,
+export function setBirthRegistrationSectionTransformer(
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) {

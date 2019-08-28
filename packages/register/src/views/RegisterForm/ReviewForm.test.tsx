@@ -4,8 +4,8 @@ import {
   IApplication,
   storeApplication
 } from '@opencrvs/register/src/applications'
-import { Event } from '@opencrvs/register/src/forms'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { Event, IForm } from '@opencrvs/register/src/forms'
+
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/register/src/navigation/routes'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
@@ -14,7 +14,8 @@ import { queries } from '@register/profile/queries'
 import { createStore } from '@register/store'
 import {
   createTestComponent,
-  mockUserResponseWithName
+  mockUserResponseWithName,
+  getReviewFormFromStore
 } from '@register/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/death/queries'
@@ -35,9 +36,10 @@ describe('ReviewForm tests', () => {
   const { store, history } = createStore()
   const scope = ['register']
   const mock: any = jest.fn()
-  const form = getReviewForm(store.getState()).birth
+  let form: IForm
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    form = await getReviewFormFromStore(store, Event.BIRTH)
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
@@ -950,7 +952,7 @@ describe('ReviewForm tests', () => {
           scope={scope}
           staticContext={mock}
           event={application.event}
-          registerForm={getReviewForm(store.getState()).death}
+          registerForm={getReviewFormFromStore(store, Event.DEATH)}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
@@ -1191,6 +1193,7 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
+      const form = await getReviewFormFromStore(store, Event.DEATH)
       const testComponent = createTestComponent(
         <ReviewForm
           location={mock}
@@ -1198,7 +1201,7 @@ describe('ReviewForm tests', () => {
           scope={scope}
           staticContext={mock}
           event={application.event}
-          registerForm={getReviewForm(store.getState()).death}
+          registerForm={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {

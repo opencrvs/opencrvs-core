@@ -7,7 +7,8 @@ import {
   INFORMATIVE_RADIO_GROUP,
   WARNING,
   PARAGRAPH,
-  FIELD_WITH_DYNAMIC_DEFINITIONS
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  CertificateSection
 } from '@register/forms'
 import { conditionals } from '@register/forms/utils'
 import {
@@ -46,7 +47,7 @@ export const fatherDataDoesNotExist: IFormField = {
 }
 
 export const collectBirthCertificateFormSection: IFormSection = {
-  id: 'collectCertificate',
+  id: CertificateSection.CollectCertificate,
   viewType: 'form',
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
@@ -193,7 +194,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
 }
 
 export const collectDeathCertificateFormSection: IFormSection = {
-  id: 'collectDeathCertificate',
+  id: CertificateSection.CollectDeathCertificate,
   viewType: 'form',
   name: certificateMessages.printCertificate,
   title: certificateMessages.certificateCollectionTitle,
