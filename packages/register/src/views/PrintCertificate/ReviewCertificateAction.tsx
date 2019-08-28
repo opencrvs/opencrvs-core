@@ -37,6 +37,7 @@ import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { getEventRegisterForm } from '@register/forms/register/application-selectors'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -325,7 +326,7 @@ function mapStatetoProps(
     registrationId,
     draft,
     drafts: state.applicationsState,
-    registerForm: state.registerForm.registerForm[event]
+    registerForm: getEventRegisterForm(state, event)
   }
 }
 const mapDispatchToProps = {

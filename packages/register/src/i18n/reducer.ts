@@ -1,7 +1,8 @@
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
+import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@register/i18n/actions'
 import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
 import * as offlineActions from '@register/offline/actions'
+import { ILocation } from '@register/offline/reducer'
 
 export interface IntlMessages {
   [key: string]: string
@@ -54,6 +55,29 @@ export const initialState: IntlState = {
   languages: initLanguages()
 }
 
+export const formatLocationLanguageState = (
+  locations: ILocation[],
+  languages: ILanguageState
+): ILanguageState => {
+  const primaryLocationMessages: IntlMessages = {}
+  const secondaryLocationMessages: IntlMessages = {}
+
+  locations.forEach((location: ILocation) => {
+    primaryLocationMessages[`location.${location.id}`] = location.name
+    if (Object.keys(languages).length === 2) {
+      secondaryLocationMessages[`location.${location.id}`] = location.alias
+    }
+  })
+  Object.keys(languages).forEach((key, index) => {
+    const language = languages[key]
+    language.messages = {
+      ...language.messages,
+      ...(index === 1 ? secondaryLocationMessages : primaryLocationMessages)
+    }
+  })
+  return languages
+}
+
 const getNextMessages = (
   language: string,
   languages: ILanguageState
@@ -63,7 +87,7 @@ const getNextMessages = (
 
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: any
+  action: actions.Action | offlineActions.Action
 ): IntlState | Loop<IntlState, actions.Action | offlineActions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
@@ -74,48 +98,37 @@ export const intlReducer: LoopReducer<IntlState, any> = (
         language: action.payload.language,
         messages
       }
-    case actions.STORE_OFFLINE_LANGUAGES:
-      const offlineLanguages = action.payload as ILanguage[]
-      const offlineLanguagesState: ILanguageState = {}
-      offlineLanguages.forEach((language: ILanguage) => {
-        offlineLanguagesState[language.lang] = language
-      })
-      return loop(
-        {
-          ...state,
-          languages: offlineLanguagesState
-        },
-        Cmd.list([
-          Cmd.action(
-            offlineActions.filterLocationsByLanguage(offlineLanguagesState)
-          )
-        ])
+
+    case offlineActions.READY:
+      const languages = action.payload.languages
+
+      const loadedLanguagesState: ILanguageState = languages.reduce(
+        (indexedByLang, language) => ({
+          ...indexedByLang,
+          [language.lang]: language
+        }),
+        {}
       )
-    case actions.STORE_LANGUAGES:
-      const languagesLoaded = action.payload as ILanguage[]
-      const loadedLanguagesState: ILanguageState = {}
-      languagesLoaded.forEach((language: ILanguage) => {
-        loadedLanguagesState[language.lang] = language
-      })
-      return loop(
-        {
-          ...state,
-          languages: loadedLanguagesState
-        },
-        Cmd.list([
-          Cmd.action(offlineActions.loadLocations(loadedLanguagesState))
-        ])
+
+      const languagesWithLocations = formatLocationLanguageState(
+        Object.values(action.payload.locations),
+        loadedLanguagesState
       )
-    case actions.ADD_OFFLINE_KEYS:
-      let updatedMessages = getNextMessages(state.language, state.languages)
-      updatedMessages = {
-        ...updatedMessages,
-        ...action.payload[state.language].messages
+
+      const languagesWithFacilities = formatLocationLanguageState(
+        Object.values(action.payload.facilities),
+        languagesWithLocations
+      )
+
+      const updatedMessages = {
+        ...getNextMessages(state.language, state.languages),
+        ...languagesWithFacilities[state.language].messages
       }
+
       return {
         ...state,
         messages: updatedMessages,
-        languages: action.payload
+        languages: languagesWithFacilities
       }
     default:
       return state

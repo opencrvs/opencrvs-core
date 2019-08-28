@@ -1,9 +1,10 @@
-import { ILocation } from '@register/offline/reducer'
+import { ILocation, IOfflineData } from '@register/offline/reducer'
 import { ILanguage, ILanguageState } from '@register/i18n/reducer'
 import {
   ILocationDataResponse,
   ILanguagesDataResponse,
-  IFacilitiesDataResponse
+  IFacilitiesDataResponse,
+  IFormsDataResponse
 } from '@register/utils/referenceApi'
 import { IUserDetails } from '@register/utils/userUtils'
 
@@ -68,24 +69,9 @@ export type IFilterLocationsAction = {
   type: typeof FORMAT_LOCATIONS
   payload: ILanguageState
 }
-export const LOAD_LOCATIONS = 'OFFLINE/LOAD_LOCATIONS'
-export type ILoadLocationsAction = {
-  type: typeof LOAD_LOCATIONS
-  payload: ILanguageState
-}
-export type Action =
-  | GetLocations
-  | LocationsFailedAction
-  | LocationsLoadedAction
-  | SetOfflineData
-  | IGetOfflineDataSuccessAction
-  | IGetOfflineDataFailedAction
-  | FacilitiesLoadedAction
-  | FacilitiesFailedAction
-  | LanguagesFailedAction
-  | LanguagesLoadedAction
-  | IFilterLocationsAction
-  | ILoadLocationsAction
+export const READY = 'OFFLINE/READY' as const
+export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED' as const
+export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED' as const
 
 export const locationsLoaded = (
   payload: ILocationDataResponse
@@ -139,16 +125,33 @@ export const languagesFailed = (error: Error): LanguagesFailedAction => ({
   payload: error
 })
 
-export const filterLocationsByLanguage = (
-  languageState: ILanguageState
-): IFilterLocationsAction => ({
-  type: FORMAT_LOCATIONS,
-  payload: languageState
+export const formsLoaded = (payload: IFormsDataResponse) => ({
+  type: FORMS_LOADED,
+  payload: payload
 })
 
-export const loadLocations = (
-  languageState: ILanguageState
-): ILoadLocationsAction => ({
-  type: LOAD_LOCATIONS,
-  payload: languageState
+export const formsFailed = (error: Error) => ({
+  type: FORMS_FAILED,
+  payload: error
 })
+
+export const offlineDataReady = (state: IOfflineData) => ({
+  type: READY,
+  payload: state
+})
+
+export type Action =
+  | GetLocations
+  | LocationsFailedAction
+  | LocationsLoadedAction
+  | SetOfflineData
+  | IGetOfflineDataSuccessAction
+  | IGetOfflineDataFailedAction
+  | FacilitiesLoadedAction
+  | FacilitiesFailedAction
+  | LanguagesFailedAction
+  | LanguagesLoadedAction
+  | IFilterLocationsAction
+  | ReturnType<typeof offlineDataReady>
+  | ReturnType<typeof formsLoaded>
+  | ReturnType<typeof formsFailed>

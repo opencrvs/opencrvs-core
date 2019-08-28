@@ -1,7 +1,6 @@
 import { defineMessages } from 'react-intl'
 
 interface ISelectInformantMessages {
-  newBirthRegistration: ReactIntl.FormattedMessage.MessageDescriptor
   birthInformantTitle: ReactIntl.FormattedMessage.MessageDescriptor
   deathInformantTitle: ReactIntl.FormattedMessage.MessageDescriptor
   parents: ReactIntl.FormattedMessage.MessageDescriptor
@@ -10,11 +9,6 @@ interface ISelectInformantMessages {
 }
 
 const messagesToDefine: ISelectInformantMessages = {
-  newBirthRegistration: {
-    id: 'register.selectInformant.newBirthRegistration',
-    defaultMessage: 'New birth application',
-    description: 'The message that appears for new birth registrations'
-  },
   birthInformantTitle: {
     id: 'register.selectInformant.birthInformantTitle',
     defaultMessage: 'Who is applying for birth registration?',

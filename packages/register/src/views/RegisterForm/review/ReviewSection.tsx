@@ -13,7 +13,10 @@ import {
 } from '@register/applications'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
-import { getRegisterForm } from '@register/forms/register/application-selectors'
+import {
+  getRegisterForm,
+  getBirthSection
+} from '@register/forms/register/application-selectors'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
 import {
   getConditionalActionsForField,
@@ -29,15 +32,15 @@ import {
   TextArea,
   InputField
 } from '@opencrvs/components/lib/forms'
-import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
+
 import { getScope } from '@register/profile/profileSelectors'
 import { Scope } from '@register/utils/authUtils'
-import { getOfflineState } from '@register/offline/selectors'
+import { getOfflineData } from '@register/offline/selectors'
 import {
-  IOfflineDataState,
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
-  ILocation
+  ILocation,
+  IOfflineData
 } from '@register/offline/reducer'
 import { getLanguage } from '@register/i18n/selectors'
 import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
@@ -58,7 +61,10 @@ import {
   WARNING,
   DATE,
   TEXTAREA,
-  Event
+  Event,
+  Section,
+  BirthSection,
+  DeathSection
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
@@ -66,21 +72,21 @@ import { buttonMessages } from '@register/i18n/messages'
 import { REJECTED, BIRTH } from '@register/utils/constants'
 import { ReviewHeader } from './ReviewHeader'
 import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
-  sectionMapping as birthSectionMapping,
-  sectionTitle as birthSectionTitle
+  birthSectionMapping,
+  birthSectionTitle
 } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 import {
-  sectionMapping as deathSectionMapping,
-  sectionTitle as deathSectionTitle
+  deathSectionMapping,
+  deathSectionTitle
 } from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { IValidationResult } from '@register/utils/validate'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -139,11 +145,11 @@ const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
 `
 const InputWrapper = styled.div`
-  margin-top: 48px;
+  margin-top: 56px;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
-  activeSection: any,
+  activeSection: IFormSection,
   application: IApplication
 ) => void
 interface IProps {
@@ -159,17 +165,19 @@ interface IProps {
     payload?: IPayload
   ) => void
   scope: Scope | null
-  offlineResources: IOfflineDataState
+  offlineResources: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
   writeApplication: typeof writeApplication
+  registrationSection: IFormSection
+  documentsSection: IFormSection
 }
 type State = {
   displayEditDialog: boolean
-  editClickedSectionId: string
+  editClickedSectionId: Section | null
   editClickedSectionGroupId: string
   editClickFieldName: string
-  activeSection: string
+  activeSection: Section | null
 }
 type FullProps = IProps & InjectedIntlProps
 
@@ -200,7 +208,7 @@ export function renderSelectDynamicLabel(
   options: IDynamicOptions,
   draftData: IFormSectionData,
   intl: InjectedIntl,
-  resources: IOfflineDataState,
+  resources: IOfflineData,
   language: string
 ) {
   if (!options.resource) {
@@ -244,7 +252,7 @@ const renderValue = (
   section: IFormSection,
   field: IFormField,
   intl: InjectedIntl,
-  offlineResources: IOfflineDataState,
+  offlineResources: IOfflineData,
   language: string
 ) => {
   const value: IFormFieldValue = draft.data[section.id]
@@ -291,14 +299,17 @@ const getErrorsOnFieldsBySection = (
 
     const errors = getValidationErrorsForForm(
       fields,
-      draft.data[section.id] || {}
+      draft.data[section.id] || {},
+      undefined,
+      draft.data
     )
 
     return {
       ...sections,
       [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
-        const validationErrors = errors[field.name]
+        const validationErrors: IValidationResult[] =
+          errors[field.name as keyof typeof errors]
 
         const value = draft.data[section.id]
           ? draft.data[section.id][field.name]
@@ -328,10 +339,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     this.state = {
       displayEditDialog: false,
-      editClickedSectionId: '',
       editClickedSectionGroupId: '',
       editClickFieldName: '',
-      activeSection: ''
+      editClickedSectionId: null,
+      activeSection: null
     }
   }
 
@@ -384,8 +395,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   prepSectionDocuments = (
     draft: IApplication,
-    activeSection: string
+    activeSection: Section
   ): IDocumentViewerOptions => {
+    const { documentsSection } = this.props
+
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
     const selectOptions: SelectComponentOptions[] = []
@@ -402,13 +415,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     uploadedDocuments = uploadedDocuments.filter(document => {
       const sectionMapping = SECTION_MAPPING[draft.event]
       const sectionTitle = SECTION_TITLE[draft.event]
-      // @ts-ignore
-      const allowedDocumentType = sectionMapping[activeSection] || []
+
+      const allowedDocumentType: string[] =
+        sectionMapping[activeSection as keyof typeof sectionMapping] || []
 
       if (
         allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
       ) {
-        const title = sectionTitle[activeSection]
+        const title = sectionTitle[activeSection as keyof typeof sectionMapping]
         const label = title + ' ' + document.optionValues[1]
 
         documentOptions.push({
@@ -437,7 +451,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   editLinkClickHandler = (
-    sectionId: string,
+    sectionId: Section | null,
     sectionGroupId: string,
     fieldName: string
   ) => {
@@ -550,6 +564,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       rejectApplicationClickEvent,
       submitClickEvent,
       pageRoute,
+      registrationSection,
+      documentsSection,
       draft: { event }
     } = this.props
 
@@ -662,7 +678,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       this.editLinkClickHandler(
                         documentsSection.id,
                         documentsSection.groups[0].id,
-                        this.state.activeSection
+                        this.state.activeSection!
                       )
                     }
                   >
@@ -683,7 +699,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             this.props.goToPageGroup(
               pageRoute,
               draft.id,
-              this.state.editClickedSectionId,
+              this.state.editClickedSectionId!,
               this.state.editClickedSectionGroupId,
               draft.event.toLowerCase(),
               this.state.editClickFieldName
@@ -698,8 +714,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 export const ReviewSection = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
+    registrationSection: getBirthSection(state, BirthSection.Registration),
+    documentsSection: getBirthSection(state, BirthSection.Documents),
     scope: getScope(state),
-    offlineResources: getOfflineState(state),
+    offlineResources: getOfflineData(state),
     language: getLanguage(state)
   }),
   { goToPageGroup, writeApplication }

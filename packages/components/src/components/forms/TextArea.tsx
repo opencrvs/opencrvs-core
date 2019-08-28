@@ -6,7 +6,7 @@ interface ITextAreaProps {
 }
 
 const StyledTextArea = styled.textarea<ITextAreaProps>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.bigBodyStyle};
   width: 100%;
   padding: 10px;
   min-height: 104px;
@@ -16,6 +16,7 @@ const StyledTextArea = styled.textarea<ITextAreaProps>`
     outline: 0;
   }
   background-color: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.copy};
 
   &::-webkit-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholder};

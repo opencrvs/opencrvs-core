@@ -2,26 +2,28 @@ import { required, IValidationResult } from '@register/utils/validate'
 import {
   IFormField,
   IFormSectionData,
-  IDynamicFormField
+  IDynamicFormField,
+  IFormData
 } from '@register/forms'
 import {
   getConditionalActionsForField,
   getFieldValidation
 } from '@opencrvs/register/src/forms/utils'
-import { IOfflineDataState } from '@register/offline/reducer'
+import { IOfflineData } from '@register/offline/reducer'
 
 export function getValidationErrorsForField(
   field: IFormField,
   values: IFormSectionData,
-  offlineResources?: IOfflineDataState
+  resources?: IOfflineData,
+  drafts?: IFormData
 ) {
   const value = values[field.name]
   const conditionalActions = getConditionalActionsForField(
     field,
     values,
-    offlineResources
+    resources,
+    drafts
   )
-
   if (conditionalActions.includes('hide')) {
     return []
   }
@@ -37,22 +39,24 @@ export function getValidationErrorsForField(
   }
 
   return validators
-    .map(validator => validator(value))
+    .map(validator => validator(value, drafts))
     .filter(error => error !== undefined) as IValidationResult[]
 }
 
-export type Errors = { [key: string]: string }
+export type Errors = { [key: string]: IValidationResult[] }
 
 export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData,
-  offlineResources?: IOfflineDataState
-): { [key: string]: IValidationResult[] } {
+  resource?: IOfflineData,
+  drafts?: IFormData
+) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     const validationErrors = getValidationErrorsForField(
       field,
       values,
-      offlineResources
+      resource,
+      drafts
     )
     return {
       ...errorsForAllFields,

@@ -16,9 +16,11 @@ import { validateFunc } from '@opencrvs/commons'
 import { languagesHandler as bgdLanguagesHandler } from '@resources/bgd/features/languages/handler'
 import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
+import { formsHandler as bgdFormsHandler } from '@resources/bgd/features/forms/handler'
 import { languagesHandler as zmbLanguagesHandler } from '@resources/zmb/features/languages/handler'
 import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
 import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
+import { formsHandler as zmbFormsHandler } from '@resources/zmb/features/forms/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -76,6 +78,16 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description: 'Returns Bangladesh facilities.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/bgd/forms/{application}',
+    handler: bgdFormsHandler,
+    options: {
+      tags: ['api'],
+      description: 'Returns Bangladesh forms'
     }
   })
 
@@ -147,6 +159,16 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description: 'Returns Bangladesh facilities.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/bgd/forms/{application}',
+    handler: zmbFormsHandler,
+    options: {
+      tags: ['api'],
+      description: 'Returns Bangladesh forms'
     }
   })
 

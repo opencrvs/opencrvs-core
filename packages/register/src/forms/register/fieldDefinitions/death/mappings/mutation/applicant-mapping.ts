@@ -1,4 +1,4 @@
-import { IFormField, IFormData } from '@register/forms'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 import {
   cloneDeep,
   keys,
@@ -65,7 +65,7 @@ export const fieldValueNestingTransformer = (
   transformerMethod?: any,
   objectType?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -104,7 +104,7 @@ export const fieldValueNestingTransformer = (
 }
 
 export function setInformantSectionTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) {

@@ -23,14 +23,18 @@ import {
   goToDeathRegistration
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+
 import {
   InputField,
   TextInput,
   IRadioOption as RadioComponentOption
 } from '@opencrvs/components/lib/forms'
-import { Event } from '@register/forms'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  IFormSection
+} from '@register/forms'
 import { phoneNumberFormat } from '@register/utils/validate'
 import {
   PHONE_NO_FIELD_STRING,
@@ -38,11 +42,16 @@ import {
   INFORMANT_FIELD_STRING
 } from '@register/utils/constants'
 import { messages } from '@register/i18n/messages/views/selectInformant'
+import { constantsMessages } from '@register/i18n/messages/constants'
 import {
   validationMessages,
   formMessages,
   buttonMessages
 } from '@register/i18n/messages'
+import {
+  getBirthSection,
+  getDeathSection
+} from '@register/forms/register/application-selectors'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -207,6 +216,8 @@ type IFullProps = {
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
   goToPrimaryApplicant: typeof goToPrimaryApplicant
+  registrationSection: IFormSection
+  applicantsSection: IFormSection
 } & InjectedIntlProps &
   RouteComponentProps<IMatchProps>
 
@@ -222,6 +233,7 @@ interface IState {
 export class SelectInformantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
+    const { applicantsSection, registrationSection } = props
     this.state = {
       informant:
         (this.props.application &&
@@ -269,7 +281,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
-      const { application, goToPrimaryApplicant } = this.props
+      const {
+        application,
+        goToPrimaryApplicant,
+        registrationSection
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -291,7 +307,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const {
         application,
         goToBirthContactPoint,
-        goToDeathContactPoint
+        goToDeathContactPoint,
+        registrationSection,
+        applicantsSection
       } = this.props
       const newApplication = {
         ...application,
@@ -334,7 +352,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       !this.state.isPhoneNoError &&
       this.state.relationship !== ''
     ) {
-      const { application, goToDeathRegistration } = this.props
+      const {
+        application,
+        goToDeathRegistration,
+        applicantsSection
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -408,10 +430,23 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       ? Event.BIRTH
       : Event.DEATH
     const infornantFields = setInformantFields(intl, event)
+
+    let titleMessage
+    switch (event) {
+      case Event.BIRTH:
+        titleMessage = constantsMessages.newBirthRegistration
+        break
+      case Event.DEATH:
+        titleMessage = constantsMessages.newDeathRegistration
+        break
+      default:
+        titleMessage = constantsMessages.newBirthRegistration
+    }
+
     return (
       <Container>
         <EventTopBar
-          title={intl.formatMessage(messages.newBirthRegistration)}
+          title={intl.formatMessage(titleMessage)}
           goHome={this.props.goToHome}
         />
 
@@ -501,9 +536,11 @@ const mapStateToProps = (
 ) => {
   const { match } = props
   return {
+    registrationSection: getBirthSection(store, BirthSection.Registration),
+    applicantsSection: getDeathSection(store, DeathSection.Applicants),
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
-    ) as IApplication
+    )!
   }
 }
 
@@ -521,4 +558,4 @@ export const SelectInformant = withRouter(
       modifyApplication
     }
   )(injectIntl(SelectInformantView))
-) as any
+)

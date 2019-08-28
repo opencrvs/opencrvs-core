@@ -30,6 +30,7 @@ import {
 } from '@register/i18n/messages'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { SimpleDocumentUploader } from '@register/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -58,7 +59,7 @@ class UserReviewFormComponent extends React.Component<
     const sections: ISectionData[] = []
 
     getVisibleSectionGroupsBasedOnConditions(
-      userSection,
+      deserializeFormSection(userSection),
       this.props.formData
     ).forEach(group => {
       group.fields.forEach((field: IFormField) => {
@@ -146,7 +147,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goBack: () => dispatch(goBack()),
     submitForm: () => {
       const variables = draftToGqlTransformer(
-        { sections: [userSection] },
+        { sections: [deserializeFormSection(userSection)] },
         { user: props.formData }
       )
       dispatch(submitUserFormData(props.client, createUserMutation, variables))
