@@ -1,9 +1,6 @@
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 import { localFonts } from '@register/pdfRenderer/templates/localFonts'
-import {
-  SEAL_BD_GOVT,
-  DUMMY_SIGNATURE
-} from '@opencrvs/register/src/pdfRenderer/templates/logo'
+import { SEAL_BD_GOVT } from '@opencrvs/register/src/pdfRenderer/templates/logo'
 
 export const template: IPDFTemplate = {
   definition: {
@@ -235,8 +232,8 @@ export const template: IPDFTemplate = {
                           {
                             border: [false, false, false, false],
                             alignment: 'center',
-                            image: DUMMY_SIGNATURE,
-                            fit: [78, 78]
+                            image: '{registrarSignature}',
+                            fit: [78, 50]
                           }
                         ],
                         [
@@ -429,6 +426,11 @@ export const template: IPDFTemplate = {
       parameters: {
         formattedKeys: '{registration.regStatus.officeAlias}'
       }
+    },
+    {
+      field: 'registrarSignature',
+      operation: 'LoggedInUserSignature',
+      baseData: 'userdetails'
     },
     {
       field: 'registrarName',

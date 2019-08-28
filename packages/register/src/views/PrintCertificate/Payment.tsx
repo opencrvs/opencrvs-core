@@ -98,13 +98,15 @@ class PaymentComponent extends React.Component<IFullProps> {
           certificates: [
             {
               ...certificate,
-              payment: {
-                type: 'MANUAL',
-                total: paymentAmount,
-                amount: paymentAmount,
-                outcome: 'COMPLETED',
-                date: Date.now()
-              }
+              payments: [
+                {
+                  type: 'MANUAL',
+                  total: paymentAmount,
+                  amount: paymentAmount,
+                  outcome: 'COMPLETED',
+                  date: Date.now()
+                }
+              ]
             }
           ]
         }

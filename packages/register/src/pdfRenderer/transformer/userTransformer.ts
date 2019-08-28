@@ -40,5 +40,12 @@ export const userTransformers: IFunctionTransformer = {
     return userDetails.role
       ? intl.formatMessage(userMessages[userDetails.role])
       : ''
+  },
+
+  /*
+    LoggedInUserRole provides the branded role of the loggedIn user.     
+  */
+  LoggedInUserSignature: (userDetails: TransformerData, intl: InjectedIntl) => {
+    return userDetails.signature ? userDetails.signature.data || '' : ''
   }
 }

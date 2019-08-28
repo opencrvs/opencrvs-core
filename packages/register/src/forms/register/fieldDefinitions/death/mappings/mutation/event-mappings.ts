@@ -84,6 +84,10 @@ export function setRegistrationSectionTransformer(
       transformedData.registration.registrationNumber =
         draftData.registration.registrationNumber
     }
+    if (draftData.registration.certificates) {
+      transformedData.registration.certificates =
+        draftData.registration.certificates
+    }
   }
   return transformedData
 }

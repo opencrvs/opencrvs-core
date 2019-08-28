@@ -21,4 +21,8 @@ export function setRegistrationSectionTransformer(
       }
     ]
   }
+
+  if (draftData[sectionId].certificates) {
+    transformedData[sectionId].certificates = draftData[sectionId].certificates
+  }
 }

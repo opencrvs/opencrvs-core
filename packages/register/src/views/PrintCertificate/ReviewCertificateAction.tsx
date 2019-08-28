@@ -28,7 +28,10 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
-import { previewCertificate } from '@register/views/PrintCertificate/PDFUtils'
+import {
+  previewCertificate,
+  printCertificate
+} from '@register/views/PrintCertificate/PDFUtils'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -134,8 +137,11 @@ class ReviewCertificateActionComponent extends React.Component<
 
   readyToCertify = () => {
     const { draft } = this.props
+    printCertificate(this.props.intl, draft, this.props.userDetails)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
+    // @ts-ignore
+    draft.data.registration.certificates[0].data = this.state.certificatePdf
     this.props.modifyApplication(draft)
     this.toggleModal()
     this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
