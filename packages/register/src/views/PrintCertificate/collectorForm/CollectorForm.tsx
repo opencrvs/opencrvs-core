@@ -225,7 +225,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     if (currentGroup === 'affidavit') {
       if (
-        collector.affidavitFilea &&
+        collector.affidavitFile &&
         (collector.affidavitFile as IFormSectionData).data
       ) {
         this.props.writeApplication(draft)
