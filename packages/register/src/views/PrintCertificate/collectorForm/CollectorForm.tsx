@@ -54,7 +54,7 @@ import {
 } from '@register/views/PrintCertificate/utils'
 import { StyledSpinner } from '@register/views/RegistrationHome/RegistrationHome'
 import * as Sentry from '@sentry/browser'
-import { debounce, flatten } from 'lodash'
+import { debounce, flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -468,24 +468,24 @@ const mapStateToProps = (
     application => application.id === registrationId
   )
   const formSection = getCollectCertificateForm(event, state)
+  const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
-    if (formSection.groups && formSection.groups[0].id === 'certCollector')
-      formSection.groups.shift()
     if (application && application.data && application.data.father) {
       if (application.data.father.fathersDetailsExist) {
-        formSection.groups.unshift(
+        clonedFormSection.groups.unshift(
           certCollectorGroupForBirthAppWithFatherDetails
         )
       } else {
-        formSection.groups.unshift(
+        clonedFormSection.groups.unshift(
           certCollectorGroupForBirthAppWithoutFatherDetails
         )
       }
     }
   }
+  console.log(JSON.stringify(clonedFormSection))
   const formGroup =
-    formSection.groups.find(group => group.id === groupId) ||
-    formSection.groups[0]
+    clonedFormSection.groups.find(group => group.id === groupId) ||
+    clonedFormSection.groups[0]
 
   return {
     registerForm: state.registerForm.registerForm[event],
@@ -493,7 +493,7 @@ const mapStateToProps = (
     pageRoute: CERTIFICATE_COLLECTOR,
     applicationId: registrationId,
     application,
-    formSection,
+    formSection: clonedFormSection,
     formGroup
   }
 }
