@@ -2162,7 +2162,7 @@ export const mockApplicationData = {
     certificates: [
       {
         collector: {
-          relationship: 'MOTHER'
+          type: 'MOTHER'
         },
         hasShowedVerifiedDocument: true
       }
@@ -2278,12 +2278,68 @@ export const mockDeathApplicationData = {
     certificates: [
       {
         collector: {
-          relationship: 'MOTHER'
+          type: 'MOTHER'
         },
         hasShowedVerifiedDocument: true
       }
     ]
   }
+}
+
+export const mockBirthRegistrationSectionData = {
+  whoseContactDetails: 'MOTHER',
+  presentAtBirthRegistration: 'BOTH_PARENTS',
+  registrationPhone: '01557394986',
+  trackingId: 'BDSS0SE',
+  registrationNumber: '201908122365BDSS0SE1',
+  regStatus: {
+    type: 'REGISTERED',
+    officeName: 'MokhtarPur',
+    officeAlias: 'মখতারপুর',
+    officeAddressLevel3: 'Gazipur',
+    officeAddressLevel4: 'Dhaka'
+  },
+  certificates: [
+    {
+      collector: {
+        type: 'OTHER',
+        relationship: 'Uncle',
+        firstName: 'Mushraful',
+        lastName: 'Hoque',
+        iDType: 'PASSPORT',
+        iD: '123456789'
+      },
+      hasShowedVerifiedDocument: true
+    }
+  ]
+}
+
+export const mockDeathRegistrationSectionData = {
+  whoseContactDetails: 'MOTHER',
+  presentAtBirthRegistration: 'BOTH_PARENTS',
+  registrationPhone: '01557394986',
+  trackingId: 'DDSS0SE',
+  registrationNumber: '201908122365DDSS0SE1',
+  regStatus: {
+    type: 'REGISTERED',
+    officeName: 'MokhtarPur',
+    officeAlias: 'মখতারপুর',
+    officeAddressLevel3: 'Gazipur',
+    officeAddressLevel4: 'Dhaka'
+  },
+  certificates: [
+    {
+      collector: {
+        type: 'OTHER',
+        relationship: 'Uncle',
+        firstName: 'Mushraful',
+        lastName: 'Hoque',
+        iDType: 'PASSPORT',
+        iD: '123456789'
+      },
+      hasShowedVerifiedDocument: true
+    }
+  ]
 }
 
 export const mockOfflineData = {

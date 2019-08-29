@@ -1,5 +1,5 @@
 import { IFormField, IFormData, Event } from '@register/forms'
-import { REGISTRATION_SECTION } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
+import { REGISTRATION_SECTION } from '@register/forms/register/fieldMappings/death/query/documents-mappings'
 import {
   GQLRegWorkflow,
   GQLRegStatus

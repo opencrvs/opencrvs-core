@@ -81,11 +81,11 @@ import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
   birthSectionMapping,
   birthSectionTitle
-} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+} from '@register/forms/register/fieldMappings/birth/mutation/documents-mappings'
 import {
   deathSectionMapping,
   deathSectionTitle
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+} from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { IValidationResult } from '@register/utils/validate'
 
