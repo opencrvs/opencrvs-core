@@ -359,7 +359,7 @@ context('Death Integration Test', () => {
       .click()
     cy.get('#rejectApplicationBtn').click()
     // REJECT MODAL
-    cy.get('#rejectionReasonOther').click()
+    cy.get('#rejectionReasonother').click()
     cy.get('#rejectionCommentForHealthWorker').type(
       'Lack of information, please notify informant about it.'
     )
@@ -515,7 +515,7 @@ context('Death Integration Test', () => {
       .click()
     cy.get('#rejectApplicationBtn').click()
     // REJECT MODAL
-    cy.get('#rejectionReasonOther').click()
+    cy.get('#rejectionReasonother').click()
     cy.get('#rejectionCommentForHealthWorker').type(
       'Lack of information, please notify informant about it.'
     )

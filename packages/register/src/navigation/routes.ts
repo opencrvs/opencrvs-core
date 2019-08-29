@@ -30,8 +30,10 @@ export const MY_RECORDS = '/my-records'
 export const MY_DRAFTS = '/my-drafts'
 export const REVIEW_DUPLICATES = '/duplicates/:applicationId'
 export const CONFIRMATION_SCREEN = '/confirm'
-export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
-export const VERIFY_COLLECTOR = '/print/:registrationId/:eventType/:collector'
+export const CERTIFICATE_COLLECTOR =
+  '/cert/collector/:registrationId/:eventType/:groupId'
+export const VERIFY_COLLECTOR =
+  '/print/check/:registrationId/:eventType/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
 export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
