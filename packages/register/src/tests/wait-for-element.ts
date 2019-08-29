@@ -2,7 +2,13 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 
-const MAX_TIME = process.env.CI ? 10000 : 2000
+const MINUTE = 1000 * 60
+
+if (process.env.CI) {
+  jest.setTimeout(MINUTE)
+}
+
+const MAX_TIME = process.env.CI ? MINUTE : 2000
 const INTERVAL = 10
 
 export async function waitFor(condition: () => boolean) {
