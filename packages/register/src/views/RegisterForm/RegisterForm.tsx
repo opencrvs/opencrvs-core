@@ -56,7 +56,8 @@ import { buttonMessages, formMessages } from '@register/i18n/messages'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
+  PAGE_TRANSITIONS_EXIT_TIME
 } from '@register/utils/constants'
 
 const FormSectionTitle = styled.h4`
@@ -186,21 +187,20 @@ type State = {
 }
 
 const fadeFromTop = keyframes`
-from {
-   -webkit-transform: translateY(-100%);
-   transform: translateY(-100%);
+  to {
+    -webkit-transform: translateY(100vh);
+    transform: translateY(100vh);
   }
 `
 const StyledContainer = styled(Container)`
   &.${PAGE_TRANSITIONS_CLASSNAME}-exit {
-    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_ENTER_TIME}ms
-      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
-    position: fixed;
+    top: 0;
     z-index: 999;
+    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_EXIT_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
   }
 
   &.${PAGE_TRANSITIONS_CLASSNAME}-exit-active {
-    position: fixed;
     z-index: 999;
   }
 `
