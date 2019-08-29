@@ -14,7 +14,6 @@ import { Event } from '@register/forms'
 import { REGISTRAR_ROLES } from '@register/utils/constants'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { storage } from '@register/storage'
 import { checkAuth } from '@register/profile/profileActions'
 import { waitForElement } from '@register/tests/wait-for-element'
 

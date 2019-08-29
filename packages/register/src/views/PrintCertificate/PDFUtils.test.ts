@@ -1,5 +1,6 @@
 import {
   printMoneyReceipt,
+  previewCertificate,
   printCertificate
 } from '@register/views/PrintCertificate/PDFUtils'
 import {
@@ -13,10 +14,7 @@ import { omit } from 'lodash'
 
 const intlProvider = new IntlProvider(
   {
-    locale: 'en',
-    messages: {
-      message1: 'Hello world'
-    }
+    locale: 'en'
   },
   {}
 )
@@ -49,6 +47,20 @@ describe('PDFUtils related tests', () => {
       )
     ).not.toThrowError()
   })
+  it('Print money reciept function will throws exception if invalid userDetails found', () => {
+    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    expect(() =>
+      printMoneyReceipt(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: deathApplication,
+          event: Event.DEATH
+        },
+        null
+      )
+    ).toThrowError('No user details found')
+  })
   it('Throws exception if invalid key is provided', () => {
     const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
     expect(() =>
@@ -64,5 +76,34 @@ describe('PDFUtils related tests', () => {
     ).toThrowError(
       'Given value key structure is not valid: deathEvent.deathDate'
     )
+  })
+  it('Throws exception if invalid userDetails found for printCertificate', () => {
+    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    expect(() =>
+      printCertificate(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: deathApplication,
+          event: Event.DEATH
+        },
+        null
+      )
+    ).toThrowError('No user details found')
+  })
+  it('Throws exception if invalid userDetails found for previewCertificate', () => {
+    const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
+    expect(
+      previewCertificate(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: deathApplication,
+          event: Event.DEATH
+        },
+        null,
+        (pdf: string) => {}
+      )
+    ).rejects.toThrowError('No user details found')
   })
 })
