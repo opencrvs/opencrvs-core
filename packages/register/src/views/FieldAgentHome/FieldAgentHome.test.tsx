@@ -98,7 +98,10 @@ describe('FieldAgentHome tests', () => {
 
     testComponent.component.update()
     const app = testComponent.component
-    expect(app.find('#field-agent-home-spinner').hostNodes()).toHaveLength(1)
+
+    const element = await waitForElement(app, '#field-agent-home-spinner')
+
+    expect(element.hostNodes()).toHaveLength(1)
   })
 
   it('renders error text when an error occurs', async () => {
