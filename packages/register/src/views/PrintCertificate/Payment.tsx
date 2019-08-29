@@ -88,28 +88,29 @@ class PaymentComponent extends React.Component<IFullProps> {
     const certificates =
       application && application.data.registration.certificates
 
-    const certificate = {
-      ...((certificates && certificates[0]) || {}),
-      payments: {
-        type: 'MANUAL' as const,
-        total: paymentAmount,
-        amount: paymentAmount,
-        outcome: 'COMPLETED' as const,
-        date: Date.now()
-      }
-    }
+    const certificate = (certificates && certificates[0]) || {}
 
-    const modifiedApplication: IPrintableApplication = {
+    this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          certificates: [certificate]
+          certificates: [
+            {
+              ...certificate,
+              payments: {
+                type: 'MANUAL' as const,
+                total: paymentAmount,
+                amount: paymentAmount,
+                outcome: 'COMPLETED' as const,
+                date: Date.now()
+              }
+            }
+          ]
         }
       }
-    }
-    this.props.modifyApplication(modifiedApplication)
+    })
 
     this.props.goToReviewCertificate(
       this.props.registrationId,

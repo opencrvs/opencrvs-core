@@ -60,22 +60,18 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const { application } = this.props
     const certificates = application.data.registration.certificates
 
-    const certificate = {
-      ...((certificates && certificates[0]) || {}),
-      hasShowedVerifiedDocument: true
-    }
+    const certificate = (certificates && certificates[0]) || {}
 
-    const modifiedApplication: IPrintableApplication = {
+    this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          certificates: [certificate]
+          certificates: [{ ...certificate, hasShowedVerifiedDocument: true }]
         }
       }
-    }
-    this.props.modifyApplication(modifiedApplication)
+    })
 
     this.handleVerification()
   }

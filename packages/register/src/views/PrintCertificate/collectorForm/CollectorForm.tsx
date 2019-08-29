@@ -170,7 +170,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
 
-    const newApplication: IPrintableApplication = {
+    this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
@@ -184,8 +184,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           ]
         }
       }
-    }
-    this.props.modifyApplication(newApplication)
+    })
   }
 
   continueButtonHandler = (

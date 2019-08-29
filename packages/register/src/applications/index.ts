@@ -1,9 +1,4 @@
-import {
-  Event,
-  IFormData,
-  IFormFieldValue,
-  IFormSectionData
-} from '@register/forms'
+import { Event, IFormData, IFormFieldValue } from '@register/forms'
 import { Action as NavigationAction, GO_TO_PAGE } from '@register/navigation'
 import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -59,8 +54,8 @@ export interface IApplication {
   submissionStatus?: string
   action?: string
   trackingId?: string
-  registrationNumber?: string
   compositionId?: string
+  registrationNumber?: string
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
 }
@@ -97,8 +92,8 @@ export interface IPrintableApplication extends Omit<IApplication, 'data'> {
       presentAtBirthRegistration: Relation
       whoseContactDetails: string
       registrationPhone: string
-      trackingId?: string
-      registrationNumber?: string
+      trackingId: string
+      registrationNumber: string
       certificates: ICertificate[]
       [key: string]: IFormFieldValue
     }
