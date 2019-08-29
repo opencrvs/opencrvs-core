@@ -19284,7 +19284,7 @@
           "id": "form.section.documents.name"
         },
         "title": {
-          "defaultMessage": "Supporting documents",
+          "defaultMessage": "Attaching supporting documents",
           "description": "Form section title for Documents",
           "id": "form.section.documents.title"
         },
@@ -41156,11 +41156,10 @@
           "id": "form.section.documents.name"
         },
         "title": {
-          "defaultMessage": "Supporting documents",
+          "defaultMessage": "Attach supporting documents",
           "description": "Form section title for Documents",
           "id": "form.section.documents.title"
         },
-        "optional": true,
         "groups": [
           {
             "id": "documents-view-group",
