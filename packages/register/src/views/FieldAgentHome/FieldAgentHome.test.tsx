@@ -22,6 +22,7 @@ import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
 } from '@register/search/queries'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const getItem = window.localStorage.getItem as jest.Mock
 
@@ -552,7 +553,7 @@ describe('FieldAgentHome tests', () => {
       expect(component.find('#failed3').hostNodes()).toHaveLength(1)
     })
 
-    it('when offline renders pending submission status', () => {
+    it('when offline renders pending submission status', async () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
 
       const readyApplication = {
@@ -564,8 +565,9 @@ describe('FieldAgentHome tests', () => {
 
       store.dispatch(storeApplication(readyApplication))
 
-      component.update()
-      expect(component.find('#offline0').hostNodes()).toHaveLength(1)
+      const element = await waitForElement(component, '#offline0')
+
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
 
