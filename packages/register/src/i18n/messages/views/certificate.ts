@@ -55,6 +55,17 @@ interface ICertificateMessages {
   modalTitle: ReactIntl.FormattedMessage.MessageDescriptor
   modalBody: ReactIntl.FormattedMessage.MessageDescriptor
   toastMessage: ReactIntl.FormattedMessage.MessageDescriptor
+  otherCollectorFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  otherCollectorFormParagraph: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateCollectorError: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateOtherCollectorInfoError: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateOtherCollectorAffidavitFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateOtherCollectorAffidavitError: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateOtherCollectorAffidavitFormParagraph: ReactIntl.FormattedMessage.MessageDescriptor
+  noSignedAffidavitAvailable: ReactIntl.FormattedMessage.MessageDescriptor
+  noAffidavitModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  noAffidavitModalDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  signedAffidavitFileLabel: ReactIntl.FormattedMessage.MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -63,7 +74,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.addAnotherSignature'
   },
   certificateCollectionTitle: {
-    defaultMessage: 'Certificate Collection',
+    defaultMessage: 'Certificate collection',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
   },
@@ -339,6 +350,67 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.toast.message',
     defaultMessage: 'Certificate is ready to print',
     description: 'Floating Toast message upon certificate ready to print'
+  },
+  otherCollectorFormTitle: {
+    defaultMessage: 'What is their ID and name',
+    description: 'Title for other collector form',
+    id: 'print.certificate.collector.other.title'
+  },
+  otherCollectorFormParagraph: {
+    defaultMessage:
+      'Because there are no details of this person on record, we need to capture their details:',
+    description: 'Paragraph for other collector form',
+    id: 'print.certificate.collector.other.paragraph'
+  },
+  certificateCollectorError: {
+    defaultMessage: 'Select who is collecting the certificate',
+    description: 'Form level error for collector form',
+    id: 'print.certificate.collector.form.error'
+  },
+  certificateOtherCollectorInfoError: {
+    defaultMessage: 'Complete all the mandatory fields',
+    description: 'Form level error for other collector information form',
+    id: 'print.certificate.collector.other.form.error'
+  },
+  certificateOtherCollectorAffidavitFormTitle: {
+    defaultMessage: 'Attach a signed affidavit',
+    description: 'Form title for other collector affidavit form',
+    id: 'print.certificate.collector.other.affidavit.form.title'
+  },
+  certificateOtherCollectorAffidavitError: {
+    defaultMessage:
+      'Attach a signed affidavit or click the checkbox if they do not have one.',
+    description: 'Form level error for other collector affidavit form',
+    id: 'print.certificate.collector.other.affidavit.form.error'
+  },
+  certificateOtherCollectorAffidavitFormParagraph: {
+    defaultMessage:
+      'This document should clearly prove that the individual has the authority to collect the certificate',
+    description: 'Form paragraph for other collector affidavit form',
+    id: 'print.certificate.collector.other.affidavit.form.paragraph'
+  },
+  noSignedAffidavitAvailable: {
+    defaultMessage: "They don't have a signed affidavit",
+    description: 'Label for no affidavit checkbox',
+    id: 'print.certificate.collector.other.affidavit.form.checkbox'
+  },
+  noAffidavitModalTitle: {
+    defaultMessage: 'Continue without signed affidavit?',
+    description:
+      'Modal title for other coller form submission without signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.modal.title'
+  },
+  noAffidavitModalDescription: {
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for issuing a certificate without necessary evidence from the collector',
+    description:
+      'Modal description for other coller form submission without signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.modal.description'
+  },
+  signedAffidavitFileLabel: {
+    defaultMessage: 'Signed affidavit',
+    description: 'File label for signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.file.label'
   }
 }
 
