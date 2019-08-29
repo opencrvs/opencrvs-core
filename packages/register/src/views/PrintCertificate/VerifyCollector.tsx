@@ -1,14 +1,19 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { goBack } from '@register/navigation'
-import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
-import { Event } from '@register/forms'
-import { RouteComponentProps } from 'react-router'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
-import { IStoreState } from '@register/store'
 import { IApplication, modifyApplication } from '@register/applications'
+import { Event, ICertificate } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
+import {
+  goBack,
+  goToPrintCertificatePayment,
+  goToReviewCertificate
+} from '@register/navigation'
+import { IStoreState } from '@register/store'
+import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
+import * as React from 'react'
+import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { getEventDate, isFreeOfCost } from './utils'
 
 interface IMatchParams {
   registrationId: string
@@ -22,6 +27,8 @@ interface IStateProps {
 interface IDispatchProps {
   goBack: typeof goBack
   modifyApplication: typeof modifyApplication
+  goToReviewCertificate: typeof goToReviewCertificate
+  goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams> & InjectedIntlProps
@@ -29,20 +36,47 @@ type IOwnProps = RouteComponentProps<IMatchParams> & InjectedIntlProps
 type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
 class VerifyCollectorComponent extends React.Component<IFullProps> {
-  handleVerification = (verified: boolean) => {
-    const updatedApplicationData = {
-      ...this.props.application.data,
-      certificateCollector: {
-        verified
+  handleVerification = () => {
+    const event = this.props.application.event
+    const eventDate = getEventDate(this.props.application.data, event)
+
+    if (isFreeOfCost(event, eventDate)) {
+      this.props.goToReviewCertificate(
+        this.props.match.params.registrationId,
+        event
+      )
+    } else {
+      this.props.goToPrintCertificatePayment(
+        this.props.match.params.registrationId,
+        event
+      )
+    }
+  }
+
+  handleNegativeVerification = () => {
+    const { application } = this.props
+    const certificates =
+      (application &&
+        (application.data.registration.certificates as ICertificate[])) ||
+      null
+    const certificate: ICertificate = (certificates && certificates[0]) || {}
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        registration: {
+          ...application.data.registration,
+          certificates: [
+            {
+              ...certificate,
+              hasShowedVerifiedDocument: true
+            }
+          ]
+        }
       }
-    }
+    })
 
-    const applicationWithVerificationStatus = {
-      ...this.props.application,
-      data: updatedApplicationData
-    }
-
-    this.props.modifyApplication(applicationWithVerificationStatus)
+    this.handleVerification()
   }
 
   render() {
@@ -60,15 +94,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
           actionProps={{
             positiveAction: {
               label: intl.formatMessage(messages.idCheckVerify),
-              handler: () => {
-                this.handleVerification(true)
-              }
+              handler: this.handleVerification
             },
             negativeAction: {
               label: intl.formatMessage(messages.idCheckWithoutVerify),
-              handler: () => {
-                this.handleVerification(false)
-              }
+              handler: this.handleNegativeVerification
             }
           }}
         />
@@ -94,5 +124,10 @@ const mapStateToProps = (
 
 export const VerifyCollector = connect(
   mapStateToProps,
-  { goBack, modifyApplication }
+  {
+    goBack,
+    modifyApplication,
+    goToReviewCertificate,
+    goToPrintCertificatePayment
+  }
 )(injectIntl(VerifyCollectorComponent))

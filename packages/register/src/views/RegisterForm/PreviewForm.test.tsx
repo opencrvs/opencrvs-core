@@ -326,7 +326,7 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
 
       app
-        .find('#rejectionReasonMisspelling')
+        .find('#rejectionReasonmisspelling')
         .hostNodes()
         .simulate('change')
 
@@ -517,7 +517,7 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
 
       app
-        .find('#rejectionReasonMisspelling')
+        .find('#rejectionReasonmisspelling')
         .hostNodes()
         .simulate('change')
 

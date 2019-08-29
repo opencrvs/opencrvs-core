@@ -44,7 +44,7 @@ describe('reject registration form', () => {
 
   it('enables submit button when form is complete', () => {
     rejectFormComponent
-      .find('#rejectionReasonOther')
+      .find('#rejectionReasonother')
       .hostNodes()
       .simulate('change', { checked: true })
 

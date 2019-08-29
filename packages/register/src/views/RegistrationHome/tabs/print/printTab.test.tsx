@@ -126,7 +126,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('RegistrarHome ready to print tab related tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
@@ -918,8 +918,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
     })
     testComponent.component.update()
 
-    expect(window.location.href).toContain(
-      '/print/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    expect(history.location.pathname).toContain(
+      '/cert/collector/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
     testComponent.component.unmount()
   })
