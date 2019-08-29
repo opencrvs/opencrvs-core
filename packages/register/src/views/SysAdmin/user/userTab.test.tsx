@@ -28,7 +28,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -69,7 +69,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -116,7 +116,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -224,7 +224,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -334,7 +334,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -511,7 +511,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -693,7 +693,7 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,

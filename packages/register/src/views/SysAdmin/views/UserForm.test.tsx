@@ -12,8 +12,8 @@ const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
-  beforeEach(() => {
-    const testComponent = createTestComponent(
+  beforeEach(async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserForm
         section={deserializeFormSection(userSection)}

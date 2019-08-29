@@ -55,7 +55,7 @@ describe('ReviewForm tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -217,7 +217,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -377,7 +377,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -478,7 +478,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -636,7 +636,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -714,7 +714,7 @@ describe('ReviewForm tests', () => {
     )
     store.dispatch(storeApplication(application))
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -945,7 +945,7 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}
@@ -1194,7 +1194,7 @@ describe('ReviewForm tests', () => {
         }
       ]
       const form = await getReviewFormFromStore(store, Event.DEATH)
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}
@@ -1284,7 +1284,7 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}

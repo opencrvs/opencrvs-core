@@ -84,12 +84,21 @@ export function getInitialState(): IStoreState {
   return mockStore.getState()
 }
 
-export function createTestApp() {
+export function waitForReady(app: ReactWrapper) {
+  return waitForElement(app, '#readyApplication')
+}
+
+export async function createTestApp(
+  config = { waitUntilResourcesLoaded: true }
+) {
   const { store, history } = createStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
+  if (config.waitUntilResourcesLoaded) {
+    await waitForReady(app)
+  }
   return { history, app, store }
 }
 
@@ -2478,7 +2487,7 @@ export const mockOfflineData = {
   ).data
 }
 
-export function createTestComponent(
+export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   store: AppStore,
   graphqlMocks: any = null
@@ -2490,7 +2499,7 @@ export function createTestComponent(
    * Feels odd the whole boilerplate has to be recreated
    */
 
-  store.dispatch(
+  await store.dispatch(
     offlineDataReady({
       languages: mockOfflineData.languages,
       forms: mockOfflineData.forms,
@@ -2516,8 +2525,8 @@ export function createTestComponent(
       childContextTypes: { intl: intlShape }
     }
   )
-
-  return { component, store }
+  await flushPromises()
+  return { component: component.update(), store }
 }
 
 export const mockDeathApplicationDataWithoutFirstNames = {
@@ -2681,10 +2690,6 @@ export async function goToMotherSection(component: ReactWrapper) {
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 
-export function waitForReady(app: ReactWrapper) {
-  return waitForElement(app, '#readyApplication')
-}
-
 export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: Event
@@ -2701,4 +2706,20 @@ export async function getReviewFormFromStore(
   await store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getReviewForm(state)![event]
+}
+
+export async function setPinCode(component: ReactWrapper) {
+  component
+    .find('#createPinBtn')
+    .hostNodes()
+    .simulate('click')
+
+  for (let i = 1; i <= 8; i++) {
+    component
+      .find(`#keypad-${i % 2}`)
+      .hostNodes()
+      .simulate('click')
+  }
+  await flushPromises()
+  component.update()
 }

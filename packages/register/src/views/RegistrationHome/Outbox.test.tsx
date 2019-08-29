@@ -122,7 +122,7 @@ describe('OutBox tests', () => {
   const { store } = createStore()
 
   describe('When all the fields are fully provided', () => {
-    it('renders texts in data rows for birth applications', () => {
+    it('renders texts in data rows for birth applications', async () => {
       const applications: IApplication[] = []
       statuses.map(status =>
         applications.push({
@@ -130,7 +130,7 @@ describe('OutBox tests', () => {
           submissionStatus: status
         })
       )
-      const comp = createTestComponent(
+      const comp = await createTestComponent(
         <OutBox application={applications} />,
         store
       )
@@ -148,7 +148,7 @@ describe('OutBox tests', () => {
       testComp.unmount()
     })
 
-    it('renders texts in data rows for death applications', () => {
+    it('renders texts in data rows for death applications', async () => {
       const applications: IApplication[] = []
       statuses.map(status =>
         applications.push({
@@ -156,7 +156,7 @@ describe('OutBox tests', () => {
           submissionStatus: status
         })
       )
-      const comp = createTestComponent(
+      const comp = await createTestComponent(
         <OutBox application={applications} />,
         store
       )
@@ -173,14 +173,14 @@ describe('OutBox tests', () => {
       }
       testComp.unmount()
     })
-    it('shows "Waiting to register" if no status is provided', () => {
+    it('shows "Waiting to register" if no status is provided', async () => {
       const applications: IApplication[] = []
       applications.push({
         ...deathApp,
         submissionStatus: ''
       })
 
-      const comp = createTestComponent(
+      const comp = await createTestComponent(
         <OutBox application={applications} />,
         store
       )
@@ -199,10 +199,10 @@ describe('OutBox tests', () => {
   })
 
   describe('When a part of the name or the whole name is missing', () => {
-    it('displays only the last name if there is no first name', () => {
+    it('displays only the last name if there is no first name', async () => {
       const noFirstNameBirthApp = birthApp
       noFirstNameBirthApp.data.child.firstNamesEng = ''
-      const comp = createTestComponent(
+      const comp = await createTestComponent(
         <OutBox application={[noFirstNameBirthApp]} />,
         store
       )
@@ -218,10 +218,10 @@ describe('OutBox tests', () => {
       testComp.unmount()
     })
 
-    it('displays only the first name if there is no last name', () => {
+    it('displays only the first name if there is no last name', async () => {
       const noLastNameDeathApp = deathApp
       noLastNameDeathApp.data.deceased.familyNameEng = ''
-      const comp = createTestComponent(
+      const comp = await createTestComponent(
         <OutBox application={[noLastNameDeathApp]} />,
         store
       )
@@ -236,12 +236,12 @@ describe('OutBox tests', () => {
         )
       testComp.unmount()
     })
-    it('displays empty string if there is no name', () => {
+    it('displays empty string if there is no name', async () => {
       const noNameBirthApp = birthApp
       noNameBirthApp.data.child.firstNamesEng = ''
       noNameBirthApp.data.child.familyNameEng = ''
 
-      const comp = createTestComponent(
+      const comp = await createTestComponent(
         <OutBox application={[noNameBirthApp]} />,
         store
       )
@@ -256,8 +256,8 @@ describe('OutBox tests', () => {
         )
       testComp.unmount()
     })
-    it('displays empty div if there is no application', () => {
-      const comp = createTestComponent(<OutBox application={[]} />, store)
+    it('displays empty div if there is no application', async () => {
+      const comp = await createTestComponent(<OutBox application={[]} />, store)
       const testComp = comp.component
       expect(testComp.find('#row_0').exists()).toBeFalsy()
       testComp.unmount()
@@ -265,15 +265,15 @@ describe('OutBox tests', () => {
   })
 
   describe('Pagination test', () => {
-    it('shows pagination bar for more than 10 applications', () => {
+    it('shows pagination bar for more than 10 applications', async () => {
       const applications: IApplication[] = []
       for (let i = 0; i < 16; i++) {
         applications.push(birthApp)
       }
-      const testComp = createTestComponent(
+      const testComp = (await createTestComponent(
         <OutBox application={applications} />,
         store
-      ).component
+      )).component
       expect(testComp.exists('#pagination')).toBeTruthy()
       testComp
         .find('#pagination')

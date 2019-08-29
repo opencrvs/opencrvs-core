@@ -487,7 +487,7 @@ describe('Review Duplicates component', () => {
 
   it('query gateway correctly and displays the returned duplicates correctly', async () => {
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
         match={{
@@ -509,7 +509,7 @@ describe('Review Duplicates component', () => {
 
   it('query gateway correctly and displays the returned duplicates correctly in case of minimal data', async () => {
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
         match={{
@@ -567,7 +567,7 @@ describe('Review Duplicates component', () => {
     ]
 
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
         match={{
@@ -604,7 +604,7 @@ describe('Review Duplicates component', () => {
     ]
 
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
         match={{
@@ -630,7 +630,7 @@ describe('Review Duplicates component', () => {
     let component: ReactWrapper<{}, {}>
     beforeEach(async () => {
       const { store } = createStore()
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
           match={{
@@ -701,7 +701,7 @@ describe('Review Duplicates component', () => {
         }
       })
       const { store } = createStore()
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
           match={{
@@ -744,7 +744,7 @@ describe('Review Duplicates component', () => {
     let component: ReactWrapper<{}, {}>
     beforeEach(async () => {
       const { store } = createStore()
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
           match={{
@@ -813,7 +813,7 @@ describe('Review Duplicates component', () => {
         }
       })
       const { store } = createStore()
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
           match={{
@@ -872,7 +872,7 @@ describe('Review Duplicates component', () => {
         }
       })
       const { store } = createStore()
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
           match={{
@@ -907,7 +907,7 @@ describe('Review Duplicates component', () => {
 
     it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {
       const { store } = createStore()
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewDuplicates
           // @ts-ignore
           match={{
@@ -936,7 +936,7 @@ describe('Review Duplicates component', () => {
 
   it('takes user back to work queue page when back button is pressed', async () => {
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewDuplicates
         // @ts-ignore
         match={{

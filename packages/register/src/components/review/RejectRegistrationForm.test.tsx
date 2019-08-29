@@ -13,7 +13,7 @@ describe('reject registration form', () => {
   let rejectFormComponent: ReactWrapper<{}, {}>
   const draftApplication = createApplication(Event.BIRTH)
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <RejectRegistrationForm
         onBack={mockHandler}
         duplicate={true}
@@ -44,7 +44,7 @@ describe('reject registration form', () => {
 
   it('enables submit button when form is complete', () => {
     rejectFormComponent
-      .find('#rejectionReasonOther')
+      .find('#rejectionReasonother')
       .hostNodes()
       .simulate('change', { checked: true })
 

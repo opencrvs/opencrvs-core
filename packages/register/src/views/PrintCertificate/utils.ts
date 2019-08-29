@@ -1,4 +1,4 @@
-import { Event } from '@register/forms'
+import { Event, IFormData } from '@register/forms'
 import moment from 'moment'
 import { dynamicMessages } from '@register/i18n/messages/views/certificate'
 
@@ -19,7 +19,7 @@ interface IRange {
 
 interface IDayRange {
   rangeData: { [key in Event]?: IRange[] }
-  getValue: (event: string, days: number) => IRange['value']
+  getValue: (event: Event, days: number) => IRange['value']
 }
 
 const ranges: IRange[] = [
@@ -51,7 +51,6 @@ export const dayRange: IDayRange = {
     [Event.BIRTH]: ranges,
     [Event.DEATH]: ranges
   },
-  // @ts-ignore
   getValue
 }
 
@@ -94,4 +93,29 @@ export function getServiceMessage(event: Event, eventDate: string) {
   return days > CHARGE_UP_LIMIT
     ? dynamicMessages[`${event}ServiceAfter`]
     : dynamicMessages[`${event}ServiceBetween`]
+}
+
+export function isFreeOfCost(event: Event, eventDate: string): boolean {
+  const days = calculateDays(eventDate)
+  const result = dayRange.getValue(event, days)
+  return result === 0
+}
+
+export function getEventDate(data: IFormData, event: Event) {
+  switch (event) {
+    case Event.BIRTH:
+      return data.child.childBirthDate as string
+    case Event.DEATH:
+      return data.deathEvent.deathDate as string
+  }
+}
+
+export function getEvent(eventType: string | undefined) {
+  switch (eventType && eventType.toLowerCase()) {
+    case 'birth':
+    default:
+      return Event.BIRTH
+    case 'death':
+      return Event.DEATH
+  }
 }

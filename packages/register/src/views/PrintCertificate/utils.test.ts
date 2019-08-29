@@ -1,7 +1,7 @@
 import {
   calculateDays,
   timeElapsed
-} from '@register/views/PrintCertificate/calculatePrice'
+} from '@register/views/PrintCertificate/utils'
 
 describe('calculateDays, timeElapsed tests', () => {
   it('timeElapsedInWords function returns required time duration in words', () => {

@@ -9,17 +9,13 @@ import {
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
 
-import { storage } from '@register/storage'
-import { createStore } from '@register/store'
+import { createStore, AppStore } from '@register/store'
 import {
   checkAuth,
   getStorageUserDetailsSuccess
 } from '@register/profile/profileActions'
 import { UserSetupPage } from '@register/views/UserSetup/UserSetupPage'
 import { ProtectedAccount } from '@register/components/ProtectedAccount'
-
-const getItem = window.localStorage.getItem as jest.Mock
-const mockFetchUserDetails = jest.fn()
 
 const nameObj = {
   data: {
@@ -40,20 +36,16 @@ const nameObj = {
 }
 
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
+;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
 
 describe('UserSetupPage tests', () => {
-  const { store } = createStore()
-  beforeAll(() => {
-    getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
+  let store: AppStore
+  beforeEach(() => {
+    store = createStore().store
   })
   it('renders page successfully', async () => {
-    const testComponent = createTestComponent(
+    store.dispatch(checkAuth({ '?token': validToken }))
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage />,
       store
@@ -68,12 +60,15 @@ describe('UserSetupPage tests', () => {
     ).toEqual('Sahriar Nafis')
   })
   it('renders page successfully without type', async () => {
-    store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const testComponent = createTestComponent(
+    await store.dispatch(
+      getStorageUserDetailsSuccess(JSON.stringify(userDetails))
+    )
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage />,
       store
     )
+
     const app = testComponent.component
     expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
     expect(
@@ -84,7 +79,7 @@ describe('UserSetupPage tests', () => {
     ).toEqual('Shakib Al Hasan')
   })
   it('go to password page', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <ProtectedAccount />,
       store
@@ -99,8 +94,9 @@ describe('UserSetupPage tests', () => {
     expect(app.find('#NewPassword')).toBeDefined()
   })
   it('go to password page without userDetails', async () => {
+    store.dispatch(checkAuth({ '?token': validToken }))
     store.dispatch(getStorageUserDetailsSuccess('null'))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage goToStep={() => {}} />,
       store

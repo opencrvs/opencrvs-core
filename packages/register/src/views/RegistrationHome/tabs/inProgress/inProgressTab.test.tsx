@@ -98,7 +98,7 @@ describe('In Progress tab', () => {
         data: {}
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
@@ -175,7 +175,7 @@ describe('In Progress tab', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
@@ -276,7 +276,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -309,7 +309,7 @@ describe('In Progress tab', () => {
       for (let i = 0; i < 12; i++) {
         drafts.push(createApplication(Event.BIRTH))
       }
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -422,7 +422,7 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       store.dispatch(storeApplication(drafts))
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -513,7 +513,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -651,7 +651,7 @@ describe('In Progress tab', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -804,7 +804,7 @@ describe('In Progress tab', () => {
       ]
 
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -884,7 +884,7 @@ describe('In Progress tab', () => {
       ]
 
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -986,7 +986,7 @@ describe('Tablet tests', () => {
     ]
 
     // @ts-ignore
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <InProgressTab
         drafts={drafts}
