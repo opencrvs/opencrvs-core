@@ -9,8 +9,6 @@ import {
   IFormSectionData,
   IFormFieldValue
 } from '@opencrvs/register/src/forms'
-import moment from 'moment'
-import { TransformerData } from './types'
 import { IApplication } from '@register/applications'
 
 const eventMessageDescriptor = {

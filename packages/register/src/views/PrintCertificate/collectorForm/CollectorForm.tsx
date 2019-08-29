@@ -135,8 +135,6 @@ const getErrorsOnFieldsBySection = (
 
   return {
     [sectionId]: fields.reduce((fields, field) => {
-      // REFACTOR
-
       const validationErrors: IValidationResult[] =
         errors[field.name as keyof typeof errors]
 
