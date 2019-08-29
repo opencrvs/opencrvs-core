@@ -33,16 +33,15 @@ import {
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
-import { IOfflineDataState } from '@register/offline/reducer'
+
 import { HOME } from '@register/navigation/routes'
-import { getOfflineState } from '@register/offline/selectors'
+
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled, { keyframes } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { isNull, isUndefined, merge } from 'lodash'
-// @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
@@ -169,7 +168,6 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
-  offlineResources: IOfflineDataState
 }
 
 export type FullProps = IFormProps &
@@ -335,7 +333,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       setAllFieldsDirty,
       application,
       registerForm,
-      offlineResources,
       handleSubmit,
       duplicate,
       activeSection,
@@ -521,7 +518,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={getVisibleGroupFields(activeSectionGroup)}
-                      offlineResources={offlineResources}
                       draftData={application.data}
                     />
                   </form>
@@ -612,6 +608,7 @@ function mapStateToProps(
   const { match, registerForm, application } = props
 
   const sectionId = match.params.pageId || registerForm.sections[0].id
+
   const activeSection = registerForm.sections.find(
     section => section.id === sectionId
   )
@@ -646,13 +643,10 @@ function mapStateToProps(
     application.data[activeSection.id] || {}
   )
 
-  const offlineResources = getOfflineState(state)
-
   return {
     registerForm,
     scope: getScope(state),
     setAllFieldsDirty,
-    offlineResources,
     activeSection,
     activeSectionGroup: {
       ...activeSectionGroup,

@@ -1,16 +1,17 @@
 import { IFormField, IFormData } from '@register/forms'
 import { attachmentToFieldTransformer } from '@register/forms/mappings/query/field-mappings'
 import {
-  documentForWhomFhirMapping,
-  documentTypeFhirMapping
+  birthDocumentForWhomFhirMapping,
+  birthDocumentTypeFhirMapping
 } from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
 
 const fieldNameMapping = {
-  [documentForWhomFhirMapping.Mother]: 'uploadDocForMother',
-  [documentForWhomFhirMapping.Father]: 'uploadDocForFather',
-  [documentForWhomFhirMapping.Parent]: 'uploadDocForParentPermanentAddress',
-  [documentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
-  [documentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge'
+  [birthDocumentForWhomFhirMapping.Mother]: 'uploadDocForMother',
+  [birthDocumentForWhomFhirMapping.Father]: 'uploadDocForFather',
+  [birthDocumentForWhomFhirMapping.Parent]:
+    'uploadDocForParentPermanentAddress',
+  [birthDocumentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
+  [birthDocumentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge'
 }
 
 export function birthAttachmentToFieldTransformer(
@@ -25,8 +26,8 @@ export function birthAttachmentToFieldTransformer(
     sectionId,
     field,
     'registration',
-    documentForWhomFhirMapping,
-    documentTypeFhirMapping,
+    birthDocumentForWhomFhirMapping,
+    birthDocumentTypeFhirMapping,
     fieldNameMapping
   )
 }

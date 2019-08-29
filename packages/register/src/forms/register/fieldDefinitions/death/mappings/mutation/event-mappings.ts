@@ -1,9 +1,9 @@
-import { IFormField, IFormData } from '@register/forms'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 
 export const fieldToDeceasedDateTransformation = (
   alternativeSectionId?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -20,11 +20,11 @@ export const fieldToDeceasedDateTransformation = (
   return transformedData
 }
 
-export const eventLocationMutationTransformer = (
+export const deathEventLocationMutationTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -41,6 +41,7 @@ export const eventLocationMutationTransformer = (
       }
     } as fhir.Location
   }
+
   if (lineNumber > 0) {
     transformedData.eventLocation.address.line[lineNumber - 1] =
       draftData[sectionId][field.name]
@@ -64,8 +65,8 @@ export const eventLocationMutationTransformer = (
   return transformedData
 }
 
-export function setRegistrationSectionTransformer(
-  transformedData: any,
+export function setDeathRegistrationSectionTransformer(
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) {

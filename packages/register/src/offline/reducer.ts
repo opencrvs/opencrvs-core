@@ -1,11 +1,12 @@
-import { loop, Cmd, LoopReducer, Loop } from 'redux-loop'
+import { loop, Cmd, Loop, liftState, getModel, getCmd } from 'redux-loop'
 import * as actions from '@register/offline/actions'
 import { storage } from '@register/storage'
 import { referenceApi } from '@register/utils/referenceApi'
-import * as i18nActions from '@register/i18n/actions'
-import { ILanguage, ILanguageState, IntlMessages } from '@register/i18n/reducer'
+import { ILanguage } from '@register/i18n/reducer'
 import { filterLocations, getLocation } from '@register/utils/locationUtils'
 import { tempData } from '@register/offline/temp/tempLocations'
+import { ISerializedForm } from '@register/forms'
+import { isOfflineDataLoaded } from './selectors'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -19,196 +20,64 @@ export interface ILocation {
   type: string
   partOf: string
 }
-export const formatLocationLanguageState = (
-  locations: ILocation[],
-  languages: ILanguageState
-): ILanguageState => {
-  const primaryLocationMessages: IntlMessages = {}
-  const secondaryLocationMessages: IntlMessages = {}
-  locations.forEach((location: ILocation) => {
-    primaryLocationMessages[`location.${location.id}`] = location.name
-    if (Object.keys(languages).length === 2) {
-      secondaryLocationMessages[`location.${location.id}`] = location.alias
-    }
-  })
-  Object.keys(languages).forEach((key, index) => {
-    if (index === 1) {
-      languages[Object.keys(languages)[index]].messages = {
-        ...languages[Object.keys(languages)[index]].messages,
-        ...secondaryLocationMessages
-      }
-    } else {
-      languages[Object.keys(languages)[index]].messages = {
-        ...languages[Object.keys(languages)[index]].messages,
-        ...primaryLocationMessages
-      }
-    }
-  })
-  return languages
-}
 
 export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
   languages: ILanguage[]
+  forms: {
+    // @todo this is also used in review, so it could be named just form
+    registerForm: {
+      birth: ISerializedForm
+      death: ISerializedForm
+    }
+  }
 }
 
 export type IOfflineDataState = {
-  locations: { [key: string]: ILocation }
-  facilities: { [key: string]: ILocation }
+  offlineData: Partial<IOfflineData>
   healthFacilityFilterLocation: string
   offlineDataLoaded: boolean
   loadingError: boolean
-  languages: ILanguage[]
-  languageState: ILanguageState
 }
 
 export const initialState: IOfflineDataState = {
-  locations: {},
-  facilities: {},
-  languages: [],
-  languageState: {},
-  // rejected: [],
-  // records: [],
+  offlineData: {},
   offlineDataLoaded: false,
   loadingError: false,
   healthFacilityFilterLocation: ''
 }
-// TODO: Union type actions.Action | i18nActions.Action stopped working after upgrade.  Temp replacement of any
-export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
+
+function checkIfDone(
+  loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
+) {
+  const loopWithState = liftState(loopOrState)
+  const newState = getModel(loopWithState)
+  const cmd = getCmd(loopWithState)
+
+  if (
+    isOfflineDataLoaded(newState.offlineData) &&
+    !newState.offlineDataLoaded
+  ) {
+    return loop(
+      { ...newState, offlineDataLoaded: true },
+      Cmd.list([
+        ...(cmd ? [cmd] : []),
+        Cmd.action(actions.offlineDataReady(newState.offlineData))
+      ])
+    )
+  }
+  return loopWithState
+}
+
+function reducer(
   state: IOfflineDataState = initialState,
   action: actions.Action
-):
-  | IOfflineDataState
-  | Loop<IOfflineDataState, actions.Action | i18nActions.Action> => {
-  let locationLanguageState: ILanguageState
-  let facilitesLanguageState: ILanguageState
-
+): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
   switch (action.type) {
-    case actions.LANGUAGES_LOADED:
-      return loop<IOfflineDataState, any>(
-        {
-          ...state,
-          loadingError: false,
-          languages: action.payload
-        },
-        Cmd.list([Cmd.action(i18nActions.storeLanguages(action.payload))])
-      )
-    case actions.LOAD_LOCATIONS:
-      return loop(
-        {
-          ...state,
-          languageState: action.payload
-        },
-        Cmd.run<actions.LocationsFailedAction, actions.LocationsLoadedAction>(
-          referenceApi.loadLocations,
-          {
-            successActionCreator: actions.locationsLoaded,
-            failActionCreator: actions.locationsFailed
-          }
-        )
-      )
-    case actions.LANGUAGES_FAILED:
-      return loop(
-        {
-          ...state,
-          loadingError: true
-        },
-        Cmd.run<actions.LocationsFailedAction, actions.LocationsLoadedAction>(
-          referenceApi.loadLocations,
-          {
-            successActionCreator: actions.locationsLoaded,
-            failActionCreator: actions.locationsFailed
-          }
-        )
-      )
-    case actions.LOCATIONS_LOADED:
-      return loop(
-        {
-          ...state,
-          loadingError: false,
-          locations: action.payload
-        },
-        Cmd.run<actions.FacilitiesFailedAction, actions.FacilitiesLoadedAction>(
-          referenceApi.loadFacilities,
-          {
-            successActionCreator: actions.facilitiesLoaded,
-            failActionCreator: actions.facilitiesFailed
-          }
-        )
-      )
-    case actions.LOCATIONS_FAILED:
-      return loop(
-        {
-          ...state,
-          loadingError: true,
-          locations: tempData.locations
-        },
-        Cmd.run<actions.FacilitiesFailedAction, actions.FacilitiesLoadedAction>(
-          referenceApi.loadFacilities,
-          {
-            successActionCreator: actions.facilitiesLoaded,
-            failActionCreator: actions.facilitiesFailed
-          }
-        )
-      )
-    case actions.FACILITIES_FAILED:
-      locationLanguageState = formatLocationLanguageState(
-        Object.values(state.locations),
-        state.languageState
-      )
-      facilitesLanguageState = formatLocationLanguageState(
-        Object.values(tempData.facilities),
-        state.languageState
-      )
-      return loop(
-        {
-          ...state,
-          loadingError: true,
-          offlineDataLoaded: true,
-          facilities: tempData.facilities
-        },
-        Cmd.list([
-          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
-          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
-        ])
-      )
-    case actions.FACILITIES_LOADED:
-      const facilities = filterLocations(
-        action.payload,
-        state.healthFacilityFilterLocation
-      )
-      storage.setItem(
-        'offline',
-        JSON.stringify({
-          locations: state.locations,
-          languages: state.languages,
-          facilities
-        })
-      )
-
-      locationLanguageState = formatLocationLanguageState(
-        Object.values(state.locations),
-        state.languageState
-      )
-      facilitesLanguageState = formatLocationLanguageState(
-        Object.values(action.payload),
-        state.languageState
-      )
-
-      return loop(
-        {
-          ...state,
-          loadingError: false,
-          facilities,
-          offlineDataLoaded: true
-        },
-        Cmd.list([
-          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
-          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
-        ])
-      )
-    case actions.SET_OFFLINE_DATA:
+    // entrypoint - called from profile reducer
+    // @todo, remove profile reducers dependency to this reducer
+    case actions.SET_OFFLINE_DATA: {
       return loop(
         {
           ...state,
@@ -221,68 +90,165 @@ export const offlineDataReducer: LoopReducer<IOfflineDataState, any> = (
           actions.IGetOfflineDataFailedAction,
           actions.IGetOfflineDataSuccessAction
         >(storage.getItem, {
+          args: ['offline'],
           successActionCreator: actions.getOfflineDataSuccess,
-          failActionCreator: actions.getOfflineDataFailed,
-          args: ['offline']
+          // @todo this action isn't handled
+          failActionCreator: actions.getOfflineDataFailed
         })
       )
-    case actions.GET_OFFLINE_DATA_SUCCESS:
+    }
+    case actions.GET_OFFLINE_DATA_SUCCESS: {
       const offlineDataString = action.payload
       const offlineData: IOfflineData = JSON.parse(
         offlineDataString ? offlineDataString : '{}'
       )
 
-      const hasAllRequiredData =
-        offlineData.locations && offlineData.facilities && offlineData.languages
-
-      if (hasAllRequiredData) {
+      if (isOfflineDataLoaded(offlineData)) {
+        const newState = {
+          ...state,
+          offlineData,
+          offlineDataLoaded: true
+        }
         return loop(
-          {
-            ...state,
-            locations: offlineData.locations,
-            facilities: offlineData.facilities,
-            languages: offlineData.languages,
-            offlineDataLoaded: true
-          },
-          Cmd.list([
-            Cmd.action(i18nActions.storeOfflineLanguages(offlineData.languages))
-          ])
+          newState,
+          Cmd.action(actions.offlineDataReady(newState.offlineData))
         )
       } else {
         return loop(
-          {
-            ...state
-          },
-          Cmd.run<actions.LanguagesFailedAction, actions.LanguagesLoadedAction>(
-            referenceApi.loadLanguages,
-            {
+          state,
+          Cmd.list<actions.Action>([
+            Cmd.run(referenceApi.loadLanguages, {
               successActionCreator: actions.languagesLoaded,
               failActionCreator: actions.languagesFailed
-            }
-          )
+            }),
+            Cmd.run(referenceApi.loadFacilities, {
+              successActionCreator: actions.facilitiesLoaded,
+              failActionCreator: actions.facilitiesFailed
+            }),
+            Cmd.run(referenceApi.loadLocations, {
+              successActionCreator: actions.locationsLoaded,
+              failActionCreator: actions.locationsFailed
+            }),
+            Cmd.run(referenceApi.loadForms, {
+              successActionCreator: actions.formsLoaded,
+              failActionCreator: actions.formsFailed
+            })
+          ])
         )
       }
+    }
 
-    case actions.FORMAT_LOCATIONS:
-      locationLanguageState = formatLocationLanguageState(
-        Object.values(state.locations),
-        action.payload
+    /*
+     * Languages
+     */
+
+    case actions.LANGUAGES_LOADED: {
+      return {
+        ...state,
+        loadingError: false,
+        offlineData: {
+          ...state.offlineData,
+          languages: action.payload
+        }
+      }
+    }
+    case actions.LANGUAGES_FAILED: {
+      return {
+        ...state,
+        loadingError: true
+      }
+    }
+
+    /*
+     * Locations
+     */
+
+    case actions.LOCATIONS_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          locations: action.payload
+        }
+      }
+    }
+    case actions.LOCATIONS_FAILED: {
+      return {
+        ...state,
+        loadingError: true,
+        offlineData: {
+          ...state.offlineData,
+          locations: tempData.locations
+        }
+      }
+    }
+
+    /*
+     * Forms
+     */
+
+    case actions.FORMS_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          forms: {
+            registerForm: action.payload
+          }
+        }
+      }
+    }
+    case actions.FORMS_FAILED: {
+      return {
+        ...state,
+        loadingError: true
+      }
+    }
+
+    /*
+     * Facilities
+     */
+
+    case actions.FACILITIES_LOADED: {
+      const facilities = filterLocations(
+        action.payload,
+        state.healthFacilityFilterLocation
       )
-      facilitesLanguageState = formatLocationLanguageState(
-        Object.values(state.facilities),
-        action.payload
-      )
-      return loop(
-        {
-          ...state,
-          languageState: action.payload
-        },
-        Cmd.list([
-          Cmd.action(i18nActions.addOfflineData(locationLanguageState)),
-          Cmd.action(i18nActions.addOfflineData(facilitesLanguageState))
-        ])
-      )
+
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          facilities
+        }
+      }
+    }
+    case actions.FACILITIES_FAILED: {
+      return {
+        ...state,
+        loadingError: true,
+        offlineData: {
+          ...state.offlineData,
+          facilities: tempData.facilities
+        }
+      }
+    }
+
+    // @hack this is only here to provide a way of hydrating the state during tests
+    case actions.READY: {
+      return {
+        ...state,
+        offlineData: action.payload
+      }
+    }
     default:
       return state
   }
+}
+
+export function offlineDataReducer(
+  state: IOfflineDataState | undefined,
+  action: actions.Action
+): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
+  return checkIfDone(reducer(state, action))
 }

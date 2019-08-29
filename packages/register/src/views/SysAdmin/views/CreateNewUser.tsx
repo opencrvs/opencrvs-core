@@ -80,7 +80,6 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
 
   render() {
     const { section, submitting } = this.props
-
     if (submitting) {
       return this.renderLoadingPage()
     }
@@ -149,6 +148,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   }
 
   const fields = replaceInitialValues(group.fields, state.userForm.userFormData)
+
   const nextGroupId = getNextSectionIds(
     state.userForm.userForm.sections,
     section,

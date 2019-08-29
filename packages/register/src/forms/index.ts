@@ -1,4 +1,4 @@
-import { Validation, ValidationInitializer } from '@register/utils/validate'
+import { ValidationInitializer } from '@register/utils/validate'
 import { FormattedMessage } from 'react-intl'
 import {
   ISelectOption as SelectComponentOption,
@@ -10,6 +10,14 @@ import {
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
+
+import * as mutations from './mappings/mutation'
+import * as queries from './mappings/query'
+import * as graphQLQueries from './mappings/queries'
+import * as labels from './mappings/label'
+import * as types from './mappings/type'
+import * as responseTransformers from './mappings/response-transformers'
+import * as validators from '@opencrvs/register/src/utils/validate'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -90,6 +98,24 @@ export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
 
+export interface ISerializedDynamicFormFieldDefinitions {
+  label?: {
+    dependency: string
+    labelMapper: Operation<typeof labels>
+  }
+  type?:
+    | IStaticFieldType
+    | {
+        kind: 'dynamic'
+        dependency: string
+        typeMapper: Operation<typeof types>
+      }
+  validate?: Array<{
+    dependencies: string[]
+    validator: FactoryOperation<typeof validators>
+  }>
+}
+
 export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   type?: IDynamicFieldType | IStaticFieldType
@@ -138,7 +164,7 @@ export interface IAttachmentValue {
 }
 
 export type IFormFieldMutationMapFunction = (
-  transFormedData: any,
+  transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   fieldDefinition: IFormField
@@ -151,15 +177,94 @@ export type IFormFieldQueryMapFunction = (
   fieldDefinition: IFormField
 ) => void
 
+/*
+ * Takes in an array of function arguments (array, number, string, function)
+ * and replaces all functions with the descriptor type
+ *
+ * So type Array<number | Function | string> would become
+ * Array<number | Descriptor | string>
+ */
+type FunctionParamsToDescriptor<T> =
+  // It's an array - recursively call this type for all items
+  T extends Array<any>
+    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
+    : T extends IFormFieldQueryMapFunction // It's a query transformation function - return a query transformation descriptor
+    ? IQueryDescriptor
+    : T extends IFormFieldMutationMapFunction // It's a mutation transformation function - return a mutation transformation descriptor
+    ? IMutationDescriptor
+    : T // It's a none of the above - return self
+
+interface FactoryOperation<
+  OperationMap,
+  Key extends keyof OperationMap = keyof OperationMap
+> {
+  operation: Key
+  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>>
+}
+interface Operation<
+  OperationMap,
+  Key extends keyof OperationMap = keyof OperationMap
+> {
+  operation: Key
+}
+
+export type IFormFieldQueryMapDescriptor<
+  T extends keyof typeof queries = keyof typeof queries
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+}
+
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
 }
+
+/*
+ * These types are here only for replacing mapping types to
+ * serializable ones in IFormField. The default Omit type doesn't work
+ * with type unions :(
+ */
+
+type UnionKeys<T> = T extends any ? keyof T : never
+type UnionPick<T, K extends any> = T extends any
+  ? Pick<T, Extract<K, keyof T>>
+  : never
+
+type UnionOmit<T, K extends UnionKeys<T>> = UnionPick<
+  T,
+  Exclude<UnionKeys<T>, K>
+>
+
+type SerializedFormFieldWithDynamicDefinitions = UnionOmit<
+  IFormFieldWithDynamicDefinitions,
+  'dynamicDefinitions'
+> & {
+  dynamicDefinitions: ISerializedDynamicFormFieldDefinitions
+}
+
+type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
+  queryMap: ISerializedQueryMap
+}
+
+export type SerializedFormField = UnionOmit<
+  | Exclude<IFormField, IFormFieldWithDynamicDefinitions | ILoaderButton>
+  | SerializedFormFieldWithDynamicDefinitions
+  | ILoaderButtonWithSerializedQueryMap,
+  'validate' | 'mapping'
+> & {
+  validate: IValidatorDescriptor[]
+  mapping?: {
+    mutation?: IMutationDescriptor
+    query?: IQueryDescriptor
+  }
+}
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: FormattedMessage.MessageDescriptor
-  validate: Validation[]
+  validate: validators.Validation[]
   required?: boolean
   prefix?: string
   postfix?: string
@@ -285,6 +390,13 @@ export interface IQuery {
   errorText: FormattedMessage.MessageDescriptor
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
+
+export interface ISerializedQueryMap {
+  [key: string]: Omit<IQuery, 'responseTransformer' | 'query'> & {
+    responseTransformer: Operation<typeof responseTransformers>
+    query: Operation<typeof graphQLQueries>
+  }
+}
 export interface IQueryMap {
   [key: string]: IQuery
 }
@@ -383,8 +495,119 @@ export interface IConditionals {
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
+type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
+
+/*
+ * TEMPORARY @todo
+ *
+ * Remove when form field definitions are removed from codebase
+ */
+
+type FilterType<Base, Condition> = {
+  [Key in keyof Base]: Base[Key] extends Condition ? Key : never
+}
+
+// Validation
+
+type ValidationFactoryOperationKeys = FilterType<
+  typeof validators,
+  (...args: any[]) => (...args: any[]) => any
+>[keyof typeof validators]
+
+type ValidationDefaultOperationKeys = Exclude<
+  keyof typeof validators,
+  ValidationFactoryOperationKeys
+>
+
+export type ValidationFactoryOperation<
+  T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
+> = {
+  operation: T
+  parameters: Params<typeof validators[T]>
+}
+
+type ValidationDefaultOperation<
+  T extends ValidationDefaultOperationKeys = ValidationDefaultOperationKeys
+> = {
+  operation: T
+}
+
+export type IValidatorDescriptor =
+  | ValidationFactoryOperation
+  | ValidationDefaultOperation
+
+// Queries
+
+type QueryFactoryOperationKeys = FilterType<
+  typeof queries,
+  (...args: any[]) => (...args: any[]) => any
+>[keyof typeof queries]
+
+type QueryDefaultOperationKeys = Exclude<
+  keyof typeof queries,
+  QueryFactoryOperationKeys
+>
+
+export type QueryFactoryOperation<
+  T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+}
+
+type QueryDefaultOperation<
+  T extends QueryDefaultOperationKeys = QueryDefaultOperationKeys
+> = {
+  operation: T
+}
+
+export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
+
+// Mutations
+
+type MutationFactoryOperationKeys = FilterType<
+  typeof mutations,
+  (...args: any[]) => (...args: any[]) => any
+>[keyof typeof mutations]
+
+type MutationDefaultOperationKeys = Exclude<
+  keyof typeof mutations,
+  MutationFactoryOperationKeys
+>
+
+export type MutationFactoryOperation<
+  T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
+> = {
+  operation: T
+  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+}
+
+type MutationDefaultOperation<
+  T extends MutationDefaultOperationKeys = MutationDefaultOperationKeys
+> = {
+  operation: T
+}
+
+export type IMutationDescriptor =
+  | MutationFactoryOperation
+  | MutationDefaultOperation
+
+/*
+ * / TEMPORARY @todo
+ *
+ */
+
+// Initial type as it's always used as an object.
+// Should be stricter than this
+export type TransformedData = { [key: string]: any }
+
+export type IFormSectionMapping = {
+  mutation?: IFormSectionMutationMapFunction
+  query?: IFormSectionQueryMapFunction
+}
+
 export type IFormSectionMutationMapFunction = (
-  transFormedData: any,
+  transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) => void
@@ -395,12 +618,49 @@ export type IFormSectionQueryMapFunction = (
   sectionId: string
 ) => void
 
-export type IFormSectionMapping = {
-  mutation?: IFormSectionMutationMapFunction
-  query?: IFormSectionQueryMapFunction
+export enum BirthSection {
+  Child = 'child',
+  Mother = 'mother',
+  Father = 'father',
+  Registration = 'registration',
+  Documents = 'documents',
+  Preview = 'preview'
 }
+
+export enum DeathSection {
+  Deceased = 'deceased',
+  Event = 'deathEvent',
+  CauseOfDeath = 'causeOfDeath',
+  Applicants = 'informant',
+  DeathDocuments = 'documents',
+  Preview = 'preview'
+}
+export enum UserSection {
+  User = 'user',
+  Preview = 'preview'
+}
+export enum CertificateSection {
+  CollectCertificate = 'collectCertificate',
+  CollectDeathCertificate = 'collectDeathCertificate',
+  CertificatePreview = 'certificatePreview'
+}
+export enum PaymentSection {
+  Payment = 'payment'
+}
+export enum ReviewSection {
+  Review = 'review'
+}
+
+export type Section =
+  | ReviewSection
+  | PaymentSection
+  | BirthSection
+  | DeathSection
+  | UserSection
+  | CertificateSection
+
 export interface IFormSection {
-  id: string
+  id: Section
   viewType: ViewType
   name: FormattedMessage.MessageDescriptor
   title: FormattedMessage.MessageDescriptor
@@ -410,6 +670,19 @@ export interface IFormSection {
   notice?: FormattedMessage.MessageDescriptor
   mapping?: IFormSectionMapping
   hasDocumentSection?: boolean
+}
+
+export type ISerializedFormSection = Omit<
+  IFormSection,
+  'groups' | 'mapping'
+> & {
+  groups: Array<
+    Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
+  >
+  mapping?: {
+    mutation?: IMutationDescriptor
+    query?: IQueryDescriptor
+  }
 }
 
 export interface IFormSectionGroup {
@@ -424,6 +697,9 @@ export interface IFormSectionGroup {
 export interface IForm {
   sections: IFormSection[]
 }
+export interface ISerializedForm {
+  sections: ISerializedFormSection[]
+}
 
 export interface Ii18nSelectOption {
   value: string
@@ -435,7 +711,7 @@ export interface Ii18nFormFieldBase {
   type: string
   label: string
   description?: string
-  validate: Validation[]
+  validate: validators.Validation[]
   required?: boolean
   prefix?: string
   initialValue?: IFormFieldValue
