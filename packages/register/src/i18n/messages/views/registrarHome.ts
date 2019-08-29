@@ -24,7 +24,7 @@ const messagesToDefine: IregistrationHomeMessages = {
     id: 'register.registrationHome.table.label'
   },
   inProgress: {
-    defaultMessage: 'In progresdfss',
+    defaultMessage: 'In progress',
     description: 'The title of In progress',
     id: 'register.registrationHome.inProgress'
   },
