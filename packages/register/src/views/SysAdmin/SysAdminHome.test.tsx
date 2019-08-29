@@ -51,7 +51,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('renders page with top-bar', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{
@@ -70,7 +70,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('when user clicks the sent for users tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{
@@ -96,7 +96,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('when user clicks the sent for overview tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{
@@ -122,7 +122,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('when user clicks the sent for offices tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{
@@ -148,7 +148,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('when user clicks the sent for devices tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{
@@ -174,7 +174,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('when user clicks the sent for network tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{
@@ -200,7 +200,7 @@ describe('SysAdminHome tests', () => {
   })
 
   it('when user clicks the sent for config tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SysAdminHome
         match={{

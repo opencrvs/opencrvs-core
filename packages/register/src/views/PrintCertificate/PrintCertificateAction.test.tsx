@@ -188,7 +188,7 @@ describe('when user wants to print certificate', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <PrintCertificateAction
         location={mockLocation}
         history={history}
@@ -331,7 +331,7 @@ describe('when user wants to print certificate', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <PrintCertificateAction
         location={mockLocation}
         resources={mockOfflineData}
@@ -410,8 +410,8 @@ describe('when user wants to print certificate', () => {
     })
   })
 
-  it('renders parent details component', () => {
-    const parentDetailsComponent = createTestComponent(
+  it('renders parent details component', async () => {
+    const parentDetailsComponent = await createTestComponent(
       <ParentDetails
         information={{
           name: [
@@ -443,14 +443,14 @@ describe('when user wants to print certificate', () => {
     ).toBe(1)
   })
 
-  it('renders informative radio group component', () => {
+  it('renders informative radio group component', async () => {
     const id = 'informative_radio_group'
     const onChange = mock
     const onBlur = mock
     const value = true
     const touched = false
     const error = ''
-    const informativeRadioGroupComponent = createTestComponent(
+    const informativeRadioGroupComponent = await createTestComponent(
       <InformativeRadioGroup
         inputProps={{ id, onChange, onBlur, value, error: Boolean(error) }}
         inputFieldProps={{
@@ -665,7 +665,7 @@ describe('when user wants to print certificate', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <PrintCertificateAction
           location={mockLocation}
           resources={mockOfflineData}

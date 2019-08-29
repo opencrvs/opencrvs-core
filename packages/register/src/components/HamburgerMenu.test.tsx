@@ -49,7 +49,7 @@ describe('when user is in the menu page', () => {
   const menuTitleTextSelector = `#sub-menu-wrapper`
 
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <HamburgerMenu menuTitle={menuTitle} menuItems={menuItems} />,
       store
     )

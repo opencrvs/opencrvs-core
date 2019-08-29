@@ -29,8 +29,8 @@ describe('verify collector tests', () => {
       store.dispatch(storeApplication(birthApplication))
     })
 
-    it('when mother is collector renders Payment component', () => {
-      const testComponent = createTestComponent(
+    it('when mother is collector renders Payment component', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <Payment
           history={history}
@@ -45,7 +45,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(
         testComponent
@@ -67,8 +67,8 @@ describe('verify collector tests', () => {
         .simulate('click')
     })
 
-    it('invalid application id', () => {
-      expect(() =>
+    it('invalid application id', async () => {
+      expect(
         createTestComponent(
           // @ts-ignore
           <Payment
@@ -85,7 +85,7 @@ describe('verify collector tests', () => {
           />,
           store
         )
-      ).toThrowError()
+      ).rejects.toEqual(new Error('Application "mockBirth" missing!'))
     })
   })
 
@@ -94,8 +94,8 @@ describe('verify collector tests', () => {
       store.dispatch(storeApplication(deathApplication))
     })
 
-    it('when informant is collector', () => {
-      const testComponent = createTestComponent(
+    it('when informant is collector', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <Payment
           history={history}
@@ -110,7 +110,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(
         testComponent

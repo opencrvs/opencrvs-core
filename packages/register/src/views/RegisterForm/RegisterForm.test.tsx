@@ -172,7 +172,7 @@ describe('when user is in the register form before initial draft load', () => {
     const form = await getRegisterFormFromStore(store, Event.BIRTH)
 
     try {
-      createTestComponent(
+      await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -215,7 +215,7 @@ describe('when user is in the register form for birth event', () => {
 
       const mock: any = jest.fn()
       const form = await getRegisterFormFromStore(store, Event.BIRTH)
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -298,7 +298,7 @@ describe('when user is in the register form for death event', () => {
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -337,8 +337,8 @@ describe('when user is in the register form for death event', () => {
   })
 
   describe('when user is in deceased section', () => {
-    it('renders loader button when idType is Birth Registration Number', () => {
-      const testComponent = createTestComponent(
+    it('renders loader button when idType is Birth Registration Number', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -362,8 +362,8 @@ describe('when user is in the register form for death event', () => {
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
-    it('renders loader button when idType is National ID', () => {
-      const testComponent = createTestComponent(
+    it('renders loader button when idType is National ID', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -422,7 +422,7 @@ describe('when user is in the register form for death event', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -541,7 +541,7 @@ describe('when user is in the register form for death event', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -660,7 +660,7 @@ describe('when user is in the register form for death event', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -725,7 +725,7 @@ describe('when user is in the register form for death event', () => {
           error: new Error('boom')
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -795,7 +795,7 @@ describe('when user is in the register form for death event', () => {
           error: new Error('boom')
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -854,8 +854,8 @@ describe('when user is in the register form for death event', () => {
     })
   })
   describe('when user is death event section', () => {
-    it('renders the notice label for date field', () => {
-      const testComponent = createTestComponent(
+    it('renders the notice label for date field', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -899,7 +899,7 @@ describe('when user is in the register form preview section', () => {
     store.dispatch(storeApplication(draft))
 
     const form = await getRegisterFormFromStore(store, Event.BIRTH)
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         history={history}
@@ -949,7 +949,7 @@ describe('when user is in the register form preview section', () => {
       store.dispatch(storeApplication(nApplication))
 
       const nform = getRegisterForm(store.getState())[Event.BIRTH]
-      const nTestComponent = createTestComponent(
+      const nTestComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           history={history}
@@ -1019,7 +1019,7 @@ describe('when user is in the register form review section', () => {
 
     const form = await getReviewFormFromStore(store, Event.BIRTH)
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}
@@ -1084,7 +1084,7 @@ describe('When user is in Preview section death event', () => {
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
     deathForm = await getRegisterFormFromStore(store, Event.DEATH)
-    const nTestComponent = createTestComponent(
+    const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}
@@ -1231,7 +1231,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     store.dispatch(storeApplication(deathDraft))
 
     deathForm = await getRegisterFormFromStore(store, Event.DEATH)
-    const nTestComponent = createTestComponent(
+    const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}

@@ -266,7 +266,7 @@ describe('when user wants to review death certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewCertificateAction
         location={mockLocation}
         history={history}
@@ -519,7 +519,7 @@ describe('when user wants to review birth certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewCertificateAction
         location={mockLocation}
         history={history}

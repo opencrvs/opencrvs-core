@@ -79,7 +79,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('renders loading icon while loading page', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -114,7 +114,7 @@ describe('FieldAgentHome tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -143,7 +143,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('renders page with three tabs', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -173,7 +173,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the floating action button', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -258,7 +258,7 @@ describe('FieldAgentHome tests', () => {
         }
       }
     }
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -339,7 +339,7 @@ describe('FieldAgentHome tests', () => {
         }
       }
     }
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -372,7 +372,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the sent for review tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -405,7 +405,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the sent for updates tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -438,7 +438,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the sent for inprogress tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -473,8 +473,8 @@ describe('FieldAgentHome tests', () => {
   describe('when user is in sent for review tab', () => {
     let component: ReactWrapper
 
-    beforeEach(() => {
-      component = createTestComponent(
+    beforeEach(async () => {
+      component = (await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -487,11 +487,11 @@ describe('FieldAgentHome tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
     })
 
-    it('renders no records text when no data in grid table', () => {
-      const testComponent = createTestComponent(
+    it('renders no records text when no data in grid table', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -572,8 +572,8 @@ describe('FieldAgentHome tests', () => {
   describe('when user is in progress tab', () => {
     let component: ReactWrapper
 
-    beforeEach(() => {
-      component = createTestComponent(
+    beforeEach(async () => {
+      component = (await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -586,7 +586,7 @@ describe('FieldAgentHome tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
     })
 
     it('renders no records text when no data in grid table', () => {
