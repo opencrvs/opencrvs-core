@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 
-const MAX_TIME = 2000
+const MAX_TIME = process.env.CI ? 10000 : 2000
 const INTERVAL = 10
 
 export async function waitFor(condition: () => boolean) {
