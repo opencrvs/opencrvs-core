@@ -436,7 +436,7 @@ class ReviewActionComponent extends React.Component<
                 {applicationToBeRegistered
                   ? intl.formatMessage(buttonMessages.register)
                   : applicationToBeValidated
-                  ? intl.formatMessage(buttonMessages.sendForApproval)
+                  ? intl.formatMessage(buttonMessages.send)
                   : intl.formatMessage(buttonMessages.send)}
               </PrimaryButton>
             ]}
