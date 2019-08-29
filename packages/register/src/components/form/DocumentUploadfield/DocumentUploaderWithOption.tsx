@@ -5,7 +5,7 @@ import {
 } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@register/components/form/DocumentUploadfield/DocumentPreview'
-import { IFileValue, IFormFieldValue } from '@register/forms'
+import { IFileValue, IFormFieldValue, IAttachmentValue } from '@register/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as Jimp from 'jimp'
 import * as React from 'react'
@@ -210,7 +210,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     })
   }
 
-  onDelete = (image: IFormFieldValue) => {
+  onDelete = (image: IFileValue | IAttachmentValue) => {
     const previewImage = image as IFileValue
     const addableOption = this.props.options.find(
       (item: ISelectOption) => item.value === previewImage.optionValues[1]
@@ -230,7 +230,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.setState({ previewImage: null })
   }
 
-  selectForPreview = (previewImage: IFormFieldValue) => {
+  selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
     this.setState({ previewImage: previewImage as IFileValue })
   }
 
