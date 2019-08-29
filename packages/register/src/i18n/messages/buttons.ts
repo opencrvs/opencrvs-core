@@ -31,6 +31,7 @@ interface IButtonsMessages {
   send: ReactIntl.FormattedMessage.MessageDescriptor
   sendForReview: ReactIntl.FormattedMessage.MessageDescriptor
   sendIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
+  sendForApproval: ReactIntl.FormattedMessage.MessageDescriptor
   settings: ReactIntl.FormattedMessage.MessageDescriptor
   start: ReactIntl.FormattedMessage.MessageDescriptor
   update: ReactIntl.FormattedMessage.MessageDescriptor
@@ -195,6 +196,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Send incomplete application',
     description: 'Title for Incomplete submit button',
     id: 'buttons.sendIncomplete'
+  },
+  sendForApproval: {
+    defaultMessage: 'SEND FOR APPROVAL',
+    description: 'Title for complete submit button',
+    id: 'buttons.sendForApproval'
   },
   settings: {
     defaultMessage: 'Settings',
