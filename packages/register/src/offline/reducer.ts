@@ -103,6 +103,8 @@ function reducer(
         offlineDataString ? offlineDataString : '{}'
       )
 
+      // TODO check for offline data updates, see OCRVS-1974
+
       if (isOfflineDataLoaded(offlineData)) {
         const newState = {
           ...state,
@@ -209,8 +211,10 @@ function reducer(
       }
     }
 
-    // @hack this is only here to provide a way of hydrating the state during tests
     case actions.READY: {
+      // save offline data
+      storage.setItem('offline', JSON.stringify(action.payload))
+
       return {
         ...state,
         offlineData: action.payload
