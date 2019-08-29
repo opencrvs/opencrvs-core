@@ -12,11 +12,12 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 
 export function transformCertificateData(
-  transformedSectionData: TransformedData,
-  certificateData: ICertificate
+  transformedData: TransformedData,
+  certificateData: ICertificate,
+  sectionId: string
 ) {
   if (!certificateData || !certificateData.collector) {
-    return transformedSectionData
+    return transformedData
   }
   const collector: GQLRelatedPerson = {}
   if (certificateData.collector.type) {
@@ -51,7 +52,7 @@ export function transformCertificateData(
       }
     ] as GQLAttachment[]
   }
-  transformedSectionData.certificates = [
+  transformedData[sectionId].certificates = [
     {
       ...certificateData,
       collector
@@ -83,8 +84,9 @@ export function setBirthRegistrationSectionTransformer(
 
   if (draftData[sectionId].certificates) {
     transformCertificateData(
-      transformedData[sectionId],
-      (draftData[sectionId].certificates as ICertificate[])[0]
+      transformedData,
+      (draftData[sectionId].certificates as ICertificate[])[0],
+      sectionId
     )
   }
 }

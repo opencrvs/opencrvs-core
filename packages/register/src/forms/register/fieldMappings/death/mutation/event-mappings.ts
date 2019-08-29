@@ -100,8 +100,9 @@ export function setDeathRegistrationSectionTransformer(
     }
     if (draftData.registration.certificates) {
       transformCertificateData(
-        transformedData.registration,
-        (draftData.registration.certificates as ICertificate[])[0]
+        transformedData,
+        (draftData.registration.certificates as ICertificate[])[0],
+        'registration'
       )
     }
   }
