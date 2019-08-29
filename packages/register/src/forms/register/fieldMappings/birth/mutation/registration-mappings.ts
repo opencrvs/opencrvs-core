@@ -11,6 +11,54 @@ import {
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 
+export function transformCertificateData(
+  transformedSectionData: TransformedData,
+  certificateData: ICertificate
+) {
+  if (!certificateData || !certificateData.collector) {
+    return transformedSectionData
+  }
+  const collector: GQLRelatedPerson = {}
+  if (certificateData.collector.type) {
+    collector.relationship = certificateData.collector
+      .type as GQLRelationshipType
+  }
+  if (certificateData.collector.relationship) {
+    collector.otherRelationship = certificateData.collector
+      .relationship as string
+    collector.individual = {
+      name: [
+        {
+          use: 'en',
+          firstNames: certificateData.collector.firstName,
+          familyName: certificateData.collector.lastName
+        }
+      ],
+      identifier: [
+        {
+          id: certificateData.collector.iD,
+          type: certificateData.collector.iDType
+        }
+      ]
+    } as GQLPerson
+  }
+  if (certificateData.collector.affidavitFile) {
+    collector.affidavit = [
+      {
+        contentType: (certificateData.collector.affidavitFile as IFileValue)
+          .type,
+        data: (certificateData.collector.affidavitFile as IFileValue).data
+      }
+    ] as GQLAttachment[]
+  }
+  transformedSectionData.certificates = [
+    {
+      ...certificateData,
+      collector
+    }
+  ]
+}
+
 export function setBirthRegistrationSectionTransformer(
   transformedData: TransformedData,
   draftData: IFormData,
@@ -34,47 +82,9 @@ export function setBirthRegistrationSectionTransformer(
   }
 
   if (draftData[sectionId].certificates) {
-    const certificate = (draftData[sectionId].certificates as ICertificate[])[0]
-    if (certificate.collector) {
-      const collector: GQLRelatedPerson = {}
-      if (certificate.collector.type) {
-        collector.relationship = certificate.collector
-          .type as GQLRelationshipType
-      }
-      if (certificate.collector.relationship) {
-        collector.otherRelationship = certificate.collector
-          .relationship as string
-        collector.individual = {
-          name: [
-            {
-              use: 'en',
-              firstNames: certificate.collector.firstName,
-              familyName: certificate.collector.lastName
-            }
-          ],
-          identifier: [
-            {
-              id: certificate.collector.iD,
-              type: certificate.collector.iDType
-            }
-          ]
-        } as GQLPerson
-      }
-      if (certificate.collector.affidavitFile) {
-        collector.affidavit = [
-          {
-            contentType: (certificate.collector.affidavitFile as IFileValue)
-              .type,
-            data: (certificate.collector.affidavitFile as IFileValue).data
-          }
-        ] as GQLAttachment[]
-      }
-      transformedData[sectionId].certificates = [
-        {
-          ...certificate,
-          collector
-        }
-      ]
-    }
+    transformCertificateData(
+      transformedData[sectionId],
+      (draftData[sectionId].certificates as ICertificate[])[0]
+    )
   }
 }

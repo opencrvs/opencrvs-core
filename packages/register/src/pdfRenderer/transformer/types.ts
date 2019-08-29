@@ -30,10 +30,10 @@ export interface IFieldTransformer {
   parameters?: TransformerPayload
 }
 
-export type TransformerData = IApplication & IUserDetails
+export type TransformableData = IApplication | IUserDetails
 export interface IFunctionTransformer {
   [transformerFunction: string]: (
-    data: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => string | null

@@ -18,8 +18,6 @@ import { storage } from '@register/storage'
 import { checkAuth } from '@register/profile/profileActions'
 import { waitForElement } from '@register/tests/wait-for-element'
 
-const mockFetchUserDetails = jest.fn()
-
 const nameObj = {
   data: {
     getUser: {
@@ -38,11 +36,8 @@ const nameObj = {
   }
 }
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
 const getItem = window.localStorage.getItem as jest.Mock
+;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
 
 describe('when user wants to review death certificate', () => {
   const { store, history } = createStore()

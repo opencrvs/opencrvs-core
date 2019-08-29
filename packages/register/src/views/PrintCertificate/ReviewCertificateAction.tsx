@@ -86,7 +86,7 @@ const Title = styled.h4`
 `
 
 type State = {
-  certificatePdf: string
+  certificatePdf: string | null
   showConfirmationModal: boolean
 }
 type IProps = {
@@ -111,12 +111,12 @@ class ReviewCertificateActionComponent extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      certificatePdf: '',
+      certificatePdf: null,
       showConfirmationModal: false
     }
   }
   componentDidMount() {
-    if (this.state.certificatePdf === '') {
+    if (this.state.certificatePdf === null) {
       previewCertificate(
         this.props.intl,
         this.props.draft,
@@ -149,7 +149,8 @@ class ReviewCertificateActionComponent extends React.Component<
       certificates: [
         {
           ...certificate,
-          data: this.state.certificatePdf
+          data:
+            this.state.certificatePdf === null ? '' : this.state.certificatePdf
         }
       ]
     }

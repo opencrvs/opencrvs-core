@@ -12,11 +12,13 @@ import {
   INumberFeildConversionPayload,
   IDateFeildValuePayload,
   IFunctionTransformer,
-  TransformerData,
+  TransformableData,
   TransformerPayload,
   IFormattedFeildValuePayload
 } from '@register/pdfRenderer/transformer/types'
 import moment from 'moment'
+import { IFormSectionData } from '@register/forms'
+import { IApplication } from '@register/applications'
 
 export const fieldTransformers: IFunctionTransformer = {
   /*
@@ -26,10 +28,11 @@ export const fieldTransformers: IFunctionTransformer = {
       - MessageValues: Optional field, which will be used to replace any value on the meessage descriptor (if needed)  
   */
   IntlLabel: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     let messageValues = {}
     const message = payload && (payload as IIntLabelPayload)
     if (!message) {
@@ -44,12 +47,11 @@ export const fieldTransformers: IFunctionTransformer = {
                 application.data,
                 (message.messageValues && message.messageValues[valueKey]) || ''
               )
-        if (messageValue !== null) {
-          messageValues = {
-            ...messageValues,
-            ...{
-              [valueKey]: messageValue
-            }
+
+        messageValues = {
+          ...messageValues,
+          ...{
+            [valueKey]: messageValue
           }
         }
       })
@@ -64,10 +66,11 @@ export const fieldTransformers: IFunctionTransformer = {
       - format: Mendatory field. Need to provide locale wise name fields which will be concatenated together with spaces 
   */
   ApplicantName: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     const formatPayload = payload && (payload as IApplicantNamePayload)
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
@@ -77,7 +80,7 @@ export const fieldTransformers: IFunctionTransformer = {
         `No data key defined on payload for event: ${application.event}`
       )
     }
-    const applicantObj = getValueFromApplicationDataByKey(
+    const applicantObj: IFormSectionData = getValueFromApplicationDataByKey(
       application.data,
       formatPayload.key[application.event]
     )
@@ -97,10 +100,11 @@ export const fieldTransformers: IFunctionTransformer = {
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'        
   */
   FieldValue: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     const key = payload && (payload as IFeildValuePayload)
     if (!key) {
       throw new Error('No payload found for this transformer')
@@ -117,10 +121,11 @@ export const fieldTransformers: IFunctionTransformer = {
       - format: Mendatory field. Formats the extracted date value by this given format. 
   */
   DateFieldValue: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     const formatPayload = payload && (payload as IDateFeildValuePayload)
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
@@ -148,10 +153,11 @@ export const fieldTransformers: IFunctionTransformer = {
       Ex: '{child.firstName}, {child.lastName}'        
   */
   FormattedFieldValue: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     const key = payload && (payload as IFormattedFeildValuePayload)
     if (!key) {
       throw new Error('No payload found for this transformer')
@@ -181,10 +187,11 @@ export const fieldTransformers: IFunctionTransformer = {
     Based on matched condition, this transformer will render the result based on output type 
   */
   ConditionExecutor: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     const params = payload && (payload as IConditionExecutorPayload)
     if (!params) {
       throw new Error('No payload found for this transformer')
@@ -219,10 +226,11 @@ export const fieldTransformers: IFunctionTransformer = {
      - conversionMap: Mendatory field. ex: { 0: '০', 1: '১'}   
   */
   NumberConversion: (
-    application: TransformerData,
+    data: TransformableData,
     intl: InjectedIntl,
     payload?: TransformerPayload
   ) => {
+    const application = data as IApplication
     const params = payload && (payload as INumberFeildConversionPayload)
     if (!params) {
       throw new Error('No payload found for this transformer')

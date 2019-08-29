@@ -12,7 +12,7 @@ const Container = styled.div`
 `
 
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {
-  pdfSource: string
+  pdfSource: string | null
 }
 
 interface IPDFViewerState {

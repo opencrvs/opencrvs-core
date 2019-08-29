@@ -3,7 +3,7 @@ import { commonVFS } from '@register/pdfRenderer/common_vfs'
 import { transformers } from '@register/pdfRenderer/transformer'
 import {
   IPDFTemplate,
-  TransformerData
+  TransformableData
 } from '@register/pdfRenderer/transformer/types'
 import { InjectedIntl } from 'react-intl'
 import { IApplication } from '@register/applications'
@@ -31,7 +31,7 @@ export function createPDF(
       }
       const transformerData = (isUserDetailsDataBase(transformerDef)
         ? userDetails
-        : application) as TransformerData
+        : application) as TransformableData
       definitionString = definitionString.replace(
         new RegExp(`{${transformerDef.field}}`, 'gi'),
         transformFunction(transformerData, intl, transformerDef.parameters) ||
