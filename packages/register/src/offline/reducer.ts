@@ -114,15 +114,12 @@ function reducer(
       ])
 
       if (isOfflineDataLoaded(offlineData)) {
-        const newState = {
-          ...state,
-          offlineData,
-          offlineDataLoaded: true
-        }
         return loop(
-          newState,
+          {
+            ...state,
+            offlineData
+          },
           Cmd.list([
-            Cmd.action(actions.offlineDataReady(newState.offlineData)),
             // Try loading data regardless as it might have been updated.
             !state.offlineDataLoaded ? dataLoadingCmds : Cmd.none
           ])
