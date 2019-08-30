@@ -68,7 +68,8 @@ function checkIfDone(
 
   if (
     isOfflineDataLoaded(newState.offlineData) &&
-    !newState.offlineDataLoaded
+    (!newState.offlineDataLoaded ||
+      oldState.offlineData !== newState.offlineData)
   ) {
     return loop(
       { ...newState, offlineDataLoaded: true },
@@ -83,7 +84,7 @@ function checkIfDone(
 }
 
 function reducer(
-  state: IOfflineDataState = initialState,
+  state: IOfflineDataState,
   action: actions.Action | profileActions.Action
 ): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
   switch (action.type) {
@@ -222,8 +223,8 @@ function reducer(
 }
 
 export function offlineDataReducer(
-  state: IOfflineDataState | undefined,
+  state: IOfflineDataState | undefined = initialState,
   action: actions.Action
 ): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
-  return checkIfDone(reducer(state, action))
+  return checkIfDone(state, reducer(state, action))
 }
