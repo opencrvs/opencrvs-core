@@ -178,7 +178,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           comments {
             comment
           }
-
+          type
           location {
             name
             alias

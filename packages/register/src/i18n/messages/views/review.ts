@@ -36,12 +36,12 @@ interface IReviewMessages {
 const messagesToDefine: IReviewMessages = {
   validateCompleteApplicationActionTitle: {
     id: 'validate.complete.application.action.title',
-    defaultMessage: 'Ready to approve?'
+    defaultMessage: 'Send for approval or reject?'
   },
   validateCompleteApplicationActionDescription: {
     id: 'validate.complete.application.action.description',
     defaultMessage:
-      'By approving you confirm that the applicatiohn is ready to register'
+      'By sending for approval you confirm that the application is ready for approval'
   },
   validateApplicationActionModalTitle: {
     id: 'validate.application.action.modal.title',

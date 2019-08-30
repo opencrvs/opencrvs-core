@@ -51,9 +51,24 @@ storage.setItem = storageSetItemMock
 const warn = jest.fn()
 const error = jest.fn()
 const debug = jest.fn()
+
 console.warn = warn
 console.error = error
 console.debug = debug
+
+const log = console.log.bind(console)
+
+const BLOCKED_MESSAGES = [
+  'Warning: Setting up fake worker.'
+]
+
+console.log = jest.fn().mockImplementation((...messages) => {
+  if(BLOCKED_MESSAGES.includes(messages.join(' '))) {
+    return
+  }
+  log(...messages)
+})
+
 
 /*
  * GraphQL Queries

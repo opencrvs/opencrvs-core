@@ -4,4 +4,4 @@ export {
   getDateOfMarriageLabel,
   getMotherDateOfBirthLabel,
   getFatherDateOfBirthLabel
-} from '@register/forms/register/fieldDefinitions/birth/staticLabel'
+} from '@register/forms/register/fieldMappings/birth/staticLabel'
