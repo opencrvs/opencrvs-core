@@ -67,6 +67,7 @@ interface IProps {
   title?: string
   backLabel?: string
   icon?: () => React.ReactNode
+  id?: string
 }
 
 export class ActionPageLight extends React.Component<
@@ -75,10 +76,10 @@ export class ActionPageLight extends React.Component<
   }
 > {
   render() {
-    const { title, icon, goBack, backLabel } = this.props
+    const { id, title, icon, goBack, backLabel } = this.props
 
     return (
-      <ActionContainer>
+      <ActionContainer id={id}>
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>

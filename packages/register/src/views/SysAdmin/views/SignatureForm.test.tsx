@@ -24,7 +24,7 @@ describe('signature upload tests', () => {
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
-      testComponent = createTestComponent(
+      testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
@@ -39,7 +39,7 @@ describe('signature upload tests', () => {
         />,
         store,
         [mockFetchRoleGraphqlOperation]
-      ).component
+      )).component
     })
 
     it('show the signature form page', async () => {
@@ -134,9 +134,9 @@ describe('signature upload tests', () => {
   })
 
   describe('when user in review page', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      testComponent = createTestComponent(
+      testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
@@ -151,7 +151,7 @@ describe('signature upload tests', () => {
         />,
         store,
         [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
-      ).component
+      )).component
     })
 
     it('renders review header', () => {

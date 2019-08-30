@@ -13,7 +13,7 @@ const { store } = createStore()
 describe('Security Question Page', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SecurityQuestion setupData={{ securityQuestionAnswers: [] }} />,
       store

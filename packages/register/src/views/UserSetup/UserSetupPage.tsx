@@ -79,6 +79,7 @@ export class UserSetupView extends React.Component<
 > {
   render() {
     const { intl, userDetails, goToStep } = this.props
+
     return (
       <Page>
         <Container id="user-setup-landing-page">

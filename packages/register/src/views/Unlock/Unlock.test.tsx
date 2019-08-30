@@ -18,37 +18,41 @@ const clearPassword = (component: ReactWrapper) => {
 }
 
 describe('Unlock page loads Properly', () => {
-  // mock indexeddb
-  const indexedDB = {
-    USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
-    USER_DATA: JSON.stringify([
-      {
-        userID: 'shakib75',
-        userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-        drafts: []
-      }
-    ]),
-    screenLock: undefined,
-    USER_ID: 'shakib75',
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    locked_time: undefined
-  }
+  let testComponent: { component: ReactWrapper }
+  beforeEach(async () => {
+    // mock indexeddb
+    const indexedDB = {
+      USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
+      USER_DATA: JSON.stringify([
+        {
+          userID: 'shakib75',
+          userPIN:
+            '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
+          drafts: []
+        }
+      ]),
+      screenLock: undefined,
+      USER_ID: 'shakib75',
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      locked_time: undefined
+    }
 
-  storage.getItem = jest.fn(async (key: string) =>
-    // @ts-ignore
-    Promise.resolve(indexedDB[key])
-  )
+    storage.getItem = jest.fn(async (key: string) =>
+      // @ts-ignore
+      Promise.resolve(indexedDB[key])
+    )
 
-  storage.setItem = jest.fn(
-    // @ts-ignore
-    async (key: string, value: string) => (indexedDB[key] = value)
-  )
+    storage.setItem = jest.fn(
+      // @ts-ignore
+      async (key: string, value: string) => (indexedDB[key] = value)
+    )
 
-  const { store } = createStore()
-  const testComponent = createTestComponent(
-    <Unlock onCorrectPinMatch={() => null} />,
-    store
-  )
+    const { store } = createStore()
+    testComponent = await createTestComponent(
+      <Unlock onCorrectPinMatch={() => null} />,
+      store
+    )
+  })
 
   it('Should load the Unlock page properly', () => {
     const elem = testComponent.component.find('#unlockPage').hostNodes().length
@@ -72,15 +76,17 @@ describe('Unlock page loads Properly', () => {
 })
 
 describe('For wrong inputs', () => {
-  const { store } = createStore()
-  const testComponent = createTestComponent(
-    <Unlock onCorrectPinMatch={() => null} />,
-    store
-  )
+  let testComponent: { component: ReactWrapper }
+  beforeEach(async () => {
+    const { store } = createStore()
+    testComponent = await createTestComponent(
+      <Unlock onCorrectPinMatch={() => null} />,
+      store
+    )
 
-  // These tests are only for wrong inputs, so this mock fn only returns a promise of false
-  pinOps.comparePins = jest.fn(async (pin1, pin2) => Promise.resolve(false))
-
+    // These tests are only for wrong inputs, so this mock fn only returns a promise of false
+    pinOps.comparePins = jest.fn(async (pin1, pin2) => Promise.resolve(false))
+  })
   it('Should Display Incorrect error message', async () => {
     clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
@@ -189,23 +195,22 @@ describe('For wrong inputs', () => {
 })
 
 describe('Logout Sequence', () => {
-  const { store } = createStore()
-  const redirect = jest.fn()
-  const testComponent = createTestComponent(
-    <Unlock onCorrectPinMatch={() => redirect} />,
-    store
-  )
-  const indexeddb = {
-    SCREEN_LOCK: true,
-    SECURITY_PIN_EXPIRED_AT: 1234
-  }
-  // @ts-ignore
-  storage.removeItem = jest.fn((key: string) => {
+  it('should clear lock-related indexeddb entries upon logout', async () => {
+    const { store } = createStore()
+    const redirect = jest.fn()
+    const testComponent = await createTestComponent(
+      <Unlock onCorrectPinMatch={() => redirect} />,
+      store
+    )
+    const indexeddb = {
+      SCREEN_LOCK: true,
+      SECURITY_PIN_EXPIRED_AT: 1234
+    }
     // @ts-ignore
-    delete indexeddb[key]
-  })
-
-  it('should clear lock-related indexeddb entries upon logout', () => {
+    storage.removeItem = jest.fn((key: string) => {
+      // @ts-ignore
+      delete indexeddb[key]
+    })
     testComponent.component
       .find('#logout')
       .hostNodes()

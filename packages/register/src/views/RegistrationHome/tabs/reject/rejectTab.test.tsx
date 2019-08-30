@@ -134,8 +134,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -168,7 +168,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -223,7 +223,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -331,7 +331,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -375,7 +375,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -424,7 +424,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -604,7 +604,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -720,7 +720,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -864,7 +864,7 @@ describe('Tablet tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{

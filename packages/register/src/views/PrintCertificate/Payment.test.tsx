@@ -41,8 +41,8 @@ describe('verify collector tests', () => {
       store.dispatch(storeApplication(birthApplication))
     })
 
-    it('when mother is collector renders Payment component', () => {
-      const testComponent = createTestComponent(
+    it('when mother is collector renders Payment component', async () => {
+      const testComponent = (await createTestComponent(
         <Payment
           history={history}
           location={mockLocation}
@@ -57,7 +57,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(
         testComponent
@@ -79,9 +79,9 @@ describe('verify collector tests', () => {
         .simulate('click')
     })
 
-    it('print payment receipt', () => {
+    it('print payment receipt', async () => {
       const printMoneyReceiptSpy = jest.spyOn(PDFUtils, 'printMoneyReceipt')
-      const testComponent = createTestComponent(
+      const testComponent = (await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
@@ -96,7 +96,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       testComponent
         .find('#print-receipt')
@@ -107,7 +107,7 @@ describe('verify collector tests', () => {
     })
 
     it('invalid application id', () => {
-      expect(() =>
+      expect(
         createTestComponent(
           <Payment
             location={mockLocation}
@@ -124,7 +124,7 @@ describe('verify collector tests', () => {
           />,
           store
         )
-      ).toThrowError()
+      ).rejects.toEqual(new Error('Application "mockBirth" missing!'))
     })
   })
 
@@ -133,8 +133,8 @@ describe('verify collector tests', () => {
       store.dispatch(storeApplication(deathApplication))
     })
 
-    it('when informant is collector', () => {
-      const testComponent = createTestComponent(
+    it('when informant is collector', async () => {
+      const testComponent = (await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
@@ -149,7 +149,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(
         testComponent

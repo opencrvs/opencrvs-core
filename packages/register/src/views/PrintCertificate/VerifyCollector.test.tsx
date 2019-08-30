@@ -26,12 +26,12 @@ describe('verify collector tests', () => {
   }
 
   describe('in case of birth application', () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       store.dispatch(storeApplication(birthApplication))
     })
 
-    it('when mother is collector renders idVerifier component', () => {
-      const testComponent = createTestComponent(
+    it('when mother is collector renders idVerifier component', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -47,15 +47,15 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
     describe('when father is collector', () => {
       let testComponent: ReactWrapper
-      beforeEach(() => {
-        testComponent = createTestComponent(
+      beforeEach(async () => {
+        testComponent = (await createTestComponent(
           // @ts-ignore
           <VerifyCollector
             history={history}
@@ -71,7 +71,7 @@ describe('verify collector tests', () => {
             }}
           />,
           store
-        ).component
+        )).component
       })
 
       it('renders idVerifier compomnent', () => {
@@ -153,8 +153,8 @@ describe('verify collector tests', () => {
       store.dispatch(storeApplication(deathApplication))
     })
 
-    it('when informant is collector', () => {
-      const testComponent = createTestComponent(
+    it('when informant is collector', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -170,7 +170,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
