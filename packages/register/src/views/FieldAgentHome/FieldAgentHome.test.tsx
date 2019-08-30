@@ -4,10 +4,10 @@ import {
   validToken,
   flushPromises,
   mockApplicationData,
-  mockUserResponse
+  mockUserResponse,
+  getItem
 } from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { storage } from '@register/storage'
 import { FIELD_AGENT_ROLES } from '@register/utils/constants'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { storeApplication, SUBMISSION_STATUS } from '@register/applications'
@@ -23,10 +23,6 @@ import {
   SEARCH_APPLICATIONS_USER_WISE
 } from '@register/search/queries'
 import { waitForElement } from '@register/tests/wait-for-element'
-
-const getItem = window.localStorage.getItem as jest.Mock
-
-const mockFetchUserDetails = jest.fn()
 
 const nameObj = {
   data: {
@@ -65,16 +61,12 @@ const countQueryGraphqlMock = {
 }
 
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
 
 describe('FieldAgentHome tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
+    ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     getItem.mockReturnValue(validToken)
     store.dispatch(checkAuth({ '?token': validToken }))
   })
@@ -93,12 +85,11 @@ describe('FieldAgentHome tests', () => {
         }}
       />,
       store,
-      [countQueryGraphqlMock]
+      [{ ...countQueryGraphqlMock, delay: 2000 }]
     )
 
     testComponent.component.update()
     const app = testComponent.component
-
     const element = await waitForElement(app, '#field-agent-home-spinner')
 
     expect(element.hostNodes()).toHaveLength(1)

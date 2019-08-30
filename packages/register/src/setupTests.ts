@@ -6,6 +6,10 @@ import { noop } from 'lodash'
 import * as CommonUtils from '@register/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 
+if (process.env.CI) {
+  jest.setTimeout(30000)
+}
+
 /*
  * Initialize mocks
  */
