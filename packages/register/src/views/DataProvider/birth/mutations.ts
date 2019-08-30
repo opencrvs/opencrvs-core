@@ -85,10 +85,13 @@ export function getBirthMutationMappings(
     case Action.COLLECT_CERTIFICATE:
       return {
         mutation: COLLECT_BIRTH_CERTIFICATE,
-        //  TODO: Need to change the payload according to new structure
-        variables: {
-          ...payload
-        },
+        variables:
+          form && draft
+            ? {
+                id: draft.id,
+                details: draftToGqlTransformer(form, draft.data)
+              }
+            : {},
         dataKey: 'markBirthAsCertified'
       }
     default:

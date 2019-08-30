@@ -124,6 +124,7 @@ describe('Certificate collector test for a birth registration without father det
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -562,6 +563,7 @@ describe('Test for a free birth registration', () => {
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -852,6 +854,7 @@ describe('Certificate collector test for a birth registration with father detail
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -1083,6 +1086,7 @@ describe('Certificate collector test for a death registration', () => {
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],

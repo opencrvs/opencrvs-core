@@ -64,9 +64,11 @@
         "certificate.parent.details.label.nationality": "Nationality",
         "certificate.parent.details.label.number": "Number",
         "certificate.parent.details.label.typeOfID": "Type of ID",
-        "certificate.receipt.amount": "Amount paid:\n\n",
+        "certificate.receipt.amount": "Amount paid:",
         "certificate.receipt.header": "Receipt for {event} Certificate of",
         "certificate.receipt.issuedAt": "Issued at:",
+        "certificate.receipt.issuedBy": "By:",
+        "certificate.receipt.issuedDate": "Date of payment:",
         "certificate.receipt.issuer": "By: {role}, {name}\n Date of payment: {dateOfPayment}",
         "certificate.receipt.service": "Service: ",
         "certificate.receipt.amountDue": "Amount Due:",
@@ -995,7 +997,11 @@
         "form.field.label.userSignatureAttachmentDesc": "Ask the registrar to sign a piece of paper and then scan or take a photo.",
         "form.field.label.userAttachmentSection": "Attachments",
         "form.field.label.addFile": "Add file",
-        "form.field.label.fileUploadError": "{type} supported only"
+        "form.field.label.fileUploadError": "{type} supported only",
+        "certificate.receipt.service.45day": "{event} registration after 45 days of event",
+        "certificate.receipt.service.5year": "{event} registration after 5 years of event",
+        "certificate.receipt.service.45day.amount": "\u09F3 25.00",
+        "certificate.receipt.service..5year.amount": "\u09F3 50.00"
       }
     },
     {
@@ -1062,9 +1068,11 @@
         "certificate.parent.details.label.nationality": "জাতীয়তা",
         "certificate.parent.details.label.number": "সংখ্যা",
         "certificate.parent.details.label.typeOfID": "আইডি প্রকার",
-        "certificate.receipt.amount": "পরিশোধিত মূল্য: \n\n",
+        "certificate.receipt.amount": "পরিশোধিত মূল্য: ",
         "certificate.receipt.header": "{event} নিবন্ধন রশিদ",
-        "certificate.receipt.issuedAt": "প্রদানের স্থান:",
+        "certificate.receipt.issuedAt": "প্রদানের স্থান: ",
+        "certificate.receipt.issuedBy": "দ্বারা: ",
+        "certificate.receipt.issuedDate": "পেমেন্ট তারিখ: ",
         "certificate.receipt.issuer": "প্রদানকারী: {role}, {name}\n তারিখ: {dateOfPayment}",
         "certificate.receipt.service": "সেবা: ",
         "certificate.receipt.amountDue": "পাওনা অঙ্ক:",
@@ -1999,7 +2007,11 @@
         "form.field.label.userSignatureAttachmentDesc": "নিবন্ধককে  কাগজের টুকরোতে স্বাক্ষর করে  স্ক্যান করতে নিতে বা ছবি তুলে নিতে  বলুন।",
         "form.field.label.userAttachmentSection": "সংযুক্তি",
         "form.field.label.addFile": "নথি যুক্ত করুন",
-        "form.field.label.fileUploadError": "শুধুমাত্র {type} গ্রহণযোগ্য "
+        "form.field.label.fileUploadError": "শুধুমাত্র {type} গ্রহণযোগ্য ",
+        "certificate.receipt.service.45day": "{event} তারিখের ৪৫ দিনের পরে জন্ম নিবন্ধন",
+        "certificate.receipt.service.5year": "{event} তারিখের ৫ বছর পরে জন্ম নিবন্ধন",
+        "certificate.receipt.service.45day.amount": "\u09F3 ২৫.০০",
+        "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০"
       }
     }
   ]

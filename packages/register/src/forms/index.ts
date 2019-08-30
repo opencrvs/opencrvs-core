@@ -883,7 +883,7 @@ type Payment = {
 export interface ICertificate {
   collector?: IFormSectionData
   hasShowedVerifiedDocument?: boolean
-  payments?: Payment
+  payments?: Payment[]
   data?: string
 }
 
