@@ -33,8 +33,7 @@ export type MaxLengthValidation = (
 
 export type Validation = (
   value: IFormFieldValue,
-  drafts?: IFormData,
-  maruf?: number
+  drafts?: IFormData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
