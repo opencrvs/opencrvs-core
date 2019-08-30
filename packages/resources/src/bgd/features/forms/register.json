@@ -19296,7 +19296,7 @@
                 "name": "paragraph",
                 "type": "PARAGRAPH",
                 "label": {
-                  "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                  "defaultMessage": "For birth registration of birth occurring within 45 days old the following documents are required:",
                   "description": "Documents Paragraph text",
                   "id": "form.section.documents.birth.requirements"
                 },
@@ -19317,7 +19317,7 @@
                 "name": "paragraph",
                 "type": "PARAGRAPH",
                 "label": {
-                  "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                  "defaultMessage": "For birth registration of births occurring within 45 days and and 5 years old the following documents are required:",
                   "description": "Documents Paragraph text",
                   "id": "form.section.documents.paragraph45daysTo5Years"
                 },
@@ -19338,7 +19338,7 @@
                 "name": "paragraph",
                 "type": "PARAGRAPH",
                 "label": {
-                  "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                  "defaultMessage": "For birth registration of births occurring after 5 years the following documents are required:",
                   "description": "Documents Paragraph text",
                   "id": "form.section.documents.paragraphAbove5Years"
                 },
@@ -19359,7 +19359,7 @@
                 "name": "uploadDocForMother",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Mother's ID",
+                  "defaultMessage": "Proof of mothers ID",
                   "description": "Label for list item Mother ID Proof",
                   "id": "form.field.label.proofOfMothersID"
                 },
@@ -19371,7 +19371,7 @@
                   {
                     "value": "Birth Registration",
                     "label": {
-                      "defaultMessage": "Birth Registration",
+                      "defaultMessage": "Birth registration certificate",
                       "description": "Label for select option Birth Registration",
                       "id": "form.field.label.docTypeBR"
                     }
@@ -19403,7 +19403,7 @@
                   {
                     "value": "School Certificate",
                     "label": {
-                      "defaultMessage": "School Certificate",
+                      "defaultMessage": "School certificate",
                       "description": "Label for radio option School Certificate",
                       "id": "form.field.label.docTypeSC"
                     }
@@ -19430,7 +19430,7 @@
                 "name": "uploadDocForFather",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Father's ID",
+                  "defaultMessage": "Proof of fathers ID",
                   "description": "Label for list item Father ID Proof",
                   "id": "form.field.label.proofOfFathersID"
                 },
@@ -19442,7 +19442,7 @@
                   {
                     "value": "Birth Registration",
                     "label": {
-                      "defaultMessage": "Birth Registration",
+                      "defaultMessage": "Birth registration certificate",
                       "description": "Label for select option Birth Registration",
                       "id": "form.field.label.docTypeBR"
                     }
@@ -19474,7 +19474,7 @@
                   {
                     "value": "School Certificate",
                     "label": {
-                      "defaultMessage": "School Certificate",
+                      "defaultMessage": "School certificate",
                       "description": "Label for radio option School Certificate",
                       "id": "form.field.label.docTypeSC"
                     }
@@ -19501,7 +19501,7 @@
                 "name": "uploadDocForParentPermanentAddress",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Permanent Address of Parent",
+                  "defaultMessage": "Proof of permanent address of parent",
                   "description": "Label for list item Parent Permanent Address Proof",
                   "id": "form.field.label.proofOfParentPermanentAddress"
                 },
@@ -19540,7 +19540,7 @@
                 "name": "uploadDocForChildDOB",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Place and Date of Birth",
+                  "defaultMessage": "Proof of place and date of birth of child",
                   "description": "Label for select option Child Birth Proof",
                   "id": "form.field.label.docTypeChildBirthProof"
                 },
@@ -19552,7 +19552,7 @@
                   {
                     "value": "Discharge Certificate",
                     "label": {
-                      "defaultMessage": "Discharge Certificate",
+                      "defaultMessage": "Discharge certificate",
                       "description": "Document type label for Discharge Certificate",
                       "id": "form.field.label.docTypeHospitalDischargeCertificate"
                     }
@@ -19595,7 +19595,7 @@
                 "name": "uploadDocForChildAge",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Child Age",
+                  "defaultMessage": "Proof of child age",
                   "description": "Label for select option Child Age Proof",
                   "id": "form.field.label.docTypeChildAgeProof"
                 },
@@ -19607,7 +19607,7 @@
                   {
                     "value": "EPI Card",
                     "label": {
-                      "defaultMessage": "EPI Card",
+                      "defaultMessage": "EPI card",
                       "description": "Label for select option EPI Card",
                       "id": "form.field.label.docTypeEPICard"
                     }
@@ -19615,7 +19615,7 @@
                   {
                     "value": "EPI Staff Certificate",
                     "label": {
-                      "defaultMessage": "EPI Staff Certificate",
+                      "defaultMessage": "EPI staff certificate",
                       "description": "Label for select option EPI Card",
                       "id": "form.field.label.docTypeEPIStaffCertificate"
                     }
@@ -19623,7 +19623,7 @@
                   {
                     "value": "Doctor Certificate",
                     "label": {
-                      "defaultMessage": "Doctor Certificate",
+                      "defaultMessage": "Doctor's certificate",
                       "description": "Label for select option Doctor Certificate",
                       "id": "form.field.label.docTypeDoctorCertificate"
                     }
@@ -19660,7 +19660,7 @@
                 "name": "uploadDocForChildAge",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Child Age",
+                  "defaultMessage": "Proof of child age",
                   "description": "Label for select option Child Age Proof",
                   "id": "form.field.label.docTypeChildAgeProof"
                 },
@@ -19672,7 +19672,7 @@
                   {
                     "value": "Doctor Certificate",
                     "label": {
-                      "defaultMessage": "Doctor Certificate",
+                      "defaultMessage": "Doctor's certificate",
                       "description": "Label for select option Doctor Certificate",
                       "id": "form.field.label.docTypeDoctorCertificate"
                     }
@@ -19680,7 +19680,7 @@
                   {
                     "value": "School Certificate",
                     "label": {
-                      "defaultMessage": "School Certificate",
+                      "defaultMessage": "School certificate",
                       "description": "Label for radio option School Certificate",
                       "id": "form.field.label.docTypeSC"
                     }

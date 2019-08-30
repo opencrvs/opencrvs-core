@@ -1386,19 +1386,19 @@ const messagesToDefine: IFormMessages = {
   },
   paragraph: {
     defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+      'For birth registration of birth occurring within 45 days old the following documents are required:',
     description: 'Documents Paragraph text',
     id: 'form.section.documents.birth.requirements'
   },
   paragraph45daysTo5Years: {
     defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+      'For birth registration of births occurring within 45 days and and 5 years old the following documents are required:',
     description: 'Documents Paragraph text',
     id: 'form.section.documents.paragraph45daysTo5Years'
   },
   paragraphAbove5Years: {
     defaultMessage:
-      'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
+      'For birth registration of births occurring after 5 years the following documents are required:',
     description: 'Documents Paragraph text',
     id: 'form.section.documents.paragraphAbove5Years'
   },
@@ -1474,7 +1474,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.print.otherPersonPrompt'
   },
   proofOfBirthPlaceAndDate: {
-    defaultMessage: 'Proof of Place and Date of Birth of Child',
+    defaultMessage: 'Proof of place and date of birth of child',
     description: 'Label for list item Child Birth Proof',
     id: 'form.field.label.proofOfBirthPlaceAndDate'
   },
@@ -1490,17 +1490,17 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.proofOfEPICardOfChild'
   },
   proofOfFathersID: {
-    defaultMessage: "Proof of Father's ID",
+    defaultMessage: 'Proof of fathers ID',
     description: 'Label for list item Father ID Proof',
     id: 'form.field.label.proofOfFathersID'
   },
   proofOfMothersID: {
-    defaultMessage: "Proof of Mother's ID",
+    defaultMessage: 'Proof of mothers ID',
     description: 'Label for list item Mother ID Proof',
     id: 'form.field.label.proofOfMothersID'
   },
   proofOfParentPermanentAddress: {
-    defaultMessage: 'Proof of Permanent Address of Parent',
+    defaultMessage: 'Proof of permanent address of parent',
     description: 'Label for list item Parent Permanent Address Proof',
     id: 'form.field.label.proofOfParentPermanentAddress'
   },
