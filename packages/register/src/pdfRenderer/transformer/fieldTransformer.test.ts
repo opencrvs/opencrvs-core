@@ -1,6 +1,6 @@
 import { mockApplicationData } from '@register/tests/util'
 import { fieldTransformers } from '@register/pdfRenderer/transformer/fieldTransformer'
-import { IntlProvider } from 'react-intl'
+import { createIntl } from 'react-intl'
 import { Event } from '@register/forms'
 import { IApplication } from '@register/applications'
 
@@ -12,16 +12,13 @@ describe('PDF template field transformer tests', () => {
   }
   describe('IntlLabel transformer tests', () => {
     it('Returns right message', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en',
-          messages: {
-            'certificate.receipt.childBorned': '{firstName} has born.'
-          }
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en',
+        messages: {
+          'certificate.receipt.childBorned': '{firstName} has born.'
+        }
+      })
+
       const transformedValue = fieldTransformers.IntlLabel(application, intl, {
         messageDescriptor: {
           defaultMessage: '{firstName} has born.',
@@ -35,16 +32,13 @@ describe('PDF template field transformer tests', () => {
       expect(transformedValue).toEqual('Mike has born.')
     })
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en',
-          messages: {
-            'certificate.receipt.childBorned': '{firstName} has born.'
-          }
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en',
+        messages: {
+          'certificate.receipt.childBorned': '{firstName} has born.'
+        }
+      })
+
       expect(() => fieldTransformers.IntlLabel(application, intl)).toThrowError(
         'No payload found for this transformer'
       )
@@ -52,13 +46,11 @@ describe('PDF template field transformer tests', () => {
   })
   describe('ApplicantName transformer tests', () => {
     it('Returns proper name based on event and local', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'bn'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'bn',
+        defaultLocale: 'bn'
+      })
+
       const transformedValue = fieldTransformers.ApplicantName(
         application,
         intl,
@@ -74,25 +66,19 @@ describe('PDF template field transformer tests', () => {
       expect(transformedValue).toEqual('গায়ত্রী স্পিভক')
     })
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       expect(() =>
         fieldTransformers.ApplicantName(application, intl)
       ).toThrowError('No payload found for this transformer')
     })
     it('Throws exception if data key is not provided for the right event', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'bn'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'bn'
+      })
+
       expect(() =>
         fieldTransformers.ApplicantName(application, intl, {
           key: {
@@ -107,26 +93,20 @@ describe('PDF template field transformer tests', () => {
   })
   describe('FieldValue transformer tests', () => {
     it('Returns the right value based on provided key', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       const transformedValue = fieldTransformers.FieldValue(application, intl, {
         valueKey: 'mother.dateOfMarriage'
       })
       expect(transformedValue).toEqual('1972-09-19')
     })
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       expect(() =>
         fieldTransformers.FieldValue(application, intl)
       ).toThrowError('No payload found for this transformer')
@@ -134,13 +114,10 @@ describe('PDF template field transformer tests', () => {
   })
   describe('DateFieldValue transformer tests', () => {
     it('Returns the formatted date value based on provided key and format', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       const transformedValue = fieldTransformers.DateFieldValue(
         application,
         intl,
@@ -152,13 +129,10 @@ describe('PDF template field transformer tests', () => {
       expect(transformedValue).toEqual('19.09.1972')
     })
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       expect(() =>
         fieldTransformers.DateFieldValue(application, intl)
       ).toThrowError('No payload found for this transformer')
@@ -166,13 +140,10 @@ describe('PDF template field transformer tests', () => {
   })
   describe('FormattedFieldValue transformer tests', () => {
     it('Returns the formatted value based on provided formated key', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       const transformedValue = fieldTransformers.FormattedFieldValue(
         application,
         intl,
@@ -186,13 +157,10 @@ describe('PDF template field transformer tests', () => {
       )
     })
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       expect(() =>
         fieldTransformers.FormattedFieldValue(application, intl)
       ).toThrowError('No payload found for this transformer')
@@ -200,13 +168,10 @@ describe('PDF template field transformer tests', () => {
   })
   describe('ConditionExecutor transformer tests', () => {
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       expect(() =>
         fieldTransformers.ConditionExecutor(application, intl)
       ).toThrowError('No payload found for this transformer')
@@ -214,13 +179,10 @@ describe('PDF template field transformer tests', () => {
   })
   describe('NumberConversion transformer tests', () => {
     it('Returns the converted number based on given format', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       const transformedValue = fieldTransformers.NumberConversion(
         application,
         intl,
@@ -244,13 +206,10 @@ describe('PDF template field transformer tests', () => {
       expect(transformedValue).toEqual('৬৫৪৬৫১১৮৭৬৯৩২')
     })
     it('Throws exception if payload is not provided', () => {
-      const intlProvider = new IntlProvider(
-        {
-          locale: 'en'
-        },
-        {}
-      )
-      const { intl } = intlProvider.getChildContext()
+      const intl = createIntl({
+        locale: 'en'
+      })
+
       expect(() =>
         fieldTransformers.NumberConversion(application, intl)
       ).toThrowError('No payload found for this transformer')

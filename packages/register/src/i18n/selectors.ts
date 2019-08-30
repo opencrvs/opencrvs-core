@@ -15,7 +15,3 @@ export const getLanguages = (store: IStoreState): IntlState['languages'] =>
 
 export const getMessages = (store: IStoreState): IntlState['messages'] =>
   getKey(store, 'messages')
-
-export const getMessagesLoaded = (
-  store: IStoreState
-): IntlState['messagesLoaded'] => getKey(store, 'messagesLoaded')

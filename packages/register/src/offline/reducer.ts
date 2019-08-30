@@ -60,6 +60,7 @@ async function saveOfflineData(offlineData: IOfflineData) {
 }
 
 function checkIfDone(
+  oldState: IOfflineDataState,
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
 ) {
   const loopWithState = liftState(loopOrState)

@@ -7,10 +7,8 @@ import { MockedProvider } from 'react-apollo/test-utils'
 import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '@register/store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import en from 'react-intl/locale-data/en'
 import { mount, configure, shallow, ReactWrapper } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '@register/App'
 import { getSchema } from '@register/tests/graphql-schema-mock'
 import { ThemeProvider } from '@register/styledComponents'
@@ -78,8 +76,6 @@ function createGraphQLClient() {
   })
 }
 
-addLocaleData([...en])
-
 export function getInitialState(): IStoreState {
   const { store: mockStore } = createStore()
 
@@ -108,19 +104,6 @@ export async function createTestApp(
 
 interface ITestView {
   intl: ReactIntl.InjectedIntl
-}
-
-const intlProvider = new IntlProvider(
-  {
-    locale: 'en',
-    messages: {}
-  },
-  {}
-)
-export const { intl } = intlProvider.getChildContext()
-
-function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
-  return React.cloneElement(node, { intl })
 }
 
 export function createShallowRenderedComponent(
@@ -2616,15 +2599,11 @@ export async function createTestComponent(
           <ThemeProvider
             theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
           >
-            {nodeWithIntlProp(node)}
+            {node}
           </ThemeProvider>
         </I18nContainer>
       </Provider>
-    </MockedProvider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
+    </MockedProvider>
   )
 
   return { component: component.update(), store }
