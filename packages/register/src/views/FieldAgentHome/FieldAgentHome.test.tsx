@@ -4,10 +4,10 @@ import {
   validToken,
   flushPromises,
   mockApplicationData,
-  mockUserResponse
+  mockUserResponse,
+  getItem
 } from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { storage } from '@register/storage'
 import { FIELD_AGENT_ROLES } from '@register/utils/constants'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { storeApplication, SUBMISSION_STATUS } from '@register/applications'
@@ -22,10 +22,7 @@ import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
 } from '@register/search/queries'
-
-const getItem = window.localStorage.getItem as jest.Mock
-
-const mockFetchUserDetails = jest.fn()
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const nameObj = {
   data: {
@@ -64,16 +61,12 @@ const countQueryGraphqlMock = {
 }
 
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
 
 describe('FieldAgentHome tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
+    ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     getItem.mockReturnValue(validToken)
     store.dispatch(checkAuth({ '?token': validToken }))
   })
@@ -92,12 +85,14 @@ describe('FieldAgentHome tests', () => {
         }}
       />,
       store,
-      [countQueryGraphqlMock]
+      [{ ...countQueryGraphqlMock, delay: 2000 }]
     )
 
     testComponent.component.update()
     const app = testComponent.component
-    expect(app.find('#field-agent-home-spinner').hostNodes()).toHaveLength(1)
+    const element = await waitForElement(app, '#field-agent-home-spinner')
+
+    expect(element.hostNodes()).toHaveLength(1)
   })
 
   it('renders error text when an error occurs', async () => {
@@ -552,7 +547,7 @@ describe('FieldAgentHome tests', () => {
       expect(component.find('#failed3').hostNodes()).toHaveLength(1)
     })
 
-    it('when offline renders pending submission status', () => {
+    it('when offline renders pending submission status', async () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
 
       const readyApplication = {
@@ -564,8 +559,9 @@ describe('FieldAgentHome tests', () => {
 
       store.dispatch(storeApplication(readyApplication))
 
-      component.update()
-      expect(component.find('#offline0').hostNodes()).toHaveLength(1)
+      const element = await waitForElement(component, '#offline0')
+
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
 

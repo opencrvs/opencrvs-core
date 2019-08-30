@@ -1993,7 +1993,7 @@
         "validations.maxLength": "{max} অক্ষরের বেশি হতে হবে না",
         "validations.minLength": "Must be {min} characters or more",
         "validations.numberRequired": "Must be a number",
-        "validations.phoneNumberFormat": "রেজিস্টারড মোবাইল নম্বর হতে হবে এবং শূন্য দিয় শুরু করতে হবে।",
+        "validations.phoneNumberFormat": "অবশ্যই {num} ডিজিটের বৈধ নম্বর হতে হবে যা {start} দিয়ে শুরু হবে।",
         "validations.range": "{min} থেকে {max} এর মধ্যে হতে হবে",
         "validations.required": "নিবন্ধনের জন্য প্রয়োজনীয়",
         "validations.requiredSymbol": "",

@@ -2626,7 +2626,7 @@ export async function createTestComponent(
       childContextTypes: { intl: intlShape }
     }
   )
-  await flushPromises()
+
   return { component: component.update(), store }
 }
 

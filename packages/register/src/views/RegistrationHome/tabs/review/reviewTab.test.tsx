@@ -9,7 +9,6 @@ import { waitForElement, waitFor } from '@register/tests/wait-for-element'
 
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import {
   RegistrationHome,
@@ -450,6 +449,18 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
+    const validateScopeToken = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    getItem.mockReturnValue(validateScopeToken)
+    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
+
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
@@ -466,17 +477,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store,
       graphqlMock
     )
-    const validateScopeToken = jwt.sign(
-      { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
 
     const gridTable = await waitForElement(testComponent.component, GridTable)
     const data = gridTable.prop('content')

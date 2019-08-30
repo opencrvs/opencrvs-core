@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { createStore } from '@register/store'
-import { storeApplication } from '@register/applications'
+import { storeApplication, IApplication } from '@register/applications'
 import {
-  validToken,
   createTestComponent,
   mockApplicationData,
   mockUserResponse,
-  mockDeathApplicationData
+  mockDeathApplicationData,
+  validToken
 } from '@register/tests/util'
 import { ReviewCertificateAction } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
@@ -14,8 +14,8 @@ import { Event } from '@register/forms'
 import { REGISTRAR_ROLES } from '@register/utils/constants'
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { checkAuth } from '@register/profile/profileActions'
 import { waitForElement } from '@register/tests/wait-for-element'
+import { checkAuth } from '@register/profile/profileActions'
 
 const nameObj = {
   data: {
@@ -35,8 +35,10 @@ const nameObj = {
   }
 }
 merge(mockUserResponse, nameObj)
-const getItem = window.localStorage.getItem as jest.Mock
-;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
+
+beforeEach(() => {
+  ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
+})
 
 describe('when user wants to review death certificate', () => {
   const { store, history } = createStore()
@@ -45,21 +47,14 @@ describe('when user wants to review death certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
-
-    store.dispatch(
-      storeApplication({
+    await store.dispatch(
+      storeApplication(({
         id: 'mockDeath1234',
         data: mockDeathApplicationData,
         event: Event.DEATH
-      })
+      } as unknown) as IApplication)
     )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
+    await store.dispatch(checkAuth({ '?token': validToken }))
     const testComponent = await createTestComponent(
       <ReviewCertificateAction
         location={mockLocation}
@@ -76,12 +71,6 @@ describe('when user wants to review death certificate', () => {
       />,
       store
     )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
     component = testComponent.component
   })
 
@@ -99,20 +88,15 @@ describe('when user wants to review birth certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
-
-    store.dispatch(
-      storeApplication({
+    await store.dispatch(
+      storeApplication(({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockApplicationData,
         event: Event.BIRTH
-      })
+      } as unknown) as IApplication)
     )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+
+    await store.dispatch(checkAuth({ '?token': validToken }))
 
     const testComponent = await createTestComponent(
       <ReviewCertificateAction
@@ -130,12 +114,8 @@ describe('when user wants to review birth certificate', () => {
       />,
       store
     )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
 
+    testComponent.component.update()
     component = testComponent.component
   })
 

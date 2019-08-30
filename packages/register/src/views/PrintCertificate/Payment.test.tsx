@@ -3,6 +3,7 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   mockApplicationData,
+  mockDeathApplicationData,
   validToken,
   mockUserResponse
 } from '@register/tests/util'
@@ -26,6 +27,12 @@ describe('verify collector tests', () => {
     event: Event.BIRTH
   }
 
+  const deathApplication = {
+    id: 'mockDeath1234',
+    data: mockDeathApplicationData,
+    event: Event.DEATH
+  }
+
   describe('in case of birth application', () => {
     beforeAll(() => {
       getItem.mockReturnValue(validToken)
@@ -35,7 +42,7 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders Payment component', async () => {
-      const testComponent = await createTestComponent(
+      const testComponent = (await createTestComponent(
         <Payment
           history={history}
           location={mockLocation}
@@ -50,23 +57,23 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      )
+      )).component
 
       expect(
-        testComponent.component
+        testComponent
           .find('#service')
           .hostNodes()
           .text()
       ).toContain('Birth')
 
       expect(
-        testComponent.component
+        testComponent
           .find('#amountDue')
           .hostNodes()
           .text()
       ).toContain('50')
 
-      testComponent.component
+      testComponent
         .find('#Continue')
         .hostNodes()
         .simulate('click')
@@ -74,7 +81,7 @@ describe('verify collector tests', () => {
 
     it('print payment receipt', async () => {
       const printMoneyReceiptSpy = jest.spyOn(PDFUtils, 'printMoneyReceipt')
-      const testComponent = await createTestComponent(
+      const testComponent = (await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
@@ -89,9 +96,9 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      )
+      )).component
 
-      testComponent.component
+      testComponent
         .find('#print-receipt')
         .hostNodes()
         .simulate('click')
@@ -99,7 +106,7 @@ describe('verify collector tests', () => {
       expect(printMoneyReceiptSpy).toBeCalled()
     })
 
-    it('invalid application id', async () => {
+    it('invalid application id', () => {
       expect(
         createTestComponent(
           <Payment
@@ -118,6 +125,38 @@ describe('verify collector tests', () => {
           store
         )
       ).rejects.toEqual(new Error('Application "mockBirth" missing!'))
+    })
+  })
+
+  describe('in case of death application renders payment component', () => {
+    beforeAll(() => {
+      store.dispatch(storeApplication(deathApplication))
+    })
+
+    it('when informant is collector', async () => {
+      const testComponent = (await createTestComponent(
+        <Payment
+          location={mockLocation}
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockDeath1234',
+              eventType: Event.DEATH
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )).component
+
+      expect(
+        testComponent
+          .find('#service')
+          .hostNodes()
+          .text()
+      ).toContain('Death')
     })
   })
 })
