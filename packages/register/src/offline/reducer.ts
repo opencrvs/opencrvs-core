@@ -48,6 +48,16 @@ export const initialState: IOfflineDataState = {
   healthFacilityFilterLocation: ''
 }
 
+async function saveOfflineData(offlineData: IOfflineData) {
+  // @ts-ignore
+  if (storage.setItem.mock) {
+    // don't save in tests as it introduces a performance hit
+    return
+  }
+
+  return storage.setItem('offline', JSON.stringify(offlineData))
+}
+
 function checkIfDone(
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
 ) {
@@ -63,6 +73,7 @@ function checkIfDone(
       { ...newState, offlineDataLoaded: true },
       Cmd.list([
         ...(cmd ? [cmd] : []),
+        Cmd.run(saveOfflineData, { args: [newState.offlineData] }),
         Cmd.action(actions.offlineDataReady(newState.offlineData))
       ])
     )
@@ -212,9 +223,6 @@ function reducer(
     }
 
     case actions.READY: {
-      // save offline data
-      storage.setItem('offline', JSON.stringify(action.payload))
-
       return {
         ...state,
         offlineData: action.payload
