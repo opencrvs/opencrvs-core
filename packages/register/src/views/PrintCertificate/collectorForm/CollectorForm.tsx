@@ -356,6 +356,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     return (
       <>
         <ActionPageLight
+          id="collector_form"
           title={intl.formatMessage(formSection.title)}
           goBack={() => {
             deleteApplication(applicationToBeCertified)

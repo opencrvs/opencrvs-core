@@ -181,6 +181,7 @@ describe('Certificate collector test for a birth registration without father det
         graphqlMock
       )
       component = testComponent.component
+      await waitForElement(component, '#collector_form')
     })
 
     it('father option will not be available', () => {

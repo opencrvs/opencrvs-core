@@ -57,7 +57,9 @@ export async function waitForElement<T>(
     await waitFor(() => rootComponent.update().find(selector).length > 0)
   } catch (err) {
     throw new Error(
-      `Couldn't find selector ${selector} from component in ${MAX_TIME}ms`
+      `Couldn't find selector ${
+        typeof selector === 'function' ? selector.name : selector
+      } from component in ${MAX_TIME}ms`
     )
   }
   return rootComponent.update().find(selector)
