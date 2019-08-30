@@ -184,7 +184,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -302,7 +302,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -485,7 +485,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -656,7 +656,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -832,7 +832,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -1018,7 +1018,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{

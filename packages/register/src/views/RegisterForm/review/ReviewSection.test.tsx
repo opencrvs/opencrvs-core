@@ -72,7 +72,7 @@ beforeEach(() => {
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={draft}
@@ -186,7 +186,7 @@ describe('when user is in the review page for rejected birth application', () =>
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftBirth}
@@ -208,7 +208,7 @@ describe('when user is in the review page for rejected birth application', () =>
 describe('when user is in the review page for rejected death application', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftDeath}
@@ -231,7 +231,7 @@ describe('when user is in the review page to validate birth application', () => 
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={declaredBirthApplication}

@@ -17,7 +17,7 @@ describe('SetupReviewPage page tests', () => {
         JSON.stringify({ ...userDetails, type: 'CHA' })
       )
     )
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -37,7 +37,7 @@ describe('SetupReviewPage page tests', () => {
   })
   it('render page without type', async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -63,7 +63,7 @@ describe('SetupReviewPage page tests', () => {
     testComponent.component.unmount()
   })
   it('clicks question to change', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -103,7 +103,7 @@ describe('SetupReviewPage page tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -140,7 +140,7 @@ describe('SetupReviewPage page tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -200,7 +200,7 @@ describe('SetupReviewPage page tests', () => {
       )
     )
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{

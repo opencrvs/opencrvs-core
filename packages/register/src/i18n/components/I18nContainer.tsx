@@ -3,7 +3,11 @@ import { addLocaleData, IntlProvider } from 'react-intl'
 import en from 'react-intl/locale-data/en'
 import bn from 'react-intl/locale-data/bn'
 
-import { getLanguage, getMessages } from '@register/i18n/selectors'
+import {
+  getLanguage,
+  getMessages,
+  getUpdatedAt
+} from '@register/i18n/selectors'
 import { IStoreState } from '@register/store'
 import { IntlMessages } from '@register/i18n/reducer'
 
@@ -12,12 +16,16 @@ addLocaleData([...en, ...bn])
 type StateProps = {
   locale?: string
   messages: IntlMessages
+  key: string
 }
 
-const mapStateToProps = (store: IStoreState): StateProps => {
+const mapStateToProps = (state: IStoreState): StateProps => {
+  const locale = getLanguage(state)
+
   return {
-    locale: getLanguage(store),
-    messages: getMessages(store)
+    locale,
+    messages: getMessages(state),
+    key: locale + getUpdatedAt(state).toString()
   }
 }
 

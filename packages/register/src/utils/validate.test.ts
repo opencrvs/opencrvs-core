@@ -332,7 +332,7 @@ describe('validate', () => {
         message: {
           id: 'validations.phoneNumberFormat',
           defaultMessage:
-            'Must be {num} digit valid mobile phone number that stars with {start}',
+            'Must be a valid {num} digit number that starts with {start}',
           description:
             'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
         },

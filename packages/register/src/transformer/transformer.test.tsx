@@ -16,7 +16,6 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { storage } from '@register/storage'
 import { v4 as uuid } from 'uuid'
 import { draftToGqlTransformer } from '@register/transformer'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
@@ -30,14 +29,6 @@ const fetch = fetchAny as any
 interface IPersonDetails {
   [key: string]: any
 }
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
-
-beforeEach(() => {
-  window.history.replaceState({}, '', '/')
-  assign.mockClear()
-})
 
 describe('when draft data is transformed to graphql', () => {
   let app: ReactWrapper
@@ -131,7 +122,7 @@ describe('when draft data is transformed to graphql', () => {
       [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
       [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
     )
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     app = testApp.app
     await flushPromises()
     app.update()

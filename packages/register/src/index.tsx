@@ -9,6 +9,8 @@ import { storage } from '@register/storage'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@register/SubmissionController'
+import * as pdfjsLib from 'pdfjs-dist'
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
 
 storage.configStorage('OpenCRVS')
 

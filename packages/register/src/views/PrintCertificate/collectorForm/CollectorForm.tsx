@@ -135,7 +135,6 @@ const getErrorsOnFieldsBySection = (
 
   return {
     [sectionId]: fields.reduce((fields, field) => {
-      // REFACTOR
       const validationErrors: IValidationResult[] =
         errors[field.name as keyof typeof errors]
 
@@ -312,7 +311,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       application
     )
     let applicationToBeCertified: IApplication = application as IApplication
-    if (!applicationToBeCertified) {
+    if (
+      !applicationToBeCertified ||
+      !applicationToBeCertified.data ||
+      !applicationToBeCertified.data.registration.regStatus
+    ) {
       return (
         <QueryProvider
           event={event}
@@ -356,6 +359,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     return (
       <>
         <ActionPageLight
+          id="collector_form"
           title={intl.formatMessage(formSection.title)}
           goBack={() => {
             deleteApplication(applicationToBeCertified)

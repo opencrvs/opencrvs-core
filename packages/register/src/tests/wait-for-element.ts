@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 
-const MAX_TIME = 2000
+const MAX_TIME = process.env.CI ? 10000 : 2000
 const INTERVAL = 10
 
 export async function waitFor(condition: () => boolean) {
@@ -57,7 +57,9 @@ export async function waitForElement<T>(
     await waitFor(() => rootComponent.update().find(selector).length > 0)
   } catch (err) {
     throw new Error(
-      `Couldn't find selector ${selector} from component in ${MAX_TIME}ms`
+      `Couldn't find selector ${
+        typeof selector === 'function' ? selector.name : selector
+      } from component in ${MAX_TIME}ms`
     )
   }
   return rootComponent.update().find(selector)

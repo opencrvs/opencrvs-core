@@ -4,7 +4,6 @@ import { FormList } from '@register/components/form/FormList'
 import { ReactWrapper } from 'enzyme'
 import * as actions from '@register/i18n/actions'
 import { createStore, AppStore } from '@register/store'
-import { referenceApi } from '@register/utils/referenceApi'
 
 describe('when user is in the document upload page', () => {
   let formListComponent: ReactWrapper<{}, {}>
@@ -36,13 +35,11 @@ describe('when user is in the document upload page', () => {
 
   beforeEach(async () => {
     store = createStore().store
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <FormList list={listItems} />,
       store
     )
 
-    const languagesResponse = await referenceApi.loadLanguages()
-    store.dispatch(actions.storeLanguages(languagesResponse))
     formListComponent = testComponent.component
   })
   it('renders the whole list', () => {
@@ -61,11 +58,9 @@ describe('when user is in the document upload page', () => {
   })
   it('renders first list item text in bengali', async () => {
     const action = actions.changeLanguage({ language: 'bn' })
-    store.dispatch(action)
+    await store.dispatch(action)
 
     const firstItem = formListComponent.find('ul li').first()
-
-    await new Promise(resolve => setTimeout(resolve, 2000))
 
     // No clue if this is what it should say..
     expect(firstItem.update().text()).toBe(
@@ -76,7 +71,10 @@ describe('when user is in the document upload page', () => {
     const action = actions.changeLanguage({ language: 'bn' })
     store.dispatch(action)
 
-    const lastItem = formListComponent.find('ul li').last()
+    const lastItem = formListComponent
+      .update()
+      .find('ul li')
+      .last()
     expect(lastItem.text()).toBe(
       'রেজিস্টারের চাহিদা মোতাবেক অন্যান্য কাগজপত্রের সত্যায়িত অনুলিপি'
     )

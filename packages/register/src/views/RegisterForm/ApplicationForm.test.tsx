@@ -1,7 +1,6 @@
 import {
   createTestApp,
   flushPromises,
-  waitForReady,
   userDetails,
   goToEndOfForm,
   goToDocumentsSection,
@@ -23,18 +22,12 @@ import { Event } from '@register/forms'
 import { waitForElement } from '@register/tests/wait-for-element'
 
 describe('when user has starts a new application', () => {
-  let app: ReactWrapper
-  let history: History
-  let store: Store
-
-  beforeEach(async () => {
-    const testApp = createTestApp()
-    app = testApp.app
-    history = testApp.history
-    store = testApp.store
-  })
   describe('In case of insecured page show unlock screen', () => {
     let draft: IApplication
+    let app: ReactWrapper
+    let history: History
+    let store: Store
+
     beforeEach(async () => {
       const userData: IUserData[] = [
         {
@@ -53,8 +46,11 @@ describe('when user has starts a new application', () => {
       ;(storage.getItem as jest.Mock).mockImplementation(
         (param: keyof typeof indexedDB) => Promise.resolve(indexedDB[param])
       )
+      const testApp = await createTestApp()
+      app = testApp.app
+      history = testApp.history
+      store = testApp.store
 
-      await waitForReady(app)
       draft = createApplication(Event.BIRTH)
       await store.dispatch(storeApplication(draft))
     })
@@ -66,188 +62,201 @@ describe('when user has starts a new application', () => {
       await waitForElement(app, '#unlockPage')
     })
   })
-  describe('when user is in birth registration by parent informant view', () => {
-    let draft: IApplication
+
+  describe('when secured', () => {
+    let app: ReactWrapper
+    let history: History
+    let store: Store
+
     beforeEach(async () => {
-      draft = createApplication(Event.BIRTH)
-
-      /*
-       * Needs to be done before storeApplication(draft)
-       * so offline applications wouldn't override the dispatched ones
-       */
-      await waitForReady(app)
-      store.dispatch(storeApplication(draft))
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
-      )
-      await waitForElement(app, '#register_form')
+      const testApp = await createTestApp()
+      app = testApp.app
+      history = testApp.history
+      store = testApp.store
     })
-
-    describe('when user types in something and press continue', () => {
+    describe('when user is in birth registration by parent informant view', () => {
+      let draft: IApplication
       beforeEach(async () => {
-        await waitForElement(app, '#informant_parent_view')
-        app
-          .find('#firstNames')
-          .hostNodes()
-          .simulate('change', {
-            target: { id: 'firstNames', value: 'hello' }
-          })
+        draft = createApplication(Event.BIRTH)
 
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-      })
-      it('stores the value to a new draft and move to next section', () => {
-        const mockCalls = (storage.setItem as jest.Mock).mock.calls
-        const userData = mockCalls[mockCalls.length - 1]
-        const storedApplications = JSON.parse(userData[userData.length - 1])[0]
-          .applications
-        expect(storedApplications[0].data.child.firstNames).toEqual('hello')
-        expect(window.location.href).toContain('mother')
-      })
-      it('redirect to home when pressed save and exit button', async () => {
-        app
-          .find('#save_draft')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-        expect(window.location.href).toContain('/')
-      })
-      it('check toggle menu toggle button handler', async () => {
-        app
-          .find('#eventToggleMenuToggleButton')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-        expect(app.find('#eventToggleMenuSubMenu').hostNodes().length).toEqual(
-          1
+        /*
+         * Needs to be done before storeApplication(draft)
+         * so offline applications wouldn't override the dispatched ones
+         */
+        store.dispatch(storeApplication(draft))
+        history.replace(
+          DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
-      })
-      it('check toggle menu item handler', async () => {
-        app
-          .find('#eventToggleMenuToggleButton')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-
-        app
-          .find('#eventToggleMenuItem0')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-
-        expect(window.location.href).toContain('/')
-      })
-    })
-
-    describe('when user enters childBirthDate and clicks to documents page', () => {
-      beforeEach(async () => {
-        Date.now = jest.fn(() => 1549607679507) // 08-02-2019
-        await waitForElement(app, '#childBirthDate-dd')
-        app
-          .find('#childBirthDate-dd')
-          .hostNodes()
-          .simulate('change', {
-            target: { id: 'childBirthDate-dd', value: '19' }
-          })
-        app
-          .find('#childBirthDate-mm')
-          .hostNodes()
-          .simulate('change', {
-            target: { id: 'childBirthDate-mm', value: '11' }
-          })
-        app
-          .find('#childBirthDate-yyyy')
-          .hostNodes()
-          .simulate('change', {
-            target: { id: 'childBirthDate-yyyy', value: '2018' }
-          })
+        await waitForElement(app, '#register_form')
       })
 
-      describe('when user goes to documents page', () => {
+      describe('when user types in something and press continue', () => {
         beforeEach(async () => {
+          await waitForElement(app, '#informant_parent_view')
+          app
+            .find('#firstNames')
+            .hostNodes()
+            .simulate('change', {
+              target: { id: 'firstNames', value: 'hello' }
+            })
+
           app
             .find('#next_section')
             .hostNodes()
             .simulate('click')
-          await flushPromises()
-          app.update()
+        })
+        it('stores the value to a new draft and move to next section', () => {
+          const mockCalls = (storage.setItem as jest.Mock).mock.calls
+          const userData = mockCalls[mockCalls.length - 1]
+          const storedApplications = JSON.parse(
+            userData[userData.length - 1]
+          )[0].applications
+          expect(storedApplications[0].data.child.firstNames).toEqual('hello')
+          expect(window.location.href).toContain('mother')
+        })
+        it('redirect to home when pressed save and exit button', async () => {
           app
-            .find('#next_section')
+            .find('#save_draft')
             .hostNodes()
             .simulate('click')
           await flushPromises()
           app.update()
+          expect(window.location.href).toContain('/')
+        })
+        it('check toggle menu toggle button handler', async () => {
           app
-            .find('#next_section')
+            .find('#eventToggleMenuToggleButton')
             .hostNodes()
             .simulate('click')
           await flushPromises()
           app.update()
+          expect(
+            app.find('#eventToggleMenuSubMenu').hostNodes().length
+          ).toEqual(1)
+        })
+        it('check toggle menu item handler', async () => {
+          app
+            .find('#eventToggleMenuToggleButton')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+
+          app
+            .find('#eventToggleMenuItem0')
+            .hostNodes()
+            .simulate('click')
+          await flushPromises()
+          app.update()
+
+          expect(window.location.href).toContain('/')
+        })
+      })
+
+      describe('when user enters childBirthDate and clicks to documents page', () => {
+        beforeEach(async () => {
+          Date.now = jest.fn(() => 1549607679507) // 08-02-2019
+          await waitForElement(app, '#childBirthDate-dd')
+          app
+            .find('#childBirthDate-dd')
+            .hostNodes()
+            .simulate('change', {
+              target: { id: 'childBirthDate-dd', value: '19' }
+            })
+          app
+            .find('#childBirthDate-mm')
+            .hostNodes()
+            .simulate('change', {
+              target: { id: 'childBirthDate-mm', value: '11' }
+            })
+          app
+            .find('#childBirthDate-yyyy')
+            .hostNodes()
+            .simulate('change', {
+              target: { id: 'childBirthDate-yyyy', value: '2018' }
+            })
         })
 
-        it('renders list of document upload field', () => {
-          const fileInputs = app
-            .find('#form_section_id_documents-view-group')
-            .find('section')
-            .children().length
+        describe('when user goes to documents page', () => {
+          beforeEach(async () => {
+            app
+              .find('#next_section')
+              .hostNodes()
+              .simulate('click')
+            await flushPromises()
+            app.update()
+            app
+              .find('#next_section')
+              .hostNodes()
+              .simulate('click')
+            await flushPromises()
+            app.update()
+            app
+              .find('#next_section')
+              .hostNodes()
+              .simulate('click')
+            await flushPromises()
+            app.update()
+          })
 
-          expect(fileInputs).toEqual(6)
+          it('renders list of document upload field', () => {
+            const fileInputs = app
+              .find('#form_section_id_documents-view-group')
+              .find('section')
+              .children().length
+
+            expect(fileInputs).toEqual(6)
+          })
         })
       })
-    })
 
-    describe('when user goes to preview page', () => {
-      beforeEach(async () => {
-        await goToEndOfForm(app)
-        app
-          .find('#btn_change_child_firstNames')
-          .hostNodes()
-          .simulate('click')
-        app
-          .find('#edit_confirm')
-          .hostNodes()
-          .simulate('click')
+      describe('when user goes to preview page', () => {
+        beforeEach(async () => {
+          await goToEndOfForm(app)
+          app
+            .find('#btn_change_child_firstNames')
+            .hostNodes()
+            .simulate('click')
+          app
+            .find('#edit_confirm')
+            .hostNodes()
+            .simulate('click')
+        })
+
+        it('renders preview page', async () => {
+          const button = await waitForElement(app, '#back-to-review-button')
+
+          button.hostNodes().simulate('click')
+
+          const changeNameButton = await waitForElement(
+            app,
+            '#btn_change_child_firstNames'
+          )
+          expect(changeNameButton.hostNodes()).toHaveLength(1)
+        })
       })
 
-      it('renders preview page', async () => {
-        const button = await waitForElement(app, '#back-to-review-button')
-
-        button.hostNodes().simulate('click')
-
-        const changeNameButton = await waitForElement(
-          app,
-          '#btn_change_child_firstNames'
-        )
-        expect(changeNameButton.hostNodes()).toHaveLength(1)
+      describe('when user clicks the "mother" page', () => {
+        beforeEach(() => goToMotherSection(app))
+        it('changes to the mother details section', () => {
+          expect(
+            app.find('#form_section_title_mother-view-group').hostNodes()
+          ).toHaveLength(1)
+        })
       })
-    })
-
-    describe('when user clicks the "mother" page', () => {
-      beforeEach(() => goToMotherSection(app))
-      it('changes to the mother details section', () => {
-        expect(
-          app.find('#form_section_title_mother-view-group').hostNodes()
-        ).toHaveLength(1)
+      describe('when user clicks the "father" page', () => {
+        beforeEach(() => goToFatherSection(app))
+        it('changes to the father details section', () => {
+          expect(
+            app.find('#form_section_title_father-view-group').hostNodes()
+          ).toHaveLength(1)
+        })
       })
-    })
-    describe('when user clicks the "father" page', () => {
-      beforeEach(() => goToFatherSection(app))
-      it('changes to the father details section', () => {
-        expect(
-          app.find('#form_section_title_father-view-group').hostNodes()
-        ).toHaveLength(1)
-      })
-    })
-    describe('when user is in document page', () => {
-      beforeEach(() => goToDocumentsSection(app))
-      it('image upload field is rendered', () => {
-        expect(app.find('#upload_document').hostNodes()).toHaveLength(4)
+      describe('when user is in document page', () => {
+        beforeEach(() => goToDocumentsSection(app))
+        it('image upload field is rendered', () => {
+          expect(app.find('#upload_document').hostNodes()).toHaveLength(4)
+        })
       })
     })
   })

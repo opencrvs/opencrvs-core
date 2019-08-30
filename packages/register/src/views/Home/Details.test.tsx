@@ -148,10 +148,10 @@ describe('Field Agnet tests', () => {
     store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
   })
 
-  it('loads properly for draft application with create row', () => {
+  it('loads properly for draft application with create row', async () => {
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -176,7 +176,7 @@ describe('Field Agnet tests', () => {
     testComponent.component.unmount()
   })
 
-  it('loads properly for draft application with create and update row', () => {
+  it('loads properly for draft application with create and update row', async () => {
     const draft = createApplication(Event.DEATH)
     store.dispatch(storeApplication(draft))
     // @ts-ignore
@@ -184,7 +184,7 @@ describe('Field Agnet tests', () => {
       familyNameEng: 'Anik'
     }
     store.dispatch(modifyApplication(draft))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -208,7 +208,7 @@ describe('Field Agnet tests', () => {
 
     testComponent.component.unmount()
   })
-  it('loads properly for failed application', () => {
+  it('loads properly for failed application', async () => {
     const draft = createApplication(Event.DEATH)
     store.dispatch(storeApplication(draft))
     // @ts-ignore
@@ -217,7 +217,7 @@ describe('Field Agnet tests', () => {
     }
     draft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
     store.dispatch(modifyApplication(draft))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -334,7 +334,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -438,7 +438,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -547,7 +547,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -615,7 +615,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -730,7 +730,7 @@ describe('Registrar tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -845,7 +845,7 @@ describe('Registrar tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -896,7 +896,7 @@ describe('Registrar tests', () => {
       }
     ]
     try {
-      createTestComponent(
+      await createTestComponent(
         // @ts-ignore
         <Details
           match={{
