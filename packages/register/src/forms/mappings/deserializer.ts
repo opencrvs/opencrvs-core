@@ -29,7 +29,8 @@ import {
   IQueryMap,
   ISerializedQueryMap,
   ILoaderButton,
-  IFormFieldWithDynamicDefinitions
+  IFormFieldWithDynamicDefinitions,
+  IFormField
 } from '@register/forms'
 
 /*
@@ -37,8 +38,6 @@ import {
  * There are for instance some Enums and value mappings that are exported
  *
  * This here removes those from the type, so we don't have to cast anything to any
- *
- * @todo maybe this could live next to the other types
  */
 
 type AnyFn<T> = (...args: any[]) => T
@@ -279,6 +278,7 @@ export function deserializeFormSection(
           )
         } as IFormFieldWithDynamicDefinitions
       }
+
       if (field.type === FETCH_BUTTON) {
         return {
           ...baseFields,
@@ -286,21 +286,10 @@ export function deserializeFormSection(
         } as ILoaderButton
       }
 
-      // @todo check why returning baseFields gives a compiler error
-      return {
-        ...field,
-        validate: field.validate.map(
-          fieldValidationDescriptorToValidationFunction
-        ),
-        mapping: field.mapping && {
-          query:
-            field.mapping.query &&
-            fieldQueryDescriptorToQueryFunction(field.mapping.query),
-          mutation:
-            field.mapping.mutation &&
-            fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
-        }
-      }
+      return baseFields as Exclude<
+        IFormField,
+        IFormFieldWithDynamicDefinitions | ILoaderButton
+      >
     })
   }))
 

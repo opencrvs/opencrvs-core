@@ -151,6 +151,7 @@ export type IFormFieldValue =
   | IFileValue[]
   | { [key: string]: string }
   | IAttachmentValue
+  | ICertificate[]
 
 export interface IFileValue {
   optionValues: IFormFieldValue[]
@@ -491,17 +492,12 @@ export interface IConditionals {
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
   isRegistrarRoleSelected: IConditional
+  certCollectorOther: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
-
-/*
- * TEMPORARY @todo
- *
- * Remove when form field definitions are removed from codebase
- */
 
 type FilterType<Base, Condition> = {
   [Key in keyof Base]: Base[Key] extends Condition ? Key : never
@@ -592,13 +588,8 @@ export type IMutationDescriptor =
   | MutationFactoryOperation
   | MutationDefaultOperation
 
-/*
- * / TEMPORARY @todo
- *
- */
-
 // Initial type as it's always used as an object.
-// Should be stricter than this
+// @todo should be stricter than this
 export type TransformedData = { [key: string]: any }
 
 export type IFormSectionMapping = {
@@ -640,6 +631,7 @@ export enum UserSection {
   Preview = 'preview'
 }
 export enum CertificateSection {
+  Collector = 'collector',
   CollectCertificate = 'collectCertificate',
   CollectDeathCertificate = 'collectDeathCertificate',
   CertificatePreview = 'certificatePreview'
@@ -692,6 +684,7 @@ export interface IFormSectionGroup {
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
+  error?: FormattedMessage.MessageDescriptor
 }
 
 export interface IForm {
@@ -872,6 +865,26 @@ export interface IFormSectionData {
 
 export interface IFormData {
   [key: string]: IFormSectionData
+}
+
+type PaymentType = 'MANUAL'
+
+type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
+
+type Payment = {
+  paymentId?: string
+  type: PaymentType
+  total: string
+  amount: string
+  outcome: PaymentOutcomeType
+  date: number
+}
+
+export interface ICertificate {
+  collector?: IFormSectionData
+  hasShowedVerifiedDocument?: boolean
+  payments?: Payment[]
+  data?: string
 }
 
 export interface IAttachment {

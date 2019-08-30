@@ -205,7 +205,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           comments {
             comment
           }
-
+          type
           location {
             name
             alias
