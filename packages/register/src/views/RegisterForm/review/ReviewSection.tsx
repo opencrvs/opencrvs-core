@@ -71,7 +71,8 @@ import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
 import { buttonMessages } from '@register/i18n/messages'
 import { REJECTED, BIRTH } from '@register/utils/constants'
 import { ReviewHeader } from './ReviewHeader'
-import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
+// TODO: we need to move this to resource package as well
+import { SEAL_BD_GOVT } from '@opencrvs/register/src/pdfRenderer/templates/logo'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
@@ -80,11 +81,11 @@ import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
   birthSectionMapping,
   birthSectionTitle
-} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+} from '@register/forms/register/fieldMappings/birth/mutation/documents-mappings'
 import {
   deathSectionMapping,
   deathSectionTitle
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+} from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { IValidationResult } from '@register/utils/validate'
 

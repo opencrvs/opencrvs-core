@@ -191,11 +191,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             },
             modal: {
               title: {
-                message: messages.submitConfirmationTitle,
+                message: messages.validateConfirmationTitle,
                 payload: { completeApplication: true }
               },
               description: {
-                message: messages.submitConfirmationDesc,
+                message: messages.validateConfirmationDesc,
                 payload: { completeApplication: true }
               }
             }
@@ -359,7 +359,7 @@ class ReviewActionComponent extends React.Component<
                 {intl.formatMessage(
                   draftApplication
                     ? buttonMessages.sendForReview
-                    : buttonMessages.approve
+                    : buttonMessages.sendForApproval
                 )}
               </PrimaryButton>
             ) : (
@@ -436,7 +436,7 @@ class ReviewActionComponent extends React.Component<
                 {applicationToBeRegistered
                   ? intl.formatMessage(buttonMessages.register)
                   : applicationToBeValidated
-                  ? intl.formatMessage(buttonMessages.approve)
+                  ? intl.formatMessage(buttonMessages.send)
                   : intl.formatMessage(buttonMessages.send)}
               </PrimaryButton>
             ]}

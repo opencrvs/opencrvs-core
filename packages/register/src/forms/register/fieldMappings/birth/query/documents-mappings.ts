@@ -3,7 +3,7 @@ import { attachmentToFieldTransformer } from '@register/forms/mappings/query/fie
 import {
   birthDocumentForWhomFhirMapping,
   birthDocumentTypeFhirMapping
-} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+} from '@register/forms/register/fieldMappings/birth/mutation/documents-mappings'
 
 const fieldNameMapping = {
   [birthDocumentForWhomFhirMapping.Mother]: 'uploadDocForMother',

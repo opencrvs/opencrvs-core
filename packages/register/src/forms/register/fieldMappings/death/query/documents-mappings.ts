@@ -3,7 +3,7 @@ import { attachmentToFieldTransformer } from '@register/forms/mappings/query/fie
 import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+} from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 
 export const REGISTRATION_SECTION = 'registration'
 
