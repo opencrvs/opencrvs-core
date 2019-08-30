@@ -33,8 +33,7 @@ export type MaxLengthValidation = (
 
 export type Validation = (
   value: IFormFieldValue,
-  drafts?: IFormData,
-  maruf?: number
+  drafts?: IFormData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -60,6 +59,12 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     example: '01741234567',
     start: '01',
     num: '11'
+  },
+  zmb: {
+    pattern: /^09(5|6|7){1}[0-9]{7}$/,
+    example: '0970545855',
+    start: '09[5|6|7]',
+    num: '10'
   }
 }
 

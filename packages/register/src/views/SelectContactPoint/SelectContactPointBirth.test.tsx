@@ -141,7 +141,7 @@ describe('when user is selecting the Main point of contact', () => {
           .find('#phone_number_error')
           .hostNodes()
           .text()
-      ).toBe('Not a valid mobile number')
+      ).toBe('Must be a valid 11 digit number that starts with 01')
     })
 
     it('show error while giving invalid father mobile no', async () => {
@@ -168,7 +168,7 @@ describe('when user is selecting the Main point of contact', () => {
           .find('#phone_number_error')
           .hostNodes()
           .text()
-      ).toBe('Not a valid mobile number')
+      ).toBe('Must be a valid 11 digit number that starts with 01')
     })
 
     it('show error without selecting any input', async () => {
