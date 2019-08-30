@@ -243,13 +243,25 @@ type SerializedFormFieldWithDynamicDefinitions = UnionOmit<
 > & {
   dynamicDefinitions: ISerializedDynamicFormFieldDefinitions
 }
+type SerializedSelectFormFieldWithOptions = Omit<
+  ISelectFormFieldWithOptions,
+  'options'
+> & {
+  options: ISelectOption[] | { resource: string }
+}
 
 type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
   queryMap: ISerializedQueryMap
 }
 
 export type SerializedFormField = UnionOmit<
-  | Exclude<IFormField, IFormFieldWithDynamicDefinitions | ILoaderButton>
+  | Exclude<
+      IFormField,
+      | IFormFieldWithDynamicDefinitions
+      | ILoaderButton
+      | ISelectFormFieldWithOptions
+    >
+  | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
   | ILoaderButtonWithSerializedQueryMap,
   'validate' | 'mapping'
