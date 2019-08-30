@@ -16,6 +16,7 @@ import { getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import { ITheme } from '@register/styledComponents'
 import { IUserDetails } from '@register/utils/userUtils'
+import { printMoneyReceipt } from '@register/views/PrintCertificate/PDFUtils'
 import * as React from 'react'
 import { InjectedIntlProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -150,7 +151,13 @@ class PaymentComponent extends React.Component<IFullProps> {
               id="print-receipt"
               icon={() => <Print />}
               align={0}
-              onClick={() => {}}
+              onClick={() =>
+                printMoneyReceipt(
+                  this.props.intl,
+                  this.props.application,
+                  this.props.userDetails
+                )
+              }
             >
               {intl.formatMessage(messages.printReceipt)}
             </TertiaryButton>

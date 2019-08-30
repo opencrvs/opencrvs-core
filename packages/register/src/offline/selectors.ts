@@ -24,8 +24,6 @@ export const getOfflineDataLoaded = (
 export const getOfflineData = (store: IStoreState): IOfflineData => {
   const data = getKey(store, 'offlineData')
   if (!isOfflineDataLoaded(data)) {
-    console.log('derp')
-
     throw new Error('Offline data is not yet loaded. This should never happen')
   }
   return data

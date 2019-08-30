@@ -1,5 +1,7 @@
-import { IFormField, IFormData, Event } from '@register/forms'
-import { REGISTRATION_SECTION } from '@register/forms/register/fieldDefinitions/death/mappings/query/documents-mappings'
+import { IFormField, IFormData, Event, IFormSectionData } from '@register/forms'
+import { REGISTRATION_SECTION } from '@register/forms/register/fieldMappings/death/query/documents-mappings'
+import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
+import { transformStatusData } from '@register/forms/register/fieldMappings/birth/query/registration-mappings'
 
 export const deceasedDateToFieldTransformation = (
   alternativeSectionId?: string
@@ -59,5 +61,13 @@ export function getDeathRegistrationSectionTransformer(
     queryData[REGISTRATION_SECTION].type === 'DEATH'
   ) {
     transformedData[REGISTRATION_SECTION].type = Event.DEATH
+  }
+
+  if (queryData[REGISTRATION_SECTION].status) {
+    transformStatusData(
+      transformedData,
+      queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[],
+      REGISTRATION_SECTION
+    )
   }
 }

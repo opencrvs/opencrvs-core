@@ -51,8 +51,8 @@ beforeAll(() => {
 })
 
 describe('RegistrationHome In Progress tab related tests', () => {
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -110,7 +110,7 @@ describe('RegistrationHome In Progress tab related tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
       store,
@@ -181,7 +181,7 @@ describe('RegistrationHome In Progress tab related tests', () => {
       }
     ]
     // store.dispatch(storeApplication(createApplication(Event.BIRTH)))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
       store,

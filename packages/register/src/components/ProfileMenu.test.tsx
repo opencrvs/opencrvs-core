@@ -11,7 +11,7 @@ const { store } = createStore()
 describe('when user opens profile menu without user details', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(<ProfileMenu />, store)
+    const testComponent = await createTestComponent(<ProfileMenu />, store)
     component = testComponent.component
   })
 
@@ -29,7 +29,7 @@ describe('when user opens profile menu with user details', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const testComponent = createTestComponent(<ProfileMenu />, store)
+    const testComponent = await createTestComponent(<ProfileMenu />, store)
     component = testComponent.component
   })
 

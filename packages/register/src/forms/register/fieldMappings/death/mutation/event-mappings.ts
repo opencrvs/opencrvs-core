@@ -1,4 +1,17 @@
-import { IFormField, IFormData, TransformedData } from '@register/forms'
+import {
+  IFormField,
+  IFormData,
+  ICertificate,
+  IFileValue,
+  TransformedData
+} from '@register/forms'
+import {
+  GQLRelatedPerson,
+  GQLRelationshipType,
+  GQLPerson,
+  GQLAttachment
+} from '@opencrvs/gateway/src/graphql/schema'
+import { transformCertificateData } from '@register/forms/register/fieldMappings/birth/mutation/registration-mappings'
 
 export const fieldToDeceasedDateTransformation = (
   alternativeSectionId?: string
@@ -84,6 +97,13 @@ export function setDeathRegistrationSectionTransformer(
     if (draftData.registration.registrationNumber) {
       transformedData.registration.registrationNumber =
         draftData.registration.registrationNumber
+    }
+    if (draftData.registration.certificates) {
+      transformCertificateData(
+        transformedData,
+        (draftData.registration.certificates as ICertificate[])[0],
+        'registration'
+      )
     }
   }
   return transformedData

@@ -124,6 +124,7 @@ describe('Certificate collector test for a birth registration without father det
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -162,7 +163,7 @@ describe('Certificate collector test for a birth registration without father det
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
           history={history}
@@ -180,13 +181,8 @@ describe('Certificate collector test for a birth registration without father det
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      testComponent.component.update()
-
       component = testComponent.component
+      await waitForElement(component, '#collector_form')
     })
 
     it('father option will not be available', () => {
@@ -266,7 +262,7 @@ describe('Certificate collector test for a birth registration without father det
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
           history={history}
@@ -284,11 +280,6 @@ describe('Certificate collector test for a birth registration without father det
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      testComponent.component.update()
 
       component = testComponent.component
     })
@@ -357,7 +348,7 @@ describe('Certificate collector test for a birth registration without father det
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
           history={history}
@@ -375,11 +366,6 @@ describe('Certificate collector test for a birth registration without father det
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      testComponent.component.update()
 
       component = testComponent.component
     })
@@ -562,6 +548,7 @@ describe('Test for a free birth registration', () => {
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -600,7 +587,7 @@ describe('Test for a free birth registration', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
           history={history}
@@ -618,18 +605,12 @@ describe('Test for a free birth registration', () => {
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      testComponent.component.update()
 
       component = testComponent.component
     })
 
     it('continue to review section when the mandatory fields are filled and birth event is before 45 days', async () => {
-      component
-        .find('#noAffidavitAgreementAFFIDAVIT')
+      ;(await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT'))
         .hostNodes()
         .simulate('change', {
           checked: true
@@ -645,11 +626,6 @@ describe('Test for a free birth registration', () => {
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
       expect(
         component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
       ).toHaveLength(1)
@@ -658,10 +634,6 @@ describe('Test for a free birth registration', () => {
         .find('#submit_confirm')
         .hostNodes()
         .simulate('click')
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
 
       expect(history.location.pathname).toBe(
         '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
@@ -852,6 +824,7 @@ describe('Certificate collector test for a birth registration with father detail
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -890,7 +863,7 @@ describe('Certificate collector test for a birth registration with father detail
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
           history={history}
@@ -908,17 +881,13 @@ describe('Certificate collector test for a birth registration with father detail
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      testComponent.component.update()
 
       component = testComponent.component
     })
 
-    it('father option will be available', () => {
-      expect(component.find('#type_FATHER').hostNodes()).toHaveLength(1)
+    it('father option will be available', async () => {
+      const element = await waitForElement(component, '#type_FATHER')
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
 })
@@ -1083,6 +1052,7 @@ describe('Certificate collector test for a death registration', () => {
               status: [
                 {
                   comments: null,
+                  type: 'REGISTERED',
                   location: {
                     name: 'Moktarpur Union Parishad',
                     alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
@@ -1141,7 +1111,7 @@ describe('Certificate collector test for a death registration', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
           history={history}
@@ -1159,17 +1129,13 @@ describe('Certificate collector test for a death registration', () => {
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      testComponent.component.update()
 
       component = testComponent.component
     })
 
-    it('applicant will be available', () => {
-      expect(component.find('#type_INFORMANT').hostNodes()).toHaveLength(1)
+    it('applicant will be available', async () => {
+      const element = await waitForElement(component, '#type_INFORMANT')
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
 })

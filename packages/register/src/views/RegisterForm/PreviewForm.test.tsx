@@ -38,7 +38,7 @@ describe('when user is previewing the form data', () => {
   let store: Store
 
   beforeEach(async () => {
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     app = testApp.app
     history = testApp.history
     store = testApp.store
