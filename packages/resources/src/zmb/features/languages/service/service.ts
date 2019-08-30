@@ -1,12 +1,12 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import { readFile } from 'fs'
+import { join } from 'path'
 import { LANGUAGES_SOURCE } from '@resources/zmb/constants'
 
 interface IMessageIdentifier {
   [key: string]: string
 }
 
-interface ILanguage {
+export interface ILanguage {
   lang: string
   displayName: string
   messages: IMessageIdentifier
@@ -16,9 +16,12 @@ export interface ILanguageDataResponse {
   data: ILanguage[]
 }
 
-export function getLanguages(application: string): ILanguageDataResponse {
-  const languagesUrl = path.join(LANGUAGES_SOURCE, `${application}.json`)
-  const languages = JSON.parse(fs.readFileSync(languagesUrl).toString())
-
-  return languages
+export async function getLanguages(
+  application: string
+): Promise<ILanguageDataResponse> {
+  return new Promise((resolve, reject) => {
+    readFile(join(LANGUAGES_SOURCE, `${application}.json`), (err, data) => {
+      err ? reject(err) : resolve(JSON.parse(data.toString()))
+    })
+  })
 }

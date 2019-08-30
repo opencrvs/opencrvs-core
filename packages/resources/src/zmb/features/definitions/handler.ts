@@ -1,16 +1,24 @@
 import * as Hapi from 'hapi'
-import { getForms } from '@resources/zmb/features/forms/service'
-import { getLanguages } from '@resources/zmb/features/languages/service/service'
+import { getForms, IForms } from '@resources/zmb/features/forms/service'
+import {
+  getLanguages,
+  ILanguage
+} from '@resources/zmb/features/languages/service/service'
+
+interface IDefinitionsResponse {
+  forms: IForms
+  languages: ILanguage[]
+  timestamp: string
+}
 
 export async function definitionsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
-): Promise<any> {
-  // TODO typing
+): Promise<IDefinitionsResponse> {
   const application = request.params.application
   return {
-    forms: getForms(),
-    languages: getLanguages(application).data,
+    forms: await getForms(),
+    languages: (await getLanguages(application)).data,
     timestamp: ''
   }
 }
