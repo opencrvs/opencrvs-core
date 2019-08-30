@@ -6,7 +6,7 @@ import bn from 'react-intl/locale-data/bn'
 import {
   getLanguage,
   getMessages,
-  getUpdatedAt
+  getMessagesLoaded
 } from '@register/i18n/selectors'
 import { IStoreState } from '@register/store'
 import { IntlMessages } from '@register/i18n/reducer'
@@ -25,7 +25,7 @@ const mapStateToProps = (state: IStoreState): StateProps => {
   return {
     locale,
     messages: getMessages(state),
-    key: locale + getUpdatedAt(state).toString()
+    key: locale + getMessagesLoaded(state).toString()
   }
 }
 
