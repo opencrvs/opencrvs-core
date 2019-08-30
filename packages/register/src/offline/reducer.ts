@@ -50,6 +50,7 @@ export const initialState: IOfflineDataState = {
 }
 
 function checkIfDone(
+  oldState: IOfflineDataState,
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
 ) {
   const loopWithState = liftState(loopOrState)
