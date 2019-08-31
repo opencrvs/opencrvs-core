@@ -858,15 +858,11 @@ describe('RegistrarHome ready to print tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    testComponent.component
-      .find('#ListItemAction-0-Print')
-      .hostNodes()
-      .simulate('click')
+    const element = await waitForElement(
+      testComponent.component,
+      '#ListItemAction-0-Print'
+    )
+    element.hostNodes().simulate('click')
 
     await new Promise(resolve => {
       setTimeout(resolve, 100)
