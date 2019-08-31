@@ -1,4 +1,4 @@
-import { FormattedMessage, MessageValue } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@register/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/register/src/forms'
 import {
@@ -18,8 +18,8 @@ import {
 } from '@register/forms/identity'
 
 export interface IValidationResult {
-  message: FormattedMessage.MessageDescriptor
-  props?: { [key: string]: MessageValue }
+  message: MessageDescriptor
+  props?: { [key: string]: any }
 }
 
 export type RangeValidation = (

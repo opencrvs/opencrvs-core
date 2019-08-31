@@ -1,4 +1,4 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 export enum QUESTION_KEYS {
   BIRTH_TOWN,
@@ -11,48 +11,48 @@ export enum QUESTION_KEYS {
   FIRST_CHILD_NAME
 }
 interface IUserMessages {
-  accountTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  BBS: ReactIntl.FormattedMessage.MessageDescriptor
-  BIRTH_TOWN: ReactIntl.FormattedMessage.MessageDescriptor
-  CABINET_DIVISION: ReactIntl.FormattedMessage.MessageDescriptor
-  CHA: ReactIntl.FormattedMessage.MessageDescriptor
-  CHAIRMAN: ReactIntl.FormattedMessage.MessageDescriptor
-  changeLanguageMessege: ReactIntl.FormattedMessage.MessageDescriptor
-  changeLanguageSuccessMessage: ReactIntl.FormattedMessage.MessageDescriptor
-  changeLanguageTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  DATA_ENTRY_CLERK: ReactIntl.FormattedMessage.MessageDescriptor
-  DISTRICT_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
-  ENTREPENEUR: ReactIntl.FormattedMessage.MessageDescriptor
-  FAVORITE_FOOD: ReactIntl.FormattedMessage.MessageDescriptor
-  FAVORITE_MOVIE: ReactIntl.FormattedMessage.MessageDescriptor
-  FAVORITE_SONG: ReactIntl.FormattedMessage.MessageDescriptor
-  FAVORITE_TEACHER: ReactIntl.FormattedMessage.MessageDescriptor
-  FIRST_CHILD_NAME: ReactIntl.FormattedMessage.MessageDescriptor
-  HEALTH_DIVISION: ReactIntl.FormattedMessage.MessageDescriptor
-  HIGH_SCHOOL: ReactIntl.FormattedMessage.MessageDescriptor
-  HOSPITAL: ReactIntl.FormattedMessage.MessageDescriptor
-  labelEnglishName: ReactIntl.FormattedMessage.MessageDescriptor
-  LOCAL_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
-  LOCAL_SYSTEM_ADMIN: ReactIntl.FormattedMessage.MessageDescriptor
-  MAYOR: ReactIntl.FormattedMessage.MessageDescriptor
-  MOTHER_NAME: ReactIntl.FormattedMessage.MessageDescriptor
-  NATIONAL_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
-  NATIONAL_SYSTEM_ADMIN: ReactIntl.FormattedMessage.MessageDescriptor
-  ORG_DIVISION: ReactIntl.FormattedMessage.MessageDescriptor
-  PERFORMANCE_MANAGEMENT: ReactIntl.FormattedMessage.MessageDescriptor
-  PERFORMANCE_OVERSIGHT: ReactIntl.FormattedMessage.MessageDescriptor
-  profileTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  REGISTRATION_AGENT: ReactIntl.FormattedMessage.MessageDescriptor
-  SECRETARY: ReactIntl.FormattedMessage.MessageDescriptor
-  securityTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  settingsTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  STATE_REGISTRAR: ReactIntl.FormattedMessage.MessageDescriptor
-  systemTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  FIELD_AGENT: ReactIntl.FormattedMessage.MessageDescriptor
+  accountTitle: MessageDescriptor
+  BBS: MessageDescriptor
+  BIRTH_TOWN: MessageDescriptor
+  CABINET_DIVISION: MessageDescriptor
+  CHA: MessageDescriptor
+  CHAIRMAN: MessageDescriptor
+  changeLanguageMessege: MessageDescriptor
+  changeLanguageSuccessMessage: MessageDescriptor
+  changeLanguageTitle: MessageDescriptor
+  DATA_ENTRY_CLERK: MessageDescriptor
+  DISTRICT_REGISTRAR: MessageDescriptor
+  ENTREPENEUR: MessageDescriptor
+  FAVORITE_FOOD: MessageDescriptor
+  FAVORITE_MOVIE: MessageDescriptor
+  FAVORITE_SONG: MessageDescriptor
+  FAVORITE_TEACHER: MessageDescriptor
+  FIRST_CHILD_NAME: MessageDescriptor
+  HEALTH_DIVISION: MessageDescriptor
+  HIGH_SCHOOL: MessageDescriptor
+  HOSPITAL: MessageDescriptor
+  labelEnglishName: MessageDescriptor
+  LOCAL_REGISTRAR: MessageDescriptor
+  LOCAL_SYSTEM_ADMIN: MessageDescriptor
+  MAYOR: MessageDescriptor
+  MOTHER_NAME: MessageDescriptor
+  NATIONAL_REGISTRAR: MessageDescriptor
+  NATIONAL_SYSTEM_ADMIN: MessageDescriptor
+  ORG_DIVISION: MessageDescriptor
+  PERFORMANCE_MANAGEMENT: MessageDescriptor
+  PERFORMANCE_OVERSIGHT: MessageDescriptor
+  profileTitle: MessageDescriptor
+  REGISTRATION_AGENT: MessageDescriptor
+  SECRETARY: MessageDescriptor
+  securityTitle: MessageDescriptor
+  settingsTitle: MessageDescriptor
+  STATE_REGISTRAR: MessageDescriptor
+  systemTitle: MessageDescriptor
+  FIELD_AGENT: MessageDescriptor
 }
 
 interface IDynamicUserMessages {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 }
 
 const messagesToDefine: IUserMessages = {

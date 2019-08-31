@@ -1,12 +1,12 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IFieldAgentHomeMessages {
-  inProgressCount: ReactIntl.FormattedMessage.MessageDescriptor
-  sentForReviewCount: ReactIntl.FormattedMessage.MessageDescriptor
-  requireUpdates: ReactIntl.FormattedMessage.MessageDescriptor
-  zeroUpdatesText: ReactIntl.FormattedMessage.MessageDescriptor
-  allUpdatesText: ReactIntl.FormattedMessage.MessageDescriptor
-  requireUpdatesLoading: ReactIntl.FormattedMessage.MessageDescriptor
+  inProgressCount: MessageDescriptor
+  sentForReviewCount: MessageDescriptor
+  requireUpdates: MessageDescriptor
+  zeroUpdatesText: MessageDescriptor
+  allUpdatesText: MessageDescriptor
+  requireUpdatesLoading: MessageDescriptor
 }
 
 const messagesToDefine: IFieldAgentHomeMessages = {

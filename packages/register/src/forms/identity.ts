@@ -1,4 +1,4 @@
-import { FormattedMessage } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
 import { formMessages as messages } from '@register/i18n/messages'
 
@@ -51,9 +51,7 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
-export function identityNameMapper(
-  code: string
-): FormattedMessage.MessageDescriptor {
+export function identityNameMapper(code: string): MessageDescriptor {
   switch (code) {
     case 'NATIONAL_ID':
       return messages.iDTypeNationalID

@@ -1,16 +1,16 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRejectMessages {
-  rejectionFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionReasonSubmit: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionForm: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionReason: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionReasonDuplicate: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionReasonMisspelling: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionReasonMissingSupportingDoc: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionReasonOther: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionCommentForHealthWorkerLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectionFormInstruction: ReactIntl.FormattedMessage.MessageDescriptor
+  rejectionFormTitle: MessageDescriptor
+  rejectionReasonSubmit: MessageDescriptor
+  rejectionForm: MessageDescriptor
+  rejectionReason: MessageDescriptor
+  rejectionReasonDuplicate: MessageDescriptor
+  rejectionReasonMisspelling: MessageDescriptor
+  rejectionReasonMissingSupportingDoc: MessageDescriptor
+  rejectionReasonOther: MessageDescriptor
+  rejectionCommentForHealthWorkerLabel: MessageDescriptor
+  rejectionFormInstruction: MessageDescriptor
 }
 
 const messagesToDefine: IRejectMessages = {

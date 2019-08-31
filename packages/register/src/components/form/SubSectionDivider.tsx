@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   ISubSectionProps,
   SubSectionDivider as SubSectionDividerComponent
@@ -8,7 +8,7 @@ import { Omit } from '@opencrvs/register/src/utils'
 import { formMessages } from '@register/i18n/messages'
 
 export const SubSectionDivider = injectIntl(function FormInputField(
-  props: Omit<ISubSectionProps, 'optionalLabel'> & InjectedIntlProps
+  props: Omit<ISubSectionProps, 'optionalLabel'> & IntlShapeProps
 ) {
   return (
     <SubSectionDividerComponent

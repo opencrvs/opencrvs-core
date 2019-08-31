@@ -4,7 +4,7 @@ import { PIN } from '@opencrvs/components/lib/icons'
 import styled from '@register/styledComponents'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/register/src/storage'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@register/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@register/applications'
@@ -50,7 +50,7 @@ const ErrorBox = styled.div`
   margin-top: -20px;
 `
 
-type IProps = InjectedIntlProps & { onComplete: () => void }
+type IProps = IntlShapeProps & { onComplete: () => void }
 
 class CreatePinComponent extends React.Component<IProps> {
   pinKeyRef: any

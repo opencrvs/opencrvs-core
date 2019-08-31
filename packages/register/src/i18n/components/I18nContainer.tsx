@@ -6,7 +6,7 @@ import { IStoreState } from '@register/store'
 import { IntlMessages } from '@register/i18n/reducer'
 
 type StateProps = {
-  locale?: string
+  locale: string
   messages: IntlMessages
 }
 

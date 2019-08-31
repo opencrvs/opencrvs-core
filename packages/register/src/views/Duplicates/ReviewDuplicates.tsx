@@ -9,7 +9,11 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { Mutation, Query } from 'react-apollo'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  IntlShape
+} from 'react-intl'
 import { SEARCH_RESULT } from '@register/navigation/routes'
 import { DuplicateDetails, Action } from '@register/components/DuplicateDetails'
 import { Event } from '@register/forms'
@@ -201,7 +205,7 @@ interface IState {
   showRejectModal: boolean
   showNotDuplicateModal: boolean
 }
-type Props = InjectedIntlProps &
+type Props = IntlShapeProps &
   RouteComponentProps<IMatchParams> & { language: string }
 class ReviewDuplicatesClass extends React.Component<Props, IState> {
   constructor(props: Props) {
@@ -216,7 +220,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
   formatData(
     data: { [key: string]: GQLBirthRegistration },
     language: string,
-    intl: ReactIntl.InjectedIntl
+    intl: IntlShape
   ) {
     const { locale } = this.props.intl
 

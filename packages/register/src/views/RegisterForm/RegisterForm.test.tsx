@@ -894,8 +894,8 @@ describe('when user is in the register form for death event', () => {
 
 describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
-  let store: ReturnType<typeof createTestStore>['store']
-  let history: ReturnType<typeof createTestStore>['history']
+  let store: AppStore
+  let history: History
   const mock = jest.fn()
 
   beforeEach(async () => {

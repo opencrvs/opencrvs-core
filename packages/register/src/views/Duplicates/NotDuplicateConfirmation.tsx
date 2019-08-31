@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -26,7 +26,7 @@ const NotDuplicateConfirmationComponent = ({
   handleYes,
   handleClose,
   intl
-}: IProps & InjectedIntlProps) => {
+}: IProps & IntlShapeProps) => {
   return (
     <StyledModal
       title={intl.formatMessage(messages.notDuplicateConfirmationTxt)}

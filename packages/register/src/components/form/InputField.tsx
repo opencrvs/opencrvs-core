@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   IInputFieldProps,
   InputField as InputFieldComponent
@@ -8,7 +8,7 @@ import { Omit } from '@opencrvs/register/src/utils'
 import { formMessages } from '@register/i18n/messages'
 
 export const InputField = injectIntl(function FormInputField(
-  props: Omit<IInputFieldProps, 'optionalLabel'> & InjectedIntlProps
+  props: Omit<IInputFieldProps, 'optionalLabel'> & IntlShapeProps
 ) {
   return (
     <InputFieldComponent

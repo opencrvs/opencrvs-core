@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { countries } from '@register/forms/countries'
 import { identityNameMapper } from '@register/forms/identity'
 import { formatLongDate } from '@register/utils/date-formatting'
@@ -51,7 +51,7 @@ interface IProps {
 function ParentDetailsComponent({
   intl,
   information
-}: IProps & InjectedIntlProps) {
+}: IProps & IntlShapeProps) {
   information = information || { nationality: '', name: [] }
   const nationalities = countries.filter(country =>
     information.nationality.includes(country.value)

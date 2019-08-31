@@ -35,7 +35,7 @@ import { IUserDetails } from '@register/utils/userUtils'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { IStoreState } from '@register/store'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   goToHome,
   goToPerformance,
@@ -59,7 +59,7 @@ import {
   userMessages
 } from '@register/i18n/messages'
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
@@ -360,4 +360,4 @@ export const Header = connect(
     goToHomeAction: goToHome,
     goToPerformanceAction: goToPerformance
   }
-)(injectIntl<IProps>(HeaderComp))
+)(injectIntl<'intl', IProps>(HeaderComp))

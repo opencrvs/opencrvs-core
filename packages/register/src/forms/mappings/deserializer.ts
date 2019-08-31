@@ -34,7 +34,7 @@ import {
   SELECT_WITH_OPTIONS,
   ISelectFormFieldWithOptions
 } from '@register/forms'
-import { countries } from '../countries'
+import { countries } from '@register/forms/countries'
 
 /*
  * Some of the exports of mutations and queries are not functions
@@ -286,8 +286,8 @@ export function deserializeFormSection(
           ...baseFields,
           options:
             !Array.isArray(field.options) && field.options.resource
-              // Dummy implementation for now as there's only one resource
-              ? countries
+              ? // Dummy implementation for now as there's only one resource
+                countries
               : field.options
         } as ISelectFormFieldWithOptions
       }
