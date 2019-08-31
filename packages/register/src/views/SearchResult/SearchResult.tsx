@@ -28,7 +28,7 @@ import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { IViewHeadingProps } from '@register/components/ViewHeading'
@@ -243,7 +243,7 @@ interface IMatchParams {
   searchType: string
 }
 
-type ISearchResultProps = InjectedIntlProps &
+type ISearchResultProps = IntlShapeProps &
   IViewHeadingProps &
   ISearchInputProps &
   IBaseSearchResultProps &

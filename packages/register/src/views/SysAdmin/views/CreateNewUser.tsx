@@ -8,7 +8,7 @@ import { replaceInitialValues } from '@register/views/RegisterForm/RegisterForm'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { UserReviewForm } from '@register/views/SysAdmin/views/UserReviewForm'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ApolloClient from 'apollo-client'
@@ -44,7 +44,7 @@ interface IDispatchProps {
 
 export type Props = RouteComponentProps<IMatchParams> &
   INewUserProps &
-  InjectedIntlProps
+  IntlShapeProps
 
 const Container = styled.div`
   display: flex;

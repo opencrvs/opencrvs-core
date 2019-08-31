@@ -3,10 +3,8 @@ import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/use
 import {
   IFormSectionData,
   IForm,
-  Section,
   UserSection,
-  IFormSection,
-  ISerializedFormSection
+  IFormSection
 } from '@register/forms'
 import { Action } from 'redux'
 import { formMessages as messages } from '@register/i18n/messages'
@@ -18,10 +16,7 @@ import {
   showSubmitFormErrorToast
 } from '@register/notification/actions'
 import { SEARCH_USERS } from '@register/sysadmin/user/queries'
-import {
-  deserializeForm,
-  deserializeFormSection
-} from '@register/forms/mappings/deserializer'
+import { deserializeForm } from '@register/forms/mappings/deserializer'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'

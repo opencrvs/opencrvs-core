@@ -19,7 +19,7 @@ import {
 } from '@register/views/SysAdmin/forms/userReducer'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { buttonMessages } from '@register/i18n/messages'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
@@ -49,7 +49,7 @@ type IDispatchProps = {
   goToCreateUserSection: typeof goToCreateUserSection
   clearUserFormData: typeof clearUserFormData
 }
-type IFullProps = InjectedIntlProps & IProps & IDispatchProps
+type IFullProps = IntlShapeProps & IProps & IDispatchProps
 
 class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void

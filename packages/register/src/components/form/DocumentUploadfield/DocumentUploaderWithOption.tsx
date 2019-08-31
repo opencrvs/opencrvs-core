@@ -9,7 +9,7 @@ import { IFileValue, IFormFieldValue } from '@register/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as Jimp from 'jimp'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
@@ -57,7 +57,7 @@ type IFullProps = {
   options: ISelectOption[]
   files?: IFileValue[]
   onComplete: (files: IFileValue[]) => void
-} & InjectedIntlProps
+} & IntlShapeProps
 
 type DocumentFields = {
   documentType: string
@@ -278,6 +278,6 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 }
 
-export const DocumentUploaderWithOption = injectIntl<IFullProps>(
+export const DocumentUploaderWithOption = injectIntl<'intl', IFullProps>(
   DocumentUploaderWithOptionComp
 )

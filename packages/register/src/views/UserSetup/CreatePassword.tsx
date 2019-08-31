@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -80,7 +80,7 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 
 class CreatePasswordComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {

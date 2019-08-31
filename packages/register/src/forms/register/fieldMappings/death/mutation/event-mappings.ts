@@ -2,15 +2,9 @@ import {
   IFormField,
   IFormData,
   ICertificate,
-  IFileValue,
   TransformedData
 } from '@register/forms'
-import {
-  GQLRelatedPerson,
-  GQLRelationshipType,
-  GQLPerson,
-  GQLAttachment
-} from '@opencrvs/gateway/src/graphql/schema'
+
 import { transformCertificateData } from '@register/forms/register/fieldMappings/birth/mutation/registration-mappings'
 
 export const fieldToDeceasedDateTransformation = (

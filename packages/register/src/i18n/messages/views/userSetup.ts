@@ -1,28 +1,28 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IUserSetupMessages {
-  confirmPassword: ReactIntl.FormattedMessage.MessageDescriptor
-  hasCases: ReactIntl.FormattedMessage.MessageDescriptor
-  hasNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  header: ReactIntl.FormattedMessage.MessageDescriptor
-  instruction: ReactIntl.FormattedMessage.MessageDescriptor
-  labelAssignedOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  labelBanglaName: ReactIntl.FormattedMessage.MessageDescriptor
-  labelEnglishName: ReactIntl.FormattedMessage.MessageDescriptor
-  match: ReactIntl.FormattedMessage.MessageDescriptor
-  minLength: ReactIntl.FormattedMessage.MessageDescriptor
-  mismatch: ReactIntl.FormattedMessage.MessageDescriptor
-  newPassword: ReactIntl.FormattedMessage.MessageDescriptor
-  passwordRequired: ReactIntl.FormattedMessage.MessageDescriptor
-  setupCompleteTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userSetupInstruction: ReactIntl.FormattedMessage.MessageDescriptor
-  userSetupIntroduction: ReactIntl.FormattedMessage.MessageDescriptor
-  userSetupRevieTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userSetupReviewHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  userSetupReviewInstruction: ReactIntl.FormattedMessage.MessageDescriptor
-  userSetupWelcomeTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validationMsg: ReactIntl.FormattedMessage.MessageDescriptor
-  waiting: ReactIntl.FormattedMessage.MessageDescriptor
+  confirmPassword: MessageDescriptor
+  hasCases: MessageDescriptor
+  hasNumber: MessageDescriptor
+  header: MessageDescriptor
+  instruction: MessageDescriptor
+  labelAssignedOffice: MessageDescriptor
+  labelBanglaName: MessageDescriptor
+  labelEnglishName: MessageDescriptor
+  match: MessageDescriptor
+  minLength: MessageDescriptor
+  mismatch: MessageDescriptor
+  newPassword: MessageDescriptor
+  passwordRequired: MessageDescriptor
+  setupCompleteTitle: MessageDescriptor
+  userSetupInstruction: MessageDescriptor
+  userSetupIntroduction: MessageDescriptor
+  userSetupRevieTitle: MessageDescriptor
+  userSetupReviewHeader: MessageDescriptor
+  userSetupReviewInstruction: MessageDescriptor
+  userSetupWelcomeTitle: MessageDescriptor
+  validationMsg: MessageDescriptor
+  waiting: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {

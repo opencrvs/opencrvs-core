@@ -23,7 +23,7 @@ import { IStoreState } from '@register/store'
 import styled from '@register/styledComponents'
 import { TAB_ID } from '@register/views/RegistrationHome/tabs/inProgress/inProgressTab'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getUserDetails } from '@register/profile/profileSelectors'
@@ -100,7 +100,7 @@ type IProps = {
   storeApplication: typeof storeApplication
 }
 
-type IFullProps = InjectedIntlProps &
+type IFullProps = IntlShapeProps &
   RouteComponentProps<{}> &
   IProps & { drafts: IApplicationsState }
 
@@ -307,4 +307,4 @@ const mapDispatchToProps = {
 export const ReviewCertificateAction = connect(
   mapStatetoProps,
   mapDispatchToProps
-)(injectIntl<IFullProps>(ReviewCertificateActionComponent))
+)(injectIntl<'intl', IFullProps>(ReviewCertificateActionComponent))

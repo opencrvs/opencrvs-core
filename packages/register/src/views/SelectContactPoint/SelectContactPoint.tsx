@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -88,7 +92,7 @@ enum ContactPoint {
 }
 
 const setContactPointFields = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   event: string
 ): IInformantField[] => {
   if (event === Event.BIRTH) {
@@ -210,7 +214,7 @@ interface IProps {
   goToDeathRegistration: typeof goToDeathRegistration
 }
 
-type IFullProps = InjectedIntlProps &
+type IFullProps = IntlShapeProps &
   RouteComponentProps<IMatchProps> &
   IProps &
   IStateProps

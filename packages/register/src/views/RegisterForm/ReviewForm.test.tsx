@@ -11,7 +11,7 @@ import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
 import { queries } from '@register/profile/queries'
-import { createStore, AppStore } from '@register/store'
+import { AppStore } from '@register/store'
 import {
   createTestComponent,
   mockUserResponseWithName,
