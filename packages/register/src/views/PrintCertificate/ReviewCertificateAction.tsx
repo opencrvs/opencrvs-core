@@ -8,7 +8,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
-  IApplication,
+  IPrintableApplication,
   IApplicationsState,
   modifyApplication,
   storeApplication,
@@ -92,7 +92,7 @@ type State = {
 type IProps = {
   event: Event
   registrationId: string
-  draft: IApplication
+  draft: IPrintableApplication
   userDetails: IUserDetails | null
   registerForm: IForm
   modifyApplication: typeof modifyApplication
@@ -142,8 +142,7 @@ class ReviewCertificateActionComponent extends React.Component<
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
 
-    const certificate = (draft.data.registration
-      .certificates as ICertificate[])[0]
+    const certificate = draft.data.registration.certificates[0]
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
@@ -267,27 +266,26 @@ const getEvent = (eventType: string | undefined) => {
 }
 
 const getDraft = (
-  drafts: IApplication[],
+  drafts: IPrintableApplication[],
   registrationId: string,
   eventType: string
 ) =>
-  drafts.find(draftItem => draftItem.id === registrationId) || {
+  drafts.find(draftItem => draftItem.id === registrationId) ||
+  ({
     id: '',
     data: {},
     event: getEvent(eventType)
-  }
+  } as IPrintableApplication)
 
 function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
   const { registrationId, eventType } = props.match.params
+  const applications = state.applicationsState
+    .applications as IPrintableApplication[]
 
-  const draft = getDraft(
-    state.applicationsState.applications,
-    registrationId,
-    eventType
-  )
+  const draft = getDraft(applications, registrationId, eventType)
   const event = getEvent(draft.event)
 
   return {
