@@ -2571,6 +2571,19 @@ export const mockOfflineData = {
   ).data
 }
 
+export async function createTestStore() {
+  const { store, history } = createStore()
+  await store.dispatch(
+    offlineDataReady({
+      languages: mockOfflineData.languages,
+      forms: mockOfflineData.forms,
+      locations: mockOfflineData.locations,
+      facilities: mockOfflineData.facilities
+    })
+  )
+  return { store, history }
+}
+
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   store: AppStore,
