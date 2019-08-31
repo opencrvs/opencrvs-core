@@ -58,17 +58,14 @@ console.debug = debug
 
 const log = console.log.bind(console)
 
-const BLOCKED_MESSAGES = [
-  'Warning: Setting up fake worker.'
-]
+const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
 
 console.log = jest.fn().mockImplementation((...messages) => {
-  if(BLOCKED_MESSAGES.includes(messages.join(' '))) {
+  if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
     return
   }
   log(...messages)
 })
-
 
 /*
  * GraphQL Queries

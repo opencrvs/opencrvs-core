@@ -11,7 +11,7 @@ import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
 import { queries } from '@register/profile/queries'
-import { createStore } from '@register/store'
+import { createStore, AppStore } from '@register/store'
 import {
   createTestComponent,
   mockUserResponseWithName,
@@ -21,6 +21,7 @@ import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/death/queries'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@register/views/RegisterForm/ReviewForm'
+import { History } from 'history'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -33,12 +34,17 @@ const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
-  const { store, history } = createStore()
+  let store: AppStore
+  let history: History
+
   const scope = ['register']
   const mock: any = jest.fn()
   let form: IForm
 
   beforeAll(async () => {
+    const testStore = createStore()
+    store = testStore.store
+    history = testStore.history
     form = await getReviewFormFromStore(store, Event.BIRTH)
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -92,8 +98,6 @@ describe('ReviewForm tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while fetching birth registration')
-
-    testComponent.component.unmount()
   })
   it('it returns birth registration', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -273,8 +277,6 @@ describe('ReviewForm tests', () => {
       birthType: 'SINGLE',
       weightAtBirth: 2
     })
-
-    testComponent.component.unmount()
   })
   it('Shared contact phone number should be set properly', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -412,7 +414,6 @@ describe('ReviewForm tests', () => {
       .prop('application') as IApplication
 
     expect(data.data.registration.registrationPhone).toBe('01733333333')
-    testComponent.component.unmount()
   })
   it('when registration has attachment', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -522,8 +523,6 @@ describe('ReviewForm tests', () => {
         data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQECWAJYAAD'
       }
     ])
-
-    testComponent.component.unmount()
   })
   it('check registration', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -680,8 +679,6 @@ describe('ReviewForm tests', () => {
       trackingId: 'B123456',
       type: 'birth'
     })
-
-    testComponent.component.unmount()
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -708,7 +705,8 @@ describe('ReviewForm tests', () => {
       getStorageApplicationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application]
+          drafts: [application],
+          applications: []
         })
       )
     )
@@ -766,8 +764,6 @@ describe('ReviewForm tests', () => {
         type: 'BIRTH'
       }
     })
-
-    testComponent.component.unmount()
   })
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
@@ -1015,8 +1011,6 @@ describe('ReviewForm tests', () => {
         postCode: '12',
         _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
       })
-
-      testComponent.component.unmount()
     })
     it('populates proper casue of death section', async () => {
       const application = createReviewApplication(uuid(), {}, Event.DEATH)
@@ -1233,8 +1227,6 @@ describe('ReviewForm tests', () => {
         causeOfDeathCode: '123',
         methodOfCauseOfDeath: 'Natural'
       })
-
-      testComponent.component.unmount()
     })
   })
   describe('ReviewForm tests for register scope', () => {
@@ -1320,8 +1312,6 @@ describe('ReviewForm tests', () => {
           .children()
           .text()
       ).toBe('We are unable to display this page to you')
-
-      testComponent.component.unmount()
     })
   })
 })
