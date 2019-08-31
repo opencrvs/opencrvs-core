@@ -59,7 +59,7 @@ function checkIfDone(
 
   if (
     isOfflineDataLoaded(newState.offlineData) &&
-    (!newState.offlineDataLoaded ||
+    (!oldState.offlineDataLoaded ||
       oldState.offlineData !== newState.offlineData)
   ) {
     return loop(
@@ -233,6 +233,7 @@ function reducer(
         offlineData: action.payload
       }
     }
+
     default:
       return state
   }
@@ -242,5 +243,9 @@ export function offlineDataReducer(
   state: IOfflineDataState | undefined = initialState,
   action: actions.Action
 ): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
-  return checkIfDone(state, reducer(state, action))
+  const newState = reducer(state, action)
+  if (action.type !== actions.READY) {
+    return checkIfDone(state, newState)
+  }
+  return newState
 }

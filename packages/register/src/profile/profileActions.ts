@@ -73,10 +73,12 @@ export const setInitialUserDetails = (): ISetInitialUserDetails => ({
 
 export const getStorageUserDetailsSuccess = (
   response: string
-): IGetStorageUserDetailsSuccessAction => ({
-  type: GET_USER_DETAILS_SUCCESS,
-  payload: response
-})
+): IGetStorageUserDetailsSuccessAction => {
+  return {
+    type: GET_USER_DETAILS_SUCCESS,
+    payload: response
+  }
+}
 
 export const getStorageUserDetailsFailed = (): IGetStorageUserDetailsFailedAction => ({
   type: GET_USER_DETAILS_FAILED
