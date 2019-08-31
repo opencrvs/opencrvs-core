@@ -22,8 +22,7 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup,
-  IFormFieldValue
+  IFormSectionGroup
 } from '@register/forms'
 import {
   certCollectorGroupForBirthAppWithFatherDetails,

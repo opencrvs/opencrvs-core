@@ -1,7 +1,6 @@
 import {
   createTestApp,
   mockOfflineData,
-  assign,
   validToken,
   getItem,
   flushPromises,

@@ -901,11 +901,3 @@ export interface ICertificate {
   payments?: Payment[]
   data?: string
 }
-
-export interface IAttachment {
-  data: string
-  optionValues: string[]
-  type: string
-  title?: string
-  description?: string
-}

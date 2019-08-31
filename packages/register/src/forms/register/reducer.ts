@@ -1,5 +1,5 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, Section, BirthSection, DeathSection } from '@register/forms'
+import { IForm, BirthSection, DeathSection } from '@register/forms'
 import * as offlineActions from '@register/offline/actions'
 import { deserializeForm } from '@register/forms/mappings/deserializer'
 
