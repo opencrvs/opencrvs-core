@@ -152,8 +152,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
   it('renders error text when an error occurs', async () => {
     const graphqlMock = [
@@ -185,20 +183,11 @@ describe('RegistrarHome ready to print tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-
-    expect(
-      testComponent.component
-        .find('#search-result-error-text-print')
-        .children()
-        .text()
-    ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
+    const element = await waitForElement(
+      testComponent.component,
+      '#search-result-error-text-print'
+    )
+    expect(element.children().text()).toBe('An error occurred while searching')
   })
 
   it('check ready to print applications count', async () => {
@@ -240,19 +229,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
       graphqlMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_print')
-        .hostNodes()
-        .text()
-    ).toContain('Ready to print (7)')
+    const element = await waitForElement(testComponent.component, '#tab_print')
+    expect(element.hostNodes().text()).toContain('Ready to print (7)')
   })
 
   it('renders all items returned from graphql query in ready for print', async () => {
@@ -351,12 +329,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const element = await waitForElement(testComponent.component, GridTable)
+    const data = element.prop('content')
     const EXPECTED_DATE_OF_APPLICATION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
@@ -368,8 +342,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
-
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -418,7 +390,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar if items are more than 11 in ready for print tab', async () => {
@@ -455,22 +426,15 @@ describe('RegistrarHome ready to print tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
+    const element = await waitForElement(testComponent.component, '#pagination')
 
-    expect(
-      testComponent.component.find('#pagination').hostNodes()
-    ).toHaveLength(1)
+    expect(element.hostNodes()).toHaveLength(1)
 
     testComponent.component
       .find('#pagination button')
       .last()
       .hostNodes()
       .simulate('click')
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for ready to print', async () => {
@@ -662,7 +626,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     expect(
       testComponent.component.find('#REGISTERED-0').hostNodes().length
     ).toBe(1)
-    testComponent.component.unmount()
   })
 
   it('expanded block renders error text when an error occurs', async () => {
@@ -910,7 +873,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     expect(history.location.pathname).toContain(
       '/cert/collector/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })
 
@@ -1058,7 +1020,5 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-
-    testComponent.component.unmount()
   })
 })

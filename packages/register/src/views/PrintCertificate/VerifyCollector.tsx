@@ -1,6 +1,9 @@
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { IApplication, modifyApplication } from '@register/applications'
-import { Event, ICertificate } from '@register/forms'
+import {
+  IPrintableApplication,
+  modifyApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
 import {
   goBack,
@@ -22,7 +25,7 @@ interface IMatchParams {
 }
 
 interface IStateProps {
-  application: IApplication
+  application: IPrintableApplication
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -55,23 +58,17 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
   handleNegativeVerification = () => {
     const { application } = this.props
-    const certificates =
-      (application &&
-        (application.data.registration.certificates as ICertificate[])) ||
-      null
-    const certificate: ICertificate = (certificates && certificates[0]) || {}
+    const certificates = application.data.registration.certificates
+
+    const certificate = (certificates && certificates[0]) || {}
+
     this.props.modifyApplication({
       ...application,
       data: {
         ...application.data,
         registration: {
           ...application.data.registration,
-          certificates: [
-            {
-              ...certificate,
-              hasShowedVerifiedDocument: true
-            }
-          ]
+          certificates: [{ ...certificate, hasShowedVerifiedDocument: true }]
         }
       }
     })
@@ -115,7 +112,7 @@ const mapStateToProps = (
 
   const application = state.applicationsState.applications.find(
     draft => draft.id === registrationId
-  ) as IApplication
+  ) as IPrintableApplication
 
   return {
     application

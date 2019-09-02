@@ -69,8 +69,6 @@ describe('RegistrationHome In Progress tab related tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
 
   it('renders page with four tabs', async () => {
@@ -140,7 +138,6 @@ describe('RegistrationHome In Progress tab related tests', () => {
       .find('#tab_print')
       .hostNodes()
       .simulate('click')
-    testComponent.component.unmount()
   })
 
   it('renders in progress tab with total count of local and remote drafts', async () => {
@@ -201,6 +198,5 @@ describe('RegistrationHome In Progress tab related tests', () => {
         .hostNodes()
         .text()
     ).toContain('In progress (5)')
-    testComponent.component.unmount()
   })
 })

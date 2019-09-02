@@ -175,7 +175,5 @@ describe('Create new user page tests', () => {
     component.update()
 
     expect(component.find('#office-search-modal').hostNodes().length).toBe(1)
-
-    component.unmount()
   })
 })

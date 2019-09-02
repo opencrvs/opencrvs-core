@@ -18,6 +18,7 @@ import * as labels from './mappings/label'
 import * as types from './mappings/type'
 import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/register/src/utils/validate'
+import { ICertificate } from '@register/applications'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -146,10 +147,17 @@ export type IFormFieldValue =
   | string[]
   | number
   | boolean
-  | IFileValue[]
-  | { [key: string]: string }
+  | Date
+  | ICertificate
+  | IFileValue
   | IAttachmentValue
-  | ICertificate[]
+  | FieldValueArray
+  | FieldValueMap
+
+interface FieldValueArray extends Array<IFormFieldValue> {}
+interface FieldValueMap {
+  [key: string]: IFormFieldValue
+}
 
 export interface IFileValue {
   optionValues: IFormFieldValue[]
@@ -269,6 +277,13 @@ export type SerializedFormField = UnionOmit<
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
   }
+}
+export interface IAttachment {
+  data: string
+  optionValues: string[]
+  type: string
+  title?: string
+  description?: string
 }
 
 export interface IFormFieldBase {
@@ -895,12 +910,4 @@ export interface ICertificate {
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
   data?: string
-}
-
-export interface IAttachment {
-  data: string
-  optionValues: string[]
-  type: string
-  title?: string
-  description?: string
 }
