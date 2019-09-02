@@ -2336,13 +2336,9 @@ export const mockDeathRegistrationSectionData = {
 }
 
 export const mockOfflineData = {
-  forms: {
-    registerForm: JSON.parse(
-      require('fs')
-        .readFileSync('../resources/src/bgd/features/forms/register.json')
-        .toString()
-    ) as { birth: ISerializedForm; death: ISerializedForm }
-  },
+  forms: JSON.parse(
+    readFileSync('../resources/src/bgd/features/forms/register.json').toString()
+  ) as { registerForm: { birth: ISerializedForm; death: ISerializedForm } },
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -2570,11 +2566,9 @@ export const mockOfflineData = {
     }
   },
   languages: JSON.parse(
-    require('fs')
-      .readFileSync(
-        '../resources/src/bgd/features/languages/generated/register.json'
-      )
-      .toString()
+    readFileSync(
+      '../resources/src/bgd/features/languages/generated/register.json'
+    ).toString()
   ).data
 }
 
@@ -2616,9 +2610,7 @@ export async function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider
-            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-          >
+          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
             {node}
           </ThemeProvider>
         </I18nContainer>

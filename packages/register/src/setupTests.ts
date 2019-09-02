@@ -58,17 +58,14 @@ console.debug = debug
 
 const log = console.log.bind(console)
 
-const BLOCKED_MESSAGES = [
-  'Warning: Setting up fake worker.'
-]
+const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
 
 console.log = jest.fn().mockImplementation((...messages) => {
-  if(BLOCKED_MESSAGES.includes(messages.join(' '))) {
+  if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
     return
   }
   log(...messages)
 })
-
 
 /*
  * GraphQL Queries
@@ -95,7 +92,7 @@ const navigatorMock = {
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
-  RESOURCES_URL: 'http://localhost:3040/',
+  RESOURCES_URL: 'http://localhost:3040/bgd',
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
@@ -122,8 +119,11 @@ jest.mock('@register/utils/referenceApi', (): {
   referenceApi: {
     loadLocations: () => Promise.resolve(mockOfflineData.locations),
     loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-    loadLanguages: () => Promise.resolve(mockOfflineData.languages),
-    loadForms: () => Promise.resolve(mockOfflineData.forms.registerForm)
+    loadDefinitions: () =>
+      Promise.resolve({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms
+      })
   }
 }))
 
