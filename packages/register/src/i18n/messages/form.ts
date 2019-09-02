@@ -1480,7 +1480,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.print.otherPersonPrompt'
   },
   proofOfBirthPlaceAndDate: {
-    defaultMessage: 'Proof of Place and Date of Birth of Child',
+    defaultMessage: 'Proof of place and date of birth of child',
     description: 'Label for list item Child Birth Proof',
     id: 'form.field.label.proofOfBirthPlaceAndDate'
   },
