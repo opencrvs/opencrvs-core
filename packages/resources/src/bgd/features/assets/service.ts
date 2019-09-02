@@ -7,5 +7,5 @@ export function getAssest(file: string) {
 }
 
 export function getAssestMimeType(file: string) {
-  return lookup(join(__dirname, `./files/${file}`))
+  return lookup(join(__dirname, `./files/${file}`)) as string
 }

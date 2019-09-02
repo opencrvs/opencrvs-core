@@ -9,6 +9,6 @@ export async function assetHandler(
   h: Hapi.ResponseToolkit
 ) {
   const response = h.response(getAssest(request.params.file))
-  response.type(getAssestMimeType(request.params.file) as string)
+  response.type(getAssestMimeType(request.params.file))
   return response
 }
