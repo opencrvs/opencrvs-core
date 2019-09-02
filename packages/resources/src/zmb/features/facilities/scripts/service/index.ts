@@ -74,6 +74,14 @@ export function generateLocationResource(
   return loc
 }
 
+function getPartOfIdForFacility(facility: IFacility): string {
+  if (facility.code === 'HEALTH_FACILITY') {
+    return facility.partOf.split('/')[1]
+  } else {
+    return facility.statisticalID
+  }
+}
+
 export async function composeAndSaveFacilities(
   facilities: IFacility[],
   parentLocations: fhir.Location[]
@@ -82,7 +90,7 @@ export async function composeAndSaveFacilities(
   for (const facility of facilities) {
     const parentLocationID = getLocationIDByDescription(
       parentLocations,
-      facility.statisticalID
+      getPartOfIdForFacility(facility)
     )
     const newLocation: fhir.Location = composeFhirLocation(
       facility,

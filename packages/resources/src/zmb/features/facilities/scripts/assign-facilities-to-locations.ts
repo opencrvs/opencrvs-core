@@ -12,6 +12,7 @@ import {
 import { ILocation } from '@resources/zmb/features/utils'
 
 const crvsOfficeSourceJSON = `${FACILITIES_SOURCE}generated/crvs-facilities.json`
+const healthFacilitySourceJSON = `${FACILITIES_SOURCE}generated/health-facilities.json`
 
 const districts = JSON.parse(
   fs
@@ -21,8 +22,12 @@ const districts = JSON.parse(
 
 export default async function importFacilities() {
   let crvsOfficeLocations: fhir.Location[]
+  let healthFacilityLocations: fhir.Location[]
   const crvsOffices = JSON.parse(
     fs.readFileSync(crvsOfficeSourceJSON).toString()
+  )
+  const healthFacilities = JSON.parse(
+    fs.readFileSync(healthFacilitySourceJSON).toString()
   )
   try {
     // tslint:disable-next-line:no-console
@@ -35,9 +40,14 @@ export default async function importFacilities() {
       crvsOffices,
       districts.districts
     )
+    healthFacilityLocations = await composeAndSaveFacilities(
+      healthFacilities,
+      districts.districts
+    )
 
     const fhirLocations: fhir.Location[] = []
     fhirLocations.push(...crvsOfficeLocations)
+    fhirLocations.push(...healthFacilityLocations)
     const data: ILocation[] = []
     for (const location of fhirLocations) {
       data.push(generateLocationResource(location))
