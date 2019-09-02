@@ -19379,7 +19379,7 @@
                   {
                     "value": "National ID (front)",
                     "label": {
-                      "defaultMessage": "National ID (front)",
+                      "defaultMessage": "National ID (Front)",
                       "description": "Label for select option radio option NID front",
                       "id": "form.field.label.docTypeNIDFront"
                     }
@@ -19387,7 +19387,7 @@
                   {
                     "value": "National ID (back)",
                     "label": {
-                      "defaultMessage": "National ID (back)",
+                      "defaultMessage": "National ID (Back)",
                       "description": "Label for select option radio option NID back",
                       "id": "form.field.label.docTypeNIDBack"
                     }
@@ -19450,7 +19450,7 @@
                   {
                     "value": "National ID (front)",
                     "label": {
-                      "defaultMessage": "National ID (front)",
+                      "defaultMessage": "National ID (Front)",
                       "description": "Label for select option radio option NID front",
                       "id": "form.field.label.docTypeNIDFront"
                     }
@@ -19458,7 +19458,7 @@
                   {
                     "value": "National ID (back)",
                     "label": {
-                      "defaultMessage": "National ID (back)",
+                      "defaultMessage": "National ID (Back)",
                       "description": "Label for select option radio option NID back",
                       "id": "form.field.label.docTypeNIDBack"
                     }
@@ -41168,9 +41168,9 @@
                 "name": "paragraph",
                 "type": "PARAGRAPH",
                 "label": {
-                  "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                  "defaultMessage": "For a death registration the following documents are required:",
                   "description": "Documents Paragraph text",
-                  "id": "form.section.documents.birth.requirements"
+                  "id": "form.field.label.deceasedDocumentParagraph"
                 },
                 "initialValue": "",
                 "validate": []
@@ -41179,7 +41179,7 @@
                 "name": "uploadDocForDeceased",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Deceased's ID",
+                  "defaultMessage": "Proof of deceased's ID",
                   "description": "Option for radio group field: Type of Document To Upload",
                   "id": "form.field.label.deceasedIDProof"
                 },
@@ -41191,7 +41191,7 @@
                   {
                     "value": "National ID (front)",
                     "label": {
-                      "defaultMessage": "National ID (front)",
+                      "defaultMessage": "National ID (Front)",
                       "description": "Label for select option radio option NID front",
                       "id": "form.field.label.docTypeNIDFront"
                     }
@@ -41199,7 +41199,7 @@
                   {
                     "value": "National ID (back)",
                     "label": {
-                      "defaultMessage": "National ID (back)",
+                      "defaultMessage": "National ID (Back)",
                       "description": "Label for select option radio option NID back",
                       "id": "form.field.label.docTypeNIDBack"
                     }
@@ -41207,7 +41207,7 @@
                   {
                     "value": "Birth Registration",
                     "label": {
-                      "defaultMessage": "Birth Registration",
+                      "defaultMessage": "Birth registration certificate",
                       "description": "Label for select option Birth Registration",
                       "id": "form.field.label.docTypeBR"
                     }
@@ -41234,7 +41234,7 @@
                 "name": "uploadDocForApplicant",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Applicant's ID",
+                  "defaultMessage": "Proof of applicant ID",
                   "description": "Option for radio group field: Type of Document To Upload",
                   "id": "form.field.label.applicantIDProof"
                 },
@@ -41246,7 +41246,7 @@
                   {
                     "value": "National ID (front)",
                     "label": {
-                      "defaultMessage": "National ID (front)",
+                      "defaultMessage": "National ID (Front)",
                       "description": "Label for select option radio option NID front",
                       "id": "form.field.label.docTypeNIDFront"
                     }
@@ -41254,7 +41254,7 @@
                   {
                     "value": "National ID (back)",
                     "label": {
-                      "defaultMessage": "National ID (back)",
+                      "defaultMessage": "National ID (Back)",
                       "description": "Label for select option radio option NID back",
                       "id": "form.field.label.docTypeNIDBack"
                     }
@@ -41262,7 +41262,7 @@
                   {
                     "value": "Birth Registration",
                     "label": {
-                      "defaultMessage": "Birth Registration",
+                      "defaultMessage": "Birth registration certificate",
                       "description": "Label for select option Birth Registration",
                       "id": "form.field.label.docTypeBR"
                     }
@@ -41289,7 +41289,7 @@
                 "name": "uploadDocForDeceasedDeath",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Death of Deceased",
+                  "defaultMessage": "Proof of death of deceased",
                   "description": "Option for radio group field: Type of Document To Upload",
                   "id": "form.field.label.deceasedDeathProof"
                 },
@@ -41301,7 +41301,7 @@
                   {
                     "value": "Certified Post Mortem Report",
                     "label": {
-                      "defaultMessage": "Certified Post Mortem Report",
+                      "defaultMessage": "Certified post mortem report",
                       "description": "Label for select option Post Mortem Report",
                       "id": "form.field.label.docTypePostMortemReport"
                     }
@@ -41309,7 +41309,7 @@
                   {
                     "value": "Hospital Discharge Certificate",
                     "label": {
-                      "defaultMessage": "Hospital Discharge Certificate",
+                      "defaultMessage": "Hospital discharge certificate",
                       "description": "Label for select option Hospital Discharge Certificate",
                       "id": "form.field.label.docTypeHospitalDischargeCertificate"
                     }
@@ -41317,7 +41317,7 @@
                   {
                     "value": "Attested Letter of Death",
                     "label": {
-                      "defaultMessage": "Attested Letter of Death",
+                      "defaultMessage": "Attested letter of death",
                       "description": "Label for select option Attested Letter of Death",
                       "id": "form.field.label.docTypeLetterOfDeath"
                     }
@@ -41325,7 +41325,7 @@
                   {
                     "value": "Attested Certificate of Death",
                     "label": {
-                      "defaultMessage": "Attested Certificate of Death",
+                      "defaultMessage": "Attested certificate of death",
                       "description": "Label for select option Attested Certificate of Death",
                       "id": "form.field.label.docTypeDeathCertificate"
                     }
@@ -41333,7 +41333,7 @@
                   {
                     "value": "Certified Copy of Burial Receipt",
                     "label": {
-                      "defaultMessage": "Certified Copy of Burial Receipt",
+                      "defaultMessage": "Certified copy of burial receipt",
                       "description": "Label for select option Certified Copy of Burial Receipt",
                       "id": "form.field.label.docTypeCopyOfBurialReceipt"
                     }
@@ -41341,7 +41341,7 @@
                   {
                     "value": "Certified Copy of Funeral Receipt",
                     "label": {
-                      "defaultMessage": "Certified Copy of Funeral Receipt",
+                      "defaultMessage": "Certified copy of funeral receipt",
                       "description": "Label for select option Certified Copy of Funeral Receipt",
                       "id": "form.field.label.docTypeFuneralReceipt"
                     }
@@ -41360,7 +41360,7 @@
                 "name": "uploadDocForDeceasedPermanentAddress",
                 "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                 "label": {
-                  "defaultMessage": "Proof of Permanent Address of Deceased",
+                  "defaultMessage": "Proof of permanent address of deceased",
                   "description": "Option for radio group field: Type of Document To Upload",
                   "id": "form.field.label.deceasedPermanentAddressProof"
                 },
@@ -41372,7 +41372,7 @@
                   {
                     "value": "National ID (front)",
                     "label": {
-                      "defaultMessage": "National ID (front)",
+                      "defaultMessage": "National ID (Front)",
                       "description": "Label for select option radio option NID front",
                       "id": "form.field.label.docTypeNIDFront"
                     }
@@ -41380,7 +41380,7 @@
                   {
                     "value": "National ID (back)",
                     "label": {
-                      "defaultMessage": "National ID (back)",
+                      "defaultMessage": "National ID (Back)",
                       "description": "Label for select option radio option NID back",
                       "id": "form.field.label.docTypeNIDBack"
                     }
@@ -41388,7 +41388,7 @@
                   {
                     "value": "Birth Registration",
                     "label": {
-                      "defaultMessage": "Birth Registration",
+                      "defaultMessage": "Birth registration certificate",
                       "description": "Label for select option Birth Registration",
                       "id": "form.field.label.docTypeBR"
                     }

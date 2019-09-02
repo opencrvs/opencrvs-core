@@ -779,7 +779,7 @@ const messagesToDefine: IFormMessages = {
   },
   deceasedParagraph: {
     defaultMessage:
-      'For this death registration, the following documents are required:',
+      'For a death registration the following documents are required:',
     description: 'Documents Paragraph text',
     id: 'form.field.label.deceasedDocumentParagraph'
   },
@@ -839,7 +839,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deny'
   },
   dischargeCertificate: {
-    defaultMessage: 'Discharge Certificate',
+    defaultMessage: 'Discharge certificate',
     description: 'Document type label for Discharge Certificate',
     id: 'form.field.label.docTypeHospitalDischargeCertificate'
   },
@@ -879,12 +879,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeDeathCertificate'
   },
   docTypeDoctorCertificate: {
-    defaultMessage: 'Doctor certificate',
+    defaultMessage: "Doctor's certificate",
     description: 'Label for select option Doctor Certificate',
     id: 'form.field.label.docTypeDoctorCertificate'
   },
   docTypeEPICard: {
-    defaultMessage: 'EPI Card',
+    defaultMessage: 'EPI card',
     description: 'Label for select option EPI Card',
     id: 'form.field.label.docTypeEPICard'
   },
@@ -909,12 +909,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeLetterOfDeath'
   },
   docTypeNIDBack: {
-    defaultMessage: 'National ID (back)',
+    defaultMessage: 'National ID (Back)',
     description: 'Label for select option radio option NID back',
     id: 'form.field.label.docTypeNIDBack'
   },
   docTypeNIDFront: {
-    defaultMessage: 'National ID (front)',
+    defaultMessage: 'National ID (Front)',
     description: 'Label for select option radio option NID front',
     id: 'form.field.label.docTypeNIDFront'
   },
