@@ -20,6 +20,8 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
 import { calculatePrice, getEventDate, getServiceMessage } from './utils'
+import { IOfflineData } from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -76,6 +78,7 @@ interface IProps {
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   userDetails: IUserDetails | null
+  resources: IOfflineData
 }
 
 type IFullProps = IProps & IntlShapeProps
@@ -154,7 +157,8 @@ class PaymentComponent extends React.Component<IFullProps> {
                 printMoneyReceipt(
                   this.props.intl,
                   this.props.application,
-                  this.props.userDetails
+                  this.props.userDetails,
+                  this.props.resources
                 )
               }
             >
@@ -204,7 +208,8 @@ function mapStatetoProps(
     registrationId,
     language: state.i18n.language,
     application,
-    userDetails: getUserDetails(state)
+    userDetails: getUserDetails(state),
+    resources: getOfflineData(state)
   }
 }
 
