@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
@@ -75,10 +75,11 @@ interface IUserSetupPageProp {
   ) => void
 }
 export class UserSetupView extends React.Component<
-  IUserSetupPageProp & InjectedIntlProps
+  IUserSetupPageProp & IntlShapeProps
 > {
   render() {
     const { intl, userDetails, goToStep } = this.props
+
     return (
       <Page>
         <Container id="user-setup-landing-page">

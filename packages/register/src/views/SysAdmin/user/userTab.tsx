@@ -17,7 +17,7 @@ import { createNamesMap } from '@register/utils/data-formatting'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { UserStatus } from './utils'
 import { goToCreateNewUser } from '@register/navigation'
@@ -87,7 +87,7 @@ const Status = (statusProps: IStatusProps) => {
   }
 }
 
-interface IProps extends InjectedIntlProps {
+interface IProps extends IntlShapeProps {
   goToCreateNewUser: typeof goToCreateNewUser
 }
 

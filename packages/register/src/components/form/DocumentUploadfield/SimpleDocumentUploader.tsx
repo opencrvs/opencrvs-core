@@ -4,7 +4,7 @@ import { DocumentPreview } from '@register/components/form/DocumentUploadfield/D
 import { IFormFieldValue, IAttachmentValue } from '@register/forms'
 import * as Jimp from 'jimp'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import {
@@ -44,7 +44,7 @@ type IFullProps = {
   error?: string
   disableDeleteInPreview?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
-} & InjectedIntlProps
+} & IntlShapeProps
 
 type IState = {
   error: string
@@ -161,6 +161,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 }
 
-export const SimpleDocumentUploader = injectIntl<IFullProps>(
+export const SimpleDocumentUploader = injectIntl<'intl', IFullProps>(
   SimpleDocumentUploaderComponent
 )

@@ -20,6 +20,7 @@ import {
 } from '@register/views/RegistrationHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -126,15 +127,15 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('RegistrarHome ready to print tab related tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -167,7 +168,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -222,7 +223,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -340,7 +341,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
@@ -390,7 +391,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -444,7 +445,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
@@ -634,7 +635,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
@@ -757,7 +758,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -767,27 +768,18 @@ describe('RegistrarHome ready to print tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    const instance = testComponent.component.find(GridTable).instance() as any
+    const table = await waitForElement(testComponent.component, GridTable)
+
+    const instance = table.instance()
 
     instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
 
-    testComponent.component.update()
-    expect(
-      testComponent.component
-        .find('#search-result-error-text-expanded')
-        .children()
-        .text()
-    ).toBe('An error occurred while searching')
-    testComponent.component.unmount()
+    const element = await waitForElement(
+      testComponent.component,
+      '#search-result-error-text-expanded'
+    )
+
+    expect(element.children().text()).toBe('An error occurred while searching')
   })
 
   it('redirects to print form if print button is clicked', async () => {
@@ -893,7 +885,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,
@@ -903,23 +895,20 @@ describe('RegistrarHome ready to print tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    testComponent.component
-      .find('#ListItemAction-0-Print')
-      .hostNodes()
-      .simulate('click')
+    const listItem = await waitForElement(
+      testComponent.component,
+      '#ListItemAction-0-Print'
+    )
+
+    listItem.hostNodes().simulate('click')
 
     await new Promise(resolve => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
 
-    expect(window.location.href).toContain(
-      '/print/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+    expect(history.location.pathname).toContain(
+      '/cert/collector/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
     testComponent.component.unmount()
   })
@@ -1041,7 +1030,7 @@ describe('Tablet tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'print' } }} />,
       store,

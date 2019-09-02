@@ -13,7 +13,7 @@ describe('when user is selecting the vital event', () => {
   let history: History
 
   beforeEach(async () => {
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     app = testApp.app
     history = testApp.history
     await waitForReady(app)

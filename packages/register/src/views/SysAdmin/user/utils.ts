@@ -8,6 +8,7 @@ import {
 } from '@register/forms'
 import { userMessages } from '@register/i18n/messages'
 import { getRolesQuery } from './queries'
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
 
 export enum UserStatus {
   ACTIVE,
@@ -74,7 +75,7 @@ export const mockUserGraphqlOperation = {
   request: {
     query: createUserMutation,
     variables: draftToGqlTransformer(
-      { sections: [userSection] },
+      { sections: [deserializeFormSection(userSection)] },
       { user: mockCompleteFormData }
     )
   },

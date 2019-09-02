@@ -1,14 +1,14 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IHeaderMessages {
-  typeBrnDrn: ReactIntl.FormattedMessage.MessageDescriptor
-  typePhone: ReactIntl.FormattedMessage.MessageDescriptor
-  placeHolderTrackingId: ReactIntl.FormattedMessage.MessageDescriptor
-  placeHolderBrnDrn: ReactIntl.FormattedMessage.MessageDescriptor
-  placeHolderPhone: ReactIntl.FormattedMessage.MessageDescriptor
-  systemTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  settingsTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  helpTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  typeBrnDrn: MessageDescriptor
+  typePhone: MessageDescriptor
+  placeHolderTrackingId: MessageDescriptor
+  placeHolderBrnDrn: MessageDescriptor
+  placeHolderPhone: MessageDescriptor
+  systemTitle: MessageDescriptor
+  settingsTitle: MessageDescriptor
+  helpTitle: MessageDescriptor
 }
 
 const messagesToDefine: IHeaderMessages = {

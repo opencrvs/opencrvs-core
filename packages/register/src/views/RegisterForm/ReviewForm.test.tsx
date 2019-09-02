@@ -4,22 +4,27 @@ import {
   IApplication,
   storeApplication
 } from '@opencrvs/register/src/applications'
-import { Event } from '@opencrvs/register/src/forms'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+import { Event, IForm } from '@opencrvs/register/src/forms'
+
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/register/src/navigation/routes'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
 import { queries } from '@register/profile/queries'
-import { createStore } from '@register/store'
+import { AppStore } from '@register/store'
 import {
   createTestComponent,
-  mockUserResponseWithName
+  mockUserResponseWithName,
+  getReviewFormFromStore,
+  mockOfflineData,
+  createTestStore
 } from '@register/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/death/queries'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@register/views/RegisterForm/ReviewForm'
+import { offlineDataReady } from '@register/offline/actions'
+import { History } from 'history'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -32,12 +37,27 @@ const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
-  const { store, history } = createStore()
   const scope = ['register']
   const mock: any = jest.fn()
-  const form = getReviewForm(store.getState()).birth
+  let form: IForm
+  let store: AppStore
+  let history: History
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+
+    await store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities
+      })
+    )
+
+    form = await getReviewFormFromStore(store, Event.BIRTH)
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
@@ -53,7 +73,7 @@ describe('ReviewForm tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -215,7 +235,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -375,7 +395,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -476,7 +496,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -634,7 +654,7 @@ describe('ReviewForm tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -712,7 +732,7 @@ describe('ReviewForm tests', () => {
     )
     store.dispatch(storeApplication(application))
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -943,14 +963,14 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}
           scope={scope}
           staticContext={mock}
           event={application.event}
-          registerForm={getReviewForm(store.getState()).death}
+          registerForm={getReviewFormFromStore(store, Event.DEATH)}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
@@ -1191,14 +1211,15 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const form = await getReviewFormFromStore(store, Event.DEATH)
+      const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}
           scope={scope}
           staticContext={mock}
           event={application.event}
-          registerForm={getReviewForm(store.getState()).death}
+          registerForm={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
@@ -1281,7 +1302,7 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}

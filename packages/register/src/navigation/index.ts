@@ -9,6 +9,7 @@ import {
   DRAFT_DEATH_FORM,
   SELECT_VITAL_EVENT,
   REVIEW_DUPLICATES,
+  CERTIFICATE_COLLECTOR,
   REGISTRAR_HOME_TAB,
   FIELD_AGENT_HOME_TAB,
   SEARCH,
@@ -22,10 +23,11 @@ import {
   SELECT_DEATH_MAIN_CONTACT_POINT,
   VERIFY_COLLECTOR,
   REVIEW_CERTIFICATE,
-  PRINT_CERTIFICATE
+  PRINT_CERTIFICATE_PAYMENT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
+import { Event } from '@register/forms'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -192,20 +194,25 @@ export function goToReviewDuplicate(applicationId: string) {
   )
 }
 
-export function goToPrintCertificate(registrationId: string, event: string) {
+export function goToPrintCertificate(
+  registrationId: string,
+  event: string,
+  groupId?: string
+) {
   return push(
-    formatUrl(PRINT_CERTIFICATE, {
+    formatUrl(CERTIFICATE_COLLECTOR, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString()
+      eventType: event.toLowerCase().toString(),
+      groupId: groupId || 'certCollector'
     })
   )
 }
 
-export function goToReviewCertificate(registrationId: string, event: string) {
+export function goToReviewCertificate(registrationId: string, event: Event) {
   return push(
     formatUrl(REVIEW_CERTIFICATE, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString()
+      eventType: event
     })
   )
 }
@@ -220,6 +227,18 @@ export function goToVerifyCollector(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       collector: collector.toLowerCase().toString()
+    })
+  )
+}
+
+export function goToPrintCertificatePayment(
+  registrationId: string,
+  event: Event
+) {
+  return push(
+    formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+      registrationId: registrationId.toString(),
+      eventType: event
     })
   )
 }

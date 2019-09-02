@@ -1,49 +1,18 @@
-import {
-  createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
-  getItem,
-  flushPromises,
-  setItem
-} from '@register/tests/util'
+import { createTestApp } from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from '@register/offline/actions'
-import * as fetchAny from 'jest-fetch-mock'
-import { storage } from '@register/storage'
 import * as actions from '@register/notification/actions'
 import * as i18nActions from '@register/i18n/actions'
 import * as CommonUtils from '@register/utils/commonUtils'
-
-const fetch = fetchAny as any
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
-
-beforeEach(() => {
-  window.history.replaceState({}, '', '/')
-  assign.mockClear()
-})
 
 describe('when app notifies the user', () => {
   let app: ReactWrapper
   let store: Store
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     app = testApp.app
-    await flushPromises()
-    app.update()
     store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
   })
 
   describe('when appliation has new update', () => {
@@ -67,6 +36,7 @@ describe('when app notifies the user', () => {
       store.dispatch(action)
 
       const label = app
+        .update()
         .find('#newContentAvailableNotification')
         .hostNodes()
         .text()
@@ -111,6 +81,7 @@ describe('when app notifies the user', () => {
       store.dispatch(action)
 
       const label = app
+        .update()
         .find('#backgroundSyncShowNotification')
         .hostNodes()
         .text()

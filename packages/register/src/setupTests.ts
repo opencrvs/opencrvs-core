@@ -4,6 +4,11 @@ import { storage } from '@register/storage'
 import { IUserData } from './applications'
 import { noop } from 'lodash'
 import * as CommonUtils from '@register/utils/commonUtils'
+import { referenceApi } from './utils/referenceApi'
+
+if (process.env.CI) {
+  jest.setTimeout(30000)
+}
 
 /*
  * Initialize mocks
@@ -46,9 +51,21 @@ storage.setItem = storageSetItemMock
 const warn = jest.fn()
 const error = jest.fn()
 const debug = jest.fn()
+
 console.warn = warn
 console.error = error
 console.debug = debug
+
+const log = console.log.bind(console)
+
+const BLOCKED_MESSAGES = ['Warning: Setting up fake worker.']
+
+console.log = jest.fn().mockImplementation((...messages) => {
+  if (BLOCKED_MESSAGES.includes(messages.join(' '))) {
+    return
+  }
+  log(...messages)
+})
 
 /*
  * GraphQL Queries
@@ -96,20 +113,14 @@ const {
   assign
 } = require('./tests/util')
 
-jest.mock('@register/utils/referenceApi', () => ({
+jest.mock('@register/utils/referenceApi', (): {
+  referenceApi: typeof referenceApi
+} => ({
   referenceApi: {
     loadLocations: () => Promise.resolve(mockOfflineData.locations),
     loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-    loadLanguages: () =>
-      Promise.resolve(
-        JSON.parse(
-          require('fs')
-            .readFileSync(
-              '../resources/src/bgd/features/languages/generated/register.json'
-            )
-            .toString()
-        ).data
-      )
+    loadLanguages: () => Promise.resolve(mockOfflineData.languages),
+    loadForms: () => Promise.resolve(mockOfflineData.forms.registerForm)
   }
 }))
 

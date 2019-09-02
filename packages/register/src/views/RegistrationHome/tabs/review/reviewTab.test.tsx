@@ -9,7 +9,6 @@ import { waitForElement, waitFor } from '@register/tests/wait-for-element'
 
 import { queries } from '@register/profile/queries'
 import { merge } from 'lodash'
-import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import {
   RegistrationHome,
@@ -33,8 +32,6 @@ import { SUBMISSION_STATUS, storeApplication } from '@register/applications'
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 const getItem = window.localStorage.getItem as jest.Mock
-
-const mockFetchUserDetails = jest.fn()
 
 const nameObj = {
   data: {
@@ -128,17 +125,13 @@ for (let i = 0; i < 14; i++) {
   searchData.push(mockSearchData)
 }
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
 
 describe('RegistrationHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
   let history: ReturnType<typeof createStore>['history']
 
-  beforeAll(() => {
+  beforeEach(() => {
+    ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     const createdStore = createStore()
     store = createdStore.store
     history = createdStore.history
@@ -147,8 +140,8 @@ describe('RegistrationHome sent for review tab related tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -180,7 +173,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -226,7 +219,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -333,7 +326,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -456,7 +449,19 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const validateScopeToken = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    getItem.mockReturnValue(validateScopeToken)
+    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
+
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -472,17 +477,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
       store,
       graphqlMock
     )
-    const validateScopeToken = jwt.sign(
-      { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
 
     const gridTable = await waitForElement(testComponent.component, GridTable)
     const data = gridTable.prop('content')
@@ -519,7 +513,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -568,7 +562,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'review' } }} />,
       store,
@@ -762,7 +756,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'review' } }} />,
       store,
@@ -957,7 +951,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'review' } }} />,
       store,
@@ -1065,7 +1059,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome />,
       store,
@@ -1176,7 +1170,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome />,
       store,
@@ -1285,7 +1279,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome />,
       store,
@@ -1394,7 +1388,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     }
     store.dispatch(storeApplication(customDraft))
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -1442,7 +1436,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -1464,7 +1458,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       '#tab_review'
     )
 
-    expect(reviewTab.hostNodes().text()).toContain('Ready for review (11)')
+    expect(reviewTab.hostNodes().text()).toContain('Ready for review (12)')
   })
 })
 
@@ -1567,7 +1561,7 @@ describe('Tablet tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome />,
       store,

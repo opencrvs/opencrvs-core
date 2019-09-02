@@ -20,7 +20,7 @@ import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 
 const ExpansionContent = styled.div`
@@ -117,7 +117,7 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   theme: ITheme
   eventId: string
 }

@@ -86,9 +86,13 @@ export function getDeathMutationMappings(
     case Action.COLLECT_CERTIFICATE:
       return {
         mutation: COLLECT_DEATH_CERTIFICATE,
-        variables: {
-          ...payload
-        },
+        variables:
+          form && draft
+            ? {
+                id: draft.id,
+                details: draftToGqlTransformer(form, draft.data)
+              }
+            : {},
         dataKey: 'markDeathAsCertified'
       }
     default:

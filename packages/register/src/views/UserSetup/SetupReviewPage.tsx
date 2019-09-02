@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   ActionPageLight,
@@ -79,7 +79,7 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 
 class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {

@@ -1,4 +1,4 @@
-import { IForm, IFormData } from '@register/forms'
+import { IForm, IFormData, TransformedData } from '@register/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions
@@ -11,7 +11,7 @@ export const draftToGqlTransformer = (
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
-  const transformedData: any = { createdAt: new Date() }
+  const transformedData: TransformedData = { createdAt: new Date() }
   let inCompleteData = false
   formDefinition.sections.forEach(section => {
     if (!draftData[section.id]) {
@@ -86,6 +86,7 @@ export const draftToGqlTransformer = (
       transformedData.registration = { inProgress: true }
     }
   }
+
   return transformedData
 }
 

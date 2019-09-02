@@ -9,15 +9,16 @@ const { store } = createStore()
 describe('CreatePassword page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <CreatePassword goToStep={() => {}} setupData={{ userId: '123' }} />,
       store
     )
+
     component = testComponent.component
   })
 
-  it('it shows passwords missmatch error when Continue button is pressed', () => {
+  it('it shows passwords missmatch error when Continue button is pressed', async () => {
     component.find('input#NewPassword').simulate('change', {
       target: { id: 'NewPassword', value: '0crvsPassword' }
     })

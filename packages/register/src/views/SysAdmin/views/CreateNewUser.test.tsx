@@ -19,8 +19,8 @@ describe('create new user tests', () => {
   let testComponent: ReactWrapper
 
   describe('when user is in create new user form', () => {
-    beforeEach(() => {
-      testComponent = createTestComponent(
+    beforeEach(async () => {
+      testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
@@ -35,7 +35,7 @@ describe('create new user tests', () => {
         />,
         store,
         [mockFetchRoleGraphqlOperation]
-      ).component
+      )).component
     })
 
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
@@ -60,7 +60,7 @@ describe('create new user tests', () => {
           .find('#phoneNumber_error')
           .hostNodes()
           .text()
-      ).toBe('Required')
+      ).toBe('Required for registration')
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
@@ -101,9 +101,9 @@ describe('create new user tests', () => {
   })
 
   describe('when user in review page', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent = createTestComponent(
+      testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
@@ -118,7 +118,7 @@ describe('create new user tests', () => {
         />,
         store,
         [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
-      ).component
+      )).component
     })
 
     it('renders review header', () => {

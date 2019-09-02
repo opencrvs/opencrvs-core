@@ -43,7 +43,7 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { InProgressTab } from './tabs/inProgress/inProgressTab'
@@ -132,7 +132,7 @@ interface IRegistrationHomeState {
   showCertificateToast: boolean
 }
 
-type IRegistrationHomeProps = InjectedIntlProps &
+type IRegistrationHomeProps = IntlShapeProps &
   IViewHeadingProps &
   ISearchInputProps &
   IBaseRegistrationHomeProps

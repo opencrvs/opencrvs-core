@@ -1,29 +1,29 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IValidationMessages {
-  bengaliOnlyNameFormat: ReactIntl.FormattedMessage.MessageDescriptor
-  blockAlphaNumericDot: ReactIntl.FormattedMessage.MessageDescriptor
-  dateFormat: ReactIntl.FormattedMessage.MessageDescriptor
-  dobEarlierThanDom: ReactIntl.FormattedMessage.MessageDescriptor
-  domLaterThanDob: ReactIntl.FormattedMessage.MessageDescriptor
-  emailAddressFormat: ReactIntl.FormattedMessage.MessageDescriptor
-  englishOnlyNameFormat: ReactIntl.FormattedMessage.MessageDescriptor
-  greaterThanZero: ReactIntl.FormattedMessage.MessageDescriptor
-  isValidBirthDate: ReactIntl.FormattedMessage.MessageDescriptor
-  isValidDateOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
-  maxLength: ReactIntl.FormattedMessage.MessageDescriptor
-  minLength: ReactIntl.FormattedMessage.MessageDescriptor
-  numberRequired: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneNumberFormat: ReactIntl.FormattedMessage.MessageDescriptor
-  range: ReactIntl.FormattedMessage.MessageDescriptor
-  required: ReactIntl.FormattedMessage.MessageDescriptor
-  requiredSymbol: ReactIntl.FormattedMessage.MessageDescriptor
-  validBirthRegistrationNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  validDeathRegistrationNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  validNationalId: ReactIntl.FormattedMessage.MessageDescriptor
-  validPassportNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneNumberNotValid: ReactIntl.FormattedMessage.MessageDescriptor
-  validDrivingLicenseNumber: ReactIntl.FormattedMessage.MessageDescriptor
+  bengaliOnlyNameFormat: MessageDescriptor
+  blockAlphaNumericDot: MessageDescriptor
+  dateFormat: MessageDescriptor
+  dobEarlierThanDom: MessageDescriptor
+  domLaterThanDob: MessageDescriptor
+  emailAddressFormat: MessageDescriptor
+  englishOnlyNameFormat: MessageDescriptor
+  greaterThanZero: MessageDescriptor
+  isValidBirthDate: MessageDescriptor
+  isValidDateOfDeath: MessageDescriptor
+  maxLength: MessageDescriptor
+  minLength: MessageDescriptor
+  numberRequired: MessageDescriptor
+  phoneNumberFormat: MessageDescriptor
+  range: MessageDescriptor
+  required: MessageDescriptor
+  requiredSymbol: MessageDescriptor
+  validBirthRegistrationNumber: MessageDescriptor
+  validDeathRegistrationNumber: MessageDescriptor
+  validNationalId: MessageDescriptor
+  validPassportNumber: MessageDescriptor
+  phoneNumberNotValid: MessageDescriptor
+  validDrivingLicenseNumber: MessageDescriptor
 }
 
 const messagesToDefine: IValidationMessages = {
@@ -111,7 +111,7 @@ const messagesToDefine: IValidationMessages = {
   },
   phoneNumberFormat: {
     defaultMessage:
-      'Must be {num} digit valid mobile phone number that stars with {start}',
+      'Must be a valid {num} digit number that starts with {start}',
     description:
       'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11',
     id: 'validations.phoneNumberFormat'

@@ -11,7 +11,7 @@ const mockHandleClose = jest.fn()
 describe('when user is in the review page', () => {
   let editComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <EditConfirmation
         show={true}
         handleEdit={mockHandleEdit}

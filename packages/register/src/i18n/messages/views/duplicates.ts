@@ -1,12 +1,12 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IDuplicatesMessages {
-  notDuplicate: ReactIntl.FormattedMessage.MessageDescriptor
-  notDuplicateConfirmationTxt: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  duplicateFoundTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  duplicateFoundDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  possibleDuplicateFound: ReactIntl.FormattedMessage.MessageDescriptor
+  notDuplicate: MessageDescriptor
+  notDuplicateConfirmationTxt: MessageDescriptor
+  rejectDescription: MessageDescriptor
+  duplicateFoundTitle: MessageDescriptor
+  duplicateFoundDescription: MessageDescriptor
+  possibleDuplicateFound: MessageDescriptor
 }
 
 const messagesToDefine: IDuplicatesMessages = {

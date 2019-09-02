@@ -10,7 +10,7 @@ import {
   Delete
 } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { goToPage as goToPageAction } from '@register/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
@@ -38,7 +38,7 @@ export enum Action {
   CERTIFIED = 'CERTIFIED'
 }
 
-interface IProps {
+interface IProps extends IntlShapeProps {
   id: string
   duplicateContextId: string
   data: {
@@ -148,9 +148,7 @@ const ConditionalSeparator = styled(Separator)`
   }
 `
 
-class DuplicateDetailsClass extends React.Component<
-  IProps & InjectedIntlProps
-> {
+class DuplicateDetailsClass extends React.Component<IProps> {
   normalizeAction(action: string) {
     if (action === 'DECLARED') {
       return 'application'
@@ -345,4 +343,4 @@ export const DuplicateDetails = connect(
   {
     goToPage: goToPageAction
   }
-)(injectIntl<IProps>(DuplicateDetailsClass))
+)(injectIntl<'intl', IProps>(DuplicateDetailsClass))

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getLanguage } from '@register/i18n/selectors'
@@ -99,7 +99,7 @@ interface ILocation {
   detailedLocation: string
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 class SearchFieldClass extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
@@ -161,17 +161,17 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     )
     const locations: ILocation[] = [
       {
-        id: 'a6473e18-f5ec-467e-9a33-a6a6754c7ee7',
+        id: '54538456-fcf6-4276-86ac-122a7eb47703',
         name: 'Moktarpur Union Parishad',
         detailedLocation: 'Moktarpur, Kaliganj, Gazipur, Dhaka'
       },
       {
-        id: '51993c23-560b-465b-a7ad-5fd7b9f9fd5a',
+        id: '7218ed8f-3b07-43ee-b764-bf3843056ba2',
         name: 'Amdia Union Parishad',
         detailedLocation: 'Amdia, Narsingdi Sadar, Narsingdi, Dhaka'
       },
       {
-        id: 'ae6f88e7-0cad-4d61-8ebe-c8129eef9c19',
+        id: '8dbeb9f3-a783-47ec-9d91-408ca7c75cf5',
         name: 'Bhurungamari Union Parishad',
         detailedLocation: 'Bhurungamari, Bhurungamari, Kurigram, Rangpur'
       }

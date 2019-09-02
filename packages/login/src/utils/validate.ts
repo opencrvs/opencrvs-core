@@ -1,14 +1,14 @@
-import { defineMessages, FormattedMessage, MessageValue } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 export interface IValidationResult {
-  message: FormattedMessage.MessageDescriptor
-  props?: { [key: string]: MessageValue }
+  message: MessageDescriptor
+  props?: { [key: string]: any }
 }
 
 export type Validation = (value: string) => IValidationResult | undefined
 
 export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   required: {
     id: 'validations.required',

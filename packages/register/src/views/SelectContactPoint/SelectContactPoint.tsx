@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -34,16 +38,24 @@ import {
   RADIO_BUTTON_LARGE_STRING
 } from '@register/utils/constants'
 import { phoneNumberFormat } from '@register/utils/validate'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+
 import { IInformantField } from '@register/views/SelectInformant/SelectInformant'
-import { Event } from '@register/forms'
+import {
+  Event,
+  IFormSection,
+  BirthSection,
+  DeathSection
+} from '@register/forms'
 import { messages } from '@register/i18n/messages/views/selectContactPoint'
 import {
   formMessages,
   constantsMessages,
   buttonMessages
 } from '@register/i18n/messages'
+import {
+  getDeathSection,
+  getBirthSection
+} from '@register/forms/register/application-selectors'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -80,7 +92,7 @@ enum ContactPoint {
 }
 
 const setContactPointFields = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   event: string
 ): IInformantField[] => {
   if (event === Event.BIRTH) {
@@ -184,22 +196,33 @@ interface IMatchProps {
   applicationId: string
 }
 
-type IProps = InjectedIntlProps &
-  RouteComponentProps<IMatchProps> & {
-    language: string
-    application: IApplication
-    modifyApplication: typeof modifyApplication
-    writeApplication: typeof writeApplication
-    goBack: typeof goBackAction
-    goToHome: typeof goToHomeAction
-    storeApplication: typeof storeApplication
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    setInitialApplications: typeof setInitialApplications
-    goToDeathRegistration: typeof goToDeathRegistration
-  }
-class SelectContactPointView extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+interface IStateProps {
+  language: string
+  application: IApplication
+  registrationSection: IFormSection
+  applicantsSection: IFormSection
+}
+
+interface IProps {
+  modifyApplication: typeof modifyApplication
+  writeApplication: typeof writeApplication
+  goBack: typeof goBackAction
+  goToHome: typeof goToHomeAction
+  storeApplication: typeof storeApplication
+  goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
+  setInitialApplications: typeof setInitialApplications
+  goToDeathRegistration: typeof goToDeathRegistration
+}
+
+type IFullProps = IntlShapeProps &
+  RouteComponentProps<IMatchProps> &
+  IProps &
+  IStateProps
+
+class SelectContactPointView extends React.Component<IFullProps, IState> {
+  constructor(props: IFullProps) {
     super(props)
+    const { registrationSection, applicantsSection } = props
     this.state = {
       selected:
         (this.props.application &&
@@ -239,12 +262,8 @@ class SelectContactPointView extends React.Component<IProps, IState> {
   }
 
   handlePhoneNoChange = (value: string) => {
-    let invalidPhoneNo = false
-    if (phoneNumberFormat(value)) {
-      invalidPhoneNo = true
-    }
     this.setState({
-      isPhoneNoError: invalidPhoneNo ? true : false,
+      isPhoneNoError: phoneNumberFormat(value) ? true : false,
       phoneNumber: value,
       touched: true,
       isError: false
@@ -257,7 +276,9 @@ class SelectContactPointView extends React.Component<IProps, IState> {
       writeApplication,
       modifyApplication,
       goToBirthRegistrationAsParent,
-      goToDeathRegistration
+      goToDeathRegistration,
+      registrationSection,
+      applicantsSection
     } = this.props
     e.preventDefault()
     const event = this.props.location.pathname.includes(Event.BIRTH)
@@ -330,6 +351,9 @@ class SelectContactPointView extends React.Component<IProps, IState> {
   }
 
   renderPhoneNumberField = (id: string): JSX.Element => {
+    const error =
+      this.state.isPhoneNoError && phoneNumberFormat(this.state.phoneNumber)
+
     return (
       <InputField
         id="phone_number"
@@ -337,9 +361,7 @@ class SelectContactPointView extends React.Component<IProps, IState> {
         label={this.props.intl.formatMessage(formMessages.phoneNumber)}
         touched={this.state.touched}
         error={
-          this.state.isPhoneNoError
-            ? this.props.intl.formatMessage(messages.phoneNumberNotValid)
-            : ''
+          error ? this.props.intl.formatMessage(error.message, error.props) : ''
         }
         hideAsterisk={true}
       >
@@ -494,13 +516,15 @@ class SelectContactPointView extends React.Component<IProps, IState> {
 const mapStateToProps = (
   store: IStoreState,
   props: RouteComponentProps<{ applicationId: string }>
-) => {
+): IStateProps => {
   const { match } = props
   return {
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
-    ) as IApplication,
-    language: getLanguage(store)
+    )!,
+    language: getLanguage(store),
+    registrationSection: getBirthSection(store, BirthSection.Registration),
+    applicantsSection: getDeathSection(store, DeathSection.Applicants)
   }
 }
 
@@ -518,4 +542,4 @@ export const SelectContactPoint = withRouter(
       goToDeathRegistration
     }
   )(injectIntl(SelectContactPointView))
-) as any
+)

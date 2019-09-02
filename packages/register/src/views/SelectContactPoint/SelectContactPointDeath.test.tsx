@@ -5,33 +5,11 @@ import {
 } from '@register/applications'
 import { Event } from '@register/forms'
 import { SELECT_DEATH_MAIN_CONTACT_POINT } from '@register/navigation/routes'
-import { getOfflineDataSuccess } from '@register/offline/actions'
-import { storage } from '@register/storage'
-import {
-  assign,
-  createTestApp,
-  flushPromises,
-  getItem,
-  mockOfflineData,
-  setItem,
-  validToken
-} from '@register/tests/util'
-import * as CommonUtils from '@register/utils/commonUtils'
+
+import { createTestApp, flushPromises } from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import * as fetchAny from 'jest-fetch-mock'
 import { Store } from 'redux'
-
-const fetch = fetchAny as any
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
-jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
-
-beforeEach(() => {
-  window.history.replaceState({}, '', '/')
-  assign.mockClear()
-})
 
 describe('when user is selecting the Main point of contact', () => {
   let app: ReactWrapper
@@ -39,40 +17,17 @@ describe('when user is selecting the Main point of contact', () => {
   let store: Store
   let draft: IApplication
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
+
     app = testApp.app
-    await flushPromises()
-    app.update()
     history = testApp.history
     store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+
     draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    await store.dispatch(storeApplication(draft))
     history.replace(
       SELECT_DEATH_MAIN_CONTACT_POINT.replace(':applicationId', draft.id)
     )
-    await flushPromises()
-    app.update()
-    app
-      .find('#createPinBtn')
-      .hostNodes()
-      .simulate('click')
-    await flushPromises()
-    app.update()
-    for (let i = 1; i <= 8; i++) {
-      app
-        .find(`#keypad-${i % 2}`)
-        .hostNodes()
-        .simulate('click')
-    }
-    await flushPromises()
     app.update()
   })
   describe('In select main contact point', () => {
@@ -184,7 +139,7 @@ describe('when user is selecting the Main point of contact', () => {
           .find('#phone_number_error')
           .hostNodes()
           .text()
-      ).toBe('Not a valid mobile number')
+      ).toBe('Must be a valid 11 digit number that starts with 01')
     })
 
     it('show error while giving invalid father mobile no', async () => {
@@ -211,7 +166,7 @@ describe('when user is selecting the Main point of contact', () => {
           .find('#phone_number_error')
           .hostNodes()
           .text()
-      ).toBe('Not a valid mobile number')
+      ).toBe('Must be a valid 11 digit number that starts with 01')
     })
 
     it('show error without selecting any input', async () => {
@@ -273,7 +228,7 @@ describe('when user is selecting the Main point of contact', () => {
           .find('#phone_number_error')
           .hostNodes()
           .text()
-      ).toBe('Not a valid mobile number')
+      ).toBe('Must be a valid 11 digit number that starts with 01')
     })
     it('show error if valid phone number but relationship not entered', async () => {
       app

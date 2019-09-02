@@ -1,43 +1,44 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IButtonsMessages {
-  back: ReactIntl.FormattedMessage.MessageDescriptor
-  apply: ReactIntl.FormattedMessage.MessageDescriptor
-  cancel: ReactIntl.FormattedMessage.MessageDescriptor
-  change: ReactIntl.FormattedMessage.MessageDescriptor
-  confirm: ReactIntl.FormattedMessage.MessageDescriptor
-  continueButton: ReactIntl.FormattedMessage.MessageDescriptor
-  createUser: ReactIntl.FormattedMessage.MessageDescriptor
-  delete: ReactIntl.FormattedMessage.MessageDescriptor
-  edit: ReactIntl.FormattedMessage.MessageDescriptor
-  editRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  exitButton: ReactIntl.FormattedMessage.MessageDescriptor
-  finish: ReactIntl.FormattedMessage.MessageDescriptor
-  goToHomepage: ReactIntl.FormattedMessage.MessageDescriptor
-  login: ReactIntl.FormattedMessage.MessageDescriptor
-  logout: ReactIntl.FormattedMessage.MessageDescriptor
-  next: ReactIntl.FormattedMessage.MessageDescriptor
-  no: ReactIntl.FormattedMessage.MessageDescriptor
-  preview: ReactIntl.FormattedMessage.MessageDescriptor
-  print: ReactIntl.FormattedMessage.MessageDescriptor
-  register: ReactIntl.FormattedMessage.MessageDescriptor
-  reject: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectApplication: ReactIntl.FormattedMessage.MessageDescriptor
-  retry: ReactIntl.FormattedMessage.MessageDescriptor
-  review: ReactIntl.FormattedMessage.MessageDescriptor
-  saveExitButton: ReactIntl.FormattedMessage.MessageDescriptor
-  search: ReactIntl.FormattedMessage.MessageDescriptor
-  select: ReactIntl.FormattedMessage.MessageDescriptor
-  send: ReactIntl.FormattedMessage.MessageDescriptor
-  sendForReview: ReactIntl.FormattedMessage.MessageDescriptor
-  sendIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
-  settings: ReactIntl.FormattedMessage.MessageDescriptor
-  start: ReactIntl.FormattedMessage.MessageDescriptor
-  update: ReactIntl.FormattedMessage.MessageDescriptor
-  upload: ReactIntl.FormattedMessage.MessageDescriptor
-  yes: ReactIntl.FormattedMessage.MessageDescriptor
-  approve: ReactIntl.FormattedMessage.MessageDescriptor
-  editRecord: ReactIntl.FormattedMessage.MessageDescriptor
+  back: MessageDescriptor
+  apply: MessageDescriptor
+  cancel: MessageDescriptor
+  change: MessageDescriptor
+  confirm: MessageDescriptor
+  continueButton: MessageDescriptor
+  createUser: MessageDescriptor
+  delete: MessageDescriptor
+  edit: MessageDescriptor
+  editRegistration: MessageDescriptor
+  exitButton: MessageDescriptor
+  finish: MessageDescriptor
+  goToHomepage: MessageDescriptor
+  login: MessageDescriptor
+  logout: MessageDescriptor
+  next: MessageDescriptor
+  no: MessageDescriptor
+  preview: MessageDescriptor
+  print: MessageDescriptor
+  register: MessageDescriptor
+  reject: MessageDescriptor
+  rejectApplication: MessageDescriptor
+  retry: MessageDescriptor
+  review: MessageDescriptor
+  saveExitButton: MessageDescriptor
+  search: MessageDescriptor
+  select: MessageDescriptor
+  send: MessageDescriptor
+  sendForReview: MessageDescriptor
+  sendIncomplete: MessageDescriptor
+  sendForApproval: MessageDescriptor
+  settings: MessageDescriptor
+  start: MessageDescriptor
+  update: MessageDescriptor
+  upload: MessageDescriptor
+  yes: MessageDescriptor
+  approve: MessageDescriptor
+  editRecord: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -195,6 +196,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Send incomplete application',
     description: 'Title for Incomplete submit button',
     id: 'buttons.sendIncomplete'
+  },
+  sendForApproval: {
+    defaultMessage: 'SEND FOR APPROVAL',
+    description: 'Title for complete submit button',
+    id: 'buttons.sendForApproval'
   },
   settings: {
     defaultMessage: 'Settings',

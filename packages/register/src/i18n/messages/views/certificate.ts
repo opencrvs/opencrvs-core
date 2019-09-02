@@ -1,60 +1,71 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ICertificateMessages {
-  certificateCollectionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  addAnotherSignature: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateConfirmationTxt: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateIsCorrect: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateReceiptHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateReceiptSubHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  collectPayment: ReactIntl.FormattedMessage.MessageDescriptor
-  dateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  familyName: ReactIntl.FormattedMessage.MessageDescriptor
-  familyNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
-  father: ReactIntl.FormattedMessage.MessageDescriptor
-  firstName: ReactIntl.FormattedMessage.MessageDescriptor
-  firstNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogCancel: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogConfirm: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckVerify: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckWithoutVerify: ReactIntl.FormattedMessage.MessageDescriptor
-  informant: ReactIntl.FormattedMessage.MessageDescriptor
-  informantHasReviewedInformaiton: ReactIntl.FormattedMessage.MessageDescriptor
-  manualPaymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
-  mother: ReactIntl.FormattedMessage.MessageDescriptor
-  nationality: ReactIntl.FormattedMessage.MessageDescriptor
-  next: ReactIntl.FormattedMessage.MessageDescriptor
-  noLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  number: ReactIntl.FormattedMessage.MessageDescriptor
-  other: ReactIntl.FormattedMessage.MessageDescriptor
-  payment: ReactIntl.FormattedMessage.MessageDescriptor
-  paymentInstruction: ReactIntl.FormattedMessage.MessageDescriptor
-  paymentAmount: ReactIntl.FormattedMessage.MessageDescriptor
-  paymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
-  person1: ReactIntl.FormattedMessage.MessageDescriptor
-  person2: ReactIntl.FormattedMessage.MessageDescriptor
-  preview: ReactIntl.FormattedMessage.MessageDescriptor
-  print: ReactIntl.FormattedMessage.MessageDescriptor
-  printCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  printReceipt: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptIssuedAt: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptIssuer: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptPaidAmount: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptService: ReactIntl.FormattedMessage.MessageDescriptor
-  selectSignature: ReactIntl.FormattedMessage.MessageDescriptor
-  service: ReactIntl.FormattedMessage.MessageDescriptor
-  amountDue: ReactIntl.FormattedMessage.MessageDescriptor
-  typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
-  whoToCollect: ReactIntl.FormattedMessage.MessageDescriptor
-  confirmAndPrint: ReactIntl.FormattedMessage.MessageDescriptor
-  retiewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  retiewDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  modalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  modalBody: ReactIntl.FormattedMessage.MessageDescriptor
-  toastMessage: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateCollectionTitle: MessageDescriptor
+  addAnotherSignature: MessageDescriptor
+  certificateConfirmationTxt: MessageDescriptor
+  certificateIsCorrect: MessageDescriptor
+  certificateReceiptHeader: MessageDescriptor
+  certificateReceiptSubHeader: MessageDescriptor
+  collectPayment: MessageDescriptor
+  dateOfBirth: MessageDescriptor
+  familyName: MessageDescriptor
+  familyNameInEng: MessageDescriptor
+  father: MessageDescriptor
+  firstName: MessageDescriptor
+  firstNameInEng: MessageDescriptor
+  idCheckDialogCancel: MessageDescriptor
+  idCheckDialogConfirm: MessageDescriptor
+  idCheckDialogDescription: MessageDescriptor
+  idCheckDialogTitle: MessageDescriptor
+  idCheckTitle: MessageDescriptor
+  idCheckVerify: MessageDescriptor
+  idCheckWithoutVerify: MessageDescriptor
+  informant: MessageDescriptor
+  informantHasReviewedInformaiton: MessageDescriptor
+  manualPaymentMethod: MessageDescriptor
+  mother: MessageDescriptor
+  nationality: MessageDescriptor
+  next: MessageDescriptor
+  noLabel: MessageDescriptor
+  number: MessageDescriptor
+  other: MessageDescriptor
+  payment: MessageDescriptor
+  paymentInstruction: MessageDescriptor
+  paymentAmount: MessageDescriptor
+  paymentMethod: MessageDescriptor
+  person1: MessageDescriptor
+  person2: MessageDescriptor
+  preview: MessageDescriptor
+  print: MessageDescriptor
+  printCertificate: MessageDescriptor
+  printReceipt: MessageDescriptor
+  receiptIssuedAt: MessageDescriptor
+  receiptIssuer: MessageDescriptor
+  receiptPaidAmount: MessageDescriptor
+  receiptService: MessageDescriptor
+  selectSignature: MessageDescriptor
+  service: MessageDescriptor
+  amountDue: MessageDescriptor
+  typeOfID: MessageDescriptor
+  whoToCollect: MessageDescriptor
+  confirmAndPrint: MessageDescriptor
+  retiewTitle: MessageDescriptor
+  retiewDescription: MessageDescriptor
+  modalTitle: MessageDescriptor
+  modalBody: MessageDescriptor
+  toastMessage: MessageDescriptor
+  otherCollectorFormTitle: MessageDescriptor
+  otherCollectorFormParagraph: MessageDescriptor
+  certificateCollectorError: MessageDescriptor
+  certificateOtherCollectorInfoError: MessageDescriptor
+  certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
+  certificateOtherCollectorAffidavitError: MessageDescriptor
+  certificateOtherCollectorAffidavitFormParagraph: MessageDescriptor
+  noSignedAffidavitAvailable: MessageDescriptor
+  noAffidavitModalTitle: MessageDescriptor
+  noAffidavitModalDescription: MessageDescriptor
+  signedAffidavitFileLabel: MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -63,7 +74,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.addAnotherSignature'
   },
   certificateCollectionTitle: {
-    defaultMessage: 'Certificate Collection',
+    defaultMessage: 'Certificate collection',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
   },
@@ -339,11 +350,72 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.toast.message',
     defaultMessage: 'Certificate is ready to print',
     description: 'Floating Toast message upon certificate ready to print'
+  },
+  otherCollectorFormTitle: {
+    defaultMessage: 'What is their ID and name',
+    description: 'Title for other collector form',
+    id: 'print.certificate.collector.other.title'
+  },
+  otherCollectorFormParagraph: {
+    defaultMessage:
+      'Because there are no details of this person on record, we need to capture their details:',
+    description: 'Paragraph for other collector form',
+    id: 'print.certificate.collector.other.paragraph'
+  },
+  certificateCollectorError: {
+    defaultMessage: 'Select who is collecting the certificate',
+    description: 'Form level error for collector form',
+    id: 'print.certificate.collector.form.error'
+  },
+  certificateOtherCollectorInfoError: {
+    defaultMessage: 'Complete all the mandatory fields',
+    description: 'Form level error for other collector information form',
+    id: 'print.certificate.collector.other.form.error'
+  },
+  certificateOtherCollectorAffidavitFormTitle: {
+    defaultMessage: 'Attach a signed affidavit',
+    description: 'Form title for other collector affidavit form',
+    id: 'print.certificate.collector.other.affidavit.form.title'
+  },
+  certificateOtherCollectorAffidavitError: {
+    defaultMessage:
+      'Attach a signed affidavit or click the checkbox if they do not have one.',
+    description: 'Form level error for other collector affidavit form',
+    id: 'print.certificate.collector.other.affidavit.form.error'
+  },
+  certificateOtherCollectorAffidavitFormParagraph: {
+    defaultMessage:
+      'This document should clearly prove that the individual has the authority to collect the certificate',
+    description: 'Form paragraph for other collector affidavit form',
+    id: 'print.certificate.collector.other.affidavit.form.paragraph'
+  },
+  noSignedAffidavitAvailable: {
+    defaultMessage: "They don't have a signed affidavit",
+    description: 'Label for no affidavit checkbox',
+    id: 'print.certificate.collector.other.affidavit.form.checkbox'
+  },
+  noAffidavitModalTitle: {
+    defaultMessage: 'Continue without signed affidavit?',
+    description:
+      'Modal title for other coller form submission without signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.modal.title'
+  },
+  noAffidavitModalDescription: {
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for issuing a certificate without necessary evidence from the collector',
+    description:
+      'Modal description for other coller form submission without signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.modal.description'
+  },
+  signedAffidavitFileLabel: {
+    defaultMessage: 'Signed affidavit',
+    description: 'File label for signed affidavit',
+    id: 'print.certificate.collector.other.affidavit.form.file.label'
   }
 }
 
 interface IDynamicCertificateMessages {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 }
 
 const dynamicMessagesToDefine = {
