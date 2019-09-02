@@ -1,71 +1,71 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ICertificateMessages {
-  certificateCollectionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  addAnotherSignature: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateConfirmationTxt: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateIsCorrect: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateReceiptHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateReceiptSubHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  collectPayment: ReactIntl.FormattedMessage.MessageDescriptor
-  dateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  familyName: ReactIntl.FormattedMessage.MessageDescriptor
-  familyNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
-  father: ReactIntl.FormattedMessage.MessageDescriptor
-  firstName: ReactIntl.FormattedMessage.MessageDescriptor
-  firstNameInEng: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogCancel: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogConfirm: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckDialogTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckVerify: ReactIntl.FormattedMessage.MessageDescriptor
-  idCheckWithoutVerify: ReactIntl.FormattedMessage.MessageDescriptor
-  informant: ReactIntl.FormattedMessage.MessageDescriptor
-  informantHasReviewedInformaiton: ReactIntl.FormattedMessage.MessageDescriptor
-  manualPaymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
-  mother: ReactIntl.FormattedMessage.MessageDescriptor
-  nationality: ReactIntl.FormattedMessage.MessageDescriptor
-  next: ReactIntl.FormattedMessage.MessageDescriptor
-  noLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  number: ReactIntl.FormattedMessage.MessageDescriptor
-  other: ReactIntl.FormattedMessage.MessageDescriptor
-  payment: ReactIntl.FormattedMessage.MessageDescriptor
-  paymentInstruction: ReactIntl.FormattedMessage.MessageDescriptor
-  paymentAmount: ReactIntl.FormattedMessage.MessageDescriptor
-  paymentMethod: ReactIntl.FormattedMessage.MessageDescriptor
-  person1: ReactIntl.FormattedMessage.MessageDescriptor
-  person2: ReactIntl.FormattedMessage.MessageDescriptor
-  preview: ReactIntl.FormattedMessage.MessageDescriptor
-  print: ReactIntl.FormattedMessage.MessageDescriptor
-  printCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  printReceipt: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptIssuedAt: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptIssuer: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptPaidAmount: ReactIntl.FormattedMessage.MessageDescriptor
-  receiptService: ReactIntl.FormattedMessage.MessageDescriptor
-  selectSignature: ReactIntl.FormattedMessage.MessageDescriptor
-  service: ReactIntl.FormattedMessage.MessageDescriptor
-  amountDue: ReactIntl.FormattedMessage.MessageDescriptor
-  typeOfID: ReactIntl.FormattedMessage.MessageDescriptor
-  whoToCollect: ReactIntl.FormattedMessage.MessageDescriptor
-  confirmAndPrint: ReactIntl.FormattedMessage.MessageDescriptor
-  retiewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  retiewDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  modalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  modalBody: ReactIntl.FormattedMessage.MessageDescriptor
-  toastMessage: ReactIntl.FormattedMessage.MessageDescriptor
-  otherCollectorFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  otherCollectorFormParagraph: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateCollectorError: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateOtherCollectorInfoError: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateOtherCollectorAffidavitFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateOtherCollectorAffidavitError: ReactIntl.FormattedMessage.MessageDescriptor
-  certificateOtherCollectorAffidavitFormParagraph: ReactIntl.FormattedMessage.MessageDescriptor
-  noSignedAffidavitAvailable: ReactIntl.FormattedMessage.MessageDescriptor
-  noAffidavitModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  noAffidavitModalDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  signedAffidavitFileLabel: ReactIntl.FormattedMessage.MessageDescriptor
+  certificateCollectionTitle: MessageDescriptor
+  addAnotherSignature: MessageDescriptor
+  certificateConfirmationTxt: MessageDescriptor
+  certificateIsCorrect: MessageDescriptor
+  certificateReceiptHeader: MessageDescriptor
+  certificateReceiptSubHeader: MessageDescriptor
+  collectPayment: MessageDescriptor
+  dateOfBirth: MessageDescriptor
+  familyName: MessageDescriptor
+  familyNameInEng: MessageDescriptor
+  father: MessageDescriptor
+  firstName: MessageDescriptor
+  firstNameInEng: MessageDescriptor
+  idCheckDialogCancel: MessageDescriptor
+  idCheckDialogConfirm: MessageDescriptor
+  idCheckDialogDescription: MessageDescriptor
+  idCheckDialogTitle: MessageDescriptor
+  idCheckTitle: MessageDescriptor
+  idCheckVerify: MessageDescriptor
+  idCheckWithoutVerify: MessageDescriptor
+  informant: MessageDescriptor
+  informantHasReviewedInformaiton: MessageDescriptor
+  manualPaymentMethod: MessageDescriptor
+  mother: MessageDescriptor
+  nationality: MessageDescriptor
+  next: MessageDescriptor
+  noLabel: MessageDescriptor
+  number: MessageDescriptor
+  other: MessageDescriptor
+  payment: MessageDescriptor
+  paymentInstruction: MessageDescriptor
+  paymentAmount: MessageDescriptor
+  paymentMethod: MessageDescriptor
+  person1: MessageDescriptor
+  person2: MessageDescriptor
+  preview: MessageDescriptor
+  print: MessageDescriptor
+  printCertificate: MessageDescriptor
+  printReceipt: MessageDescriptor
+  receiptIssuedAt: MessageDescriptor
+  receiptIssuer: MessageDescriptor
+  receiptPaidAmount: MessageDescriptor
+  receiptService: MessageDescriptor
+  selectSignature: MessageDescriptor
+  service: MessageDescriptor
+  amountDue: MessageDescriptor
+  typeOfID: MessageDescriptor
+  whoToCollect: MessageDescriptor
+  confirmAndPrint: MessageDescriptor
+  retiewTitle: MessageDescriptor
+  retiewDescription: MessageDescriptor
+  modalTitle: MessageDescriptor
+  modalBody: MessageDescriptor
+  toastMessage: MessageDescriptor
+  otherCollectorFormTitle: MessageDescriptor
+  otherCollectorFormParagraph: MessageDescriptor
+  certificateCollectorError: MessageDescriptor
+  certificateOtherCollectorInfoError: MessageDescriptor
+  certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
+  certificateOtherCollectorAffidavitError: MessageDescriptor
+  certificateOtherCollectorAffidavitFormParagraph: MessageDescriptor
+  noSignedAffidavitAvailable: MessageDescriptor
+  noAffidavitModalTitle: MessageDescriptor
+  noAffidavitModalDescription: MessageDescriptor
+  signedAffidavitFileLabel: MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -415,7 +415,7 @@ const messagesToDefine: ICertificateMessages = {
 }
 
 interface IDynamicCertificateMessages {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 }
 
 const dynamicMessagesToDefine = {

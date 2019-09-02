@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import {
-  InjectedIntlProps,
+  WrappedComponentProps as IntlShapeProps,
   injectIntl,
-  InjectedIntl,
+  IntlShape,
   FormattedHTMLMessage,
-  defineMessages
+  defineMessages,
+  MessageDescriptor
 } from 'react-intl'
 import { Box, Spinner } from '@opencrvs/components/lib/interface'
 import styled, { withTheme, ITheme } from '@performance/styledComponents'
@@ -29,7 +30,7 @@ import * as Sentry from '@sentry/browser'
 import { FETCH_METRIC } from '@performance/views/home/queries'
 
 const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   logoutActionTitle: {
     id: 'buttons.logout',
@@ -234,9 +235,9 @@ interface IHomeProps {
   userDetails: IUserDetails | null
 }
 
-type FullProps = IHomeProps & InjectedIntlProps
+type FullProps = IHomeProps & IntlShapeProps
 
-const getKeyFigureLabel = (type: string, intl: InjectedIntl): string => {
+const getKeyFigureLabel = (type: string, intl: IntlShape): string => {
   switch (type) {
     case 'DAYS_0_TO_45':
       return intl.formatHTMLMessage(messages.liveBirthsWithin45DaysLabel)
@@ -248,7 +249,7 @@ const getKeyFigureLabel = (type: string, intl: InjectedIntl): string => {
 }
 const getData = (
   keyFigures: GQLBirthKeyFigures[],
-  intl: InjectedIntl
+  intl: IntlShape
 ): IData[] => {
   return (
     (keyFigures &&

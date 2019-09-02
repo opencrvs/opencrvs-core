@@ -1,6 +1,6 @@
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
-import { InjectedIntl } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
   TDocumentDefinitions,
   TFontFamily,
@@ -34,12 +34,12 @@ export type TransformableData = IApplication | IUserDetails
 export interface IFunctionTransformer {
   [transformerFunction: string]: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => string | null
 }
 export interface IIntLabelPayload {
-  messageDescriptor: ReactIntl.FormattedMessage.MessageDescriptor
+  messageDescriptor: MessageDescriptor
   messageValues?: { [valueKey: string]: string }
 }
 

@@ -1,7 +1,7 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   username: {
     id: 'login.username',

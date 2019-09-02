@@ -120,6 +120,7 @@ class Component extends React.Component<
 
   async componentDidMount() {
     const values = parse(this.props.location.search)
+
     await this.props.checkAuth(values)
     this.props.setInitialApplications()
 

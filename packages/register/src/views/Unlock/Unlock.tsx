@@ -8,7 +8,7 @@ import { IStoreState } from '@register/store'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { storage } from '@register/storage'
 import { SECURITY_PIN_EXPIRED_AT } from '@register/utils/constants'
 import moment from 'moment'
@@ -76,7 +76,7 @@ type Props = {
   redirectToAuthentication: typeof redirectToAuthentication
 }
 type IFullProps = Props &
-  InjectedIntlProps & {
+  IntlShapeProps & {
     onCorrectPinMatch: () => void
   }
 
@@ -277,4 +277,4 @@ export const Unlock = connect(
   {
     redirectToAuthentication
   }
-)(injectIntl<IFullProps>(UnlockView))
+)(injectIntl<'intl', IFullProps>(UnlockView))

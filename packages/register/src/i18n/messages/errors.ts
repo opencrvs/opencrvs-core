@@ -1,20 +1,20 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IErrorMessages {
-  draftFailed: ReactIntl.FormattedMessage.MessageDescriptor
-  duplicateQueryError: ReactIntl.FormattedMessage.MessageDescriptor
-  errorCodeUnauthorized: ReactIntl.FormattedMessage.MessageDescriptor
-  unknownErrorTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  unknownErrorDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  errorTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  errorTitleUnauthorized: ReactIntl.FormattedMessage.MessageDescriptor
-  fieldAgentQueryError: ReactIntl.FormattedMessage.MessageDescriptor
-  pleaseTryAgainError: ReactIntl.FormattedMessage.MessageDescriptor
-  printQueryError: ReactIntl.FormattedMessage.MessageDescriptor
-  queryError: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationQueryError: ReactIntl.FormattedMessage.MessageDescriptor
-  unauthorized: ReactIntl.FormattedMessage.MessageDescriptor
-  userQueryError: ReactIntl.FormattedMessage.MessageDescriptor
+  draftFailed: MessageDescriptor
+  duplicateQueryError: MessageDescriptor
+  errorCodeUnauthorized: MessageDescriptor
+  unknownErrorTitle: MessageDescriptor
+  unknownErrorDescription: MessageDescriptor
+  errorTitle: MessageDescriptor
+  errorTitleUnauthorized: MessageDescriptor
+  fieldAgentQueryError: MessageDescriptor
+  pleaseTryAgainError: MessageDescriptor
+  printQueryError: MessageDescriptor
+  queryError: MessageDescriptor
+  registrationQueryError: MessageDescriptor
+  unauthorized: MessageDescriptor
+  userQueryError: MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {

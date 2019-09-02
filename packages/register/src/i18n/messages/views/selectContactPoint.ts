@@ -1,10 +1,10 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISelectContactPointMessages {
-  heading: ReactIntl.FormattedMessage.MessageDescriptor
-  birthRelationshipLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  error: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneNumberNotValid: ReactIntl.FormattedMessage.MessageDescriptor
+  heading: MessageDescriptor
+  birthRelationshipLabel: MessageDescriptor
+  error: MessageDescriptor
+  phoneNumberNotValid: MessageDescriptor
 }
 
 const messagesToDefine: ISelectContactPointMessages = {

@@ -32,7 +32,7 @@ interface IUsersListProps {
 }
 
 const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   title: { // 1.
     id: "usersList.title",
@@ -58,7 +58,7 @@ export class UsersListComponent extends React.Component<IUsersListProps, {}> {
   }
 }
 
-export const UsersList = injectIntl<IUsersListProps>(UsersList); // 3.
+export const UsersList = injectIntl<"intl", IUsersListProps>(UsersList); // 3.
 ```
 
 **⚠️Avoid  generating message descriptors dynamically**

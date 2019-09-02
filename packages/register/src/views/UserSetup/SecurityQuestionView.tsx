@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
   formMessages as messages,
   buttonMessages,
@@ -27,7 +27,7 @@ type IProps = {
     step: ProtectedAccoutStep,
     data: IProtectedAccountSetupData
   ) => void
-} & InjectedIntlProps
+} & IntlShapeProps
 
 type IQuestion = {
   label: string

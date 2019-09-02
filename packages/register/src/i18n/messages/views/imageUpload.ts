@@ -1,9 +1,9 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IImageUploadMessages {
-  uploadError: ReactIntl.FormattedMessage.MessageDescriptor
-  documentTypeRequired: ReactIntl.FormattedMessage.MessageDescriptor
-  overSized: ReactIntl.FormattedMessage.MessageDescriptor
+  uploadError: MessageDescriptor
+  documentTypeRequired: MessageDescriptor
+  overSized: MessageDescriptor
 }
 
 const messagesToDefine: IImageUploadMessages = {

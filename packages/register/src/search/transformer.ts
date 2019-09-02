@@ -6,14 +6,14 @@ import {
   GQLQuery,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
-import { InjectedIntl } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { IApplication } from '@register/applications'
 
 export const transformData = (
   data: GQLQuery,
-  intl: InjectedIntl,
+  intl: IntlShape,
   outboxApplications: IApplication[] = [],
   checkStatus: string[] = []
 ) => {

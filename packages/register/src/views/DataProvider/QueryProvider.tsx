@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Event, Action } from '@register/forms'
 import { getBirthQueryMappings } from '@register/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@register/views/DataProvider/death/queries'
@@ -11,7 +11,7 @@ interface IQueryProviderProps {
   action: Action
   payload?: any
 }
-type IProps = IQueryProviderProps & InjectedIntlProps
+type IProps = IQueryProviderProps & IntlShapeProps
 /* Need to add mappings for events here */
 const QueryMapper = {
   [Event.BIRTH]: getBirthQueryMappings,

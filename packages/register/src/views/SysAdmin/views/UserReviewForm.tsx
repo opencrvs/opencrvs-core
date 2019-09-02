@@ -13,7 +13,7 @@ import {
 } from '@register/forms'
 import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { FormTitle, Action } from '@register/views/SysAdmin/views/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -49,7 +49,7 @@ interface ISectionData {
   items: IDataProps[]
 }
 
-type IFullProps = IUserReviewFormProps & InjectedIntlProps
+type IFullProps = IUserReviewFormProps & IntlShapeProps
 
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
@@ -157,4 +157,4 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = connect(
   null,
   mapDispatchToProps
-)(injectIntl<IFullProps & IDispatchProps>(UserReviewFormComponent))
+)(injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent))

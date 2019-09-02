@@ -1,36 +1,36 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IReviewMessages {
-  additionalComments: ReactIntl.FormattedMessage.MessageDescriptor
-  backToPreview: ReactIntl.FormattedMessage.MessageDescriptor
-  editApplicationConfirmation: ReactIntl.FormattedMessage.MessageDescriptor
-  editDocuments: ReactIntl.FormattedMessage.MessageDescriptor
-  formDataHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  headerSubjectWithName: ReactIntl.FormattedMessage.MessageDescriptor
-  headerSubjectWithoutName: ReactIntl.FormattedMessage.MessageDescriptor
-  previewName: ReactIntl.FormattedMessage.MessageDescriptor
-  previewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionDescriptionComplete: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionDescriptionIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  registerConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewActionDescriptionComplete: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewActionDescriptionIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewName: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  submitConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
-  submitConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
-  validateConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  valueApprove: ReactIntl.FormattedMessage.MessageDescriptor
-  zeroDocumentsText: ReactIntl.FormattedMessage.MessageDescriptor
-  createAndValidateApplicationActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  validateCompleteApplicationActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateCompleteApplicationActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  validateApplicationActionModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateApplicationActionModalDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  additionalComments: MessageDescriptor
+  backToPreview: MessageDescriptor
+  editApplicationConfirmation: MessageDescriptor
+  editDocuments: MessageDescriptor
+  formDataHeader: MessageDescriptor
+  headerSubjectWithName: MessageDescriptor
+  headerSubjectWithoutName: MessageDescriptor
+  previewName: MessageDescriptor
+  previewTitle: MessageDescriptor
+  registerActionDescription: MessageDescriptor
+  registerActionDescriptionComplete: MessageDescriptor
+  registerActionDescriptionIncomplete: MessageDescriptor
+  registerActionTitle: MessageDescriptor
+  registerConfirmationTitle: MessageDescriptor
+  reviewActionDescriptionComplete: MessageDescriptor
+  reviewActionDescriptionIncomplete: MessageDescriptor
+  reviewActionTitle: MessageDescriptor
+  reviewName: MessageDescriptor
+  reviewTitle: MessageDescriptor
+  submitConfirmationDesc: MessageDescriptor
+  submitConfirmationTitle: MessageDescriptor
+  validateConfirmationDesc: MessageDescriptor
+  validateConfirmationTitle: MessageDescriptor
+  valueApprove: MessageDescriptor
+  zeroDocumentsText: MessageDescriptor
+  createAndValidateApplicationActionDescription: MessageDescriptor
+  validateCompleteApplicationActionTitle: MessageDescriptor
+  validateCompleteApplicationActionDescription: MessageDescriptor
+  validateApplicationActionModalTitle: MessageDescriptor
+  validateApplicationActionModalDescription: MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
@@ -199,7 +199,7 @@ const messagesToDefine: IReviewMessages = {
 export const messages: IReviewMessages = defineMessages(messagesToDefine)
 
 interface IDynamicReviewMessages {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 }
 
 const dynamicMessagesToDefine = {

@@ -1,4 +1,4 @@
-import { InjectedIntl } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import { createPDF, printPDF } from '@register/pdfRenderer'
 import { template as receiptTemplate } from '@register/pdfRenderer/templates/receipt'
 import { template as birthCertificateTemplate } from '@register/pdfRenderer/templates/birthCertificate'
@@ -8,7 +8,7 @@ import { IUserDetails } from '@opencrvs/register/src/utils/userUtils'
 import { Event } from '@register/forms'
 
 export function printMoneyReceipt(
-  intl: InjectedIntl,
+  intl: IntlShape,
   application: IApplication,
   userDetails: IUserDetails | null
 ) {
@@ -19,7 +19,7 @@ export function printMoneyReceipt(
 }
 
 export async function previewCertificate(
-  intl: InjectedIntl,
+  intl: IntlShape,
   application: IApplication,
   userDetails: IUserDetails | null,
   callBack: (pdf: string) => void
@@ -40,7 +40,7 @@ export async function previewCertificate(
 }
 
 export function printCertificate(
-  intl: InjectedIntl,
+  intl: IntlShape,
   application: IApplication,
   userDetails: IUserDetails | null
 ) {
