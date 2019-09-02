@@ -1,7 +1,7 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISessionMessages {
-  sessionExpireTxt: ReactIntl.FormattedMessage.MessageDescriptor
+  sessionExpireTxt: MessageDescriptor
 }
 
 const messagesToDefine: ISessionMessages = {

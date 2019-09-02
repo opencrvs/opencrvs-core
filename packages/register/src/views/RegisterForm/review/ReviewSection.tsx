@@ -43,7 +43,11 @@ import {
   IOfflineData
 } from '@register/offline/reducer'
 import { getLanguage } from '@register/i18n/selectors'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
@@ -179,7 +183,7 @@ type State = {
   editClickFieldName: string
   activeSection: Section | null
 }
-type FullProps = IProps & InjectedIntlProps
+type FullProps = IProps & IntlShapeProps
 
 const getViewableSection = (registerForm: IForm): IFormSection[] => {
   return registerForm.sections.filter(
@@ -197,7 +201,7 @@ const getDocumentSections = (registerForm: IForm): IFormSection[] => {
 function renderSelectLabel(
   value: IFormFieldValue,
   options: ISelectOption[],
-  intl: InjectedIntl
+  intl: IntlShape
 ) {
   const selectedOption = options.find(option => option.value === value)
   return selectedOption ? intl.formatMessage(selectedOption.label) : value
@@ -207,7 +211,7 @@ export function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
-  intl: InjectedIntl,
+  intl: IntlShape,
   resources: IOfflineData,
   language: string
 ) {
@@ -251,7 +255,7 @@ const renderValue = (
   draft: IApplication,
   section: IFormSection,
   field: IFormField,
-  intl: InjectedIntl,
+  intl: IntlShape,
   offlineResources: IOfflineData,
   language: string
 ) => {

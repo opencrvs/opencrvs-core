@@ -1,20 +1,20 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface INotificationsMessages {
-  declarationsSynced: ReactIntl.FormattedMessage.MessageDescriptor
-  draftsSaved: ReactIntl.FormattedMessage.MessageDescriptor
-  newContentAvailable: ReactIntl.FormattedMessage.MessageDescriptor
-  outboxText: ReactIntl.FormattedMessage.MessageDescriptor
-  processingText: ReactIntl.FormattedMessage.MessageDescriptor
-  statusRegistering: ReactIntl.FormattedMessage.MessageDescriptor
-  statusRejecting: ReactIntl.FormattedMessage.MessageDescriptor
-  statusSubmitting: ReactIntl.FormattedMessage.MessageDescriptor
-  statusWaitingToRegister: ReactIntl.FormattedMessage.MessageDescriptor
-  statusWaitingToReject: ReactIntl.FormattedMessage.MessageDescriptor
-  statusWaitingToSubmit: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormFail: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSuccess: ReactIntl.FormattedMessage.MessageDescriptor
-  waitingToRetry: ReactIntl.FormattedMessage.MessageDescriptor
+  declarationsSynced: MessageDescriptor
+  draftsSaved: MessageDescriptor
+  newContentAvailable: MessageDescriptor
+  outboxText: MessageDescriptor
+  processingText: MessageDescriptor
+  statusRegistering: MessageDescriptor
+  statusRejecting: MessageDescriptor
+  statusSubmitting: MessageDescriptor
+  statusWaitingToRegister: MessageDescriptor
+  statusWaitingToReject: MessageDescriptor
+  statusWaitingToSubmit: MessageDescriptor
+  userFormFail: MessageDescriptor
+  userFormSuccess: MessageDescriptor
+  waitingToRetry: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {

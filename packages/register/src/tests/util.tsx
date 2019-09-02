@@ -7,10 +7,8 @@ import { MockedProvider } from 'react-apollo/test-utils'
 import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '@register/store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import en from 'react-intl/locale-data/en'
 import { mount, configure, shallow, ReactWrapper } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '@register/App'
 import { getSchema } from '@register/tests/graphql-schema-mock'
 import { ThemeProvider } from '@register/styledComponents'
@@ -25,6 +23,7 @@ import { ISerializedForm, Event } from '@register/forms'
 import { Store, AnyAction } from 'redux'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { getReviewForm } from '@register/forms/register/review-selectors'
+import { IntlShape } from 'react-intl'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -78,8 +77,6 @@ function createGraphQLClient() {
   })
 }
 
-addLocaleData([...en])
-
 export function getInitialState(): IStoreState {
   const { store: mockStore } = createStore()
 
@@ -107,20 +104,7 @@ export async function createTestApp(
 }
 
 interface ITestView {
-  intl: ReactIntl.InjectedIntl
-}
-
-const intlProvider = new IntlProvider(
-  {
-    locale: 'en',
-    messages: {}
-  },
-  {}
-)
-export const { intl } = intlProvider.getChildContext()
-
-function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
-  return React.cloneElement(node, { intl })
+  intl: IntlShape
 }
 
 export function createShallowRenderedComponent(
@@ -2594,6 +2578,19 @@ export const mockOfflineData = {
   ).data
 }
 
+export async function createTestStore() {
+  const { store, history } = createStore()
+  await store.dispatch(
+    offlineDataReady({
+      languages: mockOfflineData.languages,
+      forms: mockOfflineData.forms,
+      locations: mockOfflineData.locations,
+      facilities: mockOfflineData.facilities
+    })
+  )
+  return { store, history }
+}
+
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   store: AppStore,
@@ -2622,15 +2619,11 @@ export async function createTestComponent(
           <ThemeProvider
             theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
           >
-            {nodeWithIntlProp(node)}
+            {node}
           </ThemeProvider>
         </I18nContainer>
       </Provider>
-    </MockedProvider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
+    </MockedProvider>
   )
 
   return { component: component.update(), store }

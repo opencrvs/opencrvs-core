@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -42,7 +42,7 @@ interface IMatchProps {
   applicationId: string
 }
 
-type IFullProps = InjectedIntlProps &
+type IFullProps = IntlShapeProps &
   RouteComponentProps<IMatchProps> & {
     application: IApplication
     modifyApplication: typeof modifyApplication

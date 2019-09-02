@@ -56,7 +56,7 @@ import { StyledSpinner } from '@register/views/RegistrationHome/RegistrationHome
 import * as Sentry from '@sentry/browser'
 import { debounce, flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
@@ -88,7 +88,7 @@ interface IBaseProps {
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
 
-type IProps = IBaseProps & InjectedIntlProps
+type IProps = IBaseProps & IntlShapeProps
 
 function getNextSectionIds(
   formSection: IFormSection,

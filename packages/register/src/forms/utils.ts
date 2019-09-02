@@ -28,7 +28,7 @@ import {
   IFormSectionGroup,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
-import { InjectedIntl, FormattedMessage } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import {
   OFFLINE_LOCATIONS_KEY,
@@ -47,7 +47,7 @@ interface IRange {
 }
 
 export const internationaliseOptions = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
   return options.map(opt => {
@@ -59,7 +59,7 @@ export const internationaliseOptions = (
 }
 
 export const internationaliseFieldObject = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   field: IFormField
 ): Ii18nFormField => {
   const base = {
@@ -151,7 +151,7 @@ export const getFieldType = (
 export const getFieldLabel = (
   field: IDynamicFormField,
   values: IFormSectionData
-): FormattedMessage.MessageDescriptor | undefined => {
+): MessageDescriptor | undefined => {
   if (!field.dynamicDefinitions.label) {
     return undefined
   }

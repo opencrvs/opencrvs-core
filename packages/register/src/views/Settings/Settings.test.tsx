@@ -11,6 +11,7 @@ describe('Settings page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+
     const testComponent = await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
@@ -19,7 +20,7 @@ describe('Settings page tests', () => {
     component = testComponent.component
   })
   it('shows nothing', async () => {
-    // const { store } = createStore()
+    const { store } = createStore()
     store.dispatch(
       getStorageUserDetailsSuccess(
         JSON.stringify({
@@ -33,7 +34,6 @@ describe('Settings page tests', () => {
       <SettingsPage />,
       store
     )).component
-
     expect(
       comp
         .find('#English-name')

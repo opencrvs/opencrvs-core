@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import {
@@ -123,7 +123,7 @@ type Props = {
 }
 
 class ConfirmationScreenView extends React.Component<
-  Props & InjectedIntlProps & RouteComponentProps<{}>
+  Props & IntlShapeProps & RouteComponentProps<{}>
 > {
   render() {
     const { intl, history } = this.props

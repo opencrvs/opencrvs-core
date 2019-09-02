@@ -10,7 +10,6 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   flushPromises,
-  intl,
   mockOfflineData
 } from '@register/tests/util'
 import { REJECTED } from '@register/utils/constants'
@@ -23,6 +22,7 @@ import * as React from 'react'
 import { v4 as uuid } from 'uuid'
 import { waitForElement } from '@register/tests/wait-for-element'
 import { isMobileDevice } from '@register/utils/commonUtils'
+import { createIntl } from 'react-intl'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
@@ -68,6 +68,8 @@ Object.defineProperty(window, 'outerWidth', {
 beforeEach(() => {
   ;(isMobileDevice as jest.Mock).mockRestore()
 })
+
+const intl = createIntl({ locale: 'en' })
 
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>

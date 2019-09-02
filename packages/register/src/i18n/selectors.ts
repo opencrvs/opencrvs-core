@@ -15,6 +15,3 @@ export const getLanguages = (store: IStoreState): IntlState['languages'] =>
 
 export const getMessages = (store: IStoreState): IntlState['messages'] =>
   getKey(store, 'messages')
-
-export const getUpdatedAt = (store: IStoreState): IntlState['updatedAt'] =>
-  getKey(store, 'updatedAt')

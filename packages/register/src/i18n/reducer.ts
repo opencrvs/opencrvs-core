@@ -22,7 +22,6 @@ export type IntlState = {
   language: string
   messages: IntlMessages
   languages: ILanguageState
-  updatedAt: number
 }
 
 interface ISupportedLanguages {
@@ -50,11 +49,12 @@ export const initLanguages = () => {
   return initLanguages
 }
 
+const DEFAULT_MESSAGES = { default: 'default' }
+
 export const initialState: IntlState = {
   language: getDefaultLanguage(),
-  messages: { default: 'default' },
-  languages: initLanguages(),
-  updatedAt: Date.now()
+  messages: DEFAULT_MESSAGES,
+  languages: initLanguages()
 }
 
 export const formatLocationLanguageState = (
@@ -130,8 +130,7 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       return {
         ...state,
         messages: updatedMessages,
-        languages: languagesWithFacilities,
-        updatedAt: Date.now()
+        languages: languagesWithFacilities
       }
     default:
       return state

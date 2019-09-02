@@ -11,16 +11,20 @@ import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
 import { queries } from '@register/profile/queries'
-import { createStore, AppStore } from '@register/store'
+import { AppStore } from '@register/store'
+
 import {
   createTestComponent,
   mockUserResponseWithName,
-  getReviewFormFromStore
+  getReviewFormFromStore,
+  mockOfflineData,
+  createTestStore
 } from '@register/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@register/views/DataProvider/death/queries'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@register/views/RegisterForm/ReviewForm'
+import { offlineDataReady } from '@register/offline/actions'
 import { History } from 'history'
 
 const declareScope =
@@ -34,17 +38,26 @@ const mockFetchUserDetails = jest.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
-  let store: AppStore
-  let history: History
-
   const scope = ['register']
   const mock: any = jest.fn()
   let form: IForm
+  let store: AppStore
+  let history: History
 
   beforeAll(async () => {
-    const testStore = createStore()
+    const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
+
+    await store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities
+      })
+    )
+
     form = await getReviewFormFromStore(store, Event.BIRTH)
     getItem.mockReturnValue(registerScopeToken)
     store.dispatch(checkAuth({ '?token': registerScopeToken }))

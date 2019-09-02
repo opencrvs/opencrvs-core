@@ -13,7 +13,7 @@ import {
 import { IStoreState } from '@register/store'
 import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getEventDate, isFreeOfCost } from './utils'
@@ -34,7 +34,7 @@ interface IDispatchProps {
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
 
-type IOwnProps = RouteComponentProps<IMatchParams> & InjectedIntlProps
+type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps
 

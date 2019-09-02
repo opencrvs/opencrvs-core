@@ -8,17 +8,13 @@ import {
   userDetails,
   mockDeathApplicationData
 } from '@register/tests/util'
-import { IntlProvider } from 'react-intl'
+import { createIntl } from 'react-intl'
 import { Event } from '@register/forms'
 import { omit } from 'lodash'
 
-const intlProvider = new IntlProvider(
-  {
-    locale: 'en'
-  },
-  {}
-)
-const { intl } = intlProvider.getChildContext()
+const intl = createIntl({
+  locale: 'en'
+})
 
 describe('PDFUtils related tests', () => {
   it('Print from money receipt template for birth event', () => {

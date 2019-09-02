@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps, FormattedMessage } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  FormattedMessage
+} from 'react-intl'
 import { IStoreState } from '@register/store'
 import { getUserDetails } from '@register/profile/profileSelectors'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -101,7 +105,7 @@ const CancelButton = styled(TertiaryButton)`
     padding: 0;
   }
 `
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   language: string
   languages: IntlState['languages']
   userDetails: IUserDetails | null
