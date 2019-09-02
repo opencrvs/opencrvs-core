@@ -1,6 +1,6 @@
-import { FormattedMessage } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 
-export function getMotherDateOfBirthLabel(): FormattedMessage.MessageDescriptor {
+export function getMotherDateOfBirthLabel(): MessageDescriptor {
   return {
     id: 'form.field.label.motherDateOfBirth',
     defaultMessage: 'Date of birth',
@@ -8,7 +8,7 @@ export function getMotherDateOfBirthLabel(): FormattedMessage.MessageDescriptor 
   }
 }
 
-export function getFatherDateOfBirthLabel(): FormattedMessage.MessageDescriptor {
+export function getFatherDateOfBirthLabel(): MessageDescriptor {
   return {
     id: 'form.field.label.motherDateOfBirth',
     defaultMessage: 'Date of birth',
@@ -16,7 +16,7 @@ export function getFatherDateOfBirthLabel(): FormattedMessage.MessageDescriptor 
   }
 }
 
-export function getDateOfMarriageLabel(): FormattedMessage.MessageDescriptor {
+export function getDateOfMarriageLabel(): MessageDescriptor {
   return {
     id: 'form.field.label.dateOfMarriage',
     defaultMessage: 'Date of marriage',

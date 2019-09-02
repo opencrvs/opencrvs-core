@@ -44,7 +44,7 @@ import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection
 import { isNull, isUndefined, merge } from 'lodash'
 import debounce from 'lodash/debounce'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -174,7 +174,7 @@ type Props = {
 export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
+  IntlShapeProps & { scope: Scope } & RouteComponentProps<{
     pageId: string
     groupId?: string
     applicationId: string
@@ -676,4 +676,4 @@ export const RegisterForm = connect<
       console.log(values)
     }
   }
-)(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<'intl', FullProps>(RegisterFormView))

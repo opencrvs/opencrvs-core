@@ -15,7 +15,7 @@ import { ITheme } from '@register/styledComponents'
 import { IUserDetails } from '@register/utils/userUtils'
 import { printMoneyReceipt } from '@register/views/PrintCertificate/PDFUtils'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
@@ -78,7 +78,7 @@ interface IProps {
   userDetails: IUserDetails | null
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 
 class PaymentComponent extends React.Component<IFullProps> {
   continue = (paymentAmount: string) => {

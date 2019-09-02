@@ -5,7 +5,7 @@ import {
   SuccessButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   IApplication,
@@ -282,7 +282,7 @@ interface IReviewActionState {
   showSubmitModal: boolean
 }
 class ReviewActionComponent extends React.Component<
-  IReviewActionProps & InjectedIntlProps,
+  IReviewActionProps & IntlShapeProps,
   IReviewActionState
 > {
   state = { showSubmitModal: false }

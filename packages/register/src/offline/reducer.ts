@@ -1,5 +1,6 @@
 import { loop, Cmd, Loop, liftState, getModel, getCmd } from 'redux-loop'
 import * as actions from '@register/offline/actions'
+import * as profileActions from '@register/profile/profileActions'
 import { storage } from '@register/storage'
 import { referenceApi } from '@register/utils/referenceApi'
 import { ILanguage } from '@register/i18n/reducer'
@@ -7,6 +8,7 @@ import { filterLocations, getLocation } from '@register/utils/locationUtils'
 import { tempData } from '@register/offline/temp/tempLocations'
 import { ISerializedForm } from '@register/forms'
 import { isOfflineDataLoaded } from './selectors'
+import { IUserDetails } from '@register/utils/userUtils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -36,19 +38,19 @@ export interface IOfflineData {
 
 export type IOfflineDataState = {
   offlineData: Partial<IOfflineData>
-  healthFacilityFilterLocation: string
   offlineDataLoaded: boolean
   loadingError: boolean
+  userDetails?: IUserDetails
 }
 
 export const initialState: IOfflineDataState = {
   offlineData: {},
   offlineDataLoaded: false,
-  loadingError: false,
-  healthFacilityFilterLocation: ''
+  loadingError: false
 }
 
 function checkIfDone(
+  oldState: IOfflineDataState,
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
 ) {
   const loopWithState = liftState(loopOrState)
@@ -57,7 +59,8 @@ function checkIfDone(
 
   if (
     isOfflineDataLoaded(newState.offlineData) &&
-    !newState.offlineDataLoaded
+    (!oldState.offlineDataLoaded ||
+      oldState.offlineData !== newState.offlineData)
   ) {
     return loop(
       { ...newState, offlineDataLoaded: true },
@@ -71,25 +74,15 @@ function checkIfDone(
 }
 
 function reducer(
-  state: IOfflineDataState = initialState,
-  action: actions.Action
+  state: IOfflineDataState,
+  action: actions.Action | profileActions.Action
 ): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
   switch (action.type) {
-    // entrypoint - called from profile reducer
-    // @todo, remove profile reducers dependency to this reducer
-    case actions.SET_OFFLINE_DATA: {
+    // ENTRYPOINT - called from profile reducer
+    case profileActions.USER_DETAILS_AVAILABLE: {
       return loop(
-        {
-          ...state,
-          healthFacilityFilterLocation: getLocation(
-            action.payload,
-            window.config.HEALTH_FACILITY_FILTER
-          )
-        },
-        Cmd.run<
-          actions.IGetOfflineDataFailedAction,
-          actions.IGetOfflineDataSuccessAction
-        >(storage.getItem, {
+        { ...state, userDetails: action.payload },
+        Cmd.run(storage.getItem, {
           args: ['offline'],
           successActionCreator: actions.getOfflineDataSuccess,
           // @todo this action isn't handled
@@ -103,39 +96,38 @@ function reducer(
         offlineDataString ? offlineDataString : '{}'
       )
 
+      const dataLoadingCmds = Cmd.list<actions.Action>([
+        Cmd.run(referenceApi.loadLanguages, {
+          successActionCreator: actions.languagesLoaded,
+          failActionCreator: actions.languagesFailed
+        }),
+        Cmd.run(referenceApi.loadFacilities, {
+          successActionCreator: actions.facilitiesLoaded,
+          failActionCreator: actions.facilitiesFailed
+        }),
+        Cmd.run(referenceApi.loadLocations, {
+          successActionCreator: actions.locationsLoaded,
+          failActionCreator: actions.locationsFailed
+        }),
+        Cmd.run(referenceApi.loadForms, {
+          successActionCreator: actions.formsLoaded,
+          failActionCreator: actions.formsFailed
+        })
+      ])
+
       if (isOfflineDataLoaded(offlineData)) {
-        const newState = {
-          ...state,
-          offlineData,
-          offlineDataLoaded: true
-        }
         return loop(
-          newState,
-          Cmd.action(actions.offlineDataReady(newState.offlineData))
-        )
-      } else {
-        return loop(
-          state,
-          Cmd.list<actions.Action>([
-            Cmd.run(referenceApi.loadLanguages, {
-              successActionCreator: actions.languagesLoaded,
-              failActionCreator: actions.languagesFailed
-            }),
-            Cmd.run(referenceApi.loadFacilities, {
-              successActionCreator: actions.facilitiesLoaded,
-              failActionCreator: actions.facilitiesFailed
-            }),
-            Cmd.run(referenceApi.loadLocations, {
-              successActionCreator: actions.locationsLoaded,
-              failActionCreator: actions.locationsFailed
-            }),
-            Cmd.run(referenceApi.loadForms, {
-              successActionCreator: actions.formsLoaded,
-              failActionCreator: actions.formsFailed
-            })
+          {
+            ...state,
+            offlineData
+          },
+          Cmd.list([
+            // Try loading data regardless as it might have been updated.
+            !state.offlineDataLoaded ? dataLoadingCmds : Cmd.none
           ])
         )
       }
+      return loop(state, dataLoadingCmds)
     }
 
     /*
@@ -212,7 +204,7 @@ function reducer(
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        state.healthFacilityFilterLocation
+        getLocation(state.userDetails!, window.config.HEALTH_FACILITY_FILTER)
       )
 
       return {
@@ -241,14 +233,19 @@ function reducer(
         offlineData: action.payload
       }
     }
+
     default:
       return state
   }
 }
 
 export function offlineDataReducer(
-  state: IOfflineDataState | undefined,
+  state: IOfflineDataState | undefined = initialState,
   action: actions.Action
 ): IOfflineDataState | Loop<IOfflineDataState, actions.Action> {
-  return checkIfDone(reducer(state, action))
+  const newState = reducer(state, action)
+  if (action.type !== actions.READY) {
+    return checkIfDone(state, newState)
+  }
+  return newState
 }

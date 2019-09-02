@@ -5,7 +5,7 @@ import {
   IPDFTemplate,
   TransformableData
 } from '@register/pdfRenderer/transformer/types'
-import { InjectedIntl } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
 import { isUserDetailsDataBase } from '@register/pdfRenderer/transformer/utils'
@@ -17,7 +17,7 @@ export function createPDF(
   template: IPDFTemplate,
   application: IApplication,
   userDetails: IUserDetails,
-  intl: InjectedIntl
+  intl: IntlShape
 ): TCreatedPdf {
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
@@ -50,7 +50,7 @@ export function printPDF(
   template: IPDFTemplate,
   application: IApplication,
   userDetails: IUserDetails,
-  intl: InjectedIntl
+  intl: IntlShape
 ) {
   createPDF(template, application, userDetails, intl).print()
 }

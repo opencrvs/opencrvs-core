@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { keyframes } from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
@@ -62,7 +62,7 @@ const StyledContainer = styled.div`
   }
 `
 class SelectVitalEventView extends React.Component<
-  InjectedIntlProps & {
+  IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
     storeApplication: typeof storeApplication

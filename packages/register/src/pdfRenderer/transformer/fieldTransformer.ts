@@ -1,4 +1,4 @@
-import { InjectedIntl } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import {
   getValueFromApplicationDataByKey,
   getEventMessageDescription,
@@ -23,13 +23,13 @@ import { IApplication } from '@register/applications'
 export const fieldTransformers: IFunctionTransformer = {
   /*
     IntlLabel transforms the internationalized label
-    @params: 
+    @params:
       - messageDescriptor: Mendatory field, which will be used get the appropriate key
-      - MessageValues: Optional field, which will be used to replace any value on the meessage descriptor (if needed)  
+      - MessageValues: Optional field, which will be used to replace any value on the meessage descriptor (if needed)
   */
   IntlLabel: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication
@@ -61,13 +61,13 @@ export const fieldTransformers: IFunctionTransformer = {
 
   /*
     ApplicantName transforms the applicant name from the application data
-    @params: 
-      - key: Mendatory field. Need to provide event wise source object key. Ex: 'birth': 'data.child'  
-      - format: Mendatory field. Need to provide locale wise name fields which will be concatenated together with spaces 
+    @params:
+      - key: Mendatory field. Need to provide event wise source object key. Ex: 'birth': 'data.child'
+      - format: Mendatory field. Need to provide locale wise name fields which will be concatenated together with spaces
   */
   ApplicantName: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication
@@ -95,13 +95,13 @@ export const fieldTransformers: IFunctionTransformer = {
 
   /*
     FieldValue transforms the value for any given key from the application data
-    @params: 
-      - key: Mendatory field. It will be able to traverse through the object structure 
-      and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'        
+    @params:
+      - key: Mendatory field. It will be able to traverse through the object structure
+      and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
   */
   FieldValue: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication
@@ -114,15 +114,15 @@ export const fieldTransformers: IFunctionTransformer = {
 
   /*
     DateFieldValue transforms the date value for any given key from the application data
-    @params: 
-      - key: Optional field. It will be able to traverse through the object structure 
-      and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'        
+    @params:
+      - key: Optional field. It will be able to traverse through the object structure
+      and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
       If key is not provided, it will take current time as dateValue
-      - format: Mendatory field. Formats the extracted date value by this given format. 
+      - format: Mendatory field. Formats the extracted date value by this given format.
   */
   DateFieldValue: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication
@@ -147,14 +147,14 @@ export const fieldTransformers: IFunctionTransformer = {
 
   /*
     FormattedFieldValue transforms the value for one/many given keys from the application data in a provided format
-    @params: 
-      - formattedKeys: Mendatory field. It will be able to traverse through the object structure 
-      and fetch the appropriate value if found otherwise will throw exception. 
-      Ex: '{child.firstName}, {child.lastName}'        
+    @params:
+      - formattedKeys: Mendatory field. It will be able to traverse through the object structure
+      and fetch the appropriate value if found otherwise will throw exception.
+      Ex: '{child.firstName}, {child.lastName}'
   */
   FormattedFieldValue: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication
@@ -184,11 +184,11 @@ export const fieldTransformers: IFunctionTransformer = {
     From/To fields can be a key from the application data or can be ExecutorKey type.
     ExecutorKey type allows us to define different type of default data. Ex: CURRENT_DATE
     Conditions is an array of type, minDiff, maxDiff and output
-    Based on matched condition, this transformer will render the result based on output type 
+    Based on matched condition, this transformer will render the result based on output type
   */
   ConditionExecutor: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication
@@ -221,13 +221,13 @@ export const fieldTransformers: IFunctionTransformer = {
   /*
     NumberConversion allows us to convert any number to given format
     @params:
-     - valueKey: Mendatory field. It will be able to traverse through the object structure 
+     - valueKey: Mendatory field. It will be able to traverse through the object structure
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'registration.registrationNumber'
-     - conversionMap: Mendatory field. ex: { 0: '০', 1: '১'}   
+     - conversionMap: Mendatory field. ex: { 0: '০', 1: '১'}
   */
   NumberConversion: (
     data: TransformableData,
-    intl: InjectedIntl,
+    intl: IntlShape,
     payload?: TransformerPayload
   ) => {
     const application = data as IApplication

@@ -97,6 +97,9 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
+/*
+ * Only called from tests atm
+ */
 export const setOfflineData = (userDetails: IUserDetails): SetOfflineData => ({
   type: SET_OFFLINE_DATA,
   payload: userDetails

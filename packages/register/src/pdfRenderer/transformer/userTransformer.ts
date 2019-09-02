@@ -1,4 +1,4 @@
-import { InjectedIntl } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import {
   IFunctionTransformer,
   TransformableData
@@ -10,9 +10,9 @@ import { IUserDetails } from '@register/utils/userUtils'
 export const userTransformers: IFunctionTransformer = {
   /*
     LoggedInUserName provides the username of the loggedIn user.
-    format: '{firstName} {familyName}' 
+    format: '{firstName} {familyName}'
   */
-  LoggedInUserName: (data: TransformableData, intl: InjectedIntl) => {
+  LoggedInUserName: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
     const nameObj =
       userDetails.name &&
@@ -26,17 +26,17 @@ export const userTransformers: IFunctionTransformer = {
   },
 
   /*
-    LoggedInUserOfficeName provides local office name of the loggedIn user.    
+    LoggedInUserOfficeName provides local office name of the loggedIn user.
   */
-  LoggedInUserOfficeName: (data: TransformableData, intl: InjectedIntl) => {
+  LoggedInUserOfficeName: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
     return userDetails.primaryOffice ? userDetails.primaryOffice.name || '' : ''
   },
 
   /*
-    LoggedInUserRole provides the branded role of the loggedIn user.     
+    LoggedInUserRole provides the branded role of the loggedIn user.
   */
-  LoggedInUserRole: (data: TransformableData, intl: InjectedIntl) => {
+  LoggedInUserRole: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
     return userDetails.role
       ? intl.formatMessage(userMessages[userDetails.role])
@@ -44,9 +44,9 @@ export const userTransformers: IFunctionTransformer = {
   },
 
   /*
-    LoggedInUserRole provides the branded role of the loggedIn user.     
+    LoggedInUserRole provides the branded role of the loggedIn user.
   */
-  LoggedInUserSignature: (data: TransformableData, intl: InjectedIntl) => {
+  LoggedInUserSignature: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
     return userDetails.signature ? userDetails.signature.data || '' : ''
   }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -23,7 +23,7 @@ const EditConfirmationComponent = ({
   handleEdit,
   handleClose,
   intl
-}: IProps & InjectedIntlProps) => {
+}: IProps & IntlShapeProps) => {
   return (
     <Modal
       title={intl.formatMessage(messages.editApplicationConfirmation)}

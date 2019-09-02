@@ -1,13 +1,13 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISysAdminMessages {
-  overviewTab: ReactIntl.FormattedMessage.MessageDescriptor
-  officesTab: ReactIntl.FormattedMessage.MessageDescriptor
-  usersTab: ReactIntl.FormattedMessage.MessageDescriptor
-  devicesTab: ReactIntl.FormattedMessage.MessageDescriptor
-  networkTab: ReactIntl.FormattedMessage.MessageDescriptor
-  configTab: ReactIntl.FormattedMessage.MessageDescriptor
-  systemTitle: ReactIntl.FormattedMessage.MessageDescriptor
+  overviewTab: MessageDescriptor
+  officesTab: MessageDescriptor
+  usersTab: MessageDescriptor
+  devicesTab: MessageDescriptor
+  networkTab: MessageDescriptor
+  configTab: MessageDescriptor
+  systemTitle: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {

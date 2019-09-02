@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { LightLogo } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -30,7 +30,7 @@ const LoginButton = styled(PrimaryButton)`
 export class SetupConfirmationView extends React.Component<
   {
     redirectToAuthentication: typeof redirectToAuthentication
-  } & InjectedIntlProps
+  } & IntlShapeProps
 > {
   async componentDidMount() {
     await storage.removeItem(USER_DETAILS)

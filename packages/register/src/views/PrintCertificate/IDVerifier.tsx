@@ -9,7 +9,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
 import { IFormSectionData } from '@register/forms'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@register/i18n/messages'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 import { identityNameMapper } from '@register/forms/identity'
@@ -76,7 +76,7 @@ interface IIDVerifierState {
 }
 
 class IDVerifierComponent extends React.Component<
-  IIDVerifierProps & InjectedIntlProps,
+  IIDVerifierProps & IntlShapeProps,
   IIDVerifierState
 > {
   state = { showPrompt: false }

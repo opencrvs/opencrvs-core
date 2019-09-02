@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createTestComponent, flushPromises } from '@register/tests/util'
+import { createTestComponent } from '@register/tests/util'
 import { createStore } from '@register/store'
 import { CreatePassword } from './CreatePassword'
 import { ReactWrapper } from 'enzyme'

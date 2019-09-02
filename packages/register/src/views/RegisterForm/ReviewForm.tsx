@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
@@ -43,7 +43,7 @@ interface IApplicationProp {
 type IProps = IReviewProps &
   IApplicationProp &
   FullProps &
-  InjectedIntlProps &
+  IntlShapeProps &
   RouteComponentProps<{}>
 
 export interface IReviewSectionDetails {

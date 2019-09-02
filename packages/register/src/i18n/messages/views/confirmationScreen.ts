@@ -1,12 +1,12 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConfirmationScreenMessages {
-  backButton: ReactIntl.FormattedMessage.MessageDescriptor
-  boxHeaderDesc: ReactIntl.FormattedMessage.MessageDescriptor
-  trackingSectionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  trackingSectionDesc: ReactIntl.FormattedMessage.MessageDescriptor
-  backToDuplicatesButton: ReactIntl.FormattedMessage.MessageDescriptor
-  newButton: ReactIntl.FormattedMessage.MessageDescriptor
+  backButton: MessageDescriptor
+  boxHeaderDesc: MessageDescriptor
+  trackingSectionTitle: MessageDescriptor
+  trackingSectionDesc: MessageDescriptor
+  backToDuplicatesButton: MessageDescriptor
+  newButton: MessageDescriptor
 }
 
 const messagesToDefine: IConfirmationScreenMessages = {

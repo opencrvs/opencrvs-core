@@ -6,7 +6,8 @@ import {
   mockDeathApplicationData,
   mockDeathApplicationDataWithoutFirstNames,
   getRegisterFormFromStore,
-  getReviewFormFromStore
+  getReviewFormFromStore,
+  createTestStore
 } from '@register/tests/util'
 import { RegisterForm } from '@register/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -24,7 +25,7 @@ import {
   SUBMISSION_STATUS
 } from '@register/applications'
 import { v4 as uuid } from 'uuid'
-import { createStore } from '@register/store'
+import { AppStore } from '@register/store'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -46,6 +47,7 @@ import { formMessages as messages } from '@register/i18n/messages'
 import * as profileSelectors from '@register/profile/profileSelectors'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { waitForElement } from '@register/tests/wait-for-element'
+import { History } from 'history'
 
 describe('when user logs in', () => {
   // Some mock data
@@ -165,7 +167,7 @@ describe('when there is no user-data saved', () => {
 
 describe('when user is in the register form before initial draft load', () => {
   it('throws error when draft not found after initial drafts load', async () => {
-    const { store, history } = createStore()
+    const { store, history } = await createTestStore()
 
     const mock: any = jest.fn()
     const draft = createApplication(Event.BIRTH)
@@ -199,12 +201,13 @@ describe('when user is in the register form before initial draft load', () => {
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>
-  let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
+
+  let store: AppStore
+  let history: History
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
-      const storeContext = createStore()
+      const storeContext = await createTestStore()
       store = storeContext.store
       history = storeContext.history
 
@@ -281,15 +284,22 @@ describe('when user is in the register form for birth event', () => {
 })
 
 describe('when user is in the register form for death event', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
   let form: IForm
+  let store: AppStore
+  let history: History
+  let draft: ReturnType<typeof createApplication>
+
   beforeEach(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+
+    draft = createApplication(Event.DEATH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
     form = await getRegisterFormFromStore(store, Event.DEATH)
   })
   describe('when user is in optional cause of death section', () => {
@@ -884,13 +894,13 @@ describe('when user is in the register form for death event', () => {
 
 describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
-  let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
+  let store: AppStore
+  let history: History
   const mock = jest.fn()
 
   beforeEach(async () => {
     mock.mockReset()
-    const storeContext = createStore()
+    const storeContext = await createTestStore()
     store = storeContext.store
     history = storeContext.history
 
@@ -1005,7 +1015,7 @@ describe('when user is in the register form preview section', () => {
 describe('when user is in the register form review section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store, history } = await createTestStore()
     // @ts-ignore
     const application = createReviewApplication(
       uuid(),
@@ -1058,10 +1068,8 @@ describe('when user is in the register form review section', () => {
 })
 
 describe('When user is in Preview section death event', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
+  let store: AppStore
+  let history: History
   let component: ReactWrapper<{}, {}>
   let deathDraft
   let deathForm: IForm
@@ -1069,6 +1077,13 @@ describe('When user is in Preview section death event', () => {
   const mock: any = jest.fn()
 
   beforeEach(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+
+    const draft = createApplication(Event.DEATH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
     jest.clearAllMocks()
     // @ts-ignore
     deathDraft = createReviewApplication(
@@ -1203,17 +1218,23 @@ describe('When user is in Preview section death event', () => {
 })
 
 describe('When user is in Preview section death event in offline mode', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
   let deathDraft
   let deathForm: IForm
+  let store: AppStore
+  let history: History
 
   const mock: any = jest.fn()
 
   beforeEach(async () => {
+    const testStore = await createTestStore()
+    history = testStore.history
+    store = testStore.store
+
+    const draft = createApplication(Event.DEATH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
+
     Object.defineProperty(window.navigator, 'onLine', {
       value: false,
       writable: true

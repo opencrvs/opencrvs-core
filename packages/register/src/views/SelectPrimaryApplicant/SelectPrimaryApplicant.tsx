@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -22,12 +22,7 @@ import {
 import { IStoreState } from '@register/store'
 import { messages } from '@register/i18n/messages/views/selectPrimaryApplicant'
 import { formMessages, buttonMessages } from '@register/i18n/messages'
-import {
-  IFormSection,
-  Section,
-  DeathSection,
-  BirthSection
-} from '@register/forms'
+import { IFormSection, BirthSection } from '@register/forms'
 import { getBirthSection } from '@register/forms/register/application-selectors'
 
 const Title = styled.h4`
@@ -47,7 +42,7 @@ interface IMatchProps {
   applicationId: string
 }
 
-type IFullProps = InjectedIntlProps &
+type IFullProps = IntlShapeProps &
   RouteComponentProps<IMatchProps> & {
     application: IApplication
     modifyApplication: typeof modifyApplication

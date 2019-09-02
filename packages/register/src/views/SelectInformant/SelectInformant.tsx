@@ -1,6 +1,10 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -94,7 +98,7 @@ export interface IInformantField {
 }
 
 const setInformantFields = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   event: string
 ): IInformantField[] => {
   if (event === Event.BIRTH) {
@@ -218,7 +222,7 @@ type IFullProps = {
   goToPrimaryApplicant: typeof goToPrimaryApplicant
   registrationSection: IFormSection
   applicantsSection: IFormSection
-} & InjectedIntlProps &
+} & IntlShapeProps &
   RouteComponentProps<IMatchProps>
 
 interface IState {
