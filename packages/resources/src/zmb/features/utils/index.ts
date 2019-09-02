@@ -5,13 +5,14 @@ type ISupportedType =
   | fhir.Practitioner
   | fhir.PractitionerRole
   | fhir.Location
-  | IOISFLocation
+  | ICSVLocation
 
-export interface IOISFLocation {
-  bbsCode: string
+export interface ICSVLocation {
+  statisticalID: string
   name: string
-  nameBn: string
-  id: number
+  partOf: string
+  code: string
+  physicalType: string
 }
 
 export interface IStatistic {

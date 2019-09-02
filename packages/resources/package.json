@@ -14,7 +14,8 @@
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
     "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts",
     "save:testData": "yarn prep:employees:bgd && yarn save:testLocations && yarn save:testEmployees",
-    "populate:bgd": "bash populateBgd.sh"
+    "populate:bgd": "bash populateBgd.sh",
+    "populate:zmb": "bash populateZmb.sh"
   },
   "devDependencies": {
     "csv2json": "^1.4.2",
