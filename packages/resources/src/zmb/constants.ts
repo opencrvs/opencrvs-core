@@ -8,3 +8,8 @@ export const ADMIN_STRUCTURE_SOURCE = path.join(
   process.cwd(),
   'src/zmb/features/administrative/'
 )
+
+export const FACILITIES_SOURCE = path.join(
+  process.cwd(),
+  'src/zmb/features/facilities/'
+)

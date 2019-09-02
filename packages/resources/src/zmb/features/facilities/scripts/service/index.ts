@@ -1,4 +1,59 @@
-import { ILocation } from '@resources/zmb/features/utils'
+import {
+  ILocation,
+  getLocationIDByDescription,
+  sendToFhir
+} from '@resources/zmb/features/utils'
+import { ORG_URL } from '@resources/constants'
+import { Response } from 'node-fetch'
+
+interface IFacility {
+  statisticalID: string
+  name: string
+  partOf: string
+  code: string
+  physicalType: string
+  district: string
+  state: string
+}
+
+const composeFhirLocation = (
+  location: IFacility,
+  partOfReference: string
+): fhir.Location => {
+  return {
+    resourceType: 'Location',
+    identifier: [],
+    name: location.name, // English name
+    alias: [location.name], // Bangla name in element 0
+    status: 'active',
+    mode: 'instance',
+    partOf: {
+      reference: partOfReference // Reference to the location this office falls under, if any
+    },
+    type: {
+      coding: [
+        {
+          system: `${ORG_URL}/specs/location-type`,
+          code: location.code
+        }
+      ]
+    },
+    physicalType: {
+      coding: [
+        {
+          code: 'bu',
+          display: 'Building'
+        }
+      ]
+    },
+    telecom: [],
+    address: {
+      line: [],
+      district: location.district,
+      state: location.state
+    }
+  }
+}
 
 export function generateLocationResource(
   fhirLocation: fhir.Location
@@ -17,4 +72,38 @@ export function generateLocationResource(
     fhirLocation.type.coding[0].code
   loc.partOf = fhirLocation.partOf && fhirLocation.partOf.reference
   return loc
+}
+
+export async function composeAndSaveFacilities(
+  facilities: IFacility[],
+  parentLocations: fhir.Location[]
+): Promise<fhir.Location[]> {
+  const locations: fhir.Location[] = []
+  for (const facility of facilities) {
+    const parentLocationID = getLocationIDByDescription(
+      parentLocations,
+      facility.statisticalID
+    )
+    const newLocation: fhir.Location = composeFhirLocation(
+      facility,
+      `Location/${parentLocationID}`
+    )
+    // tslint:disable-next-line:no-console
+    console.log(
+      `Saving facility ... type: ${facility.code}, name: ${facility.name}`
+    )
+    const savedLocationResponse = (await sendToFhir(
+      newLocation,
+      '/Location',
+      'POST'
+    ).catch(err => {
+      throw Error('Cannot save location to FHIR')
+    })) as Response
+    const locationHeader = savedLocationResponse.headers.get(
+      'location'
+    ) as string
+    newLocation.id = locationHeader.split('/')[3]
+    locations.push(newLocation)
+  }
+  return locations
 }
