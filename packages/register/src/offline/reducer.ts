@@ -224,7 +224,7 @@ function reducer(
         offlineData: {
           ...state.offlineData,
           assets: {
-            ...action.payload
+            logo: action.payload.logo
           }
         }
       }
