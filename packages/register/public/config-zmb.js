@@ -2,6 +2,7 @@ window.config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'zmb',
+  COUNTRY_LOGO_FILE: 'logo.png',
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en',
