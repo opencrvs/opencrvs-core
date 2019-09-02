@@ -33,7 +33,7 @@ const languageFonts = {
   }
 }
 
-export const fonts = (country: string, language: string): IFonts => {
+export const fonts = (language: string): IFonts => {
   const regularFont =
     languageFonts[language].regularFontFamily ||
     languageFonts.default.regularFontFamily

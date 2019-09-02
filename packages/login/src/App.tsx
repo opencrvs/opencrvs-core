@@ -22,13 +22,7 @@ export class App extends React.Component {
       <ErrorBoundary>
         <Provider store={store}>
           <IntlContainer>
-            <ThemeProvider
-              theme={getTheme(
-                (window as Window & { config: { [key: string]: string } })
-                  .config.COUNTRY,
-                getDefaultLanguage()
-              )}
-            >
+            <ThemeProvider theme={getTheme(getDefaultLanguage())}>
               <ConnectedRouter history={history}>
                 <DarkPageContainer>
                   <Switch>

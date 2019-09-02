@@ -42,9 +42,7 @@ export class App extends React.Component<IAppProps, {}> {
         <ApolloProvider client={this.props.client || client}>
           <Provider store={this.props.store}>
             <I18nContainer>
-              <ThemeProvider
-                theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-              >
+              <ThemeProvider theme={getTheme(getDefaultLanguage())}>
                 <ConnectedRouter history={this.props.history}>
                   <Page>
                     <Switch>

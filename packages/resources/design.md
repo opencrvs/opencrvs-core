@@ -19,7 +19,7 @@ This will serve raw assets like images via an unprotected endpoint so these may 
 
 ## GET `/definitions` 🔒
 
-The `/definitions` endpoint will return JSON with the following format along with a timestamp so that the app may know when it need to update these definitions. The structure is as follows:
+The `/definitions` endpoint will return JSON with the following format:
 
 ```json
 {
@@ -47,8 +47,7 @@ The `/definitions` endpoint will return JSON with the following format along wit
     "birth": { ... },
     "death": { ... },
     "receipt": { ... }
-  },
-  "timestamp": ""
+  }
 }
 ```
 
