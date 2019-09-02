@@ -24,7 +24,7 @@ const composeFhirLocation = (
     resourceType: 'Location',
     identifier: [],
     name: location.name, // English name
-    alias: [location.name], // Bangla name in element 0
+    alias: [location.name], // Secondary language name in element 0
     status: 'active',
     mode: 'instance',
     partOf: {
