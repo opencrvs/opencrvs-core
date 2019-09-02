@@ -2571,7 +2571,7 @@ export const mockOfflineData = {
     ).toString()
   ).data,
   assets: {
-    logo: 'dummy base64 log'
+    logo: `data:image;base64,${validImageB64String}`
   }
 }
 
