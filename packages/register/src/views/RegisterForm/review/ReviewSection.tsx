@@ -74,8 +74,6 @@ import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
 import { buttonMessages } from '@register/i18n/messages'
 import { REJECTED, BIRTH } from '@register/utils/constants'
 import { ReviewHeader } from './ReviewHeader'
-// TODO: we need to move this to resource package as well
-import { SEAL_BD_GOVT } from '@opencrvs/register/src/pdfRenderer/templates/logo'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import { findDOMNode } from 'react-dom'
@@ -570,6 +568,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       pageRoute,
       registrationSection,
       documentsSection,
+      offlineResources,
       draft: { event }
     } = this.props
 
@@ -603,14 +602,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
     const isDraft =
       this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
-
     return (
       <FullBodyContent>
         <Row>
           <StyledColumn>
             <ReviewHeader
               id="review_header"
-              logoSource={SEAL_BD_GOVT}
+              logoSource={offlineResources.assets.logo}
               title={intl.formatMessage(
                 dynamicMessages[`${window.config.COUNTRY}GovtName`]
               )}

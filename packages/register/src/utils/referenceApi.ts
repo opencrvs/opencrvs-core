@@ -73,13 +73,14 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 
 async function loadAssets(): Promise<IAssetResponse> {
   const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const base64Logo = await ImageDownloader(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
   return {
-    logo: await ImageDownloader(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
+    logo: `data:image;base64,${base64Logo}`
   }
 }
 
