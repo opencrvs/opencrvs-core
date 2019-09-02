@@ -1,8 +1,9 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { PrimitiveType } from 'intl-messageformat'
 
 export interface IValidationResult {
   message: MessageDescriptor
-  props?: { [key: string]: any }
+  props?: { [key: string]: PrimitiveType }
 }
 
 export type Validation = (value: string) => IValidationResult | undefined
