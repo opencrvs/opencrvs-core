@@ -2610,9 +2610,7 @@ export async function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider
-            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-          >
+          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
             {node}
           </ThemeProvider>
         </I18nContainer>

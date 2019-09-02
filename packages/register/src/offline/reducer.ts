@@ -50,12 +50,6 @@ export const initialState: IOfflineDataState = {
 }
 
 async function saveOfflineData(offlineData: IOfflineData) {
-  // @ts-ignore
-  if (storage.setItem.mock) {
-    // don't save in tests as it introduces a performance hit
-    return
-  }
-
   return storage.setItem('offline', JSON.stringify(offlineData))
 }
 

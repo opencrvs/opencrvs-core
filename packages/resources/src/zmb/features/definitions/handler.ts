@@ -8,7 +8,6 @@ import {
 interface IDefinitionsResponse {
   forms: IForms
   languages: ILanguage[]
-  timestamp: string
 }
 
 export async function definitionsHandler(
@@ -18,7 +17,6 @@ export async function definitionsHandler(
   const application = request.params.application
   return {
     forms: await getForms(),
-    languages: (await getLanguages(application)).data,
-    timestamp: ''
+    languages: (await getLanguages(application)).data
   }
 }
