@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
 import { getLanguage } from '@register/i18n/selectors'
@@ -99,7 +99,7 @@ interface ILocation {
   detailedLocation: string
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 class SearchFieldClass extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)

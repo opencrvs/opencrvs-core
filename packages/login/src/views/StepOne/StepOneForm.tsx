@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  defineMessages,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 
 import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
@@ -23,7 +28,7 @@ import {
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
 export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   stepOneTitle: {
     id: 'buttons.login',
@@ -149,14 +154,14 @@ export interface IDispatchProps {
 
 type IStepOneForm = IProps & IDispatchProps
 
-export type FullProps = InjectedIntlProps &
+export type FullProps = IntlShapeProps &
   InjectedFormProps<IAuthenticationData, IStepOneForm> &
   IStepOneForm
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
 
-type Props = WrappedFieldProps & InjectedIntlProps
+type Props = WrappedFieldProps & IntlShapeProps
 
 const UserNameInput = injectIntl((props: Props) => {
   const { intl, meta, input, ...otherProps } = props
@@ -242,14 +247,14 @@ export class StepOneForm extends React.Component<FullProps> {
             <Field
               name={userNameField.name}
               validate={userNameField.validate}
-              component={UserNameInput as React.ComponentClass<any>}
+              component={UserNameInput}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
               name={passwordField.name}
               validate={passwordField.validate}
-              component={Password as React.ComponentClass<any>}
+              component={Password}
             />
           </FieldWrapper>
           <ActionWrapper>

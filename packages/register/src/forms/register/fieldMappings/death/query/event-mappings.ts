@@ -1,4 +1,4 @@
-import { IFormField, IFormData, Event, IFormSectionData } from '@register/forms'
+import { IFormField, IFormData, Event } from '@register/forms'
 import { REGISTRATION_SECTION } from '@register/forms/register/fieldMappings/death/query/documents-mappings'
 import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { transformStatusData } from '@register/forms/register/fieldMappings/birth/query/registration-mappings'

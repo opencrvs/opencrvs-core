@@ -2,7 +2,7 @@ import * as React from 'react'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import { IApplication } from '@register/applications'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { sentenceCase } from '@register/utils/data-formatting'
 import moment from 'moment'
@@ -16,7 +16,7 @@ interface IInProgressProps {
   goToApplicationDetails: typeof goToApplicationDetails
 }
 
-type IFullProps = IInProgressProps & InjectedIntlProps
+type IFullProps = IInProgressProps & IntlShapeProps
 
 interface IState {
   inProgressPageNo: number

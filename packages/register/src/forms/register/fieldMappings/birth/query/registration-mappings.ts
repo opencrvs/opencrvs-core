@@ -1,4 +1,4 @@
-import { IFormData, Event, IFormSectionData } from '@register/forms'
+import { IFormData, Event } from '@register/forms'
 import {
   GQLRegWorkflow,
   GQLRegStatus

@@ -1,16 +1,12 @@
 import { userDetails, validImageB64String } from '@register/tests/util'
 import { userTransformers } from '@register/pdfRenderer/transformer/userTransformer'
-import { IntlProvider } from 'react-intl'
+import { createIntl } from 'react-intl'
 import { omit } from 'lodash'
 
 describe("PDF template's logged-in user field related transformer tests", () => {
-  const intlProvider = new IntlProvider(
-    {
-      locale: 'en'
-    },
-    {}
-  )
-  const { intl } = intlProvider.getChildContext()
+  const intl = createIntl({
+    locale: 'en'
+  })
 
   describe('LoggedInUserName transformer tests', () => {
     it('Returns the name properly', () => {
@@ -46,15 +42,13 @@ describe("PDF template's logged-in user field related transformer tests", () => 
   })
   describe('LoggedInUserRole transformer tests', () => {
     it('Returns the role properly', () => {
-      const { intl } = new IntlProvider(
-        {
-          locale: 'en',
-          messages: {
-            FIELD_AGENT: 'Field Agent'
-          }
-        },
-        {}
-      ).getChildContext()
+      const intl = createIntl({
+        locale: 'en',
+        messages: {
+          FIELD_AGENT: 'Field Agent'
+        }
+      })
+
       const transformedValue = userTransformers.LoggedInUserRole(
         userDetails,
         intl

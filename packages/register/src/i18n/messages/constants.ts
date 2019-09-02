@@ -1,66 +1,66 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages {
-  areYouSure: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantContactNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  application: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationCollectedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationFailedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationInformantLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationRegisteredOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationRejectedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationStartedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationState: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationSubmittedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationUpdatedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  applicationValidatedOn: ReactIntl.FormattedMessage.MessageDescriptor
-  birth: ReactIntl.FormattedMessage.MessageDescriptor
-  by: ReactIntl.FormattedMessage.MessageDescriptor
-  certified: ReactIntl.FormattedMessage.MessageDescriptor
-  collected: ReactIntl.FormattedMessage.MessageDescriptor
-  collectedBy: ReactIntl.FormattedMessage.MessageDescriptor
-  comment: ReactIntl.FormattedMessage.MessageDescriptor
-  dateOfApplication: ReactIntl.FormattedMessage.MessageDescriptor
-  death: ReactIntl.FormattedMessage.MessageDescriptor
-  declared: ReactIntl.FormattedMessage.MessageDescriptor
-  dob: ReactIntl.FormattedMessage.MessageDescriptor
-  dod: ReactIntl.FormattedMessage.MessageDescriptor
-  eventDate: ReactIntl.FormattedMessage.MessageDescriptor
-  failedToSend: ReactIntl.FormattedMessage.MessageDescriptor
-  gender: ReactIntl.FormattedMessage.MessageDescriptor
-  id: ReactIntl.FormattedMessage.MessageDescriptor
-  issuedBy: ReactIntl.FormattedMessage.MessageDescriptor
-  labelLanguage: ReactIntl.FormattedMessage.MessageDescriptor
-  labelPassword: ReactIntl.FormattedMessage.MessageDescriptor
-  labelPhone: ReactIntl.FormattedMessage.MessageDescriptor
-  labelPin: ReactIntl.FormattedMessage.MessageDescriptor
-  labelRole: ReactIntl.FormattedMessage.MessageDescriptor
-  lastEdited: ReactIntl.FormattedMessage.MessageDescriptor
-  name: ReactIntl.FormattedMessage.MessageDescriptor
-  newBirthRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  newDeathRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  noNameProvided: ReactIntl.FormattedMessage.MessageDescriptor
-  noResults: ReactIntl.FormattedMessage.MessageDescriptor
-  pendingConnection: ReactIntl.FormattedMessage.MessageDescriptor
-  performanceTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  reason: ReactIntl.FormattedMessage.MessageDescriptor
-  registered: ReactIntl.FormattedMessage.MessageDescriptor
-  rejected: ReactIntl.FormattedMessage.MessageDescriptor
-  rejectedDays: ReactIntl.FormattedMessage.MessageDescriptor
-  relationship: ReactIntl.FormattedMessage.MessageDescriptor
-  review: ReactIntl.FormattedMessage.MessageDescriptor
-  search: ReactIntl.FormattedMessage.MessageDescriptor
-  sending: ReactIntl.FormattedMessage.MessageDescriptor
-  sentOn: ReactIntl.FormattedMessage.MessageDescriptor
-  status: ReactIntl.FormattedMessage.MessageDescriptor
-  submissionStatus: ReactIntl.FormattedMessage.MessageDescriptor
-  trackingId: ReactIntl.FormattedMessage.MessageDescriptor
-  type: ReactIntl.FormattedMessage.MessageDescriptor
-  update: ReactIntl.FormattedMessage.MessageDescriptor
-  user: ReactIntl.FormattedMessage.MessageDescriptor
-  username: ReactIntl.FormattedMessage.MessageDescriptor
-  waitingToSend: ReactIntl.FormattedMessage.MessageDescriptor
+  areYouSure: MessageDescriptor
+  applicantContactNumber: MessageDescriptor
+  application: MessageDescriptor
+  applicationCollectedOn: MessageDescriptor
+  applicationFailedOn: MessageDescriptor
+  applicationInformantLabel: MessageDescriptor
+  applicationRegisteredOn: MessageDescriptor
+  applicationRejectedOn: MessageDescriptor
+  applicationStartedOn: MessageDescriptor
+  applicationState: MessageDescriptor
+  applicationSubmittedOn: MessageDescriptor
+  applicationTitle: MessageDescriptor
+  applicationUpdatedOn: MessageDescriptor
+  applicationValidatedOn: MessageDescriptor
+  birth: MessageDescriptor
+  by: MessageDescriptor
+  certified: MessageDescriptor
+  collected: MessageDescriptor
+  collectedBy: MessageDescriptor
+  comment: MessageDescriptor
+  dateOfApplication: MessageDescriptor
+  death: MessageDescriptor
+  declared: MessageDescriptor
+  dob: MessageDescriptor
+  dod: MessageDescriptor
+  eventDate: MessageDescriptor
+  failedToSend: MessageDescriptor
+  gender: MessageDescriptor
+  id: MessageDescriptor
+  issuedBy: MessageDescriptor
+  labelLanguage: MessageDescriptor
+  labelPassword: MessageDescriptor
+  labelPhone: MessageDescriptor
+  labelPin: MessageDescriptor
+  labelRole: MessageDescriptor
+  lastEdited: MessageDescriptor
+  name: MessageDescriptor
+  newBirthRegistration: MessageDescriptor
+  newDeathRegistration: MessageDescriptor
+  noNameProvided: MessageDescriptor
+  noResults: MessageDescriptor
+  pendingConnection: MessageDescriptor
+  performanceTitle: MessageDescriptor
+  reason: MessageDescriptor
+  registered: MessageDescriptor
+  rejected: MessageDescriptor
+  rejectedDays: MessageDescriptor
+  relationship: MessageDescriptor
+  review: MessageDescriptor
+  search: MessageDescriptor
+  sending: MessageDescriptor
+  sentOn: MessageDescriptor
+  status: MessageDescriptor
+  submissionStatus: MessageDescriptor
+  trackingId: MessageDescriptor
+  type: MessageDescriptor
+  update: MessageDescriptor
+  user: MessageDescriptor
+  username: MessageDescriptor
+  waitingToSend: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -378,7 +378,7 @@ export const constantsMessages: IConstantsMessages = defineMessages(
 )
 
 interface IDynamicConstants {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 }
 
 const dynamicMessagesToDefine: IDynamicConstants = {

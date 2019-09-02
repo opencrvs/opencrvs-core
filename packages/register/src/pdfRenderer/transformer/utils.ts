@@ -10,6 +10,7 @@ import {
   IFormFieldValue
 } from '@opencrvs/register/src/forms'
 import { IApplication } from '@register/applications'
+import { MessageDescriptor } from 'react-intl'
 
 const eventMessageDescriptor = {
   [Event.BIRTH]: {
@@ -55,9 +56,7 @@ export function isUserDetailsDataBase(transformerDef: IFieldTransformer) {
   )
 }
 
-export function getEventMessageDescription(
-  event: Event
-): ReactIntl.FormattedMessage.MessageDescriptor {
+export function getEventMessageDescription(event: Event): MessageDescriptor {
   return eventMessageDescriptor[event]
 }
 

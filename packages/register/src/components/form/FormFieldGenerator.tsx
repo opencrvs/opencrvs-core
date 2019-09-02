@@ -74,11 +74,10 @@ import { InformativeRadioGroup } from '@register/views/PrintCertificate/Informat
 import { SearchField } from './SearchField'
 import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
 import {
-  InjectedIntlProps,
+  WrappedComponentProps as IntlShapeProps,
   injectIntl,
   FormattedHTMLMessage,
-  FormattedMessage,
-  MessageValue
+  MessageDescriptor
 } from 'react-intl'
 import {
   withFormik,
@@ -295,14 +294,14 @@ function GeneratedInputField({
     return <FieldGroupTitle>{fieldDefinition.label}</FieldGroupTitle>
   }
   if (fieldDefinition.type === PARAGRAPH) {
-    const label = (fieldDefinition.label as unknown) as FormattedMessage.MessageDescriptor
+    const label = (fieldDefinition.label as unknown) as MessageDescriptor
 
     return (
       <Paragraph fontSize={fieldDefinition.fontSize}>
         <FormattedHTMLMessage
           {...label}
           values={{
-            [fieldDefinition.name]: value as MessageValue
+            [fieldDefinition.name]: value as any
           }}
         />
       </Paragraph>
@@ -410,7 +409,7 @@ interface IStateProps {
 type Props = IFormSectionProps &
   IStateProps &
   FormikProps<IFormSectionData> &
-  InjectedIntlProps
+  IntlShapeProps
 
 interface IQueryData {
   [key: string]: any

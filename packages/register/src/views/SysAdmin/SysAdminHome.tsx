@@ -10,7 +10,7 @@ import styled, { withTheme } from '@register/styledComponents'
 import { SYS_ADMIN_ROLES } from '@register/utils/constants'
 import { IUserDetails } from '@register/utils/userUtils'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { UserTab } from './user/userTab'
@@ -55,7 +55,7 @@ interface IMatchParams {
   tabId: string
 }
 
-type IFulProps = IProps & InjectedIntlProps & RouteComponentProps<IMatchParams>
+type IFulProps = IProps & IntlShapeProps & RouteComponentProps<IMatchParams>
 
 class SysAdminHomeView extends React.Component<IFulProps> {
   render() {

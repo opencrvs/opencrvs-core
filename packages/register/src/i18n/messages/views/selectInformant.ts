@@ -1,11 +1,11 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISelectInformantMessages {
-  birthInformantTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  deathInformantTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  parents: ReactIntl.FormattedMessage.MessageDescriptor
-  birthErrorMessage: ReactIntl.FormattedMessage.MessageDescriptor
-  deathErrorMessage: ReactIntl.FormattedMessage.MessageDescriptor
+  birthInformantTitle: MessageDescriptor
+  deathInformantTitle: MessageDescriptor
+  parents: MessageDescriptor
+  birthErrorMessage: MessageDescriptor
+  deathErrorMessage: MessageDescriptor
 }
 
 const messagesToDefine: ISelectInformantMessages = {

@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps, InjectedIntl } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  IntlShape
+} from 'react-intl'
 import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
 import {
   SettingsBlack,
@@ -40,10 +44,10 @@ interface IState {
   showLogoutModal: boolean
 }
 
-type FullProps = IProps & InjectedIntlProps
+type FullProps = IProps & IntlShapeProps
 
 class ProfileMenuComponent extends React.Component<FullProps, IState> {
-  getMenuItems = (intl: InjectedIntl): IToggleMenuItem[] => {
+  getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
       icon: <SettingsBlack />,
@@ -59,7 +63,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   }
 
   getMenuHeader = (
-    intl: InjectedIntl,
+    intl: IntlShape,
     language: string,
     userDetails: IUserDetails | null
   ): JSX.Element => {

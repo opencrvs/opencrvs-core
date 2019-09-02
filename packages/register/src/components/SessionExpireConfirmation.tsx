@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@register/styledComponents'
 import { Modal } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -20,7 +20,7 @@ interface IProps {
 }
 
 class SessionExpireComponent extends React.Component<
-  SessionExpireProps & IProps & InjectedIntlProps
+  SessionExpireProps & IProps & IntlShapeProps
 > {
   handleLogin = () => {
     console.log('login')

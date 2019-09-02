@@ -1,13 +1,13 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISearchMessages {
-  dataTableResults: ReactIntl.FormattedMessage.MessageDescriptor
-  dataTableNoResults: ReactIntl.FormattedMessage.MessageDescriptor
-  listItemEventRegistrationNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  informantContact: ReactIntl.FormattedMessage.MessageDescriptor
-  searchingFor: ReactIntl.FormattedMessage.MessageDescriptor
-  searchResultFor: ReactIntl.FormattedMessage.MessageDescriptor
-  totalResultText: ReactIntl.FormattedMessage.MessageDescriptor
+  dataTableResults: MessageDescriptor
+  dataTableNoResults: MessageDescriptor
+  listItemEventRegistrationNumber: MessageDescriptor
+  informantContact: MessageDescriptor
+  searchingFor: MessageDescriptor
+  searchResultFor: MessageDescriptor
+  totalResultText: MessageDescriptor
 }
 
 const messagesToDefine: ISearchMessages = {

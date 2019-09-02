@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Tab, Tabs } from '@opencrvs/components/lib/interface'
 import { IFormSection } from '@register/forms'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IFormTabProps {
   sections: IFormSection[]
@@ -14,7 +14,7 @@ function FormTabsComponent({
   activeTabId,
   onTabClick,
   intl
-}: IFormTabProps & InjectedIntlProps) {
+}: IFormTabProps & IntlShapeProps) {
   return (
     <Tabs>
       {sections.map(({ name, id, disabled }) => (
