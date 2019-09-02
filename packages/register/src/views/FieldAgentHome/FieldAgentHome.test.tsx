@@ -133,8 +133,6 @@ describe('FieldAgentHome tests', () => {
     const app = testComponent.component.update()
 
     expect(app.find('#field-agent-home_error').hostNodes()).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
 
   it('renders page with three tabs', async () => {

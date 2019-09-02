@@ -410,10 +410,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let uploadedDocuments: IFileValue[] = []
 
     for (let index in draft.data[draftItemName]) {
-      if (isArray(draft.data[draftItemName][index]))
-        uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
+      if (isArray(draft.data[draftItemName][index])) {
+        const newDocuments = (draft.data[draftItemName][
           index
-        ] as IFileValue[])
+        ] as unknown) as IFileValue[]
+        uploadedDocuments = uploadedDocuments.concat(newDocuments)
+      }
     }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
@@ -424,7 +426,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         sectionMapping[activeSection as keyof typeof sectionMapping] || []
 
       if (
-        allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
+        allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
         const title = sectionTitle[activeSection as keyof typeof sectionMapping]
         const label = title + ' ' + document.optionValues[1]

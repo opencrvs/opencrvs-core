@@ -10167,7 +10167,7 @@
                 "name": "paragraph",
                 "type": "PARAGRAPH",
                 "label": {
-                  "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                  "defaultMessage": "For a death registration the following documents are required:",
                   "description": "Documents Paragraph text",
                   "id": "form.section.documents.birth.requirements"
                 },

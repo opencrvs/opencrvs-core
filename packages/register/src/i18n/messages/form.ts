@@ -890,7 +890,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeDoctorCertificate'
   },
   docTypeEPICard: {
-    defaultMessage: 'EPI Card',
+    defaultMessage: 'EPI CdocTypeEPICardard',
     description: 'Label for select option EPI Card',
     id: 'form.field.label.docTypeEPICard'
   },

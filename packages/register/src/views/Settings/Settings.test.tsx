@@ -51,8 +51,6 @@ describe('Settings page tests', () => {
   it('it checks component has loaded', () => {
     // @ts-ignore
     expect(component.containsMatchingElement(DataSection)).toBe(true)
-
-    component.unmount()
   })
   it('it checks modal is open when button clicked', () => {
     component
@@ -61,8 +59,6 @@ describe('Settings page tests', () => {
       .simulate('click')
 
     expect(component.find('#ChangeLanguageModal').hostNodes()).toHaveLength(1)
-
-    component.unmount()
   })
   it('it checks cancel button clicked', () => {
     component
@@ -76,8 +72,6 @@ describe('Settings page tests', () => {
       .find('#modal_cancel')
       .hostNodes()
       .simulate('click')
-
-    component.unmount()
   })
   it('it checks cancel button clicked', () => {
     component
@@ -91,7 +85,5 @@ describe('Settings page tests', () => {
       .find('#apply_change')
       .hostNodes()
       .simulate('click')
-
-    component.unmount()
   })
 })

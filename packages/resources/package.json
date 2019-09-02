@@ -6,7 +6,7 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
-    "test": "jest  --silent --noStackTrace && yarn test:compilation",
+    "test": "jest  --silent --noStackTrace --coverage && yarn test:compilation",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
