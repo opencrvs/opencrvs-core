@@ -1,7 +1,12 @@
 import { Field, WrappedFieldProps, InjectedFormProps } from 'redux-form'
 import * as React from 'react'
 import styled from 'styled-components'
-import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  defineMessages,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 
 import {
   TextInput,
@@ -28,7 +33,7 @@ import { Ii18nReduxFormFieldProps } from '@login/utils/fieldUtils'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 
 export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
@@ -97,14 +102,14 @@ export interface IDispatchProps {
 
 type IStepTwoForm = IProps & IDispatchProps
 
-export type FullProps = InjectedIntlProps &
+export type FullProps = IntlShapeProps &
   InjectedFormProps<IVerifyCodeNumbers, IStepTwoForm> &
   IStepTwoForm
 const CodeInput = injectIntl(
   (
     props: WrappedFieldProps & {
       field: Ii18nReduxFormFieldProps
-    } & InjectedIntlProps
+    } & IntlShapeProps
   ) => {
     const { field, meta, intl, ...otherProps } = props
     return (

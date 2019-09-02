@@ -1,20 +1,20 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IregistrationHomeMessages {
-  dataTableResults: ReactIntl.FormattedMessage.MessageDescriptor
-  inProgress: ReactIntl.FormattedMessage.MessageDescriptor
-  inProgressFieldAgents: ReactIntl.FormattedMessage.MessageDescriptor
-  inProgressOwnDrafts: ReactIntl.FormattedMessage.MessageDescriptor
-  listItemAction: ReactIntl.FormattedMessage.MessageDescriptor
-  listItemApplicationDate: ReactIntl.FormattedMessage.MessageDescriptor
-  listItemRegisteredDate: ReactIntl.FormattedMessage.MessageDescriptor
-  readyForReview: ReactIntl.FormattedMessage.MessageDescriptor
-  readyToPrint: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  sentForApprovals: ReactIntl.FormattedMessage.MessageDescriptor
-  sentForUpdates: ReactIntl.FormattedMessage.MessageDescriptor
-  validatedApplicationTooltipForRegistrar: ReactIntl.FormattedMessage.MessageDescriptor
-  validatedApplicationTooltipForRegistrationAgent: ReactIntl.FormattedMessage.MessageDescriptor
+  dataTableResults: MessageDescriptor
+  inProgress: MessageDescriptor
+  inProgressFieldAgents: MessageDescriptor
+  inProgressOwnDrafts: MessageDescriptor
+  listItemAction: MessageDescriptor
+  listItemApplicationDate: MessageDescriptor
+  listItemRegisteredDate: MessageDescriptor
+  readyForReview: MessageDescriptor
+  readyToPrint: MessageDescriptor
+  registrationNumber: MessageDescriptor
+  sentForApprovals: MessageDescriptor
+  sentForUpdates: MessageDescriptor
+  validatedApplicationTooltipForRegistrar: MessageDescriptor
+  validatedApplicationTooltipForRegistrationAgent: MessageDescriptor
 }
 
 const messagesToDefine: IregistrationHomeMessages = {

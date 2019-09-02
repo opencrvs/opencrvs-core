@@ -1,7 +1,7 @@
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import {
@@ -157,7 +157,7 @@ interface IMatchParams {
 }
 
 type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
-  InjectedIntlProps &
+  IntlShapeProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
 

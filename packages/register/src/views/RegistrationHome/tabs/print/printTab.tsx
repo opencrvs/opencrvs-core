@@ -14,7 +14,7 @@ import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
@@ -47,7 +47,7 @@ interface IPrintTabState {
   width: number
 }
 
-type IPrintTabProps = InjectedIntlProps & IBasePrintTabProps
+type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
 
 class PrintTabComponent extends React.Component<
   IPrintTabProps,

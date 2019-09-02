@@ -1,4 +1,4 @@
-import { FormattedMessage } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { Validation } from '@login/utils/validate'
 import { Field } from 'redux-form'
 import { IInputFieldProps } from '@opencrvs/components/lib/forms'
@@ -19,8 +19,8 @@ export type Ii18nReduxFormFieldProps = {
 }
 
 export type IReduxFormFieldProps = {
-  placeholder?: FormattedMessage.MessageDescriptor
-  label?: FormattedMessage.MessageDescriptor
+  placeholder?: MessageDescriptor
+  label?: MessageDescriptor
 } & Omit<Ii18nReduxFormFieldProps, 'placeholder' | 'label'>
 
 export type IFieldGroup = {

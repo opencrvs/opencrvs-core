@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { Scope } from '@register/utils/authUtils'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
@@ -19,7 +24,7 @@ import { changeLanguage as changeLanguageAction } from '@register/i18n/actions'
 import { HamburgerMenu } from '@opencrvs/components/lib/interface'
 
 const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   back: {
     id: 'buttons.back',
@@ -118,7 +123,7 @@ type Props = {
 interface IState {
   showLogoutModal: boolean
 }
-type IFullProps = Props & InjectedIntlProps
+type IFullProps = Props & IntlShapeProps
 
 class TopMenuComponent extends React.Component<IFullProps, IState> {
   goToPerformance = () => {
@@ -199,4 +204,4 @@ export const TopMenu = connect(
     changeLanguage: changeLanguageAction,
     redirectToAuthentication
   }
-)(injectIntl<IFullProps>(TopMenuComponent))
+)(injectIntl<'intl', IFullProps>(TopMenuComponent))

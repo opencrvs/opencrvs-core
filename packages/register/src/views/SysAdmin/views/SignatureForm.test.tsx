@@ -3,8 +3,7 @@ import {
   createTestComponent,
   flushPromises,
   getFileFromBase64String,
-  validImageB64String,
-  waitForReady
+  validImageB64String
 } from '@register/tests/util'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { createStore } from '@register/store'

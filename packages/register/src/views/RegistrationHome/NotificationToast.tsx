@@ -3,7 +3,11 @@ import { ExpandableNotification } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import { connect } from 'react-redux'
 import { IStoreState } from '@register/store'
-import { defineMessages, InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  defineMessages,
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl
+} from 'react-intl'
 import Outbox from './Outbox'
 import { IApplication, SUBMISSION_STATUS } from '@register/applications'
 
@@ -30,7 +34,7 @@ const ExpandableNotificationContainer = styled.div`
 interface IProps {
   application: IApplication[]
 }
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 class NotificationToast extends React.Component<IFullProps> {
   render() {
     const outboxData = this.props.application.filter(

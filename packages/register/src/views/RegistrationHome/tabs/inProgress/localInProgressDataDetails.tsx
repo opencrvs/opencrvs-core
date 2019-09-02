@@ -4,7 +4,7 @@ import { IStoreState } from '@register/store'
 import { CERTIFICATE_DATE_FORMAT } from '@register/utils/constants'
 import moment from 'moment'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import {
@@ -76,7 +76,7 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
   )
 }
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   draft: IApplication | undefined
 }
 

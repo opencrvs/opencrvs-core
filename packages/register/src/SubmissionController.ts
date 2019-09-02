@@ -6,7 +6,7 @@ import {
   writeApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
-import { Action, IForm } from '@register/forms'
+import { Action } from '@register/forms'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { AppStore } from '@register/store'
 import { createClient } from '@register/utils/apolloClient'
