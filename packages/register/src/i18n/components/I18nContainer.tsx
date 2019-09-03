@@ -1,26 +1,24 @@
 import { connect } from 'react-redux'
-import { addLocaleData, IntlProvider } from 'react-intl'
-import en from 'react-intl/locale-data/en'
-import bn from 'react-intl/locale-data/bn'
+import { IntlProvider } from 'react-intl'
 
 import { getLanguage, getMessages } from '@register/i18n/selectors'
 import { IStoreState } from '@register/store'
 import { IntlMessages } from '@register/i18n/reducer'
 
-addLocaleData([...en, ...bn])
-
 type StateProps = {
-  locale?: string
+  locale: string
   messages: IntlMessages
 }
 
-const mapStateToProps = (store: IStoreState): StateProps => {
+const mapStateToProps = (state: IStoreState): StateProps => {
+  const locale = getLanguage(state)
+
   return {
-    locale: getLanguage(store),
-    messages: getMessages(store)
+    locale,
+    messages: getMessages(state)
   }
 }
 
-export const I18nContainer = connect<StateProps, {}, StateProps, IStoreState>(
+export const I18nContainer = connect<StateProps, {}, {}, IStoreState>(
   mapStateToProps
-)(IntlProvider) as any
+)(IntlProvider)

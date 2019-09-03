@@ -51,8 +51,8 @@ beforeAll(() => {
 })
 
 describe('RegistrationHome In Progress tab related tests', () => {
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -69,8 +69,6 @@ describe('RegistrationHome In Progress tab related tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
 
   it('renders page with four tabs', async () => {
@@ -110,7 +108,7 @@ describe('RegistrationHome In Progress tab related tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
       store,
@@ -140,7 +138,6 @@ describe('RegistrationHome In Progress tab related tests', () => {
       .find('#tab_print')
       .hostNodes()
       .simulate('click')
-    testComponent.component.unmount()
   })
 
   it('renders in progress tab with total count of local and remote drafts', async () => {
@@ -181,7 +178,7 @@ describe('RegistrationHome In Progress tab related tests', () => {
       }
     ]
     // store.dispatch(storeApplication(createApplication(Event.BIRTH)))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
       store,
@@ -201,6 +198,5 @@ describe('RegistrationHome In Progress tab related tests', () => {
         .hostNodes()
         .text()
     ).toContain('In progress (5)')
-    testComponent.component.unmount()
   })
 })

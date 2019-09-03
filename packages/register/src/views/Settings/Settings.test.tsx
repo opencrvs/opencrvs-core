@@ -11,7 +11,8 @@ describe('Settings page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const testComponent = createTestComponent(
+
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
       store
@@ -19,7 +20,7 @@ describe('Settings page tests', () => {
     component = testComponent.component
   })
   it('shows nothing', async () => {
-    // const { store } = createStore()
+    const { store } = createStore()
     store.dispatch(
       getStorageUserDetailsSuccess(
         JSON.stringify({
@@ -28,12 +29,11 @@ describe('Settings page tests', () => {
         })
       )
     )
-    const comp = createTestComponent(
+    const comp = (await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
       store
-    ).component
-
+    )).component
     expect(
       comp
         .find('#English-name')
@@ -51,8 +51,6 @@ describe('Settings page tests', () => {
   it('it checks component has loaded', () => {
     // @ts-ignore
     expect(component.containsMatchingElement(DataSection)).toBe(true)
-
-    component.unmount()
   })
   it('it checks modal is open when button clicked', () => {
     component
@@ -61,8 +59,6 @@ describe('Settings page tests', () => {
       .simulate('click')
 
     expect(component.find('#ChangeLanguageModal').hostNodes()).toHaveLength(1)
-
-    component.unmount()
   })
   it('it checks cancel button clicked', () => {
     component
@@ -76,8 +72,6 @@ describe('Settings page tests', () => {
       .find('#modal_cancel')
       .hostNodes()
       .simulate('click')
-
-    component.unmount()
   })
   it('it checks cancel button clicked', () => {
     component
@@ -91,7 +85,5 @@ describe('Settings page tests', () => {
       .find('#apply_change')
       .hostNodes()
       .simulate('click')
-
-    component.unmount()
   })
 })

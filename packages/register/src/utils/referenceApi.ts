@@ -1,7 +1,7 @@
-import { resolve } from 'url'
 import { ILocation } from '@register/offline/reducer'
 import { getToken } from '@register/utils/authUtils'
 import { ILanguage } from '@register/i18n/reducer'
+import { ISerializedForm } from '@register/forms'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -9,13 +9,13 @@ export interface ILocationDataResponse {
 export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
-export type ILanguagesDataResponse = ILanguage[]
+export interface IDefinitionsResponse {
+  languages: ILanguage[]
+  forms: { registerForm: { birth: ISerializedForm; death: ISerializedForm } }
+}
 
-async function loadLanguages(): Promise<ILanguagesDataResponse> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/languages/register`
-  )
+async function loadDefinitions(): Promise<IDefinitionsResponse> {
+  const url = `${window.config.RESOURCES_URL}/definitions/register`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -29,14 +29,11 @@ async function loadLanguages(): Promise<ILanguagesDataResponse> {
   }
 
   const response = await res.json()
-  return response.data
+  return response
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/locations`
-  )
+  const url = `${window.config.RESOURCES_URL}/locations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -54,10 +51,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/facilities`
-  )
+  const url = `${window.config.RESOURCES_URL}/facilities`
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -76,5 +70,5 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
-  loadLanguages
+  loadDefinitions
 }

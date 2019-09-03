@@ -43,8 +43,8 @@ describe('SearchResult tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
         match={{
@@ -62,8 +62,6 @@ describe('SearchResult tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
 
   it('renders all items returned from graphql query', async () => {
@@ -221,7 +219,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
         match={{
@@ -314,8 +312,6 @@ describe('SearchResult tests', () => {
         modifiedAt: undefined
       }
     ])
-
-    testComponent.component.unmount()
   })
 
   it('renders error text when an error occurs', async () => {
@@ -335,7 +331,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
         match={{
@@ -364,15 +360,13 @@ describe('SearchResult tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
   })
-  it('renders empty search page with a header in small devices', () => {
-    const testSearchResultComponent = createTestComponent(
+  it('renders empty search page with a header in small devices', async () => {
+    const testSearchResultComponent = (await createTestComponent(
       // @ts-ignore
       <SearchResult match={{ params: {} }} />,
       store
-    ).component
+    )).component
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,

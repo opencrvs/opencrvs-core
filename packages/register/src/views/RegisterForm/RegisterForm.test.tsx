@@ -4,7 +4,10 @@ import {
   selectOption,
   mockApplicationData,
   mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames
+  mockDeathApplicationDataWithoutFirstNames,
+  getRegisterFormFromStore,
+  getReviewFormFromStore,
+  createTestStore
 } from '@register/tests/util'
 import { RegisterForm } from '@register/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -22,7 +25,7 @@ import {
   SUBMISSION_STATUS
 } from '@register/applications'
 import { v4 as uuid } from 'uuid'
-import { createStore } from '@register/store'
+import { AppStore } from '@register/store'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -30,8 +33,7 @@ import {
   HOME,
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
 } from '@opencrvs/register/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
-import { getReviewForm } from '@opencrvs/register/src/forms/register/review-selectors'
+
 import { Event, IFormData } from '@opencrvs/register/src/forms'
 import { draftToGqlTransformer } from '@register/transformer'
 import { IForm } from '@register/forms'
@@ -43,6 +45,9 @@ import { IUserDetails } from '@register/utils/userUtils'
 
 import { formMessages as messages } from '@register/i18n/messages'
 import * as profileSelectors from '@register/profile/profileSelectors'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { waitForElement } from '@register/tests/wait-for-element'
+import { History } from 'history'
 
 describe('when user logs in', () => {
   // Some mock data
@@ -73,13 +78,13 @@ describe('when user logs in', () => {
 
   // Mocking storage reading
   // @ts-ignore
-  storage.getItem = jest.fn((key: string): string => {
+  storage.getItem = jest.fn((key: string) => {
     switch (key) {
       case 'USER_DATA':
       case 'USER_DETAILS':
         return indexedDB[key]
       default:
-        return 'undefined'
+        return undefined
     }
   })
 
@@ -161,14 +166,15 @@ describe('when there is no user-data saved', () => {
 })
 
 describe('when user is in the register form before initial draft load', () => {
-  const { store, history } = createStore()
+  it('throws error when draft not found after initial drafts load', async () => {
+    const { store, history } = await createTestStore()
 
-  const mock: any = jest.fn()
-  const draft = createApplication(Event.BIRTH)
-  const form = getRegisterForm(store.getState())[Event.BIRTH]
-  it('throws error when draft not found after initial drafts load', () => {
+    const mock: any = jest.fn()
+    const draft = createApplication(Event.BIRTH)
+    const form = await getRegisterFormFromStore(store, Event.BIRTH)
+
     try {
-      createTestComponent(
+      await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -194,19 +200,25 @@ describe('when user is in the register form before initial draft load', () => {
 })
 
 describe('when user is in the register form for birth event', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.BIRTH)
-  store.dispatch(storeApplication(draft))
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
-  const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())[Event.BIRTH]
+  let store: AppStore
+  let history: History
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
-      const testComponent = createTestComponent(
+      const storeContext = await createTestStore()
+      store = storeContext.store
+      history = storeContext.history
+
+      const draft = createApplication(Event.BIRTH)
+      store.dispatch(storeApplication(draft))
+      store.dispatch(setInitialApplications())
+      store.dispatch(storeApplication(draft))
+
+      const mock: any = jest.fn()
+      const form = await getRegisterFormFromStore(store, Event.BIRTH)
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -272,22 +284,31 @@ describe('when user is in the register form for birth event', () => {
 })
 
 describe('when user is in the register form for death event', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
 
   const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())[Event.DEATH]
+  let form: IForm
+  let store: AppStore
+  let history: History
+  let draft: ReturnType<typeof createApplication>
 
+  beforeEach(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+
+    draft = createApplication(Event.DEATH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
+    form = await getRegisterFormFromStore(store, Event.DEATH)
+  })
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
       const clonedForm = cloneDeep(form)
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -326,8 +347,8 @@ describe('when user is in the register form for death event', () => {
   })
 
   describe('when user is in deceased section', () => {
-    it('renders loader button when idType is Birth Registration Number', () => {
-      const testComponent = createTestComponent(
+    it('renders loader button when idType is Birth Registration Number', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -351,8 +372,8 @@ describe('when user is in the register form for death event', () => {
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
-    it('renders loader button when idType is National ID', () => {
-      const testComponent = createTestComponent(
+    it('renders loader button when idType is National ID', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -411,7 +432,7 @@ describe('when user is in the register form for death event', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -530,7 +551,7 @@ describe('when user is in the register form for death event', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -649,7 +670,7 @@ describe('when user is in the register form for death event', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -714,7 +735,7 @@ describe('when user is in the register form for death event', () => {
           error: new Error('boom')
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -784,7 +805,7 @@ describe('when user is in the register form for death event', () => {
           error: new Error('boom')
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -843,8 +864,8 @@ describe('when user is in the register form for death event', () => {
     })
   })
   describe('when user is death event section', () => {
-    it('renders the notice label for date field', () => {
-      const testComponent = createTestComponent(
+    it('renders the notice label for date field', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -872,34 +893,40 @@ describe('when user is in the register form for death event', () => {
 })
 
 describe('when user is in the register form preview section', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.BIRTH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
+  let store: AppStore
+  let history: History
+  const mock = jest.fn()
 
-  const mock: any = jest.fn()
-  const form = getRegisterForm(store.getState())[Event.BIRTH]
-  const testComponent = createTestComponent(
-    // @ts-ignore
-    <RegisterForm
-      location={mock}
-      scope={mock}
-      history={history}
-      staticContext={mock}
-      registerForm={form}
-      application={draft}
-      pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-      match={{
-        params: { applicationId: draft.id, pageId: 'preview' },
-        isExact: true,
-        path: '',
-        url: ''
-      }}
-    />,
-    store
-  )
-  component = testComponent.component
+  beforeEach(async () => {
+    mock.mockReset()
+    const storeContext = await createTestStore()
+    store = storeContext.store
+    history = storeContext.history
+
+    const draft = createApplication(Event.BIRTH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
+
+    const form = await getRegisterFormFromStore(store, Event.BIRTH)
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <RegisterForm
+        history={history}
+        registerForm={form}
+        application={draft}
+        pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
+        match={{
+          params: { applicationId: draft.id, pageId: 'preview' },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    component = testComponent.component
+  })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
     expect(
@@ -932,12 +959,10 @@ describe('when user is in the register form preview section', () => {
       store.dispatch(storeApplication(nApplication))
 
       const nform = getRegisterForm(store.getState())[Event.BIRTH]
-      const nTestComponent = createTestComponent(
+      const nTestComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
-          location={mock}
           history={history}
-          staticContext={mock}
           registerForm={nform}
           application={nApplication}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
@@ -990,7 +1015,7 @@ describe('when user is in the register form preview section', () => {
 describe('when user is in the register form review section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store, history } = await createTestStore()
     // @ts-ignore
     const application = createReviewApplication(
       uuid(),
@@ -1001,8 +1026,10 @@ describe('when user is in the register form review section', () => {
     store.dispatch(storeApplication(application))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-    const form = getReviewForm(store.getState()).birth
-    const testComponent = createTestComponent(
+
+    const form = await getReviewFormFromStore(store, Event.BIRTH)
+
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}
@@ -1027,11 +1054,13 @@ describe('when user is in the register form review section', () => {
     component = testComponent.component
   })
 
-  it('clicking the reject button launches the reject form action page', () => {
+  it('clicking the reject button launches the reject form action page', async () => {
     component
       .find('#rejectApplicationBtn')
       .hostNodes()
       .simulate('click')
+
+    await waitForElement(component, '#reject-registration-form-container')
     expect(
       component.find('#reject-registration-form-container').hostNodes()
     ).toHaveLength(1)
@@ -1039,10 +1068,8 @@ describe('when user is in the register form review section', () => {
 })
 
 describe('When user is in Preview section death event', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
+  let store: AppStore
+  let history: History
   let component: ReactWrapper<{}, {}>
   let deathDraft
   let deathForm: IForm
@@ -1050,6 +1077,13 @@ describe('When user is in Preview section death event', () => {
   const mock: any = jest.fn()
 
   beforeEach(async () => {
+    const testStore = await createTestStore()
+    store = testStore.store
+    history = testStore.history
+
+    const draft = createApplication(Event.DEATH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
     jest.clearAllMocks()
     // @ts-ignore
     deathDraft = createReviewApplication(
@@ -1064,8 +1098,8 @@ describe('When user is in Preview section death event', () => {
 
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
-    deathForm = getRegisterForm(store.getState())[Event.DEATH]
-    const nTestComponent = createTestComponent(
+    deathForm = await getRegisterFormFromStore(store, Event.DEATH)
+    const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}
@@ -1123,6 +1157,7 @@ describe('When user is in Preview section death event', () => {
       'HEALTH_INSTITUTION'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
+
     expect(
       draftToGqlTransformer(
         deathForm,
@@ -1139,6 +1174,7 @@ describe('When user is in Preview section death event', () => {
       'HEALTH_INSTITUTION'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
+
     expect(
       draftToGqlTransformer(
         deathForm,
@@ -1182,17 +1218,23 @@ describe('When user is in Preview section death event', () => {
 })
 
 describe('When user is in Preview section death event in offline mode', () => {
-  const { store, history } = createStore()
-  const draft = createApplication(Event.DEATH)
-  store.dispatch(setInitialApplications())
-  store.dispatch(storeApplication(draft))
   let component: ReactWrapper<{}, {}>
   let deathDraft
   let deathForm: IForm
+  let store: AppStore
+  let history: History
 
   const mock: any = jest.fn()
 
   beforeEach(async () => {
+    const testStore = await createTestStore()
+    history = testStore.history
+    store = testStore.store
+
+    const draft = createApplication(Event.DEATH)
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(draft))
+
     Object.defineProperty(window.navigator, 'onLine', {
       value: false,
       writable: true
@@ -1209,8 +1251,8 @@ describe('When user is in Preview section death event in offline mode', () => {
     store.dispatch(setInitialApplications())
     store.dispatch(storeApplication(deathDraft))
 
-    deathForm = getRegisterForm(store.getState())[Event.DEATH]
-    const nTestComponent = createTestComponent(
+    deathForm = await getRegisterFormFromStore(store, Event.DEATH)
+    const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}

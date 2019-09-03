@@ -9,15 +9,16 @@ const { store } = createStore()
 describe('CreatePassword page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <CreatePassword goToStep={() => {}} setupData={{ userId: '123' }} />,
       store
     )
+
     component = testComponent.component
   })
 
-  it('it shows passwords missmatch error when Continue button is pressed', () => {
+  it('it shows passwords missmatch error when Continue button is pressed', async () => {
     component.find('input#NewPassword').simulate('change', {
       target: { id: 'NewPassword', value: '0crvsPassword' }
     })
@@ -31,8 +32,6 @@ describe('CreatePassword page tests', () => {
         .hostNodes()
         .text()
     ).toEqual('Passwords do not match')
-
-    component.unmount()
   })
   it('it passes validations', () => {
     component.find('input#NewPassword').simulate('change', {
@@ -42,8 +41,6 @@ describe('CreatePassword page tests', () => {
       target: { id: 'ConfirmPassword', value: '0crvsPassword' }
     })
     component.find('button#Continue').simulate('click')
-
-    component.unmount()
   })
   it('it shows passwords required error when Continue button is pressed', () => {
     component.find('button#Continue').simulate('click')
@@ -53,7 +50,5 @@ describe('CreatePassword page tests', () => {
         .hostNodes()
         .text()
     ).toEqual('New password is not valid')
-
-    component.unmount()
   })
 })

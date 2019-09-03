@@ -2,7 +2,8 @@ import {
   IFormField,
   IFormData,
   IFormFieldValue,
-  IAttachment
+  IAttachment,
+  TransformedData
 } from '@register/forms'
 
 interface IPersonName {
@@ -13,7 +14,7 @@ export const fieldToNameTransformer = (
   language: string,
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -41,7 +42,7 @@ export const fieldToNameTransformer = (
 }
 
 export function ignoreFieldTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -51,7 +52,7 @@ export function ignoreFieldTransformer(
 }
 
 export function fieldToArrayTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -61,7 +62,7 @@ export function fieldToArrayTransformer(
 }
 
 export const fieldToIdentifierTransformer = (identifierField: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -113,12 +114,13 @@ export const fieldToAddressTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
   const sectionData = transformedData[sectionId]
+
   if (!sectionData.address) {
     sectionData.address = []
   }
@@ -138,11 +140,12 @@ export const fieldToAddressTransformer = (
     address[!transformedFieldName ? field.name : transformedFieldName] =
       draftData[sectionId][field.name]
   }
+
   return transformedData
 }
 
 export const fieldNameTransformer = (transformedFieldName: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -156,7 +159,7 @@ export const fieldValueSectionExchangeTransformer = (
   toSectionId: string,
   toSectionField?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -172,7 +175,7 @@ export const fieldValueSectionExchangeTransformer = (
 export const sectionFieldToBundleFieldTransformer = (
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -186,7 +189,7 @@ export const sectionFieldToBundleFieldTransformer = (
 }
 
 export const copyEventAddressTransformer = (fromSection: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -232,7 +235,7 @@ export const copyAddressTransformer = (
   triggerValue: boolean = true,
   nodeName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -277,7 +280,7 @@ export const copyAddressTransformer = (
 }
 
 export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -290,7 +293,7 @@ export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
 }
 
 export function fieldToCommentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -310,7 +313,7 @@ export function fieldToCommentTransformer(
 }
 
 export function fieldToAttachmentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField,
@@ -352,7 +355,7 @@ export function fieldToAttachmentTransformer(
 export const fieldToPhoneNumberTransformer = (
   transformedSectionId?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -366,7 +369,7 @@ export const fieldToPhoneNumberTransformer = (
 export const fieldToIdentifierWithTypeTransformer = (
   identifierType: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -381,7 +384,7 @@ export const fieldToIdentifierWithTypeTransformer = (
 }
 
 export const fieldNameValueTransformer = (transformedFieldName: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField

@@ -1,9 +1,9 @@
-import { ILocation } from '@register/offline/reducer'
-import { ILanguage, ILanguageState } from '@register/i18n/reducer'
+import { ILocation, IOfflineData } from '@register/offline/reducer'
+import { ILanguageState } from '@register/i18n/reducer'
 import {
   ILocationDataResponse,
-  ILanguagesDataResponse,
-  IFacilitiesDataResponse
+  IFacilitiesDataResponse,
+  IDefinitionsResponse
 } from '@register/utils/referenceApi'
 import { IUserDetails } from '@register/utils/userUtils'
 
@@ -13,15 +13,15 @@ type GetLocations = {
   payload: string
 }
 
-export const LANGUAGES_LOADED = 'OFFLINE/LANGUAGES_LOADED'
-export type LanguagesLoadedAction = {
-  type: typeof LANGUAGES_LOADED
-  payload: ILanguage[]
+export const DEFINITIONS_LOADED = 'OFFLINE/DEFINITIONS_LOADED'
+export type DefinitionsLoadedAction = {
+  type: typeof DEFINITIONS_LOADED
+  payload: IDefinitionsResponse
 }
 
-export const LANGUAGES_FAILED = 'OFFLINE/LANGUAGES_FAILED'
-export type LanguagesFailedAction = {
-  type: typeof LANGUAGES_FAILED
+export const DEFINITIONS_FAILED = 'OFFLINE/DEFINITIONS_FAILED'
+export type DefinitionsFailedAction = {
+  type: typeof DEFINITIONS_FAILED
   payload: Error
 }
 
@@ -49,9 +49,9 @@ export type FacilitiesFailedAction = {
   payload: Error
 }
 
-export const SET_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
+export const GET_EXISTING_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
 type SetOfflineData = {
-  type: typeof SET_OFFLINE_DATA
+  type: typeof GET_EXISTING_OFFLINE_DATA
   payload: IUserDetails
 }
 export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
@@ -68,24 +68,7 @@ export type IFilterLocationsAction = {
   type: typeof FORMAT_LOCATIONS
   payload: ILanguageState
 }
-export const LOAD_LOCATIONS = 'OFFLINE/LOAD_LOCATIONS'
-export type ILoadLocationsAction = {
-  type: typeof LOAD_LOCATIONS
-  payload: ILanguageState
-}
-export type Action =
-  | GetLocations
-  | LocationsFailedAction
-  | LocationsLoadedAction
-  | SetOfflineData
-  | IGetOfflineDataSuccessAction
-  | IGetOfflineDataFailedAction
-  | FacilitiesLoadedAction
-  | FacilitiesFailedAction
-  | LanguagesFailedAction
-  | LanguagesLoadedAction
-  | IFilterLocationsAction
-  | ILoadLocationsAction
+export const READY = 'OFFLINE/READY' as const
 
 export const locationsLoaded = (
   payload: ILocationDataResponse
@@ -111,8 +94,11 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
+/*
+ * Only called from tests atm
+ */
 export const setOfflineData = (userDetails: IUserDetails): SetOfflineData => ({
-  type: SET_OFFLINE_DATA,
+  type: GET_EXISTING_OFFLINE_DATA,
   payload: userDetails
 })
 
@@ -127,28 +113,33 @@ export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
   type: GET_OFFLINE_DATA_FAILED
 })
 
-export const languagesLoaded = (
-  payload: ILanguagesDataResponse
-): LanguagesLoadedAction => ({
-  type: LANGUAGES_LOADED,
+export const definitionsLoaded = (
+  payload: IDefinitionsResponse
+): DefinitionsLoadedAction => ({
+  type: DEFINITIONS_LOADED,
   payload: payload
 })
 
-export const languagesFailed = (error: Error): LanguagesFailedAction => ({
-  type: LANGUAGES_FAILED,
+export const definitionsFailed = (error: Error): DefinitionsFailedAction => ({
+  type: DEFINITIONS_FAILED,
   payload: error
 })
 
-export const filterLocationsByLanguage = (
-  languageState: ILanguageState
-): IFilterLocationsAction => ({
-  type: FORMAT_LOCATIONS,
-  payload: languageState
+export const offlineDataReady = (state: IOfflineData) => ({
+  type: READY,
+  payload: state
 })
 
-export const loadLocations = (
-  languageState: ILanguageState
-): ILoadLocationsAction => ({
-  type: LOAD_LOCATIONS,
-  payload: languageState
-})
+export type Action =
+  | GetLocations
+  | LocationsFailedAction
+  | LocationsLoadedAction
+  | SetOfflineData
+  | IGetOfflineDataSuccessAction
+  | IGetOfflineDataFailedAction
+  | FacilitiesLoadedAction
+  | FacilitiesFailedAction
+  | DefinitionsFailedAction
+  | DefinitionsLoadedAction
+  | IFilterLocationsAction
+  | ReturnType<typeof offlineDataReady>

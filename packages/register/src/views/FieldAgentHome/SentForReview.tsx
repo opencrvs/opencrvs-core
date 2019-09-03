@@ -5,7 +5,7 @@ import {
   ColumnContentAlignment,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import {
   SUBMISSION_STATUS,
@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { sentenceCase } from '@register/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { calculateDays } from '@register/views/PrintCertificate/calculatePrice'
+import { calculateDays } from '@register/views/PrintCertificate/utils'
 import { goToApplicationDetails } from '@register/navigation'
 import { constantsMessages as messages } from '@register/i18n/messages'
 import { getDefaultLanguage } from '@register/i18n/utils'
@@ -40,7 +40,7 @@ interface IState {
   width: number
 }
 
-type IFullProps = ISentForReviewProps & InjectedIntlProps
+type IFullProps = ISentForReviewProps & IntlShapeProps
 
 class SentForReviewComponent extends React.Component<IFullProps, IState> {
   pageSize: number
@@ -227,8 +227,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           label: this.props.intl.formatMessage(messages.submissionStatus),
           width: 35,
           key: 'submissionStatus',
-          color: getTheme(window.config.COUNTRY, getDefaultLanguage()).colors
-            .secondaryLabel
+          color: getTheme(getDefaultLanguage()).colors.secondaryLabel
         },
         {
           label: '',

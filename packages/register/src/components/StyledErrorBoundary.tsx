@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as Sentry from '@sentry/browser'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@register/store'
@@ -34,7 +34,7 @@ const GoToHomepage = styled(Button)`
   margin-top: 60px;
 `
 
-type IFullProps = InjectedIntlProps
+type IFullProps = IntlShapeProps
 
 interface IErrorInfo extends React.ErrorInfo {
   [key: string]: string

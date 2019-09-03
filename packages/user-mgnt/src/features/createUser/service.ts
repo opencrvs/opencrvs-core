@@ -12,31 +12,24 @@ export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
       { system: 'phone', value: user.mobile },
       { system: 'email', value: user.email }
     ],
-    name: user.name
-  }
-}
-
-interface IFhirSignature extends fhir.Signature {
-  resourceType: string
-}
-export const createFhirSignature = (
-  user: IUser,
-  practitionerId: string
-): IFhirSignature => {
-  return {
-    resourceType: 'Signature',
-    blob: user.signature.data,
-    type: [
+    name: user.name,
+    extension: user.signature && [
       {
-        system: 'http://opencrvs.org/specs/signature',
-        code: 'Signature'
+        url: 'http://opencrvs.org/specs/extension/employee-signature',
+        valueSignature: {
+          type: [
+            {
+              system: 'urn:iso-astm:E1762-95:2013',
+              code: '1.2.840.10065.1.12.1.13',
+              display: 'Review Signature'
+            }
+          ],
+          when: new Date().toISOString(),
+          contentType: user.signature.type,
+          blob: user.signature.data
+        }
       }
-    ],
-    whoReference: {
-      reference: `Practitioner/${practitionerId}`
-    },
-    when: new Date().toISOString(),
-    contentType: user.signature.type
+    ]
   }
 }
 
@@ -121,8 +114,7 @@ export const deleteFhir = async (
 export const rollback = async (
   token: string,
   practitionerId: string | null,
-  roleId: string | null,
-  signatureId: string | null
+  roleId: string | null
 ) => {
   if (practitionerId) {
     await deleteFhir(token, 'Practitioner', practitionerId)
@@ -130,9 +122,6 @@ export const rollback = async (
 
   if (roleId) {
     await deleteFhir(token, 'PractitionerRole', roleId)
-  }
-  if (signatureId) {
-    await deleteFhir(token, 'signature', signatureId)
   }
 }
 

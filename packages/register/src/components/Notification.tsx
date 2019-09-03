@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { messages } from '@register/i18n/messages/views/notifications'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import {
@@ -41,10 +41,7 @@ type DispatchProps = {
 }
 
 class Component extends React.Component<
-  NotificationProps &
-    DispatchProps &
-    InjectedIntlProps &
-    RouteComponentProps<{}>
+  NotificationProps & DispatchProps & IntlShapeProps & RouteComponentProps<{}>
 > {
   onNewContentAvailableNotificationClick = () => {
     if (this.props.waitingSW) {

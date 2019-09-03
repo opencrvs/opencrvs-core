@@ -1,7 +1,11 @@
 import * as actions from '@register/profile/profileActions'
 import { initialState } from '@register/profile/profileReducer'
 import { createStore, AppStore } from '@register/store'
-import { mockUserResponse, getItem } from '@register/tests/util'
+import {
+  mockUserResponse,
+  getItem,
+  mockRegistrarUserResponse
+} from '@register/tests/util'
 import { storage } from '@register/storage'
 
 storage.removeItem = jest.fn()
@@ -35,6 +39,15 @@ describe('profileReducer tests', () => {
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockUserResponse
+    }
+    store.dispatch(action)
+    expect(store.getState().profile.userDetailsFetched).toEqual(true)
+  })
+
+  it('sets user details for registrar', async () => {
+    const action = {
+      type: actions.SET_USER_DETAILS,
+      payload: mockRegistrarUserResponse
     }
     store.dispatch(action)
     expect(store.getState().profile.userDetailsFetched).toEqual(true)

@@ -10,8 +10,9 @@ import { createClient } from '@register/utils/apolloClient'
 import * as actions from '@register/notification/actions'
 import { referenceApi } from '@register/utils/referenceApi'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
-import { createStore } from '@register/store'
+import { createStore, AppStore } from '@register/store'
 import { waitFor } from './tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
 
 const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -24,20 +25,19 @@ beforeEach(() => {
   getItem.mockReset()
 })
 
-it('renders without crashing', async () => {
-  createTestApp()
-})
+it('renders without crashing', () =>
+  createTestApp({ waitUntilResourcesLoaded: false }))
 
 it("redirects user to SSO if user doesn't have a token", async () => {
-  createTestApp()
+  await createTestApp({ waitUntilResourcesLoaded: false })
   await waitFor(() => assign.mock.calls[0][0] === window.config.LOGIN_URL)
 })
 
 describe('when user has a valid token in url but an expired one in localStorage', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     getItem.mockReturnValue(expiredToken)
     window.history.replaceState('', '', '?token=' + validToken)
-    createTestApp()
+    await createTestApp()
   })
 
   it("doesn't redirect user to SSO", async () => {
@@ -50,22 +50,29 @@ describe('when user has a valid token in url but an expired one in localStorage'
 
     window.history.replaceState({}, '', '?token=' + token)
 
-    createTestApp()
+    await createTestApp()
     expect(assign.mock.calls).toHaveLength(0)
   })
 })
 
 describe('when session expired', () => {
-  const { app, store } = createTestApp()
+  let app: ReactWrapper
+  let store: AppStore
+
+  beforeEach(async () => {
+    const testApp = await createTestApp({ waitUntilResourcesLoaded: false })
+    app = testApp.app
+    store = testApp.store
+  })
 
   it('when apolloClient is created', () => {
     const client = createClient(store)
     expect(client.link).toBeDefined()
   })
 
-  it('displays session expired confirmation dialog', () => {
+  it('displays session expired confirmation dialog', async () => {
     const action = actions.showSessionExpireConfirmation()
-    store.dispatch(action)
+    await store.dispatch(action)
     app.update()
 
     expect(app.find('#login').hostNodes()).toHaveLength(1)
@@ -85,24 +92,24 @@ describe('when user has a valid token in local storage', () => {
 
   it('loads languages, facilities and locations on startup', async () => {
     const loadFacilities = jest.spyOn(referenceApi, 'loadFacilities')
-    const loadLanguages = jest.spyOn(referenceApi, 'loadLanguages')
+    const loadDefinitions = jest.spyOn(referenceApi, 'loadDefinitions')
     const loadLocations = jest.spyOn(referenceApi, 'loadLocations')
 
     createTestApp()
     await flushPromises()
     expect(loadFacilities).toHaveBeenCalled()
-    expect(loadLanguages).toHaveBeenCalled()
+    expect(loadDefinitions).toHaveBeenCalled()
     expect(loadLocations).toHaveBeenCalled()
   })
 })
 
 describe('it handles react errors', () => {
   const { store } = createStore()
-  it('displays react error page', () => {
+  it('displays react error page', async () => {
     function Problem(): JSX.Element {
       throw new Error('Error thrown.')
     }
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
@@ -117,11 +124,11 @@ describe('it handles react errors', () => {
 
 describe('it handles react unauthorized errors', () => {
   const { store } = createStore()
-  it('displays react error page', () => {
+  it('displays react error page', async () => {
     function Problem(): JSX.Element {
       throw new Error('401')
     }
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,

@@ -13,17 +13,13 @@ const { store } = createStore()
 describe('Security Question Page', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SecurityQuestion setupData={{ securityQuestionAnswers: [] }} />,
       store
     )
     component = testComponent.component
     component.find('button#submit-security-question').simulate('click')
-  })
-
-  afterEach(() => {
-    component.unmount()
   })
 
   it('Should display the validation error messages when Contrinue button is pressed', () => {

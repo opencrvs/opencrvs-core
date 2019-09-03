@@ -1928,16 +1928,23 @@ const builders: IFieldBuilders = {
           const relatedPersonResource = selectOrCreateRelatedPersonResource(
             fhirBundle,
             context,
-            EVENT_TYPE.BIRTH
+            context.event
           )
-          relatedPersonResource.relationship = {
-            coding: [
-              {
-                system:
-                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-                code: fieldValue
-              }
-            ]
+          if (
+            relatedPersonResource.relationship &&
+            relatedPersonResource.relationship.coding
+          ) {
+            relatedPersonResource.relationship.coding[0].code = fieldValue
+          } else {
+            relatedPersonResource.relationship = {
+              coding: [
+                {
+                  system:
+                    'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                  code: fieldValue
+                }
+              ]
+            }
           }
           /* if mother/father is collecting then we will just put the person ref here */
           if (fieldValue === 'MOTHER') {
@@ -1961,6 +1968,33 @@ const builders: IFieldBuilders = {
               fhirBundle,
               context
             )
+          }
+        },
+        otherRelationship: async (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const relatedPersonResource = selectOrCreateRelatedPersonResource(
+            fhirBundle,
+            context,
+            context.event
+          )
+          if (
+            relatedPersonResource.relationship &&
+            relatedPersonResource.relationship.coding
+          ) {
+            relatedPersonResource.relationship.coding[0].display = fieldValue
+          } else {
+            relatedPersonResource.relationship = {
+              coding: [
+                {
+                  system:
+                    'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                  display: fieldValue
+                }
+              ]
+            }
           }
         },
         affidavit: {

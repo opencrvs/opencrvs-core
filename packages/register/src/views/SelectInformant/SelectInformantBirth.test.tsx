@@ -5,74 +5,36 @@ import {
 } from '@register/applications'
 import { Event } from '@register/forms'
 import { SELECT_BIRTH_INFORMANT } from '@register/navigation/routes'
-import { getOfflineDataSuccess } from '@register/offline/actions'
+
 import { storage } from '@register/storage'
-import {
-  assign,
-  createTestApp,
-  flushPromises,
-  getItem,
-  mockOfflineData,
-  setItem,
-  validToken
-} from '@register/tests/util'
-import * as CommonUtils from '@register/utils/commonUtils'
+import { createTestApp, flushPromises, setPinCode } from '@register/tests/util'
+
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import * as fetchAny from 'jest-fetch-mock'
-import { Store } from 'redux'
-
-const fetch = fetchAny as any
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
-jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
+import { AppStore } from '@register/store'
 
 beforeEach(() => {
-  window.history.replaceState({}, '', '/')
-  assign.mockClear()
+  ;(storage.getItem as jest.Mock).mockReset()
 })
 
 describe('when user is selecting the informant', () => {
   let app: ReactWrapper
   let history: History
-  let store: Store
+  let store: AppStore
   let draft: IApplication
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     app = testApp.app
-    await flushPromises()
-    app.update()
     history = testApp.history
     store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+
     draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
     history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
+
     await flushPromises()
-    app.update()
-    app
-      .find('#createPinBtn')
-      .hostNodes()
-      .simulate('click')
-    await flushPromises()
-    app.update()
-    for (let i = 1; i <= 8; i++) {
-      app
-        .find(`#keypad-${i % 2}`)
-        .hostNodes()
-        .simulate('click')
-    }
-    await flushPromises()
-    app.update()
+    await setPinCode(app)
   })
   describe('when selects "Parent"', () => {
     it('takes user to the birth registration contact view', () => {
@@ -136,8 +98,7 @@ describe('when user is selecting the informant', () => {
       )
     })
   })
-  console.warn = () => {}
-  console.error = () => {}
+
   describe('when select both parents', () => {
     it('takes user to the select primary applicant view', () => {
       app
@@ -168,20 +129,11 @@ describe('when user is selecting the informant', () => {
 })
 describe('when select informant page loads with existing data', () => {
   it('loads data properly while initiating', async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     const app = testApp.app
-    await flushPromises()
-    app.update()
     const history = testApp.history
     const store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+
     const draft = createApplication(Event.BIRTH, {
       registration: {
         presentAtBirthRegistration: 'MOTHER',
@@ -190,22 +142,8 @@ describe('when select informant page loads with existing data', () => {
     })
     store.dispatch(storeApplication(draft))
     history.replace(SELECT_BIRTH_INFORMANT.replace(':applicationId', draft.id))
-    await flushPromises()
-    app.update()
-    app
-      .find('#createPinBtn')
-      .hostNodes()
-      .simulate('click')
-    await flushPromises()
-    app.update()
-    for (let i = 1; i <= 8; i++) {
-      app
-        .find(`#keypad-${i % 2}`)
-        .hostNodes()
-        .simulate('click')
-    }
-    await flushPromises()
-    app.update()
+
+    await setPinCode(app)
 
     expect(
       app

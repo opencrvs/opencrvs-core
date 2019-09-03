@@ -98,7 +98,7 @@ describe('In Progress tab', () => {
         data: {}
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
@@ -175,7 +175,7 @@ describe('In Progress tab', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
@@ -276,7 +276,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -299,8 +299,6 @@ describe('In Progress tab', () => {
       expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
       expect(data[0].actions).toBeDefined()
-
-      testComponent.component.unmount()
     })
 
     it('Should render pagination in progress tab if data is more than 10', async () => {
@@ -309,7 +307,7 @@ describe('In Progress tab', () => {
       for (let i = 0; i < 12; i++) {
         drafts.push(createApplication(Event.BIRTH))
       }
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -333,7 +331,6 @@ describe('In Progress tab', () => {
         .last()
         .hostNodes()
         .simulate('click')
-      testComponent.component.unmount()
     })
 
     it('redirects user to draft preview page on update click', async () => {
@@ -422,7 +419,7 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       store.dispatch(storeApplication(drafts))
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -453,7 +450,6 @@ describe('In Progress tab', () => {
       expect(history.location.pathname).toContain(
         '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       )
-      testComponent.component.unmount()
     })
   })
 
@@ -513,7 +509,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -537,8 +533,6 @@ describe('In Progress tab', () => {
       expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
       expect(data[0].actions).toBeDefined()
-
-      testComponent.component.unmount()
     })
 
     it('Should render pagination in progress tab if data is more than 10', async () => {
@@ -651,7 +645,7 @@ describe('In Progress tab', () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -676,7 +670,6 @@ describe('In Progress tab', () => {
         .last()
         .hostNodes()
         .simulate('click')
-      testComponent.component.unmount()
     })
 
     it('renders expanded area for remote draft data', async () => {
@@ -804,7 +797,7 @@ describe('In Progress tab', () => {
       ]
 
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -833,8 +826,6 @@ describe('In Progress tab', () => {
       expect(
         testComponent.component.find('#IN_PROGRESS-0').hostNodes().length
       ).toBe(1)
-
-      testComponent.component.unmount()
     })
     it('redirects user to draft preview page on update click', async () => {
       jest.clearAllMocks()
@@ -884,7 +875,7 @@ describe('In Progress tab', () => {
       ]
 
       // @ts-ignore
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
@@ -920,7 +911,6 @@ describe('In Progress tab', () => {
           event: 'birth'
         })
       )
-      testComponent.component.unmount()
     })
   })
 })
@@ -986,7 +976,7 @@ describe('Tablet tests', () => {
     ]
 
     // @ts-ignore
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <InProgressTab
         drafts={drafts}
@@ -1018,6 +1008,5 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })

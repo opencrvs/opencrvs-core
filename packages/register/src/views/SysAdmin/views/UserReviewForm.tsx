@@ -13,7 +13,7 @@ import {
 } from '@register/forms'
 import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { FormTitle, Action } from '@register/views/SysAdmin/views/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -30,6 +30,7 @@ import {
 } from '@register/i18n/messages'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { SimpleDocumentUploader } from '@register/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -48,7 +49,7 @@ interface ISectionData {
   items: IDataProps[]
 }
 
-type IFullProps = IUserReviewFormProps & InjectedIntlProps
+type IFullProps = IUserReviewFormProps & IntlShapeProps
 
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
@@ -58,7 +59,7 @@ class UserReviewFormComponent extends React.Component<
     const sections: ISectionData[] = []
 
     getVisibleSectionGroupsBasedOnConditions(
-      userSection,
+      deserializeFormSection(userSection),
       this.props.formData
     ).forEach(group => {
       group.fields.forEach((field: IFormField) => {
@@ -93,13 +94,15 @@ class UserReviewFormComponent extends React.Component<
     const { intl, formData } = this.props
 
     if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+      const files = (formData[field.name] as unknown) as IAttachmentValue
+
       return (
         <SimpleDocumentUploader
           label={intl.formatMessage(field.label)}
           disableDeleteInPreview={true}
           name={field.name}
           onComplete={() => {}}
-          files={formData[field.name] as IAttachmentValue}
+          files={files}
         />
       )
     }
@@ -146,7 +149,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goBack: () => dispatch(goBack()),
     submitForm: () => {
       const variables = draftToGqlTransformer(
-        { sections: [userSection] },
+        { sections: [deserializeFormSection(userSection)] },
         { user: props.formData }
       )
       dispatch(submitUserFormData(props.client, createUserMutation, variables))
@@ -156,4 +159,4 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = connect(
   null,
   mapDispatchToProps
-)(injectIntl<IFullProps & IDispatchProps>(UserReviewFormComponent))
+)(injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent))

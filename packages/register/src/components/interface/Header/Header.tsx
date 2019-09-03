@@ -31,11 +31,10 @@ import { storage } from '@register/storage'
 import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { connect } from 'react-redux'
 import { getUserDetails } from '@register/profile/profileSelectors'
-import { IUserDetails } from '@register/utils/userUtils'
+import { IUserDetails, getIndividualNameObj } from '@register/utils/userUtils'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { IStoreState } from '@register/store'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   goToHome,
   goToPerformance,
@@ -59,7 +58,7 @@ import {
   userMessages
 } from '@register/i18n/messages'
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
@@ -103,12 +102,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     let name = ''
     if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName | null) => {
-          const name = storedName as GQLHumanName
-          return name.use === language
-        }
-      ) as GQLHumanName
+      const nameObj = getIndividualNameObj(userDetails.name, language)
       name = nameObj
         ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
         : ''
@@ -360,4 +354,4 @@ export const Header = connect(
     goToHomeAction: goToHome,
     goToPerformanceAction: goToPerformance
   }
-)(injectIntl<IProps>(HeaderComp))
+)(injectIntl<'intl', IProps>(HeaderComp))

@@ -1,24 +1,28 @@
-import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
-import styled, { withTheme } from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { messages } from '@register/i18n/messages/views/certificate'
+import { Print } from '@opencrvs/components/lib/icons'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import {
+  IPrintableApplication,
+  modifyApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/certificate'
 import {
   goBack as goBackAction,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@register/navigation'
-import { IStoreState } from '@register/store'
-import { RouteComponentProps } from 'react-router'
-import { Event, IFormData } from '@register/forms'
-import { IApplication } from '@register/applications'
-import { ITheme } from '@register/styledComponents'
-import { connect } from 'react-redux'
-import { calculatePrice, getServiceMessage } from './calculatePrice'
-import { Print } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import { ITheme } from '@register/styledComponents'
 import { IUserDetails } from '@register/utils/userUtils'
+import { printMoneyReceipt } from '@register/views/PrintCertificate/PDFUtils'
+import * as React from 'react'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import styled, { withTheme } from 'styled-components'
+import { calculatePrice, getEventDate, getServiceMessage } from './utils'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -69,25 +73,46 @@ interface IProps {
   event: Event
   registrationId: string
   language: string
-  application: IApplication
+  application: IPrintableApplication
   theme: ITheme
+  modifyApplication: typeof modifyApplication
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   userDetails: IUserDetails | null
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 
 class PaymentComponent extends React.Component<IFullProps> {
-  getEventDate(data: IFormData, event: Event): string {
-    switch (event) {
-      case Event.BIRTH:
-        return data.child.childBirthDate as string
-      case Event.DEATH:
-        return data.deathEvent.deathDate as string
-    }
-  }
-  continue = () => {
+  continue = (paymentAmount: string) => {
+    const { application } = this.props
+    const certificates =
+      application && application.data.registration.certificates
+
+    const certificate = (certificates && certificates[0]) || {}
+
+    this.props.modifyApplication({
+      ...application,
+      data: {
+        ...application.data,
+        registration: {
+          ...application.data.registration,
+          certificates: [
+            {
+              ...certificate,
+              payments: {
+                type: 'MANUAL' as const,
+                total: paymentAmount,
+                amount: paymentAmount,
+                outcome: 'COMPLETED' as const,
+                date: Date.now()
+              }
+            }
+          ]
+        }
+      }
+    })
+
     this.props.goToReviewCertificate(
       this.props.registrationId,
       this.props.event
@@ -96,7 +121,7 @@ class PaymentComponent extends React.Component<IFullProps> {
 
   render = () => {
     const { intl, application, event, goBack } = this.props
-    const eventDate = this.getEventDate(application.data, event)
+    const eventDate = getEventDate(application.data, event)
 
     const paymentAmount = calculatePrice(event, eventDate)
 
@@ -126,13 +151,22 @@ class PaymentComponent extends React.Component<IFullProps> {
               id="print-receipt"
               icon={() => <Print />}
               align={0}
-              onClick={() => {}}
+              onClick={() =>
+                printMoneyReceipt(
+                  this.props.intl,
+                  this.props.application,
+                  this.props.userDetails
+                )
+              }
             >
               {intl.formatMessage(messages.printReceipt)}
             </TertiaryButton>
           </GreyBody>
           <Action>
-            <PrimaryButton id="Continue" onClick={this.continue}>
+            <PrimaryButton
+              id="Continue"
+              onClick={() => this.continue(paymentAmount)}
+            >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>
@@ -160,7 +194,7 @@ function mapStatetoProps(
   const event = getEvent(eventType)
   const application = state.applicationsState.applications.find(
     app => app.id === registrationId && app.event === event
-  )
+  ) as IPrintableApplication | undefined
 
   if (!application) {
     throw new Error(`Application "${registrationId}" missing!`)
@@ -179,6 +213,7 @@ export const Payment = connect(
   mapStatetoProps,
   {
     goBack: goBackAction,
+    modifyApplication,
     goToReviewCertificate: goToReviewCertificateAction
   }
 )(injectIntl(withTheme(PaymentComponent)))

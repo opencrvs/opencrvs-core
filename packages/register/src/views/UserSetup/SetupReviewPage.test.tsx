@@ -17,7 +17,7 @@ describe('SetupReviewPage page tests', () => {
         JSON.stringify({ ...userDetails, type: 'CHA' })
       )
     )
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -33,11 +33,10 @@ describe('SetupReviewPage page tests', () => {
     )
 
     expect(testComponent.component.find('#UserSetupData')).toBeDefined()
-    testComponent.component.unmount()
   })
   it('render page without type', async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -60,10 +59,9 @@ describe('SetupReviewPage page tests', () => {
       .childAt(1)
       .text()
     expect(role).toEqual('Field Agent')
-    testComponent.component.unmount()
   })
   it('clicks question to change', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -82,8 +80,6 @@ describe('SetupReviewPage page tests', () => {
       .find('#Question_Action_BIRTH_TOWN')
       .hostNodes()
       .simulate('click')
-
-    testComponent.component.unmount()
   })
   it('submit user setup for activation', async () => {
     const mock = [
@@ -103,7 +99,7 @@ describe('SetupReviewPage page tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -119,8 +115,6 @@ describe('SetupReviewPage page tests', () => {
     )
 
     testComponent.component.find('button#Confirm').simulate('click')
-
-    testComponent.component.unmount()
   })
 
   it('it shows error if error occurs', async () => {
@@ -140,7 +134,7 @@ describe('SetupReviewPage page tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -167,8 +161,6 @@ describe('SetupReviewPage page tests', () => {
         .hostNodes()
         .text()
     ).toBe('An error occured. Please try again.')
-
-    testComponent.component.unmount()
   })
 
   it('shows nothing for undefined fields of userDetails', async () => {
@@ -200,7 +192,7 @@ describe('SetupReviewPage page tests', () => {
       )
     )
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -237,7 +229,5 @@ describe('SetupReviewPage page tests', () => {
         .hostNodes()
         .text()
     ).toBe('Phone numberChange')
-
-    testComponent.component.unmount()
   })
 })

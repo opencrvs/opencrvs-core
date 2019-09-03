@@ -10,7 +10,6 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   flushPromises,
-  intl,
   mockOfflineData
 } from '@register/tests/util'
 import { REJECTED } from '@register/utils/constants'
@@ -23,6 +22,7 @@ import * as React from 'react'
 import { v4 as uuid } from 'uuid'
 import { waitForElement } from '@register/tests/wait-for-element'
 import { isMobileDevice } from '@register/utils/commonUtils'
+import { createIntl } from 'react-intl'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
@@ -69,10 +69,12 @@ beforeEach(() => {
   ;(isMobileDevice as jest.Mock).mockRestore()
 })
 
+const intl = createIntl({ locale: 'en' })
+
 describe('when user is in the review page', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={draft}
@@ -160,13 +162,7 @@ describe('return the correct label on dynamic fields', () => {
           statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
-        {
-          ...mockOfflineData,
-          offlineDataLoaded: true,
-          loadingError: false,
-          languages: [],
-          languageState: {}
-        },
+        mockOfflineData,
         'bn'
       )
     ).toBe('চট্টগ্রাম')
@@ -181,13 +177,7 @@ describe('return the correct label on dynamic fields', () => {
           statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
         },
         intl,
-        {
-          ...mockOfflineData,
-          offlineDataLoaded: true,
-          loadingError: false,
-          languages: [],
-          languageState: {}
-        },
+        mockOfflineData,
         'en'
       )
     ).toBe('Chittagong')
@@ -198,7 +188,7 @@ describe('when user is in the review page for rejected birth application', () =>
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftBirth}
@@ -220,7 +210,7 @@ describe('when user is in the review page for rejected birth application', () =>
 describe('when user is in the review page for rejected death application', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={rejectedDraftDeath}
@@ -243,7 +233,7 @@ describe('when user is in the review page to validate birth application', () => 
   let reviewSectionComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ReviewSection
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         draft={declaredBirthApplication}

@@ -20,7 +20,6 @@ import {
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
 import { queries } from '@register/profile/queries'
-import * as offlineActions from '@register/offline/actions'
 import * as changeLanguageActions from '@register/i18n/actions'
 
 export type ProfileState = {
@@ -39,16 +38,13 @@ export const initialState: ProfileState = {
 
 export const profileReducer: LoopReducer<
   ProfileState,
-  actions.Action | offlineActions.Action | changeLanguageActions.Action
+  actions.Action | changeLanguageActions.Action
 > = (
   state: ProfileState = initialState,
-  action: actions.Action | offlineActions.Action | changeLanguageActions.Action
+  action: actions.Action | changeLanguageActions.Action
 ):
   | ProfileState
-  | Loop<
-      ProfileState,
-      actions.Action | offlineActions.Action | changeLanguageActions.Action
-    > => {
+  | Loop<ProfileState, actions.Action | changeLanguageActions.Action> => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
       return loop(
@@ -90,6 +86,7 @@ export const profileReducer: LoopReducer<
           Cmd.action(actions.redirectToAuthentication())
         )
       }
+
       return loop(
         {
           ...state,
@@ -119,7 +116,7 @@ export const profileReducer: LoopReducer<
           },
           Cmd.list([
             Cmd.run(() => storeUserDetails(userDetails)),
-            Cmd.action(offlineActions.setOfflineData(userDetails))
+            Cmd.action(actions.userDetailsAvailable(userDetails))
           ])
         )
       } else {
@@ -192,7 +189,7 @@ export const profileReducer: LoopReducer<
             ...state,
             userDetails: userDetailsCollection
           },
-          Cmd.action(offlineActions.setOfflineData(userDetailsCollection!))
+          Cmd.action(actions.userDetailsAvailable(userDetailsCollection!))
         )
       }
 

@@ -4,10 +4,10 @@ import {
   validToken,
   flushPromises,
   mockApplicationData,
-  mockUserResponse
+  mockUserResponse,
+  getItem
 } from '@register/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { storage } from '@register/storage'
 import { FIELD_AGENT_ROLES } from '@register/utils/constants'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
 import { storeApplication, SUBMISSION_STATUS } from '@register/applications'
@@ -22,10 +22,7 @@ import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
 } from '@register/search/queries'
-
-const getItem = window.localStorage.getItem as jest.Mock
-
-const mockFetchUserDetails = jest.fn()
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const nameObj = {
   data: {
@@ -64,22 +61,18 @@ const countQueryGraphqlMock = {
 }
 
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
 
 describe('FieldAgentHome tests', () => {
   const { store } = createStore()
 
   beforeAll(() => {
+    ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     getItem.mockReturnValue(validToken)
     store.dispatch(checkAuth({ '?token': validToken }))
   })
 
   it('renders loading icon while loading page', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -92,12 +85,14 @@ describe('FieldAgentHome tests', () => {
         }}
       />,
       store,
-      [countQueryGraphqlMock]
+      [{ ...countQueryGraphqlMock, delay: 2000 }]
     )
 
     testComponent.component.update()
     const app = testComponent.component
-    expect(app.find('#field-agent-home-spinner').hostNodes()).toHaveLength(1)
+    const element = await waitForElement(app, '#field-agent-home-spinner')
+
+    expect(element.hostNodes()).toHaveLength(1)
   })
 
   it('renders error text when an error occurs', async () => {
@@ -114,7 +109,7 @@ describe('FieldAgentHome tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -138,12 +133,10 @@ describe('FieldAgentHome tests', () => {
     const app = testComponent.component.update()
 
     expect(app.find('#field-agent-home_error').hostNodes()).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
 
   it('renders page with three tabs', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -173,7 +166,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the floating action button', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -258,7 +251,7 @@ describe('FieldAgentHome tests', () => {
         }
       }
     }
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -339,7 +332,7 @@ describe('FieldAgentHome tests', () => {
         }
       }
     }
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -372,7 +365,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the sent for review tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -405,7 +398,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the sent for updates tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -438,7 +431,7 @@ describe('FieldAgentHome tests', () => {
   })
 
   it('when user clicks the sent for inprogress tab', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <FieldAgentHome
         match={{
@@ -473,8 +466,8 @@ describe('FieldAgentHome tests', () => {
   describe('when user is in sent for review tab', () => {
     let component: ReactWrapper
 
-    beforeEach(() => {
-      component = createTestComponent(
+    beforeEach(async () => {
+      component = (await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -487,11 +480,11 @@ describe('FieldAgentHome tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
     })
 
-    it('renders no records text when no data in grid table', () => {
-      const testComponent = createTestComponent(
+    it('renders no records text when no data in grid table', async () => {
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -552,7 +545,7 @@ describe('FieldAgentHome tests', () => {
       expect(component.find('#failed3').hostNodes()).toHaveLength(1)
     })
 
-    it('when offline renders pending submission status', () => {
+    it('when offline renders pending submission status', async () => {
       Object.defineProperty(window.navigator, 'onLine', { value: false })
 
       const readyApplication = {
@@ -564,16 +557,17 @@ describe('FieldAgentHome tests', () => {
 
       store.dispatch(storeApplication(readyApplication))
 
-      component.update()
-      expect(component.find('#offline0').hostNodes()).toHaveLength(1)
+      const element = await waitForElement(component, '#offline0')
+
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
 
   describe('when user is in progress tab', () => {
     let component: ReactWrapper
 
-    beforeEach(() => {
-      component = createTestComponent(
+    beforeEach(async () => {
+      component = (await createTestComponent(
         // @ts-ignore
         <FieldAgentHome
           match={{
@@ -586,7 +580,7 @@ describe('FieldAgentHome tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
     })
 
     it('renders no records text when no data in grid table', () => {

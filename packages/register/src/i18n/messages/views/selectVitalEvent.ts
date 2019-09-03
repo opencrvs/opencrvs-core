@@ -1,9 +1,9 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISelectPrimaryApplicantMessages {
-  registerNewEventTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  registerNewEventHeading: ReactIntl.FormattedMessage.MessageDescriptor
-  errorMessage: ReactIntl.FormattedMessage.MessageDescriptor
+  registerNewEventTitle: MessageDescriptor
+  registerNewEventHeading: MessageDescriptor
+  errorMessage: MessageDescriptor
 }
 
 const messagesToDefine: ISelectPrimaryApplicantMessages = {

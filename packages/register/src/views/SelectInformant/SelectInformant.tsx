@@ -1,6 +1,10 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -23,14 +27,18 @@ import {
   goToDeathRegistration
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+
 import {
   InputField,
   TextInput,
   IRadioOption as RadioComponentOption
 } from '@opencrvs/components/lib/forms'
-import { Event } from '@register/forms'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  IFormSection
+} from '@register/forms'
 import { phoneNumberFormat } from '@register/utils/validate'
 import {
   PHONE_NO_FIELD_STRING,
@@ -44,6 +52,10 @@ import {
   formMessages,
   buttonMessages
 } from '@register/i18n/messages'
+import {
+  getBirthSection,
+  getDeathSection
+} from '@register/forms/register/application-selectors'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -86,7 +98,7 @@ export interface IInformantField {
 }
 
 const setInformantFields = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   event: string
 ): IInformantField[] => {
   if (event === Event.BIRTH) {
@@ -208,7 +220,9 @@ type IFullProps = {
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
   goToPrimaryApplicant: typeof goToPrimaryApplicant
-} & InjectedIntlProps &
+  registrationSection: IFormSection
+  applicantsSection: IFormSection
+} & IntlShapeProps &
   RouteComponentProps<IMatchProps>
 
 interface IState {
@@ -223,6 +237,7 @@ interface IState {
 export class SelectInformantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
+    const { applicantsSection, registrationSection } = props
     this.state = {
       informant:
         (this.props.application &&
@@ -270,7 +285,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
-      const { application, goToPrimaryApplicant } = this.props
+      const {
+        application,
+        goToPrimaryApplicant,
+        registrationSection
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -292,7 +311,9 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const {
         application,
         goToBirthContactPoint,
-        goToDeathContactPoint
+        goToDeathContactPoint,
+        registrationSection,
+        applicantsSection
       } = this.props
       const newApplication = {
         ...application,
@@ -335,7 +356,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       !this.state.isPhoneNoError &&
       this.state.relationship !== ''
     ) {
-      const { application, goToDeathRegistration } = this.props
+      const {
+        application,
+        goToDeathRegistration,
+        applicantsSection
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -515,9 +540,11 @@ const mapStateToProps = (
 ) => {
   const { match } = props
   return {
+    registrationSection: getBirthSection(store, BirthSection.Registration),
+    applicantsSection: getDeathSection(store, DeathSection.Applicants),
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
-    ) as IApplication
+    )!
   }
 }
 
@@ -535,4 +562,4 @@ export const SelectInformant = withRouter(
       modifyApplication
     }
   )(injectIntl(SelectInformantView))
-) as any
+)

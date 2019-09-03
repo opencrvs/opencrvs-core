@@ -6,7 +6,7 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
-    "test": "jest  --silent --noStackTrace && yarn test:compilation",
+    "test": "jest  --silent --noStackTrace --coverage && yarn test:compilation",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
@@ -14,7 +14,8 @@
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
     "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts",
     "save:testData": "yarn prep:employees:bgd && yarn save:testLocations && yarn save:testEmployees",
-    "populate:bgd": "bash populateBgd.sh"
+    "populate:bgd": "bash populateBgd.sh",
+    "populate:zmb": "bash populateZmb.sh"
   },
   "devDependencies": {
     "csv2json": "^1.4.2",

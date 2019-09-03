@@ -26,12 +26,12 @@ describe('verify collector tests', () => {
   }
 
   describe('in case of birth application', () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       store.dispatch(storeApplication(birthApplication))
     })
 
-    it('when mother is collector renders idVerifier component', () => {
-      const testComponent = createTestComponent(
+    it('when mother is collector renders idVerifier component', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -47,15 +47,15 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
     describe('when father is collector', () => {
       let testComponent: ReactWrapper
-      beforeEach(() => {
-        testComponent = createTestComponent(
+      beforeEach(async () => {
+        testComponent = (await createTestComponent(
           // @ts-ignore
           <VerifyCollector
             history={history}
@@ -71,24 +71,23 @@ describe('verify collector tests', () => {
             }}
           />,
           store
-        ).component
+        )).component
       })
 
       it('renders idVerifier compomnent', () => {
         expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
       })
 
-      it('clicking on yes button marks collector verified', () => {
+      it('clicking on yes button takes user to review certificate if there is no fee', () => {
+        Date.now = jest.fn(() => 243885600000)
+
         testComponent
           .find('#idVerifier')
           .find('#verifyPositive')
           .hostNodes()
           .simulate('click')
 
-        expect(
-          store.getState().applicationsState.applications[0].data
-            .certificateCollector.verified
-        ).toBe(true)
+        expect(history.location.pathname).toContain('review')
       })
 
       it('clicking on no button shows up modal', () => {
@@ -105,7 +104,9 @@ describe('verify collector tests', () => {
         ).toHaveLength(1)
       })
 
-      it('clicking on send button on modal marks collector unverified', () => {
+      it('clicking on send button on modal takes user to payment if there is fee', () => {
+        Date.now = jest.fn(() => 969732000000)
+
         testComponent
           .find('#idVerifier')
           .find('#verifyNegative')
@@ -120,10 +121,7 @@ describe('verify collector tests', () => {
           .hostNodes()
           .simulate('click')
 
-        expect(
-          store.getState().applicationsState.applications[0].data
-            .certificateCollector.verified
-        ).toBe(false)
+        expect(history.location.pathname).toContain('payment')
       })
 
       it('clicking on cancel button hides the modal', () => {
@@ -155,8 +153,8 @@ describe('verify collector tests', () => {
       store.dispatch(storeApplication(deathApplication))
     })
 
-    it('when informant is collector', () => {
-      const testComponent = createTestComponent(
+    it('when informant is collector', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -172,7 +170,7 @@ describe('verify collector tests', () => {
           }}
         />,
         store
-      ).component
+      )).component
 
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })

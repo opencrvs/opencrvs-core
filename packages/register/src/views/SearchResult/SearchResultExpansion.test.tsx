@@ -184,7 +184,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -224,8 +224,6 @@ describe('SearchResult expansion related tests', () => {
       expect(
         testComponent.component.find('#DECLARED-0').hostNodes().length
       ).toBe(1)
-
-      testComponent.component.unmount()
     })
 
     it('renders error while expanded section can not load data', async () => {
@@ -302,7 +300,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -342,8 +340,6 @@ describe('SearchResult expansion related tests', () => {
       expect(
         testComponent.component.find('#DECLARED-0').hostNodes().length
       ).toBe(0)
-
-      testComponent.component.unmount()
     })
 
     it('renders rejected section after expanding', async () => {
@@ -485,7 +481,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -525,8 +521,6 @@ describe('SearchResult expansion related tests', () => {
       expect(
         testComponent.component.find('#REJECTED-0').hostNodes().length
       ).toBe(1)
-
-      testComponent.component.unmount()
     })
 
     it('renders registered section after expanding', async () => {
@@ -656,7 +650,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -696,8 +690,6 @@ describe('SearchResult expansion related tests', () => {
       expect(
         testComponent.component.find('#REGISTERED-0').hostNodes().length
       ).toBe(1)
-
-      testComponent.component.unmount()
     })
 
     it('renders collected section after expanding', async () => {
@@ -832,7 +824,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -872,8 +864,6 @@ describe('SearchResult expansion related tests', () => {
       expect(
         testComponent.component.find('#CERTIFIED-0').hostNodes().length
       ).toBe(1)
-
-      testComponent.component.unmount()
     })
 
     it('check branches  using miscellaneous data', async () => {
@@ -1018,7 +1008,7 @@ describe('SearchResult expansion related tests', () => {
         }
       ]
 
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <SearchResult
           match={{
@@ -1058,8 +1048,6 @@ describe('SearchResult expansion related tests', () => {
       expect(
         testComponent.component.find('#CERTIFIED-0').hostNodes().length
       ).toBe(1)
-
-      testComponent.component.unmount()
     })
   })
 })

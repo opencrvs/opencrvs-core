@@ -1,16 +1,16 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IPinMessages {
-  createTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  createDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  pinSameDigitsError: ReactIntl.FormattedMessage.MessageDescriptor
-  pinSequentialDigitsError: ReactIntl.FormattedMessage.MessageDescriptor
-  pinMatchError: ReactIntl.FormattedMessage.MessageDescriptor
-  reEnterTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  reEnterDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  incorrect: ReactIntl.FormattedMessage.MessageDescriptor
-  lastTry: ReactIntl.FormattedMessage.MessageDescriptor
-  locked: ReactIntl.FormattedMessage.MessageDescriptor
+  createTitle: MessageDescriptor
+  createDescription: MessageDescriptor
+  pinSameDigitsError: MessageDescriptor
+  pinSequentialDigitsError: MessageDescriptor
+  pinMatchError: MessageDescriptor
+  reEnterTitle: MessageDescriptor
+  reEnterDescription: MessageDescriptor
+  incorrect: MessageDescriptor
+  lastTry: MessageDescriptor
+  locked: MessageDescriptor
 }
 
 const messagesToDefine: IPinMessages = {

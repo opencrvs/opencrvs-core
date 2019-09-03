@@ -148,10 +148,10 @@ describe('Field Agnet tests', () => {
     store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
   })
 
-  it('loads properly for draft application with create row', () => {
+  it('loads properly for draft application with create row', async () => {
     const draft = createApplication(Event.BIRTH)
     store.dispatch(storeApplication(draft))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -172,11 +172,9 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#history_row_1_DRAFT_MODIFIED').hostNodes()
     ).toHaveLength(0)
-
-    testComponent.component.unmount()
   })
 
-  it('loads properly for draft application with create and update row', () => {
+  it('loads properly for draft application with create and update row', async () => {
     const draft = createApplication(Event.DEATH)
     store.dispatch(storeApplication(draft))
     // @ts-ignore
@@ -184,7 +182,7 @@ describe('Field Agnet tests', () => {
       familyNameEng: 'Anik'
     }
     store.dispatch(modifyApplication(draft))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -205,10 +203,8 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#history_row_1_DRAFT_STARTED').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
-  it('loads properly for failed application', () => {
+  it('loads properly for failed application', async () => {
     const draft = createApplication(Event.DEATH)
     store.dispatch(storeApplication(draft))
     // @ts-ignore
@@ -217,7 +213,7 @@ describe('Field Agnet tests', () => {
     }
     draft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]
     store.dispatch(modifyApplication(draft))
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -238,8 +234,6 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#failed_retry').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
   it('loads properly for sent_for_review application', async () => {
     const graphqlMock = [
@@ -334,7 +328,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -358,8 +352,6 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#history_row_0_DECLARED').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
   it('loads properly for required update application, and does not show update button for a field agent', async () => {
     const graphqlMock = [
@@ -438,7 +430,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -468,8 +460,6 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#history_row_1_APPLICATION').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
   it('loads history properly for all statuses of an application', async () => {
     const graphqlMock = [
@@ -547,7 +537,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -577,8 +567,6 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#history_row_0_CERTIFIED').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
   it('loads successfuly with empty history ', async () => {
     const graphqlMock = [
@@ -615,7 +603,7 @@ describe('Field Agnet tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -639,8 +627,6 @@ describe('Field Agnet tests', () => {
     expect(
       testComponent.component.find('#sub_page_back_button').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
 })
 
@@ -730,7 +716,7 @@ describe('Registrar tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -764,8 +750,6 @@ describe('Registrar tests', () => {
     expect(
       testComponent.component.find('#registrar_update').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
 
   it('Shows print button for a registered application if the user is a registrar', async () => {
@@ -845,7 +829,7 @@ describe('Registrar tests', () => {
         }
       }
     ]
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
         match={{
@@ -879,8 +863,6 @@ describe('Registrar tests', () => {
     expect(
       testComponent.component.find('#registrar_print').hostNodes()
     ).toHaveLength(1)
-
-    testComponent.component.unmount()
   })
 
   it('Renders error page in-case of any network error', async () => {
@@ -896,7 +878,7 @@ describe('Registrar tests', () => {
       }
     ]
     try {
-      createTestComponent(
+      await createTestComponent(
         // @ts-ignore
         <Details
           match={{

@@ -1,4 +1,4 @@
-import { FormattedMessage, MessageValue } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@register/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/register/src/forms'
 import {
@@ -18,8 +18,8 @@ import {
 } from '@register/forms/identity'
 
 export interface IValidationResult {
-  message: FormattedMessage.MessageDescriptor
-  props?: { [key: string]: MessageValue }
+  message: MessageDescriptor
+  props?: { [key: string]: any }
 }
 
 export type RangeValidation = (
@@ -33,8 +33,7 @@ export type MaxLengthValidation = (
 
 export type Validation = (
   value: IFormFieldValue,
-  drafts?: IFormData,
-  maruf?: number
+  drafts?: IFormData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -60,6 +59,12 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     example: '01741234567',
     start: '01',
     num: '11'
+  },
+  zmb: {
+    pattern: /^09(5|6|7){1}[0-9]{7}$/,
+    example: '0970545855',
+    start: '09[5|6|7]',
+    num: '10'
   }
 }
 
@@ -218,9 +223,9 @@ export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
       }
 }
 
-export const checkBirthDate: ValidationInitializer = (
-  marriageDate: string
-): Validation => (value: IFormFieldValue) => {
+export const checkBirthDate = (marriageDate: string): Validation => (
+  value: IFormFieldValue
+) => {
   const cast = value as string
   if (!isAValidDateFormat(cast)) {
     return {
@@ -247,9 +252,9 @@ export const checkBirthDate: ValidationInitializer = (
       }
 }
 
-export const checkMarriageDate: ValidationInitializer = (
-  birthDate: string
-): Validation => (value: IFormFieldValue) => {
+export const checkMarriageDate = (birthDate: string): Validation => (
+  value: IFormFieldValue
+) => {
   const cast = value as string
   if (!isAValidDateFormat(cast)) {
     return {
@@ -276,9 +281,9 @@ export const checkMarriageDate: ValidationInitializer = (
       }
 }
 
-export const dateGreaterThan: ValidationInitializer = (
-  previousDate: string
-): Validation => (value: IFormFieldValue) => {
+export const dateGreaterThan = (previousDate: string): Validation => (
+  value: IFormFieldValue
+) => {
   const cast = value as string
   if (!previousDate || !isAValidDateFormat(previousDate)) {
     return undefined
@@ -291,9 +296,9 @@ export const dateGreaterThan: ValidationInitializer = (
       }
 }
 
-export const dateLessThan: ValidationInitializer = (
-  laterDate: string
-): Validation => (value: IFormFieldValue) => {
+export const dateLessThan = (laterDate: string): Validation => (
+  value: IFormFieldValue
+) => {
   const cast = value as string
   if (!laterDate || !isAValidDateFormat(laterDate)) {
     return undefined
@@ -306,9 +311,7 @@ export const dateLessThan: ValidationInitializer = (
       }
 }
 
-export const dateNotInFuture: ValidationInitializer = (): Validation => (
-  value: IFormFieldValue
-) => {
+export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
   const cast = value as string
   if (isDateNotInFuture(cast)) {
     return undefined
@@ -332,13 +335,11 @@ export const isDateInPast: Validation = (value: IFormFieldValue) => {
   }
 }
 
-export const dateInPast: ValidationInitializer = (): Validation => (
-  value: IFormFieldValue
-) => isDateInPast(value)
+export const dateInPast = (): Validation => (value: IFormFieldValue) =>
+  isDateInPast(value)
 
-export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
-  value: IFormFieldValue
-) => dateFormat(value)
+export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
+  dateFormat(value)
 
 /*
  * TODO: The name validation functions should be refactored out.
@@ -356,9 +357,8 @@ export const dateFormatIsCorrect: ValidationInitializer = (): Validation => (
  * an English name in the Bengali name field and vice versa.
  */
 
-//
 // Each character has to be a part of the Unicode Bengali script or the hyphen.
-//
+
 export const isValidBengaliWord = (value: string): boolean => {
   const bengaliRe = XRegExp.cache('^[\\p{Bengali}-.]+$')
   const lettersRe = XRegExp.cache('^[\\pL\\pM-.]+$')
@@ -378,10 +378,9 @@ export const isValidEnglishWord = (value: string): boolean => {
 
 type Checker = (value: string) => boolean
 
-//
 // Utility 2nd order function. Does a little common task then passes on to
 // the callback.
-//
+
 const checkNameWords = (value: string, checker: Checker): boolean => {
   const trimmedValue = value === undefined || value === null ? '' : value.trim()
 
@@ -436,9 +435,7 @@ export const range: RangeValidation = (min: number, max: number) => (
 const hasValidLength = (value: string, length: number): boolean =>
   !value || value.length === length
 
-export const validIDNumber: ValidationInitializer = (
-  typeOfID: string
-): Validation => (value: any) => {
+export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
   const validNationalIDLength = 13
   const validBirthRegistrationNumberLength = {
     min: 17,

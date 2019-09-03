@@ -170,6 +170,7 @@ describe('User root resolvers', () => {
       expect(response.results).toEqual([dummyUserList[2]])
     })
   })
+
   describe('activateUser mutation', () => {
     it('activates the pending user', async () => {
       fetch.mockResponses(

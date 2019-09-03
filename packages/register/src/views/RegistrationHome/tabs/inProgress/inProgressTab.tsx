@@ -34,7 +34,7 @@ import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
@@ -105,7 +105,7 @@ interface IRegistrarHomeState {
   progressCurrentPage: number
 }
 
-type IRegistrarHomeProps = InjectedIntlProps & IBaseRegistrarHomeProps
+type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps
 
 export const TAB_ID = {
   inProgress: 'progress',

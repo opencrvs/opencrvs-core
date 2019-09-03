@@ -11,8 +11,11 @@
   "scripts": {
     "postinstall": "patch-package",
     "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start",
+    "start:zmb": "cp packages/register/public/config-zmb.js packages/register/public/config.js && COUNTRY=zmb COUNTRY_ALPHA3=ZMB BRN_GENERATOR_CODE=zm yarn start",
+    "start:bgd": "cp packages/register/public/config-bgd.js packages/register/public/config.js && COUNTRY=bgd COUNTRY_ALPHA3=BGD BRN_GENERATOR_CODE=bd yarn start",
     "start:prod": "yarn build && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
-    "dev": "yarn dev:secrets:gen && concurrently \"yarn run start\" \"yarn run compose:deps\"",
+    "dev:bgd": "yarn dev:secrets:gen && concurrently \"yarn run start:bgd\" \"yarn run compose:deps\"",
+    "dev:zmb": "yarn dev:secrets:gen && concurrently \"yarn run start:zmb\" \"yarn run compose:deps\"",
     "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
     "dev:tmux": "tmuxinator start",
     "dev:tmux:kill": "tmux kill-session -t opencrvs",

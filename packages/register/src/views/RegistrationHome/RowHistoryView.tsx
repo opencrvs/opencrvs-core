@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
 import { Query } from 'react-apollo'
@@ -147,7 +147,7 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   theme: ITheme
   eventId: string
 }

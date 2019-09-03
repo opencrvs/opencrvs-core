@@ -2,7 +2,8 @@ import {
   GQLLocation,
   GQLUser,
   GQLHumanName,
-  GQLIdentifier
+  GQLIdentifier,
+  GQLSignature
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/register/src/storage'
 import { getDefaultLanguage } from '@register/i18n/utils'
@@ -31,6 +32,7 @@ export interface IUserDetails {
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
   language: string
+  signature?: GQLSignature
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
@@ -43,7 +45,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     type,
     status,
     userMgntUserID,
-    practitionerId
+    practitionerId,
+    signature
   } = user
   const userDetails: IUserDetails = {
     language: getDefaultLanguage()
@@ -103,6 +106,10 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     }
   }
 
+  if (signature) {
+    userDetails.signature = signature
+  }
+
   return userDetails
 }
 
@@ -119,4 +126,15 @@ export async function storeUserDetails(userDetails: IUserDetails) {
 }
 export async function removeUserDetails() {
   storage.removeItem(USER_DETAILS)
+}
+
+export function getIndividualNameObj(
+  individualNameArr: Array<GQLHumanName | null>,
+  language: string
+) {
+  return (
+    individualNameArr.find((name: GQLHumanName | null) => {
+      return name && name.use === language ? true : false
+    }) || individualNameArr[0]
+  )
 }

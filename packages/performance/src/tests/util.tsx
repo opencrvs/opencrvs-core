@@ -14,8 +14,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import Adapter from 'enzyme-adapter-react-16'
 import { ThemeProvider } from '@performance/styledComponents'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { ENGLISH_STATE } from '@opencrvs/performance/src/i18n/locales/en'
-import { IntlProvider, intlShape } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import { I18nContainer } from '@opencrvs/performance/src/i18n/components/I18nContainer'
 import { App } from '@performance/App'
 import { MockedProvider } from 'react-apollo/test-utils'
@@ -31,18 +30,7 @@ export function getInitialState(): IStoreState {
   return mockStore.getState()
 }
 interface ITestView {
-  intl: ReactIntl.InjectedIntl
-}
-
-const intlProvider = new IntlProvider(
-  { locale: 'en', messages: ENGLISH_STATE.messages },
-  {}
-)
-
-const { intl } = intlProvider.getChildContext()
-
-function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
-  return React.cloneElement(node, { intl })
+  intl: IntlShape
 }
 
 export function createShallowRenderedComponent(
@@ -60,18 +48,12 @@ export function createTestComponent(
     <MockedProvider mocks={graphqlMocks} addTypename={false}>
       <Provider store={store}>
         <I18nContainer>
-          <ThemeProvider
-            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-          >
-            {nodeWithIntlProp(node)}
+          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+            {node}
           </ThemeProvider>
         </I18nContainer>
       </Provider>
-    </MockedProvider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
+    </MockedProvider>
   )
 
   return { component, store }

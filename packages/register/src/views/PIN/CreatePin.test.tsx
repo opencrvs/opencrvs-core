@@ -10,9 +10,9 @@ storage.setItem = jest.fn()
 describe('Create PIN view', () => {
   let c: ReactWrapper
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <CreatePin onComplete={() => null} />,
       store
     )

@@ -2,9 +2,8 @@ import * as React from 'react'
 import { mount, configure, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import Adapter from 'enzyme-adapter-react-16'
-import en from 'react-intl/locale-data/en'
+
 import { ThemeProvider } from 'styled-components'
-import { addLocaleData } from 'react-intl'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
@@ -14,7 +13,6 @@ import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import { getDefaultLanguage } from '@login/i18n/utils'
 
 configure({ adapter: new Adapter() })
-addLocaleData([...en])
 
 export const mockState: IStoreState = createStore().getState()
 
@@ -26,13 +24,7 @@ export function createTestComponent(node: React.ReactElement<object>) {
   return mount(
     <Provider store={store}>
       <IntlContainer>
-        <ThemeProvider
-          theme={getTheme(
-            (window as Window & { config: { [key: string]: string } }).config
-              .COUNTRY,
-            getDefaultLanguage()
-          )}
-        >
+        <ThemeProvider theme={getTheme(getDefaultLanguage())}>
           {node}
         </ThemeProvider>
       </IntlContainer>

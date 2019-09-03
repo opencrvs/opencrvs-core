@@ -6,16 +6,18 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
+
 const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
-  beforeEach(() => {
-    const testComponent = createTestComponent(
+  beforeEach(async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <UserForm
-        section={userSection}
-        activeGroup={userSection.groups[0]}
+        section={deserializeFormSection(userSection)}
+        activeGroup={deserializeFormSection(userSection).groups[0]}
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,
@@ -173,7 +175,5 @@ describe('Create new user page tests', () => {
     component.update()
 
     expect(component.find('#office-search-modal').hostNodes().length).toBe(1)
-
-    component.unmount()
   })
 })

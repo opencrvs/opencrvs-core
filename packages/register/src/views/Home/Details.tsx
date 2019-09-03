@@ -19,7 +19,7 @@ import {
   StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import {
@@ -199,7 +199,7 @@ function generateHistoryEntry(
   }
 }
 
-class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
+class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DRAFT_STARTED':

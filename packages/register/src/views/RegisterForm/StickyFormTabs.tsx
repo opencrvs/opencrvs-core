@@ -3,7 +3,7 @@ import Sticky from 'react-stickynode'
 import { IFormSection } from '@register/forms'
 import styled from '@register/styledComponents'
 import { FormTabs } from '@register/components/form'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const StickyFormTabsContainer = styled.div`
   div.sticky-inner-wrapper {
@@ -21,7 +21,7 @@ function StickyFormTabsComponent({
   sections,
   activeTabId,
   onTabClick
-}: IStickyFormTabProps & InjectedIntlProps) {
+}: IStickyFormTabProps & IntlShapeProps) {
   return (
     <StickyFormTabsContainer id="form_tabs_container">
       <Sticky enabled={true} innerZ={2}>

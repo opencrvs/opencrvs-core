@@ -134,8 +134,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -152,8 +152,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
   it('renders error text when an error occurs', async () => {
     const graphqlMock = [
@@ -168,7 +166,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -197,8 +195,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
   })
 
   it('check sent for update applications count', async () => {
@@ -223,7 +219,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -331,7 +327,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -375,7 +371,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -424,7 +420,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -604,7 +600,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -631,7 +627,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(testComponent.component.find('#REJECTED-0').hostNodes().length).toBe(
       1
     )
-    testComponent.component.unmount()
   })
 
   it('redirects user to review page on update action click', async () => {
@@ -720,7 +715,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -761,7 +756,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(window.location.href).toContain(
       '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })
 
@@ -864,7 +858,7 @@ describe('Tablet tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -902,6 +896,5 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })

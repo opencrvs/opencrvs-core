@@ -4,10 +4,9 @@ import {
   mockUserResponse,
   resizeWindow
 } from '@register/tests/util'
-import { queries } from '@register/profile/queries'
+
 import { merge } from 'lodash'
-import { storage } from '@register/storage'
-import { createStore } from '@register/store'
+import { createStore, AppStore } from '@register/store'
 import {
   RegistrationHome,
   EVENT_STATUS
@@ -22,6 +21,7 @@ import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
@@ -32,10 +32,6 @@ const validateScopeToken = jwt.sign(
     audience: 'opencrvs:gateway-user'
   }
 )
-
-const getItem = window.localStorage.getItem as jest.Mock
-
-const mockFetchUserDetails = jest.fn()
 
 const nameObj = {
   data: {
@@ -129,22 +125,19 @@ for (let i = 0; i < 14; i++) {
   userData.push(mockUserData)
 }
 merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
 
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
+const getItem = window.localStorage.getItem as jest.Mock
 
 describe('RegistrationHome sent for approval tab related tests', () => {
-  const { store } = createStore()
-
-  beforeAll(() => {
+  let store: AppStore
+  beforeEach(() => {
+    store = createStore().store
     getItem.mockReturnValue(validateScopeToken)
     store.dispatch(checkAuth({ '?token': validateScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -161,8 +154,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
   it('renders error text when an error occurs', async () => {
     const graphqlMock = [
@@ -177,7 +168,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -206,8 +197,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
   })
 
   it('check sent for approval tab count', async () => {
@@ -232,7 +221,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -262,7 +251,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         .hostNodes()
         .text()
     ).toContain('Sent for approval (2)')
-    testComponent.component.unmount()
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
@@ -350,8 +338,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         }
       }
     ]
-
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -367,10 +354,8 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       store,
       graphqlMock
     )
-
     getItem.mockReturnValue(validateScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
-
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
       setTimeout(resolve, 500)
@@ -381,7 +366,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
     ).fromNow()
-
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
@@ -389,8 +373,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeUndefined()
-
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -412,7 +394,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    getItem.mockReturnValue(validateScopeToken)
+
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -429,17 +413,13 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       graphqlMock
     )
 
-    getItem.mockReturnValue(validateScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const data = (await waitForElement(
+      testComponent.component,
+      GridTable
+    )).prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar if items more than 11 in Approval Tab', async () => {
@@ -466,7 +446,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'approvals' } }} />,
       store,
@@ -491,7 +471,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       .last()
       .hostNodes()
       .simulate('click')
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for validated status', async () => {
@@ -664,7 +643,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'approvals' } }} />,
       store,
@@ -690,7 +669,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(
       testComponent.component.find('#VALIDATED-0').hostNodes().length
     ).toBe(1)
-    testComponent.component.unmount()
   })
 })
 
@@ -794,7 +772,7 @@ describe('Tablet tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -832,6 +810,5 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })
