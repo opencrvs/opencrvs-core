@@ -17,7 +17,6 @@ export const birthEventLocationMutationTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  console.log(field)
   if (!transformedData.eventLocation) {
     transformedData.eventLocation = {
       address: {
