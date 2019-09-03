@@ -6,6 +6,7 @@ import {
   TFontFamily,
   TFontFamilyTypes
 } from 'pdfmake/build/pdfmake'
+import { IOfflineData } from '@register/offline/reducer'
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
@@ -30,7 +31,7 @@ export interface IFieldTransformer {
   parameters?: TransformerPayload
 }
 
-export type TransformableData = IApplication | IUserDetails
+export type TransformableData = IApplication | IUserDetails | IOfflineData
 export interface IFunctionTransformer {
   [transformerFunction: string]: (
     data: TransformableData,
