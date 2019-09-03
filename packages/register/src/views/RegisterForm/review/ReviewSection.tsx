@@ -71,7 +71,7 @@ import {
   SEARCH_FIELD
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
-import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
+import { messages } from '@register/i18n/messages/views/review'
 import { buttonMessages } from '@register/i18n/messages'
 import { REJECTED, BIRTH } from '@register/utils/constants'
 import { ReviewHeader } from './ReviewHeader'
@@ -619,9 +619,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <ReviewHeader
               id="review_header"
               logoSource={SEAL_BD_GOVT}
-              title={intl.formatMessage(
-                dynamicMessages[`${window.config.COUNTRY}GovtName`]
-              )}
+              title={intl.formatMessage(messages.govtName)}
               subject={
                 applicantName
                   ? intl.formatMessage(messages.headerSubjectWithName, {
