@@ -6,7 +6,8 @@ import {
 import {
   mockApplicationData,
   userDetails,
-  mockDeathApplicationData
+  mockDeathApplicationData,
+  mockOfflineData
 } from '@register/tests/util'
 import { createIntl } from 'react-intl'
 import { Event } from '@register/forms'
@@ -26,7 +27,8 @@ describe('PDFUtils related tests', () => {
           data: mockApplicationData,
           event: Event.BIRTH
         },
-        userDetails
+        userDetails,
+        mockOfflineData
       )
     ).not.toThrowError()
   })
@@ -39,7 +41,8 @@ describe('PDFUtils related tests', () => {
           data: mockDeathApplicationData,
           event: Event.DEATH
         },
-        userDetails
+        userDetails,
+        mockOfflineData
       )
     ).not.toThrowError()
   })
@@ -53,7 +56,8 @@ describe('PDFUtils related tests', () => {
           data: deathApplication,
           event: Event.DEATH
         },
-        null
+        null,
+        mockOfflineData
       )
     ).toThrowError('No user details found')
   })
@@ -67,7 +71,8 @@ describe('PDFUtils related tests', () => {
           data: deathApplication,
           event: Event.DEATH
         },
-        userDetails
+        userDetails,
+        mockOfflineData
       )
     ).toThrowError(
       'Given value key structure is not valid: deathEvent.deathDate'
@@ -83,7 +88,8 @@ describe('PDFUtils related tests', () => {
           data: deathApplication,
           event: Event.DEATH
         },
-        null
+        null,
+        mockOfflineData
       )
     ).toThrowError('No user details found')
   })
@@ -98,6 +104,7 @@ describe('PDFUtils related tests', () => {
           event: Event.DEATH
         },
         null,
+        mockOfflineData,
         (pdf: string) => {}
       )
     ).rejects.toThrowError('No user details found')

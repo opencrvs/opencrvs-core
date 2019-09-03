@@ -90,7 +90,7 @@ export function getPrimaryLocationFromLocationList(
 }
 
 function getOfficeLocationFromLocationList(
-  locations: [fhir.Location]
+  locations: fhir.Location[]
 ): fhir.Location {
   let office: fhir.Location | undefined
   locations.forEach((location: fhir.Location) => {

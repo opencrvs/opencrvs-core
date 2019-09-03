@@ -3,6 +3,7 @@ interface Window {
     API_GATEWAY_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
+    COUNTRY_LOGO_FILE: string
     DESKTOP_TIME_OUT_MILLISECONDS: number
     LANGUAGES: string
     LOGIN_URL: string

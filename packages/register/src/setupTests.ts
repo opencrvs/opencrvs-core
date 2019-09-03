@@ -89,6 +89,7 @@ const navigatorMock = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
+  COUNTRY_LOGO_FILE: 'logo.png',
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
@@ -123,7 +124,8 @@ jest.mock('@register/utils/referenceApi', (): {
       Promise.resolve({
         languages: mockOfflineData.languages,
         forms: mockOfflineData.forms
-      })
+      }),
+    loadAssets: () => Promise.resolve(mockOfflineData.assets)
   }
 }))
 

@@ -16,9 +16,11 @@ import { validateFunc } from '@opencrvs/commons'
 import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
 import { definitionsHandler as bgdDefinitionsHandler } from '@resources/bgd/features/definitions/handler'
+import { assetHandler as bgdAssetHandler } from '@resources/bgd/features/assets/handler'
 import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
 import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
 import { definitionsHandler as zmbDefinitionsHandler } from '@resources/zmb/features/definitions/handler'
+import { assetHandler as zmbAssetHandler } from '@resources/zmb/features/assets/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -71,9 +73,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/bgd/assets/{file}',
-    handler: () => {
-      return
-    },
+    handler: bgdAssetHandler,
     options: {
       tags: ['api'],
       description: 'Serves country specific assets, unprotected'
@@ -129,9 +129,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/zmb/assets/{file}',
-    handler: () => {
-      return
-    },
+    handler: zmbAssetHandler,
     options: {
       tags: ['api'],
       description: 'Serves country specific assets, unprotected'

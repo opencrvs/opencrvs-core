@@ -25,6 +25,7 @@ yarn-error.log*
 src/bgd/features/facilities/generated/crvs-facilities.json
 src/bgd/features/facilities/generated/health-facilities.json
 src/bgd/features/administrative/generated/locations.json
+src/zmb/features/administrative/generated/locations.json
 src/bgd/features/facilities/generated/locations.json
 src/bgd/features/languages/generated/en.csv
 src/bgd/features/languages/generated/bn.csv
