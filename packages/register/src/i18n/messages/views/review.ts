@@ -207,6 +207,11 @@ const dynamicMessagesToDefine = {
     id: 'review.header.title.govtName.bgd',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
+  },
+  zmbGovtName: {
+    id: 'review.header.title.govtName.bgd',
+    defaultMessage: 'Government of the peoples republic of Bangladesh',
+    description: 'Header title that shows bgd govt name'
   }
 }
 
