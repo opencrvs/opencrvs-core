@@ -67,7 +67,8 @@ import {
   TEXTAREA,
   Event,
   Section,
-  BirthSection
+  BirthSection,
+  SEARCH_FIELD
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
@@ -91,6 +92,7 @@ import {
 } from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { IValidationResult } from '@register/utils/validate'
+import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -279,6 +281,10 @@ const renderValue = (
 
   if (field.type === DATE && value && typeof value === 'string') {
     return formatLongDate(value)
+  }
+
+  if (field.type === SEARCH_FIELD) {
+    return (value as IDynamicValues).label
   }
 
   if (typeof value === 'string') {

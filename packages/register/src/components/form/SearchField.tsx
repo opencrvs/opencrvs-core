@@ -226,7 +226,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
               className="item"
               onClick={this.handleClick}
             >
-              {intl.formatMessage(formMessages.changeAssignedOffice)}
+              {intl.formatMessage(formMessages.changeButtonLabel, {
+                fieldName: fieldName
+              })}
             </LinkButton>
           </InputSection>
         )}

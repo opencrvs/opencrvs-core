@@ -204,9 +204,14 @@ interface IDynamicReviewMessages {
 
 const dynamicMessagesToDefine = {
   bgdGovtName: {
-    id: 'review.header.title.govtName.bgd',
+    id: 'review.header.title.govtName',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
+  },
+  zmbGovtName: {
+    id: 'review.header.title.govtName',
+    defaultMessage: 'Republic of Zambia',
+    description: 'Header title that shows zmb govt name'
   }
 }
 

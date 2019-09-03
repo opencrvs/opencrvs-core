@@ -24,63 +24,11 @@
                   "name": "firstNames",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
-                    "description": "Label for form field: First names",
-                    "id": "form.field.label.childFirstNames"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "bengaliOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToNameTransformer",
-                      "parameters": ["bn"]
-                    },
-                    "query": {
-                      "operation": "nameToFieldTransformer",
-                      "parameters": ["bn"]
-                    }
-                  }
-                },
-                {
-                  "name": "familyName",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
-                    "description": "Label for form field: Family name",
-                    "id": "form.field.label.childFamilyName"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "bengaliOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToNameTransformer",
-                      "parameters": ["bn"]
-                    },
-                    "query": {
-                      "operation": "nameToFieldTransformer",
-                      "parameters": ["bn"]
-                    }
-                  }
-                },
-                {
-                  "name": "firstNamesEng",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: First names in english",
+                    "defaultMessage": "Given name(s)",
+                    "description": "Label for form field: Given names",
                     "id": "form.field.label.childFirstNamesEng"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -99,11 +47,11 @@
                   }
                 },
                 {
-                  "name": "familyNameEng",
+                  "name": "familyName",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
+                    "defaultMessage": "Surname",
+                    "description": "Label for form field: Surname in english",
                     "id": "form.field.label.childFamilyNameEng"
                   },
                   "required": true,
@@ -256,6 +204,14 @@
                         "defaultMessage": "Layperson",
                         "description": "Label for form field: Attendant at birth",
                         "id": "form.field.label.attendantAtBirthLayperson"
+                      }
+                    },
+                    {
+                      "value": "TRADITIONAL_BIRTH_ATTENDANT",
+                      "label": {
+                        "defaultMessage": "Traditional birth attendant",
+                        "description": "Label for form field: Attendant at birth",
+                        "id": "form.field.label.attendantAtBirthTraditionalBirthAttendant"
                       }
                     },
                     {
@@ -440,11 +396,11 @@
                       }
                     },
                     {
-                      "value": "OTHER_HEALTH_INSTITUTION",
+                      "value": "HEALTH_INSTITUTION",
                       "label": {
-                        "defaultMessage": "Other Health Institution",
-                        "description": "Select item for Other Health Institution",
-                        "id": "form.field.label.otherHealthInstitution"
+                        "defaultMessage": "Health Institution",
+                        "description": "Select item for Health Institution",
+                        "id": "form.field.label.healthInstitution"
                       }
                     },
                     {
@@ -477,28 +433,19 @@
                 },
                 {
                   "name": "birthLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
-                    "defaultMessage": "Hospital / Clinic",
-                    "description": "Label for form field: Hospital or Health Institution",
-                    "id": "form.field.label.birthLocation"
+                    "defaultMessage": "Health instition",
+                    "description": "Label for form field: Health Institution",
+                    "id": "form.field.label.healdInstitution"
                   },
                   "required": false,
                   "initialValue": "",
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "placeOfBirth"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"HOSPITAL\" && values.placeOfBirth!=\"OTHER_HEALTH_INSTITUTION\")"
+                      "expression": "(values.placeOfBirth!=\"HEALTH_INSTITUTION\")"
                     }
                   ],
                   "mapping": {
