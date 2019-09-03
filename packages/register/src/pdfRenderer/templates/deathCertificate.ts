@@ -1,6 +1,5 @@
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 import { localFonts } from '@register/pdfRenderer/templates/localFonts'
-import { SEAL_BD_GOVT } from '@opencrvs/register/src/pdfRenderer/templates/logo'
 
 export const template: IPDFTemplate = {
   definition: {
@@ -24,7 +23,7 @@ export const template: IPDFTemplate = {
                 margin: [30, 25, 30, 25],
                 stack: [
                   {
-                    image: SEAL_BD_GOVT,
+                    image: '{countryLogo}',
                     fit: [78, 78]
                   },
                   '\n',
@@ -300,6 +299,11 @@ export const template: IPDFTemplate = {
   fonts: localFonts.fonts,
   vfs: localFonts.vfs,
   transformers: [
+    {
+      field: 'countryLogo',
+      operation: 'OfflineCompanyLogo',
+      baseData: 'resource'
+    },
     {
       field: 'registrationNumber',
       operation: 'FieldValue',

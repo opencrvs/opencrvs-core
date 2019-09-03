@@ -13,10 +13,9 @@ import {
   AvatarSmall
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from '@register/store'
-import { IUserDetails } from '@register/utils/userUtils'
+import { IUserDetails, getIndividualNameObj } from '@register/utils/userUtils'
 import { getLanguage } from '@register/i18n/selectors'
 import { getUserDetails } from '@register/profile/profileSelectors'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { goToSettings } from '@register/navigation'
 import { buttonMessages, userMessages } from '@register/i18n/messages'
@@ -71,12 +70,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     let userRole
 
     if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName | null) => {
-          const name = storedName as GQLHumanName
-          return name.use === language
-        }
-      ) as GQLHumanName
+      const nameObj = getIndividualNameObj(userDetails.name, language)
 
       if (nameObj) {
         userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`

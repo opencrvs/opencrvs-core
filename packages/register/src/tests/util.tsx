@@ -2569,7 +2569,10 @@ export const mockOfflineData = {
     readFileSync(
       '../resources/src/bgd/features/languages/generated/register.json'
     ).toString()
-  ).data
+  ).data,
+  assets: {
+    logo: `data:image;base64,${validImageB64String}`
+  }
 }
 
 export async function createTestStore() {
@@ -2579,7 +2582,8 @@ export async function createTestStore() {
       languages: mockOfflineData.languages,
       forms: mockOfflineData.forms,
       locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities
+      facilities: mockOfflineData.facilities,
+      assets: mockOfflineData.assets
     })
   )
   return { store, history }
@@ -2602,7 +2606,8 @@ export async function createTestComponent(
       languages: mockOfflineData.languages,
       forms: mockOfflineData.forms,
       locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities
+      facilities: mockOfflineData.facilities,
+      assets: mockOfflineData.assets
     })
   )
 

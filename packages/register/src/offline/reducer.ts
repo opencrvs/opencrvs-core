@@ -34,6 +34,9 @@ export interface IOfflineData {
       death: ISerializedForm
     }
   }
+  assets: {
+    logo: string
+  }
 }
 
 export type IOfflineDataState = {
@@ -113,6 +116,10 @@ function reducer(
         Cmd.run(referenceApi.loadDefinitions, {
           successActionCreator: actions.definitionsLoaded,
           failActionCreator: actions.definitionsFailed
+        }),
+        Cmd.run(referenceApi.loadAssets, {
+          successActionCreator: actions.assetsLoaded,
+          failActionCreator: actions.assetsFailed
         })
       ])
 
@@ -203,6 +210,29 @@ function reducer(
           ...state.offlineData,
           facilities: tempData.facilities
         }
+      }
+    }
+
+    /*
+     * Assets
+     */
+
+    case actions.ASSETS_LOADED: {
+      return {
+        ...state,
+        loadingError: false,
+        offlineData: {
+          ...state.offlineData,
+          assets: {
+            logo: action.payload.logo
+          }
+        }
+      }
+    }
+    case actions.ASSETS_FAILED: {
+      return {
+        ...state,
+        loadingError: true
       }
     }
 
