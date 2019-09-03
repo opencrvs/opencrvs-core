@@ -62,8 +62,6 @@ describe('SearchResult tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
 
   it('renders all items returned from graphql query', async () => {
@@ -314,8 +312,6 @@ describe('SearchResult tests', () => {
         modifiedAt: undefined
       }
     ])
-
-    testComponent.component.unmount()
   })
 
   it('renders error text when an error occurs', async () => {
@@ -364,8 +360,6 @@ describe('SearchResult tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
   })
   it('renders empty search page with a header in small devices', async () => {
     const testSearchResultComponent = (await createTestComponent(

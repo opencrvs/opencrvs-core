@@ -12,6 +12,7 @@ import { RegisterForm } from '@opencrvs/register/src/views/RegisterForm/Register
 import * as React from 'react'
 import { queries } from '@register/profile/queries'
 import { AppStore } from '@register/store'
+
 import {
   createTestComponent,
   mockUserResponseWithName,
@@ -111,8 +112,6 @@ describe('ReviewForm tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while fetching birth registration')
-
-    testComponent.component.unmount()
   })
   it('it returns birth registration', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -292,8 +291,6 @@ describe('ReviewForm tests', () => {
       birthType: 'SINGLE',
       weightAtBirth: 2
     })
-
-    testComponent.component.unmount()
   })
   it('Shared contact phone number should be set properly', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -431,7 +428,6 @@ describe('ReviewForm tests', () => {
       .prop('application') as IApplication
 
     expect(data.data.registration.registrationPhone).toBe('01733333333')
-    testComponent.component.unmount()
   })
   it('when registration has attachment', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -541,8 +537,6 @@ describe('ReviewForm tests', () => {
         data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQECWAJYAAD'
       }
     ])
-
-    testComponent.component.unmount()
   })
   it('check registration', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -699,8 +693,6 @@ describe('ReviewForm tests', () => {
       trackingId: 'B123456',
       type: 'birth'
     })
-
-    testComponent.component.unmount()
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -727,7 +719,8 @@ describe('ReviewForm tests', () => {
       getStorageApplicationsSuccess(
         JSON.stringify({
           userID: 'currentUser', // mock
-          drafts: [application]
+          drafts: [application],
+          applications: []
         })
       )
     )
@@ -785,8 +778,6 @@ describe('ReviewForm tests', () => {
         type: 'BIRTH'
       }
     })
-
-    testComponent.component.unmount()
   })
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
@@ -1034,8 +1025,6 @@ describe('ReviewForm tests', () => {
         postCode: '12',
         _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
       })
-
-      testComponent.component.unmount()
     })
     it('populates proper casue of death section', async () => {
       const application = createReviewApplication(uuid(), {}, Event.DEATH)
@@ -1252,8 +1241,6 @@ describe('ReviewForm tests', () => {
         causeOfDeathCode: '123',
         methodOfCauseOfDeath: 'Natural'
       })
-
-      testComponent.component.unmount()
     })
   })
   describe('ReviewForm tests for register scope', () => {
@@ -1339,8 +1326,6 @@ describe('ReviewForm tests', () => {
           .children()
           .text()
       ).toBe('We are unable to display this page to you')
-
-      testComponent.component.unmount()
     })
   })
 })

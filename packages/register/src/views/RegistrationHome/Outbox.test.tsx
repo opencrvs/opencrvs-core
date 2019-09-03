@@ -145,7 +145,6 @@ describe('OutBox tests', () => {
             )
           )
       }
-      testComp.unmount()
     })
 
     it('renders texts in data rows for death applications', async () => {
@@ -171,7 +170,6 @@ describe('OutBox tests', () => {
             )
           )
       }
-      testComp.unmount()
     })
     it('shows "Waiting to register" if no status is provided', async () => {
       const applications: IApplication[] = []
@@ -193,8 +191,6 @@ describe('OutBox tests', () => {
             ['Death', 'Aaron Finch', 'Waiting to register', ''][index]
           )
         )
-
-      testComp.unmount()
     })
   })
 
@@ -215,7 +211,6 @@ describe('OutBox tests', () => {
             ['Birth', 'Morgan', 'Waiting to submit', ''][index]
           )
         )
-      testComp.unmount()
     })
 
     it('displays only the first name if there is no last name', async () => {
@@ -234,7 +229,6 @@ describe('OutBox tests', () => {
             ['Death', 'Finch', 'Waiting to submit', ''][index]
           )
         )
-      testComp.unmount()
     })
     it('displays empty string if there is no name', async () => {
       const noNameBirthApp = birthApp
@@ -254,13 +248,11 @@ describe('OutBox tests', () => {
             ['Birth', '', 'Waiting to submit', ''][index]
           )
         )
-      testComp.unmount()
     })
     it('displays empty div if there is no application', async () => {
       const comp = await createTestComponent(<OutBox application={[]} />, store)
       const testComp = comp.component
       expect(testComp.find('#row_0').exists()).toBeFalsy()
-      testComp.unmount()
     })
   })
 
@@ -279,7 +271,6 @@ describe('OutBox tests', () => {
         .find('#pagination')
         .children()
         .map(child => child.simulate('click'))
-      testComp.unmount()
     })
   })
 })

@@ -1,8 +1,11 @@
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { IApplication, modifyApplication } from '@register/applications'
-import { Event, ICertificate } from '@register/forms'
+import {
+  IPrintableApplication,
+  modifyApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 import { buttonMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/certificate'
 import {
@@ -72,7 +75,7 @@ interface IProps {
   event: Event
   registrationId: string
   language: string
-  application: IApplication
+  application: IPrintableApplication
   theme: ITheme
   modifyApplication: typeof modifyApplication
   goToReviewCertificate: typeof goToReviewCertificateAction
@@ -87,10 +90,10 @@ class PaymentComponent extends React.Component<IFullProps> {
   continue = (paymentAmount: string) => {
     const { application } = this.props
     const certificates =
-      (application &&
-        (application.data.registration.certificates as ICertificate[])) ||
-      null
-    const certificate: ICertificate = (certificates && certificates[0]) || {}
+      application && application.data.registration.certificates
+
+    const certificate = (certificates && certificates[0]) || {}
+
     this.props.modifyApplication({
       ...application,
       data: {
@@ -100,15 +103,13 @@ class PaymentComponent extends React.Component<IFullProps> {
           certificates: [
             {
               ...certificate,
-              payments: [
-                {
-                  type: 'MANUAL',
-                  total: paymentAmount,
-                  amount: paymentAmount,
-                  outcome: 'COMPLETED',
-                  date: Date.now()
-                }
-              ]
+              payments: {
+                type: 'MANUAL' as const,
+                total: paymentAmount,
+                amount: paymentAmount,
+                outcome: 'COMPLETED' as const,
+                date: Date.now()
+              }
             }
           ]
         }
@@ -197,7 +198,7 @@ function mapStatetoProps(
   const event = getEvent(eventType)
   const application = state.applicationsState.applications.find(
     app => app.id === registrationId && app.event === event
-  )
+  ) as IPrintableApplication | undefined
 
   if (!application) {
     throw new Error(`Application "${registrationId}" missing!`)
