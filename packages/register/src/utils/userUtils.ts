@@ -127,3 +127,14 @@ export async function storeUserDetails(userDetails: IUserDetails) {
 export async function removeUserDetails() {
   storage.removeItem(USER_DETAILS)
 }
+
+export function getIndividualNameObj(
+  userNameArr: Array<GQLHumanName | null>,
+  language: string
+) {
+  return (
+    userNameArr.find((name: GQLHumanName | null) => {
+      return name && name.use === language ? true : false
+    }) || userNameArr[0]
+  )
+}
