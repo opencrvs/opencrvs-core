@@ -1,4 +1,3 @@
-// this file provides the dev defaults to the OpenCRVS app, don't commit country specific changes here.
 window.config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
