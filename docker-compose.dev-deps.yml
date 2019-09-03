@@ -17,6 +17,8 @@ services:
       - '9200:9200'
     volumes:
       - './data/elasticsearch:/usr/share/elasticsearch/data'
+    environment:
+      - 'cluster.routing.allocation.disk.threshold_enabled=false'
 
   influxdb:
     ports:

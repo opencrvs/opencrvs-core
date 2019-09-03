@@ -32,8 +32,6 @@ describe('CreatePassword page tests', () => {
         .hostNodes()
         .text()
     ).toEqual('Passwords do not match')
-
-    component.unmount()
   })
   it('it passes validations', () => {
     component.find('input#NewPassword').simulate('change', {
@@ -43,8 +41,6 @@ describe('CreatePassword page tests', () => {
       target: { id: 'ConfirmPassword', value: '0crvsPassword' }
     })
     component.find('button#Continue').simulate('click')
-
-    component.unmount()
   })
   it('it shows passwords required error when Continue button is pressed', () => {
     component.find('button#Continue').simulate('click')
@@ -54,7 +50,5 @@ describe('CreatePassword page tests', () => {
         .hostNodes()
         .text()
     ).toEqual('New password is not valid')
-
-    component.unmount()
   })
 })

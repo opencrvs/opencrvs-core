@@ -7,16 +7,16 @@ import {
 import {
   createReviewApplication,
   deleteApplication,
-  IApplication,
   modifyApplication,
   storeApplication,
-  writeApplication
+  writeApplication,
+  IPrintableApplication,
+  ICertificate
 } from '@register/applications'
 import { FormFieldGenerator } from '@register/components/form'
 import {
   Action,
   Event,
-  ICertificate,
   IForm,
   IFormData,
   IFormField,
@@ -73,7 +73,7 @@ interface IBaseProps {
   event: Event
   pageRoute: string
   applicationId: string
-  application: IApplication | undefined
+  application: IPrintableApplication | undefined
   formSection: IFormSection
   formGroup: IFormSectionGroup
   theme: ITheme
@@ -93,13 +93,11 @@ type IProps = IBaseProps & IntlShapeProps
 function getNextSectionIds(
   formSection: IFormSection,
   formSectionGroup: IFormSectionGroup,
-  application: IApplication | undefined
+  application?: IPrintableApplication
 ) {
-  const certificates =
-    (application &&
-      (application.data.registration.certificates as ICertificate[])) ||
-    null
-  const certificate: ICertificate = (certificates && certificates[0]) || {}
+  const certificates = application && application.data.registration.certificates
+
+  const certificate = (certificates && certificates[0]) || {}
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     formSection,
     (certificate[
@@ -120,13 +118,12 @@ function getNextSectionIds(
 }
 
 const getErrorsOnFieldsBySection = (
-  sectionId: string,
+  sectionId: keyof IPrintableApplication['data'],
   fields: IFormField[],
-  draft: IApplication
+  draft: IPrintableApplication
 ) => {
-  const certificates =
-    (draft && (draft.data.registration.certificates as ICertificate[])) || null
-  const certificate: ICertificate = (certificates && certificates[0]) || {}
+  const certificates = draft.data.registration.certificates
+  const certificate = (certificates && certificates[0]) || {}
   const errors = getValidationErrorsForForm(
     fields,
     (certificate[sectionId as keyof typeof certificate] as IFormSectionData) ||
@@ -164,15 +161,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
   }
   modifyApplication = (
-    sectionData: IFormSectionData,
-    application: IApplication
+    sectionData: ICertificate['collector'],
+    application: IPrintableApplication
   ) => {
-    const certificates =
-      (application &&
-        (application.data.registration.certificates as ICertificate[])) ||
-      null
-    const certificate: ICertificate = (certificates && certificates[0]) || {}
-    const collector = certificate.collector || {}
+    const certificates = application.data.registration.certificates
+    const certificate = (certificates && certificates[0]) || {}
+    const collector = { ...(certificate.collector || {}), ...sectionData }
+
     this.props.modifyApplication({
       ...application,
       data: {
@@ -181,10 +176,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           ...application.data.registration,
           certificates: [
             {
-              collector: {
-                ...(collector as IFormSectionData),
-                ...sectionData
-              },
+              collector: collector,
               hasShowedVerifiedDocument: false
             }
           ]
@@ -199,9 +191,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     nextGroup: string | undefined,
     event: Event,
 
-    sectionId: string,
+    sectionId: keyof IPrintableApplication['data'],
     fields: IFormField[],
-    draft: IApplication | undefined
+    draft: IPrintableApplication | undefined
   ) => {
     if (!draft) return
 
@@ -210,9 +202,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const errLength = flatten(errorValues).filter(errs => errs.length > 0)
       .length
 
-    const certificates =
-      (draft.data.registration.certificates as ICertificate[]) || null
-    const certificate: ICertificate = (certificates && certificates[0]) || {}
+    const certificates = draft.data.registration.certificates
+    const certificate = (certificates && certificates[0]) || {}
     const collector = certificate[
       sectionId as keyof typeof certificate
     ] as IFormSectionData
@@ -272,7 +263,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
   goToNextFormForSomeoneElse = (
     applicationId: string,
-    application: IApplication,
+    application: IPrintableApplication,
     event: Event
   ) => {
     if (isFreeOfCost(event, getEventDate(application.data, event))) {
@@ -310,10 +301,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       formGroup,
       application
     )
-    let applicationToBeCertified: IApplication = application as IApplication
+    const applicationToBeCertified = application
     if (
       !applicationToBeCertified ||
-      !applicationToBeCertified.data ||
       !applicationToBeCertified.data.registration.regStatus
     ) {
       return (
@@ -343,13 +333,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                   retrievedData
                 )
 
-                applicationToBeCertified = createReviewApplication(
+                const newApplicationToBeCertified = createReviewApplication(
                   applicationId,
                   transformedData,
                   event
                 )
 
-                this.props.storeApplication(applicationToBeCertified)
+                this.props.storeApplication(newApplicationToBeCertified)
               }
             }}
           </QueryContext.Consumer>
@@ -473,7 +463,8 @@ const mapStateToProps = (
 
   const application = state.applicationsState.applications.find(
     application => application.id === registrationId
-  )
+  ) as IPrintableApplication | undefined
+
   const formSection = getCollectCertificateForm(event, state)
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {

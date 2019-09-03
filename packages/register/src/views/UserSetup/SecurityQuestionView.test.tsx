@@ -22,10 +22,6 @@ describe('Security Question Page', () => {
     component.find('button#submit-security-question').simulate('click')
   })
 
-  afterEach(() => {
-    component.unmount()
-  })
-
   it('Should display the validation error messages when Contrinue button is pressed', () => {
     const questionElem = component
       .find('#question-0-validation-message')

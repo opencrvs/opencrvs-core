@@ -49,6 +49,10 @@ export const initialState: IOfflineDataState = {
   loadingError: false
 }
 
+async function saveOfflineData(offlineData: IOfflineData) {
+  return storage.setItem('offline', JSON.stringify(offlineData))
+}
+
 function checkIfDone(
   oldState: IOfflineDataState,
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, actions.Action>
@@ -66,6 +70,7 @@ function checkIfDone(
       { ...newState, offlineDataLoaded: true },
       Cmd.list([
         ...(cmd ? [cmd] : []),
+        Cmd.run(saveOfflineData, { args: [newState.offlineData] }),
         Cmd.action(actions.offlineDataReady(newState.offlineData))
       ])
     )
@@ -97,10 +102,6 @@ function reducer(
       )
 
       const dataLoadingCmds = Cmd.list<actions.Action>([
-        Cmd.run(referenceApi.loadLanguages, {
-          successActionCreator: actions.languagesLoaded,
-          failActionCreator: actions.languagesFailed
-        }),
         Cmd.run(referenceApi.loadFacilities, {
           successActionCreator: actions.facilitiesLoaded,
           failActionCreator: actions.facilitiesFailed
@@ -109,9 +110,9 @@ function reducer(
           successActionCreator: actions.locationsLoaded,
           failActionCreator: actions.locationsFailed
         }),
-        Cmd.run(referenceApi.loadForms, {
-          successActionCreator: actions.formsLoaded,
-          failActionCreator: actions.formsFailed
+        Cmd.run(referenceApi.loadDefinitions, {
+          successActionCreator: actions.definitionsLoaded,
+          failActionCreator: actions.definitionsFailed
         })
       ])
 
@@ -131,20 +132,21 @@ function reducer(
     }
 
     /*
-     * Languages
+     * Definitions
      */
 
-    case actions.LANGUAGES_LOADED: {
+    case actions.DEFINITIONS_LOADED: {
       return {
         ...state,
         loadingError: false,
         offlineData: {
           ...state.offlineData,
-          languages: action.payload
+          languages: action.payload.languages,
+          forms: action.payload.forms
         }
       }
     }
-    case actions.LANGUAGES_FAILED: {
+    case actions.DEFINITIONS_FAILED: {
       return {
         ...state,
         loadingError: true
@@ -172,28 +174,6 @@ function reducer(
           ...state.offlineData,
           locations: tempData.locations
         }
-      }
-    }
-
-    /*
-     * Forms
-     */
-
-    case actions.FORMS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          forms: {
-            registerForm: action.payload
-          }
-        }
-      }
-    }
-    case actions.FORMS_FAILED: {
-      return {
-        ...state,
-        loadingError: true
       }
     }
 
@@ -226,7 +206,6 @@ function reducer(
       }
     }
 
-    // @hack this is only here to provide a way of hydrating the state during tests
     case actions.READY: {
       return {
         ...state,
