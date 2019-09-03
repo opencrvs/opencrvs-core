@@ -60,6 +60,59 @@ export interface IApplication {
   visitedGroupIds?: IVisitedGroupId[]
 }
 
+type Relation =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+
+export type ICertificate = {
+  collector?: Partial<{ type: Relation }>
+  hasShowedVerifiedDocument?: boolean
+  payments?: Payment
+  data?: string
+}
+
+/*
+ * This type represents a submitted application that we've received from the API
+ * It provides a more strict alternative to IApplication with fields we know should always exist
+ */
+export interface IPrintableApplication extends Omit<IApplication, 'data'> {
+  data: {
+    father: {
+      fathersDetailsExist: boolean
+      [key: string]: IFormFieldValue
+    }
+    registration: {
+      _fhirID: string
+      presentAtBirthRegistration: Relation
+      whoseContactDetails: string
+      registrationPhone: string
+      trackingId: string
+      registrationNumber: string
+      certificates: ICertificate[]
+      [key: string]: IFormFieldValue
+    }
+  } & Exclude<IApplication['data'], 'father' | 'registration'>
+}
+
+type PaymentType = 'MANUAL'
+
+type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
+
+type Payment = {
+  paymentId?: string
+  type: PaymentType
+  total: string
+  amount: string
+  outcome: PaymentOutcomeType
+  date: number
+}
+
 interface IStoreApplicationAction {
   type: typeof STORE_APPLICATION
   payload: { application: IApplication }
@@ -68,14 +121,14 @@ interface IStoreApplicationAction {
 interface IModifyApplicationAction {
   type: typeof MODIFY_APPLICATION
   payload: {
-    application: IApplication
+    application: IApplication | IPrintableApplication
   }
 }
 
 export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
-    application: IApplication
+    application: IApplication | IPrintableApplication
   }
 }
 
@@ -86,7 +139,7 @@ interface ISetInitialApplicationsAction {
 interface IDeleteApplicationAction {
   type: typeof DELETE_APPLICATION
   payload: {
-    application: IApplication
+    application: IApplication | IPrintableApplication
   }
 }
 
@@ -158,7 +211,7 @@ export function storeApplication(
 }
 
 export function modifyApplication(
-  application: IApplication
+  application: IApplication | IPrintableApplication
 ): IModifyApplicationAction {
   application.modifiedOn = Date.now()
   return { type: MODIFY_APPLICATION, payload: { application } }
@@ -179,13 +232,13 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
 })
 
 export function deleteApplication(
-  application: IApplication
+  application: IApplication | IPrintableApplication
 ): IDeleteApplicationAction {
   return { type: DELETE_APPLICATION, payload: { application } }
 }
 
 export function writeApplication(
-  application: IApplication
+  application: IApplication | IPrintableApplication
 ): IWriteApplicationAction {
   return { type: WRITE_APPLICATION, payload: { application } }
 }

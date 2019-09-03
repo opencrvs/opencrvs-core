@@ -24,13 +24,7 @@ export function createTestComponent(node: React.ReactElement<object>) {
   return mount(
     <Provider store={store}>
       <IntlContainer>
-        <ThemeProvider
-          theme={getTheme(
-            (window as Window & { config: { [key: string]: string } }).config
-              .COUNTRY,
-            getDefaultLanguage()
-          )}
-        >
+        <ThemeProvider theme={getTheme(getDefaultLanguage())}>
           {node}
         </ThemeProvider>
       </IntlContainer>

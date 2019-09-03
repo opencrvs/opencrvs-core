@@ -1,12 +1,12 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import { readFile } from 'fs'
+import { join } from 'path'
 import { LANGUAGES_SOURCE } from '@resources/bgd/constants'
 
 interface IMessageIdentifier {
   [key: string]: string
 }
 
-interface ILanguage {
+export interface ILanguage {
   lang: string
   displayName: string
   messages: IMessageIdentifier
@@ -19,8 +19,9 @@ export interface ILanguageDataResponse {
 export async function getLanguages(
   application: string
 ): Promise<ILanguageDataResponse> {
-  const languagesUrl = path.join(LANGUAGES_SOURCE, `${application}.json`)
-  const languages = JSON.parse(fs.readFileSync(languagesUrl).toString())
-
-  return languages
+  return new Promise((resolve, reject) => {
+    readFile(join(LANGUAGES_SOURCE, `${application}.json`), (err, data) => {
+      err ? reject(err) : resolve(JSON.parse(data.toString()))
+    })
+  })
 }

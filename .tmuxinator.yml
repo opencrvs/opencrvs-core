@@ -8,6 +8,6 @@ windows:
       layout: tiled
       panes:
         - apps:
-            - yarn run start
+            - yarn run start:bgd
         - deps:
             - yarn run compose:deps

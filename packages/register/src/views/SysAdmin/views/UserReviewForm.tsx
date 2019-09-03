@@ -94,13 +94,15 @@ class UserReviewFormComponent extends React.Component<
     const { intl, formData } = this.props
 
     if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+      const files = (formData[field.name] as unknown) as IAttachmentValue
+
       return (
         <SimpleDocumentUploader
           label={intl.formatMessage(field.label)}
           disableDeleteInPreview={true}
           name={field.name}
           onComplete={() => {}}
-          files={formData[field.name] as IAttachmentValue}
+          files={files}
         />
       )
     }

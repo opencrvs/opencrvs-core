@@ -154,8 +154,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
   it('renders error text when an error occurs', async () => {
     const graphqlMock = [
@@ -199,8 +197,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
   })
 
   it('check sent for approval tab count', async () => {
@@ -255,7 +251,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         .hostNodes()
         .text()
     ).toContain('Sent for approval (2)')
-    testComponent.component.unmount()
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
@@ -378,7 +373,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeUndefined()
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -426,7 +420,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       GridTable
     )).prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar if items more than 11 in Approval Tab', async () => {
@@ -478,7 +471,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       .last()
       .hostNodes()
       .simulate('click')
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for validated status', async () => {
@@ -677,7 +669,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(
       testComponent.component.find('#VALIDATED-0').hostNodes().length
     ).toBe(1)
-    testComponent.component.unmount()
   })
 })
 
@@ -819,6 +810,5 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })

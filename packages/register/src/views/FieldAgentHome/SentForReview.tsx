@@ -227,8 +227,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           label: this.props.intl.formatMessage(messages.submissionStatus),
           width: 35,
           key: 'submissionStatus',
-          color: getTheme(window.config.COUNTRY, getDefaultLanguage()).colors
-            .secondaryLabel
+          color: getTheme(getDefaultLanguage()).colors.secondaryLabel
         },
         {
           label: '',
