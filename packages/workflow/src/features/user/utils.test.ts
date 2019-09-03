@@ -7,7 +7,6 @@ import {
 } from '@workflow/features/user/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { logger } from '@workflow/logger'
 
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -119,14 +118,12 @@ describe('Verify getLoggedInPractitionerResource', () => {
   })
 })
 describe('Verify getUserMobile', () => {
-  it('get user mobile logs an error in case of invalid token', async () => {
-    const logSpy = jest.spyOn(logger, 'error')
-    fetch.mockImplementationOnce(() => {
-      throw new Error('Mock Error')
-    })
-    getUserMobile('XXX', { Authorization: 'bearer acd ' })
-    expect(logSpy).toHaveBeenLastCalledWith(
-      'Unable to retrieve mobile for error : Error: Mock Error'
+  it('get user mobile throw an error in case of an bad response', async () => {
+    fetch.mockImplementationOnce(() => ({ ok: false, status: 401 }))
+    await expect(
+      getUserMobile('XXX', { Authorization: 'bearer acd ' })
+    ).rejects.toThrowError(
+      'Unable to retrieve user mobile number. Error: 401 status received'
     )
   })
 })
