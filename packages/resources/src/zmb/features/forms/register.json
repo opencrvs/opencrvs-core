@@ -1589,7 +1589,7 @@
                   "label": {
                     "defaultMessage": "What was their permanent address?",
                     "description": "Title for the permanent address fields",
-                    "id": "form.field.label.permanentAddress"
+                    "id": "form.field.label.motherPermanentAddress"
                   },
                   "initialValue": "",
                   "validate": []
@@ -1894,7 +1894,7 @@
                   "label": {
                     "defaultMessage": "Street and house number",
                     "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
+                    "id": "form.field.label.addressLine1CityOption"
                   },
                   "required": false,
                   "initialValue": "",
@@ -2463,7 +2463,7 @@
                   "label": {
                     "defaultMessage": "Street and house number",
                     "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
+                    "id": "form.field.label.addressLine1CityOption"
                   },
                   "required": false,
                   "initialValue": "",
@@ -4072,7 +4072,7 @@
                   "label": {
                     "defaultMessage": "What was their permanent address?",
                     "description": "Title for the permanent address fields",
-                    "id": "form.field.label.permanentAddress"
+                    "id": "form.field.label.fatherPermanentAddress"
                   },
                   "initialValue": "",
                   "validate": [],
@@ -4421,7 +4421,7 @@
                   "label": {
                     "defaultMessage": "Street and house number",
                     "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
+                    "id": "form.field.label.addressLine1CityOption"
                   },
                   "required": false,
                   "initialValue": "",
