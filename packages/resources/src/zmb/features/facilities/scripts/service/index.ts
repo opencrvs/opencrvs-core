@@ -4,7 +4,6 @@ import {
   sendToFhir
 } from '@resources/zmb/features/utils'
 import { ORG_URL } from '@resources/constants'
-import { Response } from 'node-fetch'
 
 interface IFacility {
   statisticalID: string

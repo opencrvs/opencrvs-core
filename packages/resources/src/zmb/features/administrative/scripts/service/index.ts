@@ -1,4 +1,3 @@
-import { Response } from 'node-fetch'
 import {
   sendToFhir,
   ILocation,
