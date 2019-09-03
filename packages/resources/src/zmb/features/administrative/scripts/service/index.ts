@@ -99,13 +99,13 @@ export async function fetchAndComposeLocations(
       jurisdictionType
     )
 
-    const savedLocationResponse = (await sendToFhir(
+    const savedLocationResponse = await sendToFhir(
       newLocation,
       '/Location',
       'POST'
     ).catch(err => {
       throw Error('Cannot save location to FHIR')
-    })) as Response
+    })
     const locationHeader = savedLocationResponse.headers.get(
       'location'
     ) as string
@@ -122,7 +122,7 @@ export function getLocationPartOfIds(
   const locations: ICSVLocation[] = []
   for (const csvLocation of rawLocationData) {
     const partOfStatisticalID = csvLocation.partOf.split('/')[1]
-    const parentProvince: fhir.Location = provinces.filter(province => {
+    const parentProvince = provinces.filter(province => {
       return province.description === partOfStatisticalID
     })[0]
     csvLocation.partOf = `Location/${parentProvince.id}`

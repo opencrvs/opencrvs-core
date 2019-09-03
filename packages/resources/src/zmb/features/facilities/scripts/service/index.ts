@@ -100,13 +100,13 @@ export async function composeAndSaveFacilities(
     console.log(
       `Saving facility ... type: ${facility.code}, name: ${facility.name}`
     )
-    const savedLocationResponse = (await sendToFhir(
+    const savedLocationResponse = await sendToFhir(
       newLocation,
       '/Location',
       'POST'
     ).catch(err => {
       throw Error('Cannot save location to FHIR')
-    })) as Response
+    })
     const locationHeader = savedLocationResponse.headers.get(
       'location'
     ) as string
