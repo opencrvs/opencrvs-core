@@ -25,6 +25,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         maritalStatus
+        occupation
         dateOfMarriage
         educationalAttainment
         nationality
@@ -56,6 +57,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         maritalStatus
+        occupation
         dateOfMarriage
         educationalAttainment
         nationality

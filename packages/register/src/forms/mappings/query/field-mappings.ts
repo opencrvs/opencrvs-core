@@ -12,6 +12,7 @@ import {
   GQLAttachment
 } from '@opencrvs/gateway/src/graphql/schema'
 import { cloneDeep } from 'lodash'
+import { EMPTY_STRING } from '@register/utils/constants'
 
 interface IName {
   [key: string]: any
@@ -103,6 +104,28 @@ export const identifierToFieldTransformer = (identifierField: string) => (
   }
   transformedData[sectionId][field.name] =
     queryData[sectionId].identifier[0][identifierField]
+  return transformedData
+}
+
+export const identityToFieldTransformer = (
+  identifierField: string,
+  identityType: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (queryData[sectionId] && queryData[sectionId].identifier) {
+    const existingIdentity = queryData[sectionId].identifier.find(
+      // @ts-ignore
+      identity => identity.type === identityType
+    )
+    transformedData[sectionId][field.name] =
+      existingIdentity && identifierField in existingIdentity
+        ? existingIdentity[identifierField]
+        : EMPTY_STRING
+  }
   return transformedData
 }
 interface IAddress {

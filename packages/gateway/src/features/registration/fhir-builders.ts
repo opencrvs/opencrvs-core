@@ -601,6 +601,27 @@ function createMaritalStatusBuilder(
   }
 }
 
+function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasOccupation = resource.extension.find(
+    extention =>
+      extention.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`
+  )
+
+  if (hasOccupation) {
+    hasOccupation.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
+      valueString: fieldValue
+    })
+  }
+}
+
 function createEducationalAttainmentBuilder(
   resource: fhir.Patient,
   fieldValue: string
@@ -837,6 +858,14 @@ const builders: IFieldBuilders = {
       )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
+    occupation: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createOccupationBulder(person, fieldValue as string)
+    },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
         MOTHER_CODE,
@@ -927,6 +956,14 @@ const builders: IFieldBuilders = {
         fhirBundle
       )
       return createMaritalStatusBuilder(person, fieldValue as string)
+    },
+    occupation: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createOccupationBulder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(

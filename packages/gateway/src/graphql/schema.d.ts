@@ -55,6 +55,7 @@ export interface GQLPerson {
   gender?: string
   birthDate?: string
   maritalStatus?: GQLMaritalStatusType
+  occupation?: string
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddress | null>
@@ -79,7 +80,8 @@ export enum GQLIdentityIDType {
   REFUGEE_NUMBER = 'REFUGEE_NUMBER',
   ALIEN_NUMBER = 'ALIEN_NUMBER',
   OTHER = 'OTHER',
-  NO_ID = 'NO_ID'
+  NO_ID = 'NO_ID',
+  SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
 }
 
 export interface GQLHumanName {
@@ -609,6 +611,7 @@ export interface GQLPersonInput {
   gender?: string
   birthDate?: string
   maritalStatus?: GQLMaritalStatusType
+  occupation?: string
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
@@ -1303,6 +1306,7 @@ export interface GQLPersonTypeResolver<TParent = any> {
   gender?: PersonToGenderResolver<TParent>
   birthDate?: PersonToBirthDateResolver<TParent>
   maritalStatus?: PersonToMaritalStatusResolver<TParent>
+  occupation?: PersonToOccupationResolver<TParent>
   dateOfMarriage?: PersonToDateOfMarriageResolver<TParent>
   multipleBirth?: PersonToMultipleBirthResolver<TParent>
   address?: PersonToAddressResolver<TParent>
@@ -1341,6 +1345,10 @@ export interface PersonToBirthDateResolver<TParent = any, TResult = any> {
 }
 
 export interface PersonToMaritalStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToOccupationResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

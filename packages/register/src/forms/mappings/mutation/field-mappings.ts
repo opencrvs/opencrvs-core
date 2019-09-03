@@ -74,6 +74,36 @@ export const fieldToIdentifierTransformer = (identifierField: string) => (
   return transformedData
 }
 
+export const fieldToIdentityTransformer = (
+  identifierField: string,
+  identityType: string
+) => (
+  transformedData: any,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = []
+  }
+
+  const existingIdentity = sectionData.identifier.find(
+    // @ts-ignore
+    identifier => identifier.type && identifier.type === identityType
+  )
+  if (!existingIdentity) {
+    sectionData.identifier.push({
+      [identifierField]: draftData[sectionId][field.name],
+      type: identityType
+    })
+  } else {
+    existingIdentity[identifierField] = draftData[sectionId][field.name]
+    existingIdentity.type = identityType
+  }
+  return transformedData
+}
+
 interface IAddress {
   [key: string]: any
 }
