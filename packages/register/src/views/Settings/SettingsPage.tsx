@@ -122,15 +122,13 @@ interface ILanguageOptions {
   [key: string]: string
 }
 
-class SettingsView extends React.Component<IProps & IState, IState> {
-  constructor(props: IProps & IState) {
+class SettingsView extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
     super(props)
     this.state = {
       showLanguageSettings: false,
       showSuccessNotification: false,
-      selectedLanguage: this.props.userDetails
-        ? this.props.userDetails.language
-        : getDefaultLanguage()
+      selectedLanguage: this.props.language
     }
   }
 
@@ -148,9 +146,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
 
   cancelLanguageSettings = () => {
     this.setState(state => ({
-      selectedLanguage: this.props.userDetails
-        ? this.props.userDetails.language
-        : getDefaultLanguage(),
+      selectedLanguage: this.props.language,
       showLanguageSettings: !state.showLanguageSettings
     }))
   }
@@ -259,7 +255,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
         items: [
           {
             label: intl.formatMessage(constantsMessages.labelLanguage),
-            value: languages[this.state.selectedLanguage].displayName,
+            value: languages[this.props.language].displayName,
             action: {
               id: 'BtnChangeLanguage',
               label: intl.formatMessage(buttonMessages.change),
@@ -345,7 +341,7 @@ class SettingsView extends React.Component<IProps & IState, IState> {
 
 export const SettingsPage = connect(
   (store: IStoreState) => ({
-    language: store.i18n.language,
+    language: store.i18n.language || getDefaultLanguage(),
     languages: store.i18n.languages,
     userDetails: getUserDetails(store)
   }),
