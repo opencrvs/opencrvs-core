@@ -653,7 +653,7 @@
         "form.field.label.print.signedAffidavit": "Do they have a signed affidavit?",
         "form.field.label.print.warningNotVerified": "Please be aware that if you proceed you will be responsible for issuing a certificate without the necessary proof of ID from the collector.",
         "form.field.label.privateHome": "Private Home",
-        "form.field.label.proofOfBirthPlaceAndDate": "Proof of Place and Date of Birth of Child",
+        "form.field.label.proofOfBirthPlaceAndDate": "Proof of place and date of birth of child",
         "form.field.label.proofOfDocCertificateOfChild": "Certificate from doctor to prove child's age OR School certificate",
         "form.field.label.proofOfEPICardOfChild": "EPI Card of Child",
         "form.field.label.proofOfFathersID": "Proof of Father's ID",
