@@ -1,2 +1,2 @@
 export const TRANSFORMER_BASE_USER_DETAILS = 'userdetails'
-export const TRANSFORMER_BASE_OFFLINE_DATA = 'offlinedata'
+export const TRANSFORMER_BASE_RESOURCE_DATA = 'resource'

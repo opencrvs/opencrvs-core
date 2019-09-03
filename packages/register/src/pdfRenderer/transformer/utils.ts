@@ -15,7 +15,7 @@ import { MessageDescriptor } from 'react-intl'
 import { IUserDetails } from '@register/utils/userUtils'
 import { IOfflineData } from '@register/offline/reducer'
 import {
-  TRANSFORMER_BASE_OFFLINE_DATA,
+  TRANSFORMER_BASE_RESOURCE_DATA,
   TRANSFORMER_BASE_USER_DETAILS
 } from '@register/pdfRenderer/transformer/constants'
 
@@ -68,7 +68,7 @@ export function getTransformerDataByBase(
   ) {
     return userdetails
   } else if (
-    transformerDef.baseData.toLowerCase() === TRANSFORMER_BASE_OFFLINE_DATA
+    transformerDef.baseData.toLowerCase() === TRANSFORMER_BASE_RESOURCE_DATA
   ) {
     return offlineResource
   }

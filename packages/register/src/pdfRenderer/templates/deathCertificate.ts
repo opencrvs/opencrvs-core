@@ -302,7 +302,7 @@ export const template: IPDFTemplate = {
     {
       field: 'countryLogo',
       operation: 'OfflineCompanyLogo',
-      baseData: 'offlinedata'
+      baseData: 'resource'
     },
     {
       field: 'registrationNumber',
