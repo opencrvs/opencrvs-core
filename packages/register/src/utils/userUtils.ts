@@ -129,12 +129,12 @@ export async function removeUserDetails() {
 }
 
 export function getIndividualNameObj(
-  userNameArr: Array<GQLHumanName | null>,
+  individualNameArr: Array<GQLHumanName | null>,
   language: string
 ) {
   return (
-    userNameArr.find((name: GQLHumanName | null) => {
+    individualNameArr.find((name: GQLHumanName | null) => {
       return name && name.use === language ? true : false
-    }) || userNameArr[0]
+    }) || individualNameArr[0]
   )
 }
