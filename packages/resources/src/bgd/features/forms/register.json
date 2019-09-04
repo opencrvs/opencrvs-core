@@ -2624,7 +2624,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                "previewTag": "currentAddress",
+                  "previewTag": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -2780,26 +2780,26 @@
                   }
                 }
               ],
-"previewTags": [
-              {
-                "id": "permanentAddress",
-                "label": {
-                  "defaultMessage": "Permanent address",
-                  "description": "Tag definition for permanentAddress",
-                  "id": "form.preview.tag.permanent.address"
+              "previewTags": [
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
                 },
-                "fieldToRedirect": "permanentAddress"
-              },
-              {
-                "id": "currentAddress",
-                "label": {
-                  "defaultMessage": "Current address",
-                  "description": "Tag definition for crrent address",
-                  "id": "form.preview.tag.current.address"
-                },
-                "fieldToRedirect": "currentAddress"
-              }
-            ]
+                {
+                  "id": "currentAddress",
+                  "label": {
+                    "defaultMessage": "Current address",
+                    "description": "Tag definition for crrent address",
+                    "id": "form.preview.tag.current.address"
+                  },
+                  "fieldToRedirect": "currentAddress"
+                }
+              ]
             }
           ]
         },
@@ -4000,7 +4000,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                "previewTag": "currentAddress",
+                  "previewTag": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -4781,25 +4781,25 @@
                 }
               ],
               "previewTags": [
-              {
-                "id": "permanentAddress",
-                "label": {
-                  "defaultMessage": "Permanent address",
-                  "description": "Tag definition for permanentAddress",
-                  "id": "form.preview.tag.permanent.address"
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
                 },
-                "fieldToRedirect": "permanentAddress"
-              },
-              {
-                "id": "currentAddress",
-                "label": {
-                  "defaultMessage": "Current address",
-                  "description": "Tag definition for crrent address",
-                  "id": "form.preview.tag.current.address"
-                },
-                "fieldToRedirect": "currentAddress"
-              }
-            ]
+                {
+                  "id": "currentAddress",
+                  "label": {
+                    "defaultMessage": "Current address",
+                    "description": "Tag definition for crrent address",
+                    "id": "form.preview.tag.current.address"
+                  },
+                  "fieldToRedirect": "currentAddress"
+                }
+              ]
             }
           ],
           "mapping": {
@@ -6940,7 +6940,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                "previewTag": "currentAddress",
+                  "previewTag": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -7097,25 +7097,25 @@
                 }
               ],
               "previewTags": [
-              {
-                "id": "permanentAddress",
-                "label": {
-                  "defaultMessage": "Permanent address",
-                  "description": "Tag definition for permanentAddress",
-                  "id": "form.preview.tag.permanent.address"
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
                 },
-                "fieldToRedirect": "permanentAddress"
-              },
-              {
-                "id": "currentAddress",
-                "label": {
-                  "defaultMessage": "Current address",
-                  "description": "Tag definition for crrent address",
-                  "id": "form.preview.tag.current.address"
-                },
-                "fieldToRedirect": "currentAddress"
-              }
-            ]
+                {
+                  "id": "currentAddress",
+                  "label": {
+                    "defaultMessage": "Current address",
+                    "description": "Tag definition for crrent address",
+                    "id": "form.preview.tag.current.address"
+                  },
+                  "fieldToRedirect": "currentAddress"
+                }
+              ]
             }
           ]
         },
@@ -7725,7 +7725,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                "previewTag": "privateHome",
+                  "previewTag": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7854,15 +7854,15 @@
                 }
               ],
               "previewTags": [
-              {
-                "id": "privateHome",
-                "label": {
-                  "defaultMessage": "Address",
-                  "description": "Tag definition for private home",
-                  "id": "form.preview.tag.private.home"
+                {
+                  "id": "privateHome",
+                  "label": {
+                    "defaultMessage": "Address",
+                    "description": "Tag definition for private home",
+                    "id": "form.preview.tag.private.home"
+                  }
                 }
-              }
-            ]
+              ]
             },
             {
               "id": "deathEvent-deathAtOtherLocation",
@@ -8232,7 +8232,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                "previewTag": "otherInstitution",
+                  "previewTag": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8360,16 +8360,16 @@
                   }
                 }
               ],
-"previewTags": [
-              {
-                "id": "otherInstitution",
-                "label": {
-                  "defaultMessage": "Address",
-                  "description": "Tag definition for other institution",
-                  "id": "form.preview.tag.other.institution"
+              "previewTags": [
+                {
+                  "id": "otherInstitution",
+                  "label": {
+                    "defaultMessage": "Address",
+                    "description": "Tag definition for other institution",
+                    "id": "form.preview.tag.other.institution"
+                  }
                 }
-              }
-            ]
+              ]
             }
           ],
           "mapping": {
@@ -9713,7 +9713,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                "previewTag": "currentAddress",
+                  "previewTag": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -10640,26 +10640,26 @@
                   }
                 }
               ],
-            "previewTags": [
-              {
-                "id": "permanentAddress",
-                "label": {
-                  "defaultMessage": "Permanent address",
-                  "description": "Tag definition for permanentAddress",
-                  "id": "form.preview.tag.permanent.address"
+              "previewTags": [
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
                 },
-                "fieldToRedirect": "permanentAddress"
-              },
-              {
-                "id": "currentAddress",
-                "label": {
-                  "defaultMessage": "Current address",
-                  "description": "Tag definition for crrent address",
-                  "id": "form.preview.tag.current.address"
-                },
-                "fieldToRedirect": "currentAddress"
-              }
-            ]
+                {
+                  "id": "currentAddress",
+                  "label": {
+                    "defaultMessage": "Current address",
+                    "description": "Tag definition for crrent address",
+                    "id": "form.preview.tag.current.address"
+                  },
+                  "fieldToRedirect": "currentAddress"
+                }
+              ]
             }
           ],
           "mapping": {
