@@ -45,7 +45,7 @@ context('Birth Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('6684176876871')
     cy.get('#familyName').type('বেগম')
     cy.get('#familyNameEng').type('Begum')
@@ -141,7 +141,7 @@ context('Birth Integration Test', () => {
     cy.selectOption('#birthType', 'Single', 'Single')
     cy.get('#multipleBirth').type('1')
     cy.get('#weightAtBirth').type('1.5')
-    cy.selectOption('#placeOfBirth', 'Private Home', 'Private Home')
+    cy.selectOption('#placeOfBirth', 'Private_Home', 'Private Home')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -153,7 +153,7 @@ context('Birth Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('হাবিবা')
@@ -169,7 +169,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-yyyy').type('1990')
     cy.selectOption(
       '#educationalAttainment',
-      'Upper secondary',
+      'UPPER_SECONDARY_ISCED_3',
       'Upper secondary'
     )
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
@@ -193,7 +193,7 @@ context('Birth Integration Test', () => {
     cy.get('#next_section').click()
     // FATHER DETAILS
     // cy.get('#fathersDetailsExist_true').click()
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('বোরহান')
@@ -209,7 +209,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-yyyy').type('1990')
     cy.selectOption(
       '#educationalAttainment',
-      'Upper secondary',
+      'UPPER_SECONDARY_ISCED_3',
       'Upper secondary'
     )
     cy.get('#addressSameAsMother_false').click()
@@ -311,7 +311,7 @@ context('Birth Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('6684176876871')
     cy.get('#familyName').type('আক্তার')
     cy.get('#familyNameEng').type('Aktar')
@@ -410,7 +410,7 @@ context('Birth Integration Test', () => {
     cy.selectOption('#birthType', 'Single', 'Single')
     cy.get('#multipleBirth').type('1')
     cy.get('#weightAtBirth').type('1')
-    cy.selectOption('#placeOfBirth', 'Private Home', 'Private Home')
+    cy.selectOption('#placeOfBirth', 'Private_Home', 'Private Home')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -422,7 +422,7 @@ context('Birth Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('নমিসা')
@@ -438,7 +438,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-yyyy').type('1975')
     cy.selectOption(
       '#educationalAttainment',
-      'Upper secondary',
+      'UPPER_SECONDARY_ISCED_3',
       'Upper secondary'
     )
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
@@ -462,7 +462,7 @@ context('Birth Integration Test', () => {
     cy.get('#next_section').click()
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_true').click()
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1234567898765')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('হামিদুর')
@@ -478,7 +478,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-yyyy').type('1975')
     cy.selectOption(
       '#educationalAttainment',
-      'Upper secondary',
+      'UPPER_SECONDARY_ISCED_3',
       'Upper secondary'
     )
     cy.get('#addressSameAsMother_false').click()
@@ -583,7 +583,7 @@ context('Birth Integration Test', () => {
     cy.selectOption('#birthType', 'Single', 'Single')
     cy.get('#multipleBirth').type('1')
     cy.get('#weightAtBirth').type('1.5')
-    cy.selectOption('#placeOfBirth', 'Private Home', 'Private Home')
+    cy.selectOption('#placeOfBirth', 'Private_Home', 'Private Home')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -595,7 +595,7 @@ context('Birth Integration Test', () => {
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1994789456123')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('হাবিবা')
@@ -611,7 +611,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-yyyy').type('1990')
     cy.selectOption(
       '#educationalAttainment',
-      'Upper secondary',
+      'UPPER_SECONDARY_ISCED_3',
       'Upper secondary'
     )
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
@@ -635,7 +635,7 @@ context('Birth Integration Test', () => {
     cy.get('#next_section').click()
     // FATHER DETAILS
     // cy.get('#fathersDetailsExist_true').click()
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1994789456123')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('বোরহান')
@@ -651,7 +651,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-yyyy').type('1990')
     cy.selectOption(
       '#educationalAttainment',
-      'Upper secondary',
+      'UPPER_SECONDARY_ISCED_3',
       'Upper secondary'
     )
     cy.get('#addressSameAsMother_false').click()
