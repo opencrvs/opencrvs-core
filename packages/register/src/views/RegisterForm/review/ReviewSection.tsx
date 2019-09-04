@@ -551,7 +551,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               id={`required_label_${section.id}_${field.name}`}
                             >
                               {intl.formatMessage(field.label)}
-                              <span>: </span>
+                              <span> </span>
                               {intl.formatMessage(
                                 errorsOnField[0].message,
                                 errorsOnField[0].props

@@ -72,6 +72,25 @@ describe('validate', () => {
       expect(required(goodValue)).toEqual(response)
     })
   })
+  describe('requiredWithLowerCaseMessage. Used for fields that must have a value', () => {
+    it('Should error when supplied a bad value. ', () => {
+      const badValue = ''
+      const response = {
+        message: {
+          defaultMessage: 'required for registration',
+          description:
+            'The error message that appears on required fields with all lower case characters',
+          id: 'validations.requiredWithLowerCaseMessage'
+        }
+      }
+      expect(required(badValue)).toEqual(response)
+    })
+    it('should pass when supplied a good value.', () => {
+      const goodValue = 'jkgjgjgkgjkj'
+      const response = undefined
+      expect(required(goodValue)).toEqual(response)
+    })
+  })
   describe('minLength. Used for fields that have a minimum length', () => {
     it('Should error when supplied a bad value. ', () => {
       const badValue = '1'

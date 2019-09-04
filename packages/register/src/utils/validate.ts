@@ -122,6 +122,24 @@ export const required: Validation = (value: IFormFieldValue) => {
   return value !== undefined ? undefined : { message: messages.required }
 }
 
+export const requiredWithLowerCaseMessage: Validation = (
+  value: IFormFieldValue
+) => {
+  if (typeof value === 'string') {
+    return value !== ''
+      ? undefined
+      : { message: messages.requiredWithLowerCaseMessage }
+  }
+  if (isArray(value)) {
+    return value.length > 0
+      ? undefined
+      : { message: messages.requiredWithLowerCaseMessage }
+  }
+  return value !== undefined
+    ? undefined
+    : { message: messages.requiredWithLowerCaseMessage }
+}
+
 export const minLength = (min: number) => (value: string) => {
   return value && value.length < min
     ? { message: messages.minLength, props: { min } }
