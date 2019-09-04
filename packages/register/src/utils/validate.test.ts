@@ -21,7 +21,8 @@ import {
   dateLessThan,
   dateNotInFuture,
   dateFormatIsCorrect,
-  dateInPast
+  dateInPast,
+  validLength
 } from '@register/utils/validate'
 import { validationMessages as messages } from '@register/i18n/messages'
 
@@ -825,6 +826,20 @@ describe('validate', () => {
       const goodValue = '1'
       const response = undefined
       expect(greaterThanZero(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('Checking validLength function', () => {
+    it('Should return error message', () => {
+      const factory = validLength(5)
+      const result = factory(999999)
+      expect(!!result).toBe(true)
+    })
+
+    it('Should return no error', () => {
+      const factory = validLength(5)
+      const result = factory(99999)
+      expect(!!result).toBe(false)
     })
   })
 })
