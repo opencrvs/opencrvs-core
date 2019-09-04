@@ -135,18 +135,26 @@ export const selectOption = (
   wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
   selector: string,
   option: string
-): string => {
-  const input = wrapper
-    .find(`${selector} input`)
-    .instance() as React.InputHTMLAttributes<HTMLInputElement>
-  input.value = option.charAt(0)
-  wrapper.find(`${selector} input`).simulate('change', {
-    target: { value: option.charAt(0) }
-  })
-  wrapper
-    .find(`${selector} .react-select__menu div[children="${option}"]`)
+): ReactWrapper => {
+  const input = wrapper.find(selector).hostNodes()
+
+  input
+    .find('input')
+    .simulate('focus')
+    .update()
+  input
+    .find('.react-select__control')
+    .simulate('mousedown')
+    .update()
+  input
+    .update()
+    .find('.react-select__option')
+    .findWhere((el: ReactWrapper) => el.text() === option)
+    .hostNodes()
     .simulate('click')
-  return `${selector} .react-select__single-value`
+    .update()
+
+  return input.find('.react-select__control')
 }
 
 const currentUserId = '123'
