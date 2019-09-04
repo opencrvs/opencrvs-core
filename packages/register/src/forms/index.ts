@@ -467,7 +467,7 @@ export type IFormField =
 
 export interface IFormTag {
   id: string
-  label: FormattedMessage.MessageDescriptor
+  label: MessageDescriptor
   fieldToRedirect?: string
 }
 
