@@ -46,7 +46,7 @@ const registrationAgent = new User({
   ],
   username: 'tamim.iqbal',
   email: 'test@test.org',
-  mobile: '+8801721111111',
+  mobile: '+8801722222222',
   passwordHash: pass.hash,
   salt: pass.salt,
   role: 'REGISTRATION_AGENT',

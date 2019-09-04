@@ -54,7 +54,8 @@ describe('ReviewForm tests', () => {
         languages: mockOfflineData.languages,
         forms: mockOfflineData.forms,
         locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities
+        facilities: mockOfflineData.facilities,
+        assets: mockOfflineData.assets
       })
     )
 

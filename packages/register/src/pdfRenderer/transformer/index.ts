@@ -1,5 +1,6 @@
 import { fieldTransformers } from '@register/pdfRenderer/transformer/fieldTransformer'
 import { userTransformers } from '@register/pdfRenderer/transformer/userTransformer'
+import { offlineTransformers } from '@register/pdfRenderer/transformer/offlineTransformer'
 import { IFunctionTransformer } from './types'
 
 /*
@@ -7,5 +8,6 @@ import { IFunctionTransformer } from './types'
  */
 export const transformers: IFunctionTransformer = {
   ...fieldTransformers,
-  ...userTransformers
+  ...userTransformers,
+  ...offlineTransformers
 }

@@ -3,7 +3,8 @@ import { ILanguageState } from '@register/i18n/reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
-  IDefinitionsResponse
+  IDefinitionsResponse,
+  IAssetResponse
 } from '@register/utils/referenceApi'
 import { IUserDetails } from '@register/utils/userUtils'
 
@@ -46,6 +47,17 @@ export type FacilitiesLoadedAction = {
 export const FACILITIES_FAILED = 'OFFLINE/FACILITIES_FAILED'
 export type FacilitiesFailedAction = {
   type: typeof FACILITIES_FAILED
+  payload: Error
+}
+export const ASSETS_LOADED = 'OFFLINE/ASSETS_LOADED'
+export type AssetsLoadedAction = {
+  type: typeof ASSETS_LOADED
+  payload: IAssetResponse
+}
+
+export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
+export type AssetsFailedAction = {
+  type: typeof ASSETS_FAILED
   payload: Error
 }
 
@@ -125,6 +137,16 @@ export const definitionsFailed = (error: Error): DefinitionsFailedAction => ({
   payload: error
 })
 
+export const assetsLoaded = (payload: IAssetResponse): AssetsLoadedAction => ({
+  type: ASSETS_LOADED,
+  payload: payload
+})
+
+export const assetsFailed = (error: Error): AssetsFailedAction => ({
+  type: ASSETS_FAILED,
+  payload: error
+})
+
 export const offlineDataReady = (state: IOfflineData) => ({
   type: READY,
   payload: state
@@ -141,5 +163,7 @@ export type Action =
   | FacilitiesFailedAction
   | DefinitionsFailedAction
   | DefinitionsLoadedAction
+  | AssetsLoadedAction
+  | AssetsFailedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>

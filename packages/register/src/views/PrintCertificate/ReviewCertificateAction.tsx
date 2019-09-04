@@ -33,6 +33,8 @@ import {
   printCertificate
 } from '@register/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@register/forms/register/application-selectors'
+import { IOfflineData } from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -95,6 +97,7 @@ type IProps = {
   draft: IPrintableApplication
   userDetails: IUserDetails | null
   registerForm: IForm
+  resources: IOfflineData
   modifyApplication: typeof modifyApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
   storeApplication: typeof storeApplication
@@ -121,6 +124,7 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.intl,
         this.props.draft,
         this.props.userDetails,
+        this.props.resources,
         (base64PDF: string) => {
           this.setState({
             certificatePdf: base64PDF
@@ -138,7 +142,12 @@ class ReviewCertificateActionComponent extends React.Component<
 
   readyToCertify = () => {
     const { draft } = this.props
-    printCertificate(this.props.intl, draft, this.props.userDetails)
+    printCertificate(
+      this.props.intl,
+      draft,
+      this.props.userDetails,
+      this.props.resources
+    )
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
 
@@ -294,6 +303,7 @@ function mapStatetoProps(
     draft,
     drafts: state.applicationsState,
     userDetails: getUserDetails(state),
+    resources: getOfflineData(state),
     registerForm: getEventRegisterForm(state, event)
   }
 }
