@@ -79,7 +79,7 @@ export const fieldToIdentityTransformer = (
   identifierField: string,
   identityType: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -90,8 +90,8 @@ export const fieldToIdentityTransformer = (
   }
 
   const existingIdentity = sectionData.identifier.find(
-    // @ts-ignore
-    identifier => identifier.type && identifier.type === identityType
+    (identifier: fhir.Identifier) =>
+      identifier.type && identifier.type === identityType
   )
   if (!existingIdentity) {
     sectionData.identifier.push({

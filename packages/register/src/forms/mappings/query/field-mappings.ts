@@ -118,8 +118,7 @@ export const identityToFieldTransformer = (
 ) => {
   if (queryData[sectionId] && queryData[sectionId].identifier) {
     const existingIdentity = queryData[sectionId].identifier.find(
-      // @ts-ignore
-      identity => identity.type === identityType
+      (identity: fhir.Identifier) => identity.type === identityType
     )
     transformedData[sectionId][field.name] =
       existingIdentity && identifierField in existingIdentity
