@@ -67,7 +67,8 @@ import {
   TEXTAREA,
   Event,
   Section,
-  BirthSection
+  BirthSection,
+  IFormTag
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
@@ -178,7 +179,7 @@ type State = {
   displayEditDialog: boolean
   editClickedSectionId: Section | null
   editClickedSectionGroupId: string
-  editClickFieldName: string
+  editClickFieldName?: string
   activeSection: Section | null
 }
 type FullProps = IProps & IntlShapeProps
@@ -457,7 +458,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   editLinkClickHandler = (
     sectionId: Section | null,
     sectionGroupId: string,
-    fieldName: string
+    fieldName?: string
   ) => {
     this.setState(() => ({
       editClickedSectionId: sectionId,
@@ -503,54 +504,151 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         type => type === field.type
       )
     }
+
     return formSections.map(section => {
       let items: any[] = []
+      let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
         section,
         draft.data[section.id] || {}
       ).forEach(group => {
-        items = items.concat(
-          group.fields
-            .filter(
-              field => isVisibleField(field, section) && !isViewOnly(field)
-            )
-            .map(field => {
-              const errorsOnField =
-                // @ts-ignore
-                errorsOnFields[section.id][field.name]
+        items = items
+          .concat(
+            group.fields
+              .filter(
+                field => isVisibleField(field, section) && !isViewOnly(field)
+              )
+              .map(field => {
+                if (field.previewTag) {
+                  if (!visitedTags.includes(field.previewTag)) {
+                    visitedTags.push(field.previewTag)
 
-              return {
-                label: intl.formatMessage(field.label),
-                value:
-                  errorsOnField.length > 0 ? (
-                    <RequiredField
-                      id={`required_label_${section.id}_${field.name}`}
-                    >
-                      {intl.formatMessage(
-                        errorsOnField[0].message,
-                        errorsOnField[0].props
-                      )}
-                    </RequiredField>
-                  ) : (
-                    renderValue(
-                      draft,
-                      section,
-                      field,
-                      intl,
-                      offlineResources,
-                      language
+                    const baseTag = field.previewTag
+                    const taggedFields = group.fields.filter(
+                      field =>
+                        isVisibleField(field, section) &&
+                        !isViewOnly(field) &&
+                        field.previewTag === baseTag
                     )
-                  ),
-                action: {
-                  id: `btn_change_${section.id}_${field.name}`,
-                  label: intl.formatMessage(buttonMessages.change),
-                  handler: () => {
-                    this.editLinkClickHandler(section.id, group.id, field.name)
+
+                    const tagDef =
+                      (group.previewTags &&
+                        (group.previewTags.filter(
+                          previewTag => previewTag.id === baseTag
+                        ) as IFormTag[])) ||
+                      []
+
+                    const values = taggedFields
+                      .map(field => {
+                        const errorsOnField =
+                          // @ts-ignore
+                          errorsOnFields[section.id][field.name]
+
+                        let value
+                        if (errorsOnField.length > 0) {
+                          value = (
+                            <RequiredField
+                              id={`required_label_${section.id}_${field.name}`}
+                            >
+                              {intl.formatMessage(field.label)}
+                              <span>: </span>
+                              {intl.formatMessage(
+                                errorsOnField[0].message,
+                                errorsOnField[0].props
+                              )}
+                            </RequiredField>
+                          )
+                        } else {
+                          const renderedValue = renderValue(
+                            draft,
+                            section,
+                            field,
+                            intl,
+                            offlineResources,
+                            language
+                          )
+
+                          if (renderedValue) {
+                            value = <>{renderedValue}</>
+                          }
+                        }
+
+                        return value
+                      })
+                      .filter(value => value)
+
+                    let completeValue = values[0]
+                    values.shift()
+                    values.forEach(
+                      value =>
+                        (completeValue = (
+                          <>
+                            {completeValue}
+                            <br />
+                            {value}
+                          </>
+                        ))
+                    )
+
+                    return {
+                      label: intl.formatMessage(tagDef[0].label),
+                      value: completeValue,
+                      action: {
+                        id: `btn_change_${section.id}_${baseTag}`,
+                        label: intl.formatMessage(buttonMessages.change),
+                        handler: () => {
+                          this.editLinkClickHandler(
+                            section.id,
+                            group.id,
+                            tagDef[0].fieldToRedirect
+                          )
+                        }
+                      }
+                    }
+                  }
+                } else {
+                  const errorsOnField =
+                    // @ts-ignore
+                    errorsOnFields[section.id][field.name]
+
+                  return {
+                    label: intl.formatMessage(field.label),
+                    value:
+                      errorsOnField.length > 0 ? (
+                        <RequiredField
+                          id={`required_label_${section.id}_${field.name}`}
+                        >
+                          {intl.formatMessage(
+                            errorsOnField[0].message,
+                            errorsOnField[0].props
+                          )}
+                        </RequiredField>
+                      ) : (
+                        renderValue(
+                          draft,
+                          section,
+                          field,
+                          intl,
+                          offlineResources,
+                          language
+                        )
+                      ),
+                    action: {
+                      id: `btn_change_${section.id}_${field.name}`,
+                      label: intl.formatMessage(buttonMessages.change),
+                      handler: () => {
+                        this.editLinkClickHandler(
+                          section.id,
+                          group.id,
+                          field.name
+                        )
+                      }
+                    }
                   }
                 }
-              }
-            })
-        )
+              })
+          )
+          .filter(item => item)
       })
       return {
         id: section.id,
