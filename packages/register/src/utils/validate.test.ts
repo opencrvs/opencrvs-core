@@ -21,7 +21,8 @@ import {
   dateLessThan,
   dateNotInFuture,
   dateFormatIsCorrect,
-  dateInPast
+  dateInPast,
+  requiredWithLowerCaseMessage
 } from '@register/utils/validate'
 import { validationMessages as messages } from '@register/i18n/messages'
 
@@ -94,6 +95,26 @@ describe('validate', () => {
       const goodValue = true
       const response = undefined
       expect(required(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('requiredWithLowerCaseMessage. Used for fields that must have a value', () => {
+    it('Should error when supplied a bad value. ', () => {
+      const badValue = ''
+      const response = {
+        message: {
+          defaultMessage: 'required for registration',
+          description:
+            'The error message that appears on required fields with all lower case characters',
+          id: 'validations.requiredWithLowerCaseMessage'
+        }
+      }
+      expect(requiredWithLowerCaseMessage(badValue)).toEqual(response)
+    })
+    it('should pass when supplied a good value.', () => {
+      const goodValue = 'jkgjgjgkgjkj'
+      const response = undefined
+      expect(requiredWithLowerCaseMessage(goodValue)).toEqual(response)
     })
   })
 
