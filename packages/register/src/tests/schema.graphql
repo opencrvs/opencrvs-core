@@ -393,6 +393,7 @@ enum IdentityIDType {
   ALIEN_NUMBER
   OTHER
   NO_ID
+  SOCIAL_SECURITY_NO
 }
 
 input IdentityInput {
@@ -566,6 +567,7 @@ type Person {
   gender: String
   birthDate: String
   maritalStatus: MaritalStatusType
+  occupation: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]

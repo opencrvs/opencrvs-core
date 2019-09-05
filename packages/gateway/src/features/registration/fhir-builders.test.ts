@@ -34,7 +34,8 @@ test('should build a minimal FHIR registration document without error', async ()
         multipleBirth: 1,
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
-        educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
+        educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
+        occupation: 'Mother Occupation'
       },
       father: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
@@ -77,7 +78,8 @@ test('should build a minimal FHIR registration document without error', async ()
         ],
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
-        educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
+        educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
+        occupation: 'Father Occupation'
       },
       child: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
@@ -256,6 +258,12 @@ test('should build a minimal FHIR registration document without error', async ()
   )
   expect(fhir.entry[1].resource.extension[2].url).toBe(
     `${OPENCRVS_SPECIFICATION_URL}extension/educational-attainment`
+  )
+  expect(fhir.entry[1].resource.extension[3].valueString).toBe(
+    'Mother Occupation'
+  )
+  expect(fhir.entry[1].resource.extension[3].url).toBe(
+    `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`
   )
   expect(fhir.entry[1].resource.extension[0].valueDateTime).toBe('2014-01-28')
 
