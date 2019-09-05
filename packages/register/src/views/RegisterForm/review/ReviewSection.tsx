@@ -591,7 +591,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     )
 
                     return {
-                      label: intl.formatMessage(tagDef[0].label),
+                      label:
+                        (tagDef[0] && intl.formatMessage(tagDef[0].label)) ||
+                        '',
                       value: completeValue,
                       action: {
                         id: `btn_change_${section.id}_${baseTag}`,

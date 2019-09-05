@@ -417,6 +417,7 @@
                 {
                   "name": "placeOfBirth",
                   "type": "SELECT_WITH_OPTIONS",
+                  "previewTag": "placeOfBirth",
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
@@ -478,6 +479,7 @@
                 {
                   "name": "birthLocation",
                   "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+
                   "label": {
                     "defaultMessage": "Hospital / Clinic",
                     "description": "Label for form field: Hospital or Health Institution",
@@ -515,12 +517,12 @@
                 {
                   "name": "country",
                   "type": "SELECT_WITH_OPTIONS",
+                  "previewTag": "placeOfBirth",
                   "label": {
                     "defaultMessage": "Country",
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "currentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -557,7 +559,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -599,7 +601,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -645,7 +647,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -695,7 +697,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -753,7 +755,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -802,7 +804,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -851,7 +853,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -900,7 +902,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -949,7 +951,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -998,7 +1000,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewTag": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1038,6 +1040,17 @@
                       "parameters": [0, "postalCode"]
                     }
                   }
+                }
+              ],
+              "previewTags": [
+                {
+                  "id": "placeOfBirth",
+                  "label": {
+                    "defaultMessage": "Place of delivery",
+                    "description": "Label for form field: Place of delivery",
+                    "id": "form.field.label.placeOfBirth"
+                  },
+                  "fieldToRedirect": "placeOfBirth"
                 }
               ]
             }
