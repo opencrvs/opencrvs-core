@@ -253,6 +253,8 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MONGO_URL=mongodb://mongo1,mongo2,mogno3/user-mgnt?replicaSet=rs0
+      - TEST_USER_PASSWORD=test
     deploy:
       labels:
         - 'traefik.enable=true'
