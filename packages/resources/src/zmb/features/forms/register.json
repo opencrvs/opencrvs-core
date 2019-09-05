@@ -1421,6 +1421,1275 @@
                       }
                     }
                   ]
+                },
+                {
+                  "name": "motherPlaceOfBirth",
+                  "type": "SUBSECTION",
+                  "label": {
+                    "defaultMessage": "What is her village of origin?",
+                    "description": "Title for mother place of birth",
+                    "id": "form.field.label.motherPlaceOfBirth"
+                  },
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
+                  "name": "districtPlaceOfBirth",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the district select",
+                    "id": "form.field.label.district"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [],
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        0,
+                        "district"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        0,
+                        "district"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "chiefPlaceOfBirth",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option1",
+                        "defaultMessage": "Chief Mushili",
+                        "description": "Label for select chief option 1"
+                      },
+                      "value": "Chief Mushili"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option2",
+                        "defaultMessage": "Chief Lesa",
+                        "description": "Label for select chief option 2"
+                      },
+                      "value": "Chief Lesa"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option3",
+                        "defaultMessage": "Chief Selenje",
+                        "description": "Label for select chief option 3"
+                      },
+                      "value": "Chief Selenje"
+                    }
+                  ],
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1PlaceOfBirth",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Village",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "permanentAddress",
+                  "type": "SUBSECTION",
+                  "label": {
+                    "defaultMessage": "What is her residential address?",
+                    "description": "Title for the permanent address fields",
+                    "id": "form.field.label.motherPermanentAddress"
+                  },
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
+                  "name": "countryPermanent",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Country",
+                    "description": "Title for the country select",
+                    "id": "form.field.label.country"
+                  },
+                  "required": false,
+                  "initialValue": "ZMB",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": {
+                    "resource": "countries"
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "country"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "country"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "statePermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Division",
+                    "description": "Title for the state select",
+                    "id": "form.field.label.state"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "countryPermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "state"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "state"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "districtPermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the district select",
+                    "id": "form.field.label.district"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "statePermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "district"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "district"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "ruralOrUrbanPermanent",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": " ",
+                    "description": "Empty label for form field",
+                    "id": "form.field.label.emptyLabel"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "defaultMessage": "Urban address",
+                        "id": "form.field.label.urban",
+                        "description": "Label for form field checkbox option Urban"
+                      },
+                      "value": "URBAN"
+                    },
+                    {
+                      "label": {
+                        "defaultMessage": "Rural address",
+                        "id": "form.field.label.rural",
+                        "description": "Label for form field checkbox option Rural"
+                      },
+                      "value": "RURAL"
+                    }
+                  ],
+                  "initialValue": "URBAN",
+                  "required": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        7
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        7
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressChiefPermanent",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option1",
+                        "defaultMessage": "Chief Mushili",
+                        "description": "Label for select chief option 1"
+                      },
+                      "value": "Chief Mushili"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option2",
+                        "defaultMessage": "Chief Lesa",
+                        "description": "Label for select chief option 2"
+                      },
+                      "value": "Chief Lesa"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option3",
+                        "defaultMessage": "Chief Selenje",
+                        "description": "Label for select chief option 3"
+                      },
+                      "value": "Chief Selenje"
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"RURAL\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        3
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        3
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine4CityOptionPermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Town",
+                    "description": "Title for the address line 4",
+                    "id": "form.field.label.addressLine4CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "districtPermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        6
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        6
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine3CityOptionPermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Residential Area",
+                    "description": "Title for the address line 3 option 2",
+                    "id": "form.field.label.addressLine3CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "addressLine4CityOptionPermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        5
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        5
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1CityOptionPermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Street / Plot Number",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        2
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        2
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "postCodeCityOptionPermanent",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Number",
+                    "description": "Title for the postcode field",
+                    "id": "form.field.label.postCode"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "postalCode"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "postalCode"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1Permanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Village",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"RURAL\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        1
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "currentAddressSameAsPermanent",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": "Is her usual place of residence the same as her residential address?",
+                    "description": "Title for the radio button to select that the mothers current address is the same as her permanent address",
+                    "id": "form.field.label.currentAddressSameAsPermanent"
+                  },
+                  "required": false,
+                  "initialValue": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": true,
+                      "label": {
+                        "defaultMessage": "Yes",
+                        "description": "confirmation label for yes / no radio button",
+                        "id": "form.field.label.confirm"
+                      }
+                    },
+                    {
+                      "value": false,
+                      "label": {
+                        "defaultMessage": "No",
+                        "description": "deny label for yes / no radio button",
+                        "id": "form.field.label.deny"
+                      }
+                    }
+                  ],
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "copyAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        "mother",
+                        "CURRENT",
+                        "mother"
+                      ]
+                    },
+                    "query": {
+                      "operation": "sameAddressFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        "mother",
+                        "CURRENT",
+                        "mother"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "currentAddress",
+                  "type": "SUBSECTION",
+                  "label": {
+                    "defaultMessage": "Current Address",
+                    "description": "Title for the current address fields",
+                    "id": "form.field.label.currentAddress"
+                  },
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ]
+                },
+                {
+                  "name": "country",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Country",
+                    "description": "Title for the country select",
+                    "id": "form.field.label.country"
+                  },
+                  "required": false,
+                  "initialValue": "ZMB",
+                  "validate": [],
+                  "options": {
+                    "resource": "countries"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "state",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Division",
+                    "description": "Title for the state select",
+                    "id": "form.field.label.state"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "validate": [],
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "country"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "district",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the district select",
+                    "id": "form.field.label.district"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "state"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "ruralOrUrban",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": " ",
+                    "description": "Empty label for form field",
+                    "id": "form.field.label.emptyLabel"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "defaultMessage": "Urban address",
+                        "id": "form.field.label.urban",
+                        "description": "Label for form field checkbox option Urban"
+                      },
+                      "value": "URBAN"
+                    },
+                    {
+                      "label": {
+                        "defaultMessage": "Rural address",
+                        "id": "form.field.label.rural",
+                        "description": "Label for form field checkbox option Rural"
+                      },
+                      "value": "RURAL"
+                    }
+                  ],
+                  "initialValue": "URBAN",
+                  "required": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        7
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        7
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressChief",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option1",
+                        "defaultMessage": "Chief Mushili",
+                        "description": "Label for select chief option 1"
+                      },
+                      "value": "Chief Mushili"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option2",
+                        "defaultMessage": "Chief Lesa",
+                        "description": "Label for select chief option 2"
+                      },
+                      "value": "Chief Lesa"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option3",
+                        "defaultMessage": "Chief Selenje",
+                        "description": "Label for select chief option 3"
+                      },
+                      "value": "Chief Selenje"
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"RURAL\""
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        3
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        3
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine4CityOption",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Town",
+                    "description": "Title for the address line 4",
+                    "id": "form.field.label.addressLine4CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "district"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        6
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        6
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine3CityOption",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Residential Area",
+                    "description": "Title for the address line 3 option 2",
+                    "id": "form.field.label.addressLine3CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "addressLine4CityOption"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        5
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        5
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1CityOption",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Street / Plot Number",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        2
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        2
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "postCodeCityOption",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Number",
+                    "description": "Title for the postcode field",
+                    "id": "form.field.label.postCode"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        0,
+                        "postalCode"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        0,
+                        "postalCode"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Village",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"RURAL\""
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.currentAddressSameAsPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "CURRENT",
+                        1
+                      ]
+                    }
+                  }
                 }
               ]
             }
@@ -1939,6 +3208,837 @@
                       }
                     }
                   ]
+                },
+                {
+                  "name": "fatherPlaceOfBirth",
+                  "type": "SUBSECTION",
+                  "label": {
+                    "defaultMessage": "What is his village of origin?",
+                    "description": "Title for father place of birth",
+                    "id": "form.field.label.fatherPlaceOfBirth"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    }
+                  ],
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
+                  "name": "districtPlaceOfBirth",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the district select",
+                    "id": "form.field.label.district"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        0,
+                        "district"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        0,
+                        "district"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "chiefPlaceOfBirth",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option1",
+                        "defaultMessage": "Chief Mushili",
+                        "description": "Label for select chief option 1"
+                      },
+                      "value": "Chief Mushili"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option2",
+                        "defaultMessage": "Chief Lesa",
+                        "description": "Label for select chief option 2"
+                      },
+                      "value": "Chief Lesa"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option3",
+                        "defaultMessage": "Chief Selenje",
+                        "description": "Label for select chief option 3"
+                      },
+                      "value": "Chief Selenje"
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1PlaceOfBirth",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Village",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PLACE_OF_BIRTH",
+                        1
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "permanentAddressSameAsMother",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": "Is his residential address the same as the mother's?",
+                    "description": "Title for the radio button to select that the father's permanent address is the same as the mother's address",
+                    "id": "form.field.label.permanentAddressSameAsMother"
+                  },
+                  "required": true,
+                  "initialValue": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": true,
+                      "label": {
+                        "defaultMessage": "Yes",
+                        "description": "confirmation label for yes / no radio button",
+                        "id": "form.field.label.confirm"
+                      }
+                    },
+                    {
+                      "value": false,
+                      "label": {
+                        "defaultMessage": "No",
+                        "description": "deny label for yes / no radio button",
+                        "id": "form.field.label.deny"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "copyAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        "mother",
+                        "PERMANENT",
+                        "father"
+                      ]
+                    },
+                    "query": {
+                      "operation": "sameAddressFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        "mother",
+                        "PERMANENT",
+                        "father"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "permanentAddress",
+                  "type": "SUBSECTION",
+                  "label": {
+                    "defaultMessage": "What is his residential address?",
+                    "description": "Title for the permanent address fields",
+                    "id": "form.field.label.fatherPermanentAddress"
+                  },
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    }
+                  ]
+                },
+                {
+                  "name": "countryPermanent",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Country",
+                    "description": "Title for the country select",
+                    "id": "form.field.label.country"
+                  },
+                  "required": true,
+                  "initialValue": "ZMB",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": {
+                    "resource": "countries"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "country"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "country"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "statePermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Province",
+                    "description": "Title for the state select",
+                    "id": "form.field.label.state"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "countryPermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "state"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "state"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "districtPermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the district select",
+                    "id": "form.field.label.district"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "statePermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "district"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "district"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "ruralOrUrbanPermanent",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": " ",
+                    "description": "Empty label for form field",
+                    "id": "form.field.label.emptyLabel"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "defaultMessage": "Urban address",
+                        "id": "form.field.label.urban",
+                        "description": "Label for form field checkbox option Urban"
+                      },
+                      "value": "URBAN"
+                    },
+                    {
+                      "label": {
+                        "defaultMessage": "Rural address",
+                        "id": "form.field.label.rural",
+                        "description": "Label for form field checkbox option Rural"
+                      },
+                      "value": "RURAL"
+                    }
+                  ],
+                  "initialValue": "URBAN",
+                  "required": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        7
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        7
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressChiefPermanent",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option1",
+                        "defaultMessage": "Chief Mushili",
+                        "description": "Label for select chief option 1"
+                      },
+                      "value": "Chief Mushili"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option2",
+                        "defaultMessage": "Chief Lesa",
+                        "description": "Label for select chief option 2"
+                      },
+                      "value": "Chief Lesa"
+                    },
+                    {
+                      "label": {
+                        "id": "form.field.select.chiefs.option3",
+                        "defaultMessage": "Chief Selenje",
+                        "description": "Label for select chief option 3"
+                      },
+                      "value": "Chief Selenje"
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"RURAL\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        3
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        3
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine4CityOptionPermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Town",
+                    "description": "Title for the address line 4",
+                    "id": "form.field.label.addressLine4CityOption"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "districtPermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        6
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        6
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine3CityOptionPermanent",
+                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Residential Area",
+                    "description": "Title for the address line 3 option 2",
+                    "id": "form.field.label.addressLine3CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "dynamicOptions": {
+                    "resource": "locations",
+                    "dependency": "addressLine4CityOptionPermanent"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        5
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        5
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1CityOptionPermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Street / Plot Number",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        2
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        2
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "postCodeCityOptionPermanent",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Number",
+                    "description": "Title for the postcode field",
+                    "id": "form.field.label.postCode"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "postalCode"
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        0,
+                        "postalCode"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine1Permanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Village",
+                    "description": "Title for the address line 1",
+                    "id": "form.field.label.addressLine1"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"RURAL\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToAddressTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        1
+                      ]
+                    },
+                    "query": {
+                      "operation": "addressToFieldTransformer",
+                      "parameters": [
+                        "PERMANENT",
+                        1
+                      ]
+                    }
+                  }
                 }
               ]
             }
