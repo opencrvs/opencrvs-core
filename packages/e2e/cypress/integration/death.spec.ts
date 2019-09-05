@@ -29,7 +29,7 @@ context('Death Integration Test', () => {
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'No ID available', 'No ID available')
+    cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
     cy.get('#familyNameEng').type('Khan')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -132,7 +132,7 @@ context('Death Integration Test', () => {
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
@@ -189,14 +189,14 @@ context('Death Integration Test', () => {
     cy.get('#next_section').click()
     cy.selectOption(
       '#methodOfCauseOfDeath',
-      'Medically Certified Cause of Death',
+      'MEDICALLY_CERTIFIED',
       'Medically Certified Cause of Death'
     )
     cy.get('#causeOfDeathCode').type('1009')
     cy.wait(500)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers License', 'Drivers License')
+    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
@@ -285,7 +285,7 @@ context('Death Integration Test', () => {
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'No ID available', 'No ID available')
+    cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
     cy.get('#familyNameEng').type('Khan')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -317,7 +317,7 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_false').click()
     cy.get('#next_section').click()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'No ID available', 'No ID available')
+    cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#applicantFamilyName').type('উদ্দিন')
     cy.get('#applicantFamilyNameEng').type('Uddin')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
@@ -392,7 +392,7 @@ context('Death Integration Test', () => {
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
@@ -449,13 +449,13 @@ context('Death Integration Test', () => {
     cy.get('#next_section').click()
     cy.selectOption(
       '#methodOfCauseOfDeath',
-      'Medically Certified Cause of Death',
+      'MEDICALLY_CERTIFIED',
       'Medically Certified Cause of Death'
     )
     cy.get('#causeOfDeathCode').type('1009')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers License', 'Drivers License')
+    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
@@ -548,7 +548,7 @@ context('Death Integration Test', () => {
     cy.get('#phone_number_input').type('01526972106')
     cy.get('#continue').click()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'National ID', 'National ID')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
@@ -605,13 +605,13 @@ context('Death Integration Test', () => {
     cy.get('#next_section').click()
     cy.selectOption(
       '#methodOfCauseOfDeath',
-      'Medically Certified Cause of Death',
+      'MEDICALLY_CERTIFIED',
       'Medically Certified Cause of Death'
     )
     cy.get('#causeOfDeathCode').type('1009')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers License', 'Drivers License')
+    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')

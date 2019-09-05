@@ -47,23 +47,19 @@ context('User Integration Test', () => {
     cy.get('#Continue').click()
     // SECURITY QUESTIONS
     cy.get('#question-0').should('exist')
-    cy.selectOption(
-      '#question-0',
-      'What city were you born in?',
-      'What city were you born in?'
-    )
+    cy.selectOption('#question-0', 'BIRTH_TOWN', 'What city were you born in?')
     cy.get('#answer-0').type('Dhaka')
     cy.get('#question-1').should('exist')
     cy.selectOption(
       '#question-1',
-      'What is your favorite movie?',
+      'FAVORITE_MOVIE',
       'What is your favorite movie?'
     )
     cy.get('#answer-1').type('Dilwale Dulhania Le Jayenge')
     cy.get('#question-2').should('exist')
     cy.selectOption(
       '#question-2',
-      'What is your favorite food?',
+      'FAVORITE_FOOD',
       'What is your favorite food?'
     )
     cy.get('#answer-2').type('Burger')

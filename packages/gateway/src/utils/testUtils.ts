@@ -103,6 +103,10 @@ export const mockPatient = {
       valueDateTime: '2014-01-28'
     },
     {
+      url: 'http://opencrvs.org/specs/extension/patient-occupation',
+      valueString: 'Some Occupation'
+    },
+    {
       url: 'http://opencrvs.org/specs/extension/educational-attainment',
       valueString: 'SECOND_STAGE_TERTIARY_ISCED_6'
     },

@@ -81,6 +81,13 @@ export const typeResolvers: GQLResolver = {
     maritalStatus: person => {
       return person.maritalStatus.text
     },
+    occupation: person => {
+      const occupationExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
+        person.extension
+      )
+      return (occupationExtension && occupationExtension.valueString) || null
+    },
     multipleBirth: person => {
       return person.multipleBirthInteger
     },

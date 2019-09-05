@@ -89,12 +89,12 @@ describe('form component', () => {
     })
     it('changes the state select', async () => {
       const select = selectOption(component, '#statePermanent', 'Barisal')
-      expect(component.find(select).text()).toEqual('Barisal')
+      expect(select.text()).toEqual('Barisal')
     })
     it('changes the district select', async () => {
       selectOption(component, '#statePermanent', 'Barisal')
       const select = selectOption(component, '#districtPermanent', 'BARGUNA')
-      expect(component.find(select).text()).toEqual('BARGUNA')
+      expect(select.text()).toEqual('BARGUNA')
     })
     describe('when resetDependentSelectValues is called', () => {
       beforeEach(() => {

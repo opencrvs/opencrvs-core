@@ -128,6 +128,15 @@ export const minLength = (min: number) => (value: string) => {
     : undefined
 }
 
+export const validLength = (length: number) => (value: IFormFieldValue) => {
+  return value && value.toString().length === length
+    ? undefined
+    : {
+        message: messages.validNationalId,
+        props: { validLength: length }
+      }
+}
+
 const isLessOrEqual = (value: string, max: number) => {
   return value && value.toString().length <= max
 }
