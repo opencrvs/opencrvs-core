@@ -1,5 +1,5 @@
 import { ORG_URL, TEST_USER_PASSWORD } from '@resources/constants'
-import { getFromFhir, sendToFhir } from '@resources/bgd/features/utils'
+import { getFromFhir, sendToFhir } from '@resources/zmb/features/utils'
 import chalk from 'chalk'
 import { logger } from '@resources/logger'
 import User, { IUserModel } from '@opencrvs/user-mgnt/src/model/user'
@@ -7,7 +7,7 @@ import { generateSaltedHash, convertToMSISDN } from '@resources/utils'
 import {
   createUsers,
   getScope
-} from '@resources/bgd/features/employees/scripts/manage-users'
+} from '@resources/zmb/features/employees/scripts/manage-users'
 
 interface ITestPractitioner {
   facilityId: string
@@ -101,7 +101,6 @@ export async function composeAndSavePractitioners(
         'Cannot save practitioner as no facilityId exists to map practitioner to an office'
       )
     }
-
     const facility = await getFromFhir(
       `/Location?identifier=${encodeURIComponent(practitioner.facilityId)}`
     )
@@ -180,7 +179,7 @@ export async function composeAndSavePractitioners(
       ],
       username: practitioner.username,
       email: practitioner.email,
-      mobile: convertToMSISDN(practitioner.mobile, 'bgd'),
+      mobile: convertToMSISDN(practitioner.mobile, 'zmb'),
       passwordHash: pass.hash,
       salt: pass.salt,
       role: practitioner.role,

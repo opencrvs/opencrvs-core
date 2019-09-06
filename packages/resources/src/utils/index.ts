@@ -7,7 +7,7 @@ interface ISaltedHash {
   salt: string
 }
 
-export function generateRandomPassowrd(demoUser?: boolean) {
+export function generateRandomPassword(demoUser?: boolean) {
   if (!!demoUser) {
     return 'test'
   }

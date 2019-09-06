@@ -1,11 +1,11 @@
-import { convertToMSISDN, generateRandomPassowrd } from '@resources/utils'
+import { convertToMSISDN, generateRandomPassword } from '@resources/utils'
 
 describe('Check password generator', () => {
   it('generates a hardcoded password for demo user', () => {
-    expect(generateRandomPassowrd(true)).toEqual('test')
+    expect(generateRandomPassword(true)).toEqual('test')
   })
   it('generates a 6 chars length password for other users', () => {
-    expect(generateRandomPassowrd(false)).toHaveLength(6)
+    expect(generateRandomPassword(false)).toHaveLength(6)
   })
 })
 
