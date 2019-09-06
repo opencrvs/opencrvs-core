@@ -46,7 +46,8 @@ import { getLanguage } from '@register/i18n/selectors'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
-  IntlShape
+  IntlShape,
+  MessageDescriptor
 } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -68,7 +69,8 @@ import {
   Event,
   Section,
   BirthSection,
-  IFormTag
+  IFormTag,
+  IFormSectionGroup
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
@@ -485,26 +487,158 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  isVisibleField(field: IFormField, section: IFormSection) {
+    const { draft, offlineResources } = this.props
+    const conditionalActions = getConditionalActionsForField(
+      field,
+      draft.data[section.id] || {},
+      offlineResources,
+      draft.data
+    )
+    return !conditionalActions.includes('hide')
+  }
+
+  isViewOnly(field: IFormField) {
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
+      type => type === field.type
+    )
+  }
+
+  getFieldValueWithErrorMessage(
+    section: IFormSection,
+    field: IFormField,
+    errorsOnField: any
+  ) {
+    return (
+      <RequiredField id={`required_label_${section.id}_${field.name}`}>
+        {field.previewGroup && this.props.intl.formatMessage(field.label) + ' '}
+        {this.props.intl.formatMessage(
+          errorsOnField.message,
+          errorsOnField.props
+        )}
+      </RequiredField>
+    )
+  }
+
+  getPreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    fieldLabel: MessageDescriptor,
+    fieldName: string,
+    value: IFormFieldValue | JSX.Element | undefined
+  ) {
+    const { intl } = this.props
+
+    return {
+      label: intl.formatMessage(fieldLabel),
+      value,
+      action: {
+        id: `btn_change_${section.id}_${fieldName}`,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          this.editLinkClickHandler(section.id, group.id, fieldName)
+        }
+      }
+    }
+  }
+
+  getPreviewGroupsField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    visitedTags: string[],
+    errorsOnFields: any
+  ) {
+    const { intl, draft, offlineResources, language } = this.props
+
+    if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
+      visitedTags.push(field.previewGroup)
+
+      const baseTag = field.previewGroup
+      const taggedFields = group.fields.filter(
+        field =>
+          this.isVisibleField(field, section) &&
+          !this.isViewOnly(field) &&
+          field.previewGroup === baseTag
+      )
+
+      const tagDef =
+        (group.previewGroups &&
+          (group.previewGroups.filter(
+            previewGroup => previewGroup.id === baseTag
+          ) as IFormTag[])) ||
+        []
+
+      const values = taggedFields
+        .map(field => {
+          const errorsOnField = errorsOnFields[section.id][field.name]
+
+          return errorsOnField.length > 0
+            ? this.getFieldValueWithErrorMessage(
+                section,
+                field,
+                errorsOnField[0]
+              )
+            : renderValue(
+                draft,
+                section,
+                field,
+                intl,
+                offlineResources,
+                language
+              )
+        })
+        .filter(value => value)
+
+      let completeValue = values[0]
+      values.shift()
+      values.forEach(
+        value =>
+          (completeValue = (
+            <>
+              {completeValue}
+              <br />
+              {value}
+            </>
+          ))
+      )
+
+      return (
+        (tagDef[0] &&
+          this.getPreviewField(
+            section,
+            group,
+            tagDef[0].label,
+            tagDef[0].fieldToRedirect || '',
+            completeValue
+          )) ||
+        null
+      )
+    }
+  }
+
+  getSinglePreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    errorsOnFields: any
+  ) {
+    const { intl, draft, offlineResources, language } = this.props
+    const errorsOnField = errorsOnFields[section.id][field.name]
+
+    const value =
+      errorsOnField.length > 0
+        ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+        : renderValue(draft, section, field, intl, offlineResources, language)
+
+    return this.getPreviewField(section, group, field.label, field.name, value)
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: any
   ) => {
-    const { intl, draft, offlineResources, language } = this.props
-    const isVisibleField = (field: IFormField, section: IFormSection) => {
-      const conditionalActions = getConditionalActionsForField(
-        field,
-        draft.data[section.id] || {},
-        offlineResources,
-        draft.data
-      )
-      return !conditionalActions.includes('hide')
-    }
-
-    const isViewOnly = (field: IFormField) => {
-      return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
-        type => type === field.type
-      )
-    }
+    const { intl, draft } = this.props
 
     return formSections.map(section => {
       let items: any[] = []
@@ -517,138 +651,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .concat(
             group.fields
               .filter(
-                field => isVisibleField(field, section) && !isViewOnly(field)
+                field =>
+                  this.isVisibleField(field, section) && !this.isViewOnly(field)
               )
               .map(field => {
-                if (field.previewGroup) {
-                  if (!visitedTags.includes(field.previewGroup)) {
-                    visitedTags.push(field.previewGroup)
-
-                    const baseTag = field.previewGroup
-                    const taggedFields = group.fields.filter(
-                      field =>
-                        isVisibleField(field, section) &&
-                        !isViewOnly(field) &&
-                        field.previewGroup === baseTag
+                return field.previewGroup
+                  ? this.getPreviewGroupsField(
+                      section,
+                      group,
+                      field,
+                      visitedTags,
+                      errorsOnFields
                     )
-
-                    const tagDef =
-                      (group.previewGroups &&
-                        (group.previewGroups.filter(
-                          previewGroup => previewGroup.id === baseTag
-                        ) as IFormTag[])) ||
-                      []
-
-                    const values = taggedFields
-                      .map(field => {
-                        const errorsOnField =
-                          // @ts-ignore
-                          errorsOnFields[section.id][field.name]
-
-                        let value
-                        if (errorsOnField.length > 0) {
-                          value = (
-                            <RequiredField
-                              id={`required_label_${section.id}_${field.name}`}
-                            >
-                              {intl.formatMessage(field.label)}
-                              <span> </span>
-                              {intl.formatMessage(
-                                errorsOnField[0].message,
-                                errorsOnField[0].props
-                              )}
-                            </RequiredField>
-                          )
-                        } else {
-                          const renderedValue = renderValue(
-                            draft,
-                            section,
-                            field,
-                            intl,
-                            offlineResources,
-                            language
-                          )
-
-                          if (renderedValue) {
-                            value = <>{renderedValue}</>
-                          }
-                        }
-
-                        return value
-                      })
-                      .filter(value => value)
-
-                    let completeValue = values[0]
-                    values.shift()
-                    values.forEach(
-                      value =>
-                        (completeValue = (
-                          <>
-                            {completeValue}
-                            <br />
-                            {value}
-                          </>
-                        ))
+                  : this.getSinglePreviewField(
+                      section,
+                      group,
+                      field,
+                      errorsOnFields
                     )
-
-                    return {
-                      label:
-                        (tagDef[0] && intl.formatMessage(tagDef[0].label)) ||
-                        '',
-                      value: completeValue,
-                      action: {
-                        id: `btn_change_${section.id}_${baseTag}`,
-                        label: intl.formatMessage(buttonMessages.change),
-                        handler: () => {
-                          this.editLinkClickHandler(
-                            section.id,
-                            group.id,
-                            tagDef[0].fieldToRedirect
-                          )
-                        }
-                      }
-                    }
-                  }
-                } else {
-                  const errorsOnField =
-                    // @ts-ignore
-                    errorsOnFields[section.id][field.name]
-
-                  return {
-                    label: intl.formatMessage(field.label),
-                    value:
-                      errorsOnField.length > 0 ? (
-                        <RequiredField
-                          id={`required_label_${section.id}_${field.name}`}
-                        >
-                          {intl.formatMessage(
-                            errorsOnField[0].message,
-                            errorsOnField[0].props
-                          )}
-                        </RequiredField>
-                      ) : (
-                        renderValue(
-                          draft,
-                          section,
-                          field,
-                          intl,
-                          offlineResources,
-                          language
-                        )
-                      ),
-                    action: {
-                      id: `btn_change_${section.id}_${field.name}`,
-                      label: intl.formatMessage(buttonMessages.change),
-                      handler: () => {
-                        this.editLinkClickHandler(
-                          section.id,
-                          group.id,
-                          field.name
-                        )
-                      }
-                    }
-                  }
-                }
               })
           )
           .filter(item => item)
