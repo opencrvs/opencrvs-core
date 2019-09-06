@@ -1,6 +1,17 @@
 import { readFile } from 'fs'
 import { join } from 'path'
-import { IPDFTemplate } from '@opencrvs/register/src/pdfRenderer/transformer/types'
+import {
+  TDocumentDefinitions,
+  TFontFamily,
+  TFontFamilyTypes
+} from 'pdfmake/build/pdfmake'
+
+export interface IPDFTemplate {
+  definition: TDocumentDefinitions
+  fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
+  vfs: TFontFamily
+  transformers?: Array<any> // no point defining full types here as we don't use them
+}
 
 export interface ITemplates {
   receipt?: IPDFTemplate
