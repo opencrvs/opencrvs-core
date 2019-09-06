@@ -1,4 +1,4 @@
-import { TransformedData } from '@register/forms'
+import { TransformedData, IFormField } from '@register/forms'
 import { birthEventLocationMutationTransformer } from './child-mappings'
 
 describe('Child section mutation mapping related tests', () => {
@@ -18,11 +18,10 @@ describe('Child section mutation mapping related tests', () => {
       transformedData,
       draftData,
       'child',
-      // @ts-ignore
       {
         name: 'birthLocation',
         type: 'SEARCH_FIELD'
-      }
+      } as IFormField
     )
     expect(transformedData.child).toBeDefined()
     expect(transformedData.eventLocation._fhirID).toEqual(
