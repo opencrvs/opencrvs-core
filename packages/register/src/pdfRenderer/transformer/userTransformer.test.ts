@@ -76,13 +76,7 @@ describe("PDF template's logged-in user field related transformer tests", () => 
     })
     it('Returns empty signature', () => {
       const transformedValue = userTransformers.LocalRegistrarUserSignature(
-        {
-          ...userDetails,
-          localRegistrar: {
-            ...userDetails.localRegistrar,
-            signature: undefined
-          }
-        },
+        omit(userDetails, 'localRegistrar.signature') as IUserDetails,
         intl
       )
       expect(transformedValue).toEqual('')
