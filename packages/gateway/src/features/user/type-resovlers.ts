@@ -110,7 +110,7 @@ export const userTypeResolvers: GQLResolver = {
     async localRegistrar(userModel: IUserModelData, _, authHeader) {
       const scope = userModel.scope
 
-      if (!(scope && scope.includes('certify'))) {
+      if (!scope) {
         return null
       }
 
