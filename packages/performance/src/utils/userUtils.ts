@@ -49,6 +49,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
       status: primaryOffice.status
     }
   }
+
   if (catchmentArea) {
     const areaWithLocations: GQLLocation[] = catchmentArea as GQLLocation[]
     const potentialCatchmentAreas = areaWithLocations.map(
