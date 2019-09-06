@@ -9,7 +9,7 @@ import { IUserDetails } from '@register/utils/userUtils'
 
 export const userTransformers: IFunctionTransformer = {
   /*
-    LocalRegistrarName provides the username of the loggedIn user.
+    LocalRegistrarUserName provides the username of the loggedIn user.
     format: '{firstName} {familyName}'
   */
   LocalRegistrarUserName: (data: TransformableData, intl: IntlShape) => {
