@@ -338,11 +338,18 @@ export interface GQLUser {
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   signature?: GQLSignature
+  localRegistrar: GQLLocalRegistrar
 }
 
 export interface GQLSignature {
   data?: string
   type?: string
+}
+
+export interface GQLLocalRegistrar {
+  name: Array<GQLHumanName | null>
+  role: string
+  signature?: GQLSignature
 }
 
 export interface GQLComment {
@@ -873,6 +880,7 @@ export interface GQLResolver {
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
   Signature?: GQLSignatureTypeResolver
+  LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Comment?: GQLCommentTypeResolver
   Certificate?: GQLCertificateTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2003,6 +2011,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
+  localRegistrar?: UserToLocalRegistrarResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2057,6 +2066,10 @@ export interface UserToSignatureResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface UserToLocalRegistrarResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLSignatureTypeResolver<TParent = any> {
   data?: SignatureToDataResolver<TParent>
   type?: SignatureToTypeResolver<TParent>
@@ -2067,6 +2080,27 @@ export interface SignatureToDataResolver<TParent = any, TResult = any> {
 }
 
 export interface SignatureToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLLocalRegistrarTypeResolver<TParent = any> {
+  name?: LocalRegistrarToNameResolver<TParent>
+  role?: LocalRegistrarToRoleResolver<TParent>
+  signature?: LocalRegistrarToSignatureResolver<TParent>
+}
+
+export interface LocalRegistrarToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocalRegistrarToRoleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocalRegistrarToSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

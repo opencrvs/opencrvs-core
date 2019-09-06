@@ -9,17 +9,20 @@ import { IUserDetails } from '@register/utils/userUtils'
 
 export const userTransformers: IFunctionTransformer = {
   /*
-    LoggedInUserName provides the username of the loggedIn user.
+    LocalRegistrarName provides the username of the loggedIn user.
     format: '{firstName} {familyName}'
   */
-  LoggedInUserName: (data: TransformableData, intl: IntlShape) => {
+  LocalRegistrarUserName: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
     const nameObj =
-      userDetails.name &&
-      (userDetails.name.find((storedName: GQLHumanName | null) => {
-        const name = storedName as GQLHumanName
-        return name.use === 'en' // TODO should be replaced with 'intl.locale' when userDetails will have proper data
-      }) as GQLHumanName)
+      userDetails.localRegistrar.name &&
+      (userDetails.localRegistrar.name.find(
+        (storedName: GQLHumanName | null) => {
+          const name = storedName as GQLHumanName
+          return name.use === 'en' // TODO should be replaced with 'intl.locale' when userDetails will have proper data
+        }
+      ) as GQLHumanName)
+
     return nameObj
       ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
       : ''
@@ -34,20 +37,23 @@ export const userTransformers: IFunctionTransformer = {
   },
 
   /*
-    LoggedInUserRole provides the branded role of the loggedIn user.
+    LocalRegistrarUserRole provides the branded role of the loggedIn user.
   */
-  LoggedInUserRole: (data: TransformableData, intl: IntlShape) => {
+  LocalRegistrarUserRole: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
-    return userDetails.role
-      ? intl.formatMessage(userMessages[userDetails.role])
+
+    return userDetails.localRegistrar.role
+      ? intl.formatMessage(userMessages[userDetails.localRegistrar.role])
       : ''
   },
 
   /*
-    LoggedInUserRole provides the branded role of the loggedIn user.
+    LocalRegistrarUserSignature provides the branded role of the loggedIn user.
   */
-  LoggedInUserSignature: (data: TransformableData, intl: IntlShape) => {
+  LocalRegistrarUserSignature: (data: TransformableData, intl: IntlShape) => {
     const userDetails = data as IUserDetails
-    return userDetails.signature ? userDetails.signature.data || '' : ''
+    return userDetails.localRegistrar.signature
+      ? userDetails.localRegistrar.signature.data || ''
+      : ''
   }
 }

@@ -1904,8 +1904,20 @@ export const userDetails = {
       ]
     }
   ],
-  signature: {
-    data: `data:image/png;base64,${validImageB64String}`
+  localRegistrar: {
+    role: 'LOCAL_REGISTRAR',
+    signature: {
+      data: `data:image/png;base64,${validImageB64String}`,
+      type: 'image/png'
+    },
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Mohammad',
+        familyName: 'Ashraful',
+        __typename: 'HumanName'
+      }
+    ]
   }
 }
 
@@ -1997,7 +2009,23 @@ export const mockUserResponse = {
       },
       __typename: 'User',
       signature: {
-        data: `data:image/png;base64,${validImageB64String}`
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_REGISTRAR',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            firstNames: 'Mohammad',
+            familyName: 'Ashraful',
+            __typename: 'HumanName'
+          }
+        ]
       }
     }
   }
@@ -2065,8 +2093,22 @@ export const mockRegistrarUserResponse = {
       },
       role: 'LOCAL_REGISTRAR',
       signature: {
-        data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo',
+        data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_REGISTRAR',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            given: ['Mohammad'],
+            family: 'Ashraful'
+          }
+        ]
       },
       __typename: 'User'
     }

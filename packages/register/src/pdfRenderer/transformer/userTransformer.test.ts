@@ -2,23 +2,24 @@ import { userDetails, validImageB64String } from '@register/tests/util'
 import { userTransformers } from '@register/pdfRenderer/transformer/userTransformer'
 import { createIntl } from 'react-intl'
 import { omit } from 'lodash'
+import { IUserDetails } from '@register/utils/userUtils'
 
 describe("PDF template's logged-in user field related transformer tests", () => {
   const intl = createIntl({
     locale: 'en'
   })
 
-  describe('LoggedInUserName transformer tests', () => {
+  describe('LocalRegistrarUserName transformer tests', () => {
     it('Returns the name properly', () => {
-      const transformedValue = userTransformers.LoggedInUserName(
+      const transformedValue = userTransformers.LocalRegistrarUserName(
         userDetails,
         intl
       )
-      expect(transformedValue).toEqual('Shakib Al Hasan')
+      expect(transformedValue).toEqual('Mohammad Ashraful')
     })
     it('Returns empty name if no name found for given locale', () => {
-      const transformedValue = userTransformers.LoggedInUserName(
-        omit(userDetails, 'name'),
+      const transformedValue = userTransformers.LocalRegistrarUserName(
+        omit(userDetails, 'localRegistrar.name') as IUserDetails,
         intl
       )
       expect(transformedValue).toEqual('')
@@ -40,24 +41,24 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('')
     })
   })
-  describe('LoggedInUserRole transformer tests', () => {
+  describe('LocalRegistrarUserRole transformer tests', () => {
     it('Returns the role properly', () => {
       const intl = createIntl({
         locale: 'en',
         messages: {
-          FIELD_AGENT: 'Field Agent'
+          REGISTRAR: 'Registrar'
         }
       })
 
-      const transformedValue = userTransformers.LoggedInUserRole(
+      const transformedValue = userTransformers.LocalRegistrarUserRole(
         userDetails,
         intl
       )
-      expect(transformedValue).toEqual('Field Agent')
+      expect(transformedValue).toEqual('Registrar')
     })
     it('Returns empty role', () => {
-      const transformedValue = userTransformers.LoggedInUserRole(
-        omit(userDetails, 'role'),
+      const transformedValue = userTransformers.LocalRegistrarUserRole(
+        omit(userDetails, 'localRegistrar.role') as IUserDetails,
         intl
       )
       expect(transformedValue).toEqual('')
@@ -65,7 +66,7 @@ describe("PDF template's logged-in user field related transformer tests", () => 
   })
   describe('LoggedInUserSignature transformer tests', () => {
     it('Returns the signature data properly', () => {
-      const transformedValue = userTransformers.LoggedInUserSignature(
+      const transformedValue = userTransformers.LocalRegistrarUserSignature(
         userDetails,
         intl
       )
@@ -74,8 +75,14 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       )
     })
     it('Returns empty signature', () => {
-      const transformedValue = userTransformers.LoggedInUserSignature(
-        omit(userDetails, 'signature'),
+      const transformedValue = userTransformers.LocalRegistrarUserSignature(
+        {
+          ...userDetails,
+          localRegistrar: {
+            ...userDetails.localRegistrar,
+            signature: undefined
+          }
+        },
         intl
       )
       expect(transformedValue).toEqual('')

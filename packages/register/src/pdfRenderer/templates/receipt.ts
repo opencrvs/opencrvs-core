@@ -285,12 +285,12 @@ export const template: IPDFTemplate = {
     },
     {
       field: 'issuedByRole',
-      operation: 'LoggedInUserRole',
+      operation: 'LocalRegistrarUserRole',
       baseData: 'userdetails'
     },
     {
       field: 'issuedBy',
-      operation: 'LoggedInUserName',
+      operation: 'LocalRegistrarUserName',
       baseData: 'userdetails'
     },
     {

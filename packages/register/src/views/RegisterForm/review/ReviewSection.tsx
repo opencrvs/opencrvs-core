@@ -604,6 +604,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const applicantName = getDraftApplicantFullName(draft, intl.locale)
     const isDraft =
       this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+
     return (
       <FullBodyContent>
         <Row>

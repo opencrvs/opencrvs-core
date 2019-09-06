@@ -5,6 +5,7 @@ import {
 } from '@gateway/graphql/schema'
 import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
+import { IAuthHeader } from '@gateway/common-types'
 
 interface IUserModelData {
   _id: string
@@ -14,6 +15,7 @@ interface IUserModelData {
   email: string
   mobile: string
   status: string
+  role: string
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -52,6 +54,38 @@ export interface IUserSearchPayload {
   sortOrder: string
 }
 
+async function getPractitionerByOfficeId(
+  primaryOfficeId: string,
+  authHeader: IAuthHeader
+) {
+  const roleBundle: fhir.Bundle = await fetchFHIR(
+    `/PractitionerRole?location=${primaryOfficeId}&role=LOCAL_REGISTRAR`,
+    authHeader
+  )
+
+  const practitionerRole =
+    roleBundle &&
+    roleBundle.entry &&
+    roleBundle.entry &&
+    roleBundle.entry.length > 0 &&
+    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+
+  const roleCode =
+    practitionerRole &&
+    practitionerRole.code &&
+    practitionerRole.code.length > 0 &&
+    practitionerRole.code[0].coding &&
+    practitionerRole.code[0].coding[0].code
+
+  return {
+    practitionerId:
+      practitionerRole && practitionerRole.practitioner
+        ? practitionerRole.practitioner.reference
+        : undefined,
+    practitionerRole: roleCode || undefined
+  }
+}
+
 export const userTypeResolvers: GQLResolver = {
   User: {
     id(userModel: IUserModelData) {
@@ -73,56 +107,47 @@ export const userTypeResolvers: GQLResolver = {
         })
       )
     },
-    async signature(userModel: IUserModelData, _, authHeader) {
+    async localRegistrar(userModel: IUserModelData, _, authHeader) {
       const scope = userModel.scope
 
-      if (scope && scope.includes('certify')) {
-        let practitionerId
-        if (!scope.includes('register')) {
-          const roleBundle: fhir.Bundle = await fetchFHIR(
-            `/PractitionerRole?location=${
-              userModel.primaryOfficeId
-            }&role=LOCAL_REGISTRAR`,
-            authHeader
-          )
-
-          const practitionerRole =
-            roleBundle &&
-            roleBundle.entry &&
-            roleBundle.entry &&
-            roleBundle.entry.length > 0 &&
-            (roleBundle.entry[0].resource as fhir.PractitionerRole)
-
-          practitionerId =
-            practitionerRole &&
-            practitionerRole.practitioner &&
-            practitionerRole.practitioner.reference
-        } else if (scope.includes('register')) {
-          practitionerId = `Practitioner/${userModel.practitionerId}`
-        }
-
-        const practitioner: fhir.Practitioner =
-          practitionerId && (await fetchFHIR(`/${practitionerId}`, authHeader))
-
-        const signatureExtension =
-          practitioner &&
-          findExtension(
-            `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
-            practitioner.extension || []
-          )
-
-        const signature =
-          signatureExtension && signatureExtension.valueSignature
-
-        if (signature) {
-          return {
-            type: signature.contentType,
-            data: signature.blob
-          }
-        }
+      if (!(scope && scope.includes('certify'))) {
+        return null
       }
 
-      return null
+      const { practitionerId, practitionerRole } = !scope.includes('register')
+        ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
+        : {
+            practitionerId: `Practitioner/${userModel.practitionerId}`,
+            practitionerRole: userModel.role
+          }
+
+      if (!practitionerId) {
+        return
+      }
+
+      const practitioner: fhir.Practitioner = await fetchFHIR(
+        `/${practitionerId}`,
+        authHeader
+      )
+
+      if (!practitioner) {
+        return
+      }
+
+      const signatureExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
+        practitioner.extension || []
+      )
+
+      const signature = signatureExtension && signatureExtension.valueSignature
+      return {
+        role: practitionerRole,
+        name: practitioner.name,
+        signature: signature && {
+          type: signature.contentType,
+          data: signature.blob
+        }
+      }
     }
   }
 }

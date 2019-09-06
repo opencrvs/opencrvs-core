@@ -423,14 +423,18 @@ export const template: IPDFTemplate = {
     },
     {
       field: 'registrarSignature',
-      operation: 'LoggedInUserSignature',
+      operation: 'LocalRegistrarUserSignature',
       baseData: 'userdetails'
     },
     {
       field: 'registrarName',
-      operation: 'LoggedInUserName',
+      operation: 'LocalRegistrarUserName',
       baseData: 'userdetails'
     },
-    { field: 'role', operation: 'LoggedInUserRole', baseData: 'userdetails' }
+    {
+      field: 'role',
+      operation: 'LocalRegistrarUserRole',
+      baseData: 'userdetails'
+    }
   ]
 }
