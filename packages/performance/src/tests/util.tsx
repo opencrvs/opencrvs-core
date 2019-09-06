@@ -183,6 +183,21 @@ export const user = {
     }
   ],
   primaryOffice: { id: '0627c48a-c721-4ff9-bc6e-1fba59a2332a' },
+  localRegistrar: {
+    role: 'REGISTRAR',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Muhammad Abdul Muid',
+        familyName: 'Khan',
+        __typename: 'HumanName'
+      },
+      { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+    ],
+    signature: {
+      data: ''
+    }
+  },
   __typename: 'User'
 }
 
@@ -257,7 +272,22 @@ export const userDetails = {
         }
       ]
     }
-  ]
+  ],
+  localRegistrar: {
+    role: 'REGISTRAR',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Muhammad Abdul Muid',
+        familyName: 'Khan',
+        __typename: 'HumanName'
+      },
+      { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+    ],
+    signature: {
+      data: ''
+    }
+  }
 }
 
 export const mockUserResponse = {
